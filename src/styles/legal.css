@@ -1,0 +1,100 @@
+:root{
+  --bg0:#000000;
+  --bg1:#02040d;
+  --bg2:#060a18;
+  --text:#c7c3ff;
+  --muted:rgba(223,219,255,.85);
+  --card:rgba(3,5,11,.68);
+  --border:rgba(255,255,255,.14);
+  --glow:rgba(167,139,250,.35);
+  --max:980px;
+  --padX:clamp(14px,4vw,24px);
+  --padY:clamp(36px,7vw,72px);
+  --radius:clamp(18px,4vw,26px);
+  --sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html,body{width:100%;overflow-x:hidden}
+body{
+  min-height:100svh;
+  font-family:var(--sans);
+  color:var(--text);
+  background: radial-gradient(circle at 50% 18%, var(--bg2) 0%, var(--bg1) 42%, var(--bg0) 100%);
+}
+
+.universe-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;width:100%;height:100svh}
+.universe-bg::after{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:
+    linear-gradient(180deg, rgba(7,8,20,.12), rgba(7,8,20,0)),
+    url("/assets/lucid5.webp");
+  background-size:cover;background-position:center;background-repeat:no-repeat;
+  opacity:.85;
+}
+.universe-bg::before{
+  content:"";position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.72;
+  background-image:
+    radial-gradient(2px 2px at 5% 10%, rgba(255,255,255,.85), transparent 160%),
+    radial-gradient(2px 2px at 95% 15%, rgba(255,255,255,.95), transparent 160%),
+    radial-gradient(2px 2px at 8% 85%, rgba(255,255,255,.95), transparent 60%),
+    radial-gradient(2px 2px at 92% 80%, rgba(255,255,255,.95), transparent 60%),
+    radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,.65), transparent 55%),
+    radial-gradient(1px 1px at 74% 14%, rgba(255,255,255,.55), transparent 55%);
+  background-repeat:no-repeat;
+}
+
+.shell{position:relative;z-index:2;max-width:var(--max);margin:0 auto;padding:var(--padY) var(--padX) clamp(28px,6vw,56px)}
+
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  margin-bottom:clamp(14px,3.5vw,22px);
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{width:42px;height:42px;object-fit:contain;filter:drop-shadow(0 0 10px rgba(0,163,200,.25)) drop-shadow(0 0 16px rgba(187,0,255,.18))}
+.brand strong{letter-spacing:.12em;text-transform:uppercase;font-weight:800;font-size:13px;opacity:.95}
+
+.nav{display:flex;gap:10px;flex-wrap:wrap}
+.nav a{
+  text-decoration:none;color:rgba(232,236,241,.92);
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(10,8,24,.55);
+  padding:10px 12px;border-radius:999px;
+  font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;
+  transition:transform .18s ease, filter .18s ease, box-shadow .18s ease;
+}
+.nav a:hover{transform:translateY(-1px);filter:brightness(1.1);box-shadow:0 0 0 1px rgba(255,255,255,.08) inset, 0 0 22px var(--glow)}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:clamp(18px,4.5vw,28px);
+  backdrop-filter: blur(8px) saturate(160%);
+  -webkit-backdrop-filter: blur(8px) saturate(160%);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.06) inset, 0 18px 40px rgba(0,0,0,.55);
+}
+
+h1{font-size:clamp(26px,5vw,40px);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+h2{font-size:clamp(18px,3.6vw,22px);margin-top:22px;margin-bottom:10px;letter-spacing:.04em}
+p,li{color:var(--muted);line-height:1.7;font-size:clamp(15px,3.6vw,17px)}
+ul{padding-left:18px}
+li{margin:8px 0}
+
+.kicker{opacity:.9;color:rgba(255,255,255,.92);font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:12px;margin-bottom:12px}
+.meta{margin-top:14px;font-size:13px;opacity:.85}
+
+.footer{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.footer .links{display:flex;gap:10px;flex-wrap:wrap}
+.footer a{color:rgba(232,236,241,.9);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.22)}
+.footer a:hover{filter:brightness(1.12)}
+
+@media (max-width: 520px){
+  .topbar{justify-content:center}
+  .footer{justify-content:center}
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important;scroll-behavior:auto !important}
+}

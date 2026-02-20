@@ -1,0 +1,107 @@
+---
+import "../../styles/converter.css";
+import CookieBanner from "../../components/CookieBanner.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
+const pageTitle = "VOLYNX Lab • Converter";
+const pageDescription = "Free image converter — convert to WebP, JPG, PNG or AVIF with quality control and resize options.";
+---
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content={pageDescription} />
+  <title>{pageTitle}</title>
+
+  <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="shortcut icon" href="/assets/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Volynx" />
+  <link rel="manifest" href="/assets/site.webmanifest" />
+</head>
+
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="pill" href="/">← Voltar</a>
+    </div>
+  </header>
+
+  <div class="brand-logo" aria-hidden="true">
+    <img src="/assets/wordmark.webp" alt="" class="brand-logo-img" />
+  </div>
+
+  <div class="brand-icon" aria-hidden="true">
+    <img src="/assets/volynx-icon.webp" alt="" class="volynx-eye-img" />
+  </div>
+
+  <main class="wrap">
+    <section class="card" aria-label="Image converter">
+      <div class="card__head">
+        <h1>Converter</h1>
+      </div>
+
+      <div id="drop" class="drop" role="region" aria-label="Drop zone">
+        <input id="file" type="file" accept="image/*" multiple aria-label="Select images" />
+        <div class="drop__inner" aria-hidden="true">
+          <div class="drop__title">Arraste imagens aqui</div>
+          <div class="drop__hint">ou clique para selecionar</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <label class="field">
+          <span>Formato</span>
+          <select id="format" aria-label="Output format">
+            <option value="webp" selected>WebP (recomendado)</option>
+            <option value="jpg">JPG</option>
+            <option value="png">PNG</option>
+            <option value="avif">AVIF (se suportado)</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Qualidade</span>
+          <input id="quality" type="range" min="40" max="95" value="82" aria-label="Quality" />
+          <em id="qualityVal" aria-live="polite">82</em>
+        </label>
+
+        <label class="field">
+          <span>Resize (largura máx)</span>
+          <select id="maxw" aria-label="Max width">
+            <option value="0" selected>Original</option>
+            <option value="3840">3840</option>
+            <option value="2560">2560</option>
+            <option value="1920">1920</option>
+            <option value="1280">1280</option>
+            <option value="1080">1080</option>
+          </select>
+        </label>
+
+        <div class="actions">
+          <button id="convert" class="btn">Converter</button>
+          <button id="zip" class="btn" disabled>Baixar ZIP</button>
+          <button id="clear" class="btn">Limpar</button>
+        </div>
+      </div>
+
+      <div class="listHead">
+        <div>Arquivos</div>
+        <div id="stats" class="stats" aria-live="polite"></div>
+      </div>
+
+      <ul id="list" class="list" aria-label="File list"></ul>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script type="module" src="/volynx-lab/app.js"></script>
+
+  <SiteFooter />
+  <CookieBanner />
+</body>
+</html>

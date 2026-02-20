@@ -1,0 +1,73 @@
+---
+// SiteFooter — universal legal footer strip for all Volynx pages
+---
+
+<footer class="vx-site-footer" role="contentinfo">
+  <div class="vx-site-footer__inner">
+    <span class="vx-site-footer__copy">© <span id="vxFooterYear"></span> VOLYNX</span>
+    <nav class="vx-site-footer__links" aria-label="Legal links">
+      <a href="/">Home</a>
+      <a href="/about/">About</a>
+      <a href="/services/">Services</a>
+      <a href="/products/">Products</a>
+      <a href="/contact/">Contact</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/disclaimer/">Disclaimer</a>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .vx-site-footer {
+    width: 100%;
+    background: rgba(2, 4, 13, 0.72);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 18px 24px;
+  }
+  .vx-site-footer__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .vx-site-footer__copy {
+    font-size: 12px;
+    color: rgba(200, 205, 255, 0.45);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+  .vx-site-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+  }
+  .vx-site-footer__links a {
+    font-size: 12px;
+    color: rgba(200, 205, 255, 0.50);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: color 0.15s;
+    white-space: nowrap;
+  }
+  .vx-site-footer__links a:hover {
+    color: rgba(200, 245, 255, 0.85);
+  }
+  @media (max-width: 600px) {
+    .vx-site-footer__inner {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>
+
+<script>
+  const el = document.getElementById("vxFooterYear");
+  if (el) el.textContent = String(new Date().getFullYear());
+</script>

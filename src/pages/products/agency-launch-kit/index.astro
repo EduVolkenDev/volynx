@@ -1,0 +1,411 @@
+---
+import CookieBanner from "../../../components/CookieBanner.astro";
+import SiteFooter from "../../../components/SiteFooter.astro";
+const pageTitle = "VOLYNX — Agency Launch Kit";
+const pageDescription = "Website + proposal/SOW/onboarding pack to close faster and reduce scope chaos.";
+---
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,date=no,address=no,email=no" />
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDescription} />
+  <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="shortcut icon" href="/assets/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Volynx" />
+  <link rel="manifest" href="/assets/site.webmanifest" />
+
+  <style>
+    /* ===== CUSTOM PROPERTIES ===== */
+    :root {
+      --holo-cyan: #00d4ff;
+      --holo-magenta: #ff006e;
+      --holo-yellow: #ffbe0b;
+      --holo-lime: #8bf900;
+      --bg-base: #0d0d12;
+      --bg-elevated: #16161d;
+      --bg-glass: rgba(22, 22, 29, 0.7);
+      --text-100: #ffffff;
+      --text-80: rgba(255, 255, 255, 0.8);
+      --text-60: rgba(255, 255, 255, 0.6);
+      --text-40: rgba(255, 255, 255, 0.4);
+      --border-subtle: rgba(255, 255, 255, 0.1);
+      --border-strong: rgba(255, 255, 255, 0.2);
+      --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px;
+      --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px;
+      --s-16: 64px; --s-20: 80px; --s-24: 96px;
+      --font-sans: system-ui, -apple-system, sans-serif;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --duration-fast: 200ms;
+      --duration-base: 300ms;
+      --duration-slow: 500ms;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    body { font-family: var(--font-sans); background: var(--bg-base); color: var(--text-100); line-height: 1.6; overflow-x: hidden; }
+
+    .holo-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .holo-layer { position: absolute; inset: 0; opacity: 0.15; mix-blend-mode: screen; }
+    .layer-1 { background: radial-gradient(circle at 20% 50%, var(--holo-cyan) 0%, transparent 50%), radial-gradient(circle at 80% 80%, var(--holo-magenta) 0%, transparent 50%); animation: holoShift1 20s ease-in-out infinite; }
+    .layer-2 { background: radial-gradient(circle at 60% 20%, var(--holo-yellow) 0%, transparent 50%), radial-gradient(circle at 40% 90%, var(--holo-lime) 0%, transparent 50%); animation: holoShift2 25s ease-in-out infinite; }
+    .layer-3 { background: linear-gradient(45deg, transparent 0%, rgba(0,212,255,0.1) 25%, transparent 50%, rgba(255,0,110,0.1) 75%, transparent 100%); background-size: 400% 400%; animation: gradientWave 15s ease infinite; }
+    .holo-layer::before { content: ''; position: absolute; inset: -100%; background: conic-gradient(from 0deg, var(--holo-magenta), aqua, transparent, var(--holo-magenta), var(--holo-cyan), var(--holo-magenta), transparent, aqua, var(--holo-magenta), aqua, transparent); animation: rotateBorder 40s linear infinite; opacity: 0.5; }
+
+    @keyframes holoShift1 { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(30px, -30px) rotate(5deg); } }
+    @keyframes holoShift2 { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(-40px, 40px) rotate(-5deg); } }
+    @keyframes gradientWave { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+    .scan-lines { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.015) 2px, rgba(255,255,255,0.015) 4px); opacity: 0.5; }
+
+    .nav-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--bg-glass); backdrop-filter: blur(24px) saturate(180%); border-bottom: 1px solid var(--border-subtle); }
+    .nav-wrap { max-width: 1400px; margin: 0 auto; padding: var(--s-4) var(--s-6); display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: var(--s-3); text-decoration: none; color: var(--text-100); font-weight: 700; letter-spacing: 1px; z-index: 101; }
+    .brand-icon { width: 28px; height: 28px; color: var(--holo-cyan); transition: transform var(--duration-base) var(--ease-out); }
+    .brand:hover .brand-icon { transform: rotate(180deg); }
+    .brand-name { font-size: 16px; }
+
+    .menu-toggle { display: flex; flex-direction: column; gap: 5px; width: 32px; height: 32px; background: none; border: none; cursor: pointer; padding: 0; z-index: 101; }
+    .menu-toggle span { width: 100%; height: 2px; background: var(--text-100); border-radius: 2px; transition: all var(--duration-base) var(--ease-out); }
+    .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .menu-toggle.active span:nth-child(2) { transform: rotate(-45deg) translate(2px, -2px); }
+
+    .main-nav { position: fixed; top: 65px; left: 0; right: 0; background: var(--bg-glass); backdrop-filter: blur(24px) saturate(180%); border-bottom: 1px solid var(--border-subtle); padding: var(--s-6); display: flex; flex-direction: column; gap: var(--s-2); transform: translateY(-120%); opacity: 0; transition: all var(--duration-base) var(--ease-out); }
+    .main-nav.active { transform: translateY(0); opacity: 1; }
+    .nav-item { padding: var(--s-4); color: var(--text-80); text-decoration: none; border-radius: 8px; border: 1px solid transparent; transition: all var(--duration-fast) var(--ease-out); font-size: 15px; }
+    .nav-item:hover { color: var(--text-100); background: rgba(255,255,255,0.05); border-color: var(--border-subtle); }
+
+    .content-main { position: relative; z-index: 10; padding-top: 65px; }
+
+    .hero { padding: var(--s-24) var(--s-6); position: relative; }
+    .hero-inner { max-width: 900px; margin: 0 auto; }
+    .hero-tag { display: inline-flex; align-items: center; gap: var(--s-2); padding: var(--s-2) var(--s-4); background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle); border-radius: 100px; font-size: 12px; letter-spacing: 1.5px; font-weight: 700; color: var(--holo-cyan); margin-bottom: var(--s-8); }
+    .tag-dot { width: 6px; height: 6px; background: var(--holo-cyan); border-radius: 50%; box-shadow: 0 0 10px var(--holo-cyan); animation: dotPulse 2s ease-in-out infinite; }
+    @keyframes dotPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    .hero-heading { font-size: clamp(40px, 12vw, 90px); font-weight: 900; line-height: 1; margin-bottom: var(--s-8); display: flex; flex-direction: column; gap: var(--s-2); }
+    .heading-line { position: relative; display: block; }
+    .holographic { background: linear-gradient(90deg, var(--holo-cyan), var(--holo-magenta), var(--holo-yellow), var(--holo-cyan)); background-size: 200% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: holoText 8s linear infinite; filter: drop-shadow(0 0 30px rgba(0,212,255,0.5)); }
+    @keyframes holoText { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+
+    .hero-lead { font-size: clamp(16px, 3vw, 22px); color: var(--text-80); max-width: 700px; margin-bottom: var(--s-8); line-height: 1.6; }
+    .hero-badges { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-bottom: var(--s-10); }
+    .badge { display: inline-flex; align-items: center; gap: var(--s-2); padding: var(--s-2) var(--s-4); background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 100px; font-size: 13px; color: var(--text-60); transition: all var(--duration-fast) var(--ease-out); }
+    .badge:hover { background: rgba(255,255,255,0.08); border-color: var(--border-strong); color: var(--text-80); }
+    .badge-icon { width: 12px; height: 12px; color: var(--holo-cyan); }
+    .hero-cta { display: flex; flex-wrap: wrap; gap: var(--s-4); margin-bottom: var(--s-12); }
+
+    .btn { display: inline-flex; align-items: center; gap: var(--s-2); padding: var(--s-4) var(--s-6); border-radius: 10px; font-size: 15px; font-weight: 600; text-decoration: none; transition: all var(--duration-base) var(--ease-out); cursor: pointer; border: 2px solid transparent; }
+    .btn-primary { background: var(--text-100); color: var(--bg-base); border-color: var(--text-100); }
+    .btn-primary:hover { background: transparent; color: var(--text-100); box-shadow: 0 0 30px rgba(255,255,255,0.3); }
+    .btn-ghost { background: transparent; color: var(--text-80); border-color: var(--border-strong); }
+    .btn-ghost:hover { background: rgba(255,255,255,0.1); color: var(--text-100); border-color: var(--text-100); }
+    .btn-outline { background: transparent; color: var(--text-80); border-color: var(--border-strong); }
+    .btn-outline:hover { background: var(--text-100); color: var(--bg-base); border-color: var(--text-100); }
+    .btn-lg { padding: var(--s-5) var(--s-10); font-size: 17px; }
+    .btn-arrow { width: 16px; height: 16px; transition: transform var(--duration-fast) var(--ease-out); }
+    .btn:hover .btn-arrow { transform: translateX(3px); }
+
+    .hero-note { display: flex; gap: var(--s-4); padding: var(--s-5); background: rgba(255,190,11,0.05); border: 1px solid rgba(255,190,11,0.2); border-radius: 12px; }
+    .note-icon { width: 20px; height: 20px; color: var(--holo-yellow); flex-shrink: 0; }
+    .hero-note p { font-size: 14px; color: var(--text-80); margin: 0; }
+
+    .section { padding: var(--s-20) var(--s-6); }
+    .section-inner { max-width: 1200px; margin: 0 auto; }
+    .section-head { text-align: center; margin-bottom: var(--s-12); }
+    .section-title { font-size: clamp(32px, 6vw, 56px); font-weight: 900; margin-bottom: var(--s-4); position: relative; display: inline-flex; align-items: center; gap: var(--s-4); }
+    .title-bar { width: 40px; height: 4px; background: linear-gradient(90deg, var(--holo-cyan), var(--holo-magenta)); border-radius: 4px; }
+    .section-lead { font-size: clamp(16px, 3vw, 18px); color: var(--text-60); max-width: 600px; margin: 0 auto; }
+
+    .grid { display: grid; gap: var(--s-8); }
+    .grid-2 { grid-template-columns: 1fr; }
+    .grid-3 { grid-template-columns: 1fr; }
+
+    .feature-box { background: var(--bg-glass); backdrop-filter: blur(10px); border: 1px solid var(--border-subtle); border-radius: 16px; padding: var(--s-8); transition: all var(--duration-base) var(--ease-out); }
+    .feature-box:hover { border-color: var(--border-strong); box-shadow: 0 8px 32px rgba(0,0,0,0.3); transform: translateY(-4px); }
+    .feature-header { display: flex; align-items: center; gap: var(--s-4); margin-bottom: var(--s-6); }
+    .feature-num { width: 48px; height: 48px; display: grid; place-items: center; background: linear-gradient(135deg, var(--holo-cyan), var(--holo-magenta)); border-radius: 12px; font-size: 18px; font-weight: 900; color: var(--bg-base); }
+    .feature-title { font-size: clamp(20px, 4vw, 26px); font-weight: 800; }
+    .feature-list { list-style: none; display: flex; flex-direction: column; gap: var(--s-4); }
+    .feature-list li { display: flex; align-items: flex-start; gap: var(--s-3); color: var(--text-80); font-size: clamp(14px, 2.5vw, 16px); line-height: 1.6; }
+    .list-check { width: 18px; height: 18px; color: var(--holo-lime); flex-shrink: 0; margin-top: 2px; }
+
+    .price-card { position: relative; background: var(--bg-glass); backdrop-filter: blur(10px); border: 2px solid var(--border-subtle); border-radius: 20px; padding: var(--s-10); display: flex; flex-direction: column; transition: all var(--duration-base) var(--ease-out); }
+    .price-card:hover { border-color: var(--border-strong); box-shadow: 0 12px 48px rgba(0,0,0,0.4); transform: translateY(-6px); }
+    .price-featured { border-color: var(--holo-cyan); background: linear-gradient(135deg, rgba(0,212,255,0.05), rgba(255,0,110,0.05)); }
+    .price-featured:hover { box-shadow: 0 12px 48px rgba(0,212,255,0.3); }
+    .featured-label { position: absolute; top: var(--s-5); right: var(--s-5); display: flex; align-items: center; gap: var(--s-2); padding: var(--s-2) var(--s-4); background: linear-gradient(135deg, var(--holo-cyan), var(--holo-magenta)); border-radius: 100px; font-size: 10px; font-weight: 800; letter-spacing: 1px; color: var(--bg-base); }
+    .featured-label svg { width: 12px; height: 12px; }
+    .price-tag { display: inline-block; padding: var(--s-2) var(--s-3); background: rgba(255,255,255,0.1); border-radius: 6px; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: var(--text-60); margin-bottom: var(--s-6); width: fit-content; }
+    .price-value { display: flex; align-items: baseline; gap: var(--s-1); margin-bottom: var(--s-4); }
+    .price-currency { font-size: 18px; font-weight: 700; color: var(--text-60); }
+    .price-amount { font-size: clamp(36px, 6vw, 48px); font-weight: 900; background: linear-gradient(135deg, var(--text-100), var(--text-60)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .price-name { font-size: clamp(22px, 4vw, 28px); font-weight: 800; margin-bottom: var(--s-6); }
+    .price-features { list-style: none; display: flex; flex-direction: column; gap: var(--s-3); margin-bottom: var(--s-8); flex: 1; }
+    .price-features li { color: var(--text-80); font-size: 15px; padding-left: var(--s-6); position: relative; }
+    .price-features li::before { content: ''; position: absolute; left: 0; top: 8px; width: 4px; height: 4px; background: var(--holo-cyan); border-radius: 50%; }
+
+    .faq-list { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--s-4); }
+    .faq-accordion { background: var(--bg-glass); backdrop-filter: blur(10px); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; transition: all var(--duration-base) var(--ease-out); }
+    .faq-accordion:hover { border-color: var(--border-strong); }
+    .faq-accordion[open] { border-color: var(--holo-cyan); }
+    .faq-q { display: flex; align-items: center; justify-content: space-between; padding: var(--s-5); font-size: clamp(15px, 3vw, 17px); font-weight: 700; color: var(--text-100); cursor: pointer; list-style: none; user-select: none; }
+    .faq-q::-webkit-details-marker { display: none; }
+    .faq-icon { width: 20px; height: 20px; color: var(--text-60); transition: transform var(--duration-base) var(--ease-out); flex-shrink: 0; }
+    .faq-accordion[open] .faq-icon { transform: rotate(180deg); }
+    .faq-a { padding: 0 var(--s-5) var(--s-5); color: var(--text-80); font-size: 15px; line-height: 1.6; }
+
+    .cta-final { padding: var(--s-24) var(--s-6); }
+    .cta-box { max-width: 900px; margin: 0 auto; background: var(--bg-glass); backdrop-filter: blur(20px); border: 2px solid var(--border-subtle); border-radius: 24px; padding: var(--s-16); text-align: center; position: relative; overflow: hidden; }
+    .cta-box::before { content: ''; position: absolute; inset: -100%; background: conic-gradient(from 0deg, transparent, var(--holo-cyan), transparent, var(--holo-magenta), transparent); animation: rotateBorder 10s linear infinite; opacity: 0.2; }
+    @keyframes rotateBorder { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .cta-content { position: relative; z-index: 1; }
+    .cta-heading { font-size: clamp(28px, 6vw, 48px); font-weight: 900; margin-bottom: var(--s-4); }
+    .cta-text { font-size: clamp(16px, 3vw, 18px); color: var(--text-80); max-width: 500px; margin: 0 auto var(--s-8); }
+
+    @media (min-width: 768px) {
+      .menu-toggle { display: none; }
+      .main-nav { position: static; flex-direction: row; gap: var(--s-1); padding: 0; transform: none; opacity: 1; background: none; border: none; }
+      .nav-item { font-size: 14px; }
+      .grid-2 { grid-template-columns: repeat(2, 1fr); }
+      .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1024px) { .grid-3 { grid-template-columns: repeat(3, 1fr); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
+    *:focus-visible { outline: 2px solid var(--holo-cyan); outline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <div class="holo-bg" aria-hidden="true">
+    <div class="holo-layer layer-1"></div>
+    <div class="holo-layer layer-2"></div>
+    <div class="holo-layer layer-3"></div>
+  </div>
+  <div class="scan-lines" aria-hidden="true"></div>
+
+  <header class="nav-header" aria-label="VOLYNX menu">
+    <div class="nav-wrap">
+      <a href="/" class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+            <polyline points="2 17 12 22 22 17"/>
+            <polyline points="2 12 12 17 22 12"/>
+          </svg>
+        </div>
+        <span class="brand-name">VOLYNX</span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+      <nav class="main-nav" id="mainNav" aria-label="Primary navigation">
+        <a href="/volynx-lab/" class="nav-item">Volynx.Lab</a>
+        <a href="/products/" class="nav-item">Products</a>
+        <a href="/" class="nav-item">Home</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="content-main">
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="hero-tag">
+          <span class="tag-dot"></span>
+          <span class="tag-text">AGENCY KIT</span>
+        </div>
+        <h1 class="hero-heading">
+          <span class="heading-line" data-text="Agency">Agency</span>
+          <span class="heading-line holographic" data-text="Launch Kit">Launch Kit</span>
+        </h1>
+        <p class="hero-lead">Website + proposal/SOW/onboarding pack to close faster and reduce scope chaos.</p>
+        <div class="hero-badges">
+          <span class="badge">
+            <svg class="badge-icon" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="8"/></svg>
+            Instant download
+          </span>
+          <span class="badge">
+            <svg class="badge-icon" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="8"/></svg>
+            Static deploy
+          </span>
+          <span class="badge">
+            <svg class="badge-icon" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="8"/></svg>
+            Docs included
+          </span>
+        </div>
+        <div class="hero-cta">
+          <a href="#licenses" class="btn btn-primary">
+            Buy Now
+            <svg class="btn-arrow" viewBox="0 0 20 20" fill="currentColor"><path d="M7 3l7 7-7 7"/></svg>
+          </a>
+          <a href="/products/" class="btn btn-ghost">← Back to Products</a>
+        </div>
+        <div class="hero-note">
+          <svg class="note-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <p>Troque os links de compra abaixo pelo seu checkout real.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section highlights">
+      <div class="section-inner">
+        <div class="section-head">
+          <h2 class="section-title"><span class="title-bar"></span>Highlights</h2>
+        </div>
+        <div class="grid grid-2">
+          <article class="feature-box">
+            <div class="feature-header">
+              <div class="feature-num">01</div>
+              <h3 class="feature-title">What You Get</h3>
+            </div>
+            <ul class="feature-list">
+              <li><svg class="list-check" viewBox="0 0 20 20" fill="currentColor"><path d="M0 11l2-2 5 5L18 3l2 2L7 18z"/></svg>Site de agência com posicionamento claro (sem textão)</li>
+              <li><svg class="list-check" viewBox="0 0 20 20" fill="currentColor"><path d="M0 11l2-2 5 5L18 3l2 2L7 18z"/></svg>Templates: proposal + SOW + onboarding</li>
+              <li><svg class="list-check" viewBox="0 0 20 20" fill="currentColor"><path d="M0 11l2-2 5 5L18 3l2 2L7 18z"/></svg>Regras de revisão/aceite (anti-scope creep)</li>
+            </ul>
+          </article>
+          <article class="feature-box">
+            <div class="feature-header">
+              <div class="feature-num">02</div>
+              <h3 class="feature-title">What's Inside</h3>
+            </div>
+            <ul class="feature-list">
+              <li><svg class="list-check" viewBox="0 0 20 20" fill="currentColor"><path d="M0 11l2-2 5 5L18 3l2 2L7 18z"/></svg>Site estático (HTML/CSS) com estrutura de serviços</li>
+              <li><svg class="list-check" viewBox="0 0 20 20" fill="currentColor"><path d="M0 11l2-2 5 5L18 3l2 2L7 18z"/></svg>Template de proposal (copiar/colar)</li>
+              <li><svg class="list-check" viewBox="0 0 20 20" fill="currentColor"><path d="M0 11l2-2 5 5L18 3l2 2L7 18z"/></svg>Template de SOW com escopo + fora do escopo</li>
+              <li><svg class="list-check" viewBox="0 0 20 20" fill="currentColor"><path d="M0 11l2-2 5 5L18 3l2 2L7 18z"/></svg>Checklist de onboarding + emails base</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section licenses" id="licenses">
+      <div class="section-inner">
+        <div class="section-head">
+          <h2 class="section-title"><span class="title-bar"></span>Choose Your License</h2>
+          <p class="section-lead">Escolha o nível de uso. Simples. Sem "letrinha miúda".</p>
+        </div>
+        <div class="grid grid-3">
+          <div class="price-card">
+            <div class="price-tag">STARTER</div>
+            <div class="price-value"><span class="price-currency">R$</span><span class="price-amount">249</span></div>
+            <h3 class="price-name">Personal</h3>
+            <ul class="price-features">
+              <li>Uso para sua agência</li>
+              <li>1 usuário</li>
+              <li>Sem redistribuição</li>
+            </ul>
+            <a href="#checkout-personal" class="btn btn-outline">Buy Personal</a>
+          </div>
+          <div class="price-card price-featured">
+            <div class="featured-label">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.5 6.5L19 8.5l-5 4.5 1.5 6.5L10 16l-5.5 3.5L6 13 1 8.5l6.5-1z"/></svg>
+              POPULAR
+            </div>
+            <div class="price-tag">PRO</div>
+            <div class="price-value"><span class="price-currency">R$</span><span class="price-amount">399</span></div>
+            <h3 class="price-name">Commercial</h3>
+            <ul class="price-features">
+              <li>Uso em clientes</li>
+              <li>Entrega final permitida</li>
+              <li>Sem revenda como template</li>
+            </ul>
+            <a href="#checkout-commercial" class="btn btn-primary">Buy Commercial</a>
+          </div>
+          <div class="price-card">
+            <div class="price-tag">ENTERPRISE</div>
+            <div class="price-value"><span class="price-currency">R$</span><span class="price-amount">699</span></div>
+            <h3 class="price-name">Studio</h3>
+            <ul class="price-features">
+              <li>Time/multi-seat</li>
+              <li>Uso interno recorrente</li>
+              <li>Updates prioritários</li>
+            </ul>
+            <a href="#checkout-studio" class="btn btn-outline">Buy Studio</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section faq">
+      <div class="section-inner">
+        <div class="section-head">
+          <h2 class="section-title"><span class="title-bar"></span>FAQ</h2>
+        </div>
+        <div class="faq-list">
+          <details class="faq-accordion" open>
+            <summary class="faq-q">
+              <span>Isso substitui contrato?</span>
+              <svg class="faq-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+            </summary>
+            <div class="faq-a">Não. É um kit de clareza (escopo/aceite/revisões). Para jurídico, consulte um profissional.</div>
+          </details>
+          <details class="faq-accordion">
+            <summary class="faq-q">
+              <span>Posso adaptar o texto para meu nicho?</span>
+              <svg class="faq-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+            </summary>
+            <div class="faq-a">Sim — inclusive é recomendado.</div>
+          </details>
+          <details class="faq-accordion">
+            <summary class="faq-q">
+              <span>Serve para freelancers?</span>
+              <svg class="faq-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+            </summary>
+            <div class="faq-a">Sim. Ajuda a padronizar proposta e reduzir retrabalho.</div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section cta-final">
+      <div class="cta-box">
+        <div class="cta-content">
+          <h2 class="cta-heading">Start Your Agency Right</h2>
+          <p class="cta-text">Profissionalismo desde o primeiro contato. Escolha sua licença agora.</p>
+          <a href="#licenses" class="btn btn-primary btn-lg">
+            Choose License
+            <svg class="btn-arrow" viewBox="0 0 20 20" fill="currentColor"><path d="M3 10l7-7 7 7M10 3v14"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const toggle = document.getElementById('menuToggle');
+    const nav = document.getElementById('mainNav');
+
+    toggle?.addEventListener('click', () => {
+      const isOpen = toggle.classList.toggle('active');
+      nav?.classList.toggle('active');
+      toggle.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href') ?? '');
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+          nav?.classList.remove('active');
+          toggle?.classList.remove('active');
+          toggle?.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+  </script>
+
+  <SiteFooter />
+  <CookieBanner />
+</body>
+</html>
