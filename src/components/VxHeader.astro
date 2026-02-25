@@ -1,0 +1,176 @@
+---
+interface Props {
+  mode?: "default" | "sections";
+  primaryCtaLabel?: string;
+  primaryCtaHref?: string;
+}
+const {
+  mode = "default",
+  primaryCtaLabel = "Entrar",
+  primaryCtaHref = "/login",
+} = Astro.props;
+---
+
+<header class="vxh" role="banner">
+  <div class="vxh__inner">
+    <a class="vxh__brand" href="/" aria-label="VOLYNX — ir para o início">
+      <img src="/assets/volynx-icon.webp" alt="VOLYNX" width="28" height="28" loading="eager" decoding="async" />
+      <span>VOLYNX</span>
+    </a>
+
+    {mode === "sections" && (
+      <nav class="vxh__nav" aria-label="Seções da página">
+        <a href="#curriculo">Currículo</a>
+        <a href="#metodo">Método</a>
+        <a href="#projetos">Projetos</a>
+        <a href="#faq">FAQ</a>
+        <a href="#acesso">Acesso</a>
+      </nav>
+    )}
+
+    <div class="vxh__actions">
+      <a class="vxh__cta" href={primaryCtaHref}>{primaryCtaLabel}</a>
+      <button class="vxh__burger" id="menuBtn" type="button" aria-label="Abrir menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <div class="vxh__mobile" id="mobileMenu" aria-hidden="true">
+    <div class="vxh__mobileInner">
+      {mode === "sections" && (
+        <nav aria-label="Seções — mobile">
+          <a href="#curriculo">Currículo</a>
+          <a href="#metodo">Método</a>
+          <a href="#projetos">Projetos</a>
+          <a href="#faq">FAQ</a>
+          <a href="#acesso">Acesso</a>
+        </nav>
+      )}
+      <a class="vxh__cta" href={primaryCtaHref}>{primaryCtaLabel}</a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .vxh {
+    position: fixed;
+    top: 0;
+    inset-inline: 0;
+    z-index: 900;
+    background: rgba(8, 6, 16, 0.88);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+  .vxh__inner {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .vxh__brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: #fff;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+  }
+  .vxh__brand img { border-radius: 6px; }
+  .vxh__nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+  .vxh__nav a {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    transition: color 0.15s, background 0.15s;
+  }
+  .vxh__nav a:hover { color: #fff; background: rgba(255, 255, 255, 0.07); }
+  .vxh__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+  }
+  .vxh__cta {
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: rgba(245, 231, 145, 0.18);
+    border: 1px solid rgba(245, 231, 145, 0.34);
+    color: rgba(255, 245, 180, 0.95);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+  .vxh__cta:hover { background: rgba(245, 231, 145, 0.26); }
+  .vxh__burger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 36px;
+    height: 36px;
+    padding: 6px;
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .vxh__burger span {
+    display: block;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.80);
+    border-radius: 2px;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+  .vxh__mobile {
+    display: none;
+    position: fixed;
+    inset: 58px 0 0;
+    background: rgba(6, 5, 16, 0.97);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 899;
+  }
+  .vxh__mobileInner {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .vxh__mobileInner nav { display: flex; flex-direction: column; gap: 4px; }
+  .vxh__mobileInner nav a {
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.80);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .vxh__mobileInner nav a:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.10); }
+  .vxh__mobileInner .vxh__cta { align-self: flex-start; margin-top: 8px; }
+
+  @media (max-width: 768px) {
+    .vxh__nav { display: none; }
+    .vxh__burger { display: flex; }
+  }
+</style>
