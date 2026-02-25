@@ -1,0 +1,211 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
+
+const title = "Products — VOLYNX";
+
+const products = [
+  {
+    name: "Agency Launch Kit",
+    slug: "agency-launch-kit",
+    badge: "Kit",
+    meta: "Brand • Pages • Copy",
+    desc: "Launch-ready assets for studios that want speed and consistency.",
+  },
+  {
+    name: "Portfolio Pro Kit",
+    slug: "portfolio-pro-kit",
+    badge: "Kit",
+    meta: "Sections • Motion • SEO",
+    desc: "A premium portfolio system designed to convert, not just look pretty.",
+  },
+  {
+    name: "SaaS Landing System",
+    slug: "saas-landing-system",
+    badge: "System",
+    meta: "Blocks • Variants • UI",
+    desc: "Conversion-first landing blocks that scale across offers.",
+  },
+  {
+    name: "IconIc*ons",
+    slug: "volynx-icons-store",
+    badge: "Icons",
+    meta: "Grid • Styles • Packs",
+    desc: "A curated icon store: sharp, consistent, brand-ready.",
+  },
+];
+---
+
+<BaseLayout title={title}>
+  <Header />
+
+  <main class="shell productsV2">
+    <section class="hero">
+      <h1>Products</h1>
+      <p class="sub">
+        Kits that ship. Systems that convert. Icons that don’t look like 2014.
+      </p>
+
+      <div class="toolbar" role="group" aria-label="Product tools">
+        <div class="search" aria-label="Search (UI only)">
+          <span class="hint" aria-hidden="true">⌘K</span>
+          <input placeholder="Search products…" disabled />
+        </div>
+
+        <div class="filters" aria-label="Quick links">
+          <a class="chip" href="/dev-hub/">Dev Hub</a>
+          <a class="chip" href="/pricing/">Pricing</a>
+          <a class="chip" href="/contact/">Contact</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid" aria-label="Product catalog">
+      {products.map((p) => (
+        <article class="card">
+          <div class="cardTop">
+            <span class="badge">{p.badge}</span>
+            <span class="meta">{p.meta}</span>
+          </div>
+
+          <h2>{p.name}</h2>
+          <p>{p.desc}</p>
+
+          <div class="metaRow">
+            <span class="small">Includes: {p.meta}</span>
+            <div class="ctaRow">
+              <a class="btn" href={`/products/${p.slug}/`}>View</a>
+              <a class="btn secondary" href="/contact/">Buy</a>
+            </div>
+          </div>
+        </article>
+      ))}
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<style>
+  @import "../../styles/home.css";
+  /* v2 skin (inline, pra não depender de arquivo extra) */
+  .productsV2 .hero { padding: 56px 0 22px; }
+  .productsV2 .sub { max-width: 70ch; opacity: .86; }
+
+  .productsV2 .toolbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin: 18px 0 10px;
+  }
+
+  .productsV2 .search {
+    flex: 1 1 280px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(10,12,20,.42);
+    backdrop-filter: blur(12px);
+  }
+  .productsV2 .search .hint { opacity: .6; font-size: 12px; }
+  .productsV2 .search input {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    opacity: .95;
+  }
+
+  .productsV2 .filters { display: flex; gap: 10px; flex-wrap: wrap; }
+  .productsV2 .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(0,0,0,.18);
+    text-decoration: none;
+    opacity: .92;
+  }
+
+  .productsV2 .grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 14px;
+    padding: 12px 0 70px;
+  }
+
+  .productsV2 .card {
+    grid-column: span 4;
+    border-radius: 24px;
+    padding: 18px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(10,12,20,.45);
+    backdrop-filter: blur(12px);
+    display: flex;
+    flex-direction: column;
+    min-height: 240px;
+  }
+
+  .productsV2 .cardTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .productsV2 .badge {
+    display: inline-flex;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.14);
+    font-size: 12px;
+    opacity: .9;
+  }
+
+  .productsV2 .meta { opacity: .75; font-size: 13px; }
+  .productsV2 h2 { margin: 12px 0 8px; }
+  .productsV2 p { margin: 0 0 14px; opacity: .86; }
+
+  .productsV2 .metaRow {
+    margin-top: auto;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid rgba(255,255,255,.06);
+    padding-top: 14px;
+  }
+
+  .productsV2 .small { opacity: .72; font-size: 13px; }
+
+  .productsV2 .ctaRow { display: flex; gap: 10px; }
+
+  .productsV2 .btn {
+    display: inline-flex;
+    justify-content: center;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.12);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .productsV2 .btn.secondary { opacity: .88; }
+
+  @media (max-width: 980px) {
+    .productsV2 .card { grid-column: span 6; }
+  }
+  @media (max-width: 640px) {
+    .productsV2 .card { grid-column: span 12; }
+    .productsV2 .ctaRow { flex-direction: column; width: 100%; }
+    .productsV2 .btn { width: 100%; }
+  }
+</style>

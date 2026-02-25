@@ -1,0 +1,634 @@
+---
+import "../styles/volynx-devjourney.css";
+import VxHeader from "../components/VxHeader.astro";
+import VxFooter from "../components/VxFooter.astro";
+---
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <meta content="#080610" name="theme-color" />
+  <title>Dev Journey • VOLYNX.Lab Education</title>
+  <meta name="description" content="Dev Journey: trilha prática, sem vídeo, com projetos reais e checklists. Gratuito — com login para salvar progresso, liberar blocos e emitir certificado por entrega." />
+  <meta property="og:title" content="Dev Journey • VOLYNX.Lab Education" />
+  <meta property="og:description" content="Trilha prática, sem vídeo, com projetos reais e checklists. Gratuito — com login para salvar progresso, liberar blocos e emitir certificado por entrega." />
+  <meta property="og:type" content="website" />
+  <meta content="index,follow" name="robots" />
+  <link rel="preload" as="image" href="/assets/stardust-galaxy.webp" />
+
+  <script is:inline>document.documentElement.classList.add('js');</script>
+</head>
+
+<body>
+  <div class="dust" aria-hidden="true"></div>
+  <a class="skip" href="#conteudo">Pular para o conteúdo</a>
+
+  <VxHeader mode="sections" primaryCtaLabel="Entrar / Criar conta" primaryCtaHref="/login" />
+
+  <!-- Modal (mantém estética do layout original; links reais ficam em /login e /signup) -->
+  <div class="modal" id="authModal" aria-hidden="true" role="dialog" aria-label="Acesso à plataforma">
+    <div class="modalCard">
+      <div class="modalHead">
+        <b>VOLYNX Access Gate</b>
+        <button class="xBtn" id="closeModal" type="button" aria-label="Fechar">✕</button>
+      </div>
+      <div class="modalBody">
+        <p style="margin:0;color:rgba(255,255,255,.80);line-height:1.6;">
+          O Dev Journey é <b>gratuito</b>. O login existe para salvar seu progresso, liberar checklists e habilitar
+          submissão + certificado por entrega.
+        </p>
+
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input id="email" type="email" placeholder="seuemail@exemplo.com" autocomplete="email" />
+        </div>
+        <div class="field">
+          <label for="pass">Senha</label>
+          <input id="pass" type="password" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+      </div>
+      <div class="modalFoot">
+        <div class="hint">
+          Aqui você troca “eu entendi” por “eu publiquei”.<br />
+          <b>UX simples:</b> login → trilha → checklist → entrega.
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+          <a class="btn ghost" href="/signup">Criar conta</a>
+          <a class="btn primary" href="/login">Entrar</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main id="conteudo">
+    <div class="container">
+      <!-- HERO -->
+      <section id="home" aria-label="Apresentação do curso" class="hero reveal" style="--d:1;">
+        <div class="heroGrid">
+          <div>
+            <div class="kicker"><i aria-hidden="true"></i> Dev Journey, sem ruído. Só execução.</div>
+            <h1>Faça seu primeiro projeto online — autoguiado, sem distrações e com entrega.</h1>
+            <p class="lead">
+              Trilha autoguiada (texto + arquivos + checklists), com projetos que viram portfólio. Você sai do “eu
+              entendi” direto para o “eu publiquei”.
+            </p>
+
+            <div class="ctaRow" style="margin-top:10px;">
+              <button class="btn primary" type="button" id="openLogin3">Começar agora (grátis)</button>
+              <a class="btn" href="#curriculo">Ver currículo</a>
+              <a class="btn ghost" href="#acesso">Como o login funciona</a>
+            </div>
+
+            <div class="heroNotice" style="margin-top:14px; padding: 12px 14px; border-radius: 16px; border: 1px solid rgba(255,255,255,.14); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); box-shadow: 0 0 0 1px rgba(0,219,255,.06), var(--shadow2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(8px);">
+              <b>Detalhe importante:</b> o curso é gratuito, mas requer login para liberar a experiência completa:
+              salvar progresso, liberar blocos, checklists e emissão de certificado por entrega.
+              <span style="color:rgba(255,255,255,.70)">Sem login você vê a vitrine; com login você roda a jornada.</span>
+            </div>
+
+            <div aria-label="Destaques" class="bullets" style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; margin: 20px 0 0;">
+              <div class="bulletCard">
+                <div aria-hidden="true" class="dot"></div>
+                <div>
+                  <b>Sprint com entregas</b><br />
+                  <span>Curto, direto e publicável. Se apareceu na tela, você aprendeu.</span>
+                </div>
+              </div>
+              <div class="bulletCard">
+                <div aria-hidden="true" class="dot"></div>
+                <div>
+                  <b>Portfólio first</b><br />
+                  <span>Entregas apresentáveis: landing + interação + mini-app (Pro e Bundle).</span>
+                </div>
+              </div>
+              <div class="bulletCard">
+                <div aria-hidden="true" class="dot"></div>
+                <div>
+                  <b>Autoguiado, sem enrolação</b><br />
+                  <span>Texto + exemplos + checklists. Método profissional e modo DEV do inicio ao fim!.</span>
+                </div>
+              </div>
+              <div class="bulletCard">
+                <div aria-hidden="true" class="dot"></div>
+                <div>
+                  <b>Acelerador de aprendizado e material para portfolio!</b><br />
+                  <span>Prompts prontos + checklist de validação. Você usa o que criou e escala de diferentes
+                    formas.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <aside aria-label="Resumo do programa" class="panel" style="position:relative; border-radius: var(--radius); border: 1px solid rgba(255,255,255,.12); background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.06), rgba(255,255,255,.035)); box-shadow: var(--shadow); padding: 20px; overflow: hidden; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(10px);">
+            <div aria-label="Selo VOLYNX" class="seal" style="position:absolute; top:8px; right:8px; width:62px; height:48px; border-radius:18px; background: rgba(97,186,230,0.22); box-shadow: 0 0 10px inset rgba(251,249,255,0.22), 0 0 14px rgba(0,219,255,.10); display:grid; place-items:center; overflow:hidden; border: 1px solid rgba(255,255,255,.12);">
+              <img alt="Olho oficial VOLYNX" src="/assets/oficial-volynx-eye.png" style="width:44px; height:44px; object-fit:contain; filter: drop-shadow(0 12px 18px rgba(0,0,0,.55));" />
+            </div>
+            <h3 style="font-size: var(--h3); margin: 4px 0 8px; font-family: var(--display);">O que você vai ter na mão</h3>
+            <p style="margin: 0 0 14px; color: var(--muted); font-size: 13.5px; line-height: 1.55;">Uma trilha que vira execução. E execução vira resultado. Simples, mas não simplista.</p>
+            <div class="stats" role="list" style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; margin-top:10px;">
+              <div class="stat" role="listitem">
+                <strong>Sprint guiada</strong>
+                <span>Blocos curtos + checkpoints (o que deve aparecer na tela).</span>
+              </div>
+              <div class="stat" role="listitem">
+                <strong>Entregas</strong>
+                <span>Social (7 dias), Pro (14 dias), Bundle (30 dias). Publicado e versionado.</span>
+              </div>
+              <div class="stat" role="listitem">
+                <strong>Checkpoints</strong>
+                <span>“Se deu certo” + “se deu erro” (debug sem adivinhação).</span>
+              </div>
+              <div class="stat" role="listitem">
+                <strong>Formato</strong>
+                <span>Sem vídeos longos e sem distraçōes, aqui o método é criar!. Texto + arquivos + checklists.</span>
+              </div>
+            </div>
+
+            <div aria-label="Tags do curso" class="mini" style="margin-top: 12px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.14); display:flex; flex-wrap:wrap; gap: 10px;">
+              <span class="tag">Social Sprint</span>
+              <span class="tag">HTML • CSS • JS</span>
+              <span class="tag">Checklists</span>
+              <span class="tag">Publicado</span>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- CURRÍCULO (conteúdo preservado) -->
+      <section aria-label="Trilha por blocos" class="reveal" id="curriculo" style="--d:2;">
+        <div class="sectionTitle">
+          <div>
+            <h2>Trilha por blocos (sem confusão)</h2>
+            <p>Você avança por entregas pequenas e visíveis. Se não aparece na tela, ainda não virou habilidade.
+              Selecione seu nível para ver os blocos incluídos:</p>
+          </div>
+          <div aria-label="Filtrar por plano" class="chips" role="tablist" style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center;">
+            <button class="chip active" data-filter="social" type="button">Social Sprint</button>
+            <button class="chip" data-filter="pro" type="button">Pro (Upgrade)</button>
+            <button class="chip" data-filter="bundle" type="button">Bundle</button>
+            <button class="chip" data-filter="all" type="button">Ver tudo</button>
+          </div>
+        </div>
+
+        <div aria-label="Blocos do Dev Journey" class="roadmap" style="display:grid; grid-template-columns: repeat(12, 1fr); gap: 14px; margin-top: 12px;">
+          <article class="blockCard" data-in="social pro bundle">
+            <div class="blockTop">
+              <span class="blockNum">Bloco 0</span>
+              <span class="badge">Start Here</span>
+            </div>
+            <h3>Setup + como estudar do jeito certo</h3>
+            <p class="muted">Ambiente pronto, pasta organizada e o método VOLYNX para sair de erros sem travar por horas.</p>
+            <ul class="mini">
+              <li>Editor + navegador + Live Server (o “porquê” e o “como”)</li>
+              <li>Checklist validável (você sabe quando está pronto)</li>
+              <li>Regras do certificado + links de submissão</li>
+            </ul>
+          </article>
+
+          <article class="blockCard" data-in="social pro bundle">
+            <div class="blockTop">
+              <span class="blockNum">Bloco 1</span>
+              <span class="badge">Fundamentos</span>
+            </div>
+            <h3>HTML + CSS + JS básico (com clique na tela)</h3>
+            <p class="muted">Primeiro projeto real: 3 arquivos conectados e uma interação funcionando na página (não só no console).</p>
+            <ul class="mini">
+              <li>Estrutura semântica + layout responsivo simples</li>
+              <li>Botões, formulário e feedback visível</li>
+              <li>Debug básico: console, erros comuns e correções</li>
+            </ul>
+          </article>
+
+          <article class="blockCard" data-in="social pro bundle">
+            <div class="blockTop">
+              <span class="blockNum">Bloco 2</span>
+              <span class="badge">JavaScript + DOM</span>
+            </div>
+            <h3>Interatividade de verdade</h3>
+            <p class="muted">Você aprende a manipular a página: eventos, validação, lógica e dados (inclui JSON com exemplos práticos).</p>
+            <ul class="mini">
+              <li>Tipos, operadores, funções e eventos</li>
+              <li>DOM: selecionar, alterar, criar elementos</li>
+              <li>JSON: o que é, por que existe e onde você usa</li>
+            </ul>
+          </article>
+
+          <article class="blockCard" data-in="pro bundle">
+            <div class="blockTop">
+              <span class="blockNum">Bloco 3</span>
+              <span class="badge">Projeto incremental</span>
+              <button class="planChip" type="button" data-plan="pro">Desbloquear com Pro</button>
+            </div>
+            <h3>Um app que cresce módulo a módulo</h3>
+            <p class="muted">Cada módulo adiciona uma feature visível. Você termina com um app apresentável e fácil de explicar.</p>
+            <ul class="mini">
+              <li>Estado, componentes simples e organização de código</li>
+              <li>Persistência básica (ex.: localStorage) + UX</li>
+              <li>Publicação + checklist de qualidade</li>
+            </ul>
+          </article>
+
+          <article class="blockCard" data-in="bundle">
+            <div class="blockTop">
+              <span class="blockNum">Bloco 4</span>
+              <span class="badge">Camada avançada</span>
+              <button class="planChip" type="button" data-plan="bundle">Desbloquear com Bundle</button>
+            </div>
+            <h3>Arquitetura + integração</h3>
+            <p class="muted">Você aprende padrões de projeto, integração e decisões “de produto” (o que fazer primeiro e por quê).</p>
+            <ul class="mini">
+              <li>Refactor guiado: clareza desde nomes e tags até responsabilidade</li>
+              <li>Integrações e dados (fluxos comuns do mercado)</li>
+              <li>Checklist anti-bugs antes de publicar</li>
+            </ul>
+          </article>
+
+          <article class="blockCard" data-in="bundle">
+            <div class="blockTop">
+              <span class="blockNum">Bloco 5</span>
+              <span class="badge">Entrega final</span>
+              <button class="planChip" type="button" data-plan="bundle">Desbloquear com Bundle</button>
+            </div>
+            <h3>Deploy + finalização profissional</h3>
+            <p class="muted">Você fecha o curso entregando algo completo: documentação e submissão, a versão final do seu projeto.</p>
+            <ul class="mini">
+              <li>Publicação e validação (GitHub)</li>
+              <li>Checklist final (responsivo, acessível, funcional)</li>
+              <li>Submissão + emissão do certificado</li>
+            </ul>
+          </article>
+
+          <article class="blockCard arsenal" data-in="bundle">
+            <div class="blockTop">
+              <span class="blockNum">Kit Arsenal</span>
+              <span class="badge">Bundle Only</span>
+              <button class="planChip" type="button" data-plan="bundle">Desbloquear com Bundle</button>
+            </div>
+            <h3>Um brinde da VOLYNX pra acelerar seu progresso durante e depois do curso!</h3>
+            <p class="muted">Arquivos reutilizáveis para você construir mais rápido (e aprender por engenharia reversa).</p>
+            <ul class="mini">
+              <li>1 site completo + 1 landing page</li>
+              <li>2 apps JavaScript prontos</li>
+              <li>Cheatcodes (atalhos e padrões de uso diário)</li>
+            </ul>
+          </article>
+        </div>
+
+        <!-- Acesso -->
+        <section id="acesso" class="reveal" style="--d:3;">
+          <div class="card" style="padding:18px;">
+            <div class="sectionTitle" style="border-top:none; padding-top:0; margin-top:0;">
+              <div>
+                <h2>Acesso gratuito (com login)</h2>
+                <p>O curso é gratuito. O login é para salvar progresso, liberar checklists, submissão e certificado por entrega.</p>
+              </div>
+              <div class="ctaRow" style="gap:10px;">
+                <button class="btn primary" type="button" id="openLogin4">Entrar / Criar conta</button>
+                <a class="btn ghost" href="#faq">Ler o FAQ</a>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section aria-label="Método" class="reveal" id="metodo" style="--d:4;">
+        <div class="sectionTitle">
+          <h2>Método VOLYNX.Lab Education</h2>
+          <p>Treinar execução. Aumentar clareza. Reduzir fricção. Parece simples porque é o caminho certo!</p>
+        </div>
+        <div class="grid3">
+          <div class="card">
+            <h3>1) Direção</h3>
+            <p>Você sabe o que fazer e por quê. Nada de “vou tentar”.</p>
+          </div>
+          <div class="card">
+            <h3>2) Entrega</h3>
+            <p>Todo módulo fecha com um resultado publicável. Progresso visível, não subjetivo.</p>
+          </div>
+          <div class="card">
+            <h3>3) Refinamento</h3>
+            <p>Revisão e melhoria: a diferença entre “funciona” e “profissional”.</p>
+          </div>
+        </div>
+      </section>
+
+      <section aria-label="Projetos" class="reveal" id="projetos" style="--d:5;">
+        <div class="sectionTitle">
+          <h2>Projetos que viram portfólio</h2>
+          <p>Não é só sobre “aprender”. É sobre construir ativos: páginas, apps e cases que te representam.</p>
+        </div>
+        <div class="grid3">
+          <div class="card">
+            <h3>Landing premium</h3>
+            <p>Grid, hierarquia, responsividade e micro-interações. A estética certa vende.</p>
+          </div>
+          <div class="card">
+            <h3>App web</h3>
+            <p>Dados, estados e UX: interfaces que respondem rápido e podem se tornar produto.</p>
+          </div>
+          <div class="card">
+            <h3>Projeto final</h3>
+            <p>Planejar, executar, publicar e apresentar. O ciclo inteiro, como no mundo real.</p>
+          </div>
+        </div>
+      </section>
+
+      <section aria-label="FAQ" class="reveal" id="faq" style="--d:6;">
+        <div class="sectionTitle">
+          <h2>FAQ</h2>
+        </div>
+        <div aria-label="Perguntas frequentes" class="accordions" role="region">
+          <details>
+            <summary>
+              <div class="sumLeft">
+                <div class="sumTxt"><b>Eu sou totalmente iniciante. Tenho chances?</b><span class="muted">Sim — o curso ensina do
+                    “onde clicar” ao “o que deve aparecer”.</span></div>
+              </div>
+              <div aria-hidden="true" class="chev">›</div>
+            </summary>
+            <div class="content">
+              <ul>
+                <li>Você vai aprender a editar arquivos, salvar e atualizar o navegador.</li>
+                <li>Quando algo der errado, você terá “o que fazer” (não só teoria).</li>
+              </ul>
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              <div class="sumLeft">
+                <div class="sumTxt"><b>Por que precisa de login se é gratuito?</b><span class="muted">Para salvar progresso, liberar
+                    checklists, submissão e certificado.</span></div>
+              </div>
+              <div aria-hidden="true" class="chev">›</div>
+            </summary>
+            <div class="content">
+              <p style="margin:0;">O conteúdo é gratuito. O login existe para transformar a experiência em jornada:
+                progresso, checklists, submissão por entrega e emissão do certificado.</p>
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              <div class="sumLeft">
+                <div class="sumTxt"><b>Tem vídeo, comunidade ou suporte?</b><span class="muted">Autoguiado (texto +
+                    arquivos + projetos).</span></div>
+              </div>
+              <div aria-hidden="true" class="chev">›</div>
+            </summary>
+            <div class="content">
+              <p style="margin:0;">É autoguiado: você recebe documentos + exemplos + arquivos + checklists. Curso em
+                formato de apostila profissional.
+                Clareza, método e execução. Sem vídeos longos, sem distrações, com validação por checklist.</p>
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              <div class="sumLeft">
+                <div class="sumTxt"><b>Preciso de computador forte?</b><span class="muted">Não. Um PC básico já dá
+                    conta.</span></div>
+              </div>
+              <div aria-hidden="true" class="chev">›</div>
+            </summary>
+            <div class="content">
+              <ul>
+                <li>Windows, macOS ou Linux.</li>
+                <li>Recomendado: 8GB RAM, navegador atualizado e espaço livre.</li>
+              </ul>
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              <div class="sumLeft">
+                <div class="sumTxt"><b>Como funciona o certificado?</b><span class="muted">Por entrega (projeto
+                    enviado).</span></div>
+              </div>
+              <div aria-hidden="true" class="chev">›</div>
+            </summary>
+            <div class="content">
+              <p style="margin:0;">Você entrega o projeto do seu nível e emite o certificado correspondente (Social /
+                Pro / Bundle).</p>
+            </div>
+          </details>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <VxFooter />
+
+  <script is:inline>
+    /* Menu mobile + scroll lock */
+    (function(){
+      var menuBtn = document.getElementById('menuBtn');
+      var mobileMenu = document.getElementById('mobileMenu');
+
+      function unlockScroll(){ document.body.style.overflow = ''; }
+      function lockScroll(){ document.body.style.overflow = 'hidden'; }
+
+      function closeMenu(){
+        if (mobileMenu){
+          mobileMenu.style.display = 'none';
+          mobileMenu.setAttribute('aria-hidden','true');
+        }
+        if (menuBtn) menuBtn.setAttribute('aria-expanded','false');
+        unlockScroll();
+      }
+      function openMenu(){
+        if (!mobileMenu || !menuBtn) return;
+        mobileMenu.style.display = 'block';
+        mobileMenu.setAttribute('aria-hidden','false');
+        menuBtn.setAttribute('aria-expanded','true');
+        lockScroll();
+      }
+
+      closeMenu();
+      document.addEventListener('DOMContentLoaded', function(){ closeMenu(); }, { once:true });
+      window.addEventListener('pageshow', closeMenu);
+
+      if (menuBtn){
+        menuBtn.addEventListener('click', function(){
+          var isOpen = menuBtn.getAttribute('aria-expanded') === 'true';
+          if (isOpen) closeMenu(); else openMenu();
+        });
+      }
+
+      if (mobileMenu){
+        mobileMenu.addEventListener('click', function(e){
+          if (e.target === mobileMenu) closeMenu();
+        });
+        var links = mobileMenu.querySelectorAll('a');
+        for (var i=0;i<links.length;i++) links[i].addEventListener('click', closeMenu);
+      }
+    })();
+
+    /* Modal */
+    (function(){
+      var modal = document.getElementById('authModal');
+      var closeModal = document.getElementById('closeModal');
+      var openBtns = [document.getElementById('openLogin3'), document.getElementById('openLogin4')].filter(Boolean);
+
+      function lockScroll(){ document.body.style.overflow = 'hidden'; }
+      function unlockScroll(){ document.body.style.overflow = ''; }
+
+      function showModal(){
+        if(!modal) return;
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden','false');
+        lockScroll();
+      }
+      function hideModal(){
+        if(!modal) return;
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden','true');
+        unlockScroll();
+      }
+
+      openBtns.forEach(function(b){ b.addEventListener('click', function(e){ e.preventDefault(); showModal(); }); });
+      if(closeModal) closeModal.addEventListener('click', hideModal);
+      if(modal){
+        modal.addEventListener('click', function(e){ if(e.target === modal) hideModal(); });
+        document.addEventListener('keydown', function(e){ if(e.key === 'Escape') hideModal(); });
+      }
+    })();
+
+    /* Accordion: suave + apenas 1 aberto */
+    (function(){
+      var accordionEls = Array.prototype.slice.call(document.querySelectorAll('.accordions details'));
+      function collapseDetails(details){
+        var summary = details.querySelector('summary');
+        var content = details.querySelector('.content');
+        if (!summary || !content) return;
+        var startHeight = details.offsetHeight;
+        var endHeight = summary.offsetHeight;
+        details.style.overflow = 'hidden';
+        var anim = details.animate([{ height: startHeight + 'px' }, { height: endHeight + 'px' }],
+          { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1)' });
+        anim.onfinish = function(){
+          details.open = false;
+          details.style.height = '';
+          details.style.overflow = '';
+        };
+      }
+      function expandDetails(details){
+        var summary = details.querySelector('summary');
+        var content = details.querySelector('.content');
+        if (!summary || !content) return;
+        for (var k=0;k<accordionEls.length;k++){
+          var o = accordionEls[k];
+          if (o !== details && o.open) collapseDetails(o);
+        }
+        var startHeight = details.offsetHeight;
+        details.open = true;
+        requestAnimationFrame(function(){
+          var endHeight = summary.offsetHeight + content.scrollHeight;
+          details.style.overflow = 'hidden';
+          var anim = details.animate([{ height: startHeight + 'px' }, { height: endHeight + 'px' }],
+            { duration: 320, easing: 'cubic-bezier(.2,.8,.2,1)' });
+          anim.onfinish = function(){
+            details.style.height = '';
+            details.style.overflow = '';
+          };
+        });
+      }
+      for (var j=0;j<accordionEls.length;j++){
+        (function(d){
+          var summary = d.querySelector('summary');
+          if (!summary) return;
+          summary.addEventListener('click', function(e){
+            e.preventDefault();
+            if (d.open) collapseDetails(d);
+            else expandDetails(d);
+          });
+        })(accordionEls[j]);
+      }
+    })();
+
+    /* Reveal */
+    (function(){
+      var revealEls = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window){
+        var io = new IntersectionObserver(function(entries, obs){
+          entries.forEach(function(entry){
+            if(entry.isIntersecting){
+              entry.target.classList.add('is-visible');
+              obs.unobserve(entry.target);
+            }
+          });
+        }, { root:null, threshold:0.02, rootMargin:'0px 0px -22% 0px' });
+        revealEls.forEach(function(el){ io.observe(el); });
+      } else {
+        revealEls.forEach(function(el){ el.classList.add('is-visible'); });
+      }
+    })();
+
+    /* Offset do header */
+    (function(){
+      var header = document.querySelector('header');
+      if(!header) return;
+      function apply(){
+        var h = Math.ceil(header.getBoundingClientRect().height);
+        document.documentElement.style.setProperty('--navOffset', (h + 14) + 'px');
+      }
+      apply();
+      window.addEventListener('resize', apply, { passive:true });
+    })();
+
+    /* Filtro do currículo (mantém seu comportamento) */
+    (function () {
+      const TOP = '.chips .chip[data-filter]';
+      const CARDS = '.roadmap .blockCard[data-in]';
+      const CARD_CHIP = '.planChip[data-plan]';
+
+      function cacheOriginalChipLabels() {
+        document.querySelectorAll(CARD_CHIP).forEach(chip => {
+          if (!chip.dataset.label) chip.dataset.label = chip.textContent.trim();
+        });
+      }
+      function resetChipLabels() {
+        document.querySelectorAll(CARD_CHIP).forEach(chip => {
+          if (chip.dataset.label) chip.textContent = chip.dataset.label;
+          chip.classList.remove('is-selected');
+        });
+      }
+      function setPlan(plan) {
+        document.querySelectorAll(TOP).forEach(b => {
+          b.classList.toggle('active', b.dataset.filter === plan);
+        });
+        document.querySelectorAll(CARDS).forEach(card => {
+          if (plan === 'all') { card.classList.remove('is--dim'); return; }
+          const allowed = (card.dataset.in || '').trim().split(/\s+/);
+          card.classList.toggle('is--dim', !allowed.includes(plan));
+        });
+        try { localStorage.setItem('dj_plan', plan); } catch (e) { }
+      }
+
+      cacheOriginalChipLabels();
+      document.addEventListener('click', (e) => {
+        const top = e.target.closest(TOP);
+        if (top) { e.preventDefault(); resetChipLabels(); setPlan(top.dataset.filter); return; }
+        const chip = e.target.closest(CARD_CHIP);
+        if (chip) {
+          e.preventDefault();
+          resetChipLabels();
+          chip.classList.add('is-selected');
+          // abre modal: o curso é free, mas login é o gate.
+          const open = document.getElementById('openLogin3');
+          if (open) open.click();
+          setPlan(chip.dataset.plan);
+          return;
+        }
+      });
+
+      let initial = 'social';
+      try { initial = localStorage.getItem('dj_plan') || initial; } catch (e) { }
+      const active = document.querySelector(TOP + '.active');
+      if (active) initial = active.dataset.filter;
+      setPlan(initial);
+    })();
+  </script>
+</body>
+</html>

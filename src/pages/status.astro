@@ -1,0 +1,116 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+<style>
+  @import "../styles/home.css";
+  @import "../styles/services.css";
+</style>
+const title = "Status — VOLYNX";
+
+const services = [
+  { name: "Website", status: "Operational" },
+  { name: "Volynx Lab", status: "Operational" },
+  { name: "Studio (Pro)", status: "Planned" },
+  { name: "QR Generator", status: "Operational" },
+  { name: "Converter", status: "Operational" },
+  { name: "Image Scaler", status: "Operational" },
+  { name: "Image Suite", status: "Beta" },
+];
+
+const incidents = [
+  {
+    date: "2026-02-24",
+    title: "Deployment migration completed",
+    body: "All routes served from Cloudflare Pages. No ongoing impact.",
+    level: "Resolved",
+  },
+];
+---
+
+<BaseLayout title={title}>
+  <Header />
+
+  <main class="shell status">
+    <section class="hero">
+      <h1>Status</h1>
+      <p class="sub">Transparency builds trust. Here’s the current platform health.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Services</h2>
+      <div class="svc-grid">
+        {services.map((s) => (
+          <div class="svc">
+            <span class="svc-name">{s.name}</span>
+            <span class={"pill " + s.status.toLowerCase().replace(/\s+/g, "-")}>{s.status}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Recent incidents</h2>
+      <div class="inc-grid">
+        {incidents.map((i) => (
+          <article class="inc">
+            <div class="inc-top">
+              <span class="pill resolved">{i.level}</span>
+              <time datetime={i.date}>{i.date}</time>
+            </div>
+            <h3>{i.title}</h3>
+            <p>{i.body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<style>
+  @import "../styles/legal.css";
+  @import "../styles/services.css";
+
+  .status .hero { padding: 48px 0 18px; }
+  .status .sub { opacity: .85; max-width: 70ch; }
+
+  .panel {
+    margin: 18px 0;
+    border-radius: 22px;
+    padding: 18px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(10,12,20,.45);
+  }
+
+  .svc-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: 10px; }
+  .svc {
+    grid-column: span 6;
+    display: flex; justify-content: space-between; align-items: center;
+    border-radius: 16px;
+    padding: 12px 14px;
+    border: 1px solid rgba(255,255,255,.06);
+    background: rgba(0,0,0,.18);
+  }
+  .svc-name { opacity: .9; }
+
+  .inc-grid { display: grid; gap: 12px; margin-top: 10px; }
+  .inc { border-radius: 18px; padding: 14px; border: 1px solid rgba(255,255,255,.06); background: rgba(0,0,0,.18); }
+  .inc-top { display: flex; justify-content: space-between; align-items: center; opacity: .85; }
+  .inc h3 { margin: 10px 0 6px; }
+  .inc p { margin: 0; opacity: .85; }
+
+  .pill {
+    display: inline-flex; padding: 6px 10px; border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.14); font-size: 12px;
+  }
+  .operational { }
+  .beta { opacity: .9; }
+  .planned { opacity: .75; }
+  .resolved { }
+
+  @media (max-width: 860px) {
+    .svc { grid-column: span 12; }
+  }
+</style>

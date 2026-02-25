@@ -1,0 +1,86 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+<style>
+  @import "../styles/home.css";
+  @import "../styles/services.css";
+</style>
+
+const title = "Changelog — VOLYNX";
+
+const releases = [
+  {
+    date: "2026-02-24",
+    title: "Platform deployed on Cloudflare Pages",
+    items: [
+      "Astro static build stabilized",
+      "Routing cleanup for Lab/Studio",
+      "Asset weight reduced (public cleanup)",
+    ],
+    tag: "Release",
+  },
+  {
+    date: "2026-02-20",
+    title: "Volynx Lab tools lineup",
+    items: ["Converter", "Image Scaler", "Image Suite", "QR Generator"],
+    tag: "Update",
+  },
+];
+---
+
+<BaseLayout title={title}>
+  <Header />
+
+  <main class="shell changelog">
+    <section class="hero">
+      <h1>Changelog</h1>
+      <p class="sub">Shipping is the strategy. Here’s what changed.</p>
+    </section>
+
+    <section class="timeline">
+      {releases.map((r) => (
+        <article class="entry">
+          <div class="meta">
+            <span class="tag">{r.tag}</span>
+            <time datetime={r.date}>{r.date}</time>
+          </div>
+          <h2>{r.title}</h2>
+          <ul>
+            {r.items.map((x) => <li>{x}</li>)}
+          </ul>
+        </article>
+      ))}
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<style>
+  @import "../styles/legal.css";
+  @import "../styles/services.css";
+
+  .changelog .hero { padding: 48px 0 22px; }
+  .changelog .sub { opacity: .85; max-width: 65ch; }
+
+  .timeline { display: grid; gap: 14px; padding: 10px 0 70px; }
+  .entry {
+    border-radius: 22px;
+    padding: 18px 18px 14px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(10,12,20,.45);
+  }
+  .meta {
+    display: flex; justify-content: space-between; align-items: center;
+    opacity: .85; margin-bottom: 10px;
+  }
+  .tag {
+    display: inline-flex; padding: 6px 10px; border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.14);
+    font-size: 12px;
+  }
+  .entry h2 { margin: 0 0 10px; }
+  .entry ul { margin: 0; padding-left: 18px; opacity: .9; }
+  .entry li { padding: 4px 0; }
+</style>

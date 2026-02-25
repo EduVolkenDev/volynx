@@ -1,0 +1,105 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
+
+const title = "Tools — VOLYNX";
+
+const tools = [
+  {
+    name: "Converter",
+    desc: "Convert images fast. Keep quality.",
+    lab: "/volynx-lab/converter/",
+    studio: "/studio/converter/",
+    tag: "Image",
+  },
+  {
+    name: "Image Scaler",
+    desc: "Resize without losing sharpness.",
+    lab: "/volynx-lab/image-scaler/",
+    studio: "/studio/image-scaler/",
+    tag: "Image",
+  },
+  {
+    name: "Image Suite",
+    desc: "Batch optimize, export, compress.",
+    lab: "/volynx-lab/image-suite/",
+    studio: "/studio/image-suite/",
+    tag: "Pro-ready",
+  },
+  {
+    name: "QR Generator",
+    desc: "Premium QR codes in seconds.",
+    lab: "/volynx-lab/qr-gen/",
+    studio: "/studio/qr-gen/",
+    tag: "Utility",
+  },
+];
+---
+
+<BaseLayout title={title}>
+  <Header />
+
+  <main class="shell tools">
+    <section class="hero">
+      <h1>Tools</h1>
+      <p class="sub">One catalog. Two tiers: Lab (free) and Studio (pro).</p>
+    </section>
+
+    <section class="grid">
+      {tools.map((t) => (
+        <article class="card">
+          <div class="top">
+            <span class="tag">{t.tag}</span>
+            <h2>{t.name}</h2>
+            <p>{t.desc}</p>
+          </div>
+
+          <div class="actions">
+            <a class="btn" href={t.lab}>Open Lab</a>
+            <a class="btn secondary" href={t.studio}>Go Studio</a>
+          </div>
+        </article>
+      ))}
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<style>
+  @import "../../styles/home.css";
+  @import "../../styles/services.css";
+
+  .tools .hero { padding: 48px 0 18px; }
+  .tools .sub { opacity: .85; max-width: 70ch; }
+
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; padding: 12px 0 70px; }
+  .card {
+    grid-column: span 6;
+    border-radius: 22px;
+    padding: 18px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(10,12,20,.45);
+  }
+  .tag {
+    display: inline-flex; padding: 6px 10px; border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.14); font-size: 12px; opacity: .9;
+  }
+  .top h2 { margin: 10px 0 8px; }
+  .top p { margin: 0; opacity: .85; }
+
+  .actions { display: flex; gap: 10px; margin-top: 16px; }
+  .btn {
+    display: inline-flex; justify-content: center; flex: 1;
+    padding: 12px 14px; border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.12);
+    text-decoration: none;
+  }
+  .btn.secondary { opacity: .9; }
+
+  @media (max-width: 860px) {
+    .card { grid-column: span 12; }
+    .actions { flex-direction: column; }
+  }
+</style>
