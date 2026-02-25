@@ -1,9 +1,9 @@
 ---
-import "../../styles/converter.css";
-import CookieBanner from "../../components/CookieBanner.astro";
+import "../../styles/lab.css";
+import PageWidgets from "../../components/PageWidgets.astro";
 import SiteFooter from "../../components/SiteFooter.astro";
-const pageTitle = "VOLYNX Lab • Converter";
-const pageDescription = "Free image converter — convert to WebP, JPG, PNG or AVIF with quality control and resize options.";
+const pageTitle = "VOLYNX Lab — Free Tools";
+const pageDescription = "Free browser-based image tools by VOLYNX — convert, upscale and process images locally, no upload required.";
 ---
 
 <!DOCTYPE html>
@@ -27,81 +27,75 @@ const pageDescription = "Free image converter — convert to WebP, JPG, PNG or A
 
   <header class="topbar">
     <div class="topbar__inner">
-      <a class="pill" href="/">← Voltar</a>
+      <a class="topbar__logo" href="/">VOLYNX</a>
+      <a class="pill-back" href="/">← Home</a>
     </div>
   </header>
 
-  <div class="brand-logo" aria-hidden="true">
-    <img src="/assets/wordmark.webp" alt="" class="brand-logo-img" />
-  </div>
-
-  <div class="brand-icon" aria-hidden="true">
-    <img src="/assets/volynx-icon.webp" alt="" class="volynx-eye-img" />
-  </div>
-
   <main class="wrap">
-    <section class="card" aria-label="Image converter">
-      <div class="card__head">
-        <h1>Converter</h1>
+    <div class="hero">
+      <div class="hero__badge">
+        <span class="hero__badge-dot" aria-hidden="true"></span>
+        VOLYNX Lab
       </div>
+      <h1 class="hero__title">
+        Free <span class="hero__title-accent">Image Tools</span>
+      </h1>
+      <p class="hero__desc">
+        Ferramentas de imagem gratuitas que rodam direto no browser.
+        Sem upload, sem servidor — tudo local.
+      </p>
+    </div>
 
-      <div id="drop" class="drop" role="region" aria-label="Drop zone">
-        <input id="file" type="file" accept="image/*" multiple aria-label="Select images" />
-        <div class="drop__inner" aria-hidden="true">
-          <div class="drop__title">Arraste imagens aqui</div>
-          <div class="drop__hint">ou clique para selecionar</div>
-        </div>
-      </div>
+    <div class="tools-grid">
+      <a href="/volynx-lab/converter/" class="tool-card">
+        <span class="tool-card__free">FREE</span>
+        <span class="tool-card__chip">Converter</span>
+        <div class="tool-card__icon" aria-hidden="true">🔄</div>
+        <h2 class="tool-card__title">Converter</h2>
+        <p class="tool-card__desc">
+          Converta imagens para WebP, JPG, PNG ou AVIF com controle de qualidade e resize.
+          Suporte a lote e download ZIP.
+        </p>
+        <span class="tool-card__link">
+          Abrir ferramenta
+          <span class="tool-card__link-arrow" aria-hidden="true">→</span>
+        </span>
+      </a>
 
-      <div class="controls">
-        <label class="field">
-          <span>Formato</span>
-          <select id="format" aria-label="Output format">
-            <option value="webp" selected>WebP (recomendado)</option>
-            <option value="jpg">JPG</option>
-            <option value="png">PNG</option>
-            <option value="avif">AVIF (se suportado)</option>
-          </select>
-        </label>
+      <a href="/volynx-lab/image-scaler/" class="tool-card">
+        <span class="tool-card__free">FREE</span>
+        <span class="tool-card__chip">Upscaler</span>
+        <div class="tool-card__icon" aria-hidden="true">🔍</div>
+        <h2 class="tool-card__title">Image Scaler</h2>
+        <p class="tool-card__desc">
+          Amplie imagens pequenas com suavização alta e nitidez opcional. Escala 2x, 3x ou 4x,
+          tudo processado localmente.
+        </p>
+        <span class="tool-card__link">
+          Abrir ferramenta
+          <span class="tool-card__link-arrow" aria-hidden="true">→</span>
+        </span>
+      </a>
 
-        <label class="field">
-          <span>Qualidade</span>
-          <input id="quality" type="range" min="40" max="95" value="82" aria-label="Quality" />
-          <em id="qualityVal" aria-live="polite">82</em>
-        </label>
-
-        <label class="field">
-          <span>Resize (largura máx)</span>
-          <select id="maxw" aria-label="Max width">
-            <option value="0" selected>Original</option>
-            <option value="3840">3840</option>
-            <option value="2560">2560</option>
-            <option value="1920">1920</option>
-            <option value="1280">1280</option>
-            <option value="1080">1080</option>
-          </select>
-        </label>
-
-        <div class="actions">
-          <button id="convert" class="btn">Converter</button>
-          <button id="zip" class="btn" disabled>Baixar ZIP</button>
-          <button id="clear" class="btn">Limpar</button>
-        </div>
-      </div>
-
-      <div class="listHead">
-        <div>Arquivos</div>
-        <div id="stats" class="stats" aria-live="polite"></div>
-      </div>
-
-      <ul id="list" class="list" aria-label="File list"></ul>
-    </section>
+      <a href="/volynx-lab/image-suite/" class="tool-card">
+        <span class="tool-card__free">FREE</span>
+        <span class="tool-card__chip">Suite</span>
+        <div class="tool-card__icon" aria-hidden="true">🎨</div>
+        <h2 class="tool-card__title">iMage Suite</h2>
+        <p class="tool-card__desc">
+          Upscale, compressão e conversão numa interface única. Limite diário para uso gratuito,
+          desbloqueio PRO disponível.
+        </p>
+        <span class="tool-card__link">
+          Abrir ferramenta
+          <span class="tool-card__link-arrow" aria-hidden="true">→</span>
+        </span>
+      </a>
+    </div>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-  <script type="module" src="/volynx-lab/app.js"></script>
-
   <SiteFooter />
-  <CookieBanner />
+  <PageWidgets />
 </body>
 </html>

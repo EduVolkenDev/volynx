@@ -1,0 +1,137 @@
+---
+import "../../../styles/image-scaler.css";
+import PageWidgets from "../../../components/PageWidgets.astro";
+import SiteFooter from "../../../components/SiteFooter.astro";
+const pageTitle = "VOLYNX Lab • Image Scaler";
+const pageDescription = "Free image upscaler — amplify small images with high smoothing and optional sharpening, locally in your browser.";
+---
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#080610" />
+  <meta name="description" content={pageDescription} />
+  <title>{pageTitle}</title>
+
+  <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="shortcut icon" href="/assets/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Volynx" />
+  <link rel="manifest" href="/assets/site.webmanifest" />
+</head>
+
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="pill-back" href="/volynx-lab/">← Voltar</a>
+    </div>
+  </header>
+
+  <img src="/assets/wordmark.webp" alt="" class="brand-logo-img" aria-hidden="true" />
+
+  <main class="wrap">
+    <div class="wrap-header">
+      <span class="hero-pill">iMAGE.Scaler</span>
+
+      <div class="hero-text">
+        <h1>Amplie imagens pequenas com qualidade</h1>
+        <p>
+          Este MVP faz upscale local (browser) com suavização e nitidez opcional.
+          Para "AI upscale real" faça o UPGRADE do seu pacote na plataforma <strong>volynx.world</strong> ou
+          compre créditos à vontade para usar como quiser!
+        </p>
+        <div class="upgrade-row">
+          <a class="upgrade-btn" href="/volynx-lab/image-scaler/upgrade/">Upgrade</a>
+          <a class="credits-btn" href="/volynx-lab/image-scaler/credits/">Buy Credits</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="cardHead">
+          <h2>Upload</h2>
+          <div class="field-row">
+            <button id="pickBtn" class="btn secondary" type="button">Selecionar arquivo</button>
+            <input id="file" type="file" accept="image/*" hidden aria-label="Select image file" />
+          </div>
+        </div>
+        <div class="cardBody">
+          <div
+            id="drop"
+            class="drop"
+            role="button"
+            tabindex="0"
+            aria-label="Arraste e solte a imagem aqui"
+          >
+            <div class="icon">☁︎</div>
+            <p><b>Arraste e solte</b> ou clique em "Selecionar arquivo"</p>
+            <p>Suporta PNG/JPG/WebP. Processamento local (não envia nada).</p>
+          </div>
+
+          <div class="field-row" style="margin-top:14px">
+            <label for="mode">Modo</label>
+            <select id="mode" aria-label="Processing mode">
+              <option value="local" selected>Rápido (local)</option>
+              <option value="ai">AI (beta)</option>
+            </select>
+
+            <label for="scale">Escala</label>
+            <select id="scale" aria-label="Upscale factor">
+              <option value="2">2x</option>
+              <option value="3">3x</option>
+              <option value="4" selected>4x</option>
+            </select>
+
+            <label for="format">Formato</label>
+            <select id="format" aria-label="Output format">
+              <option value="image/png" selected>PNG</option>
+              <option value="image/webp">WebP</option>
+              <option value="image/jpeg">JPG</option>
+            </select>
+
+            <label class="field-row" style="gap:8px">
+              <input id="sharpen" type="checkbox" checked aria-label="Apply sharpening" />
+              Nitidez (sharpen)
+            </label>
+
+            <label class="field-row" style="gap:8px">
+              <input id="smooth" type="checkbox" checked aria-label="High smoothing" />
+              Suavização alta
+            </label>
+
+            <button id="runBtn" class="btn" type="button" disabled>Gerar imagem</button>
+          </div>
+
+          <div class="kpis">
+            <div class="kpi"><b>Original</b><span id="origMeta">—</span></div>
+            <div class="kpi"><b>Saída</b><span id="outMeta">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cardHead">
+          <h2>Resultado</h2>
+          <div class="field-row">
+            <button id="downloadBtn" class="btn" type="button" disabled>Baixar</button>
+          </div>
+        </div>
+        <div class="cardBody">
+          <img id="preview" class="preview" alt="Prévia do resultado" />
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Fragment set:html={'<script src="/volynx-lab/image-scaler.js" defer></script>'} />
+
+  <SiteFooter />
+  <PageWidgets />
+</body>
+</html>

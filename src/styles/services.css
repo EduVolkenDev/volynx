@@ -590,6 +590,7 @@ header.globalnav {
     background: rgba(52, 51, 51, 0.60);
     box-shadow: 0 16px 40px rgba(225, 222, 227, 0.12);
     backdrop-filter: blur(3px);
+    display: grid;
 }
 
 .card h3 {
@@ -608,49 +609,58 @@ header.globalnav {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 14px;
-    width: 100%;
+    width: auto;
     padding: 20px 0;
 }
 
 .plan-tile {
     border-radius: var(--radius-xl);
-    border: 2px outset rgba(12, 10, 10, 0.93);
-    background: rgba(18, 24, 39, 0.54);
     overflow: hidden;
     padding: 0;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 16px 40px rgba(208, 202, 202, 0.25);
+    transition: transform .28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow .28s ease;
+    will-change: transform;
+}
+
+.plan-tile:hover {
+    transform: translateY(-8px) scale(1.012);
+    box-shadow:
+        0 24px 60px rgba(160, 110, 253, 0.28),
+        0 8px 24px rgba(0, 0, 0, 0.45);
 }
 
 .plan-media {
-    padding: 14px;
-    background:
-        radial-gradient(900px 280px at 30% 0%, rgba(255, 124, 92, 0.14), transparent 60%),
-        rgba(0, 0, 0, 0.22);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 0;
+  width: 100%;
+  display: block;
 }
 
 .plan-media a {
     display: block;
     border-radius: 26px;
     overflow: hidden;
-    border: 3px inset rgba(255, 254, 254, 0.7);
 }
 
 .plan-media img {
     width: 100%;
     height: auto;
     object-fit: cover;
+    transition: transform .38s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.plan-tile:hover .plan-media img {
+    transform: scale(1.04);
 }
 
 .plan-content {
-    padding: 18px 18px;
-    display: grid;
-    gap: 10px;
-    flex: 1;
-    backdrop-filter: blur(12px);
-    background: rgba(255, 255, 255, 0.10);
+padding: 18px 18px;
+  display: grid;
+  flex: 1;
+  backdrop-filter: blur(25px) saturate(2);
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  border: 5px double #110e0e;
 }
 
 .plan-content .chip {
