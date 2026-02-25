@@ -1,0 +1,18 @@
+/*
+  # Força HTTPS e previne downgrade attacks
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+
+  # Política de conteúdo — ajuste se adicionar novos serviços externos
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.stripe.com; frame-src https://js.stripe.com https://hooks.stripe.com https://calendly.com; form-action 'self' mailto:; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
+
+  # Bloqueia clickjacking
+  X-Frame-Options: SAMEORIGIN
+
+  # Previne MIME sniffing
+  X-Content-Type-Options: nosniff
+
+  # Controla informação de referrer enviada a terceiros
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  # Desativa APIs de hardware não usadas; libera payment para Stripe
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), usb=(), payment=(self "https://js.stripe.com")
