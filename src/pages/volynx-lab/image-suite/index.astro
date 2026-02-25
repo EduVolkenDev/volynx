@@ -149,24 +149,24 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       localStorage.setItem("volynx_usage", JSON.stringify(data));
     }
 
-    const $ = (id) => document.getElementById(id);
+    const $ = (id: string) => document.getElementById(id);
 
-    const fileEl      = $("file");
-    const pickBtn     = $("pickBtn");
-    const dropEl      = $("drop");
-    const runBtn      = $("runBtn");
-    const downloadBtn = $("downloadBtn");
-    const previewEl   = $("preview");
-    const toolEl      = $("tool");
-    const scaleEl     = $("scale");
-    const fmtEl       = $("format");
-    const qualityEl   = $("quality");
-    const qualityValEl = $("qualityVal");
-    const origMeta    = $("origMeta");
-    const outMeta     = $("outMeta");
-    const licenseInput = $("licenseKey");
-    const activateBtn = $("activateBtn");
-    const proStatus   = $("proStatus");
+    const fileEl      = $("file") as HTMLInputElement;
+    const pickBtn     = $("pickBtn") as HTMLButtonElement;
+    const dropEl      = $("drop") as HTMLElement;
+    const runBtn      = $("runBtn") as HTMLButtonElement;
+    const downloadBtn = $("downloadBtn") as HTMLButtonElement;
+    const previewEl   = $("preview") as HTMLImageElement;
+    const toolEl      = $("tool") as HTMLSelectElement;
+    const scaleEl     = $("scale") as HTMLSelectElement;
+    const fmtEl       = $("format") as HTMLSelectElement;
+    const qualityEl   = $("quality") as HTMLInputElement;
+    const qualityValEl = $("qualityVal") as HTMLElement;
+    const origMeta    = $("origMeta") as HTMLElement;
+    const outMeta     = $("outMeta") as HTMLElement;
+    const licenseInput = $("licenseKey") as HTMLInputElement;
+    const activateBtn = $("activateBtn") as HTMLButtonElement;
+    const proStatus   = $("proStatus") as HTMLElement;
 
     const VALID_LICENSES = [
       "VOLYNX-PRO-2026",
@@ -174,9 +174,9 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
     ];
 
     let isPro = localStorage.getItem("volynx_pro") === "true";
-    let srcImg = null;
-    let srcFile = null;
-    let outBlob = null;
+    let srcImg: HTMLImageElement | null = null;
+    let srcFile: File | null = null;
+    let outBlob: Blob | null = null;
     let srcName = "image";
 
     function updateProUI() {
@@ -208,7 +208,7 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
     });
 
     fileEl.addEventListener("change", async () => {
-      const f = fileEl.files[0];
+      const f = fileEl.files?.[0];
       if (!f) return;
       await loadFile(f);
     });
@@ -216,12 +216,12 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
     dropEl.addEventListener("dragover", (e) => e.preventDefault());
     dropEl.addEventListener("drop", async (e) => {
       e.preventDefault();
-      const f = e.dataTransfer.files[0];
+      const f = (e as DragEvent).dataTransfer?.files[0];
       if (!f) return;
       await loadFile(f);
     });
 
-    async function loadFile(file) {
+    async function loadFile(file: File) {
       srcFile = file;
       srcName = file.name.replace(/\.[^/.]+$/, "");
       const url = URL.createObjectURL(file);
@@ -252,25 +252,27 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       const w = srcImg.width;
       const h = srcImg.height;
       const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext("2d")!;
 
       if (tool === "upscale") {
         canvas.width  = w * scale;
         canvas.height = h * scale;
         ctx.imageSmoothingQuality = "high";
         ctx.drawImage(srcImg, 0, 0, canvas.width, canvas.height);
-        outBlob = await new Promise(res => canvas.toBlob(res, mime, 0.95));
+        outBlob = await new Promise<Blob | null>(res => canvas.toBlob(res, mime, 0.95));
       } else {
         canvas.width  = w;
         canvas.height = h;
         ctx.drawImage(srcImg, 0, 0);
-        outBlob = await new Promise(res => canvas.toBlob(res, mime, tool === "compress" ? quality : 0.95));
+        outBlob = await new Promise<Blob | null>(res => canvas.toBlob(res, mime, tool === "compress" ? quality : 0.95));
       }
+
+      if (!outBlob) return;
 
       const url = URL.createObjectURL(outBlob);
       previewEl.src = url;
 
-      const reduction = ((1 - (outBlob.size / srcFile.size)) * 100).toFixed(1);
+      const reduction = ((1 - (outBlob.size / srcFile!.size)) * 100).toFixed(1);
       outMeta.textContent = `${canvas.width}x${canvas.height} • ${(outBlob.size / 1024 / 1024).toFixed(2)}MB • ${reduction}%`;
       downloadBtn.disabled = false;
 

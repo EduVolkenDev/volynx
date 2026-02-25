@@ -506,7 +506,8 @@ const pageDescription = "Premium portfolio system with Volynx design - Showcase 
   </div>
 
   <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
+    const yearEl = document.getElementById("year");
+    if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
     const menuBtn = document.getElementById("menuBtn");
     const drawer = document.getElementById("drawer");
@@ -525,6 +526,7 @@ const pageDescription = "Premium portfolio system with Volynx design - Showcase 
     setTimeout(syncTopbarHeight, 50);
 
     const toggleDrawer = () => {
+      if (!drawer || !menuBtn) return;
       const open = drawer.classList.toggle("open");
       menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
       syncTopbarHeight();
@@ -532,18 +534,19 @@ const pageDescription = "Premium portfolio system with Volynx design - Showcase 
 
     menuBtn?.addEventListener("click", toggleDrawer);
     drawer?.addEventListener("click", (e) => {
-      const a = e.target.closest("a");
+      const a = (e.target as HTMLElement)?.closest("a");
       if (!a) return;
-      drawer.classList.remove("open");
-      menuBtn.setAttribute("aria-expanded", "false");
+      drawer!.classList.remove("open");
+      menuBtn!.setAttribute("aria-expanded", "false");
       syncTopbarHeight();
     });
 
-    const form = document.getElementById("contactForm");
+    const form = document.getElementById("contactForm") as HTMLFormElement | null;
     const statusEl = document.getElementById("contactStatus");
 
     form?.addEventListener("submit", async (e) => {
       e.preventDefault();
+      if (!statusEl) return;
       statusEl.textContent = "Sending message...";
       statusEl.style.color = "var(--accent-secondary)";
       await new Promise(r => setTimeout(r, 1000));
@@ -554,11 +557,11 @@ const pageDescription = "Premium portfolio system with Volynx design - Showcase 
     });
 
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        const href = this.getAttribute('href');
+      anchor.addEventListener('click', (e) => {
+        const href = anchor.getAttribute('href');
         if (href === '#') return;
         e.preventDefault();
-        const target = document.querySelector(href);
+        const target = document.querySelector(href!);
         if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
@@ -573,8 +576,8 @@ const pageDescription = "Premium portfolio system with Volynx design - Showcase 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0)';
+          (entry.target as HTMLElement).style.opacity = '1';
+          (entry.target as HTMLElement).style.transform = 'translateY(0)';
         }
       });
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
