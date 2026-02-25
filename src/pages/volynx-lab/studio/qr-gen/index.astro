@@ -1,0 +1,15 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+
+const CORE_URL = import.meta.env.PUBLIC_VOLYNX_CORE_URL ?? "https://simple-qr-generator-z12a.onrender.com";
+const BASE_PATH = "/tools/qr";
+---
+
+<BaseLayout title="VOLYNX QR Generator">
+  <div id="app" data-core-url={CORE_URL} data-base-path={BASE_PATH}></div>
+
+  <link rel="stylesheet" href="/tools/qr/styles/base.css" />
+
+  <script src="/tools/qr/config-init.js"></script>
+  <Fragment set:html={'<script src="https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js" defer></script><script type="module" src="/tools/qr/api.js"></script><script type="module" src="/tools/qr/app.js"></script><script src="/tools/qr/cookie-banner.js" defer></script>'} />
+</BaseLayout>

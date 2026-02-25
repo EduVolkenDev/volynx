@@ -1,0 +1,65 @@
+---
+import "../styles/legal.css";
+import PageWidgets from "../components/PageWidgets.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Volynx — Premium Tech Platform" } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+
+    <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link rel="shortcut icon" href="/assets/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Volynx" />
+    <link rel="manifest" href="/assets/site.webmanifest" />
+  </head>
+  <body>
+    <div class="universe-bg" aria-hidden="true"></div>
+
+    <div class="shell">
+      <div class="topbar">
+        <div class="brand">
+          <img src="/assets/volynx-icon.webp" alt="Volynx" />
+          <strong>VOLYNX</strong>
+        </div>
+
+        <nav class="nav" aria-label="Legal navigation">
+          <a href="/about">About</a>
+          <a href="/contact">Contact</a>
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+          <a href="/disclaimer">Disclaimer</a>
+        </nav>
+      </div>
+
+      <main class="card">
+        <slot />
+
+        <div class="footer" role="contentinfo">
+          <div class="links">
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+            <a href="/privacy">Privacy</a>
+            <a href="/terms">Terms</a>
+            <a href="/disclaimer">Disclaimer</a>
+          </div>
+          <div class="meta">© {new Date().getFullYear()} Volynx. All rights reserved.</div>
+        </div>
+      </main>
+    </div>
+
+    <PageWidgets />
+  </body>
+</html>

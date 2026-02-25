@@ -1,0 +1,45 @@
+---
+import "../styles/home.css";
+import PageWidgets from "../components/PageWidgets.astro";
+
+const {
+  title = "VOLYNX — Building a Smarter Future",
+  description = "Volynx is a digital ecosystem of tools, services and education focused on accessible technology.",
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,date=no,address=no,email=no" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+
+    <link rel="preload" as="image" href="/assets/lucid5.webp" />
+    <link rel="preload" as="image" href="/assets/wordmark.webp" />
+    <link rel="preload" as="image" href="/assets/volynx-icon.webp" />
+
+    <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link rel="shortcut icon" href="/assets/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Volynx" />
+    <link rel="manifest" href="/assets/site.webmanifest" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Volynx",
+        "url": "https://volynx.world"
+      }
+    </script>
+  </head>
+
+  <body>
+    <slot />
+    <PageWidgets />
+  </body>
+</html>

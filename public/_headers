@@ -2,8 +2,8 @@
   # Força HTTPS e previne downgrade attacks
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
 
-  # Política de conteúdo — ajuste se adicionar novos serviços externos
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.stripe.com; frame-src https://js.stripe.com https://hooks.stripe.com https://calendly.com; form-action 'self' mailto:; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
+  # Política de conteúdo — sem 'unsafe-inline' para scripts na maioria das páginas
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.stripe.com; frame-src https://js.stripe.com https://hooks.stripe.com https://calendly.com; form-action 'self' mailto:; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
 
   # Bloqueia clickjacking
   X-Frame-Options: SAMEORIGIN
@@ -16,3 +16,38 @@
 
   # Desativa APIs de hardware não usadas; libera payment para Stripe
   Permissions-Policy: camera=(), microphone=(), geolocation=(), usb=(), payment=(self "https://js.stripe.com")
+
+# Páginas de produtos e templates — contêm scripts inline (nav, animações, config de página)
+/products/portfolio-pro-kit/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.stripe.com https://formspree.io; frame-src https://js.stripe.com https://hooks.stripe.com https://calendly.com; form-action 'self' https://formspree.io mailto:; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
+
+/products/saas-landing-system/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.stripe.com https://formspree.io; frame-src https://js.stripe.com https://hooks.stripe.com https://calendly.com; form-action 'self' https://formspree.io mailto:; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
+
+/products/agency-launch-kit/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.stripe.com https://formspree.io; frame-src https://js.stripe.com https://hooks.stripe.com https://calendly.com; form-action 'self' https://formspree.io mailto:; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
+
+/products/volynx-icons-store/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.stripe.com; frame-src https://js.stripe.com https://hooks.stripe.com https://calendly.com; form-action 'self' mailto:; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
+
+# Landing Express — usa VX_CONFIG inline
+/services/landing-express/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.stripe.com https://formspree.io; frame-src https://js.stripe.com https://hooks.stripe.com https://calendly.com; form-action 'self' https://formspree.io mailto:; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
+
+# Ferramentas do Volynx Lab
+/volynx-lab/image-scaler/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; frame-src 'none'; form-action 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
+
+/volynx-lab/image-suite/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; frame-src 'none'; form-action 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
+
+/volynx-lab/studio/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://simple-qr-generator-z12a.onrender.com; frame-src 'none'; form-action 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
+
+# QR Generator — carrega biblioteca via CDN (unpkg.com)
+/volynx-lab/qr-gen/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://simple-qr-generator-z12a.onrender.com; frame-src 'none'; form-action 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
+
+# Dev Hub — páginas de preview internas com scripts inline
+/dev-hub/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.stripe.com https://formspree.io; frame-src https://js.stripe.com https://hooks.stripe.com https://calendly.com; form-action 'self' https://formspree.io mailto:; object-src 'none'; base-uri 'self'; upgrade-insecure-requests

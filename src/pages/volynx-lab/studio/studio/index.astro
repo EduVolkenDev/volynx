@@ -1,0 +1,513 @@
+---
+import "../../../styles/lab.css";
+import PageWidgets from "../../../components/PageWidgets.astro";
+import SiteFooter from "../../../components/SiteFooter.astro";
+const pageTitle = "VOLYNX Studio • Brand & Content Factory";
+const pageDescription = "Premium brand kit, presets and batch export packs — brand-safe content production in your browser.";
+---
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#080610" />
+  <meta name="description" content={pageDescription} />
+  <title>{pageTitle}</title>
+</head>
+
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="topbar__logo" href="/">VOLYNX</a>
+      <a class="pill-back" href="/volynx-lab/">← Lab</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="hero">
+      <div class="hero__badge">
+        <span class="hero__badge-dot" aria-hidden="true"></span>
+        VOLYNX Studio <span style="opacity:.7;margin-left:.35rem">Premium</span>
+      </div>
+      <h1 class="hero__title">
+        Brand & <span class="hero__title-accent">Content Factory</span>
+      </h1>
+      <p class="hero__desc">
+        Defina o Brand Kit uma vez. Gere packs multicanal em lote. Exporte com manifesto. Tudo local no browser.
+      </p>
+    </div>
+
+    <div class="card" style="max-width:960px;margin:0 auto 18px auto">
+      <div class="cardHead">
+        <strong>Acesso Premium</strong>
+        <div id="proPill" class="pill" style="margin-left:auto">—</div>
+      </div>
+      <div class="cardBody">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <input id="licenseKey" class="license-input" placeholder="Enter PRO License" type="text" aria-label="License key" style="min-width:260px" />
+          <button id="activateBtn" class="btn secondary" type="button">Activate</button>
+          <button id="deactivateBtn" class="btn secondary" type="button">Logout PRO</button>
+          <span id="proStatus" class="pro-status" aria-live="polite"></span>
+        </div>
+        <p style="margin-top:10px;opacity:.75;font-size:13px">
+          O Studio libera: Brand Kit compartilhado entre ferramentas, presets por canal e export packs em lote.
+        </p>
+      </div>
+    </div>
+
+    <div class="tools-grid" style="max-width:960px;margin:0 auto">
+      <section class="tool-card" style="cursor:default">
+        <span class="tool-card__chip">Brand Kit</span>
+        <div class="tool-card__icon" aria-hidden="true">🏷️</div>
+        <h2 class="tool-card__title">Kit de Marca</h2>
+        <p class="tool-card__desc">Logo, cores e tipografia (referência). Usado por Watermark e presets.</p>
+
+        <div style="display:grid;gap:10px;margin-top:12px">
+          <label style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <span style="min-width:110px;opacity:.8">Logo</span>
+            <input id="logoFile" type="file" accept="image/*" />
+            <button id="clearLogo" class="btn secondary" type="button">Limpar</button>
+          </label>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <label style="display:flex;gap:10px;align-items:center">
+              <span style="min-width:110px;opacity:.8">Cor primária</span>
+              <input id="primaryColor" type="color" value="#6d5efc" />
+            </label>
+            <label style="display:flex;gap:10px;align-items:center">
+              <span style="min-width:110px;opacity:.8">Cor neutra</span>
+              <input id="neutralColor" type="color" value="#0b0a10" />
+            </label>
+          </div>
+
+          <label style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <span style="min-width:110px;opacity:.8">Fonte</span>
+            <input id="fontFamily" type="text" placeholder="Ex: Inter, Satoshi, system-ui" style="flex:1;min-width:220px" />
+          </label>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <button id="saveBrand" class="btn" type="button">Salvar Brand Kit</button>
+            <span id="brandStatus" style="opacity:.75;font-size:13px"></span>
+          </div>
+
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+            <div style="width:56px;height:56px;border-radius:14px;background:rgba(255,255,255,.06);display:grid;place-items:center;overflow:hidden">
+              <img id="logoPreview" alt="Logo preview" style="max-width:80%;max-height:80%;display:none" />
+              <span id="logoEmpty" style="opacity:.45;font-size:12px">no logo</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;gap:8px;align-items:center">
+                <span style="opacity:.7;font-size:12px">Primary</span>
+                <span id="pChip" style="width:18px;height:18px;border-radius:6px;background:#6d5efc;display:inline-block"></span>
+                <code id="pVal" style="opacity:.7;font-size:12px">#6d5efc</code>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <span style="opacity:.7;font-size:12px">Neutral</span>
+                <span id="nChip" style="width:18px;height:18px;border-radius:6px;background:#0b0a10;display:inline-block"></span>
+                <code id="nVal" style="opacity:.7;font-size:12px">#0b0a10</code>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tool-card" style="cursor:default">
+        <span class="tool-card__chip">Presets</span>
+        <div class="tool-card__icon" aria-hidden="true">📦</div>
+        <h2 class="tool-card__title">Export Pack</h2>
+        <p class="tool-card__desc">Gere variações por canal (social/ads) e baixe com manifesto JSON.</p>
+
+        <div style="display:grid;gap:10px;margin-top:12px">
+          <label style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <span style="min-width:110px;opacity:.8">Imagem</span>
+            <input id="assetFile" type="file" accept="image/*" />
+          </label>
+
+          <label style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <span style="min-width:110px;opacity:.8">Pack</span>
+            <select id="pack" class="select" style="flex:1;min-width:220px">
+              <option value="social">Social (IG, X, LinkedIn)</option>
+              <option value="ads">Ads (Meta, Google Display)</option>
+              <option value="store">App Store / Play Store (básico)</option>
+            </select>
+          </label>
+
+          <label style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <span style="min-width:110px;opacity:.8">Formato</span>
+            <select id="outFmt" class="select" style="flex:1;min-width:220px">
+              <option value="image/webp">WebP</option>
+              <option value="image/png">PNG</option>
+              <option value="image/jpeg">JPEG</option>
+            </select>
+          </label>
+
+          <label style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <span style="min-width:110px;opacity:.8">Qualidade</span>
+            <input id="q" type="range" min="0.5" max="1" step="0.01" value="0.9" />
+            <em id="qv" style="font-style:normal;font-size:12px;opacity:.75">0.90</em>
+          </label>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <label style="display:flex;gap:8px;align-items:center">
+              <input id="wm" type="checkbox" />
+              <span style="opacity:.85">Watermark logo (Brand Kit)</span>
+            </label>
+
+            <select id="wmPos" class="select" style="min-width:200px">
+              <option value="br">Bottom-right</option>
+              <option value="bl">Bottom-left</option>
+              <option value="tr">Top-right</option>
+              <option value="tl">Top-left</option>
+            </select>
+
+            <label style="display:flex;gap:10px;align-items:center">
+              <span style="opacity:.75;font-size:12px">Opacidade</span>
+              <input id="wmOp" type="range" min="0.1" max="1" step="0.05" value="0.85" />
+            </label>
+          </div>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <button id="buildPack" class="btn" type="button" disabled>Gerar pack</button>
+            <button id="downloadManifest" class="btn secondary" type="button" disabled>Baixar manifesto</button>
+            <span id="packStatus" style="opacity:.75;font-size:13px"></span>
+          </div>
+
+          <div id="outList" style="display:grid;gap:8px;margin-top:10px"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <SiteFooter />
+  <PageWidgets />
+
+  <script>
+    const $ = (id: string) => document.getElementById(id);
+
+    // ---------- PRO ----------
+    const proPill = $("proPill") as HTMLElement;
+    const licenseKey = $("licenseKey") as HTMLInputElement;
+    const activateBtn = $("activateBtn") as HTMLButtonElement;
+    const deactivateBtn = $("deactivateBtn") as HTMLButtonElement;
+    const proStatus = $("proStatus") as HTMLElement;
+
+    let isPro = localStorage.getItem("volynx_pro") === "true";
+
+    function refreshPro() {
+      isPro = localStorage.getItem("volynx_pro") === "true";
+      proPill.textContent = isPro ? "PRO ✔" : "FREE";
+      proPill.style.opacity = isPro ? "1" : ".75";
+      proStatus.textContent = isPro ? "PRO Activated ✔" : "Ative o PRO para usar o Studio.";
+      // hard gate
+      (document.querySelectorAll("main input, main select, main button") as NodeListOf<HTMLElement>).forEach((el) => {
+        if (el.id === "licenseKey" || el.id === "activateBtn" || el.id === "deactivateBtn") return;
+        el.toggleAttribute("disabled", !isPro);
+      });
+    }
+
+    // Simple local license: accepts any non-empty key (you can swap later for Stripe/Backend verification)
+    activateBtn.addEventListener("click", () => {
+      const k = (licenseKey.value || "").trim();
+      if (!k) { alert("Insira uma licença."); return; }
+      localStorage.setItem("volynx_pro", "true");
+      localStorage.setItem("volynx_license", k);
+      refreshPro();
+    });
+
+    deactivateBtn.addEventListener("click", () => {
+      localStorage.removeItem("volynx_pro");
+      localStorage.removeItem("volynx_license");
+      refreshPro();
+    });
+
+    // ---------- BRAND KIT ----------
+    const logoFile = $("logoFile") as HTMLInputElement;
+    const clearLogo = $("clearLogo") as HTMLButtonElement;
+    const primaryColor = $("primaryColor") as HTMLInputElement;
+    const neutralColor = $("neutralColor") as HTMLInputElement;
+    const fontFamily = $("fontFamily") as HTMLInputElement;
+    const saveBrand = $("saveBrand") as HTMLButtonElement;
+    const brandStatus = $("brandStatus") as HTMLElement;
+    const logoPreview = $("logoPreview") as HTMLImageElement;
+    const logoEmpty = $("logoEmpty") as HTMLElement;
+    const pChip = $("pChip") as HTMLElement;
+    const nChip = $("nChip") as HTMLElement;
+    const pVal = $("pVal") as HTMLElement;
+    const nVal = $("nVal") as HTMLElement;
+
+    type BrandKit = { logoDataUrl?: string; primary?: string; neutral?: string; font?: string; updatedAt?: string };
+    function loadBrand(): BrandKit {
+      try { return JSON.parse(localStorage.getItem("volynx_brandkit") || "{}"); } catch { return {}; }
+    }
+    function saveBrandKit(data: BrandKit) {
+      localStorage.setItem("volynx_brandkit", JSON.stringify({ ...data, updatedAt: new Date().toISOString() }));
+    }
+    function renderBrand() {
+      const bk = loadBrand();
+      primaryColor.value = bk.primary || "#6d5efc";
+      neutralColor.value = bk.neutral || "#0b0a10";
+      fontFamily.value = bk.font || "";
+      pChip.style.background = primaryColor.value;
+      nChip.style.background = neutralColor.value;
+      pVal.textContent = primaryColor.value;
+      nVal.textContent = neutralColor.value;
+
+      if (bk.logoDataUrl) {
+        logoPreview.src = bk.logoDataUrl;
+        logoPreview.style.display = "block";
+        logoEmpty.style.display = "none";
+      } else {
+        logoPreview.style.display = "none";
+        logoEmpty.style.display = "block";
+      }
+    }
+
+    logoFile.addEventListener("change", async () => {
+      const f = logoFile.files?.[0];
+      if (!f) return;
+      const url = URL.createObjectURL(f);
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      URL.revokeObjectURL(url);
+
+      // store as dataURL (small logos only)
+      const c = document.createElement("canvas");
+      const maxW = 512;
+      const s = Math.min(1, maxW / img.width);
+      c.width = Math.round(img.width * s);
+      c.height = Math.round(img.height * s);
+      const ctx = c.getContext("2d")!;
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      const dataUrl = c.toDataURL("image/png", 0.92);
+
+      const bk = loadBrand();
+      saveBrandKit({ ...bk, logoDataUrl: dataUrl });
+      brandStatus.textContent = "Logo salvo.";
+      renderBrand();
+    });
+
+    clearLogo.addEventListener("click", () => {
+      const bk = loadBrand();
+      delete bk.logoDataUrl;
+      saveBrandKit(bk);
+      brandStatus.textContent = "Logo removido.";
+      renderBrand();
+    });
+
+    [primaryColor, neutralColor].forEach((el) => el.addEventListener("input", () => {
+      pChip.style.background = primaryColor.value;
+      nChip.style.background = neutralColor.value;
+      pVal.textContent = primaryColor.value;
+      nVal.textContent = neutralColor.value;
+    }));
+
+    saveBrand.addEventListener("click", () => {
+      const bk = loadBrand();
+      saveBrandKit({ ...bk, primary: primaryColor.value, neutral: neutralColor.value, font: (fontFamily.value || "").trim() });
+      brandStatus.textContent = "Brand Kit salvo.";
+      renderBrand();
+    });
+
+    // ---------- EXPORT PACK ----------
+    const assetFile = $("assetFile") as HTMLInputElement;
+    const packSel = $("pack") as HTMLSelectElement;
+    const outFmt = $("outFmt") as HTMLSelectElement;
+    const q = $("q") as HTMLInputElement;
+    const qv = $("qv") as HTMLElement;
+    const wm = $("wm") as HTMLInputElement;
+    const wmPos = $("wmPos") as HTMLSelectElement;
+    const wmOp = $("wmOp") as HTMLInputElement;
+    const buildPack = $("buildPack") as HTMLButtonElement;
+    const downloadManifest = $("downloadManifest") as HTMLButtonElement;
+    const packStatus = $("packStatus") as HTMLElement;
+    const outList = $("outList") as HTMLElement;
+
+    q.addEventListener("input", () => qv.textContent = Number(q.value).toFixed(2));
+
+    const PACKS: Record<string, { name: string; items: { key: string; w: number; h: number; mode: "cover"|"contain" }[] }> = {
+      social: {
+        name: "social",
+        items: [
+          { key: "ig-post-1080x1080", w: 1080, h: 1080, mode: "cover" },
+          { key: "ig-story-1080x1920", w: 1080, h: 1920, mode: "cover" },
+          { key: "x-post-1200x675", w: 1200, h: 675, mode: "cover" },
+          { key: "linkedin-1200x627", w: 1200, h: 627, mode: "cover" },
+        ],
+      },
+      ads: {
+        name: "ads",
+        items: [
+          { key: "meta-1080x1080", w: 1080, h: 1080, mode: "cover" },
+          { key: "meta-1080x1350", w: 1080, h: 1350, mode: "cover" },
+          { key: "gdn-300x250", w: 300, h: 250, mode: "cover" },
+          { key: "gdn-728x90", w: 728, h: 90, mode: "cover" },
+          { key: "gdn-160x600", w: 160, h: 600, mode: "cover" },
+        ],
+      },
+      store: {
+        name: "store",
+        items: [
+          { key: "appstore-1242x2688", w: 1242, h: 2688, mode: "cover" },
+          { key: "playstore-1080x1920", w: 1080, h: 1920, mode: "cover" },
+        ],
+      },
+    };
+
+    let srcImg: HTMLImageElement | null = null;
+    let srcName = "asset";
+    let manifest: any = null;
+
+    assetFile.addEventListener("change", async () => {
+      const f = assetFile.files?.[0];
+      if (!f) return;
+      srcName = f.name.replace(/\.[^/.]+$/, "");
+      const url = URL.createObjectURL(f);
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      URL.revokeObjectURL(url);
+      srcImg = img;
+      buildPack.disabled = false;
+      packStatus.textContent = `Carregado: ${img.width}x${img.height}`;
+      outList.innerHTML = "";
+      downloadManifest.disabled = true;
+      manifest = null;
+    });
+
+    function fitDraw(ctx: CanvasRenderingContext2D, img: HTMLImageElement, tw: number, th: number, mode: "cover"|"contain") {
+      const ir = img.width / img.height;
+      const tr = tw / th;
+
+      let sw = img.width, sh = img.height;
+      let sx = 0, sy = 0;
+
+      if (mode === "cover") {
+        if (ir > tr) {
+          // crop width
+          sh = img.height;
+          sw = Math.round(sh * tr);
+          sx = Math.round((img.width - sw) / 2);
+        } else {
+          sw = img.width;
+          sh = Math.round(sw / tr);
+          sy = Math.round((img.height - sh) / 2);
+        }
+        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, tw, th);
+      } else {
+        // contain
+        let dw = tw, dh = th;
+        if (ir > tr) { dh = Math.round(dw / ir); }
+        else { dw = Math.round(dh * ir); }
+        const dx = Math.round((tw - dw) / 2);
+        const dy = Math.round((th - dh) / 2);
+        ctx.clearRect(0,0,tw,th);
+        ctx.drawImage(img, 0,0,img.width,img.height, dx, dy, dw, dh);
+      }
+    }
+
+    async function drawWatermark(ctx: CanvasRenderingContext2D, tw: number, th: number) {
+      const bk = loadBrand();
+      if (!bk.logoDataUrl) return;
+      const logo = new Image();
+      logo.src = bk.logoDataUrl;
+      await logo.decode();
+
+      const pad = Math.round(Math.min(tw, th) * 0.03);
+      const maxW = Math.round(tw * 0.22);
+      const s = Math.min(1, maxW / logo.width);
+      const lw = Math.round(logo.width * s);
+      const lh = Math.round(logo.height * s);
+
+      let x = pad, y = pad;
+      const pos = wmPos.value;
+      if (pos.includes("r")) x = tw - lw - pad;
+      if (pos.includes("b")) y = th - lh - pad;
+
+      ctx.save();
+      ctx.globalAlpha = Number(wmOp.value);
+      ctx.drawImage(logo, x, y, lw, lh);
+      ctx.restore();
+    }
+
+    function dl(blob: Blob, filename: string) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    }
+
+    buildPack.addEventListener("click", async () => {
+      if (!srcImg) return;
+      packStatus.textContent = "Gerando…";
+      outList.innerHTML = "";
+
+      const sel = PACKS[packSel.value];
+      const mime = outFmt.value;
+      const quality = Number(q.value);
+
+      manifest = {
+        tool: "volynx-studio",
+        pack: sel.name,
+        createdAt: new Date().toISOString(),
+        source: { name: srcName, w: srcImg.width, h: srcImg.height },
+        outputs: [],
+      };
+
+      for (const item of sel.items) {
+        const c = document.createElement("canvas");
+        c.width = item.w; c.height = item.h;
+        const ctx = c.getContext("2d")!;
+        fitDraw(ctx, srcImg, item.w, item.h, item.mode);
+
+        if (wm.checked) {
+          await drawWatermark(ctx, item.w, item.h);
+        }
+
+        const blob: Blob = await new Promise((resolve) => c.toBlob((b) => resolve(b!), mime, quality));
+        const ext = mime === "image/png" ? "png" : mime === "image/jpeg" ? "jpg" : "webp";
+        const filename = `${srcName}__${item.key}.${ext}`;
+
+        (manifest.outputs as any[]).push({ key: item.key, w: item.w, h: item.h, mime, filename, bytes: blob.size });
+
+        const row = document.createElement("div");
+        row.style.display = "flex";
+        row.style.gap = "10px";
+        row.style.alignItems = "center";
+        row.style.justifyContent = "space-between";
+        row.style.padding = "10px 12px";
+        row.style.border = "1px solid rgba(255,255,255,.08)";
+        row.style.borderRadius = "14px";
+        row.innerHTML = `
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <strong style="font-size:13px">${item.key}</strong>
+            <span style="opacity:.7;font-size:12px">${item.w}×${item.h} • ${(blob.size/1024).toFixed(0)} KB</span>
+          </div>
+          <button class="btn secondary" type="button">Baixar</button>
+        `;
+        (row.querySelector("button") as HTMLButtonElement).addEventListener("click", () => dl(blob, filename));
+        outList.appendChild(row);
+      }
+
+      downloadManifest.disabled = false;
+      packStatus.textContent = `Pack pronto: ${sel.items.length} arquivos.`;
+    });
+
+    downloadManifest.addEventListener("click", () => {
+      if (!manifest) return;
+      const blob = new Blob([JSON.stringify(manifest, null, 2)], { type: "application/json" });
+      dl(blob, `${srcName}__manifest.json`);
+    });
+
+    refreshPro();
+    renderBrand();
+  </script>
+</body>
+</html>

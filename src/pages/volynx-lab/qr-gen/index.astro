@@ -6,13 +6,10 @@ const BASE_PATH = "/tools/qr";
 ---
 
 <BaseLayout title="VOLYNX QR Generator">
-  <div id="app"></div>
+  <div id="app" data-core-url={CORE_URL} data-base-path={BASE_PATH}></div>
 
   <link rel="stylesheet" href="/tools/qr/styles/base.css" />
 
-  <script is:inline define:vars={{ VOLYNX_CORE_URL: CORE_URL, VOLYNX_QR_BASE: BASE_PATH }}>
-    window.VOLYNX_CORE_URL = VOLYNX_CORE_URL;
-    window.VOLYNX_QR_BASE = VOLYNX_QR_BASE;
-  </script>
+  <script src="/tools/qr/config-init.js"></script>
   <Fragment set:html={'<script src="https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js" defer></script><script type="module" src="/tools/qr/api.js"></script><script type="module" src="/tools/qr/app.js"></script><script src="/tools/qr/cookie-banner.js" defer></script>'} />
 </BaseLayout>

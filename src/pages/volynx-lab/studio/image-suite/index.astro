@@ -1,0 +1,381 @@
+---
+import "../../../styles/image-suite.css";
+import PageWidgets from "../../../components/PageWidgets.astro";
+import SiteFooter from "../../../components/SiteFooter.astro";
+const pageTitle = "VOLYNX Lab • iMage Suite";
+const pageDescription = "Free image suite — upscale, compress and convert images directly in your browser, no upload required.";
+---
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#080610" />
+  <meta name="description" content={pageDescription} />
+  <title>{pageTitle}</title>
+
+  <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="shortcut icon" href="/assets/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Volynx" />
+  <link rel="manifest" href="/assets/site.webmanifest" />
+</head>
+
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="pill-back" href="/volynx-lab/">← Voltar</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <h1>iMage Suite</h1>
+
+    <div class="grid">
+      <div class="card">
+        <div class="cardHead">
+          <strong>Upload &amp; Config</strong>
+          <button id="pickBtn" class="btn secondary" type="button">Selecionar</button>
+          <input id="file" type="file" accept="image/*" hidden aria-label="Select image" />
+        </div>
+
+        <div class="cardBody">
+          <div id="drop" class="drop" role="button" tabindex="0" aria-label="Drop zone">
+            Arraste imagem aqui ou clique para selecionar
+          </div>
+
+          <div class="field-group">
+            <label class="field">
+              Ferramenta
+              <select id="tool" aria-label="Tool">
+                <option value="upscale" selected>Upscale</option>
+                <option value="compress">Compress</option>
+                <option value="convert">Convert</option>
+              </select>
+            </label>
+
+            <label class="field">
+              Escala (Upscale)
+              <select id="scale" aria-label="Scale">
+                <option value="2">2x</option>
+                <option value="3">3x</option>
+                <option value="4" selected>4x</option>
+              </select>
+            </label>
+
+            <label class="field">
+              Formato
+              <select id="format" aria-label="Output format">
+                <option value="image/png">PNG</option>
+                <option value="image/webp">WebP</option>
+                <option value="image/jpeg">JPG</option>
+              </select>
+            </label>
+
+            <label class="field">
+              Qualidade (Compress)
+              <input id="quality" type="range" min="0.3" max="1" step="0.05" value="0.85" aria-label="Quality" />
+              <em id="qualityVal" style="font-style:normal;font-size:12px;color:rgba(255,255,255,.68)">0.85</em>
+            </label>
+          </div>
+
+          <div class="pro-box" style="margin-top:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+              <strong style="font-size:13px">Brand watermark</strong>
+              <span id="wmGate" style="opacity:.7;font-size:12px"></span>
+            </div>
+            <div style="display:grid;gap:10px;margin-top:10px">
+              <label style="display:flex;gap:10px;align-items:center">
+                <input id="wmEnable" type="checkbox" />
+                <span style="opacity:.85">Aplicar logo do Brand Kit</span>
+              </label>
+
+              <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+                <select id="wmPos" class="select" style="min-width:180px">
+                  <option value="br">Bottom-right</option>
+                  <option value="bl">Bottom-left</option>
+                  <option value="tr">Top-right</option>
+                  <option value="tl">Top-left</option>
+                </select>
+                <label style="display:flex;gap:10px;align-items:center">
+                  <span style="opacity:.75;font-size:12px">Opacidade</span>
+                  <input id="wmOp" type="range" min="0.1" max="1" step="0.05" value="0.85" />
+                </label>
+              </div>
+
+              <a href="/volynx-lab/studio/" style="opacity:.75;font-size:12px;text-decoration:underline">Configurar Brand Kit no Studio</a>
+            </div>
+          </div>
+
+          <button id="runBtn" class="btn" type="button" disabled style="margin-top:16px">Processar</button> class="btn" type="button" disabled style="margin-top:16px">Processar</button>
+
+          <hr />
+
+          <div class="license-row">
+            <input
+              id="licenseKey"
+              class="license-input"
+              placeholder="Enter PRO License"
+              type="text"
+              aria-label="License key"
+            />
+            <button id="activateBtn" class="btn secondary" type="button">Activate</button>
+          </div>
+          <div id="proStatus" class="pro-status" aria-live="polite"></div>
+
+          <div class="kpis">
+            <div class="kpi"><strong>Original</strong><div id="origMeta">—</div></div>
+            <div class="kpi"><strong>Resultado</strong><div id="outMeta">—</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cardHead">
+          <strong>Resultado</strong>
+          <button id="downloadBtn" class="btn" type="button" disabled>Baixar</button>
+        </div>
+        <div class="cardBody">
+          <img id="preview" class="preview" alt="Result preview" />
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const FREE_LIMIT = 3;
+
+    function todayKey() {
+      const d = new Date();
+      return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+    }
+
+    function getUsage() {
+      const raw = localStorage.getItem("volynx_usage");
+      const today = todayKey();
+      if (!raw) {
+        const data = { date: today, used: 0 };
+        localStorage.setItem("volynx_usage", JSON.stringify(data));
+        return data;
+      }
+      const data = JSON.parse(raw);
+      if (data.date !== today) {
+        const reset = { date: today, used: 0 };
+        localStorage.setItem("volynx_usage", JSON.stringify(reset));
+        return reset;
+      }
+      return data;
+    }
+
+    function incrementUsage() {
+      const data = getUsage();
+      data.used++;
+      localStorage.setItem("volynx_usage", JSON.stringify(data));
+    }
+
+    const $ = (id: string) => document.getElementById(id);
+
+    const fileEl      = $("file") as HTMLInputElement;
+    const pickBtn     = $("pickBtn") as HTMLButtonElement;
+    const dropEl      = $("drop") as HTMLElement;
+    const runBtn      = $("runBtn") as HTMLButtonElement;
+    const downloadBtn = $("downloadBtn") as HTMLButtonElement;
+    const previewEl   = $("preview") as HTMLImageElement;
+    const toolEl      = $("tool") as HTMLSelectElement;
+    const scaleEl     = $("scale") as HTMLSelectElement;
+    const fmtEl       = $("format") as HTMLSelectElement;
+    const qualityEl   = $("quality") as HTMLInputElement;
+    const qualityValEl = $("qualityVal") as HTMLElement;
+    const origMeta    = $("origMeta") as HTMLElement;
+    const outMeta     = $("outMeta") as HTMLElement;
+    const licenseInput = $("licenseKey") as HTMLInputElement;
+    const activateBtn = $("activateBtn") as HTMLButtonElement;
+    const proStatus   = $("proStatus") as HTMLElement;
+
+    const VALID_LICENSES = [
+      "VOLYNX-PRO-2026",
+      "VOLYNX-LIFETIME-001"
+    ];
+
+    let isPro = localStorage.getItem("volynx_pro") === "true";
+
+    // Brand Kit (shared with Studio)
+    type BrandKit = { logoDataUrl?: string; primary?: string; neutral?: string; font?: string; updatedAt?: string };
+    function loadBrand(): BrandKit {
+      try { return JSON.parse(localStorage.getItem("volynx_brandkit") || "{}"); } catch { return {}; }
+    }
+
+    const wmEnable = $("wmEnable") as HTMLInputElement;
+    const wmPos    = $("wmPos") as HTMLSelectElement;
+    const wmOp     = $("wmOp") as HTMLInputElement;
+    const wmGate   = $("wmGate") as HTMLElement;
+
+    async function drawWatermark(ctx: CanvasRenderingContext2D, tw: number, th: number) {
+      const bk = loadBrand();
+      if (!bk.logoDataUrl) return;
+      const logo = new Image();
+      logo.src = bk.logoDataUrl;
+      await logo.decode();
+
+      const pad = Math.round(Math.min(tw, th) * 0.03);
+      const maxW = Math.round(tw * 0.22);
+      const s = Math.min(1, maxW / logo.width);
+      const lw = Math.round(logo.width * s);
+      const lh = Math.round(logo.height * s);
+
+      let x = pad, y = pad;
+      const pos = wmPos.value;
+      if (pos.includes("r")) x = tw - lw - pad;
+      if (pos.includes("b")) y = th - lh - pad;
+
+      ctx.save();
+      ctx.globalAlpha = Number(wmOp.value || "0.85");
+      ctx.drawImage(logo, x, y, lw, lh);
+      ctx.restore();
+    }
+
+    let srcImg: HTMLImageElement | null = null;
+    let srcFile: File | null = null;
+    let outBlob: Blob | null = null;
+    let srcName = "image";
+
+    function updateProUI() {
+      proStatus.textContent = isPro ? "PRO Activated ✔ Unlimited access enabled" : "";
+      const bk = loadBrand();
+      if (!isPro) {
+        wmGate.textContent = "PRO only";
+        wmEnable.checked = false;
+        wmEnable.disabled = true;
+        wmPos.disabled = true;
+        wmOp.disabled = true;
+      } else if (!bk.logoDataUrl) {
+        wmGate.textContent = "Adicione um logo no Studio";
+        wmEnable.checked = false;
+        wmEnable.disabled = true;
+        wmPos.disabled = true;
+        wmOp.disabled = true;
+      } else {
+        wmGate.textContent = "OK";
+        wmEnable.disabled = false;
+        wmPos.disabled = false;
+        wmOp.disabled = false;
+      }
+    }
+
+    activateBtn.addEventListener("click", () => {
+      const key = licenseInput.value.trim();
+      if (VALID_LICENSES.includes(key)) {
+        localStorage.setItem("volynx_pro", "true");
+        isPro = true;
+        updateProUI();
+        alert("PRO Activated Successfully!");
+      } else {
+        alert("Invalid License Key");
+      }
+    });
+
+    updateProUI();
+
+    qualityEl.addEventListener("input", () => {
+      qualityValEl.textContent = qualityEl.value;
+    });
+
+    pickBtn.addEventListener("click", () => fileEl.click());
+    dropEl.addEventListener("click", () => fileEl.click());
+    dropEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") fileEl.click();
+    });
+
+    fileEl.addEventListener("change", async () => {
+      const f = fileEl.files?.[0];
+      if (!f) return;
+      await loadFile(f);
+    });
+
+    dropEl.addEventListener("dragover", (e) => e.preventDefault());
+    dropEl.addEventListener("drop", async (e) => {
+      e.preventDefault();
+      const f = (e as DragEvent).dataTransfer?.files[0];
+      if (!f) return;
+      await loadFile(f);
+    });
+
+    async function loadFile(file: File) {
+      srcFile = file;
+      srcName = file.name.replace(/\.[^/.]+$/, "");
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      URL.revokeObjectURL(url);
+      srcImg = img;
+      origMeta.textContent = `${img.width}x${img.height} • ${(file.size / 1024 / 1024).toFixed(2)}MB`;
+      runBtn.disabled = false;
+    }
+
+    runBtn.addEventListener("click", async () => {
+      if (!srcImg) return;
+
+      const usage = getUsage();
+      if (!isPro && usage.used >= FREE_LIMIT) {
+        alert("Limite diário atingido. Faça upgrade para uso ilimitado.");
+        return;
+      }
+
+      runBtn.disabled = true;
+      const tool    = toolEl.value;
+      const scale   = parseInt(scaleEl.value);
+      const mime    = fmtEl.value;
+      const quality = parseFloat(qualityEl.value);
+
+      const w = srcImg.width;
+      const h = srcImg.height;
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d")!;
+
+      if (tool === "upscale") {
+        canvas.width  = w * scale;
+        canvas.height = h * scale;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(srcImg, 0, 0, canvas.width, canvas.height);
+        if (isPro && wmEnable.checked) await drawWatermark(ctx, canvas.width, canvas.height);
+        outBlob = await new Promise<Blob | null>(res => canvas.toBlob(res, mime, 0.95));
+      } else {
+        canvas.width  = w;
+        canvas.height = h;
+        ctx.drawImage(srcImg, 0, 0);
+        if (isPro && wmEnable.checked) await drawWatermark(ctx, canvas.width, canvas.height);
+        outBlob = await new Promise<Blob | null>(res => canvas.toBlob(res, mime, tool === "compress" ? quality : 0.95));
+      }
+
+      if (!outBlob) return;
+
+      const url = URL.createObjectURL(outBlob);
+      previewEl.src = url;
+
+      const reduction = ((1 - (outBlob.size / srcFile!.size)) * 100).toFixed(1);
+      outMeta.textContent = `${canvas.width}x${canvas.height} • ${(outBlob.size / 1024 / 1024).toFixed(2)}MB • ${reduction}%`;
+      downloadBtn.disabled = false;
+
+      if (!isPro) incrementUsage();
+      runBtn.disabled = false;
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      if (!outBlob) return;
+      const ext = fmtEl.value.split("/")[1];
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(outBlob);
+      a.download = `${srcName}.${ext}`;
+      a.click();
+    });
+  </script>
+
+  <SiteFooter />
+  <PageWidgets />
+</body>
+</html>
