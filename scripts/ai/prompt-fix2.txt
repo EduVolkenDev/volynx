@@ -1,0 +1,65 @@
+Você está vendo o contexto real do repo. Não chute.
+
+CORREÇÕES IMPORTANTES (baseadas no repo):
+- EXISTE: src/pages/tools/index.astro (não invente que falta).
+- EXISTE e é bug: src/pages/studio/studio/index.astro (rota /studio/studio). Deve ser removida.
+- EXISTE: src/pages/volynx-lab/index.astro e src/pages/studio/index.astro.
+- NÃO EXISTE ainda: src/pages/login/index.astro (criar).
+
+REGRAS (não discutir):
+- /volynx-lab = ferramentas gratuitas
+- /studio = suite paga
+- /tools = catálogo mestre (Lab + Studio)
+- /dev-hub = hub de kits + loja de ícones (curadoria)
+- /products = páginas oficiais de produto (CTA principal)
+- NÃO renomear slugs/paths existentes (ex.: /products/volynx-icons-store/ permanece).
+- Use home.css para páginas impactantes; services.css para páginas técnicas. Não crie novo design system.
+
+TAREFA — GERAR PATCHES COMPLETOS (Phase 1):
+1) Remover rota indesejada /studio/studio:
+   - DELETE: src/pages/studio/studio/index.astro
+   - Se a pasta ficar vazia, DELETE a pasta src/pages/studio/studio/
+   - Procurar e corrigir qualquer referência “/studio/studio” em todo o src (Header/HomeMenus/links).
+
+2) Criar a rota /login:
+   - CRIAR: src/pages/login/index.astro (arquivo completo)
+   - UI apenas, sem autenticação real
+   - Fundo com vídeo opcional + poster fallback + prefers-reduced-motion
+   - CTAs para /studio/ e /pricing/
+   - Estilo: home.css (impactante)
+
+3) Duplicidade dev-hub vs products:
+   - Em cada arquivo:
+     - src/pages/dev-hub/portfolio-pro-kit/index.astro
+     - src/pages/dev-hub/saas-landing-system/index.astro
+     - src/pages/dev-hub/volynx-icons-store/index.astro
+     Adicionar no topo um banner elegante “Ver página oficial do produto” → /products/<slug>/
+     Não remover conteúdo existente.
+
+   - Atualizar src/pages/dev-hub/index.astro:
+     - Deve listar Kits + IconIcons com cards premium (home vibe)
+     - CTAs principais devem apontar para /products/<slug>/
+     - Links secundários podem apontar para /dev-hub/<slug>/ (opcional)
+
+4) Garantir /tools como catálogo mestre:
+   - Atualizar src/pages/tools/index.astro:
+     - Seção Free (Lab) com links: /volynx-lab/converter/, /volynx-lab/image-scaler/, /volynx-lab/image-suite/, /volynx-lab/qr-gen/
+     - Seção Studio (Pro) com links: /studio/converter/, /studio/image-scaler/, /studio/image-suite/, /studio/qr-gen/
+     - CTAs de upgrade para /pricing/ e /studio/
+     - Garantir links corretos e consistentes
+
+5) Atualizar navegação global:
+   - Identificar o arquivo real do menu (src/components/Header.astro e/ou HomeMenus.astro).
+   - Garantir links: /tools, /volynx-lab, /studio, /dev-hub, /products, /services, /pricing, /login.
+   - Não duplicar itens.
+
+FORMATO DE SAÍDA (obrigatório):
+- Comece com um resumo curto do que será alterado.
+- Depois forneça patches file-by-file, no formato:
+  DELETE: caminho
+  === FILE: caminho ===
+  [conteúdo completo final do arquivo]
+- Para arquivos modificados, forneça o conteúdo completo final (não “trechos”).
+- Se faltar tokens, continue com PART 1/2 e PART 2/2.
+
+Responda em PT-BR.

@@ -1,0 +1,52 @@
+Você é um “executor” (não consultor). Use APENAS o contexto do repo. Não chute.
+
+OBJETIVO: Aplicar Phase 1 com zero ambiguidade.
+
+REGRAS FIXAS:
+- /volynx-lab = free tools
+- /studio = paid suite
+- /tools = catálogo mestre (Free + Pro)
+- /dev-hub = hub de kits + IconIcons (curadoria)
+- /products = páginas oficiais
+- NÃO renomear slugs/paths existentes.
+- /studio/studio é BUG e deve ser removido.
+
+ENTREGÁVEIS (obrigatório):
+A) Comandos exatos (terminal) para:
+  1) deletar src/pages/studio/studio (rota /studio/studio)
+  2) criar src/pages/login/index.astro
+  3) aplicar banners “Ver página oficial” nas 3 páginas duplicadas do dev-hub
+  4) atualizar /dev-hub/index.astro para listar kits + IconIcons com CTA principal para /products/<slug>/
+  5) atualizar /tools/index.astro com seções Free (Lab) e Pro (Studio), com links corretos
+  6) atualizar navegação global (Header/HomeMenus) adicionando links: /tools /volynx-lab /studio /dev-hub /products /services /pricing /login
+
+B) Patches “file-by-file” com CONTEÚDO COMPLETO para:
+  - src/pages/login/index.astro
+  - src/pages/dev-hub/index.astro
+  - src/pages/tools/index.astro
+  - src/pages/dev-hub/portfolio-pro-kit/index.astro (com banner no topo, mantendo resto)
+  - src/pages/dev-hub/saas-landing-system/index.astro (com banner no topo, mantendo resto)
+  - src/pages/dev-hub/volynx-icons-store/index.astro (com banner no topo, mantendo resto)
+  - o(s) arquivo(s) reais onde estão os links do menu (Header.astro e/ou HomeMenus.astro) — detectar e devolver o conteúdo completo final
+
+CONDIÇÕES:
+- Se algum arquivo for grande demais, NÃO trunque. Em vez disso, entregue um DIFF claro (estilo unified diff) com contexto suficiente para eu aplicar.
+- Para /login, use BaseLayout/Home vibe e respeite prefers-reduced-motion (vídeo opcional com poster).
+- Para banners do dev-hub: CTA apontando para /products/<slug>/ e visual home.css.
+- Para /tools: links corretos:
+  Free: /volynx-lab/converter/ /volynx-lab/image-scaler/ /volynx-lab/image-suite/ /volynx-lab/qr-gen/
+  Pro: /studio/converter/ /studio/image-scaler/ /studio/image-suite/ /studio/qr-gen/
+- Para remover /studio/studio: incluir "DELETE:".
+
+FORMATO DE SAÍDA:
+1) “CHECKLIST DE EXECUÇÃO” (passo a passo, numerado, com comandos copy/paste)
+2) “PATCHES”:
+   - DELETE: caminho
+   - === FILE: caminho ===
+     [conteúdo completo] OU [diff]
+3) Final: “VALIDAÇÃO” com comandos:
+   - npm run dev
+   - npm run build
+   - npm run preview
+
+Responda em PT-BR. Se faltar tokens, continue em PART 1/2 e PART 2/2.
