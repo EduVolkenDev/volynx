@@ -20,17 +20,19 @@
   box-sizing: border-box;
 }
 
-html,
-body {
-  height: 100%;
+html {
   margin: 0;
-  overflow-x: hidden;
 }
 
 body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
   font-family: "Sora", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   color: var(--txt);
-  background: url("/assets/lucid6.webp") center / cover no-repeat fixed;
+  background: url("/assets/lucid6.webp") center / cover no-repeat;
 }
 
 /* ===== BACKGROUND ===== */
@@ -118,6 +120,7 @@ body {
 
 /* ===== MAIN WRAP ===== */
 .wrap {
+  flex: 1 0 auto;
   max-width: 1080px;
   margin: 0 auto;
   padding: 22px var(--pad) 44px;
@@ -310,9 +313,11 @@ body {
   grid-template-columns: 1fr auto;
   gap: 10px;
   border-bottom: 1px solid rgba(255, 255, 255, .07);
+  overflow: hidden;
 }
 
 .item__name {
+  min-width: 0;
   font-size: 13px;
   color: var(--txt);
   overflow: hidden;
