@@ -13,10 +13,10 @@ const {
 
 <header class="vxh" role="banner">
   <div class="vxh__inner">
-    <div class="vxh__brand" aria-label="VOLYNX — ir para o início">
-      <img src="/assets/volynx-icon.webp" alt="VOLYNX" width="28" height="28" loading="eager" decoding="async" />
-      <img src="/assets/wordmark.webp" alt="VOLYNX" width="28" height="28" loading="eager" decoding="async" />
-    </div>
+    <a class="vxh__brand" href="/" aria-label="VOLYNX — ir para o início">
+      <img src="/assets/volynx-icon.webp" alt="VOLYNX" width="32" height="32" loading="eager" decoding="async" />
+      <img src="/assets/wordmark.webp" alt="VOLYNX" width="120" height="24" loading="eager" decoding="async" />
+    </a>
 
     {mode === "sections" && (
       <nav class="vxh__nav" aria-label="Seções da página">
@@ -142,6 +142,11 @@ const {
     transition: transform 0.2s, opacity 0.2s;
   }
   .vxh__mobile {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-6px);
+    transition: opacity .18s ease, transform .18s ease;
+
     display: none;
     position: fixed;
     inset: 58px 0 0;
@@ -150,6 +155,8 @@ const {
     -webkit-backdrop-filter: blur(20px);
     z-index: 899;
   }
+  .vxh__mobile.vx--open { display: block; opacity: 1; pointer-events: auto; transform: translateY(0); }
+
   .vxh__mobileInner {
     padding: 20px;
     display: flex;
@@ -170,8 +177,19 @@ const {
   .vxh__mobileInner nav a:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.10); }
   .vxh__mobileInner .vxh__cta { align-self: flex-start; margin-top: 8px; }
 
+  :global(body){ padding-top: 64px; }
+  .vxh__brand img{ display:block; }
+  .vxh__brand img:first-child{ width:32px; height:32px; }
+  .vxh__brand img:last-child{ width:120px; height:auto; }
+  @media (max-width: 420px){
+    .vxh__brand img:last-child{ width:92px; }
+    .vxh__inner{ padding: 10px 14px; gap: 14px; }
+  }
+
   @media (max-width: 768px) {
     .vxh__nav { display: none; }
     .vxh__burger { display: flex; }
   }
 </style>
+
+<script src="/js/vx-header.js" defer></script>
