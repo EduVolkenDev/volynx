@@ -1,14 +1,465 @@
 ---
-import BaseLayout from "../../../layouts/BaseLayout.astro";
-
-const CORE_URL = import.meta.env.PUBLIC_VOLYNX_CORE_URL ?? "https://simple-qr-generator-z12a.onrender.com";
-const BASE_PATH = "/tools/qr";
+import PageWidgets from "../../../components/PageWidgets.astro";
 ---
 
-<BaseLayout title="VOLYNX QR Generator">
-  <div id="app" data-core-url={CORE_URL} data-base-path={BASE_PATH}></div>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VOLYNX QR Generator — Lab</title>
+  <meta name="description" content="Gere QR Codes estilizados com logo, gradientes e muito mais. Gratuito e sem cadastro." />
+  <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="shortcut icon" href="/assets/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
 
-  <link rel="stylesheet" href="/tools/qr/styles/base.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  <Fragment set:html={'<script src="/tools/qr/config-init.js"></script><script src="https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js" defer></script><script type="module" src="/tools/qr/api.js"></script><script type="module" src="/tools/qr/app.js"></script><script src="/tools/qr/cookie-banner.js" defer></script>'} />
-</BaseLayout>
+    @keyframes gradientShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-10px); }
+    }
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(108,10,228,.3), 0 0 40px rgba(89,198,232,.2); }
+      50%       { box-shadow: 0 0 30px rgba(108,10,228,.5), 0 0 60px rgba(89,198,232,.3); }
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #0a0a1f 0%, #1a1a3e 25%, #0f0f2e 50%, #1e1e4f 75%, #0a0a1f 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(ellipse, rgb(20,142,169) 1px, #003768a6 20px, #7d46beba 0px, rgb(89,148,225) 35px);
+      background-size: 40px 40px;
+      animation: float 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .container {
+      background: rgba(255,255,255,.03);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-radius: 30px;
+      padding: 50px 40px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.08);
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+      animation: glow 4s ease-in-out infinite;
+    }
+
+    .wordmark {
+      max-width: 100vw; width: 100%;
+      display: grid; justify-content: center;
+      filter: drop-shadow(0 0 20px rgba(26,174,219,.46));
+      align-content: flex-start;
+      position: relative; margin: auto;
+    }
+    .wordmark img { width: 100%; max-width: 400px; height: auto; display: block; }
+
+    h1 {
+      font-size: 2.5em; font-weight: 700; margin-bottom: 40px;
+      background: linear-gradient(135deg, #6c0ae4, #59c6e8, #a108f7, #12ddf8);
+      background-size: 300% 300%;
+      background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      animation: gradientShift 6s ease infinite;
+      letter-spacing: -.5px; position: relative;
+    }
+    h1::after {
+      content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+      width: 100px; height: 3px;
+      background: linear-gradient(90deg, transparent, #6c0ae4, transparent);
+      border-radius: 2px;
+    }
+
+    .input-wrapper { position: relative; margin-bottom: 30px; }
+
+    input[type="text"] {
+      width: 100%; padding: 18px 20px;
+      border: 2px inset rgba(255,255,255,.4);
+      border-radius: 15px;
+      background: rgba(255,255,255,.05);
+      color: #e0e0e0; font-size: 1em; outline: none;
+      transition: all .3s cubic-bezier(.4,0,.2,1);
+    }
+    input[type="text"]::placeholder { color: rgba(255,255,255,.3); }
+    input[type="text"]:focus {
+      background: rgba(255,255,255,.08);
+      border-color: rgba(108,10,228,.5);
+      box-shadow: 0 0 0 3px rgba(108,10,228,.1), 0 8px 20px rgba(0,0,0,.3);
+      transform: translateY(-2px);
+    }
+
+    .options-section {
+      background: rgba(108,14,162,.76);
+      border-radius: 20px; padding: 25px; margin: 30px 0;
+      border: 2px inset rgba(255,255,255,.45);
+    }
+    .section-title {
+      font-size: .85em; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 1.5px; color: rgba(255,255,255,.5);
+      margin-bottom: 20px; text-align: left;
+    }
+    .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+    .option-group { display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
+    .option-group label { font-size: .85em; font-weight: 500; margin-bottom: 8px; color: rgba(255,255,255,.7); letter-spacing: .3px; }
+
+    .option-group select,
+    .option-group input[type="range"] {
+      width: 100%; padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,.1); border-radius: 10px;
+      background: rgba(255,255,255,.05); color: #e0e0e0;
+      font-size: .9em; outline: none; transition: all .3s ease; cursor: pointer;
+    }
+    .option-group select:hover,
+    .option-group select:focus { background: rgba(255,255,255,.08); border-color: rgba(108,10,228,.3); }
+
+    .option-group input[type="color"] {
+      width: 100%; height: 50px; padding: 5px;
+      border: 1px solid rgba(255,255,255,.1); border-radius: 10px;
+      background: rgba(255,255,255,.05); cursor: pointer; transition: all .3s ease;
+    }
+    .option-group input[type="color"]:hover { border-color: rgba(108,10,228,.3); transform: scale(1.02); }
+
+    .option-group input[type="file"] {
+      width: 100%; padding: 10px;
+      border: 1px solid rgba(255,255,255,.1); border-radius: 10px;
+      background: rgba(255,255,255,.05); color: #e0e0e0;
+      font-size: .85em; cursor: pointer; transition: all .3s ease;
+    }
+    .option-group input[type="file"]:hover { background: rgba(255,255,255,.08); }
+
+    .option-group input[type="range"] {
+      padding: 0; height: 6px; -webkit-appearance: none; appearance: none;
+    }
+    .option-group input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: linear-gradient(135deg, #6c0ae4, #59c6e8); cursor: pointer;
+      box-shadow: 0 2px 10px rgba(108,10,228,.5); transition: all .2s ease;
+    }
+    .option-group input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); box-shadow: 0 4px 15px rgba(108,10,228,.7); }
+    .option-group input[type="range"]::-moz-range-thumb {
+      width: 18px; height: 18px; border: none; border-radius: 50%;
+      background: linear-gradient(135deg, #6c0ae4, #59c6e8); cursor: pointer;
+      box-shadow: 0 2px 10px rgba(108,10,228,.5); transition: all .2s ease;
+    }
+
+    button {
+      width: 100%; padding: 18px; border: none; border-radius: 15px;
+      background: linear-gradient(135deg, #6c0ae4 0%, #210df7 50%, #12ddf8 100%);
+      background-size: 200% 200%;
+      color: white; font-size: 1.05em; font-weight: 600; cursor: pointer;
+      transition: all .4s cubic-bezier(.4,0,.2,1);
+      margin-bottom: 25px; position: relative; overflow: hidden;
+      text-transform: uppercase; letter-spacing: 1px;
+      box-shadow: 0 0 30px 10px inset darkturquoise;
+    }
+    button::before {
+      content: ''; position: absolute; top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
+      transition: left .5s;
+    }
+    button:hover::before { left: 100%; }
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(108,10,228,.5), 0 5px 15px rgba(18,221,248,.3);
+      background-position: 100% 0;
+    }
+    button:active { transform: translateY(-1px); }
+
+    #qr-container {
+      margin: 30px 0; max-width: 100%; padding: 20px;
+      background: rgba(255,255,255,.9); border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.3); display: inline-block;
+    }
+
+    #downloadBtn {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+      color: white; border: none; padding: 15px 30px; border-radius: 15px;
+      font-weight: 600; font-size: 1em; cursor: pointer;
+      transition: all .3s cubic-bezier(.4,0,.2,1);
+      text-transform: uppercase; letter-spacing: .5px;
+      position: relative; overflow: hidden;
+    }
+    #downloadBtn::before {
+      content: ''; position: absolute; top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
+      transition: left .5s;
+    }
+    #downloadBtn:hover::before { left: 100%; }
+    #downloadBtn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(255,107,107,.5); }
+
+    .footer {
+      margin-top: 40px; font-size: .85em;
+      color: rgba(255,255,255,.4); font-weight: 300; letter-spacing: .5px;
+    }
+
+    #logoPreview {
+      margin-top: 15px; padding: 15px;
+      background: rgba(255,255,255,.05); border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+    #logoImg { max-width: 100px; max-height: 100px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,.3); height: auto; display: block; }
+
+    @media (max-width: 768px) {
+      .container { padding: 30px 20px; }
+      h1 { font-size: 2em; }
+      .options { grid-template-columns: 1fr; gap: 15px; }
+      .wordmark img { max-width: 200px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="wordmark">
+      <img src="/assets/wordmark.webp" alt="VOLYNX" />
+    </div>
+    <h1>QR Generator</h1>
+
+    <div class="input-wrapper">
+      <input type="text" id="text" placeholder="Digite o texto ou URL para gerar QR" />
+    </div>
+
+    <div class="options-section">
+      <div class="section-title">⚙️ Configurações de Estilo</div>
+      <div class="options">
+        <div class="option-group">
+          <label>Tamanho</label>
+          <select id="size">
+            <option value="300">Pequeno (300px)</option>
+            <option value="400" selected>Médio (400px)</option>
+            <option value="500">Grande (500px)</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label>Estilo dos Pontos</label>
+          <select id="dotsType">
+            <option value="square">Quadrado</option>
+            <option value="dots">Bolotas</option>
+            <option value="rounded">Arredondado</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label>Tipo de Cor</label>
+          <select id="dotsColorType">
+            <option value="solid">Sólida</option>
+            <option value="gradient">Gradiente</option>
+            <option value="metallic">Metálico</option>
+          </select>
+        </div>
+        <div class="option-group" id="dotsColorGroup">
+          <label>Cor do QR</label>
+          <input type="color" id="dotsColor" value="#000000" />
+        </div>
+        <div class="option-group" id="dotsGradientGroup" style="display:none;">
+          <label>Gradiente — Cor 1</label>
+          <input type="color" id="dotsColor1" value="#000000" />
+        </div>
+        <div class="option-group" id="dotsGradientGroup2" style="display:none;">
+          <label>Gradiente — Cor 2</label>
+          <input type="color" id="dotsColor2" value="#ffffff" />
+        </div>
+        <div class="option-group">
+          <label>Cor de Fundo</label>
+          <input type="color" id="backgroundColor" value="#ffffff" />
+        </div>
+        <div class="option-group">
+          <label>Border Radius</label>
+          <input type="range" id="borderRadius" min="0" max="50" step="5" value="10" />
+        </div>
+      </div>
+    </div>
+
+    <div class="options-section">
+      <div class="section-title">🖼️ Configurações de Logo</div>
+      <div class="options">
+        <div class="option-group">
+          <label>Imagem do Logo</label>
+          <input type="file" id="logo" accept="image/*" />
+          <div id="logoPreview" style="display:none;">
+            <img id="logoImg" alt="Logo Preview" />
+          </div>
+        </div>
+        <div class="option-group">
+          <label>Tamanho do Logo</label>
+          <input type="range" id="logoSize" min="0.1" max="0.5" step="0.1" value="0.4" />
+        </div>
+        <div class="option-group">
+          <label>Margem do Logo</label>
+          <input type="range" id="logoMargin" min="5" max="20" step="1" value="10" />
+        </div>
+      </div>
+    </div>
+
+    <button onclick="generateQR()">Gerar QR Code</button>
+    <div id="qr-container"></div>
+    <button id="downloadBtn" onclick="downloadQR()" style="display:none;">📥 Baixar QR Code</button>
+
+    <div class="footer">Tecnologia futurista para geração instantânea · VOLYNX Lab</div>
+  </div>
+
+  <PageWidgets />
+
+  <script is:inline src="https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  <script is:inline>
+    var qrCode = null;
+
+    document.getElementById('dotsColorType').addEventListener('change', function () {
+      var type = this.value;
+      document.getElementById('dotsColorGroup').style.display = type === 'solid' ? 'flex' : 'none';
+      document.getElementById('dotsGradientGroup').style.display = type === 'gradient' ? 'flex' : 'none';
+      document.getElementById('dotsGradientGroup2').style.display = type === 'gradient' ? 'flex' : 'none';
+      if (qrCode) generateQR();
+    });
+
+    document.getElementById('logo').addEventListener('change', function (e) {
+      var file = e.target.files[0];
+      if (file) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          document.getElementById('logoImg').src = e.target.result;
+          document.getElementById('logoPreview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        document.getElementById('logoPreview').style.display = 'none';
+      }
+    });
+
+    ['logoSize', 'logoMargin', 'dotsColor', 'dotsColor1', 'dotsColor2'].forEach(function (id) {
+      document.getElementById(id).addEventListener('input', function () { if (qrCode) generateQR(); });
+    });
+
+    document.getElementById('borderRadius').addEventListener('input', function () {
+      document.getElementById('qr-container').style.borderRadius = this.value + 'px';
+    });
+
+    function fileToDataURL(file) {
+      return new Promise(function (resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function () { resolve(reader.result); };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function buildGradient(kind) {
+      if (kind === 'gradient') {
+        return {
+          type: 'linear', rotation: Math.PI / 4,
+          colorStops: [
+            { offset: 0, color: document.getElementById('dotsColor1').value },
+            { offset: 1, color: document.getElementById('dotsColor2').value }
+          ]
+        };
+      }
+      if (kind === 'metallic') {
+        return {
+          type: 'linear', rotation: 0,
+          colorStops: [{ offset: 0, color: '#c0c0c0' }, { offset: .5, color: '#808080' }, { offset: 1, color: '#c0c0c0' }]
+        };
+      }
+      return null;
+    }
+
+    async function generateQR() {
+      try {
+        var text = document.getElementById('text').value.trim();
+        if (!text) return alert('Digite algo para gerar o QR!');
+
+        var size = parseInt(document.getElementById('size').value, 10);
+        var dotsType = document.getElementById('dotsType').value;
+        var backgroundColor = document.getElementById('backgroundColor').value;
+        var dotsColorType = document.getElementById('dotsColorType').value;
+
+        var dotsOptions = { type: dotsType };
+        var cornersSquareOptions = { type: dotsType === 'rounded' ? 'extra-rounded' : 'square' };
+        var cornersDotOptions = { type: dotsType === 'rounded' ? 'dot' : 'square' };
+
+        if (dotsColorType === 'solid') {
+          var c = document.getElementById('dotsColor').value;
+          dotsOptions.color = c;
+          cornersSquareOptions.color = c;
+          cornersDotOptions.color = c;
+        } else {
+          var g = buildGradient(dotsColorType);
+          dotsOptions.gradient = g;
+          cornersSquareOptions.gradient = g;
+          cornersDotOptions.gradient = g;
+        }
+
+        var logoFile = document.getElementById('logo').files[0];
+        var logoSize = parseFloat(document.getElementById('logoSize').value);
+        var logoMargin = parseInt(document.getElementById('logoMargin').value, 10);
+
+        var options = {
+          width: size, height: size, type: 'svg', data: text,
+          dotsOptions: dotsOptions,
+          cornersSquareOptions: cornersSquareOptions,
+          cornersDotOptions: cornersDotOptions,
+          backgroundOptions: { color: backgroundColor },
+          qrOptions: { errorCorrectionLevel: 'M' }
+        };
+
+        if (logoFile) {
+          options.image = await fileToDataURL(logoFile);
+          options.imageOptions = { crossOrigin: 'anonymous', margin: logoMargin, imageSize: logoSize };
+        }
+
+        document.getElementById('qr-container').innerHTML = '';
+        qrCode = new QRCodeStyling(options);
+        qrCode.append(document.getElementById('qr-container'));
+
+        var radius = document.getElementById('borderRadius').value + 'px';
+        document.getElementById('qr-container').style.borderRadius = radius;
+
+        var svg = document.querySelector('#qr-container svg');
+        if (svg) {
+          svg.style.width = '100%';
+          svg.style.height = 'auto';
+          svg.style.maxWidth = size + 'px';
+        }
+
+        document.getElementById('downloadBtn').style.display = 'inline-block';
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao gerar o QR. Abra o Console (F12) para ver a mensagem.');
+      }
+    }
+
+    function downloadQR() {
+      if (qrCode) qrCode.download({ extension: 'png' });
+    }
+
+    window.generateQR = generateQR;
+    window.downloadQR = downloadQR;
+  </script>
+</body>
+</html>

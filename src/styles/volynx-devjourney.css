@@ -13,7 +13,7 @@
   --radius-sm: 10px;
   --accent: #04e5ff;
   --accent2: rgba(167, 139, 250, 1);
-  --muted: rgba(200, 205, 255, 0.58);
+  --muted: rgba(255, 255, 255, 0.929);
   --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
   --shadow2: 0 2px 12px rgba(0, 0, 0, 0.32);
 }
@@ -24,16 +24,17 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 72px;
-  background: #080610;
   color: #e8eaff;
+  background: black;
   font-family: var(--body);
   line-height: 1.6;
   -webkit-text-size-adjust: 100%;
 }
 
-body { min-height: 100vh; overflow-x: hidden; padding-top: 58px; }
+body { min-height: 100vh; overflow-x: hidden; padding-top: 58px;   background: url("/assets/phoenix-bg.jpg");
+ }
 
-img { max-width: 100%; display: block; }
+img { max-width: 100%; height: auto; display: block; }
 a { color: inherit; }
 button { font-family: inherit; }
 
@@ -148,6 +149,10 @@ strong, b { color: #fff; }
   grid-template-columns: 1fr 400px;
   gap: 40px;
   align-items: start;
+  backdrop-filter: blur(35px);
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px inset #ffffff57;
 }
 @media (max-width: 900px) {
   .heroGrid { grid-template-columns: 1fr; }
@@ -165,6 +170,7 @@ strong, b { color: #fff; }
   background: rgba(255, 255, 255, 0.03);
   font-size: 13.5px;
   line-height: 1.5;
+  backdrop-filter: blur(35px);
 }
 .bulletCard b { color: #fff; font-size: 13.5px; display: block; margin-bottom: 2px; }
 .bulletCard span { color: var(--muted); font-size: 12.5px; }
@@ -179,7 +185,8 @@ strong, b { color: #fff; }
 @media (max-width: 560px) { .bullets { grid-template-columns: 1fr; } }
 
 /* --- Panel --- */
-.panel { position: relative; }
+.panel { position: relative; backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px); }
 
 /* --- Mini list --- */
 .mini { list-style: none; display: flex; flex-direction: column; gap: 4px; }
@@ -258,7 +265,7 @@ strong, b { color: #fff; }
   padding: 18px;
   border-radius: var(--radius);
   border: 1px solid rgba(255, 255, 255, 0.10);
-  background: rgba(255, 255, 255, 0.03);
+background: rgba(81, 78, 78, 0.65);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   transition: border-color 0.2s, background 0.2s, opacity 0.3s;
@@ -267,13 +274,14 @@ strong, b { color: #fff; }
   gap: 10px;
 }
 .blockCard:hover { border-color: rgba(4, 229, 255, 0.22); background: rgba(4, 229, 255, 0.04); }
-.blockCard.is--dim { opacity: 0.35; }
+.blockCard.is--dim { opacity: 1; }
 .blockCard.arsenal {
   border-color: rgba(245, 231, 145, 0.18);
   background: rgba(245, 231, 145, 0.04);
+  backdrop-filter: blur(35px);
 }
 .blockCard h3 { font-size: 14.5px; font-weight: 700; color: #fff; line-height: 1.35; }
-.blockCard p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.blockCard p { font-size: 13px; color: white; line-height: 1.5; }
 
 .blockTop {
   display: flex;
