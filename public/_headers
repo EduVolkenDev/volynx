@@ -3,7 +3,7 @@
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
 
   # Política de conteúdo — sem 'unsafe-inline' para scripts na maioria das páginas
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://js.stripe.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.stripe.com; frame-src https://js.stripe.com https://hooks.stripe.com https://calendly.com; form-action 'self' mailto:; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.stripe.com; frame-src https://js.stripe.com https://hooks.stripe.com https://calendly.com; form-action 'self' mailto:; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
 
   # Bloqueia clickjacking
   X-Frame-Options: SAMEORIGIN
@@ -46,12 +46,7 @@
 
 # QR Generator — carrega biblioteca via CDN (unpkg.com)
 /volynx-lab/qr-gen/*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://simple-qr-generator-z12a.onrender.com; frame-src 'none'; form-action 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
-
-
-# QR Generator (Studio) — usa biblioteca via CDN (unpkg.com) + script inline
-/studio/qr-gen/*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://simple-qr-generator-z12a.onrender.com; frame-src 'none'; form-action 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://simple-qr-generator-z12a.onrender.com; frame-src 'none'; form-action 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
 
 # Dev Hub — páginas de preview internas com scripts inline
 /dev-hub/*
