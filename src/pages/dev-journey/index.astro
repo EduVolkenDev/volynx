@@ -421,50 +421,6 @@ import VxFooter from "../../components/VxFooter.astro";
   <VxFooter />
 
   <script is:inline>
-    /* Menu mobile + scroll lock */
-    (function(){
-      var menuBtn = document.getElementById('menuBtn');
-      var mobileMenu = document.getElementById('mobileMenu');
-
-      function unlockScroll(){ document.body.style.overflow = ''; }
-      function lockScroll(){ document.body.style.overflow = 'hidden'; }
-
-      function closeMenu(){
-        if (mobileMenu){
-          mobileMenu.style.display = 'none';
-          mobileMenu.setAttribute('aria-hidden','true');
-        }
-        if (menuBtn) menuBtn.setAttribute('aria-expanded','false');
-        unlockScroll();
-      }
-      function openMenu(){
-        if (!mobileMenu || !menuBtn) return;
-        mobileMenu.style.display = 'block';
-        mobileMenu.setAttribute('aria-hidden','false');
-        menuBtn.setAttribute('aria-expanded','true');
-        lockScroll();
-      }
-
-      closeMenu();
-      document.addEventListener('DOMContentLoaded', function(){ closeMenu(); }, { once:true });
-      window.addEventListener('pageshow', closeMenu);
-
-      if (menuBtn){
-        menuBtn.addEventListener('click', function(){
-          var isOpen = menuBtn.getAttribute('aria-expanded') === 'true';
-          if (isOpen) closeMenu(); else openMenu();
-        });
-      }
-
-      if (mobileMenu){
-        mobileMenu.addEventListener('click', function(e){
-          if (e.target === mobileMenu) closeMenu();
-        });
-        var links = mobileMenu.querySelectorAll('a');
-        for (var i=0;i<links.length;i++) links[i].addEventListener('click', closeMenu);
-      }
-    })();
-
     /* Modal */
     (function(){
       var modal = document.getElementById('authModal');
