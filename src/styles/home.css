@@ -472,6 +472,16 @@ a:focus-visible { outline: 2px solid rgba(0, 190, 196, 0.55); outline-offset: 3p
         0 0 0 2px rgba(0,190,196,0.55),
         0 0 22px rgba(167,139,250,0.35);
 }
+
+.nav-links a p {
+    font-size: 10px;
+    font-weight: 420;
+}
+
+.nav-links2 a p span {
+    font-size: 15px;
+}
+
 .nav-chev {
     display: inline-flex;
     align-items: center;
@@ -894,3 +904,46 @@ a:focus-visible { outline: 2px solid rgba(0, 190, 196, 0.55); outline-offset: 3p
         transform: translateY(calc(-1 * var(--hero-wordmark-shift)));
     }
 }
+
+/* ========================================
+   NAV CARDS — Typography hierarchy fix
+   Title bigger, subtitle smaller
+======================================== */
+
+/* 1) Title (span) bigger */
+.nav-links a > span,
+.nav-links2 a > span {
+  font-size: clamp(16px, 4.2vw, 20px);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  line-height: 1.05;
+}
+
+/* Caso o título esteja usando .nav-sub (como no Portfolio) */
+.nav-links a .nav-sub,
+.nav-links2 a .nav-sub {
+  font-size: clamp(18px, 4.8vw, 22px);
+  font-weight: 950;
+  letter-spacing: 0.07em;
+}
+
+/* 2) Subtitle (p) smaller + mais leve */
+.nav-links a p,
+.nav-links2 a p {
+  margin-top: 6px;
+  font-size: clamp(7px, 2.9vw, 10px);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+  opacity: 0.88;
+  max-width: 36ch;
+}
+
+/* 3) Chev não influencia layout */
+.nav-chev {
+  font-size: clamp(18px, 4.6vw, 20px);
+  opacity: 0.85;
+}
+
+/* 4) Remove regras antigas que atrapalham hierarquia (opcional, mas recomendado) */
+.nav-links a p { font-weight: 500; } /* sobrescreve seu 420 */
