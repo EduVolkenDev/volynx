@@ -1,4 +1,6 @@
 ---
+import VxHeader from "../../../components/VxHeader.astro";
+import VxFooter from "../../../components/VxFooter.astro";
 import PageWidgets from "../../../components/PageWidgets.astro";
 ---
 
@@ -8,7 +10,7 @@ import PageWidgets from "../../../components/PageWidgets.astro";
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VOLYNX QR Generator — Studio</title>
-  <meta name="description" content="Gere QR Codes estilizados com logo, gradientes e muito mais. Gratuito e sem cadastro." />
+  <meta name="description" content="Gere QR Codes estilizados com logo, gradientes e muito mais. Faça login para salvar." />
   <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
   <link rel="shortcut icon" href="/assets/favicon.ico" />
@@ -31,6 +33,8 @@ import PageWidgets from "../../../components/PageWidgets.astro";
       50%       { box-shadow: 0 0 30px rgba(108,10,228,.5), 0 0 60px rgba(89,198,232,.3); }
     }
 
+    html, body { height: 100%; }
+
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
       background: linear-gradient(135deg, #0a0a1f 0%, #1a1a3e 25%, #0f0f2e 50%, #1e1e4f 75%, #0a0a1f 100%);
@@ -39,11 +43,9 @@ import PageWidgets from "../../../components/PageWidgets.astro";
       color: #e0e0e0;
       min-height: 100vh;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      position: relative;
+      flex-direction: column;
       overflow-x: hidden;
+      padding-top: 58px; /* account for fixed VxHeader */
     }
 
     body::before {
@@ -55,6 +57,17 @@ import PageWidgets from "../../../components/PageWidgets.astro";
       background-size: 40px 40px;
       animation: float 4s ease-in-out infinite;
       pointer-events: none;
+      z-index: 0;
+    }
+
+    .qr-main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px;
+      position: relative;
+      z-index: 1;
     }
 
     .container {
@@ -78,7 +91,7 @@ import PageWidgets from "../../../components/PageWidgets.astro";
       align-content: flex-start;
       position: relative; margin: auto;
     }
-    .wordmark img { width: 100%; max-width: 400px; height: auto; display: block; }
+    .wordmark img { width: 100%; max-width: 400px; height: auto; display: block; margin: 0 auto; }
 
     h1 {
       font-size: 2.5em; font-weight: 700; margin-bottom: 40px;
@@ -215,116 +228,132 @@ import PageWidgets from "../../../components/PageWidgets.astro";
     #downloadBtn:hover::before { left: 100%; }
     #downloadBtn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(255,107,107,.5); }
 
-    .footer {
-      margin-top: 40px; font-size: .85em;
-      color: rgba(255,255,255,.4); font-weight: 300; letter-spacing: .5px;
+    .login-hint {
+      margin-top: 24px;
+      font-size: .82em;
+      color: rgba(255,255,255,.4);
+      line-height: 1.5;
     }
+    .login-hint a {
+      color: rgba(89,198,232,.75);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color .2s;
+    }
+    .login-hint a:hover { color: rgba(89,198,232,1); }
 
     #logoPreview {
       margin-top: 15px; padding: 15px;
       background: rgba(255,255,255,.05); border-radius: 10px;
       border: 1px solid rgba(255,255,255,.1);
     }
-    #logoImg { max-width: 100px; max-height: 100px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,.3); height: auto; display: block; }
+    #logoImg { max-width: 100px; max-height: 100px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,.3); height: auto; display: block; margin: 0 auto; }
 
     @media (max-width: 768px) {
       .container { padding: 30px 20px; }
       h1 { font-size: 2em; }
       .options { grid-template-columns: 1fr; gap: 15px; }
-      .wordmark img { max-width: 200px; }
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <div class="wordmark">
-      <img src="/assets/wordmark.webp" alt="VOLYNX" />
-    </div>
-    <h1>QR Generator</h1>
+  <VxHeader primaryCtaLabel="Entrar" primaryCtaHref="/login" />
 
-    <div class="input-wrapper">
-      <input type="text" id="text" placeholder="Digite o texto ou URL para gerar QR" />
-    </div>
-
-    <div class="options-section">
-      <div class="section-title">⚙️ Configurações de Estilo</div>
-      <div class="options">
-        <div class="option-group">
-          <label>Tamanho</label>
-          <select id="size">
-            <option value="300">Pequeno (300px)</option>
-            <option value="400" selected>Médio (400px)</option>
-            <option value="500">Grande (500px)</option>
-          </select>
-        </div>
-        <div class="option-group">
-          <label>Estilo dos Pontos</label>
-          <select id="dotsType">
-            <option value="square">Quadrado</option>
-            <option value="dots">Bolotas</option>
-            <option value="rounded">Arredondado</option>
-          </select>
-        </div>
-        <div class="option-group">
-          <label>Tipo de Cor</label>
-          <select id="dotsColorType">
-            <option value="solid">Sólida</option>
-            <option value="gradient">Gradiente</option>
-            <option value="metallic">Metálico</option>
-          </select>
-        </div>
-        <div class="option-group" id="dotsColorGroup">
-          <label>Cor do QR</label>
-          <input type="color" id="dotsColor" value="#000000" />
-        </div>
-        <div class="option-group" id="dotsGradientGroup" style="display:none;">
-          <label>Gradiente — Cor 1</label>
-          <input type="color" id="dotsColor1" value="#000000" />
-        </div>
-        <div class="option-group" id="dotsGradientGroup2" style="display:none;">
-          <label>Gradiente — Cor 2</label>
-          <input type="color" id="dotsColor2" value="#ffffff" />
-        </div>
-        <div class="option-group">
-          <label>Cor de Fundo</label>
-          <input type="color" id="backgroundColor" value="#ffffff" />
-        </div>
-        <div class="option-group">
-          <label>Border Radius</label>
-          <input type="range" id="borderRadius" min="0" max="50" step="5" value="10" />
-        </div>
+  <main class="qr-main">
+    <div class="container">
+      <div class="wordmark">
+        <img src="/assets/wordmark.webp" alt="VOLYNX" />
       </div>
-    </div>
+      <h1>QR Generator</h1>
 
-    <div class="options-section">
-      <div class="section-title">🖼️ Configurações de Logo</div>
-      <div class="options">
-        <div class="option-group">
-          <label>Imagem do Logo</label>
-          <input type="file" id="logo" accept="image/*" />
-          <div id="logoPreview" style="display:none;">
-            <img id="logoImg" alt="Logo Preview" />
+      <div class="input-wrapper">
+        <input type="text" id="text" placeholder="Digite o texto ou URL para gerar QR" />
+      </div>
+
+      <div class="options-section">
+        <div class="section-title">⚙️ Configurações de Estilo</div>
+        <div class="options">
+          <div class="option-group">
+            <label>Tamanho</label>
+            <select id="size">
+              <option value="300">Pequeno (300px)</option>
+              <option value="400" selected>Médio (400px)</option>
+              <option value="500">Grande (500px)</option>
+            </select>
+          </div>
+          <div class="option-group">
+            <label>Estilo dos Pontos</label>
+            <select id="dotsType">
+              <option value="square">Quadrado</option>
+              <option value="dots">Bolotas</option>
+              <option value="rounded">Arredondado</option>
+            </select>
+          </div>
+          <div class="option-group">
+            <label>Tipo de Cor</label>
+            <select id="dotsColorType">
+              <option value="solid">Sólida</option>
+              <option value="gradient">Gradiente</option>
+              <option value="metallic">Metálico</option>
+            </select>
+          </div>
+          <div class="option-group" id="dotsColorGroup">
+            <label>Cor do QR</label>
+            <input type="color" id="dotsColor" value="#000000" />
+          </div>
+          <div class="option-group" id="dotsGradientGroup" style="display:none;">
+            <label>Gradiente — Cor 1</label>
+            <input type="color" id="dotsColor1" value="#000000" />
+          </div>
+          <div class="option-group" id="dotsGradientGroup2" style="display:none;">
+            <label>Gradiente — Cor 2</label>
+            <input type="color" id="dotsColor2" value="#ffffff" />
+          </div>
+          <div class="option-group">
+            <label>Cor de Fundo</label>
+            <input type="color" id="backgroundColor" value="#ffffff" />
+          </div>
+          <div class="option-group">
+            <label>Border Radius</label>
+            <input type="range" id="borderRadius" min="0" max="50" step="5" value="10" />
           </div>
         </div>
-        <div class="option-group">
-          <label>Tamanho do Logo</label>
-          <input type="range" id="logoSize" min="0.1" max="0.5" step="0.1" value="0.4" />
-        </div>
-        <div class="option-group">
-          <label>Margem do Logo</label>
-          <input type="range" id="logoMargin" min="5" max="20" step="1" value="10" />
+      </div>
+
+      <div class="options-section">
+        <div class="section-title">🖼️ Configurações de Logo</div>
+        <div class="options">
+          <div class="option-group">
+            <label>Imagem do Logo</label>
+            <input type="file" id="logo" accept="image/*" />
+            <div id="logoPreview" style="display:none;">
+              <img id="logoImg" alt="Logo Preview" />
+            </div>
+          </div>
+          <div class="option-group">
+            <label>Tamanho do Logo</label>
+            <input type="range" id="logoSize" min="0.1" max="0.5" step="0.1" value="0.4" />
+          </div>
+          <div class="option-group">
+            <label>Margem do Logo</label>
+            <input type="range" id="logoMargin" min="5" max="20" step="1" value="10" />
+          </div>
         </div>
       </div>
+
+      <button onclick="generateQR()">Gerar QR Code</button>
+      <div id="qr-container"></div>
+      <button id="downloadBtn" onclick="downloadQR()" style="display:none;">📥 Baixar QR Code</button>
+
+      <p class="login-hint">
+        Quer salvar seus QR Codes?
+        <a href="/login">Faça login</a> ou <a href="/signup">crie uma conta grátis</a>.
+      </p>
     </div>
+  </main>
 
-    <button onclick="generateQR()">Gerar QR Code</button>
-    <div id="qr-container"></div>
-    <button id="downloadBtn" onclick="downloadQR()" style="display:none;">📥 Baixar QR Code</button>
-
-    <div class="footer">Tecnologia futurista para geração instantânea · VOLYNX Studio</div>
-  </div>
-
+  <VxFooter />
   <PageWidgets />
 
   <script is:inline src="https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>

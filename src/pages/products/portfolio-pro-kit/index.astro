@@ -591,5 +591,15 @@ const pageDescription = "Premium portfolio system with Volynx design - Showcase 
   </script>
 
   <PageWidgets />
+
+  <!-- Garante que is-ready seja sempre adicionado, mesmo se o módulo ES chegar tarde -->
+  <script is:inline>
+    (function () {
+      var root = document.documentElement;
+      var fire = function () { requestAnimationFrame(function () { root.classList.add('is-ready'); }); };
+      if (document.readyState === 'complete') fire();
+      else window.addEventListener('load', fire, { once: true });
+    })();
+  </script>
 </body>
 </html>
