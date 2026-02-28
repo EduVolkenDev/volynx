@@ -30,12 +30,7 @@ const pageDescription = "Premium, conversion-focused landing page. Delivered in 
        1) Cole seu Payment Link do Stripe em STRIPE_LINK
        2) Cole seu endpoint do Formspree em FORMSPREE_ACTION
   -->
-  <script>
-    (window as any).VX_CONFIG = {
-      STRIPE_LINK: "LINK_STRIPE_AQUI",
-      FORMSPREE_ACTION: "FORMSPREE_ENDPOINT_AQUI"
-    };
-  </script>
+  <script type="module" src="/scripts/landing-express.js"></script>
 
   <!-- Topbar -->
   <header class="topbar">
@@ -268,23 +263,7 @@ const pageDescription = "Premium, conversion-focused landing page. Delivered in 
     </div>
   </main>
 
-  <script>
-    // Injeta links sem mexer no HTML manualmente
-    (function () {
-      const cfg = (window as any).VX_CONFIG || {};
-      const stripe = cfg.STRIPE_LINK || "LINK_STRIPE_AQUI";
-      const action = cfg.FORMSPREE_ACTION || "FORMSPREE_ENDPOINT_AQUI";
-
-      const ctas = ["topCta", "heroCta", "midCta", "finalCta"]
-        .map(id => document.getElementById(id))
-        .filter(Boolean) as HTMLAnchorElement[];
-
-      ctas.forEach(a => a.setAttribute("href", stripe));
-
-      const form = document.getElementById("briefForm");
-      if (form) form.setAttribute("action", action);
-    })();
-  </script>
+  <script type="module" src="/scripts/landing-express.js"></script>
 
   <SiteFooter />
   <PageWidgets />
