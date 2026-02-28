@@ -1,0 +1,140 @@
+import QRCodeStyling from "https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js";
+
+let qrCode = null;
+
+function $(id){ return document.getElementById(id); }
+
+function getVal(id){ const el=$(id); return el ? el.value : ""; }
+
+function safeNumber(v, fallback){
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function getLogoDataUrl() {
+  const img = $("logoImg");
+  const src = img?.getAttribute("src") || "";
+  return src && src.startsWith("data:") ? src : undefined;
+}
+
+function makeGradient(c1, c2) {
+  return {
+    type: "linear",
+    rotation: Math.PI / 4,
+    colorStops: [
+      { offset: 0, color: c1 },
+      { offset: 1, color: c2 }
+    ]
+  };
+}
+
+function buildConfig() {
+  const data = getVal("text") || "https://volynx.world";
+  const size = safeNumber(getVal("size"), 320);
+
+  const dotsType = getVal("dotsType") || "rounded";
+  const dotsColorType = getVal("dotsColorType") || "solid";
+  const dotsColor = getVal("dotsColor") || "#ffffff";
+  const dotsColor1 = getVal("dotsColor1") || "#59C6E8";
+  const dotsColor2 = getVal("dotsColor2") || "#6C0AE4";
+
+  const br = safeNumber(getVal("borderRadius"), 0);
+
+  const logo = getLogoDataUrl();
+  const logoSize = safeNumber(getVal("logoSize"), 0.4);
+  const logoMargin = safeNumber(getVal("logoMargin"), 10);
+
+  return {
+    width: size,
+    height: size,
+    data,
+    margin: 0,
+    image: logo,
+    dotsOptions: {
+      type: dotsType,
+      color: dotsColorType === "solid" ? dotsColor : undefined,
+      gradient: dotsColorType === "gradient" ? makeGradient(dotsColor1, dotsColor2) : undefined
+    },
+    cornersSquareOptions: { type: "extra-rounded" },
+    cornersDotOptions: { type: "dot" },
+    backgroundOptions: { color: "transparent" },
+    imageOptions: {
+      crossOrigin: "anonymous",
+      margin: logoMargin,
+      imageSize: logoSize
+    }
+  };
+}
+
+function generateQR() {
+  const container = $("qr-container");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  const config = buildConfig();
+
+  qrCode = new QRCodeStyling(config);
+  qrCode.append(container);
+
+  const downloadBtn = $("downloadBtn");
+  if (downloadBtn) downloadBtn.style.display = "inline-flex";
+}
+
+function bind() {
+  const genBtn = $("generateBtn");
+  const downloadBtn = $("downloadBtn");
+
+  genBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    generateQR();
+  });
+
+  downloadBtn?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    if (!qrCode) return;
+    await qrCode.download({ name: "volynx-qr", extension: "png" });
+  });
+
+  const dotsColorType = $("dotsColorType");
+  dotsColorType?.addEventListener("change", () => {
+    const type = dotsColorType.value;
+    const g1 = $("dotsColorGroup");
+    const g2 = $("dotsGradientGroup");
+    const g3 = $("dotsGradientGroup2");
+    if (g1) g1.style.display = type === "solid" ? "flex" : "none";
+    if (g2) g2.style.display = type === "gradient" ? "flex" : "none";
+    if (g3) g3.style.display = type === "gradient" ? "flex" : "none";
+    if (qrCode) generateQR();
+  });
+
+  const logoInput = $("logo");
+  logoInput?.addEventListener("change", (e) => {
+    const file = e.target?.files?.[0];
+    const preview = $("logoPreview");
+    const img = $("logoImg");
+
+    if (!file || !img) {
+      if (preview) preview.style.display = "none";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      img.src = ev.target?.result;
+      if (preview) preview.style.display = "block";
+      if (qrCode) generateQR();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  ["logoSize","logoMargin","dotsColor","dotsColor1","dotsColor2","borderRadius","size","text","dotsType"].forEach((id) => {
+    const el = $(id);
+    el?.addEventListener("input", () => { if (qrCode) generateQR(); });
+    el?.addEventListener("change", () => { if (qrCode) generateQR(); });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  bind();
+});
