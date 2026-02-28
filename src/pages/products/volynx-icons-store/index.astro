@@ -58,7 +58,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
 
       <!-- Auth Buttons -->
       <div class="nav-actions">
-        <button class="btn btn-primary" id="signInBtn">Sign In</button>
+        <a class="btn btn-primary" id="signInBtn" href="/login/?return=/products/volynx-icons-store/">Sign In</a>
 
         <!-- User Menu (hidden by default) -->
         <div class="user-menu" id="userMenu" style="display: none;">
@@ -396,8 +396,6 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
       }
 
       const signInBtn = document.getElementById("signInBtn");
-      if (signInBtn) signInBtn.addEventListener("click", simulateLogin);
-
       const logoutBtn = document.getElementById("logoutBtn");
       if (logoutBtn) logoutBtn.addEventListener("click", logout);
     }
@@ -413,17 +411,6 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
         }
       } catch (e) { /* localStorage unavailable */ }
     }
-
-    function simulateLogin() {
-      try {
-        currentUser = { name: "John Doe", email: "john@example.com" };
-        isLoggedIn = true;
-        localStorage.setItem("designmarket_user", JSON.stringify(currentUser));
-        updateAuthUI();
-      } catch (e) {
-        isLoggedIn = true;
-        updateAuthUI();
-      }
     }
 
     function logout() {
