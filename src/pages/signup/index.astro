@@ -1,0 +1,104 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import VxHeader from "../../components/VxHeader.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
+
+const title = "Cadastro — VOLYNX";
+---
+
+<BaseLayout title={title}>
+  <VxHeader primaryCtaLabel="Entrar" primaryCtaHref="/login/" />
+
+  <main class="shell signup">
+    <section class="wrap">
+      <div class="panel">
+        <h1>Create your account</h1>
+        <p class="sub">Crie sua conta para acessar o Studio e suas ferramentas.</p>
+
+        <form class="form" id="signupForm" action="#" method="get">
+          <label class="field">
+            <span>Email</span>
+            <input type="email" id="email" name="email" autocomplete="email" required />
+          </label>
+
+          <label class="field">
+            <span>Password</span>
+            <input type="password" id="password" name="password" autocomplete="new-password" required />
+          </label>
+
+          <p id="msg" class="msg" aria-live="polite"></p>
+
+          <button class="btn primary" id="submitBtn" type="submit">Create account</button>
+
+          <div class="row">
+            <a class="link" href="/login/">Já tenho conta</a>
+            <a class="link" href="/pricing/">Pricing</a>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<script type="module" src="/scripts/auth-signup.js"></script>
+
+<style>
+  @import "../../styles/home.css";
+  @import "../../styles/services.css";
+
+  .signup{
+    min-height: calc(100svh - 120px);
+    display: grid;
+    place-items: center;
+    padding: 110px 0 70px;
+  }
+  .wrap{ width: min(520px, 92vw); }
+  .panel{
+    border-radius: 26px;
+    padding: 22px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(10,12,20,.52);
+    backdrop-filter: blur(14px);
+  }
+  h1{ margin: 0 0 8px; }
+  .sub{ margin: 0 0 18px; opacity: .85; max-width: 60ch; }
+
+  .form{ display: grid; gap: 12px; }
+  .field{ display: grid; gap: 8px; }
+  .field span{ font-size: 13px; opacity: .82; }
+
+  .msg{ min-height: 18px; margin: 0 0 6px; font-size: 13px; opacity: .92; }
+  .msg.err{ color: rgba(255, 140, 140, .95); }
+  .msg.ok{ color: rgba(140, 255, 210, .92); }
+
+  input{
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(0,0,0,.18);
+    color: inherit;
+    outline: none;
+  }
+  .btn{
+    display: inline-flex;
+    justify-content: center;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.12);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .btn.primary{ font-weight: 700; }
+
+  .row{
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+    opacity: .88;
+  }
+  .link{ text-decoration: none; }
+</style>

@@ -36,15 +36,17 @@ const title = "Login — VOLYNX";
         <form class="form" id="loginForm" action="#" method="get">
           <label class="field">
             <span>Email</span>
-            <input type="email" name="email" autocomplete="email" required />
+            <input type="email" id="email"  name="email" autocomplete="email" required />
           </label>
 
           <label class="field">
             <span>Password</span>
-            <input type="password" name="password" autocomplete="current-password" required />
+            <input type="password" id="password"  name="password" autocomplete="current-password" required />
           </label>
 
-          <button class="btn primary" type="submit">Sign in</button>
+          <button class="btn primary" id="submitBtn" type="submit">Sign in</button>
+
+          <p id="msg" class="msg" aria-live="polite"></p>
 
           <div class="row">
             <a class="link" href="/contact/">Forgot password?</a>
@@ -112,6 +114,10 @@ const title = "Login — VOLYNX";
   }
   h1{ margin: 0 0 8px; }
   .sub{ margin: 0 0 18px; opacity: .85; max-width: 60ch; }
+
+  .msg{ min-height: 18px; margin: 0 0 6px; font-size: 13px; opacity: .92; }
+  .msg.err{ color: rgba(255, 140, 140, .95); }
+  .msg.ok{ color: rgba(140, 255, 210, .92); }
 
   .form{ display: grid; gap: 12px; }
   .field{ display: grid; gap: 8px; }
