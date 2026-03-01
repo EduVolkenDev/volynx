@@ -31,8 +31,19 @@ body {
 body {
   font-family: "Sora", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   color: var(--txt);
-  background: url("/assets/lucid6.webp") center / cover no-repeat fixed;
+  background: url("/assets/vynx-ai.jpg") center / cover no-repeat fixed;
+    background-position-x: center;
+    background-position-y: center;
+    background-attachment: fixed;
+    background-size: cover;
+  background-position-x: center;
+  background-position-y: center;
+  background-attachment: fixed;
+  background-size: cover;
   min-height: 100vh;
+  background-position: center;
+  background-attachment: fixed;
+  background-size: cover;
 }
 
 /* ===== BACKGROUND OVERLAY ===== */
@@ -110,28 +121,13 @@ body {
 .hero__badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  border: 1px solid rgba(130, 220, 255, .25);
-  border-radius: 999px;
-  background: rgba(130, 220, 255, .06);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .1em;
-  color: var(--a);
-  text-transform: uppercase;
-  margin-bottom: 24px;
+  padding: 0px;
+  margin-bottom: 30px;
 }
 
-.hero__badge-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--a);
-  box-shadow: 0 0 6px var(--a);
-  animation: pulse 2s ease-in-out infinite;
+.hero__badge img {
+max-width: 300px;
 }
-
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: .4; }
@@ -174,12 +170,25 @@ body {
   background: var(--card-bg);
   border: 1px solid var(--stroke);
   border-radius: var(--r);
-  padding: 28px 24px 22px;
+  padding: 10px 24px 22px;
   text-decoration: none;
   color: inherit;
   transition: background 0.22s ease, border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(15px);
+  max-width: 100%;
+  width: auto;
+  height: 100%;
+}
+
+.tool-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: calc(var(--r) - 4px);
+  display: block;
+  margin-bottom: 14px;
 }
 
 .tool-card::before {
@@ -207,9 +216,9 @@ body {
 }
 
 .tool-card__chip {
-  display: inline-flex;
+  display: grid;
   align-items: center;
-  padding: 4px 10px;
+  padding: 6px 10px;
   border-radius: 999px;
   font-size: 10px;
   font-weight: 700;
@@ -218,8 +227,10 @@ body {
   background: rgba(130, 220, 255, .10);
   border: 1px solid rgba(130, 220, 255, .20);
   color: var(--a);
-  margin-bottom: 18px;
   align-self: flex-start;
+  position: relative;
+  left: 52%;
+  bottom: 7.5%;
 }
 
 .tool-card__icon {
@@ -236,21 +247,23 @@ body {
 }
 
 .tool-card__desc {
-  margin: 0 0 24px;
-  font-size: 13px;
-  color: var(--muted);
+  margin: 10px;
+  font-size: 15px;
+  color: white;
   line-height: 1.65;
   flex: 1;
+  text-align: center;
 }
 
 .tool-card__link {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
+  place-content: center;
+  font-size: 15px;
   font-weight: 600;
   color: var(--a);
   letter-spacing: .02em;
+  margin: 10px auto;
+
 }
 
 .tool-card__link-arrow {
@@ -263,18 +276,21 @@ body {
 
 /* ===== FREE BADGE ===== */
 .tool-card__free {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  font-size: 10px;
+  position: relative;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: .08em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: rgba(130, 255, 180, .9);
-  background: rgba(130, 255, 180, .08);
-  border: 1px solid rgba(130, 255, 180, .2);
-  padding: 3px 8px;
+  background: rgba(130, 255, 180, 0.3);
+  border: 2px inset rgba(130, 255, 180, 0.7);
+  padding: 5px 10px;
   border-radius: 999px;
+  max-width: 150px;
+  text-align: center;
+  margin: auto 0;
+  width: 150px;
+  place-self: center;
 }
 
 /* ===== RESPONSIVE ===== */

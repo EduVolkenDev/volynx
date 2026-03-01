@@ -1,4 +1,4 @@
-import QRCodeStyling from 'qr-code-styling';
+import QRCodeStyling from 'https://esm.sh/qr-code-styling@1.6.0-rc.1';
 
 let qrCode = null;
 
