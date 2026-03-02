@@ -74,7 +74,7 @@ function setMsg(el, text, kind) {
       setMsg(msg, "Login OK. Redirecionando…", "ok");
 
       // Redireciona para Studio (ajuste se necessário)
-      window.location.href = "/studio/";
+      window.location.href = "/volynx-lab/studio/";
     } catch (err) {
       setMsg(msg, err?.message || "Falha no login.", "err");
     } finally {
