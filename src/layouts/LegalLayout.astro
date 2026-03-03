@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import "../styles/legal.css";
 import PageWidgets from "../components/PageWidgets.astro";
+import VxHeader from "../components/VxHeader.astro";
 
 interface Props {
   title: string;
@@ -27,24 +28,10 @@ const { title, description = "Volynx — Premium Tech Platform" } = Astro.props;
     <link rel="manifest" href="/assets/site.webmanifest" />
   </head>
   <body>
+    <VxHeader />
     <div class="universe-bg" aria-hidden="true"></div>
 
     <div class="shell">
-      <div class="topbar">
-        <div class="brand">
-          <img src="/assets/volynx-icon.webp" alt="Volynx" />
-          <strong>VOLYNX</strong>
-        </div>
-
-        <nav class="nav" aria-label="Legal navigation">
-          <a href="/about">About</a>
-          <a href="/contact">Contact</a>
-          <a href="/privacy">Privacy</a>
-          <a href="/terms">Terms</a>
-          <a href="/disclaimer">Disclaimer</a>
-        </nav>
-      </div>
-
       <main class="card">
         <slot />
 
