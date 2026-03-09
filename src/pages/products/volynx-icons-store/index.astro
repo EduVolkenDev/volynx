@@ -203,40 +203,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
           </a>
         </div>
 
-        <div class="collections-grid">
-          <a href="#" class="collection-card" id="uiEssentialsCard">
-            <div class="collection-preview">
-              <div class="preview-icon">🎨</div>
-              <div class="preview-icon">🖌️</div>
-              <div class="preview-icon">✨</div>
-              <div class="preview-icon">🎭</div>
-            </div>
-            <h3 class="collection-title">UI Essentials</h3>
-            <p class="collection-count">240 icons</p>
-          </a>
-
-          <a href="#" class="collection-card" id="techDevicesCard">
-            <div class="collection-preview">
-              <div class="preview-icon">📱</div>
-              <div class="preview-icon">💻</div>
-              <div class="preview-icon">⌨️</div>
-              <div class="preview-icon">🖥️</div>
-            </div>
-            <h3 class="collection-title">Tech &amp; Devices</h3>
-            <p class="collection-count">180 icons</p>
-          </a>
-
-          <a href="#" class="collection-card" id="communicationCard">
-            <div class="collection-preview">
-              <div class="preview-icon">🌐</div>
-              <div class="preview-icon">📧</div>
-              <div class="preview-icon">💬</div>
-              <div class="preview-icon">📢</div>
-            </div>
-            <h3 class="collection-title">Communication</h3>
-            <p class="collection-count">150 icons</p>
-          </a>
-        </div>
+        <div class="collections-grid" id="collectionsGrid"></div>
       </div>
     </section>
 
@@ -390,13 +357,74 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
     }
 
     function updateStats() {
-      const free = allIcons.filter(i => i.plan === "free").length;
-      const prem = allIcons.filter(i => i.plan === "premium").length;
       const total = allIcons.length;
       const statEls = document.querySelectorAll<HTMLElement>(".stat-number");
       if (statEls[0]) statEls[0].textContent = total + "+";
       if (statEls[1]) statEls[1].textContent = "23";
-      if (statEls[2]) statEls[2].textContent = prem + " Premium";
+      if (statEls[2]) statEls[2].textContent = "10K+";
+      renderCollections();
+    }
+
+    // ===== FEATURED COLLECTIONS =====
+    const FEATURED_COLLECTIONS = [
+      { folder: "icon-set",           label: "Essential Set",  category: "essential", plan: "free",    price: null },
+      { folder: "purple-icons",       label: "Purple Pack",    category: "purple",    plan: "free",    price: null },
+      { folder: "icons-blue-sliced3", label: "Blue III",       category: "blue",      plan: "free",    price: null },
+      { folder: "futuristic",         label: "Futuristic",     category: "premium",   plan: "premium", price: "£4.99" },
+      { folder: "icons_refeitos_hd",  label: "HD Remaster",    category: "premium",   plan: "premium", price: "£5.99" },
+      { folder: "icons_rose_refeitos_hd", label: "Rose HD",   category: "premium",   plan: "premium", price: "£4.99" },
+    ];
+
+    function renderCollections() {
+      const grid = document.getElementById("collectionsGrid");
+      if (!grid || !allIcons.length) return;
+
+      FEATURED_COLLECTIONS.forEach(col => {
+        const icons = allIcons.filter(i => i.folder === col.folder).slice(0, 4);
+        if (!icons.length) return;
+        const count = allIcons.filter(i => i.folder === col.folder).length;
+        const isPremium = col.plan === "premium";
+
+        const card = document.createElement("div");
+        card.className = "collection-card" + (isPremium ? " collection-card--premium" : "");
+        card.style.cursor = "pointer";
+
+        const previews = icons.map(i =>
+          `<div class="preview-icon" style="background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:4px;">
+            <img src="${i.path}" alt="" style="width:100%;height:100%;object-fit:contain;" loading="lazy" />
+          </div>`
+        ).join("");
+
+        card.innerHTML = `
+          ${isPremium ? `<span style="position:absolute;top:12px;right:12px;font-size:9px;font-weight:800;letter-spacing:.07em;padding:3px 8px;border-radius:99px;background:linear-gradient(135deg,#8b5cf6,#ff006e);color:#fff;text-transform:uppercase;">PRO</span>` : ""}
+          <div class="collection-preview">${previews}</div>
+          <h3 class="collection-title">${col.label}</h3>
+          <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+            <p class="collection-count">${count} ícones</p>
+            ${isPremium ? `<span style="font-size:.875rem;font-weight:700;color:rgba(200,150,255,.9);">${col.price}</span>` : '<span style="font-size:.75rem;color:rgba(0,240,255,.7);font-weight:600;">FREE</span>'}
+          </div>
+        `;
+        card.style.position = "relative";
+
+        if (isPremium) {
+          card.addEventListener("click", () => {
+            const sample = icons[0];
+            showPremiumModal({ ...sample, collection: col.label, collectionPrice: col.price });
+          });
+        } else {
+          card.addEventListener("click", () => {
+            currentFilter = col.category;
+            document.querySelectorAll<HTMLButtonElement>(".filter-btn").forEach(b => {
+              b.classList.toggle("active", b.dataset.filter === col.category);
+            });
+            visibleCount = 48;
+            renderGallery();
+            document.getElementById("gallery")?.scrollIntoView({ behavior: "smooth" });
+          });
+        }
+
+        grid.appendChild(card);
+      });
     }
 
     function getFilteredIcons() {
@@ -416,24 +444,20 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
     }
 
     function createIconCard(icon: any) {
+      const isPremium = icon.plan === "premium";
       const card = document.createElement("div");
-      card.className = "icon-card";
+      card.className = "icon-card" + (isPremium ? " icon-card--premium" : "");
       card.dataset.category = icon.category;
       card.dataset.plan = icon.plan;
-
-      const isPremium = icon.plan === "premium";
-      const badge = isPremium
-        ? `<span style="position:absolute;top:6px;right:6px;font-size:9px;font-weight:800;letter-spacing:.06em;padding:2px 6px;border-radius:99px;background:linear-gradient(135deg,#8b5cf6,#ff006e);color:#fff;">PRO</span>`
-        : "";
-
       card.innerHTML = `
-        ${badge}
-        <div class="icon-display" style="width:56px;height:56px;">
-          <img src="${icon.path}" alt="${icon.name}" loading="lazy" style="width:100%;height:100%;object-fit:contain;" />
+        ${isPremium ? '<span class="icon-pro-badge">PRO</span>' : ""}
+        <div class="icon-img-wrap">
+          <img src="${icon.path}" alt="${icon.collection}" loading="lazy" />
         </div>
-        <div class="icon-name">${icon.name}</div>
+        ${isPremium
+          ? '<span class="icon-price-tag">from £2.99</span>'
+          : '<span class="icon-collection-label">' + icon.collection + '</span>'}
       `;
-      card.style.position = "relative";
       card.addEventListener("click", () => handleDownload(icon));
       return card;
     }
@@ -565,16 +589,27 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
     }
 
     function showPremiumModal(icon: any) {
+      const colPrice = (icon as any).collectionPrice || "£4.99";
       openModal(`
-        <div style="font-size:2.5rem;margin-bottom:1rem;">⭐</div>
-        <h3 style="color:#fff;margin-bottom:.5rem;">${icon.name}</h3>
-        <p style="color:rgba(200,160,255,.9);font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.75rem;">Coleção ${icon.collection} — Premium</p>
-        <p style="color:rgba(255,255,255,.7);font-size:.9rem;margin-bottom:1.5rem;">
-          Este ícone faz parte de uma coleção premium. Adquira individualmente ou no combo completo.
-        </p>
+        <img src="${icon.path}" alt="" style="width:80px;height:80px;object-fit:contain;background:#fff;border-radius:12px;padding:8px;margin:0 auto 1rem;display:block;" />
+        <p style="color:rgba(200,150,255,.9);font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem;">Coleção Premium</p>
+        <h3 style="color:#fff;font-size:1.25rem;margin-bottom:1.25rem;">${icon.collection}</h3>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.5rem;">
+          <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:1rem;text-align:center;">
+            <div style="color:rgba(255,255,255,.5);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.25rem;">Coleção individual</div>
+            <div style="color:#fff;font-size:1.5rem;font-weight:900;">${colPrice}</div>
+          </div>
+          <div style="background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(255,0,110,.15));border:1px solid rgba(139,92,246,.4);border-radius:12px;padding:1rem;text-align:center;">
+            <div style="color:rgba(200,150,255,.8);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.25rem;">Combo completo</div>
+            <div style="color:#fff;font-size:1.5rem;font-weight:900;">£19.99</div>
+            <div style="color:rgba(200,150,255,.7);font-size:.65rem;margin-top:.15rem;">Todas as coleções premium</div>
+          </div>
+        </div>
+
         <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
-          <a href="/pricing/" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#8b5cf6,#ff006e);color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;">Ver planos</a>
-          <a href="/pricing/" style="padding:.75rem 1.5rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;border:1px solid rgba(255,255,255,.3);">Combo completo</a>
+          <a href="/pricing/" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#8b5cf6,#ff006e);color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.875rem;">Adquirir esta coleção</a>
+          <a href="/pricing/" style="padding:.75rem 1.5rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.875rem;border:1px solid rgba(255,255,255,.2);">Ver combo</a>
         </div>
       `);
     }
