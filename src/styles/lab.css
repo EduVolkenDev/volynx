@@ -31,20 +31,26 @@ body {
 body {
   font-family: "Sora", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   color: var(--txt);
-  background: url("/assets/vynx-ai.jpg");
-
   min-height: 100vh;
-  background-position: center;
-  background-attachment: fixed;
-  background-size: cover;
 }
 
-/* ===== BACKGROUND OVERLAY ===== */
+/* ===== BACKGROUND ===== */
+/* background-attachment:fixed breaks when any child uses backdrop-filter.
+   Fix: move the image to the fixed .bg element and use ::after for the overlay. */
 .bg {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background-image: url("/assets/vynx-ai.jpg");
+  background-position: center;
+  background-size: cover;
   z-index: -2;
+}
+
+.bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
 }
 
 /* ===== TOPBAR ===== */
@@ -135,7 +141,7 @@ max-width: 300px;
 }
 
 .hero__title-accent {
-  background: linear-gradient(90deg, var(--a), var(--b));
+  background: linear-gradient(90deg, rgb(8, 180, 246), rgb(164, 21, 255), aqua, white, green, purple);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -178,11 +184,11 @@ max-width: 300px;
 
 .tool-card img {
   width: 100%;
-  height: 180px;
+  height: auto;
   object-fit: cover;
   border-radius: calc(var(--r) - 4px);
   display: block;
-  margin-bottom: 14px;
+  filter: brightness(1.5);
 }
 
 .tool-card::before {

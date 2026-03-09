@@ -1,4 +1,18 @@
 (function () {
+  async function checkPermission(toolName) {
+    var cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r){ return r.json(); });
+    var apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
+    if (!apiBase) throw new Error('apiBaseUrl não configurado');
+    var token = localStorage.getItem('volynx_access_token') || '';
+    var res = await fetch(apiBase + '/api/check-permission', {
+      method: 'POST',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
+      body: JSON.stringify({ tool: toolName }),
+    });
+    if (!res.ok) throw new Error('Erro ' + res.status);
+    return await res.json();
+  }
+
   var fileInput   = document.getElementById('file');
   var pickBtn     = document.getElementById('pickBtn');
   var drop        = document.getElementById('drop');
@@ -53,8 +67,24 @@
   }
 
   // ── Run upscale ──────────────────────────────────────────
-  runBtn.addEventListener('click', function () {
+  runBtn.addEventListener('click', async function () {
     if (!currentFile) return;
+    runBtn.disabled = true;
+    runBtn.textContent = 'Verificando…';
+    try {
+      var perm = await checkPermission('image-scaler');
+      if (!perm.allowed) {
+        var msg = perm.plan === 'public'
+          ? 'Limite gratuito atingido. Faça login ou upgrade para continuar.'
+          : 'Limite do plano ' + perm.plan + ' atingido. Faça upgrade para continuar.';
+        alert(msg);
+        runBtn.disabled = false;
+        runBtn.textContent = 'Processar';
+        return;
+      }
+    } catch (err) {
+      console.warn('check-permission falhou, permitindo uso local:', err);
+    }
     var mode = modeSelect.value;
     if (mode === 'ai') {
       alert('AI upscale requer upgrade. Usando modo local automaticamente.');

@@ -1,5 +1,25 @@
 /* VOLYNX Lab — Converter app.js */
 
+async function checkPermission(toolName) {
+  const cfg = await fetch('/config.json', { cache: 'no-store' }).then((r) => r.json());
+  const apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
+  if (!apiBase) throw new Error('apiBaseUrl não configurado');
+  const token = localStorage.getItem('volynx_access_token') || '';
+  const res = await fetch(`${apiBase}/api/check-permission`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    body: JSON.stringify({ tool: toolName }),
+  });
+  if (!res.ok) throw new Error(`Erro ${res.status}`);
+  return await res.json();
+}
+
+function isHeic(file) {
+  if (file.type === 'image/heic' || file.type === 'image/heif') return true;
+  const ext = file.name.split('.').pop().toLowerCase();
+  return ext === 'heic' || ext === 'heif';
+}
+
 const fileInput  = document.getElementById('file');
 const dropZone   = document.getElementById('drop');
 const formatSel  = document.getElementById('format');
@@ -35,7 +55,9 @@ dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
 dropZone.addEventListener('drop', (e) => {
   e.preventDefault();
   dropZone.classList.remove('drag');
-  addFiles(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')));
+  addFiles(Array.from(e.dataTransfer.files).filter(f =>
+    f.type.startsWith('image/') || isHeic(f)
+  ));
 });
 
 fileInput.addEventListener('change', () => {
@@ -95,6 +117,20 @@ convertBtn.addEventListener('click', async () => {
   convertBtn.disabled = true;
   converted = [];
 
+  try {
+    const perm = await checkPermission('converter');
+    if (!perm.allowed) {
+      const msg = perm.plan === 'public'
+        ? 'Limite gratuito atingido. Faça login ou upgrade para continuar.'
+        : `Limite do plano ${perm.plan} atingido. Faça upgrade para continuar.`;
+      alert(msg);
+      convertBtn.disabled = false;
+      return;
+    }
+  } catch (err) {
+    console.warn('check-permission falhou, permitindo uso local:', err);
+  }
+
   const format  = formatSel.value;
   const quality = parseInt(qualityIn.value, 10) / 100;
   const maxw    = parseInt(maxwSel.value, 10);
@@ -108,7 +144,8 @@ convertBtn.addEventListener('click', async () => {
     statusEl.textContent = '⏳';
 
     try {
-      const blob = await convertImage(files[i], mime, quality, maxw);
+      const resolved = await resolveFile(files[i]);
+      const blob = await convertImage(resolved, mime, quality, maxw);
       const ext  = format === 'jpg' ? 'jpg' : format;
       const name = files[i].name.replace(/\.[^.]+$/, '') + '.' + ext;
 
@@ -125,6 +162,13 @@ convertBtn.addEventListener('click', async () => {
   convertBtn.disabled = false;
   if (converted.length > 1) zipBtn.disabled = false;
 });
+
+async function resolveFile(file) {
+  if (!isHeic(file)) return file;
+  if (typeof heic2any === 'undefined') throw new Error('heic2any não carregou');
+  const result = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.92 });
+  return Array.isArray(result) ? result[0] : result;
+}
 
 function convertImage(file, mime, quality, maxw) {
   return new Promise((resolve, reject) => {

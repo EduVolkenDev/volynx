@@ -1,133 +1,173 @@
-import QRCodeStyling from 'https://esm.sh/qr-code-styling@1.6.0-rc.1';
+import QRCodeStyling from "https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js";
 
 let qrCode = null;
 
-document.getElementById('dotsColorType').addEventListener('change', function () {
-  var type = this.value;
-  document.getElementById('dotsColorGroup').style.display = type === 'solid' ? 'flex' : 'none';
-  document.getElementById('dotsGradientGroup').style.display = type === 'gradient' ? 'flex' : 'none';
-  document.getElementById('dotsGradientGroup2').style.display = type === 'gradient' ? 'flex' : 'none';
-  if (qrCode) generateQR();
-});
+async function checkPermission(toolName) {
+  const cfg = await fetch('/config.json', { cache: 'no-store' }).then((r) => r.json());
+  const apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
+  if (!apiBase) throw new Error('apiBaseUrl não configurado');
+  const token = localStorage.getItem('volynx_access_token') || '';
+  const res = await fetch(`${apiBase}/api/check-permission`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    body: JSON.stringify({ tool: toolName }),
+  });
+  if (!res.ok) throw new Error(`Erro ${res.status}`);
+  return await res.json();
+}
 
-document.getElementById('logo').addEventListener('change', function (e) {
-  var file = e.target.files[0];
-  if (file) {
-    var reader = new FileReader();
-    reader.onload = function (e) {
-      document.getElementById('logoImg').src = e.target.result;
-      document.getElementById('logoPreview').style.display = 'block';
+function $(id){ return document.getElementById(id); }
+
+function getVal(id){ const el=$(id); return el ? el.value : ""; }
+
+function safeNumber(v, fallback){
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function getLogoDataUrl() {
+  const img = $("logoImg");
+  const src = img?.getAttribute("src") || "";
+  return src && src.startsWith("data:") ? src : undefined;
+}
+
+function makeGradient(c1, c2) {
+  return {
+    type: "linear",
+    rotation: Math.PI / 4,
+    colorStops: [
+      { offset: 0, color: c1 },
+      { offset: 1, color: c2 }
+    ]
+  };
+}
+
+function buildConfig() {
+  const data = getVal("text") || "https://volynx.world";
+  const size = safeNumber(getVal("size"), 320);
+
+  const dotsType = getVal("dotsType") || "rounded";
+  const dotsColorType = getVal("dotsColorType") || "solid";
+  const dotsColor = getVal("dotsColor") || "#ffffff";
+  const dotsColor1 = getVal("dotsColor1") || "#59C6E8";
+  const dotsColor2 = getVal("dotsColor2") || "#6C0AE4";
+
+  const br = safeNumber(getVal("borderRadius"), 0);
+
+  const logo = getLogoDataUrl();
+  const logoSize = safeNumber(getVal("logoSize"), 0.4);
+  const logoMargin = safeNumber(getVal("logoMargin"), 10);
+
+  return {
+    width: size,
+    height: size,
+    data,
+    margin: 0,
+    image: logo,
+    dotsOptions: {
+      type: dotsType,
+      color: dotsColorType === "solid" ? dotsColor : undefined,
+      gradient: dotsColorType === "gradient" ? makeGradient(dotsColor1, dotsColor2) : undefined
+    },
+    cornersSquareOptions: { type: "extra-rounded" },
+    cornersDotOptions: { type: "dot" },
+    backgroundOptions: { color: "transparent" },
+    imageOptions: {
+      crossOrigin: "anonymous",
+      margin: logoMargin,
+      imageSize: logoSize
+    }
+  };
+}
+
+function generateQR() {
+  const container = $("qr-container");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  const config = buildConfig();
+
+  qrCode = new QRCodeStyling(config);
+  qrCode.append(container);
+
+  const downloadBtn = $("downloadBtn");
+  if (downloadBtn) downloadBtn.style.display = "inline-flex";
+}
+
+function bind() {
+  const genBtn = $("generateBtn");
+  const downloadBtn = $("downloadBtn");
+
+  genBtn?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    if (genBtn.disabled) return;
+    genBtn.disabled = true;
+    genBtn.textContent = "Verificando…";
+    try {
+      const perm = await checkPermission("qr-gen");
+      if (!perm.allowed) {
+        const msg = perm.plan === "public"
+          ? "Limite gratuito atingido. Faça login ou upgrade para continuar."
+          : `Limite do plano ${perm.plan} atingido. Faça upgrade para continuar.`;
+        alert(msg);
+        return;
+      }
+      generateQR();
+    } catch (err) {
+      console.warn("check-permission falhou, permitindo uso local:", err);
+      generateQR();
+    } finally {
+      genBtn.disabled = false;
+      genBtn.textContent = "Generate";
+    }
+  });
+
+  downloadBtn?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    if (!qrCode) return;
+    await qrCode.download({ name: "volynx-qr", extension: "png" });
+  });
+
+  const dotsColorType = $("dotsColorType");
+  dotsColorType?.addEventListener("change", () => {
+    const type = dotsColorType.value;
+    const g1 = $("dotsColorGroup");
+    const g2 = $("dotsGradientGroup");
+    const g3 = $("dotsGradientGroup2");
+    if (g1) g1.style.display = type === "solid" ? "flex" : "none";
+    if (g2) g2.style.display = type === "gradient" ? "flex" : "none";
+    if (g3) g3.style.display = type === "gradient" ? "flex" : "none";
+    if (qrCode) generateQR();
+  });
+
+  const logoInput = $("logo");
+  logoInput?.addEventListener("change", (e) => {
+    const file = e.target?.files?.[0];
+    const preview = $("logoPreview");
+    const img = $("logoImg");
+
+    if (!file || !img) {
+      if (preview) preview.style.display = "none";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      img.src = ev.target?.result;
+      if (preview) preview.style.display = "block";
+      if (qrCode) generateQR();
     };
     reader.readAsDataURL(file);
-  } else {
-    document.getElementById('logoPreview').style.display = 'none';
-  }
-});
+  });
 
-['logoSize', 'logoMargin', 'dotsColor', 'dotsColor1', 'dotsColor2'].forEach(function (id) {
-  document.getElementById(id).addEventListener('input', function () { if (qrCode) generateQR(); });
-});
-
-document.getElementById('borderRadius').addEventListener('input', function () {
-  document.getElementById('qr-container').style.borderRadius = this.value + 'px';
-});
-
-function fileToDataURL(file) {
-  return new Promise(function (resolve, reject) {
-    var reader = new FileReader();
-    reader.onload = function () { resolve(reader.result); };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+  ["logoSize","logoMargin","dotsColor","dotsColor1","dotsColor2","borderRadius","size","text","dotsType"].forEach((id) => {
+    const el = $(id);
+    el?.addEventListener("input", () => { if (qrCode) generateQR(); });
+    el?.addEventListener("change", () => { if (qrCode) generateQR(); });
   });
 }
 
-function buildGradient(kind) {
-  if (kind === 'gradient') {
-    return {
-      type: 'linear', rotation: Math.PI / 4,
-      colorStops: [
-        { offset: 0, color: document.getElementById('dotsColor1').value },
-        { offset: 1, color: document.getElementById('dotsColor2').value }
-      ]
-    };
-  }
-  if (kind === 'metallic') {
-    return {
-      type: 'linear', rotation: 0,
-      colorStops: [{ offset: 0, color: '#c0c0c0' }, { offset: .5, color: '#808080' }, { offset: 1, color: '#c0c0c0' }]
-    };
-  }
-  return null;
-}
-
-async function generateQR() {
-  try {
-    var text = document.getElementById('text').value.trim();
-    if (!text) return alert('Digite algo para gerar o QR!');
-
-    var size = parseInt(document.getElementById('size').value, 10);
-    var dotsType = document.getElementById('dotsType').value;
-    var backgroundColor = document.getElementById('backgroundColor').value;
-    var dotsColorType = document.getElementById('dotsColorType').value;
-
-    var dotsOptions = { type: dotsType };
-    var cornersSquareOptions = { type: dotsType === 'rounded' ? 'extra-rounded' : 'square' };
-    var cornersDotOptions = { type: dotsType === 'rounded' ? 'dot' : 'square' };
-
-    if (dotsColorType === 'solid') {
-      var c = document.getElementById('dotsColor').value;
-      dotsOptions.color = c;
-      cornersSquareOptions.color = c;
-      cornersDotOptions.color = c;
-    } else {
-      var g = buildGradient(dotsColorType);
-      dotsOptions.gradient = g;
-      cornersSquareOptions.gradient = g;
-      cornersDotOptions.gradient = g;
-    }
-
-    var logoFile = document.getElementById('logo').files[0];
-    var logoSize = parseFloat(document.getElementById('logoSize').value);
-    var logoMargin = parseInt(document.getElementById('logoMargin').value, 10);
-
-    var options = {
-      width: size, height: size, type: 'svg', data: text,
-      dotsOptions: dotsOptions,
-      cornersSquareOptions: cornersSquareOptions,
-      cornersDotOptions: cornersDotOptions,
-      backgroundOptions: { color: backgroundColor },
-      qrOptions: { errorCorrectionLevel: 'M' }
-    };
-
-    if (logoFile) {
-      options.image = await fileToDataURL(logoFile);
-      options.imageOptions = { crossOrigin: 'anonymous', margin: logoMargin, imageSize: logoSize };
-    }
-
-    document.getElementById('qr-container').innerHTML = '';
-    qrCode = new QRCodeStyling(options);
-    qrCode.append(document.getElementById('qr-container'));
-
-    var radius = document.getElementById('borderRadius').value + 'px';
-    document.getElementById('qr-container').style.borderRadius = radius;
-
-    var svg = document.querySelector('#qr-container svg');
-    if (svg) {
-      svg.style.width = '100%';
-      svg.style.height = 'auto';
-      svg.style.maxWidth = size + 'px';
-    }
-
-    document.getElementById('downloadBtn').style.display = 'inline-block';
-  } catch (err) {
-    console.error(err);
-    alert('Erro ao gerar o QR. Abra o Console (F12) para ver a mensagem.');
-  }
-}
-
-function downloadQR() {
-  if (qrCode) qrCode.download({ extension: 'png' });
-}
-
-document.getElementById('generateBtn').addEventListener('click', generateQR);
-document.getElementById('downloadBtn').addEventListener('click', downloadQR);
+document.addEventListener("DOMContentLoaded", () => {
+  bind();
+});

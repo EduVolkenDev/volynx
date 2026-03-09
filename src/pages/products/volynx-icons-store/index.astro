@@ -132,6 +132,9 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
     <!-- Hero Section -->
     <section class="hero">
       <div class="container">
+        <div class="hero-brand">
+          <img src="/assets/long-logo-icons.webp" class="hero-long-logo" alt="Volynx Icons Store" />
+        </div>
         <h1 class="hero-title">
           Premium Design Assets
           <span class="gradient-text">For Modern Developers</span>
@@ -168,10 +171,12 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
           <h2 class="section-title">Featured Icons</h2>
           <div class="filters">
             <button class="filter-btn active" data-filter="all">All</button>
-            <button class="filter-btn" data-filter="ui">UI/UX</button>
-            <button class="filter-btn" data-filter="social">Social</button>
-            <button class="filter-btn" data-filter="business">Business</button>
-            <button class="filter-btn" data-filter="arrows">Arrows</button>
+            <button class="filter-btn" data-filter="blue">Blue</button>
+            <button class="filter-btn" data-filter="pink">Pink</button>
+            <button class="filter-btn" data-filter="green">Green</button>
+            <button class="filter-btn" data-filter="purple">Purple</button>
+            <button class="filter-btn" data-filter="simple">Simple</button>
+            <button class="filter-btn" data-filter="premium">⭐ Premium</button>
           </div>
         </div>
 
@@ -311,63 +316,35 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
     </div>
   </footer>
 
+  <!-- Download modal for premium/login gate -->
+  <div id="vxModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;">
+    <div style="background:#0d0d18;border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:2rem;max-width:420px;width:90%;text-align:center;position:relative;">
+      <button id="vxModalClose" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:#fff;font-size:1.25rem;cursor:pointer;">✕</button>
+      <div id="vxModalContent"></div>
+    </div>
+  </div>
+
   <script>
     // ===== STATE =====
     let isLoggedIn = false;
     let currentUser: { name: string; email: string } | null = null;
     let currentFilter = "all";
 
-    const iconsData = [
-      { id: 1,  name: "Home",      icon: "🏠", category: "ui" },
-      { id: 2,  name: "Search",    icon: "🔍", category: "ui" },
-      { id: 3,  name: "Settings",  icon: "⚙️", category: "ui" },
-      { id: 4,  name: "User",      icon: "👤", category: "ui" },
-      { id: 5,  name: "Heart",     icon: "❤️", category: "social" },
-      { id: 6,  name: "Star",      icon: "⭐", category: "ui" },
-      { id: 7,  name: "Message",   icon: "💬", category: "social" },
-      { id: 8,  name: "Phone",     icon: "📱", category: "social" },
-      { id: 9,  name: "Mail",      icon: "✉️", category: "social" },
-      { id: 10, name: "Calendar",  icon: "📅", category: "business" },
-      { id: 11, name: "Clock",     icon: "⏰", category: "business" },
-      { id: 12, name: "Camera",    icon: "📷", category: "ui" },
-      { id: 13, name: "Image",     icon: "🖼️", category: "ui" },
-      { id: 14, name: "Video",     icon: "🎥", category: "ui" },
-      { id: 15, name: "Music",     icon: "🎵", category: "ui" },
-      { id: 16, name: "Folder",    icon: "📁", category: "business" },
-      { id: 17, name: "File",      icon: "📄", category: "business" },
-      { id: 18, name: "Chart",     icon: "📊", category: "business" },
-      { id: 19, name: "Arrow Up",  icon: "⬆️", category: "arrows" },
-      { id: 20, name: "Arrow Down",icon: "⬇️", category: "arrows" },
-      { id: 21, name: "Arrow Left",icon: "⬅️", category: "arrows" },
-      { id: 22, name: "Arrow Right",icon: "➡️", category: "arrows" },
-      { id: 23, name: "Plus",      icon: "➕", category: "ui" },
-      { id: 24, name: "Minus",     icon: "➖", category: "ui" },
-    ];
+    let allIcons: any[] = [];
+    let visibleCount = 48;
 
     // ===== INIT =====
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
       initNavigation();
-      initGallery();
+      initModal();
       initFilters();
       checkAuth();
-      initComingSoonLinks();
 
       const y = document.getElementById("y");
       if (y) y.textContent = String(new Date().getFullYear());
-    });
 
-    // ===== COMING SOON LINKS =====
-    function initComingSoonLinks() {
-      const comingSoon = [
-        "collectionsBtn", "favoritesBtn", "upgradeBtn", "pricingBtn",
-        "viewAllBtn", "uiEssentialsCard", "techDevicesCard", "communicationCard",
-        "ctaPricingBtn", "mobileCollectionsBtn", "mobileFavoritesBtn", "mobileUpgradeBtn"
-      ];
-      comingSoon.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener("click", (e) => { e.preventDefault(); alert("Coming soon!"); });
-      });
-    }
+      await loadCatalog();
+    });
 
     // ===== NAVIGATION =====
     function initNavigation() {
@@ -400,22 +377,91 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
       if (logoutBtn) logoutBtn.addEventListener("click", logout);
     }
 
+    // ===== CATALOG =====
+    async function loadCatalog() {
+      try {
+        const res = await fetch("/icons-store-assets/catalog.json");
+        allIcons = await res.json();
+        renderGallery();
+        updateStats();
+      } catch (e) {
+        console.error("Erro ao carregar catálogo:", e);
+      }
+    }
+
+    function updateStats() {
+      const free = allIcons.filter(i => i.plan === "free").length;
+      const prem = allIcons.filter(i => i.plan === "premium").length;
+      const total = allIcons.length;
+      const statEls = document.querySelectorAll<HTMLElement>(".stat-number");
+      if (statEls[0]) statEls[0].textContent = total + "+";
+      if (statEls[1]) statEls[1].textContent = "23";
+      if (statEls[2]) statEls[2].textContent = prem + " Premium";
+    }
+
+    function getFilteredIcons() {
+      if (currentFilter === "all") return allIcons;
+      return allIcons.filter(i => i.category === currentFilter);
+    }
+
+    function renderGallery() {
+      const grid = document.getElementById("galleryGrid");
+      if (!grid) return;
+      grid.innerHTML = "";
+      const filtered = getFilteredIcons();
+      const slice = filtered.slice(0, visibleCount);
+      slice.forEach(icon => grid.appendChild(createIconCard(icon)));
+      const btn = document.getElementById("loadMoreBtn");
+      if (btn) btn.style.display = filtered.length > visibleCount ? "inline-flex" : "none";
+    }
+
+    function createIconCard(icon: any) {
+      const card = document.createElement("div");
+      card.className = "icon-card";
+      card.dataset.category = icon.category;
+      card.dataset.plan = icon.plan;
+
+      const isPremium = icon.plan === "premium";
+      const badge = isPremium
+        ? `<span style="position:absolute;top:6px;right:6px;font-size:9px;font-weight:800;letter-spacing:.06em;padding:2px 6px;border-radius:99px;background:linear-gradient(135deg,#8b5cf6,#ff006e);color:#fff;">PRO</span>`
+        : "";
+
+      card.innerHTML = `
+        ${badge}
+        <div class="icon-display" style="width:56px;height:56px;">
+          <img src="${icon.path}" alt="${icon.name}" loading="lazy" style="width:100%;height:100%;object-fit:contain;" />
+        </div>
+        <div class="icon-name">${icon.name}</div>
+      `;
+      card.style.position = "relative";
+      card.addEventListener("click", () => handleDownload(icon));
+      return card;
+    }
+
     // ===== AUTH =====
     function checkAuth() {
       try {
-        const savedUser = localStorage.getItem("designmarket_user");
-        if (savedUser) {
-          currentUser = JSON.parse(savedUser);
+        const token = localStorage.getItem("volynx_access_token");
+        const sessionRaw = localStorage.getItem("volynx_session");
+        if (token && sessionRaw) {
+          const session = JSON.parse(sessionRaw);
           isLoggedIn = true;
+          currentUser = {
+            name: session?.user?.user_metadata?.full_name || session?.user?.email?.split("@")[0] || "User",
+            email: session?.user?.email || ""
+          };
           updateAuthUI();
         }
-      } catch (e) { /* localStorage unavailable */ }
+      } catch (e) {}
     }
 
     function logout() {
       currentUser = null;
       isLoggedIn = false;
-      localStorage.removeItem("designmarket_user");
+      localStorage.removeItem("volynx_access_token");
+      localStorage.removeItem("volynx_refresh_token");
+      localStorage.removeItem("volynx_session");
+      localStorage.removeItem("volynx_user_email");
       updateAuthUI();
       document.getElementById("dropdownMenu")?.classList.remove("show");
     }
@@ -440,57 +486,35 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
       }
     }
 
-    // ===== GALLERY =====
-    function initGallery() {
-      renderIcons(iconsData.slice(0, 12));
-      const loadMoreBtn = document.getElementById("loadMoreBtn");
-      if (loadMoreBtn) loadMoreBtn.addEventListener("click", loadMoreIcons);
-    }
-
-    function renderIcons(icons: typeof iconsData) {
-      const galleryGrid = document.getElementById("galleryGrid");
-      if (!galleryGrid) return;
-      icons.forEach(icon => galleryGrid.appendChild(createIconCard(icon)));
-    }
-
-    function createIconCard(icon: { id: number; name: string; icon: string; category: string }) {
-      const card = document.createElement("div");
-      card.className = "icon-card";
-      card.dataset.category = icon.category;
-      card.innerHTML = `<div class="icon-display">${icon.icon}</div><div class="icon-name">${icon.name}</div>`;
-      card.addEventListener("click", () => downloadIcon(icon));
-      return card;
-    }
-
-    function downloadIcon(icon: { name: string; icon: string }) {
-      try {
-        const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><text x="50" y="50" font-size="50" text-anchor="middle" dominant-baseline="middle">${icon.icon}</text></svg>`;
-        const blob = new Blob([svgContent], { type: "image/svg+xml" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${icon.name.toLowerCase().replace(/\s+/g, "-")}.svg`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showNotification(`Downloaded: ${icon.name}`);
-      } catch (e) {
-        showNotification("Download failed. Please try again.");
+    // ===== DOWNLOAD LOGIC =====
+    function handleDownload(icon: any) {
+      if (icon.plan === "premium") {
+        showPremiumModal(icon);
+        return;
       }
+      // Free icon — requires login
+      if (!isLoggedIn) {
+        showLoginModal(icon);
+        return;
+      }
+      triggerDownload(icon);
     }
 
-    function loadMoreIcons() {
-      const galleryGrid = document.getElementById("galleryGrid");
-      if (!galleryGrid) return;
-      const currentCount = galleryGrid.children.length;
-      const remaining = iconsData.slice(currentCount, currentCount + 12);
-      if (remaining.length > 0) renderIcons(remaining);
-      if (currentCount + remaining.length >= iconsData.length) {
-        const btn = document.getElementById("loadMoreBtn");
-        if (btn) btn.style.display = "none";
-      }
+    function triggerDownload(icon: any) {
+      const a = document.createElement("a");
+      a.href = icon.path;
+      a.download = icon.file;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showNotification(`Downloaded: ${icon.name}`);
     }
+
+    // ===== LOAD MORE =====
+    document.getElementById("loadMoreBtn")?.addEventListener("click", () => {
+      visibleCount += 48;
+      renderGallery();
+    });
 
     // ===== FILTERS =====
     function initFilters() {
@@ -500,15 +524,59 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
           filterBtns.forEach(b => b.classList.remove("active"));
           btn.classList.add("active");
           currentFilter = btn.dataset.filter ?? "all";
-          applyFilter(currentFilter);
+          visibleCount = 48;
+          renderGallery();
         });
       });
     }
 
-    function applyFilter(filter: string) {
-      document.querySelectorAll<HTMLElement>(".icon-card").forEach(card => {
-        card.style.display = (filter === "all" || card.dataset.category === filter) ? "flex" : "none";
+    // ===== MODAL =====
+    function initModal() {
+      document.getElementById("vxModalClose")?.addEventListener("click", closeModal);
+      document.getElementById("vxModal")?.addEventListener("click", (e) => {
+        if ((e.target as HTMLElement).id === "vxModal") closeModal();
       });
+    }
+
+    function openModal(html: string) {
+      const modal = document.getElementById("vxModal") as HTMLElement;
+      const content = document.getElementById("vxModalContent") as HTMLElement;
+      content.innerHTML = html;
+      modal.style.display = "flex";
+    }
+
+    function closeModal() {
+      const modal = document.getElementById("vxModal") as HTMLElement;
+      modal.style.display = "none";
+    }
+
+    function showLoginModal(icon: any) {
+      openModal(`
+        <div style="font-size:2.5rem;margin-bottom:1rem;">🔒</div>
+        <h3 style="color:#fff;margin-bottom:.5rem;">Login necessário</h3>
+        <p style="color:rgba(255,255,255,.7);font-size:.9rem;margin-bottom:1.5rem;">
+          Faça login para baixar ícones gratuitos — é rápido e grátis.
+        </p>
+        <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
+          <a href="/login/?return=/products/volynx-icons-store/" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#00f0ff,#0066ff);color:#000;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;">Entrar</a>
+          <a href="/signup/?return=/products/volynx-icons-store/" style="padding:.75rem 1.5rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;border:1px solid rgba(255,255,255,.3);">Criar conta grátis</a>
+        </div>
+      `);
+    }
+
+    function showPremiumModal(icon: any) {
+      openModal(`
+        <div style="font-size:2.5rem;margin-bottom:1rem;">⭐</div>
+        <h3 style="color:#fff;margin-bottom:.5rem;">${icon.name}</h3>
+        <p style="color:rgba(200,160,255,.9);font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.75rem;">Coleção ${icon.collection} — Premium</p>
+        <p style="color:rgba(255,255,255,.7);font-size:.9rem;margin-bottom:1.5rem;">
+          Este ícone faz parte de uma coleção premium. Adquira individualmente ou no combo completo.
+        </p>
+        <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
+          <a href="/pricing/" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#8b5cf6,#ff006e);color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;">Ver planos</a>
+          <a href="/pricing/" style="padding:.75rem 1.5rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;border:1px solid rgba(255,255,255,.3);">Combo completo</a>
+        </div>
+      `);
     }
 
     // ===== NOTIFICATIONS =====
