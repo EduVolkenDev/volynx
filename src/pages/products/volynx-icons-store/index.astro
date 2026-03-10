@@ -457,7 +457,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
           ? '<span class="icon-price-tag">from £2.99</span>'
           : '<span class="icon-collection-label">' + icon.category + '</span>'}
       `;
-      card.addEventListener("click", () => handleDownload(icon));
+      card.addEventListener("click", () => showPreviewModal(icon));
       return card;
     }
 
@@ -507,6 +507,28 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
         if (signInBtn) signInBtn.style.display = "inline-flex";
         if (userMenu) userMenu.style.display = "none";
       }
+    }
+
+    // ===== PREVIEW MODAL =====
+    function showPreviewModal(icon: any) {
+      const isPremium = icon.plan === "premium";
+      openModal(`
+        <div style="display:flex;align-items:center;justify-content:center;background:#fff;border-radius:16px;padding:24px;margin-bottom:1.25rem;min-height:180px;">
+          <img src="${icon.path}" alt="" style="width:160px;height:160px;object-fit:contain;display:block;" />
+        </div>
+        <p style="color:rgba(255,255,255,.5);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1.25rem;">${icon.category}</p>
+        <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
+          <button id="previewDownloadBtn" style="padding:.75rem 2rem;background:linear-gradient(135deg,#00f0ff,#0066ff);color:#000;font-weight:700;border-radius:10px;border:none;font-size:.9rem;cursor:pointer;">
+            ${isPremium ? "Adquirir" : "Download"}
+          </button>
+          <button id="previewCancelBtn" style="padding:.75rem 1.25rem;background:transparent;color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.15);border-radius:10px;font-size:.9rem;cursor:pointer;">Fechar</button>
+        </div>
+      `);
+      document.getElementById("previewDownloadBtn")?.addEventListener("click", () => {
+        closeModal();
+        handleDownload(icon);
+      });
+      document.getElementById("previewCancelBtn")?.addEventListener("click", closeModal);
     }
 
     // ===== DOWNLOAD LOGIC =====
