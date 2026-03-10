@@ -2,6 +2,7 @@
 import "../../../styles/image-suite.css";
 import PageWidgets from "../../../components/PageWidgets.astro";
 import SiteFooter from "../../../components/SiteFooter.astro";
+
 const pageTitle = "VOLYNX Lab • iMage Suite";
 const pageDescription = "Free image suite — upscale, compress and convert images directly in your browser, no upload required.";
 ---
@@ -40,12 +41,12 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
         <div class="cardHead">
           <strong>Upload &amp; Config</strong>
           <button id="pickBtn" class="btn secondary" type="button">Selecionar</button>
-          <input id="file" type="file" accept="image/*" hidden aria-label="Select image" />
+          <input id="file" type="file" accept="image/*" multiple hidden aria-label="Select images" />
         </div>
 
         <div class="cardBody">
           <div id="drop" class="drop" role="button" tabindex="0" aria-label="Drop zone">
-            Arraste imagem aqui ou clique para selecionar
+            Arraste imagens aqui ou clique para selecionar
           </div>
 
           <div class="field-group">
@@ -97,11 +98,18 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
             />
             <button id="activateBtn" class="btn secondary" type="button">Activate</button>
           </div>
+
           <div id="proStatus" class="pro-status" aria-live="polite"></div>
 
           <div class="kpis">
-            <div class="kpi"><strong>Original</strong><div id="origMeta">—</div></div>
-            <div class="kpi"><strong>Resultado</strong><div id="outMeta">—</div></div>
+            <div class="kpi">
+              <strong>Original</strong>
+              <div id="origMeta">—</div>
+            </div>
+            <div class="kpi">
+              <strong>Resultado</strong>
+              <div id="outMeta">—</div>
+            </div>
           </div>
         </div>
       </div>
@@ -118,8 +126,11 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
     </div>
   </main>
 
-  <script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+  <script is:inline>
     const FREE_LIMIT = 3;
+    const VALID_LICENSES = ["VOLYNX-PRO-2026", "VOLYNX-LIFETIME-001"];
 
     function todayKey() {
       const d = new Date();
@@ -129,62 +140,169 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
     function getUsage() {
       const raw = localStorage.getItem("volynx_usage");
       const today = todayKey();
+
       if (!raw) {
         const data = { date: today, used: 0 };
         localStorage.setItem("volynx_usage", JSON.stringify(data));
         return data;
       }
-      const data = JSON.parse(raw);
-      if (data.date !== today) {
+
+      try {
+        const data = JSON.parse(raw);
+
+        if (data.date !== today) {
+          const reset = { date: today, used: 0 };
+          localStorage.setItem("volynx_usage", JSON.stringify(reset));
+          return reset;
+        }
+
+        return data;
+      } catch (err) {
         const reset = { date: today, used: 0 };
         localStorage.setItem("volynx_usage", JSON.stringify(reset));
         return reset;
       }
-      return data;
     }
 
-    function incrementUsage() {
+    function incrementUsage(amount = 1) {
       const data = getUsage();
-      data.used++;
+      data.used += amount;
       localStorage.setItem("volynx_usage", JSON.stringify(data));
     }
 
-    const $ = (id: string) => document.getElementById(id);
+    function $(id) {
+      return document.getElementById(id);
+    }
 
-    const fileEl      = $("file") as HTMLInputElement;
-    const pickBtn     = $("pickBtn") as HTMLButtonElement;
-    const dropEl      = $("drop") as HTMLElement;
-    const runBtn      = $("runBtn") as HTMLButtonElement;
-    const downloadBtn = $("downloadBtn") as HTMLButtonElement;
-    const previewEl   = $("preview") as HTMLImageElement;
-    const toolEl      = $("tool") as HTMLSelectElement;
-    const scaleEl     = $("scale") as HTMLSelectElement;
-    const fmtEl       = $("format") as HTMLSelectElement;
-    const qualityEl   = $("quality") as HTMLInputElement;
-    const qualityValEl = $("qualityVal") as HTMLElement;
-    const origMeta    = $("origMeta") as HTMLElement;
-    const outMeta     = $("outMeta") as HTMLElement;
-    const licenseInput = $("licenseKey") as HTMLInputElement;
-    const activateBtn = $("activateBtn") as HTMLButtonElement;
-    const proStatus   = $("proStatus") as HTMLElement;
-
-    const VALID_LICENSES = [
-      "VOLYNX-PRO-2026",
-      "VOLYNX-LIFETIME-001"
-    ];
+    const fileEl = $("file");
+    const pickBtn = $("pickBtn");
+    const dropEl = $("drop");
+    const runBtn = $("runBtn");
+    const downloadBtn = $("downloadBtn");
+    const previewEl = $("preview");
+    const toolEl = $("tool");
+    const scaleEl = $("scale");
+    const fmtEl = $("format");
+    const qualityEl = $("quality");
+    const qualityValEl = $("qualityVal");
+    const origMeta = $("origMeta");
+    const outMeta = $("outMeta");
+    const licenseInput = $("licenseKey");
+    const activateBtn = $("activateBtn");
+    const proStatus = $("proStatus");
 
     let isPro = localStorage.getItem("volynx_pro") === "true";
-    let srcImg: HTMLImageElement | null = null;
-    let srcFile: File | null = null;
-    let outBlob: Blob | null = null;
-    let srcName = "image";
+    let loadedImages = [];
+    let processedResults = [];
+    let singleOutBlob = null;
 
     function updateProUI() {
       proStatus.textContent = isPro ? "PRO Activated ✔ Unlimited access enabled" : "";
     }
 
+    function resetPreview() {
+      if (previewEl) previewEl.removeAttribute("src");
+      if (outMeta) outMeta.textContent = "—";
+      if (downloadBtn) downloadBtn.disabled = true;
+      processedResults = [];
+      singleOutBlob = null;
+    }
+
+    async function fileToImage(file) {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      URL.revokeObjectURL(url);
+      return img;
+    }
+
+    async function loadFiles(files) {
+      const validFiles = files.filter((file) => file && file.type && file.type.startsWith("image/"));
+
+      loadedImages = [];
+      resetPreview();
+
+      if (!validFiles.length) {
+        alert("Nenhuma imagem válida encontrada.");
+        return;
+      }
+
+      runBtn.disabled = true;
+      dropEl.textContent = `Carregando ${validFiles.length} arquivo(s)...`;
+
+      for (const file of validFiles) {
+        const img = await fileToImage(file);
+        loadedImages.push({
+          file,
+          img,
+          baseName: file.name.replace(/\.[^/.]+$/, "")
+        });
+      }
+
+      const totalBytes = validFiles.reduce((sum, file) => sum + file.size, 0);
+      origMeta.textContent = `${validFiles.length} arquivo(s) • ${(totalBytes / 1024 / 1024).toFixed(2)}MB`;
+      dropEl.textContent = `${validFiles.length} arquivo(s) pronto(s) para processar`;
+      runBtn.disabled = false;
+    }
+
+    function canvasToBlob(canvas, mime, quality) {
+      return new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            reject(new Error("Falha ao gerar arquivo."));
+            return;
+          }
+          resolve(blob);
+        }, mime, quality);
+      });
+    }
+
+    async function processOne(item, tool, scale, mime, quality) {
+      const img = item.img;
+      const file = item.file;
+      const baseName = item.baseName;
+
+      const w = img.width;
+      const h = img.height;
+
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      if (!ctx) {
+        throw new Error("Falha ao criar contexto do canvas.");
+      }
+
+      if (tool === "upscale") {
+        canvas.width = w * scale;
+        canvas.height = h * scale;
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      } else {
+        canvas.width = w;
+        canvas.height = h;
+        ctx.drawImage(img, 0, 0);
+      }
+
+      const blob = await canvasToBlob(
+        canvas,
+        mime,
+        tool === "compress" ? quality : 0.95
+      );
+
+      return {
+        baseName,
+        originalFile: file,
+        blob,
+        width: canvas.width,
+        height: canvas.height
+      };
+    }
+
     activateBtn.addEventListener("click", () => {
       const key = licenseInput.value.trim();
+
       if (VALID_LICENSES.includes(key)) {
         localStorage.setItem("volynx_pro", "true");
         isPro = true;
@@ -201,91 +319,121 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       qualityValEl.textContent = qualityEl.value;
     });
 
-    pickBtn.addEventListener("click", () => fileEl.click());
-    dropEl.addEventListener("click", () => fileEl.click());
+    pickBtn.addEventListener("click", () => {
+      fileEl.click();
+    });
+
+    dropEl.addEventListener("click", () => {
+      fileEl.click();
+    });
+
     dropEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") fileEl.click();
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        fileEl.click();
+      }
     });
 
     fileEl.addEventListener("change", async () => {
-      const f = fileEl.files?.[0];
-      if (!f) return;
-      await loadFile(f);
+      const files = Array.from(fileEl.files || []);
+      if (!files.length) return;
+      await loadFiles(files);
     });
 
-    dropEl.addEventListener("dragover", (e) => e.preventDefault());
+    dropEl.addEventListener("dragover", (e) => {
+      e.preventDefault();
+    });
+
     dropEl.addEventListener("drop", async (e) => {
       e.preventDefault();
-      const f = (e as DragEvent).dataTransfer?.files[0];
-      if (!f) return;
-      await loadFile(f);
+      const files = Array.from((e.dataTransfer && e.dataTransfer.files) || []);
+      if (!files.length) return;
+      await loadFiles(files);
     });
 
-    async function loadFile(file: File) {
-      srcFile = file;
-      srcName = file.name.replace(/\.[^/.]+$/, "");
-      const url = URL.createObjectURL(file);
-      const img = new Image();
-      img.src = url;
-      await img.decode();
-      URL.revokeObjectURL(url);
-      srcImg = img;
-      origMeta.textContent = `${img.width}x${img.height} • ${(file.size / 1024 / 1024).toFixed(2)}MB`;
-      runBtn.disabled = false;
-    }
-
     runBtn.addEventListener("click", async () => {
-      if (!srcImg) return;
+      if (!loadedImages.length) return;
 
       const usage = getUsage();
-      if (!isPro && usage.used >= FREE_LIMIT) {
-        alert("Limite diário atingido. Faça upgrade para uso ilimitado.");
+      const tool = toolEl.value;
+      const scale = parseInt(scaleEl.value, 10);
+      const mime = fmtEl.value;
+      const quality = parseFloat(qualityEl.value);
+
+      if (!isPro && usage.used + loadedImages.length > FREE_LIMIT) {
+        alert(`No plano free você pode processar até ${FREE_LIMIT} imagens por dia. O lote atual excede esse limite.`);
         return;
       }
 
       runBtn.disabled = true;
-      const tool    = toolEl.value;
-      const scale   = parseInt(scaleEl.value);
-      const mime    = fmtEl.value;
-      const quality = parseFloat(qualityEl.value);
+      downloadBtn.disabled = true;
+      processedResults = [];
+      singleOutBlob = null;
 
-      const w = srcImg.width;
-      const h = srcImg.height;
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d")!;
+      try {
+        for (let i = 0; i < loadedImages.length; i++) {
+          dropEl.textContent = `Processando ${i + 1}/${loadedImages.length}...`;
 
-      if (tool === "upscale") {
-        canvas.width  = w * scale;
-        canvas.height = h * scale;
-        ctx.imageSmoothingQuality = "high";
-        ctx.drawImage(srcImg, 0, 0, canvas.width, canvas.height);
-        outBlob = await new Promise<Blob | null>(res => canvas.toBlob(res, mime, 0.95));
-      } else {
-        canvas.width  = w;
-        canvas.height = h;
-        ctx.drawImage(srcImg, 0, 0);
-        outBlob = await new Promise<Blob | null>(res => canvas.toBlob(res, mime, tool === "compress" ? quality : 0.95));
+          const result = await processOne(loadedImages[i], tool, scale, mime, quality);
+          processedResults.push(result);
+
+          if (i === 0) {
+            const url = URL.createObjectURL(result.blob);
+            previewEl.src = url;
+          }
+        }
+
+        const totalOutBytes = processedResults.reduce((sum, result) => sum + result.blob.size, 0);
+        outMeta.textContent = `${processedResults.length} arquivo(s) • ${(totalOutBytes / 1024 / 1024).toFixed(2)}MB`;
+
+        if (processedResults.length === 1) {
+          singleOutBlob = processedResults[0].blob;
+        }
+
+        if (!isPro) {
+          incrementUsage(processedResults.length);
+        }
+
+        dropEl.textContent = `${processedResults.length} arquivo(s) processado(s) com sucesso`;
+        downloadBtn.disabled = false;
+      } catch (error) {
+        console.error(error);
+        alert("Ocorreu um erro ao processar as imagens.");
+        dropEl.textContent = "Erro ao processar arquivos";
+      } finally {
+        runBtn.disabled = false;
       }
-
-      if (!outBlob) return;
-
-      const url = URL.createObjectURL(outBlob);
-      previewEl.src = url;
-
-      const reduction = ((1 - (outBlob.size / srcFile!.size)) * 100).toFixed(1);
-      outMeta.textContent = `${canvas.width}x${canvas.height} • ${(outBlob.size / 1024 / 1024).toFixed(2)}MB • ${reduction}%`;
-      downloadBtn.disabled = false;
-
-      if (!isPro) incrementUsage();
-      runBtn.disabled = false;
     });
 
-    downloadBtn.addEventListener("click", () => {
-      if (!outBlob) return;
+    downloadBtn.addEventListener("click", async () => {
+      if (!processedResults.length) return;
+
       const ext = fmtEl.value.split("/")[1];
+
+      if (processedResults.length === 1 && singleOutBlob) {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(singleOutBlob);
+        a.download = `${processedResults[0].baseName}.${ext}`;
+        a.click();
+        return;
+      }
+
+      if (!window.JSZip) {
+        alert("JSZip não carregado.");
+        return;
+      }
+
+      const zip = new window.JSZip();
+
+      for (const result of processedResults) {
+        zip.file(`${result.baseName}.${ext}`, result.blob);
+      }
+
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+
       const a = document.createElement("a");
-      a.href = URL.createObjectURL(outBlob);
-      a.download = `${srcName}.${ext}`;
+      a.href = URL.createObjectURL(zipBlob);
+      a.download = "volynx-image-suite-batch.zip";
       a.click();
     });
   </script>

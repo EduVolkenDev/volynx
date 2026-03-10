@@ -1,6 +1,18 @@
+const LOGIN_PATH = "/login/";
+const DEFAULT_REDIRECT = "/volynx-lab/studio/";
+
+function resolveRedirect() {
+  try {
+    const url = new URL(window.location.href);
+    const next = url.searchParams.get("next") || "";
+    if (next.startsWith("/") && !next.startsWith("//")) return next;
+  } catch {}
+  return DEFAULT_REDIRECT;
+}
+
 async function loadConfig() {
   const res = await fetch("/config.json", { cache: "no-store" });
-  if (!res.ok) throw new Error("config.json não encontrado (adicione /config.json no deploy).");
+  if (!res.ok) throw new Error("config.json não encontrado na raiz pública do deploy.");
   return await res.json();
 }
 
@@ -9,7 +21,7 @@ async function supabaseSignup({ supabaseUrl, supabaseAnonKey, email, password })
   const res = await fetch(url, {
     method: "POST",
     headers: {
-      "apikey": supabaseAnonKey,
+      apikey: supabaseAnonKey,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({ email, password })
@@ -20,13 +32,26 @@ async function supabaseSignup({ supabaseUrl, supabaseAnonKey, email, password })
     const msg = data?.error_description || data?.msg || data?.error || `Erro ${res.status}`;
     throw new Error(msg);
   }
-  return data; // { user, session? }
+  return data;
 }
 
 function setMsg(el, text, kind) {
   el.textContent = text || "";
   el.classList.remove("err", "ok");
   if (kind) el.classList.add(kind);
+}
+
+function persistSession(session, email) {
+  localStorage.setItem("volynx_access_token", session.access_token || "");
+  localStorage.setItem("volynx_refresh_token", session.refresh_token || "");
+  localStorage.setItem("volynx_user_email", email || session?.user?.email || "");
+  localStorage.setItem("volynx_session", JSON.stringify({
+    access_token: session.access_token || "",
+    refresh_token: session.refresh_token || "",
+    expires_at: session.expires_at || null,
+    expires_in: session.expires_in || null,
+    user: session.user || null
+  }));
 }
 
 (function init() {
@@ -54,7 +79,6 @@ function setMsg(el, text, kind) {
 
     try {
       const cfg = await loadConfig();
-
       if (!cfg?.supabaseUrl || !cfg?.supabaseAnonKey || String(cfg.supabaseAnonKey).includes("YOUR_")) {
         throw new Error("Configure SUPABASE_URL e SUPABASE_ANON_KEY em /config.json.");
       }
@@ -66,18 +90,17 @@ function setMsg(el, text, kind) {
         password
       });
 
-      // Se o Supabase estiver com confirmação de email, session pode vir null
       if (out?.session?.access_token) {
-        localStorage.setItem("volynx_access_token", out.session.access_token);
-        localStorage.setItem("volynx_refresh_token", out.session.refresh_token || "");
-        localStorage.setItem("volynx_user_email", email);
+        persistSession(out.session, email);
         setMsg(msg, "Conta criada e logada. Indo para o Studio…", "ok");
-        window.location.href = "/studio/";
+        window.location.href = resolveRedirect();
         return;
       }
 
       setMsg(msg, "Conta criada. Verifique seu email para confirmar e depois faça login.", "ok");
-      setTimeout(() => { window.location.href = "/login/"; }, 1200);
+      setTimeout(() => {
+        window.location.href = `${LOGIN_PATH}?next=${encodeURIComponent(resolveRedirect())}`;
+      }, 1200);
     } catch (err) {
       setMsg(msg, err?.message || "Falha ao criar conta.", "err");
     } finally {

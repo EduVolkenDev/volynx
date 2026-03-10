@@ -1,6 +1,17 @@
+const DEFAULT_REDIRECT = "/volynx-lab/studio/";
+
+function resolveRedirect() {
+  try {
+    const url = new URL(window.location.href);
+    const next = url.searchParams.get("next") || "";
+    if (next.startsWith("/") && !next.startsWith("//")) return next;
+  } catch {}
+  return DEFAULT_REDIRECT;
+}
+
 async function loadConfig() {
   const res = await fetch("/config.json", { cache: "no-store" });
-  if (!res.ok) throw new Error("config.json não encontrado (adicione /config.json no deploy).");
+  if (!res.ok) throw new Error("config.json não encontrado na raiz pública do deploy.");
   return await res.json();
 }
 
@@ -9,7 +20,7 @@ async function supabasePasswordGrant({ supabaseUrl, supabaseAnonKey, email, pass
   const res = await fetch(url, {
     method: "POST",
     headers: {
-      "apikey": supabaseAnonKey,
+      apikey: supabaseAnonKey,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({ email, password })
@@ -20,13 +31,26 @@ async function supabasePasswordGrant({ supabaseUrl, supabaseAnonKey, email, pass
     const msg = data?.error_description || data?.msg || data?.error || `Erro ${res.status}`;
     throw new Error(msg);
   }
-  return data; // { access_token, refresh_token, expires_in, token_type, user }
+  return data;
 }
 
 function setMsg(el, text, kind) {
   el.textContent = text || "";
   el.classList.remove("err", "ok");
   if (kind) el.classList.add(kind);
+}
+
+function persistSession(session, email) {
+  localStorage.setItem("volynx_access_token", session.access_token || "");
+  localStorage.setItem("volynx_refresh_token", session.refresh_token || "");
+  localStorage.setItem("volynx_user_email", email || session?.user?.email || "");
+  localStorage.setItem("volynx_session", JSON.stringify({
+    access_token: session.access_token || "",
+    refresh_token: session.refresh_token || "",
+    expires_at: session.expires_at || null,
+    expires_in: session.expires_in || null,
+    user: session.user || null
+  }));
 }
 
 (function init() {
@@ -39,7 +63,7 @@ function setMsg(el, text, kind) {
   if (!form || !emailEl || !passEl || !btn || !msg) return;
 
   form.addEventListener("submit", async (e) => {
-    e.preventDefault(); // evita POST -> 405 em host estático
+    e.preventDefault();
 
     const email = String(emailEl.value || "").trim();
     const password = String(passEl.value || "");
@@ -54,7 +78,6 @@ function setMsg(el, text, kind) {
 
     try {
       const cfg = await loadConfig();
-
       if (!cfg?.supabaseUrl || !cfg?.supabaseAnonKey || String(cfg.supabaseAnonKey).includes("YOUR_")) {
         throw new Error("Configure SUPABASE_URL e SUPABASE_ANON_KEY em /config.json.");
       }
@@ -66,15 +89,9 @@ function setMsg(el, text, kind) {
         password
       });
 
-      // Armazena sessão para o frontend consumir (Bearer token)
-      localStorage.setItem("volynx_access_token", session.access_token);
-      localStorage.setItem("volynx_refresh_token", session.refresh_token || "");
-      localStorage.setItem("volynx_user_email", email);
-
+      persistSession(session, email);
       setMsg(msg, "Login OK. Redirecionando…", "ok");
-
-      // Redireciona para Studio (ajuste se necessário)
-      window.location.href = "/volynx-lab/studio/";
+      window.location.href = resolveRedirect();
     } catch (err) {
       setMsg(msg, err?.message || "Falha no login.", "err");
     } finally {

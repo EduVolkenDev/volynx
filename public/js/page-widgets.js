@@ -1,16 +1,17 @@
-(function () {
-  var btn = document.getElementById('vxBackTop');
-  if (!btn) return;
+(function initPageWidgets() {
+  const backTop = document.getElementById('vxBackTop');
+  if (!backTop) return;
 
-  window.addEventListener('scroll', function () {
-    if (window.scrollY > 300) {
-      btn.classList.add('vx--visible');
-    } else {
-      btn.classList.remove('vx--visible');
-    }
-  }, { passive: true });
+  const THRESHOLD = 300;
 
-  btn.addEventListener('click', function () {
+  function onScroll() {
+    backTop.classList.toggle('vx--visible', window.scrollY > THRESHOLD);
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  backTop.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 })();
