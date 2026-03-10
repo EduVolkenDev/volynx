@@ -347,7 +347,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
     // ===== CATALOG =====
     async function loadCatalog() {
       try {
-        const res = await fetch("/icons-store-assets/catalog.json");
+        const res = await fetch("/assets/icons-store/catalog.json");
         allIcons = await res.json();
         renderGallery();
         updateStats();
@@ -367,12 +367,11 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
 
     // ===== FEATURED COLLECTIONS =====
     const FEATURED_COLLECTIONS = [
-      { folder: "icon-set",           label: "Essential Set",  category: "essential", plan: "free",    price: null },
-      { folder: "purple-icons",       label: "Purple Pack",    category: "purple",    plan: "free",    price: null },
-      { folder: "icons-blue-sliced3", label: "Blue III",       category: "blue",      plan: "free",    price: null },
-      { folder: "futuristic",         label: "Futuristic",     category: "premium",   plan: "premium", price: "£4.99" },
-      { folder: "icons_refeitos_hd",  label: "HD Remaster",    category: "premium",   plan: "premium", price: "£5.99" },
-      { folder: "icons_rose_refeitos_hd", label: "Rose HD",   category: "premium",   plan: "premium", price: "£4.99" },
+      { category: "blue",   label: "Blue Icons",   plan: "free", price: null },
+      { category: "simple", label: "Simple Icons",  plan: "free", price: null },
+      { category: "purple", label: "Purple Icons",  plan: "free", price: null },
+      { category: "green",  label: "Green Icons",   plan: "free", price: null },
+      { category: "pink",   label: "Pink Icons",    plan: "free", price: null },
     ];
 
     function renderCollections() {
@@ -380,9 +379,9 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
       if (!grid || !allIcons.length) return;
 
       FEATURED_COLLECTIONS.forEach(col => {
-        const icons = allIcons.filter(i => i.folder === col.folder).slice(0, 4);
+        const icons = allIcons.filter(i => i.category === col.category).slice(0, 4);
         if (!icons.length) return;
-        const count = allIcons.filter(i => i.folder === col.folder).length;
+        const count = allIcons.filter(i => i.category === col.category).length;
         const isPremium = col.plan === "premium";
 
         const card = document.createElement("div");
@@ -456,7 +455,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
         </div>
         ${isPremium
           ? '<span class="icon-price-tag">from £2.99</span>'
-          : '<span class="icon-collection-label">' + icon.collection + '</span>'}
+          : '<span class="icon-collection-label">' + icon.category + '</span>'}
       `;
       card.addEventListener("click", () => handleDownload(icon));
       return card;
