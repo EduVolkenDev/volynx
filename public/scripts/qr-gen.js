@@ -102,24 +102,27 @@ function bind() {
   genBtn?.addEventListener("click", async (e) => {
     e.preventDefault();
     if (genBtn.disabled) return;
+    const originalText = genBtn.textContent;
     genBtn.disabled = true;
-    genBtn.textContent = "Verificando…";
+    genBtn.textContent = "Gerando…";
     try {
-      const perm = await checkPermission("qr-gen");
-      if (!perm.allowed) {
-        const msg = perm.plan === "public"
-          ? "Limite gratuito atingido. Faça login ou upgrade para continuar."
-          : `Limite do plano ${perm.plan} atingido. Faça upgrade para continuar.`;
-        alert(msg);
-        return;
+      // Try to get plan info; fall back to free on any error
+      let plan = "free";
+      try {
+        const perm = await checkPermission("qr-gen");
+        plan = perm.plan || "free";
+      } catch (_) {}
+
+      generateQR();
+
+      // Show save hint based on plan
+      const loginHint = document.querySelector(".login-hint");
+      if (loginHint && plan !== "free") {
+        loginHint.style.display = "none";
       }
-      generateQR();
-    } catch (err) {
-      console.warn("check-permission falhou, permitindo uso local:", err);
-      generateQR();
     } finally {
       genBtn.disabled = false;
-      genBtn.textContent = "Generate";
+      genBtn.textContent = originalText;
     }
   });
 

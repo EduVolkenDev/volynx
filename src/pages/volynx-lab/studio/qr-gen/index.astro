@@ -258,7 +258,12 @@ import PageWidgets from "../../../../components/PageWidgets.astro";
 </head>
 
 <body>
-  <VxHeader primaryCtaLabel="Entrar" primaryCtaHref="/login" />
+  <VxHeader primaryCtaLabel="Minha conta" primaryCtaHref="/volynx-lab/studio/" />
+
+  <!-- Upgrade banner (shown only on free plan) -->
+  <div id="vx-upgrade-banner" style="display:none;background:rgba(108,10,228,.18);border-bottom:1px solid rgba(108,10,228,.35);padding:10px 20px;text-align:center;font-size:.85em;">
+    Você está no plano gratuito. <a href="/pricing/" style="color:#59c6e8;font-weight:700;">Faça upgrade para Pro</a> e salve seus QR codes.
+  </div>
 
   <main class="qr-main">
     <div class="container">
@@ -356,6 +361,8 @@ import PageWidgets from "../../../../components/PageWidgets.astro";
   <VxFooter />
   <PageWidgets />
 
+  <script>window.__vxTool = 'qr-gen';</script>
+  <script src="/scripts/vx-auth-gate.js"></script>
   <script type="module" src="/scripts/qr-gen.js"></script>
 </body>
 </html>
