@@ -1,26 +1,43 @@
+alert("AUTH SIGNUP JS CARREGOU");
+import { getSupabaseClient } from "/src/lib/supabase-client.js";
+
 async function loadConfig() {
   const res = await fetch("/config.json", { cache: "no-store" });
-  if (!res.ok) throw new Error("config.json não encontrado (adicione /config.json no deploy).");
+  if (!res.ok) {
+    throw new Error("config.json não encontrado (adicione /config.json no deploy).");
+  }
   return await res.json();
 }
 
-async function supabaseSignup({ supabaseUrl, supabaseAnonKey, email, password }) {
-  const url = `${supabaseUrl}/auth/v1/signup`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "apikey": supabaseAnonKey,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ email, password })
+async function supabaseSignup({ email, password }) {
+  const supabase = await getSupabaseClient();
+
+  const isLocalhost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+
+  const redirectTo = isLocalhost
+    ? "http://localhost:4321/auth/confirm"
+    : "https://volynx.world/auth/confirm";
+
+  console.log("SIGNUP_REDIRECT_TO =", redirectTo);
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: redirectTo
+    }
   });
 
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const msg = data?.error_description || data?.msg || data?.error || `Erro ${res.status}`;
-    throw new Error(msg);
+  console.log("SIGNUP_RESPONSE =", data);
+  console.log("SIGNUP_ERROR =", error);
+
+  if (error) {
+    throw new Error(error.message || "Falha ao criar conta.");
   }
-  return data; // { user, session? }
+
+  return data;
 }
 
 function setMsg(el, text, kind) {
@@ -55,18 +72,19 @@ function setMsg(el, text, kind) {
     try {
       const cfg = await loadConfig();
 
-      if (!cfg?.supabaseUrl || !cfg?.supabaseAnonKey || String(cfg.supabaseAnonKey).includes("YOUR_")) {
+      if (
+        !cfg?.supabaseUrl ||
+        !cfg?.supabaseAnonKey ||
+        String(cfg.supabaseAnonKey).includes("YOUR_")
+      ) {
         throw new Error("Configure SUPABASE_URL e SUPABASE_ANON_KEY em /config.json.");
       }
 
       const out = await supabaseSignup({
-        supabaseUrl: cfg.supabaseUrl,
-        supabaseAnonKey: cfg.supabaseAnonKey,
         email,
         password
       });
 
-      // Se o Supabase estiver com confirmação de email, session pode vir null
       if (out?.session?.access_token) {
         localStorage.setItem("volynx_access_token", out.session.access_token);
         localStorage.setItem("volynx_refresh_token", out.session.refresh_token || "");
@@ -77,9 +95,13 @@ function setMsg(el, text, kind) {
       }
 
       setMsg(msg, "Conta criada. Verifique seu email para confirmar e depois faça login.", "ok");
-      setTimeout(() => { window.location.href = "/login/"; }, 1200);
+      setTimeout(() => {
+        window.location.href = "/login/";
+      }, 1200);
     } catch (err) {
-      setMsg(msg, err?.message || "Falha ao criar conta.", "err");
+      const errorMessage = err?.message || "Falha ao criar conta.";
+      setMsg(msg, errorMessage, "err");
+      console.error("SIGNUP_ERROR =", err);
     } finally {
       btn.disabled = false;
     }
