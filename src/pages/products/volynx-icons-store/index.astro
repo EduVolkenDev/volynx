@@ -495,7 +495,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
       if (loadMoreBtn) loadMoreBtn.style.display = "none";
     }
 
-    function createIconCard(icon: any) {
+    function createIconCard(icon: any, eager = false) {
       const isPaid = icon.plan === "premium" || icon.plan === "paid";
       const card = document.createElement("div");
       card.className = "icon-card icon-card--" + icon.category + (isPaid ? " icon-card--premium" : "");
@@ -504,7 +504,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
       card.innerHTML = `
         ${isPaid ? '<span class="icon-pro-badge">' + (icon.plan === "paid" ? "PAID" : "PRO") + '</span>' : ""}
         <div class="icon-img-wrap">
-          <img src="${icon.path}" alt="${icon.collection ?? icon.category}" loading="lazy" />
+          <img src="${icon.path}" alt="${icon.collection ?? icon.category}" loading="${eager ? 'eager' : 'lazy'}" />
         </div>
         <span class="icon-collection-label">${icon.collection ?? icon.category}</span>
       `;
@@ -672,7 +672,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
       grid.innerHTML = "";
 
       const icons = allIcons.filter(i => i.category === currentBrowserCatKey);
-      icons.slice(0, catBrowserVisibleCount).forEach(icon => grid.appendChild(createIconCard(icon)));
+      icons.slice(0, catBrowserVisibleCount).forEach(icon => grid.appendChild(createIconCard(icon, true)));
 
       const btn = document.getElementById("catBrowserLoadMore");
       if (btn) btn.style.display = icons.length > catBrowserVisibleCount ? "inline-flex" : "none";
