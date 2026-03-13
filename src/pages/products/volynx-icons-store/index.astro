@@ -368,23 +368,18 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
     }
 
     // ===== FEATURED COLLECTIONS =====
-    const FEATURED_COLLECTIONS = [
-      { category: "blue",   label: "Blue Icons",   plan: "free", price: null },
-      { category: "simple", label: "Simple Icons",  plan: "free", price: null },
-      { category: "purple", label: "Purple Icons",  plan: "free", price: null },
-      { category: "green",  label: "Green Icons",   plan: "free", price: null },
-      { category: "pink",   label: "Pink Icons",    plan: "free", price: null },
-    ];
-
+    // Uses CATEGORY_CONFIG defined later; rendered after catalog loads
     function renderCollections() {
       const grid = document.getElementById("collectionsGrid");
       if (!grid || !allIcons.length) return;
 
-      FEATURED_COLLECTIONS.forEach(col => {
-        const icons = allIcons.filter(i => i.category === col.category).slice(0, 4);
+      CATEGORY_CONFIG.forEach(col => {
+        const icons = allIcons.filter(i => i.category === col.key).slice(0, 4);
         if (!icons.length) return;
-        const count = allIcons.filter(i => i.category === col.category).length;
-        const isPremium = col.plan === "premium";
+        const allCatIcons = allIcons.filter(i => i.category === col.key);
+        const count = allCatIcons.length;
+        const freeCount = allCatIcons.filter(i => i.plan === "free").length;
+        const isPremium = freeCount === 0;
 
         const card = document.createElement("div");
         card.className = "collection-card" + (isPremium ? " collection-card--premium" : "");
@@ -402,27 +397,24 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
           <h3 class="collection-title">${col.label}</h3>
           <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
             <p class="collection-count">${count} ícones</p>
-            ${isPremium ? `<span style="font-size:.875rem;font-weight:700;color:rgba(200,150,255,.9);">${col.price}</span>` : '<span style="font-size:.75rem;color:rgba(0,240,255,.7);font-weight:600;">FREE</span>'}
+            ${isPremium
+            ? '<span style="font-size:.75rem;font-weight:700;color:rgba(200,150,255,.9);">PREMIUM</span>'
+            : freeCount === count
+              ? '<span style="font-size:.75rem;color:rgba(0,240,255,.7);font-weight:600;">FREE</span>'
+              : '<span style="font-size:.75rem;color:rgba(255,183,77,.8);font-weight:600;">MIXED</span>'}
           </div>
         `;
         card.style.position = "relative";
 
-        if (isPremium) {
-          card.addEventListener("click", () => {
-            const sample = icons[0];
-            showPremiumModal({ ...sample, collection: col.label, collectionPrice: col.price });
+        card.addEventListener("click", () => {
+          currentFilter = col.key;
+          document.querySelectorAll<HTMLButtonElement>(".filter-btn").forEach(b => {
+            b.classList.toggle("active", b.dataset.filter === col.key);
           });
-        } else {
-          card.addEventListener("click", () => {
-            currentFilter = col.category;
-            document.querySelectorAll<HTMLButtonElement>(".filter-btn").forEach(b => {
-              b.classList.toggle("active", b.dataset.filter === col.category);
-            });
-            visibleCount = 48;
-            renderGallery();
-            document.getElementById("gallery")?.scrollIntoView({ behavior: "smooth" });
-          });
-        }
+          visibleCount = 48;
+          renderGallery();
+          document.getElementById("gallery")?.scrollIntoView({ behavior: "smooth" });
+        });
 
         grid.appendChild(card);
       });
