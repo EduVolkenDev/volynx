@@ -293,6 +293,20 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
     </div>
   </div>
 
+  <!-- Category browser modal -->
+  <div id="catBrowserModal" class="cat-browser-overlay">
+    <div class="cat-browser-panel">
+      <div class="cat-browser-header">
+        <div class="cat-browser-title" id="catBrowserTitle"></div>
+        <button class="cat-browser-close" id="catBrowserClose">✕</button>
+      </div>
+      <div class="cat-browser-grid" id="catBrowserGrid"></div>
+      <div class="cat-browser-footer">
+        <button class="btn btn-secondary" id="catBrowserLoadMore" style="display:none;">Load More</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ===== STATE =====
     let isLoggedIn = false;
@@ -301,12 +315,15 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
 
     let allIcons: any[] = [];
     let visibleCount = 48;
+    const PREVIEW_COUNT = 12;
+    let catBrowserVisibleCount = 48;
 
     // ===== INIT =====
     document.addEventListener("DOMContentLoaded", async () => {
       initNavigation();
       initModal();
       initFilters();
+      initCategoryBrowser();
       checkAuth();
 
       const y = document.getElementById("y");
@@ -442,73 +459,40 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
       if (!container) return;
       container.innerHTML = "";
 
-      if (currentFilter === "all") {
-        CATEGORY_CONFIG.forEach(cat => {
-          const icons = allIcons.filter(i => i.category === cat.key);
-          if (!icons.length) return;
-          const section = document.createElement("div");
-          section.className = "category-section";
-          section.dataset.category = cat.key;
+      // Always render category sections with preview icons
+      CATEGORY_CONFIG.forEach(cat => {
+        const icons = allIcons.filter(i => i.category === cat.key);
+        if (!icons.length) return;
+        const section = document.createElement("div");
+        section.className = "category-section";
+        section.dataset.category = cat.key;
 
-          section.innerHTML = `
-            <div class="category-section-header">
-              <div class="category-section-title">
-                <span class="cat-accent" style="background:${cat.color};box-shadow:0 0 10px ${cat.glow};"></span>
-                <span>${cat.label}</span>
-                <span class="cat-count">${icons.length}</span>
-              </div>
-              <button class="cat-view-all-btn" data-filter="${cat.key}">
-                Ver todos
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
-              </button>
-            </div>
-            <div class="gallery-grid cat-grid"></div>
-          `;
-
-          const grid = section.querySelector<HTMLElement>(".cat-grid")!;
-          icons.slice(0, 48).forEach(icon => grid.appendChild(createIconCard(icon)));
-          container.appendChild(section);
-        });
-
-        container.querySelectorAll<HTMLButtonElement>(".cat-view-all-btn").forEach(btn => {
-          btn.addEventListener("click", () => {
-            const filter = btn.dataset.filter ?? "all";
-            currentFilter = filter;
-            visibleCount = 48;
-            document.querySelectorAll<HTMLButtonElement>(".filter-btn").forEach(b => {
-              b.classList.toggle("active", b.dataset.filter === filter);
-            });
-            renderGallery();
-            document.getElementById("gallery")?.scrollIntoView({ behavior: "smooth" });
-          });
-        });
-
-        const btn = document.getElementById("loadMoreBtn");
-        if (btn) btn.style.display = "none";
-      } else {
-        const filtered = getFilteredIcons();
-        const catMeta = CATEGORY_CONFIG.find(c => c.key === currentFilter);
-        if (catMeta) {
-          const header = document.createElement("div");
-          header.className = "category-section-header";
-          header.innerHTML = `
+        section.innerHTML = `
+          <div class="category-section-header">
             <div class="category-section-title">
-              <span class="cat-accent" style="background:${catMeta.color};box-shadow:0 0 10px ${catMeta.glow};"></span>
-              <span>${catMeta.label}</span>
-              <span class="cat-count">${filtered.length}</span>
+              <span class="cat-accent" style="background:${cat.color};box-shadow:0 0 10px ${cat.glow};"></span>
+              <span>${cat.label}</span>
+              <span class="cat-count">${icons.length}</span>
             </div>
-          `;
-          container.appendChild(header);
-        }
+            <button class="cat-view-all-btn" data-catkey="${cat.key}">
+              Ver todos
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+            </button>
+          </div>
+          <div class="gallery-grid cat-grid"></div>
+        `;
 
-        const grid = document.createElement("div");
-        grid.className = "gallery-grid";
-        filtered.slice(0, visibleCount).forEach(icon => grid.appendChild(createIconCard(icon)));
-        container.appendChild(grid);
+        const grid = section.querySelector<HTMLElement>(".cat-grid")!;
+        icons.slice(0, PREVIEW_COUNT).forEach(icon => grid.appendChild(createIconCard(icon)));
+        container.appendChild(section);
+      });
 
-        const btn = document.getElementById("loadMoreBtn");
-        if (btn) btn.style.display = filtered.length > visibleCount ? "inline-flex" : "none";
-      }
+      container.querySelectorAll<HTMLButtonElement>(".cat-view-all-btn").forEach(btn => {
+        btn.addEventListener("click", () => openCategoryBrowser(btn.dataset.catkey ?? ""));
+      });
+
+      const loadMoreBtn = document.getElementById("loadMoreBtn");
+      if (loadMoreBtn) loadMoreBtn.style.display = "none";
     }
 
     function createIconCard(icon: any) {
@@ -626,7 +610,6 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
     document.getElementById("loadMoreBtn")?.addEventListener("click", () => {
       visibleCount += 48;
       renderGallery();
-      // Keep scroll position
     });
 
     // ===== FILTERS =====
@@ -634,13 +617,73 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
       const filterBtns = document.querySelectorAll<HTMLButtonElement>(".filter-btn");
       filterBtns.forEach(btn => {
         btn.addEventListener("click", () => {
-          filterBtns.forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-          currentFilter = btn.dataset.filter ?? "all";
-          visibleCount = 48;
-          renderGallery();
+          const filter = btn.dataset.filter ?? "all";
+          if (filter === "all") {
+            filterBtns.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            return;
+          }
+          openCategoryBrowser(filter);
         });
       });
+    }
+
+    // ===== CATEGORY BROWSER MODAL =====
+    function initCategoryBrowser() {
+      document.getElementById("catBrowserClose")?.addEventListener("click", closeCategoryBrowser);
+      document.getElementById("catBrowserModal")?.addEventListener("click", (e) => {
+        if ((e.target as HTMLElement).id === "catBrowserModal") closeCategoryBrowser();
+      });
+      document.getElementById("catBrowserLoadMore")?.addEventListener("click", () => {
+        catBrowserVisibleCount += 48;
+        renderCategoryBrowserGrid();
+      });
+    }
+
+    let currentBrowserCatKey = "";
+
+    function openCategoryBrowser(catKey: string) {
+      const cat = CATEGORY_CONFIG.find(c => c.key === catKey);
+      if (!cat) return;
+      currentBrowserCatKey = catKey;
+      catBrowserVisibleCount = 48;
+
+      const titleEl = document.getElementById("catBrowserTitle");
+      if (titleEl) {
+        titleEl.innerHTML = `
+          <span class="cat-accent" style="background:${cat.color};box-shadow:0 0 10px ${cat.glow};"></span>
+          <span>${cat.label}</span>
+          <span class="cat-count">${allIcons.filter(i => i.category === catKey).length}</span>
+        `;
+      }
+
+      renderCategoryBrowserGrid();
+
+      const modal = document.getElementById("catBrowserModal");
+      if (modal) {
+        modal.classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+    }
+
+    function renderCategoryBrowserGrid() {
+      const grid = document.getElementById("catBrowserGrid");
+      if (!grid) return;
+      grid.innerHTML = "";
+
+      const icons = allIcons.filter(i => i.category === currentBrowserCatKey);
+      icons.slice(0, catBrowserVisibleCount).forEach(icon => grid.appendChild(createIconCard(icon)));
+
+      const btn = document.getElementById("catBrowserLoadMore");
+      if (btn) btn.style.display = icons.length > catBrowserVisibleCount ? "inline-flex" : "none";
+    }
+
+    function closeCategoryBrowser() {
+      const modal = document.getElementById("catBrowserModal");
+      if (modal) {
+        modal.classList.remove("open");
+        document.body.style.overflow = "";
+      }
     }
 
     // ===== MODAL =====
