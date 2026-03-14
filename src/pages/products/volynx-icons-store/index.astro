@@ -47,13 +47,13 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
       <div class="nav-links desktop-nav">
         <a href="/products/volynx-icons-store/" class="nav-link active">Gallery</a>
         <a href="#" class="nav-link" id="collectionsBtn">Collections</a>
-        <a href="#" class="nav-link" id="favoritesBtn">
+        <a href="#" class="nav-link" id="favoritesBtn" style="display:none;">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
           </svg>
           Favorites
         </a>
-        <a href="#" class="btn-upgrade" id="upgradeBtn">Upgrade</a>
+        <a href="/pricing/" class="btn-upgrade" id="upgradeBtn" style="display:none;">Upgrade</a>
       </div>
 
       <!-- Auth Buttons -->
@@ -117,13 +117,13 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
     <div class="mobile-menu" id="mobileMenu">
       <a href="/products/volynx-icons-store/" class="mobile-menu-item active">Gallery</a>
       <a href="#" class="mobile-menu-item" id="mobileCollectionsBtn">Collections</a>
-      <a href="#" class="mobile-menu-item" id="mobileFavoritesBtn">
+      <a href="#" class="mobile-menu-item" id="mobileFavoritesBtn" style="display:none;">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
         </svg>
         Favorites
       </a>
-      <a href="#" class="mobile-menu-item upgrade" id="mobileUpgradeBtn">Upgrade to Pro</a>
+      <a href="/pricing/" class="mobile-menu-item upgrade" id="mobileUpgradeBtn" style="display:none;">Upgrade to Pro</a>
     </div>
   </nav>
 
@@ -501,10 +501,18 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
       const userName = document.getElementById("userName");
       const userNameFull = document.getElementById("userNameFull");
       const userEmail = document.getElementById("userEmail");
+      const favoritesBtn = document.getElementById("favoritesBtn");
+      const mobileFavoritesBtn = document.getElementById("mobileFavoritesBtn");
+      const upgradeBtn = document.getElementById("upgradeBtn");
+      const mobileUpgradeBtn = document.getElementById("mobileUpgradeBtn");
 
       if (isLoggedIn && currentUser) {
         if (signInBtn) signInBtn.style.display = "none";
         if (userMenu) userMenu.style.display = "block";
+        if (favoritesBtn) favoritesBtn.style.display = "flex";
+        if (mobileFavoritesBtn) mobileFavoritesBtn.style.display = "flex";
+        if (upgradeBtn) upgradeBtn.style.display = "inline-flex";
+        if (mobileUpgradeBtn) mobileUpgradeBtn.style.display = "block";
         const displayName = currentUser.name.split(" ")[0];
         if (userName) userName.textContent = displayName;
         if (userNameFull) userNameFull.textContent = currentUser.name;
@@ -512,6 +520,10 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
       } else {
         if (signInBtn) signInBtn.style.display = "inline-flex";
         if (userMenu) userMenu.style.display = "none";
+        if (favoritesBtn) favoritesBtn.style.display = "none";
+        if (mobileFavoritesBtn) mobileFavoritesBtn.style.display = "none";
+        if (upgradeBtn) upgradeBtn.style.display = "none";
+        if (mobileUpgradeBtn) mobileUpgradeBtn.style.display = "none";
       }
     }
 

@@ -458,17 +458,29 @@ import VxFooter from "../../components/VxFooter.astro";
 
       <!-- CROSS-SELL STRIP -->
       <section aria-label="What's next after Dev Journey" class="reveal" id="whats-next" style="--d:8;">
-        <div class="crosssell-strip">
-          <div class="crosssell-strip__inner">
-            <div class="crosssell-strip__text">
-              <h2>Finished the course? Now ship for real.</h2>
-              <p>Take your new skills further — build a production site with VOLYNX Services, or use our Studio tools for your day-to-day workflow.</p>
-            </div>
-            <div class="crosssell-strip__actions">
-              <a class="btn primary" href="/services/">Work with VOLYNX →</a>
-              <a class="btn ghost" href="/volynx-lab/studio/">Explore Studio Pro</a>
-            </div>
-          </div>
+        <div class="sectionTitle">
+          <h2>Finished a step? Here's what's next.</h2>
+          <p>Your skills are real now — time to use them. Pick your next move.</p>
+        </div>
+        <div class="nextstep-grid">
+          <a class="nextstep-card" href="/dev-hub/portfolio-pro-kit/">
+            <div class="nextstep-badge">Kit</div>
+            <h3>Need a portfolio?</h3>
+            <p>The Portfolio Pro Kit is the professional version of what you just built. Sections, motion, SEO — ready to deploy.</p>
+            <span class="nextstep-cta">See the kit →</span>
+          </a>
+          <a class="nextstep-card" href="/volynx-lab/studio/">
+            <div class="nextstep-badge">Studio</div>
+            <h3>Want the pro tools?</h3>
+            <p>Studio Pro unlocks batch processing, advanced export, and commercial usage for your day-to-day workflow.</p>
+            <span class="nextstep-cta">Explore Studio →</span>
+          </a>
+          <a class="nextstep-card" href="/services/">
+            <div class="nextstep-badge">Services</div>
+            <h3>Need a real site built?</h3>
+            <p>VOLYNX builds it for you — landing pages, full sites, and maintenance plans. You scope it, I execute.</p>
+            <span class="nextstep-cta">Work with VOLYNX →</span>
+          </a>
         </div>
       </section>
 
@@ -603,6 +615,45 @@ import VxFooter from "../../components/VxFooter.astro";
       .crosssell-strip__actions { width: 100%; }
       .crosssell-strip__actions .btn { flex: 1; text-align: center; }
     }
+
+    /* Next step grid */
+    .nextstep-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 16px;
+    }
+    @media (max-width: 720px) { .nextstep-grid { grid-template-columns: 1fr; } }
+    .nextstep-card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 22px 20px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      background: rgba(255,255,255,.03);
+      text-decoration: none;
+      color: inherit;
+      transition: border-color .15s, background .15s;
+    }
+    .nextstep-card:hover {
+      border-color: rgba(0,219,255,.3);
+      background: rgba(0,219,255,.05);
+    }
+    .nextstep-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(0,219,255,.7);
+      border: 1px solid rgba(0,219,255,.25);
+      border-radius: 99px;
+      padding: 3px 9px;
+      width: fit-content;
+    }
+    .nextstep-card h3 { font-size: 16px; font-weight: 700; margin: 0; color: #fff; }
+    .nextstep-card p { font-size: 13px; color: rgba(255,255,255,.6); margin: 0; line-height: 1.55; flex: 1; }
+    .nextstep-cta { font-size: 13px; font-weight: 600; color: rgba(0,219,255,.8); margin-top: 4px; }
   </style>
 </body>
 </html>

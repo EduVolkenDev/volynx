@@ -1,0 +1,847 @@
+---
+import LabBg from "../../components/LabBg.astro";
+import VxHeader from "../../components/VxHeader.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
+---
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VOLYNX Builder — Create & Manage Sites</title>
+  <meta name="description" content="Create and manage mini-sites with a JSON editor, magic link auth and one-click publish." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="shortcut icon" href="/assets/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <LabBg src="/assets/lucid3.jpg" />
+  <VxHeader primaryCtaLabel="← Site" primaryCtaHref="/" />
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero__badge">
+      <span class="badge-dot" aria-hidden="true"></span>
+      <span>VOLYNX Builder</span>
+    </div>
+    <h1 class="hero__title">
+      Build &amp; <span class="accent">Deploy</span> Sites
+    </h1>
+    <p class="hero__sub">
+      Create mini-sites with JSON, manage them in one place,
+      and publish to your own subdomain.
+    </p>
+  </section>
+
+  <!-- APP SHELL -->
+  <main class="app" id="app">
+
+    <!-- AUTH PANEL (shown when logged out) -->
+    <div class="panel auth-panel" id="authPanel">
+      <div class="panel__icon" aria-hidden="true">⚡</div>
+      <h2 class="panel__title">Sign in to Builder</h2>
+      <p class="panel__sub">Enter your email — we'll send a magic link. No password needed.</p>
+      <div class="auth-form">
+        <input
+          id="email"
+          type="email"
+          placeholder="your@email.com"
+          autocomplete="email"
+          class="field"
+        />
+        <button class="btn btn--primary" id="sendLink">Get magic link</button>
+        <p class="auth-msg" id="authMsg"></p>
+      </div>
+    </div>
+
+    <!-- BUILDER WORKSPACE (shown when logged in) -->
+    <div class="workspace" id="workspace" hidden>
+
+      <!-- Session bar -->
+      <div class="session-bar">
+        <div class="session-who">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="who" class="session-email">...</span>
+        </div>
+        <button id="logout" class="btn btn--ghost btn--sm">Sign out</button>
+      </div>
+
+      <div class="grid">
+        <!-- NEW PROJECT -->
+        <div class="card">
+          <h3 class="card__title">New project</h3>
+          <div class="row">
+            <div class="field-group">
+              <label class="label" for="pname">Name</label>
+              <input id="pname" class="field" placeholder="Studio Aurora" />
+            </div>
+            <div class="field-group">
+              <label class="label" for="pslug">Slug</label>
+              <input id="pslug" class="field" placeholder="studio-aurora" />
+            </div>
+          </div>
+          <div class="row" style="margin-top:12px">
+            <div class="field-group">
+              <label class="label" for="ctaText">CTA label</label>
+              <input id="ctaText" class="field" placeholder="Book now" />
+            </div>
+            <div class="field-group">
+              <label class="label" for="ctaHref">CTA link</label>
+              <input id="ctaHref" class="field" placeholder="https://wa.me/..." />
+            </div>
+          </div>
+          <button class="btn btn--primary" id="create" style="margin-top:14px;width:100%">
+            Create project →
+          </button>
+          <p class="hint" style="margin-top:10px">
+            Will publish at <code>https://slug.volynx.world</code>
+          </p>
+        </div>
+
+        <!-- PROJECTS LIST -->
+        <div class="card card--list">
+          <h3 class="card__title">My projects</h3>
+          <div id="projects" class="projects-list hint">No projects yet.</div>
+        </div>
+
+        <!-- JSON EDITOR -->
+        <div class="card card--editor">
+          <div class="editor-header">
+            <h3 class="card__title">JSON editor</h3>
+            <div class="editor-actions">
+              <button class="btn btn--ghost btn--sm" id="copy">Copy</button>
+              <button class="btn btn--ghost btn--sm" id="save">Save</button>
+              <button class="btn btn--primary btn--sm" id="publish">Publish →</button>
+            </div>
+          </div>
+          <textarea id="json" class="json-editor" placeholder="Select a project to edit…" spellcheck="false"></textarea>
+          <div class="editor-footer">
+            <p class="hint" id="status"></p>
+            <p class="hint" id="link"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <SiteFooter />
+</body>
+</html>
+
+<script>
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+  const SUPABASE_URL = "https://yrqaonqflpspjszjkbbs.supabase.co";
+  const SUPABASE_ANON_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlycWFvbnFmbHBzcGpzemprYmJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0Njk3NzAsImV4cCI6MjA4NTA0NTc3MH0.88ksLpLxDj9bVZrGpNn3O-bSl-1A0VZk3PJRJjGP8fE";
+
+  const supa = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+  });
+
+  const $ = (id: string) => document.getElementById(id);
+
+  const REDIRECT_TO = "https://volynx.world/builder/";
+  const OTP_COOLDOWN_MS = 60_000;
+  const OTP_LAST_KEY = "volynx_last_otp_sent_at";
+
+  let currentProject: any = null;
+
+  const setStatus = (t: string) => {
+    const el = $("status");
+    if (el) el.textContent = t || "";
+  };
+
+  const slugify = (s: string) =>
+    (s || "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+  const rand4 = () => Math.random().toString(16).slice(2, 6);
+
+  const defaultJSON = (name: string, slug: string, ctaText: string, ctaHref: string) => ({
+    brand: { name, primary: "#7DD3FC", bg: "#070A12", fg: "#E7EEF7" },
+    content: {
+      headline: `${name} — clean tech minimal`,
+      sub: "Premium structure, fast and ready to convert.",
+      ctaText: ctaText || "Talk now",
+      ctaHref: ctaHref || "#contact",
+      features: ["Minimal and elegant layout", "Performance and SEO-friendly", "Publish in 1 click"],
+      faq: [{ q: "How does it work?", a: "You edit, publish and done." }],
+    },
+  });
+
+  function showAuth(show: boolean) {
+    const authPanel = $("authPanel") as HTMLElement | null;
+    const workspace = $("workspace") as HTMLElement | null;
+    if (authPanel) authPanel.hidden = !show;
+    if (workspace) workspace.hidden = show;
+  }
+
+  function setSendLoading(on: boolean, msg?: string) {
+    const btn = $("sendLink") as HTMLButtonElement | null;
+    if (btn) {
+      btn.disabled = !!on;
+      btn.classList.toggle("is-loading", !!on);
+      btn.textContent = on ? "Sending…" : "Get magic link";
+    }
+    const m = $("authMsg");
+    if (m) m.textContent = msg || "";
+  }
+
+  function startCooldown(seconds = 15) {
+    const btn = $("sendLink") as HTMLButtonElement | null;
+    if (!btn) return;
+    let left = seconds;
+    btn.disabled = true;
+    btn.classList.remove("is-loading");
+    const t = setInterval(() => {
+      btn.textContent = `Resend in ${left}s`;
+      left--;
+      if (left < 0) {
+        clearInterval(t);
+        btn.disabled = false;
+        btn.textContent = "Get magic link";
+      }
+    }, 1000);
+  }
+
+  async function refreshUser() {
+    const { data } = await supa.auth.getSession();
+    const user = data?.session?.user || null;
+    const who = $("who");
+    if (who) who.textContent = user?.email || "";
+    showAuth(!user);
+    return user;
+  }
+
+  async function listProjects(user: any) {
+    if (!user) return;
+    const { data, error } = await supa
+      .from("projects")
+      .select("id,name,slug,site_json,created_at")
+      .order("created_at", { ascending: false });
+
+    if (error) return setStatus(error.message);
+    const box = $("projects");
+    if (!box) return;
+
+    box.innerHTML =
+      (data || []).map((p: any) => `
+        <button class="project-btn" data-id="${p.id}">
+          <span class="project-name">${p.name}</span>
+          <span class="project-slug">${p.slug}</span>
+        </button>
+      `).join("") || `<span class="hint">No projects yet.</span>`;
+
+    box.querySelectorAll(".project-btn").forEach((btn) => {
+      btn.addEventListener("click", () =>
+        openProject((data || []).find((x: any) => x.id === (btn as HTMLElement).dataset.id))
+      );
+    });
+  }
+
+  function openProject(p: any) {
+    currentProject = p;
+    const json = $("json") as HTMLTextAreaElement | null;
+    if (json) json.value = JSON.stringify(p.site_json || {}, null, 2);
+    const link = $("link");
+    if (link) link.innerHTML = `Active: <code>${p.slug}</code>`;
+    setStatus("Project loaded.");
+
+    document.querySelectorAll(".project-btn").forEach((b) => b.classList.remove("active"));
+    const active = document.querySelector(`[data-id="${p.id}"]`);
+    if (active) active.classList.add("active");
+  }
+
+  async function saveCurrent() {
+    if (!currentProject) return false;
+    let parsed;
+    try {
+      parsed = JSON.parse(($("json") as HTMLTextAreaElement)?.value || "{}");
+    } catch {
+      setStatus("Invalid JSON.");
+      return false;
+    }
+    const { error } = await supa
+      .from("projects")
+      .update({ site_json: parsed })
+      .eq("id", currentProject.id);
+    if (error) { setStatus(error.message); return false; }
+    return true;
+  }
+
+  $("sendLink")?.addEventListener("click", async () => {
+    const emailInput = $("email") as HTMLInputElement | null;
+    const email = (emailInput?.value || "").trim();
+    if (!email) return;
+
+    const last = Number(localStorage.getItem(OTP_LAST_KEY) || 0);
+    const left = OTP_COOLDOWN_MS - (Date.now() - last);
+    if (left > 0) {
+      setSendLoading(false, `Wait ${Math.ceil(left / 1000)}s to resend.`);
+      return;
+    }
+
+    setSendLoading(true, "Sending magic link…");
+    try {
+      const { error } = await supa.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: REDIRECT_TO },
+      });
+      if (error) {
+        const msg = String(error.message || "");
+        if (msg.toLowerCase().includes("rate limit")) {
+          localStorage.setItem(OTP_LAST_KEY, String(Date.now()));
+          setSendLoading(false, "Too many requests. Wait 60s.");
+          startCooldown(60);
+          return;
+        }
+        setSendLoading(false, msg);
+        return;
+      }
+      localStorage.setItem(OTP_LAST_KEY, String(Date.now()));
+      setSendLoading(false, "✅ Link sent! Check your inbox and spam.");
+      startCooldown(15);
+    } catch {
+      setSendLoading(false, "Failed to send. Try again.");
+    }
+  });
+
+  $("logout")?.addEventListener("click", async () => {
+    await supa.auth.signOut();
+    const json = $("json") as HTMLTextAreaElement | null;
+    if (json) json.value = "";
+    const link = $("link");
+    if (link) link.textContent = "";
+    setStatus("");
+    currentProject = null;
+    await refreshUser();
+  });
+
+  $("create")?.addEventListener("click", async () => {
+    const user = await refreshUser();
+    if (!user) return setStatus("Sign in first.");
+
+    const name = (($("pname") as HTMLInputElement)?.value || "").trim() || "New Site";
+    const baseSlug = slugify((($("pslug") as HTMLInputElement)?.value || "").trim() || name) || "site";
+    const slug = `${baseSlug}-${rand4()}`;
+    const ctaText = (($("ctaText") as HTMLInputElement)?.value || "").trim();
+    const ctaHref = (($("ctaHref") as HTMLInputElement)?.value || "").trim();
+
+    const site_json = defaultJSON(name, slug, ctaText, ctaHref);
+
+    const { data, error } = await supa
+      .from("projects")
+      .insert({ user_id: user.id, name, slug, site_json, status: "draft" })
+      .select("id,name,slug,site_json,created_at")
+      .single();
+
+    if (error) return setStatus(error.message);
+    setStatus("Project created.");
+    await listProjects(user);
+    openProject(data);
+  });
+
+  $("save")?.addEventListener("click", async () => {
+    if (!currentProject) return setStatus("Select a project.");
+    const ok = await saveCurrent();
+    if (!ok) return;
+    setStatus("Saved ✓");
+  });
+
+  $("copy")?.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(($("json") as HTMLTextAreaElement)?.value || "");
+      setStatus("Copied to clipboard.");
+    } catch {
+      setStatus("Clipboard permission denied.");
+    }
+  });
+
+  $("publish")?.addEventListener("click", async () => {
+    if (!currentProject) return setStatus("Select a project.");
+    setStatus("Saving…");
+    const ok = await saveCurrent();
+    if (!ok) return;
+
+    const { data } = await supa.auth.getSession();
+    const token = data?.session?.access_token;
+    if (!token) return setStatus("Sign in first.");
+
+    setStatus("Publishing…");
+    try {
+      const r = await fetch("https://api.volynx.world/publish", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ projectId: currentProject.id }),
+      });
+
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) return setStatus((j as any)?.error || "Publish error.");
+
+      const link = $("link");
+      if (link)
+        link.innerHTML = `Published: <a href="${(j as any).url}" target="_blank" rel="noreferrer">${(j as any).url}</a>`;
+      setStatus("Published ✓");
+      const user = await refreshUser();
+      await listProjects(user);
+    } catch {
+      setStatus("Publish API unavailable.");
+    }
+  });
+
+  supa.auth.onAuthStateChange(async (event) => {
+    if (["SIGNED_IN", "SIGNED_OUT", "TOKEN_REFRESHED"].includes(event)) {
+      const user = await refreshUser();
+      await listProjects(user);
+    }
+  });
+
+  async function boot() {
+    let { data: s1 } = await supa.auth.getSession();
+    if (!s1?.session && window.location.hash.includes("access_token")) {
+      await new Promise((r) => setTimeout(r, 300));
+      ({ data: s1 } = await supa.auth.getSession());
+      if (!s1?.session) {
+        await new Promise((r) => setTimeout(r, 800));
+        ({ data: s1 } = await supa.auth.getSession());
+      }
+    }
+    const user = await refreshUser();
+    await listProjects(user);
+    if (window.location.hash.includes("access_token")) {
+      history.replaceState(null, "", window.location.pathname);
+    }
+  }
+
+  boot();
+</script>
+
+<style>
+  :root {
+    --bg: #070A12;
+    --fg: #E7EEF7;
+    --mut: rgba(231, 238, 247, .55);
+    --line: rgba(231, 238, 247, .10);
+    --accent: #7DD3FC;
+    --card-bg: rgba(231, 238, 247, .04);
+    --card-border: rgba(231, 238, 247, .10);
+    --r: 20px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    background: var(--bg);
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Sora", ui-sans-serif, system-ui, sans-serif;
+    color: var(--fg);
+    background: transparent;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    text-align: center;
+    padding: 56px 24px 40px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(125, 211, 252, .22);
+    background: rgba(125, 211, 252, .06);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+  }
+
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .3; }
+  }
+
+  .hero__title {
+    margin: 0 0 14px;
+    font-size: clamp(32px, 6vw, 56px);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    line-height: 1.05;
+  }
+
+  .accent {
+    background: linear-gradient(90deg, #7DD3FC, #a78bfa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero__sub {
+    margin: 0;
+    font-size: clamp(14px, 2vw, 16px);
+    color: var(--mut);
+    line-height: 1.7;
+  }
+
+  /* APP */
+  .app {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  /* AUTH PANEL */
+  .panel {
+    max-width: 440px;
+    margin: 0 auto 60px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--r);
+    padding: 36px 32px;
+    text-align: center;
+    backdrop-filter: blur(16px);
+  }
+
+  .panel__icon { font-size: 36px; margin-bottom: 16px; }
+  .panel__title { margin: 0 0 8px; font-size: 20px; font-weight: 700; }
+  .panel__sub { margin: 0 0 24px; font-size: 14px; color: var(--mut); line-height: 1.6; }
+
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .auth-msg {
+    font-size: 13px;
+    color: var(--mut);
+    min-height: 18px;
+    margin: 0;
+  }
+
+  /* SESSION BAR */
+  .session-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: rgba(125, 211, 252, .04);
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+
+  .session-who {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .session-email {
+    font-size: 13px;
+    color: var(--mut);
+    font-weight: 600;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 5px rgba(125, 211, 252, .12);
+    flex-shrink: 0;
+  }
+
+  /* GRID */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .card--editor {
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 800px) {
+    .grid { grid-template-columns: 1fr; }
+    .card--editor { grid-column: auto; }
+  }
+
+  /* CARD */
+  .card {
+    border: 1px solid var(--card-border);
+    border-radius: var(--r);
+    padding: 22px;
+    background: var(--card-bg);
+    backdrop-filter: blur(14px);
+  }
+
+  .card__title {
+    margin: 0 0 16px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: .02em;
+  }
+
+  /* FORM ELEMENTS */
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  @media (max-width: 520px) {
+    .row { grid-template-columns: 1fr; }
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--mut);
+  }
+
+  .field {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(231, 238, 247, .14);
+    background: rgba(7, 10, 18, .65);
+    color: var(--fg);
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: border-color .15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .field:focus { border-color: rgba(125, 211, 252, .4); }
+  .field::placeholder { color: rgba(231, 238, 247, .28); }
+
+  /* PROJECTS LIST */
+  .projects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 260px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+
+  .project-btn {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    background: rgba(231, 238, 247, .04);
+    color: var(--fg);
+    cursor: pointer;
+    text-align: left;
+    transition: background .15s, border-color .15s;
+    width: 100%;
+    font-family: inherit;
+  }
+
+  .project-btn:hover,
+  .project-btn.active {
+    background: rgba(125, 211, 252, .08);
+    border-color: rgba(125, 211, 252, .2);
+  }
+
+  .project-name {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .project-slug {
+    font-size: 11px;
+    color: var(--mut);
+    font-family: ui-monospace, monospace;
+  }
+
+  /* EDITOR */
+  .editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .editor-header .card__title { margin: 0; }
+
+  .editor-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .json-editor {
+    width: 100%;
+    min-height: 300px;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(231, 238, 247, .14);
+    background: rgba(7, 10, 18, .75);
+    color: var(--accent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    outline: none;
+    resize: vertical;
+    transition: border-color .15s;
+  }
+
+  .json-editor:focus { border-color: rgba(125, 211, 252, .35); }
+
+  .editor-footer {
+    margin-top: 8px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 20px;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: background .15s, transform .1s, opacity .15s;
+    letter-spacing: .02em;
+  }
+
+  .btn--primary {
+    background: linear-gradient(135deg, rgba(125, 211, 252, .28), rgba(99, 102, 241, .22));
+    border: 1px solid rgba(125, 211, 252, .3);
+    color: var(--fg);
+  }
+
+  .btn--primary:hover {
+    background: linear-gradient(135deg, rgba(125, 211, 252, .38), rgba(99, 102, 241, .32));
+    transform: translateY(-1px);
+  }
+
+  .btn--ghost {
+    background: rgba(231, 238, 247, .06);
+    border: 1px solid var(--line);
+    color: var(--mut);
+  }
+
+  .btn--ghost:hover {
+    background: rgba(231, 238, 247, .10);
+    color: var(--fg);
+  }
+
+  .btn--sm {
+    padding: 7px 14px;
+    font-size: 12px;
+    border-radius: 10px;
+  }
+
+  .btn[disabled] {
+    opacity: .5;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  .btn.is-loading::after {
+    content: "";
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(231, 238, 247, .4);
+    border-top-color: var(--fg);
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 8px;
+    vertical-align: -2px;
+    animation: spin .7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* MISC */
+  .hint {
+    font-size: 12px;
+    color: var(--mut);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  code {
+    font-family: ui-monospace, monospace;
+    background: rgba(125, 211, 252, .1);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 11px;
+    color: var(--accent);
+  }
+
+  a { color: inherit; }
+
+  .btn[disabled] { opacity: .5; cursor: not-allowed; }
+
+  /* Mobile */
+  @media (max-width: 680px) {
+    .hero { padding: 40px 16px 28px; }
+    .panel { padding: 28px 20px; }
+    .card { padding: 16px; }
+    .json-editor { min-height: 220px; }
+    .editor-header { flex-direction: column; align-items: flex-start; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
