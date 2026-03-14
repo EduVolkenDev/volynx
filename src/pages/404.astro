@@ -1,0 +1,345 @@
+---
+import LabBg from "../components/LabBg.astro";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>System Offline — VOLYNX</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <LabBg src="/assets/stardust-galaxy.webp" />
+
+  <canvas id="particles" aria-hidden="true"></canvas>
+
+  <div class="shell">
+    <header class="topbar">
+      <a href="/" class="logo">VOLYNX</a>
+      <span class="status-dot" aria-hidden="true"></span>
+    </header>
+
+    <main class="center">
+      <div class="eye-wrap">
+        <img src="/assets/volynx-icon.webp" alt="" class="eye" aria-hidden="true" />
+        <div class="eye-ring" aria-hidden="true"></div>
+        <div class="eye-ring ring2" aria-hidden="true"></div>
+      </div>
+
+      <div class="code-line" aria-hidden="true">
+        <span class="blink">▋</span>
+        <span id="typewriter"></span>
+      </div>
+
+      <h1 class="title">
+        System <span class="accent">Offline</span>
+      </h1>
+
+      <p class="sub">
+        This node hasn't gone live yet — or the coordinates you entered don't exist.<br />
+        The lab is always expanding. Check back soon.
+      </p>
+
+      <div class="nav-grid">
+        <a href="/" class="nav-card">
+          <span class="nav-icon">⌂</span>
+          <span class="nav-label">Home</span>
+        </a>
+        <a href="/volynx-lab/" class="nav-card">
+          <span class="nav-icon">⚗</span>
+          <span class="nav-label">Lab</span>
+        </a>
+        <a href="/products/" class="nav-card">
+          <span class="nav-icon">◈</span>
+          <span class="nav-label">Products</span>
+        </a>
+        <a href="/contact/" class="nav-card">
+          <span class="nav-icon">◎</span>
+          <span class="nav-label">Contact</span>
+        </a>
+      </div>
+    </main>
+
+    <footer class="foot">
+      <span class="foot-code">ERR_NODE_OFFLINE</span>
+      <a href="/" class="foot-link">← Return to base</a>
+    </footer>
+  </div>
+</body>
+</html>
+
+<script>
+  // Typewriter
+  const phrases = [
+    "initializing node...",
+    "scanning coordinates...",
+    "signal lost.",
+    "rerouting...",
+  ];
+  let pi = 0, ci = 0, deleting = false;
+  const el = document.getElementById("typewriter")!;
+  function tick() {
+    const phrase = phrases[pi];
+    if (!deleting) {
+      el.textContent = phrase.slice(0, ++ci);
+      if (ci === phrase.length) { deleting = true; setTimeout(tick, 1400); return; }
+    } else {
+      el.textContent = phrase.slice(0, --ci);
+      if (ci === 0) { deleting = false; pi = (pi + 1) % phrases.length; }
+    }
+    setTimeout(tick, deleting ? 40 : 70);
+  }
+  tick();
+
+  // Particles
+  const canvas = document.getElementById("particles") as HTMLCanvasElement;
+  const ctx = canvas.getContext("2d")!;
+  let W = 0, H = 0;
+  const pts: { x: number; y: number; vx: number; vy: number; r: number; a: number }[] = [];
+  function resize() {
+    W = canvas.width = innerWidth;
+    H = canvas.height = innerHeight;
+  }
+  resize();
+  window.addEventListener("resize", resize);
+  for (let i = 0; i < 60; i++) {
+    pts.push({
+      x: Math.random() * innerWidth,
+      y: Math.random() * innerHeight,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      r: Math.random() * 1.5 + 0.4,
+      a: Math.random(),
+    });
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (const p of pts) {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(130,220,255,${p.a * 0.5})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+
+  // Mouse parallax on eye
+  const eye = document.querySelector(".eye") as HTMLElement;
+  document.addEventListener("mousemove", (e) => {
+    const dx = (e.clientX / innerWidth - 0.5) * 12;
+    const dy = (e.clientY / innerHeight - 0.5) * 12;
+    eye.style.transform = `translate(${dx}px, ${dy}px)`;
+  });
+</script>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; }
+
+  html, body {
+    height: 100%;
+    background: #070a14;
+    font-family: "Sora", ui-sans-serif, system-ui, sans-serif;
+    color: rgba(255,255,255,.9);
+    overflow-x: hidden;
+  }
+
+  #particles {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .shell {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 28px;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+    background: rgba(7,10,20,.6);
+    backdrop-filter: blur(14px);
+  }
+  .logo {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .1em;
+    color: rgba(255,255,255,.7);
+    text-decoration: none;
+    transition: color .18s;
+  }
+  .logo:hover { color: #fff; }
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: rgba(255, 80, 80, .9);
+    box-shadow: 0 0 8px rgba(255,80,80,.7);
+    animation: pulse-red 2s ease-in-out infinite;
+    margin-left: auto;
+  }
+  @keyframes pulse-red {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .3; }
+  }
+
+  /* MAIN */
+  .center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    text-align: center;
+    gap: 28px;
+  }
+
+  /* EYE */
+  .eye-wrap {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .eye {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    transition: transform .08s ease-out;
+    filter: drop-shadow(0 0 18px rgba(109,94,252,.6));
+  }
+  .eye-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(109,94,252,.3);
+    animation: spin 8s linear infinite;
+  }
+  .ring2 {
+    inset: -16px;
+    border-color: rgba(130,220,255,.15);
+    animation-duration: 14s;
+    animation-direction: reverse;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* TYPEWRITER */
+  .code-line {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    color: rgba(130,220,255,.7);
+    font-family: "SF Mono", "Fira Code", monospace;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .blink {
+    animation: blink .7s step-end infinite;
+    color: rgba(130,220,255,.5);
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* TITLE */
+  .title {
+    font-size: clamp(36px, 7vw, 72px);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    line-height: 1.05;
+  }
+  .accent {
+    background: linear-gradient(90deg, #6d5efc, #82dcff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* SUB */
+  .sub {
+    max-width: 480px;
+    font-size: clamp(14px, 2vw, 16px);
+    color: rgba(255,255,255,.5);
+    line-height: 1.7;
+  }
+
+  /* NAV GRID */
+  .nav-grid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .nav-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 16px 22px;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 16px;
+    background: rgba(255,255,255,.04);
+    backdrop-filter: blur(12px);
+    text-decoration: none;
+    color: rgba(255,255,255,.7);
+    transition: background .2s, border-color .2s, transform .2s, color .2s;
+    min-width: 90px;
+  }
+  .nav-card:hover {
+    background: rgba(109,94,252,.12);
+    border-color: rgba(109,94,252,.4);
+    color: #fff;
+    transform: translateY(-3px);
+  }
+  .nav-icon { font-size: 20px; }
+  .nav-label { font-size: 12px; font-weight: 700; letter-spacing: .06em; }
+
+  /* FOOTER */
+  .foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 28px;
+    border-top: 1px solid rgba(255,255,255,.06);
+    background: rgba(7,10,20,.5);
+  }
+  .foot-code {
+    font-size: 11px;
+    letter-spacing: .12em;
+    color: rgba(255,255,255,.2);
+    font-family: monospace;
+  }
+  .foot-link {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(130,220,255,.6);
+    text-decoration: none;
+    transition: color .18s;
+  }
+  .foot-link:hover { color: #82dcff; }
+</style>
