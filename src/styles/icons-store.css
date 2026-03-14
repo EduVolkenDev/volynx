@@ -28,18 +28,17 @@ html {
     overflow-x: hidden;
 }
 
-/* base da página futurista */
+/* base da página */
 body.fx-grid {
     margin: 0;
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
-    background:
-        radial-gradient(circle at top, #111827 0, #020617 55%, #000 100%);
-    color: #f9fafb;
+    background: #05070f;
+    color: #e8eaf6;
 }
 
-/* GRID NEON + linhas */
+/* GRID sutil */
 body.fx-grid::before {
     content: "";
     position: fixed;
@@ -47,34 +46,12 @@ body.fx-grid::before {
     z-index: -1;
     pointer-events: none;
     background-image:
-        linear-gradient(var(--grid-main) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid-main) 1px, transparent 1px);
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
     background-size: 80px 80px;
-    opacity: 0.45;
-    mix-blend-mode: screen;
 }
 
-/* GLOW / HOLOFOTE animado */
-body.fx-grid::after {
-    content: "";
-    position: fixed;
-    inset: -20%;
-    z-index: -1;
-    pointer-events: none;
-    background:
-        radial-gradient(circle at 20% 30%, rgba(144, 46, 229, 0.25), transparent 55%),
-        radial-gradient(circle at 80% 70%, rgba(53, 198, 238, 0.68), transparent 55%),
-        radial-gradient(circle at 50% 110%, rgba(118, 58, 181, 0.645), transparent 60%);
-    filter: blur(10px);
-    mix-blend-mode: screen;
-    animation: fxGridAurora 20s ease-in-out infinite alternate;
-}
-
-@keyframes fxGridAurora {
-    0% { background-position: 10% 20%, 85% 70%, 50% 110%; }
-    50% { background-position: 30% 10%, 70% 90%, 40% 100%; }
-    100% { background-position: 5% 35%, 95% 60%, 60% 115%; }
-}
+body.fx-grid::after { display: none; }
 
 .fx-grid .wrap,
 .fx-grid main,
