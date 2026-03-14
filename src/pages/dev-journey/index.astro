@@ -5,15 +5,15 @@ import VxFooter from "../../components/VxFooter.astro";
 ---
 
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1" name="viewport" />
   <meta content="#080610" name="theme-color" />
   <title>Dev Journey • VOLYNX.Lab Education</title>
-  <meta name="description" content="Dev Journey: trilha prática, sem vídeo, com projetos reais e checklists. Gratuito — com login para salvar progresso, liberar blocos e emitir certificado por entrega." />
+  <meta name="description" content="Dev Journey: a self-guided, project-based learning track with no video fluff. Free with login — save progress, unlock checklists, and earn a certificate by delivering real work." />
   <meta property="og:title" content="Dev Journey • VOLYNX.Lab Education" />
-  <meta property="og:description" content="Trilha prática, sem vídeo, com projetos reais e checklists. Gratuito — com login para salvar progresso, liberar blocos e emitir certificado por entrega." />
+  <meta property="og:description" content="Self-guided, project-based learning track. No video fluff. Free with login — save progress, unlock checklists, and earn a certificate by delivering real work." />
   <meta property="og:type" content="website" />
   <meta content="index,follow" name="robots" />
   <link rel="preload" as="image" href="/assets/stardust-galaxy.webp" />
@@ -24,334 +24,379 @@ import VxFooter from "../../components/VxFooter.astro";
 
 <body>
   <div class="dust" aria-hidden="true"></div>
-  <a class="skip" href="#conteudo">Pular para o conteúdo</a>
+  <a class="skip" href="#content">Skip to content</a>
 
-  <VxHeader mode="sections" primaryCtaLabel="Entrar / Criar conta" primaryCtaHref="/login" />
+  <VxHeader mode="sections" primaryCtaLabel="Sign in / Create account" primaryCtaHref="/login" />
 
-  <!-- Modal (mantém estética do layout original; links reais ficam em /login e /signup) -->
-  <div class="modal" id="authModal" aria-hidden="true" role="dialog" aria-label="Acesso à plataforma">
+  <!-- Auth modal -->
+  <div class="modal" id="authModal" aria-hidden="true" role="dialog" aria-label="Platform access">
     <div class="modalCard">
       <div class="modalHead">
         <b>VOLYNX Access Gate</b>
-        <button class="xBtn" id="closeModal" type="button" aria-label="Fechar">✕</button>
+        <button class="xBtn" id="closeModal" type="button" aria-label="Close">✕</button>
       </div>
       <div class="modalBody">
         <p style="margin:0;color:rgba(255,255,255,.80);line-height:1.6;">
-          O Dev Journey é <b>gratuito</b>. O login existe para salvar seu progresso, liberar checklists e habilitar
-          submissão + certificado por entrega.
+          Dev Journey is <b>free</b>. Login exists to save your progress, unlock checklists, enable
+          submission, and issue your certificate on delivery.
         </p>
 
         <div class="field">
-          <label for="email">E-mail</label>
-          <input id="email" type="email" placeholder="seuemail@exemplo.com" autocomplete="email" />
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="you@example.com" autocomplete="email" />
         </div>
         <div class="field">
-          <label for="pass">Senha</label>
+          <label for="pass">Password</label>
           <input id="pass" type="password" placeholder="••••••••" autocomplete="current-password" />
         </div>
       </div>
       <div class="modalFoot">
         <div class="hint">
-          Aqui você troca “eu entendi” por “eu publiquei”.<br />
-          <b>UX simples:</b> login → trilha → checklist → entrega.
+          Here you trade "I understood" for "I shipped".<br />
+          <b>Simple UX:</b> login → track → checklist → deliver.
         </div>
         <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
-          <a class="btn ghost" href="/signup">Criar conta</a>
-          <a class="btn primary" href="/login">Entrar</a>
+          <a class="btn ghost" href="/signup">Create account</a>
+          <a class="btn primary" href="/login">Sign in</a>
         </div>
       </div>
     </div>
   </div>
 
-  <main id="conteudo">
+  <main id="content">
     <div class="container">
       <!-- HERO -->
-      <section id="home" aria-label="Apresentação do curso" class="hero reveal" style="--d:1;">
+      <section id="home" aria-label="Dev Journey intro" class="hero reveal" style="--d:1;">
         <div class="heroGrid">
           <div>
-            <div class="kicker"><i aria-hidden="true"></i> Dev Journey, sem ruído. Só execução.</div>
-            <h1>Faça seu primeiro projeto online — autoguiado, sem distrações e com entrega.</h1>
+            <div class="kicker"><i aria-hidden="true"></i> Dev Journey. Less noise. More shipping.</div>
+            <h1>Build your first live project — self-guided, distraction-free, and with a real deliverable.</h1>
             <p class="lead">
-              Trilha autoguiada (texto + arquivos + checklists), com projetos que viram portfólio. Você sai do “eu
-              entendi” direto para o “eu publiquei”.
+              A self-guided track (text + files + checklists) with projects that become portfolio work. You go from "I understood" straight to "I shipped."
             </p>
 
             <div class="ctaRow" style="margin-top:10px;">
-              <button class="btn primary" type="button" id="openLogin3">Começar agora (grátis)</button>
-              <a class="btn" href="#curriculo">Ver currículo</a>
-              <a class="btn ghost" href="#acesso">Como o login funciona</a>
+              <button class="btn primary" type="button" id="openLogin3">Start now (free)</button>
+              <a class="btn" href="#curriculum">View curriculum</a>
+              <a class="btn ghost" href="#access">How login works</a>
             </div>
 
             <div class="heroNotice" style="margin-top:14px; padding: 12px 14px; border-radius: 16px; border: 1px solid rgba(255,255,255,.14); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); box-shadow: 0 0 0 1px rgba(0,219,255,.06), var(--shadow2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(8px);">
-              <b>Detalhe importante:</b> o curso é gratuito, mas requer login para liberar a experiência completa:
-              salvar progresso, liberar blocos, checklists e emissão de certificado por entrega.
-              <span style="color:rgba(255,255,255,.70)">Sem login você vê a vitrine; com login você roda a jornada.</span>
+              <b>Important:</b> the course is free, but requires login to unlock the full experience:
+              save progress, unlock blocks, checklists, and certificate issuance on delivery.
+              <span style="color:rgba(255,255,255,.70)">Without login you see the overview; with login you run the journey.</span>
             </div>
 
-            <div aria-label="Destaques" class="bullets" style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; margin: 20px 0 0;">
+            <div aria-label="Highlights" class="bullets" style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; margin: 20px 0 0;">
               <div class="bulletCard">
                 <div aria-hidden="true" class="dot"></div>
                 <div>
-                  <b>Sprint com entregas</b><br />
-                  <span>Curto, direto e publicável. Se apareceu na tela, você aprendeu.</span>
+                  <b>Sprint with deliverables</b><br />
+                  <span>Short, direct, and publishable. If it showed up on screen, you learned it.</span>
                 </div>
               </div>
               <div class="bulletCard">
                 <div aria-hidden="true" class="dot"></div>
                 <div>
-                  <b>Portfólio first</b><br />
-                  <span>Entregas apresentáveis: landing + interação + mini-app (Pro e Bundle).</span>
+                  <b>Portfolio first</b><br />
+                  <span>Presentable outputs: landing + interaction + mini-app (Pro and Bundle).</span>
                 </div>
               </div>
               <div class="bulletCard">
                 <div aria-hidden="true" class="dot"></div>
                 <div>
-                  <b>Autoguiado, sem enrolação</b><br />
-                  <span>Texto + exemplos + checklists. Método profissional e modo DEV do inicio ao fim!.</span>
+                  <b>Self-guided, no filler</b><br />
+                  <span>Text + examples + checklists. Professional method, dev mode from day one.</span>
                 </div>
               </div>
               <div class="bulletCard">
                 <div aria-hidden="true" class="dot"></div>
                 <div>
-                  <b>Acelerador de aprendizado e material para portfolio!</b><br />
-                  <span>Prompts prontos + checklist de validação. Você usa o que criou e escala de diferentes
-                    formas.</span>
+                  <b>Built-in portfolio assets</b><br />
+                  <span>Ready prompts + validation checklists. Use what you built and scale it.</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <aside aria-label="Resumo do programa" class="panel" style="position:relative; border-radius: var(--radius); border: 1px solid rgba(255,255,255,.12); background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.06), rgba(255,255,255,.035)); box-shadow: var(--shadow); padding: 20px; overflow: hidden; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(10px);">
-            <div aria-label="Selo VOLYNX" class="seal" style="position:absolute; top:8px; right:8px; width:62px; height:48px; border-radius:18px; background: rgba(97,186,230,0.22); box-shadow: 0 0 10px inset rgba(251,249,255,0.22), 0 0 14px rgba(0,219,255,.10); display:grid; place-items:center; overflow:hidden; border: 1px solid rgba(255,255,255,.12);">
-              <img alt="Olho oficial VOLYNX" src="/assets/oficial-volynx-eye.png" style="width:44px; height:44px; object-fit:contain; filter: drop-shadow(0 12px 18px rgba(0,0,0,.55));" />
+          <aside aria-label="Programme summary" class="panel" style="position:relative; border-radius: var(--radius); border: 1px solid rgba(255,255,255,.12); background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.06), rgba(255,255,255,.035)); box-shadow: var(--shadow); padding: 20px; overflow: hidden; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(10px);">
+            <div aria-label="VOLYNX seal" class="seal" style="position:absolute; top:8px; right:8px; width:62px; height:48px; border-radius:18px; background: rgba(97,186,230,0.22); box-shadow: 0 0 10px inset rgba(251,249,255,0.22), 0 0 14px rgba(0,219,255,.10); display:grid; place-items:center; overflow:hidden; border: 1px solid rgba(255,255,255,.12);">
+              <img alt="VOLYNX official eye" src="/assets/oficial-volynx-eye.png" style="width:44px; height:44px; object-fit:contain; filter: drop-shadow(0 12px 18px rgba(0,0,0,.55));" />
             </div>
-            <h3 style="font-size: var(--h3); margin: 4px 0 8px; font-family: var(--display);">O que você vai ter na mão</h3>
-            <p style="margin: 0 0 14px; color: var(--muted); font-size: 13.5px; line-height: 1.55;">Uma trilha que vira execução. E execução vira resultado. Simples, mas não simplista.</p>
+            <h3 style="font-size: var(--h3); margin: 4px 0 8px; font-family: var(--display);">What you'll have in hand</h3>
+            <p style="margin: 0 0 14px; color: var(--muted); font-size: 13.5px; line-height: 1.55;">A track that becomes execution. And execution becomes results. Simple, but not simplistic.</p>
             <div class="stats" role="list" style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; margin-top:10px;">
               <div class="stat" role="listitem">
-                <strong>Sprint guiada</strong>
-                <span>Blocos curtos + checkpoints (o que deve aparecer na tela).</span>
+                <strong>Guided sprint</strong>
+                <span>Short blocks + checkpoints (what should appear on screen).</span>
               </div>
               <div class="stat" role="listitem">
-                <strong>Entregas</strong>
-                <span>Social (7 dias), Pro (14 dias), Bundle (30 dias). Publicado e versionado.</span>
+                <strong>Deliverables</strong>
+                <span>Social (7 days), Pro (14 days), Bundle (30 days). Published and versioned.</span>
               </div>
               <div class="stat" role="listitem">
                 <strong>Checkpoints</strong>
-                <span>“Se deu certo” + “se deu erro” (debug sem adivinhação).</span>
+                <span>"If it worked" + "if it didn't" (debug without guessing).</span>
               </div>
               <div class="stat" role="listitem">
-                <strong>Formato</strong>
-                <span>Sem vídeos longos e sem distraçōes, aqui o método é criar!. Texto + arquivos + checklists.</span>
+                <strong>Format</strong>
+                <span>No long videos, no distractions. Text + files + checklists — the method is to create.</span>
               </div>
             </div>
 
-            <div aria-label="Tags do curso" class="mini" style="margin-top: 12px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.14); display:flex; flex-wrap:wrap; gap: 10px;">
+            <div aria-label="Course tags" class="mini" style="margin-top: 12px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.14); display:flex; flex-wrap:wrap; gap: 10px;">
               <span class="tag">Social Sprint</span>
-              <span class="tag">HTML • CSS • JS</span>
+              <span class="tag">HTML · CSS · JS</span>
               <span class="tag">Checklists</span>
-              <span class="tag">Publicado</span>
+              <span class="tag">Published</span>
             </div>
           </aside>
         </div>
       </section>
 
-      <!-- CURRÍCULO (conteúdo preservado) -->
-      <section aria-label="Trilha por blocos" class="reveal" id="curriculo" style="--d:2;">
+      <!-- CURRICULUM -->
+      <section aria-label="Track by blocks" class="reveal" id="curriculum" style="--d:2;">
         <div class="sectionTitle">
           <div>
-            <h2>Trilha por blocos (sem confusão)</h2>
-            <p>Você avança por entregas pequenas e visíveis. Se não aparece na tela, ainda não virou habilidade.
-              Selecione seu nível para ver os blocos incluídos:</p>
+            <h2>Track by blocks (no confusion)</h2>
+            <p>You advance through small, visible deliverables. If it doesn't appear on screen, it hasn't become a skill yet.
+              Select your level to see included blocks:</p>
           </div>
-          <div aria-label="Filtrar por plano" class="chips" role="tablist" style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center;">
+          <div aria-label="Filter by plan" class="chips" role="tablist" style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center;">
             <button class="chip active" data-filter="social" type="button">Social Sprint</button>
             <button class="chip" data-filter="pro" type="button">Pro (Upgrade)</button>
             <button class="chip" data-filter="bundle" type="button">Bundle</button>
-            <button class="chip" data-filter="all" type="button">Ver tudo</button>
+            <button class="chip" data-filter="all" type="button">See all</button>
           </div>
         </div>
 
-        <div aria-label="Blocos do Dev Journey" class="roadmap" style="display:grid; grid-template-columns: repeat(12, 1fr); gap: 14px; margin-top: 12px;">
+        <div aria-label="Dev Journey blocks" class="roadmap" style="display:grid; grid-template-columns: repeat(12, 1fr); gap: 14px; margin-top: 12px;">
           <article class="blockCard" data-in="social pro bundle">
             <div class="blockTop">
-              <span class="blockNum">Bloco 0</span>
+              <span class="blockNum">Block 0</span>
               <span class="badge">Start Here</span>
             </div>
-            <h3>Setup + como estudar do jeito certo</h3>
-            <p class="muted">Ambiente pronto, pasta organizada e o método VOLYNX para sair de erros sem travar por horas.</p>
+            <h3>Setup + how to study the right way</h3>
+            <p class="muted">Environment ready, folder organised, and the VOLYNX method to get out of errors without being stuck for hours.</p>
             <ul class="mini">
-              <li>Editor + navegador + Live Server (o “porquê” e o “como”)</li>
-              <li>Checklist validável (você sabe quando está pronto)</li>
-              <li>Regras do certificado + links de submissão</li>
+              <li>Editor + browser + Live Server (the "why" and the "how")</li>
+              <li>Validatable checklist (you know when you're ready)</li>
+              <li>Certificate rules + submission links</li>
             </ul>
           </article>
 
           <article class="blockCard" data-in="social pro bundle">
             <div class="blockTop">
-              <span class="blockNum">Bloco 1</span>
-              <span class="badge">Fundamentos</span>
+              <span class="blockNum">Block 1</span>
+              <span class="badge">Foundations</span>
             </div>
-            <h3>HTML + CSS + JS básico (com clique na tela)</h3>
-            <p class="muted">Primeiro projeto real: 3 arquivos conectados e uma interação funcionando na página (não só no console).</p>
+            <h3>HTML + CSS + basic JS (with a click on screen)</h3>
+            <p class="muted">First real project: 3 connected files and an interaction working on the page (not just in the console).</p>
             <ul class="mini">
-              <li>Estrutura semântica + layout responsivo simples</li>
-              <li>Botões, formulário e feedback visível</li>
-              <li>Debug básico: console, erros comuns e correções</li>
+              <li>Semantic structure + simple responsive layout</li>
+              <li>Buttons, form, and visible feedback</li>
+              <li>Basic debugging: console, common errors, and fixes</li>
             </ul>
           </article>
 
           <article class="blockCard" data-in="social pro bundle">
             <div class="blockTop">
-              <span class="blockNum">Bloco 2</span>
+              <span class="blockNum">Block 2</span>
               <span class="badge">JavaScript + DOM</span>
             </div>
-            <h3>Interatividade de verdade</h3>
-            <p class="muted">Você aprende a manipular a página: eventos, validação, lógica e dados (inclui JSON com exemplos práticos).</p>
+            <h3>Real interactivity</h3>
+            <p class="muted">You learn to manipulate the page: events, validation, logic, and data (includes JSON with practical examples).</p>
             <ul class="mini">
-              <li>Tipos, operadores, funções e eventos</li>
-              <li>DOM: selecionar, alterar, criar elementos</li>
-              <li>JSON: o que é, por que existe e onde você usa</li>
+              <li>Types, operators, functions, and events</li>
+              <li>DOM: select, change, create elements</li>
+              <li>JSON: what it is, why it exists, and where you use it</li>
             </ul>
           </article>
 
           <article class="blockCard" data-in="pro bundle">
             <div class="blockTop">
-              <span class="blockNum">Bloco 3</span>
-              <span class="badge">Projeto incremental</span>
-              <button class="planChip" type="button" data-plan="pro">Desbloquear com Pro</button>
+              <span class="blockNum">Block 3</span>
+              <span class="badge">Incremental project</span>
+              <a class="planChip" href="#upgrade">Unlock with Pro</a>
             </div>
-            <h3>Um app que cresce módulo a módulo</h3>
-            <p class="muted">Cada módulo adiciona uma feature visível. Você termina com um app apresentável e fácil de explicar.</p>
+            <h3>An app that grows module by module</h3>
+            <p class="muted">Each module adds a visible feature. You finish with a presentable app that's easy to explain.</p>
             <ul class="mini">
-              <li>Estado, componentes simples e organização de código</li>
-              <li>Persistência básica (ex.: localStorage) + UX</li>
-              <li>Publicação + checklist de qualidade</li>
+              <li>State, simple components, and code organisation</li>
+              <li>Basic persistence (e.g. localStorage) + UX</li>
+              <li>Publishing + quality checklist</li>
             </ul>
           </article>
 
           <article class="blockCard" data-in="bundle">
             <div class="blockTop">
-              <span class="blockNum">Bloco 4</span>
-              <span class="badge">Camada avançada</span>
-              <button class="planChip" type="button" data-plan="bundle">Desbloquear com Bundle</button>
+              <span class="blockNum">Block 4</span>
+              <span class="badge">Advanced layer</span>
+              <a class="planChip" href="#upgrade">Unlock with Bundle</a>
             </div>
-            <h3>Arquitetura + integração</h3>
-            <p class="muted">Você aprende padrões de projeto, integração e decisões “de produto” (o que fazer primeiro e por quê).</p>
+            <h3>Architecture + integration</h3>
+            <p class="muted">You learn design patterns, integration, and "product" decisions (what to build first and why).</p>
             <ul class="mini">
-              <li>Refactor guiado: clareza desde nomes e tags até responsabilidade</li>
-              <li>Integrações e dados (fluxos comuns do mercado)</li>
-              <li>Checklist anti-bugs antes de publicar</li>
+              <li>Guided refactor: clarity from names and tags to responsibility</li>
+              <li>Integrations and data (common market flows)</li>
+              <li>Anti-bug checklist before publishing</li>
             </ul>
           </article>
 
           <article class="blockCard" data-in="bundle">
             <div class="blockTop">
-              <span class="blockNum">Bloco 5</span>
-              <span class="badge">Entrega final</span>
-              <button class="planChip" type="button" data-plan="bundle">Desbloquear com Bundle</button>
+              <span class="blockNum">Block 5</span>
+              <span class="badge">Final delivery</span>
+              <a class="planChip" href="#upgrade">Unlock with Bundle</a>
             </div>
-            <h3>Deploy + finalização profissional</h3>
-            <p class="muted">Você fecha o curso entregando algo completo: documentação e submissão, a versão final do seu projeto.</p>
+            <h3>Deploy + professional finishing</h3>
+            <p class="muted">You close the course delivering something complete: documentation and submission — the final version of your project.</p>
             <ul class="mini">
-              <li>Publicação e validação (GitHub)</li>
-              <li>Checklist final (responsivo, acessível, funcional)</li>
-              <li>Submissão + emissão do certificado</li>
+              <li>Publishing and validation (GitHub)</li>
+              <li>Final checklist (responsive, accessible, functional)</li>
+              <li>Submission + certificate issuance</li>
             </ul>
           </article>
 
           <article class="blockCard arsenal" data-in="bundle">
             <div class="blockTop">
-              <span class="blockNum">Kit Arsenal</span>
+              <span class="blockNum">Arsenal Kit</span>
               <span class="badge">Bundle Only</span>
-              <button class="planChip" type="button" data-plan="bundle">Desbloquear com Bundle</button>
+              <a class="planChip" href="#upgrade">Unlock with Bundle</a>
             </div>
-            <h3>Um brinde da VOLYNX pra acelerar seu progresso durante e depois do curso!</h3>
-            <p class="muted">Arquivos reutilizáveis para você construir mais rápido (e aprender por engenharia reversa).</p>
+            <h3>A VOLYNX gift to accelerate your progress during and after the course!</h3>
+            <p class="muted">Reusable files so you can build faster (and learn through reverse engineering).</p>
             <ul class="mini">
-              <li>1 site completo + 1 landing page</li>
-              <li>2 apps JavaScript prontos</li>
-              <li>Cheatcodes (atalhos e padrões de uso diário)</li>
+              <li>1 full site + 1 landing page</li>
+              <li>2 ready JavaScript apps</li>
+              <li>Cheatcodes (shortcuts and daily-use patterns)</li>
             </ul>
           </article>
         </div>
 
-        <!-- Acesso -->
-        <section id="acesso" class="reveal" style="--d:3;">
+        <!-- Free access -->
+        <section id="access" class="reveal" style="--d:3;">
           <div class="card" style="padding:18px;">
             <div class="sectionTitle" style="border-top:none; padding-top:0; margin-top:0;">
               <div>
-                <h2>Acesso gratuito (com login)</h2>
-                <p>O curso é gratuito. O login é para salvar progresso, liberar checklists, submissão e certificado por entrega.</p>
+                <h2>Free access (with login)</h2>
+                <p>The course is free. Login is to save progress, unlock checklists, enable submission, and issue your certificate on delivery.</p>
               </div>
               <div class="ctaRow" style="gap:10px;">
-                <button class="btn primary" type="button" id="openLogin4">Entrar / Criar conta</button>
-                <a class="btn ghost" href="#faq">Ler o FAQ</a>
+                <button class="btn primary" type="button" id="openLogin4">Sign in / Create account</button>
+                <a class="btn ghost" href="#faq">Read the FAQ</a>
               </div>
             </div>
           </div>
         </section>
       </section>
 
-      <section aria-label="Método" class="reveal" id="metodo" style="--d:4;">
+      <section aria-label="Method" class="reveal" id="method" style="--d:4;">
         <div class="sectionTitle">
-          <h2>Método VOLYNX.Lab Education</h2>
-          <p>Treinar execução. Aumentar clareza. Reduzir fricção. Parece simples porque é o caminho certo!</p>
+          <h2>VOLYNX.Lab Education method</h2>
+          <p>Train execution. Increase clarity. Reduce friction. Sounds simple because it's the right path.</p>
         </div>
         <div class="grid3">
           <div class="card">
-            <h3>1) Direção</h3>
-            <p>Você sabe o que fazer e por quê. Nada de “vou tentar”.</p>
+            <h3>1) Direction</h3>
+            <p>You know what to do and why. No "I'll try".</p>
           </div>
           <div class="card">
-            <h3>2) Entrega</h3>
-            <p>Todo módulo fecha com um resultado publicável. Progresso visível, não subjetivo.</p>
+            <h3>2) Delivery</h3>
+            <p>Every module closes with a publishable result. Visible progress, not subjective.</p>
           </div>
           <div class="card">
-            <h3>3) Refinamento</h3>
-            <p>Revisão e melhoria: a diferença entre “funciona” e “profissional”.</p>
+            <h3>3) Refinement</h3>
+            <p>Review and improvement: the difference between "it works" and "it's professional".</p>
           </div>
         </div>
       </section>
 
-      <section aria-label="Projetos" class="reveal" id="projetos" style="--d:5;">
+      <section aria-label="Projects" class="reveal" id="projects" style="--d:5;">
         <div class="sectionTitle">
-          <h2>Projetos que viram portfólio</h2>
-          <p>Não é só sobre “aprender”. É sobre construir ativos: páginas, apps e cases que te representam.</p>
+          <h2>Projects that become portfolio</h2>
+          <p>It's not just about "learning". It's about building assets: pages, apps, and case studies that represent you.</p>
         </div>
         <div class="grid3">
           <div class="card">
-            <h3>Landing premium</h3>
-            <p>Grid, hierarquia, responsividade e micro-interações. A estética certa vende.</p>
+            <h3>Premium landing</h3>
+            <p>Grid, hierarchy, responsiveness, and micro-interactions. The right aesthetic sells.</p>
           </div>
           <div class="card">
-            <h3>App web</h3>
-            <p>Dados, estados e UX: interfaces que respondem rápido e podem se tornar produto.</p>
+            <h3>Web app</h3>
+            <p>Data, states, and UX: interfaces that respond fast and can become a product.</p>
           </div>
           <div class="card">
-            <h3>Projeto final</h3>
-            <p>Planejar, executar, publicar e apresentar. O ciclo inteiro, como no mundo real.</p>
+            <h3>Final project</h3>
+            <p>Plan, execute, publish, and present. The full cycle, as in the real world.</p>
           </div>
         </div>
       </section>
 
-      <section aria-label="FAQ" class="reveal" id="faq" style="--d:6;">
+      <!-- UPGRADE / PRICING SECTION -->
+      <section aria-label="Course upgrade plans" class="reveal" id="upgrade" style="--d:6;">
+        <div class="sectionTitle">
+          <h2>Unlock the full track</h2>
+          <p>Social Sprint is free. Pro and Bundle unlock the advanced blocks, portfolio projects, and the Arsenal Kit.</p>
+        </div>
+
+        <div class="upgrade-grid">
+          <div class="upgrade-card free">
+            <div class="upgrade-badge">Free</div>
+            <div class="upgrade-price">£0</div>
+            <p class="upgrade-tagline">Try the method. No friction.</p>
+            <ul class="upgrade-perks">
+              <li>Blocks 0, 1, 2 (Social Sprint)</li>
+              <li>Login to save progress</li>
+              <li>Social Sprint certificate</li>
+            </ul>
+            <a class="btn primary" href="/signup/">Start free</a>
+          </div>
+
+          <div class="upgrade-card pro highlighted">
+            <div class="upgrade-badge best">Pro</div>
+            <div class="upgrade-price">£19<span>/one-time</span></div>
+            <p class="upgrade-tagline">Build real apps. Get hired faster.</p>
+            <ul class="upgrade-perks">
+              <li>Everything in Free</li>
+              <li>Block 3 — incremental app</li>
+              <li>Pro certificate (14-day track)</li>
+              <li>Priority checklist feedback</li>
+            </ul>
+            <a class="btn primary" href="/contact/">Get Pro access →</a>
+          </div>
+
+          <div class="upgrade-card bundle">
+            <div class="upgrade-badge">Bundle</div>
+            <div class="upgrade-price">£39<span>/one-time</span></div>
+            <p class="upgrade-tagline">The full stack. Portfolio-ready.</p>
+            <ul class="upgrade-perks">
+              <li>Everything in Pro</li>
+              <li>Blocks 4 + 5 — architecture + deploy</li>
+              <li>Bundle certificate (30-day track)</li>
+              <li>Arsenal Kit (4 reusable projects)</li>
+            </ul>
+            <a class="btn primary" href="/contact/">Get Bundle access →</a>
+          </div>
+        </div>
+      </section>
+
+      <section aria-label="FAQ" class="reveal" id="faq" style="--d:7;">
         <div class="sectionTitle">
           <h2>FAQ</h2>
         </div>
-        <div aria-label="Perguntas frequentes" class="accordions" role="region">
+        <div aria-label="Frequently asked questions" class="accordions" role="region">
           <details>
             <summary>
               <div class="sumLeft">
-                <div class="sumTxt"><b>Eu sou totalmente iniciante. Tenho chances?</b><span class="muted">Sim — o curso ensina do
-                    “onde clicar” ao “o que deve aparecer”.</span></div>
+                <div class="sumTxt"><b>I'm a complete beginner. Do I stand a chance?</b><span class="muted">Yes — the course teaches from "where to click" to "what should appear".</span></div>
               </div>
               <div aria-hidden="true" class="chev">›</div>
             </summary>
             <div class="content">
               <ul>
-                <li>Você vai aprender a editar arquivos, salvar e atualizar o navegador.</li>
-                <li>Quando algo der errado, você terá “o que fazer” (não só teoria).</li>
+                <li>You'll learn to edit files, save, and refresh the browser.</li>
+                <li>When something goes wrong, you'll have "what to do" (not just theory).</li>
               </ul>
             </div>
           </details>
@@ -359,44 +404,40 @@ import VxFooter from "../../components/VxFooter.astro";
           <details>
             <summary>
               <div class="sumLeft">
-                <div class="sumTxt"><b>Por que precisa de login se é gratuito?</b><span class="muted">Para salvar progresso, liberar
-                    checklists, submissão e certificado.</span></div>
+                <div class="sumTxt"><b>Why do I need to log in if it's free?</b><span class="muted">To save progress, unlock checklists, submission, and certificate.</span></div>
               </div>
               <div aria-hidden="true" class="chev">›</div>
             </summary>
             <div class="content">
-              <p style="margin:0;">O conteúdo é gratuito. O login existe para transformar a experiência em jornada:
-                progresso, checklists, submissão por entrega e emissão do certificado.</p>
+              <p style="margin:0;">The content is free. Login transforms the experience into a journey:
+                progress, checklists, submission on delivery, and certificate issuance.</p>
             </div>
           </details>
 
           <details>
             <summary>
               <div class="sumLeft">
-                <div class="sumTxt"><b>Tem vídeo, comunidade ou suporte?</b><span class="muted">Autoguiado (texto +
-                    arquivos + projetos).</span></div>
+                <div class="sumTxt"><b>Is there video, community, or support?</b><span class="muted">Self-guided (text + files + projects).</span></div>
               </div>
               <div aria-hidden="true" class="chev">›</div>
             </summary>
             <div class="content">
-              <p style="margin:0;">É autoguiado: você recebe documentos + exemplos + arquivos + checklists. Curso em
-                formato de apostila profissional.
-                Clareza, método e execução. Sem vídeos longos, sem distrações, com validação por checklist.</p>
+              <p style="margin:0;">It's self-guided: you get documents + examples + files + checklists. A professional workbook format.
+                Clarity, method, and execution. No long videos, no distractions, with checklist validation.</p>
             </div>
           </details>
 
           <details>
             <summary>
               <div class="sumLeft">
-                <div class="sumTxt"><b>Preciso de computador forte?</b><span class="muted">Não. Um PC básico já dá
-                    conta.</span></div>
+                <div class="sumTxt"><b>Do I need a powerful computer?</b><span class="muted">No. A basic PC is enough.</span></div>
               </div>
               <div aria-hidden="true" class="chev">›</div>
             </summary>
             <div class="content">
               <ul>
-                <li>Windows, macOS ou Linux.</li>
-                <li>Recomendado: 8GB RAM, navegador atualizado e espaço livre.</li>
+                <li>Windows, macOS, or Linux.</li>
+                <li>Recommended: 8GB RAM, updated browser, and free storage.</li>
               </ul>
             </div>
           </details>
@@ -404,23 +445,164 @@ import VxFooter from "../../components/VxFooter.astro";
           <details>
             <summary>
               <div class="sumLeft">
-                <div class="sumTxt"><b>Como funciona o certificado?</b><span class="muted">Por entrega (projeto
-                    enviado).</span></div>
+                <div class="sumTxt"><b>How does the certificate work?</b><span class="muted">By delivery (submitted project).</span></div>
               </div>
               <div aria-hidden="true" class="chev">›</div>
             </summary>
             <div class="content">
-              <p style="margin:0;">Você entrega o projeto do seu nível e emite o certificado correspondente (Social /
-                Pro / Bundle).</p>
+              <p style="margin:0;">You deliver the project for your level and issue the corresponding certificate (Social / Pro / Bundle).</p>
             </div>
           </details>
         </div>
       </section>
+
+      <!-- CROSS-SELL STRIP -->
+      <section aria-label="What's next after Dev Journey" class="reveal" id="whats-next" style="--d:8;">
+        <div class="crosssell-strip">
+          <div class="crosssell-strip__inner">
+            <div class="crosssell-strip__text">
+              <h2>Finished the course? Now ship for real.</h2>
+              <p>Take your new skills further — build a production site with VOLYNX Services, or use our Studio tools for your day-to-day workflow.</p>
+            </div>
+            <div class="crosssell-strip__actions">
+              <a class="btn primary" href="/services/">Work with VOLYNX →</a>
+              <a class="btn ghost" href="/volynx-lab/studio/">Explore Studio Pro</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   </main>
 
   <VxFooter />
 
   <script src="/js/devjourney-modal.js" defer></script>
+
+  <style>
+    /* Upgrade pricing grid */
+    .upgrade-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 20px;
+    }
+    @media (max-width: 720px) {
+      .upgrade-grid { grid-template-columns: 1fr; }
+    }
+    .upgrade-card {
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      padding: 22px 20px;
+      background: rgba(255,255,255,.03);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .upgrade-card.highlighted {
+      border-color: rgba(0,219,255,.35);
+      background: linear-gradient(160deg, rgba(0,219,255,.07), rgba(0,100,200,.05));
+      box-shadow: 0 0 0 1px rgba(0,219,255,.12);
+    }
+    .upgrade-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.5);
+    }
+    .upgrade-badge.best { color: rgba(0,219,255,.9); }
+    .upgrade-price {
+      font-size: 32px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.1;
+    }
+    .upgrade-price span {
+      font-size: 14px;
+      font-weight: 400;
+      color: rgba(255,255,255,.5);
+    }
+    .upgrade-tagline {
+      font-size: 13px;
+      color: rgba(255,255,255,.6);
+      margin: 0;
+    }
+    .upgrade-perks {
+      list-style: none;
+      padding: 0;
+      margin: 4px 0 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      flex: 1;
+    }
+    .upgrade-perks li {
+      font-size: 13px;
+      color: rgba(255,255,255,.75);
+      padding-left: 18px;
+      position: relative;
+    }
+    .upgrade-perks li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: rgba(0,219,255,.7);
+      font-size: 11px;
+    }
+    .upgrade-card .btn { text-align: center; width: 100%; }
+
+    /* planChip as link */
+    a.planChip {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 99px;
+      border: 1px solid rgba(0,219,255,.35);
+      color: rgba(0,219,255,.8);
+      background: rgba(0,219,255,.07);
+      text-decoration: none;
+      transition: background .15s;
+    }
+    a.planChip:hover { background: rgba(0,219,255,.14); }
+
+    /* Cross-sell strip */
+    .crosssell-strip {
+      border: 1px solid rgba(109,94,252,.3);
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(109,94,252,.08), rgba(0,219,255,.05));
+      padding: 32px 28px;
+      margin-top: 16px;
+    }
+    .crosssell-strip__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .crosssell-strip__text h2 {
+      font-size: clamp(18px, 2.5vw, 24px);
+      margin: 0 0 8px;
+    }
+    .crosssell-strip__text p {
+      margin: 0;
+      color: rgba(255,255,255,.6);
+      font-size: 14px;
+      max-width: 480px;
+    }
+    .crosssell-strip__actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+    @media (max-width: 640px) {
+      .crosssell-strip__inner { flex-direction: column; }
+      .crosssell-strip__actions { width: 100%; }
+      .crosssell-strip__actions .btn { flex: 1; text-align: center; }
+    }
+  </style>
 </body>
 </html>
