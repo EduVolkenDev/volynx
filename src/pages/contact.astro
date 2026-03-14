@@ -1,25 +1,337 @@
 ---
-import LegalLayout from "../layouts/LegalLayout.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import VxHeader from "../components/VxHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+const title = "Contact — VOLYNX";
 ---
 
-<LegalLayout
-  title="Contact • Volynx"
-  description="How to contact Volynx for support, business, or partnerships."
->
-  <div class="kicker">Support</div>
-  <h1>Contact</h1>
-  <p>Fastest way: email. If you include screenshots + links, response time improves dramatically (and everyone wins).</p>
+<BaseLayout title={title} description="Talk to Volynx about your project, support needs, or partnership ideas.">
+  <VxHeader />
 
-  <h2>Email</h2>
-  <p><a href="mailto:contact@volynx.world">contact@volynx.world</a></p>
+  <main class="shell contact-page">
 
-  <h2>What to include</h2>
-  <ul>
-    <li>Page URL (or product name)</li>
-    <li>What you expected vs what happened</li>
-    <li>Browser + device</li>
-  </ul>
+    <section class="hero">
+      <div class="kicker">Get in touch</div>
+      <h1>Let's talk about your project</h1>
+      <p class="sub">Whether you need support or want to start something — there's a path for that.</p>
+    </section>
 
-  <h2>Business &amp; partnerships</h2>
-  <p>Send a short brief with goals, deadline, and budget range.</p>
-</LegalLayout>
+    <div class="two-col">
+
+      <!-- LEFT: Support -->
+      <div class="panel support-panel">
+        <div class="panel-label">Support</div>
+        <h2>Need help?</h2>
+        <p>If you hit a bug, have a billing question, or need help with a product — email is the fastest route.</p>
+
+        <a class="email-link" href="mailto:contact@volynx.world">contact@volynx.world</a>
+
+        <div class="sla-badge">
+          <span class="dot"></span>
+          Usually responds within 48h on business days
+        </div>
+
+        <h3>What to include</h3>
+        <ul class="checklist">
+          <li>Page URL or product name</li>
+          <li>What you expected vs what happened</li>
+          <li>Browser + device (for tool issues)</li>
+          <li>Screenshots if possible</li>
+        </ul>
+
+        <div class="alt-channels">
+          <div class="channel-label">Or reach out directly</div>
+          <a class="channel-btn" href="mailto:contact@volynx.world">
+            <span class="channel-icon">✉</span>
+            Email support
+          </a>
+          <a class="channel-btn" href="mailto:privacy@volynx.world">
+            <span class="channel-icon">🔒</span>
+            Privacy requests
+          </a>
+        </div>
+      </div>
+
+      <!-- RIGHT: Sales lead form -->
+      <div class="panel sales-panel">
+        <div class="panel-label">Sales &amp; Projects</div>
+        <h2>Start a project</h2>
+        <p>Tell me what you're building. I'll come back with a clear path and what it takes to make it happen.</p>
+
+        <!-- Replace FORM_ID with your Formspree form ID from formspree.io -->
+        <form class="lead-form" method="POST" action="https://formspree.io/f/FORM_ID">
+          <div class="field-row">
+            <div class="field">
+              <label for="name">Name</label>
+              <input type="text" id="name" name="name" placeholder="Your name" required />
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" placeholder="you@company.com" required />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="project_type">Project type</label>
+            <select id="project_type" name="project_type">
+              <option value="">Select a type…</option>
+              <option value="landing-page">Landing Page</option>
+              <option value="portfolio">Portfolio Site</option>
+              <option value="saas-landing">SaaS Landing System</option>
+              <option value="maintenance">Maintenance Plan</option>
+              <option value="agency-kit">Agency Launch Kit</option>
+              <option value="partnership">Partnership / Collaboration</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="budget">Budget range</label>
+              <select id="budget" name="budget">
+                <option value="">Select range…</option>
+                <option value="under-1k">Under £1,000</option>
+                <option value="1k-3k">£1,000 – £3,000</option>
+                <option value="3k-10k">£3,000 – £10,000</option>
+                <option value="10k-plus">£10,000+</option>
+                <option value="not-sure">Not sure yet</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="timeline">Timeline</label>
+              <select id="timeline" name="timeline">
+                <option value="">Select timeline…</option>
+                <option value="asap">ASAP</option>
+                <option value="1-2mo">1–2 months</option>
+                <option value="3-6mo">3–6 months</option>
+                <option value="exploring">Just exploring</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="brief">Brief</label>
+            <textarea id="brief" name="brief" rows="4" placeholder="What are you trying to build, and what's the goal?"></textarea>
+          </div>
+
+          <button class="submit-btn" type="submit">Send brief →</button>
+
+          <p class="form-note">No spam. Your info is only used to respond to this inquiry.</p>
+        </form>
+      </div>
+
+    </div>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<style>
+  .contact-page { padding-bottom: 80px; }
+
+  .hero {
+    padding: 56px 0 36px;
+    max-width: 680px;
+  }
+  .kicker {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 14px;
+  }
+  .sub { opacity: 0.75; font-size: 17px; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .panel {
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 20px;
+    padding: 32px;
+    background: rgba(10,12,20,.5);
+    backdrop-filter: blur(12px);
+  }
+  .panel-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.45;
+    margin-bottom: 12px;
+  }
+  .panel h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .panel > p {
+    opacity: 0.75;
+    font-size: 14px;
+    margin-bottom: 22px;
+    line-height: 1.6;
+  }
+
+  .email-link {
+    display: inline-block;
+    font-size: 16px;
+    font-weight: 600;
+    color: #4fc3f7;
+    text-decoration: none;
+    margin-bottom: 14px;
+    transition: opacity 0.2s;
+  }
+  .email-link:hover { opacity: 0.75; }
+
+  .sla-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    opacity: 0.55;
+    margin-bottom: 28px;
+  }
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #4caf50;
+    flex-shrink: 0;
+  }
+
+  .panel h3 {
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 28px;
+  }
+  .checklist li {
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    font-size: 14px;
+    opacity: 0.8;
+  }
+  .checklist li::before {
+    content: "✓ ";
+    color: #4fc3f7;
+    opacity: 0.7;
+  }
+
+  .alt-channels { margin-top: 4px; }
+  .channel-label {
+    font-size: 11px;
+    opacity: 0.4;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+  }
+  .channel-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 13px;
+    opacity: 0.8;
+    margin-bottom: 8px;
+    transition: all 0.2s;
+  }
+  .channel-btn:hover {
+    border-color: rgba(79,195,247,.3);
+    opacity: 1;
+  }
+  .channel-icon { font-size: 15px; }
+
+  /* Sales form */
+  .lead-form { display: flex; flex-direction: column; gap: 14px; }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .field input,
+  .field select,
+  .field textarea {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: #fff;
+    font-size: 14px;
+    transition: border-color 0.2s;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .field select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(255,255,255,0.4)'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus { border-color: rgba(79,195,247,.5); }
+  .field textarea { resize: vertical; min-height: 100px; }
+
+  .field input::placeholder,
+  .field textarea::placeholder { opacity: 0.3; }
+
+  .submit-btn {
+    padding: 14px 24px;
+    background: rgba(79,195,247,.12);
+    border: 1px solid rgba(79,195,247,.3);
+    border-radius: 12px;
+    color: #4fc3f7;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    align-self: flex-start;
+  }
+  .submit-btn:hover {
+    background: rgba(79,195,247,.2);
+    border-color: rgba(79,195,247,.6);
+  }
+
+  .form-note {
+    font-size: 11px;
+    opacity: 0.35;
+    margin: 0;
+  }
+
+  @media (max-width: 860px) {
+    .two-col { grid-template-columns: 1fr; }
+    .panel { padding: 24px; }
+  }
+  @media (max-width: 520px) {
+    .field-row { grid-template-columns: 1fr; }
+    .hero { padding: 36px 0 24px; }
+  }
+</style>
