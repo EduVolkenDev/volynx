@@ -1,19 +1,19 @@
 /* products.v2.css — visual upgrade no estilo Lab */
 
 /* ===== BACKGROUND ===== */
-/* Using fixed .bg div instead of body:has() + background-attachment:fixed
-   to avoid backdrop-filter stacking issues and :has() browser support gaps */
-.productsV2-bg {
-  position: fixed;
-  inset: 0;
-  background:
+/* Set on html so it overrides the body { background } from global.css.
+   When html has a background, the browser uses it for the canvas directly —
+   no z-index / stacking context issues needed. */
+html {
+  background-color: #06080f;
+  background-image:
     radial-gradient(ellipse 80% 60% at 20% 10%, rgba(108, 10, 228, .18), transparent),
     radial-gradient(ellipse 60% 50% at 80% 80%, rgba(89, 198, 232, .12), transparent),
     linear-gradient(160deg, #06080f 0%, #0c0b1e 45%, #060d18 100%);
-  z-index: -1;
 }
 
 body {
+  background: transparent;
   font-family: "Sora", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 

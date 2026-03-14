@@ -28,30 +28,25 @@ body {
   overflow-x: hidden;
 }
 
+/* ===== BACKGROUND ===== */
+/* Set directly on html to avoid z-index / stacking context issues with
+   backdrop-filter children. background-attachment:fixed NOT used — it
+   breaks when any descendant has backdrop-filter. */
+html {
+  background-color: #070a14;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.52), rgba(0, 0, 0, 0.52)),
+    url("/assets/vynx-ai.jpg");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
 body {
   font-family: "Sora", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   color: var(--txt);
   min-height: 100vh;
-  background: #070a14;
-}
-
-/* ===== BACKGROUND ===== */
-/* background-attachment:fixed breaks when any child uses backdrop-filter.
-   Fix: move the image to the fixed .bg element and use ::after for the overlay. */
-.bg {
-  position: fixed;
-  inset: 0;
-  background-image: url("/assets/vynx-ai.jpg");
-  background-position: center;
-  background-size: cover;
-  z-index: -1;
-}
-
-.bg::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: transparent;
 }
 
 /* ===== TOPBAR ===== */
