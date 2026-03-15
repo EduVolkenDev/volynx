@@ -1,0 +1,385 @@
+---
+import PageWidgets from "../../../components/PageWidgets.astro";
+const pageTitle = "PropertyFlow — VOLYNX Real Estate Platform";
+const pageDescription = "Premium property management platform for real estate agencies. Smart catalogue, bilingual interface, filters, and Supabase-ready backend.";
+---
+
+<!DOCTYPE html>
+<html lang="en" class="is-ready">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#07070b" />
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDescription} />
+
+  <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="shortcut icon" href="/assets/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Volynx" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <script>document.documentElement.classList.add('js');</script>
+
+  <style>
+    :root {
+      --bg: #07070b;
+      --text: rgba(255,255,255,0.96);
+      --muted: rgba(255,255,255,0.62);
+      --gold: #d6b36a;
+      --gold-soft: #f1deaa;
+      --violet: #8b5cf6;
+      --blue: #59c3ff;
+      --line: rgba(255,255,255,0.10);
+      --shadow: 0 20px 80px rgba(0,0,0,0.5);
+      --radius: 26px;
+      --max: 1100px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(89,195,255,0.10), transparent 30%),
+        radial-gradient(circle at 80% 15%, rgba(139,92,246,0.10), transparent 28%),
+        linear-gradient(180deg, #05050a 0%, #090910 100%);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ─── Topbar ─── */
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(18px);
+      background: rgba(7,7,11,0.6);
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar__inner {
+      max-width: var(--max); margin: 0 auto;
+      padding: 0 20px; min-height: 72px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .brand {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: 0.9rem; letter-spacing: 0.02em;
+    }
+    .brand__mark {
+      width: 13px; height: 13px; border-radius: 999px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--blue), var(--violet), var(--gold));
+      box-shadow: 0 0 20px rgba(89,195,255,0.4);
+    }
+    .topbar__back {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 16px; border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.03);
+      color: var(--muted); font-size: 0.84rem;
+      transition: color 180ms, background 180ms;
+    }
+    .topbar__back:hover { color: var(--text); background: rgba(255,255,255,0.07); }
+
+    /* ─── Shell ─── */
+    .shell { max-width: var(--max); margin: 0 auto; padding: 0 20px 80px; }
+
+    /* ─── Hero ─── */
+    .hero {
+      padding: 72px 0 56px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+    .hero__badge {
+      display: inline-flex; width: fit-content;
+      padding: 7px 14px; border-radius: 999px;
+      border: 1px solid rgba(214,179,106,0.25);
+      background: rgba(214,179,106,0.08);
+      color: #ead8aa; font-size: 0.76rem;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(2.6rem, 5.5vw, 4.8rem);
+      line-height: 0.96; letter-spacing: -0.05em;
+    }
+    .hero h1 span {
+      display: block;
+      background: linear-gradient(135deg, #fff, #e8d49a, #89d7ff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero p {
+      margin: 22px 0 0; max-width: 54ch;
+      color: var(--muted); line-height: 1.8; font-size: 1.05rem;
+    }
+    .hero__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 48px; padding: 0 22px; border-radius: 999px;
+      border: 1px solid var(--line); font-size: 0.9rem; font-weight: 500;
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+      cursor: pointer;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn--primary {
+      color: #0a0a0f;
+      background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+      border-color: rgba(255,255,255,0.15);
+    }
+    .btn--ghost { background: rgba(255,255,255,0.04); color: var(--text); }
+
+    /* ─── Hero visual ─── */
+    .hero__visual {
+      position: relative; min-height: 480px;
+    }
+    .hero__glow {
+      position: absolute; border-radius: 999px;
+      filter: blur(60px); opacity: 0.3; pointer-events: none;
+    }
+    .hero__glow--a { width: 200px; height: 200px; top: 0; right: 0; background: rgba(89,195,255,0.5); }
+    .hero__glow--b { width: 200px; height: 200px; bottom: 30px; left: 0; background: rgba(139,92,246,0.4); }
+    .hero__mock {
+      position: relative; z-index: 1;
+      border-radius: 30px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03)), rgba(7,7,11,0.8);
+      box-shadow: var(--shadow); padding: 18px;
+    }
+    .mock__bar { display: flex; gap: 8px; margin-bottom: 14px; }
+    .mock__bar span { width: 10px; height: 10px; border-radius: 999px; background: rgba(255,255,255,0.2); }
+    .mock__filter {
+      height: 52px; border-radius: 16px; margin-bottom: 14px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+    }
+    .mock__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .mock__card {
+      border-radius: 20px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.03);
+    }
+    .mock__card-img {
+      height: 100px;
+      background: linear-gradient(135deg, rgba(89,195,255,0.10), rgba(214,179,106,0.08));
+    }
+    .mock__card-body { padding: 10px; }
+    .mock__line { height: 8px; border-radius: 999px; background: rgba(255,255,255,0.08); margin-bottom: 6px; }
+    .mock__line--short { width: 55%; }
+    .mock__tag {
+      display: inline-flex; padding: 4px 8px; border-radius: 999px;
+      background: rgba(214,179,106,0.12); border: 1px solid rgba(214,179,106,0.2);
+      height: 8px; width: 40%; margin-top: 8px;
+    }
+
+    /* ─── Section ─── */
+    .section { padding: 48px 0 24px; }
+    .section__head { margin-bottom: 32px; }
+    .kicker {
+      display: inline-block; padding: 7px 14px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03);
+      color: #e6d6a8; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em;
+      margin-bottom: 14px;
+    }
+    .section h2 {
+      margin: 0; font-size: clamp(1.8rem, 3.5vw, 3rem);
+      line-height: 1.02; letter-spacing: -0.04em;
+    }
+    .section p.sub { margin: 14px 0 0; color: var(--muted); line-height: 1.8; max-width: 60ch; }
+
+    /* ─── Feature grid ─── */
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .feature {
+      border-radius: var(--radius); padding: 24px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+      box-shadow: var(--shadow);
+    }
+    .feature__icon {
+      width: 40px; height: 40px; border-radius: 14px; margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+      font-size: 1.1rem;
+    }
+    .feature h3 { margin: 0 0 8px; font-size: 1rem; }
+    .feature p { margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.7; }
+
+    /* ─── Stack row ─── */
+    .stack { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .stack__pill {
+      display: inline-flex; padding: 8px 14px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04);
+      color: var(--muted); font-size: 0.84rem;
+    }
+
+    /* ─── CTA block ─── */
+    .cta-block {
+      border-radius: 30px; padding: 40px;
+      border: 1px solid rgba(214,179,106,0.2);
+      background: linear-gradient(180deg, rgba(214,179,106,0.08), rgba(255,255,255,0.02));
+      box-shadow: var(--shadow);
+      display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    }
+    .cta-block h2 { margin: 0; font-size: clamp(1.5rem, 3vw, 2.4rem); letter-spacing: -0.04em; }
+    .cta-block p { margin: 10px 0 0; color: var(--muted); line-height: 1.7; }
+    .cta-block__actions { display: flex; gap: 12px; flex-shrink: 0; flex-wrap: wrap; }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 860px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero__visual { min-height: auto; }
+      .features { grid-template-columns: 1fr 1fr; }
+      .cta-block { flex-direction: column; align-items: flex-start; }
+    }
+    @media (max-width: 560px) {
+      .features { grid-template-columns: 1fr; }
+      .cta-block { padding: 24px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="brand" href="/">
+        <span class="brand__mark"></span>
+        <span>VOLYNX</span>
+      </a>
+      <a class="topbar__back" href="/products/">← All products</a>
+    </div>
+  </header>
+
+  <main class="shell">
+    <div class="hero">
+      <div>
+        <span class="hero__badge">Real Estate · SaaS</span>
+        <h1>
+          Property management
+          <span>done with precision.</span>
+        </h1>
+        <p>
+          PropertyFlow is a premium platform for real estate agencies to manage listings,
+          showcase properties, and deliver a polished client experience —
+          with zero operational friction.
+        </p>
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="/contact/?product=propertyflow">Request a demo</a>
+          <a class="btn btn--ghost" href="/contact/">Talk to us</a>
+        </div>
+      </div>
+
+      <div class="hero__visual">
+        <div class="hero__glow hero__glow--a"></div>
+        <div class="hero__glow hero__glow--b"></div>
+        <div class="hero__mock">
+          <div class="mock__bar"><span></span><span></span><span></span></div>
+          <div class="mock__filter"></div>
+          <div class="mock__grid">
+            <div class="mock__card">
+              <div class="mock__card-img"></div>
+              <div class="mock__card-body">
+                <div class="mock__line"></div>
+                <div class="mock__line mock__line--short"></div>
+                <div class="mock__tag"></div>
+              </div>
+            </div>
+            <div class="mock__card">
+              <div class="mock__card-img"></div>
+              <div class="mock__card-body">
+                <div class="mock__line"></div>
+                <div class="mock__line mock__line--short"></div>
+                <div class="mock__tag"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <section class="section">
+      <div class="section__head">
+        <span class="kicker">What's inside</span>
+        <h2>Everything an agency needs.</h2>
+        <p class="sub">From listing management to client-facing showcase — built for real workflows.</p>
+      </div>
+
+      <div class="features">
+        <div class="feature">
+          <div class="feature__icon">🏠</div>
+          <h3>Smart Catalogue</h3>
+          <p>Property grid with cover images, meta tags, featured badges and detail modals with full gallery.</p>
+        </div>
+        <div class="feature">
+          <div class="feature__icon">🔍</div>
+          <h3>Live Filters</h3>
+          <p>Search by name, neighbourhood or city. Filter by purpose (sale / rent), type and price range.</p>
+        </div>
+        <div class="feature">
+          <div class="feature__icon">🌐</div>
+          <h3>Bilingual by Default</h3>
+          <p>Full EN / PT-BR interface with one-click language toggle. Every string translated — zero hardcoded text.</p>
+        </div>
+        <div class="feature">
+          <div class="feature__icon">⚡</div>
+          <h3>Supabase-Ready</h3>
+          <p>Clean data layer architected for a real backend. Swap the static data for live queries in minutes.</p>
+        </div>
+        <div class="feature">
+          <div class="feature__icon">📐</div>
+          <h3>Premium Visual System</h3>
+          <p>Dark luxury aesthetic with glassmorphism, gold accents and VOLYNX design tokens throughout.</p>
+        </div>
+        <div class="feature">
+          <div class="feature__icon">📱</div>
+          <h3>Fully Responsive</h3>
+          <p>Mobile-first layouts. Filter bar, property grid and modal all adapt cleanly to any screen size.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stack -->
+    <section class="section">
+      <div class="section__head">
+        <span class="kicker">Tech stack</span>
+        <h2>Built on modern, reliable tools.</h2>
+      </div>
+      <div class="stack">
+        <span class="stack__pill">React 19</span>
+        <span class="stack__pill">Vite 7</span>
+        <span class="stack__pill">Supabase</span>
+        <span class="stack__pill">Custom i18n (EN / PT-BR)</span>
+        <span class="stack__pill">CSS Custom Properties</span>
+        <span class="stack__pill">Context API</span>
+        <span class="stack__pill">Inter · Google Fonts</span>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section">
+      <div class="cta-block">
+        <div>
+          <h2>Ready to modernise your property showcase?</h2>
+          <p>PropertyFlow is available as a white-label solution. Request a demo and we'll walk you through setup and customisation.</p>
+        </div>
+        <div class="cta-block__actions">
+          <a class="btn btn--primary" href="/contact/?product=propertyflow">Request a demo</a>
+          <a class="btn btn--ghost" href="/products/">All products</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <PageWidgets />
+</body>
+</html>
