@@ -10,7 +10,7 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
 ---
 
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -31,38 +31,38 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
 
   <header class="topbar">
     <div class="topbar__inner">
-      <a class="pill-back" href="/volynx-lab/">← Voltar</a>
+      <a class="pill-back" href="/volynx-lab/" data-i18n="suite.back">← Voltar</a>
     </div>
   </header>
 
   <main class="wrap">
-    <h1>iMage Suite</h1>
+    <h1 data-i18n="suite.title">iMage Suite</h1>
 
     <div class="grid">
       <div class="card">
         <div class="cardHead">
-          <strong>Upload &amp; Config</strong>
-          <button id="pickBtn" class="btn secondary" type="button">Selecionar</button>
+          <strong data-i18n="suite.card_upload">Upload &amp; Config</strong>
+          <button id="pickBtn" class="btn secondary" type="button" data-i18n="suite.btn_select">Selecionar</button>
           <input id="file" type="file" accept="image/*" multiple hidden aria-label="Select images" />
         </div>
 
         <div class="cardBody">
-          <div id="drop" class="drop" role="button" tabindex="0" aria-label="Drop zone">
+          <div id="drop" class="drop" role="button" tabindex="0" aria-label="Drop zone" data-i18n="suite.drop_text">
             Arraste imagens aqui ou clique para selecionar
           </div>
 
           <div class="field-group">
             <label class="field">
-              Ferramenta
+              <span data-i18n="suite.tool_label">Ferramenta</span>
               <select id="tool" aria-label="Tool">
-                <option value="upscale" selected>Upscale</option>
-                <option value="compress">Compress</option>
-                <option value="convert">Convert</option>
+                <option value="upscale" selected data-i18n="suite.tool_upscale">Upscale</option>
+                <option value="compress" data-i18n="suite.tool_compress">Compress</option>
+                <option value="convert" data-i18n="suite.tool_convert">Convert</option>
               </select>
             </label>
 
             <label class="field">
-              Escala (Upscale)
+              <span data-i18n="suite.scale_label">Escala (Upscale)</span>
               <select id="scale" aria-label="Scale">
                 <option value="2">2x</option>
                 <option value="3">3x</option>
@@ -71,7 +71,7 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
             </label>
 
             <label class="field">
-              Formato
+              <span data-i18n="suite.format_label">Formato</span>
               <select id="format" aria-label="Output format">
                 <option value="image/png">PNG</option>
                 <option value="image/webp">WebP</option>
@@ -80,13 +80,13 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
             </label>
 
             <label class="field">
-              Qualidade (Compress)
+              <span data-i18n="suite.quality_label">Qualidade (Compress)</span>
               <input id="quality" type="range" min="0.3" max="1" step="0.05" value="0.85" aria-label="Quality" />
               <em id="qualityVal" style="font-style:normal;font-size:12px;color:rgba(255,255,255,.68)">0.85</em>
             </label>
           </div>
 
-          <button id="runBtn" class="btn" type="button" disabled style="margin-top:16px">Processar</button>
+          <button id="runBtn" class="btn" type="button" disabled style="margin-top:16px" data-i18n="suite.btn_process">Processar</button>
 
           <hr />
 
@@ -95,21 +95,22 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
               id="licenseKey"
               class="license-input"
               placeholder="Enter PRO License"
+              data-i18n-placeholder="suite.license_placeholder"
               type="text"
               aria-label="License key"
             />
-            <button id="activateBtn" class="btn secondary" type="button">Activate</button>
+            <button id="activateBtn" class="btn secondary" type="button" data-i18n="suite.btn_activate">Activate</button>
           </div>
 
           <div id="proStatus" class="pro-status" aria-live="polite"></div>
 
           <div class="kpis">
             <div class="kpi">
-              <strong>Original</strong>
+              <strong data-i18n="suite.original_label">Original</strong>
               <div id="origMeta">—</div>
             </div>
             <div class="kpi">
-              <strong>Resultado</strong>
+              <strong data-i18n="suite.result_label">Resultado</strong>
               <div id="outMeta">—</div>
             </div>
           </div>
@@ -118,8 +119,8 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
 
       <div class="card">
         <div class="cardHead">
-          <strong>Resultado</strong>
-          <button id="downloadBtn" class="btn" type="button" disabled>Baixar</button>
+          <strong data-i18n="suite.card_result">Resultado</strong>
+          <button id="downloadBtn" class="btn" type="button" disabled data-i18n="suite.btn_download">Baixar</button>
         </div>
         <div class="cardBody">
           <img id="preview" class="preview" alt="Result preview" />

@@ -14,6 +14,8 @@ const products = [
     badge: "Kit",
     meta: "Brand • Pages • Copy",
     desc: "Launch-ready assets for studios that want speed and consistency.",
+    metaKey: "products.alkit.meta",
+    descKey: "products.alkit.desc",
   },
   {
     name: "Portfolio Pro Kit",
@@ -21,6 +23,8 @@ const products = [
     badge: "Kit",
     meta: "Sections • Motion • SEO",
     desc: "A premium portfolio system designed to convert, not just look pretty.",
+    metaKey: "products.ppk.meta",
+    descKey: "products.ppk.desc",
   },
   {
     name: "SaaS Landing System",
@@ -28,6 +32,8 @@ const products = [
     badge: "System",
     meta: "Blocks • Variants • UI",
     desc: "Conversion-first landing blocks that scale across offers.",
+    metaKey: "products.sls.meta",
+    descKey: "products.sls.desc",
   },
   {
     name: "Volynx Icons",
@@ -35,6 +41,8 @@ const products = [
     badge: "Icons",
     meta: "Grid • Styles • Packs",
     desc: "A curated icon store: sharp, consistent, brand-ready.",
+    metaKey: "products.icons.meta",
+    descKey: "products.icons.desc",
   },
   {
     name: "Maintenance Plans",
@@ -43,6 +51,8 @@ const products = [
     badge: "Plans",
     meta: "Updates • SEO • Support",
     desc: "Structured website maintenance and product evolution. Predictable delivery, zero friction.",
+    metaKey: "products.maintenance.meta",
+    descKey: "products.maintenance.desc",
   },
   {
     name: "Landing Express",
@@ -51,6 +61,8 @@ const products = [
     badge: "Pages",
     meta: "Conversion • Copy • Speed",
     desc: "A serious Landing Page that turns visitors into buyers. Delivered in 48–72h.",
+    metaKey: "products.landing.meta",
+    descKey: "products.landing.desc",
   },
   {
     name: "Dev Tools",
@@ -59,6 +71,8 @@ const products = [
     badge: "Tools",
     meta: "Convert • Scale • Ship",
     desc: "Production-grade tools for developers: image processing, QR generation, converters and more.",
+    metaKey: "products.devtools.meta",
+    descKey: "products.devtools.desc",
   },
   {
     name: "VOLYNX Builder",
@@ -67,6 +81,8 @@ const products = [
     badge: "Builder",
     meta: "Sites • JSON • Deploy",
     desc: "Create and manage mini-sites with a JSON editor, magic link auth and one-click publish.",
+    metaKey: "products.builder.meta",
+    descKey: "products.builder.desc",
   },
   {
     name: "PropertyFlow",
@@ -74,6 +90,8 @@ const products = [
     badge: "Real Estate",
     meta: "Listings • Filters • CMS",
     desc: "Premium property management platform for real estate agencies. Smart catalogue, bilingual interface, and Supabase-ready backend.",
+    metaKey: "products.propertyflow.meta",
+    descKey: "products.propertyflow.desc",
   },
 ];
 ---
@@ -83,21 +101,21 @@ const products = [
 
   <main class="shell productsV2">
     <section class="hero">
-      <h1>Products</h1>
-      <p class="sub">
+      <h1 data-i18n="products.title">Products</h1>
+      <p class="sub" data-i18n="products.subtitle">
         Kits that ship. Systems that convert. Icons that don’t look like 2014.
       </p>
 
       <div class="toolbar" role="group" aria-label="Product tools">
         <div class="search" aria-label="Search (UI only)">
           <span class="hint" aria-hidden="true">⌘K</span>
-          <input placeholder="Search products…" disabled />
+          <input placeholder="Search products…" data-i18n-placeholder="products.search_placeholder" disabled />
         </div>
 
         <div class="filters" aria-label="Quick links">
-          <a class="chip" href="/dev-hub/">Dev Hub</a>
-          <a class="chip" href="/pricing/">Pricing</a>
-          <a class="chip" href="/contact/">Contact</a>
+          <a class="chip" href="/dev-hub/" data-i18n="products.filter.devhub">Dev Hub</a>
+          <a class="chip" href="/pricing/" data-i18n="products.filter.pricing">Pricing</a>
+          <a class="chip" href="/contact/" data-i18n="products.filter.contact">Contact</a>
         </div>
       </div>
     </section>
@@ -107,17 +125,17 @@ const products = [
         <article class="card">
           <div class="cardTop">
             <span class="badge">{p.badge}</span>
-            <span class="meta">{p.meta}</span>
+            <span class="meta" data-i18n={p.metaKey}>{p.meta}</span>
           </div>
 
           <h2>{p.name}</h2>
-          <p>{p.desc}</p>
+          <p data-i18n={p.descKey}>{p.desc}</p>
 
           <div class="metaRow">
-            <span class="small">Includes: {p.meta}</span>
+            <span class="small">Includes: <span data-i18n={p.metaKey}>{p.meta}</span></span>
             <div class="ctaRow">
-              <a class="btn" href={p.href ?? `/products/${p.slug}/`}>View</a>
-              <a class="btn secondary" href="/contact/">Buy</a>
+              <a class="btn" href={p.href ?? `/products/${p.slug}/`} data-i18n="products.view_btn">View</a>
+              <a class="btn secondary" href="/contact/" data-i18n="products.buy_btn">Buy</a>
             </div>
           </div>
         </article>

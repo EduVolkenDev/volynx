@@ -7,17 +7,17 @@ const isAuth = ["/login/", "/signup/", "/auth/"].some(p => Astro.url.pathname.st
 <!-- Utility bar: lang toggle + login -->
 <div class="vx-util-bar" id="vxUtilBar">
   <button id="vxLangToggle" class="vx-widget vx-lang-btn" aria-label="Toggle language" title="Switch language / Mudar idioma">
-    <span class="vx-lang-label">EN</span>
+    <span class="vx-lang-label" data-i18n="widget.lang">EN</span>
   </button>
   {!isAuth && (
-    <a href="/login/" id="vxLoginBtn" class="vx-widget vx-login-btn">
+    <a href="/login/" id="vxLoginBtn" class="vx-widget vx-login-btn" data-i18n="widget.login">
       Login
     </a>
   )}
 </div>
 
 {!isHome && (
-  <a href="/" id="vxHomeBtn" class="vx-widget vx-home-btn" aria-label="Ir para o início">
+  <a href="/" id="vxHomeBtn" class="vx-widget vx-home-btn" aria-label="Go home" data-i18n="widget.home">
     ← Home
   </a>
 )}
@@ -95,6 +95,15 @@ const isAuth = ["/login/", "/signup/", "/auth/"].some(p => Astro.url.pathname.st
     gap: 8px;
   }
 
+  /* Itens dentro da barra não devem ter position:fixed próprio */
+  .vx-util-bar .vx-widget {
+    position: relative;
+    top: unset;
+    right: unset;
+    bottom: unset;
+    left: unset;
+  }
+
   .vx-lang-btn {
     min-width: 48px;
     padding: 7px 11px;
@@ -125,4 +134,6 @@ const isAuth = ["/login/", "/signup/", "/auth/"].some(p => Astro.url.pathname.st
   }
 </style>
 
+<script src="/js/translations.js" defer></script>
+<script src="/js/i18n.js" defer></script>
 <script src="/js/page-widgets.js" defer></script>

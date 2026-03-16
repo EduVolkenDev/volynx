@@ -2,10 +2,11 @@
 import LabBg from "../../components/LabBg.astro";
 import VxHeader from "../../components/VxHeader.astro";
 import SiteFooter from "../../components/SiteFooter.astro";
+import PageWidgets from "../../components/PageWidgets.astro";
 ---
 
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -29,12 +30,12 @@ import SiteFooter from "../../components/SiteFooter.astro";
   <section class="hero">
     <div class="hero__badge">
       <span class="badge-dot" aria-hidden="true"></span>
-      <span>VOLYNX Builder</span>
+      <span data-i18n="builder.badge">VOLYNX Builder</span>
     </div>
-    <h1 class="hero__title">
+    <h1 class="hero__title" data-i18n="builder.title">
       Build &amp; <span class="accent">Deploy</span> Sites
     </h1>
-    <p class="hero__sub">
+    <p class="hero__sub" data-i18n="builder.subtitle">
       Create mini-sites with JSON, manage them in one place,
       and publish to your own subdomain.
     </p>
@@ -46,8 +47,8 @@ import SiteFooter from "../../components/SiteFooter.astro";
     <!-- AUTH PANEL (shown when logged out) -->
     <div class="panel auth-panel" id="authPanel">
       <div class="panel__icon" aria-hidden="true">⚡</div>
-      <h2 class="panel__title">Sign in to Builder</h2>
-      <p class="panel__sub">Enter your email — we'll send a magic link. No password needed.</p>
+      <h2 class="panel__title" data-i18n="builder.auth.title">Sign in to Builder</h2>
+      <p class="panel__sub" data-i18n="builder.auth.subtitle">Enter your email — we'll send a magic link. No password needed.</p>
       <div class="auth-form">
         <input
           id="email"
@@ -56,7 +57,7 @@ import SiteFooter from "../../components/SiteFooter.astro";
           autocomplete="email"
           class="field"
         />
-        <button class="btn btn--primary" id="sendLink">Get magic link</button>
+        <button class="btn btn--primary" id="sendLink" data-i18n="builder.auth.cta">Get magic link</button>
         <p class="auth-msg" id="authMsg"></p>
       </div>
     </div>
@@ -132,6 +133,7 @@ import SiteFooter from "../../components/SiteFooter.astro";
   </main>
 
   <SiteFooter />
+  <PageWidgets />
 </body>
 </html>
 

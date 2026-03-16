@@ -6,7 +6,7 @@ interface Props {
 }
 const {
   mode = "default",
-  primaryCtaLabel = "Entrar",
+  primaryCtaLabel,
   primaryCtaHref = "/login/",
 } = Astro.props;
 ---
@@ -19,17 +19,19 @@ const {
     </a>
 
     {mode === "sections" && (
-      <nav class="vxh__nav" aria-label="Seções da página">
-        <a href="#curriculo">Currículo</a>
-        <a href="#metodo">Método</a>
-        <a href="#projetos">Projetos</a>
-        <a href="#faq">FAQ</a>
-        <a href="#acesso">Acesso</a>
+      <nav class="vxh__nav" aria-label="Page sections">
+        <a href="#curriculum" data-i18n="vxh.curriculum">Curriculum</a>
+        <a href="#method" data-i18n="vxh.method">Method</a>
+        <a href="#projects" data-i18n="vxh.projects">Projects</a>
+        <a href="#faq" data-i18n="vxh.faq">FAQ</a>
+        <a href="#access" data-i18n="vxh.access">Access</a>
       </nav>
     )}
 
     <div class="vxh__actions">
-      <a class="vxh__cta" href={primaryCtaHref}>{primaryCtaLabel}</a>
+      {primaryCtaLabel && (
+        <a class="vxh__cta" href={primaryCtaHref}>{primaryCtaLabel}</a>
+      )}
       <button class="vxh__burger" id="menuBtn" type="button" aria-label="Abrir menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -40,15 +42,17 @@ const {
   <div class="vxh__mobile" id="mobileMenu" aria-hidden="true">
     <div class="vxh__mobileInner">
       {mode === "sections" && (
-        <nav aria-label="Seções — mobile">
-          <a href="#curriculo">Currículo</a>
-          <a href="#metodo">Método</a>
-          <a href="#projetos">Projetos</a>
-          <a href="#faq">FAQ</a>
-          <a href="#acesso">Acesso</a>
+        <nav aria-label="Page sections — mobile">
+          <a href="#curriculum" data-i18n="vxh.curriculum">Curriculum</a>
+          <a href="#method" data-i18n="vxh.method">Method</a>
+          <a href="#projects" data-i18n="vxh.projects">Projects</a>
+          <a href="#faq" data-i18n="vxh.faq">FAQ</a>
+          <a href="#access" data-i18n="vxh.access">Access</a>
         </nav>
       )}
-      <a class="vxh__cta" href={primaryCtaHref}>{primaryCtaLabel}</a>
+      {primaryCtaLabel && (
+        <a class="vxh__cta" href={primaryCtaHref}>{primaryCtaLabel}</a>
+      )}
     </div>
   </div>
 </header>
