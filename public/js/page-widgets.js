@@ -16,6 +16,24 @@
   });
 })();
 
+(function initSessionWidget() {
+  const loginBtn = document.getElementById('vxLoginBtn');
+  if (!loginBtn) return;
+
+  const token = localStorage.getItem('volynx_access_token');
+  if (!token) return;
+
+  const email = localStorage.getItem('volynx_user_email') || '';
+  const initials = email ? email.slice(0, 2).toUpperCase() : '??';
+
+  loginBtn.href = '/profile/';
+  loginBtn.textContent = initials;
+  loginBtn.setAttribute('aria-label', 'Open profile');
+  loginBtn.setAttribute('title', email || 'My profile');
+  loginBtn.classList.add('vx--logged-in');
+  loginBtn.removeAttribute('data-i18n');
+})();
+
 (function initLangToggle() {
   const btn = document.getElementById('vxLangToggle');
   if (!btn) return;

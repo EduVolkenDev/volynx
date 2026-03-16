@@ -90,8 +90,9 @@ function persistSession(session, email) {
       });
 
       persistSession(session, email);
+      localStorage.setItem("volynx_post_login_next", resolveRedirect());
       setMsg(msg, "Login OK. Redirecionando…", "ok");
-      window.location.href = resolveRedirect();
+      window.location.href = "/profile/?welcome=1";
     } catch (err) {
       setMsg(msg, err?.message || "Falha no login.", "err");
     } finally {

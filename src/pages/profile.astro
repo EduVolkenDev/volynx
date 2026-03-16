@@ -1,4 +1,6 @@
 ---
+import PageWidgets from "../components/PageWidgets.astro";
+
 const user = {
 	name: "Eduardo Volken",
 	username: "@eduardo",
@@ -61,8 +63,23 @@ const sessions = [
 					<a href="/volynx-lab/studio/">Studio</a>
 					<a href="/pricing/">Pricing</a>
 					<a href="/contact/">Support</a>
+					<button type="button" class="logout-btn" id="logoutBtn">Sign out</button>
 				</nav>
 			</header>
+
+			<!-- Welcome banner (shown after login) -->
+			<div id="welcomeBanner" class="welcome-banner" hidden>
+				<div class="welcome-inner">
+					<div class="welcome-text">
+						<strong>Welcome back!</strong>
+						<span>Want to complete your profile, or continue where you left off?</span>
+					</div>
+					<div class="welcome-actions">
+						<button type="button" class="btn btn-primary" id="editProfileBtn">Edit profile</button>
+						<button type="button" class="btn btn-secondary" id="continueBtn">Continue task</button>
+					</div>
+				</div>
+			</div>
 
 			<main class="container">
 				<section class="profile-cover card">
@@ -140,7 +157,7 @@ const sessions = [
 
 								<div class="info-item">
 									<span>Email</span>
-									<strong>{user.email}</strong>
+									<strong id="summaryEmail">{user.email}</strong>
 								</div>
 
 								<div class="info-item">
@@ -361,6 +378,50 @@ const sessions = [
 		</div>
 
 		<script is:inline>
+			// --- Session & welcome banner ---
+			(function () {
+				// Redirect to login if no session
+				const token = localStorage.getItem("volynx_access_token");
+				if (!token) { window.location.href = "/login/?next=/profile/"; return; }
+
+				// Load real email
+				const email = localStorage.getItem("volynx_user_email") || "";
+				const emailEl = document.getElementById("summaryEmail");
+				if (emailEl && email) emailEl.textContent = email;
+
+				// Welcome banner
+				const params = new URLSearchParams(window.location.search);
+				if (params.get("welcome") === "1") {
+					document.getElementById("welcomeBanner").hidden = false;
+					// Clean URL without reload
+					history.replaceState({}, "", "/profile/");
+				}
+
+				// Continue task button
+				document.getElementById("continueBtn")?.addEventListener("click", () => {
+					const next = localStorage.getItem("volynx_post_login_next") || "/volynx-lab/studio/";
+					localStorage.removeItem("volynx_post_login_next");
+					window.location.href = next;
+				});
+
+				// Edit profile button — just dismiss banner and stay
+				document.getElementById("editProfileBtn")?.addEventListener("click", () => {
+					document.getElementById("welcomeBanner").hidden = true;
+				});
+
+				// Logout
+				document.getElementById("logoutBtn")?.addEventListener("click", () => {
+					localStorage.removeItem("volynx_access_token");
+					localStorage.removeItem("volynx_refresh_token");
+					localStorage.removeItem("volynx_user_email");
+					localStorage.removeItem("volynx_session");
+					localStorage.removeItem("volynx_post_login_next");
+					window.location.href = "/";
+				});
+			})();
+		</script>
+
+		<script is:inline>
 			const avatarInput = document.getElementById("avatarInput");
 			const avatarPreview = document.getElementById("avatarPreview");
 			const avatarFallback = document.querySelector(".avatar-fallback");
@@ -434,6 +495,8 @@ const sessions = [
 				}, 0);
 			});
 		</script>
+
+		<PageWidgets />
 	</body>
 </html>
 
@@ -1127,6 +1190,46 @@ const sessions = [
 		.content-grid {
 			grid-template-columns: 1fr;
 		}
+	}
+
+	/* Welcome banner */
+	.welcome-banner {
+		width: min(calc(100% - 32px), var(--container));
+		margin: 16px auto 0;
+	}
+	.welcome-inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		flex-wrap: wrap;
+		padding: 18px 22px;
+		border-radius: 18px;
+		background: linear-gradient(135deg, rgba(0, 232, 197, .1), rgba(120, 0, 255, .08));
+		border: 1px solid rgba(0, 232, 197, .28);
+		backdrop-filter: blur(14px);
+	}
+	.welcome-text { display: flex; flex-direction: column; gap: 4px; }
+	.welcome-text strong { font-size: 1rem; }
+	.welcome-text span { font-size: 0.88rem; color: var(--muted); }
+	.welcome-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+	.welcome-actions .btn { min-height: 40px; padding: 0 16px; font-size: 0.88rem; }
+
+	/* Logout button in nav */
+	.logout-btn {
+		background: none;
+		border: 1px solid rgba(255, 118, 118, .3);
+		border-radius: 8px;
+		color: rgba(255, 180, 180, .85);
+		font-size: 0.88rem;
+		font-weight: 600;
+		padding: 6px 14px;
+		cursor: pointer;
+		transition: background 0.15s, border-color 0.15s;
+	}
+	.logout-btn:hover {
+		background: rgba(255, 118, 118, .1);
+		border-color: rgba(255, 118, 118, .5);
 	}
 
 	@media (max-width: 720px) {
