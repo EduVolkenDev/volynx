@@ -1,7 +1,20 @@
 ---
 import CookieBanner from "./CookieBanner.astro";
 const isHome = Astro.url.pathname === "/" || Astro.url.pathname === "";
+const isAuth = ["/login/", "/signup/", "/auth/"].some(p => Astro.url.pathname.startsWith(p));
 ---
+
+<!-- Utility bar: lang toggle + login -->
+<div class="vx-util-bar" id="vxUtilBar">
+  <button id="vxLangToggle" class="vx-widget vx-lang-btn" aria-label="Toggle language" title="Switch language / Mudar idioma">
+    <span class="vx-lang-label">EN</span>
+  </button>
+  {!isAuth && (
+    <a href="/login/" id="vxLoginBtn" class="vx-widget vx-login-btn">
+      Login
+    </a>
+  )}
+</div>
 
 {!isHome && (
   <a href="/" id="vxHomeBtn" class="vx-widget vx-home-btn" aria-label="Ir para o início">
@@ -71,9 +84,44 @@ const isHome = Astro.url.pathname === "/" || Astro.url.pathname === "";
     transform: translateY(0);
   }
 
+  /* Utility bar — top right */
+  .vx-util-bar {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 9990;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .vx-lang-btn {
+    min-width: 48px;
+    padding: 7px 11px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .09em;
+  }
+
+  .vx-login-btn {
+    padding: 7px 15px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    background: rgba(130, 100, 255, .18);
+    border-color: rgba(160, 130, 255, .30);
+  }
+  .vx-login-btn:hover {
+    background: rgba(130, 100, 255, .32);
+    border-color: rgba(180, 155, 255, .55);
+  }
+
   @media (max-width: 480px) {
     .vx-home-btn { bottom: 14px; left: 14px; font-size: 12px; padding: 7px 12px; }
     .vx-backtop  { bottom: 14px; right: 14px; }
+    .vx-util-bar { top: 10px; right: 10px; gap: 6px; }
+    .vx-lang-btn { min-width: 42px; padding: 6px 9px; font-size: 10px; }
+    .vx-login-btn { padding: 6px 11px; font-size: 11px; }
   }
 </style>
 

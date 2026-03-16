@@ -1,16 +1,16 @@
 ---
-import "../../../styles/image-suite.css";
+import "../../../styles/image-scaler.css";
 import LabBg from "../../../components/LabBg.astro";
 import PageWidgets from "../../../components/PageWidgets.astro";
 import SiteFooter from "../../../components/SiteFooter.astro";
 import LabUpgradeBanner from "../../../components/LabUpgradeBanner.astro";
 
-const pageTitle = "VOLYNX Lab • iMage Suite";
-const pageDescription = "Free image suite — upscale, compress and convert images directly in your browser, no upload required.";
+const pageTitle = "VOLYNX Lab • Image Scaler";
+const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser — no upload, no server, 100% local processing.";
 ---
 
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -31,47 +31,49 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
 
   <header class="topbar">
     <div class="topbar__inner">
-      <a class="pill-back" href="/volynx-lab/">← Voltar</a>
+      <a class="pill-back" href="/volynx-lab/">← Back</a>
     </div>
   </header>
 
   <main class="wrap">
-    <h1>iMage Suite</h1>
+    <div class="wrap-header">
+      <div class="hero-pill">Image Scaler</div>
+      <div class="hero-text">
+        <h1>High-Quality Upscaling</h1>
+        <p>
+          Scale images <strong>2×, 3× or 4×</strong> with detail preservation.<br />
+          100% local — nothing leaves your device.
+        </p>
+      </div>
+    </div>
 
     <div class="grid">
+      <!-- Left card: controls -->
       <div class="card">
         <div class="cardHead">
-          <strong>Upload &amp; Config</strong>
-          <button id="pickBtn" class="btn secondary" type="button">Selecionar</button>
+          <h2>Upload &amp; Settings</h2>
+          <button id="pickBtn" class="btn secondary" type="button">Select</button>
           <input id="file" type="file" accept="image/*" multiple hidden aria-label="Select images" />
         </div>
 
         <div class="cardBody">
           <div id="drop" class="drop" role="button" tabindex="0" aria-label="Drop zone">
-            Arraste imagens aqui ou clique para selecionar
+            <span class="icon">⬆</span>
+            <p>Drop images here or click to select</p>
           </div>
 
-          <div class="field-group">
-            <label class="field">
-              Ferramenta
-              <select id="tool" aria-label="Tool">
-                <option value="upscale" selected>Upscale</option>
-                <option value="compress">Compress</option>
-                <option value="convert">Convert</option>
+          <div class="field-row">
+            <label>
+              Scale
+              <select id="scale" aria-label="Scale factor">
+                <option value="2">2×</option>
+                <option value="3">3×</option>
+                <option value="4" selected>4×</option>
               </select>
             </label>
 
-            <label class="field">
-              Escala (Upscale)
-              <select id="scale" aria-label="Scale">
-                <option value="2">2x</option>
-                <option value="3">3x</option>
-                <option value="4" selected>4x</option>
-              </select>
-            </label>
-
-            <label class="field">
-              Formato
+            <label>
+              Output format
               <select id="format" aria-label="Output format">
                 <option value="image/png">PNG</option>
                 <option value="image/webp">WebP</option>
@@ -79,50 +81,35 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
               </select>
             </label>
 
-            <label class="field">
-              Qualidade (Compress)
-              <input id="quality" type="range" min="0.3" max="1" step="0.05" value="0.85" aria-label="Quality" />
-              <em id="qualityVal" style="font-style:normal;font-size:12px;color:rgba(255,255,255,.68)">0.85</em>
+            <label>
+              <input id="smooth" type="checkbox" checked aria-label="High quality smoothing" />
+              High-quality smoothing
             </label>
           </div>
 
-          <button id="runBtn" class="btn" type="button" disabled style="margin-top:16px">Processar</button>
-
-          <hr />
-
-          <div class="license-row">
-            <input
-              id="licenseKey"
-              class="license-input"
-              placeholder="Enter PRO License"
-              type="text"
-              aria-label="License key"
-            />
-            <button id="activateBtn" class="btn secondary" type="button">Activate</button>
-          </div>
-
-          <div id="proStatus" class="pro-status" aria-live="polite"></div>
+          <button id="runBtn" class="btn" type="button" disabled style="margin-top:18px;width:100%">Upscale</button>
 
           <div class="kpis">
             <div class="kpi">
-              <strong>Original</strong>
-              <div id="origMeta">—</div>
+              <b>Original</b>
+              <span id="origMeta">—</span>
             </div>
             <div class="kpi">
-              <strong>Resultado</strong>
-              <div id="outMeta">—</div>
+              <b>Result</b>
+              <span id="outMeta">—</span>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- Right card: preview -->
       <div class="card">
         <div class="cardHead">
-          <strong>Resultado</strong>
-          <button id="downloadBtn" class="btn" type="button" disabled>Baixar</button>
+          <h2>Preview</h2>
+          <button id="downloadBtn" class="btn" type="button" disabled>Download</button>
         </div>
         <div class="cardBody">
-          <img id="preview" class="preview" alt="Result preview" />
+          <img id="preview" class="preview" alt="Upscaled preview" />
         </div>
       </div>
     </div>
@@ -131,8 +118,7 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
   <script is:inline>
-    const FREE_LIMIT = 3;
-    const VALID_LICENSES = ["VOLYNX-PRO-2026", "VOLYNX-LIFETIME-001"];
+    const FREE_LIMIT = 5;
 
     function todayKey() {
       const d = new Date();
@@ -140,74 +126,58 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
     }
 
     function getUsage() {
-      const raw = localStorage.getItem("volynx_usage");
+      const raw = localStorage.getItem("volynx_scaler_usage");
       const today = todayKey();
-
       if (!raw) {
         const data = { date: today, used: 0 };
-        localStorage.setItem("volynx_usage", JSON.stringify(data));
+        localStorage.setItem("volynx_scaler_usage", JSON.stringify(data));
         return data;
       }
-
       try {
         const data = JSON.parse(raw);
-
         if (data.date !== today) {
           const reset = { date: today, used: 0 };
-          localStorage.setItem("volynx_usage", JSON.stringify(reset));
+          localStorage.setItem("volynx_scaler_usage", JSON.stringify(reset));
           return reset;
         }
-
         return data;
-      } catch (err) {
+      } catch {
         const reset = { date: today, used: 0 };
-        localStorage.setItem("volynx_usage", JSON.stringify(reset));
+        localStorage.setItem("volynx_scaler_usage", JSON.stringify(reset));
         return reset;
       }
     }
 
-    function incrementUsage(amount = 1) {
+    function incrementUsage(n) {
       const data = getUsage();
-      data.used += amount;
-      localStorage.setItem("volynx_usage", JSON.stringify(data));
+      data.used += n;
+      localStorage.setItem("volynx_scaler_usage", JSON.stringify(data));
     }
 
-    function $(id) {
-      return document.getElementById(id);
-    }
+    function $(id) { return document.getElementById(id); }
 
-    const fileEl = $("file");
-    const pickBtn = $("pickBtn");
-    const dropEl = $("drop");
-    const runBtn = $("runBtn");
+    const fileEl      = $("file");
+    const pickBtn     = $("pickBtn");
+    const dropEl      = $("drop");
+    const runBtn      = $("runBtn");
     const downloadBtn = $("downloadBtn");
-    const previewEl = $("preview");
-    const toolEl = $("tool");
-    const scaleEl = $("scale");
-    const fmtEl = $("format");
-    const qualityEl = $("quality");
-    const qualityValEl = $("qualityVal");
-    const origMeta = $("origMeta");
-    const outMeta = $("outMeta");
-    const licenseInput = $("licenseKey");
-    const activateBtn = $("activateBtn");
-    const proStatus = $("proStatus");
+    const previewEl   = $("preview");
+    const scaleEl     = $("scale");
+    const fmtEl       = $("format");
+    const smoothEl    = $("smooth");
+    const origMeta    = $("origMeta");
+    const outMeta     = $("outMeta");
 
-    let isPro = localStorage.getItem("volynx_pro") === "true";
     let loadedImages = [];
     let processedResults = [];
-    let singleOutBlob = null;
-
-    function updateProUI() {
-      proStatus.textContent = isPro ? "PRO Activated ✔ Unlimited access enabled" : "";
-    }
+    let singleBlob = null;
 
     function resetPreview() {
       if (previewEl) previewEl.removeAttribute("src");
       if (outMeta) outMeta.textContent = "—";
       if (downloadBtn) downloadBtn.disabled = true;
       processedResults = [];
-      singleOutBlob = null;
+      singleBlob = null;
     }
 
     async function fileToImage(file) {
@@ -220,188 +190,96 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
     }
 
     async function loadFiles(files) {
-      const validFiles = files.filter((file) => file && file.type && file.type.startsWith("image/"));
-
+      const valid = files.filter(f => f && f.type && f.type.startsWith("image/"));
       loadedImages = [];
       resetPreview();
-
-      if (!validFiles.length) {
-        alert("Nenhuma imagem válida encontrada.");
-        return;
-      }
+      if (!valid.length) { alert("No valid images found."); return; }
 
       runBtn.disabled = true;
-      dropEl.textContent = `Carregando ${validFiles.length} arquivo(s)...`;
+      dropEl.querySelector("p").textContent = `Loading ${valid.length} file(s)...`;
 
-      for (const file of validFiles) {
-        const img = await fileToImage(file);
-        loadedImages.push({
-          file,
-          img,
-          baseName: file.name.replace(/\.[^/.]+$/, "")
-        });
+      for (const f of valid) {
+        const img = await fileToImage(f);
+        loadedImages.push({ file: f, img, baseName: f.name.replace(/\.[^/.]+$/, "") });
       }
 
-      const totalBytes = validFiles.reduce((sum, file) => sum + file.size, 0);
-      origMeta.textContent = `${validFiles.length} arquivo(s) • ${(totalBytes / 1024 / 1024).toFixed(2)}MB`;
-      dropEl.textContent = `${validFiles.length} arquivo(s) pronto(s) para processar`;
+      const totalBytes = valid.reduce((s, f) => s + f.size, 0);
+      origMeta.textContent = `${valid.length} file(s) · ${(totalBytes / 1024 / 1024).toFixed(2)} MB`;
+      dropEl.querySelector("p").textContent = `${valid.length} file(s) ready`;
       runBtn.disabled = false;
     }
 
     function canvasToBlob(canvas, mime, quality) {
-      return new Promise((resolve, reject) => {
-        canvas.toBlob((blob) => {
-          if (!blob) {
-            reject(new Error("Falha ao gerar arquivo."));
-            return;
-          }
-          resolve(blob);
-        }, mime, quality);
+      return new Promise((res, rej) => {
+        canvas.toBlob(blob => blob ? res(blob) : rej(new Error("Blob generation failed")), mime, quality);
       });
     }
 
-    async function processOne(item, tool, scale, mime, quality) {
-      const img = item.img;
-      const file = item.file;
-      const baseName = item.baseName;
-
-      const w = img.width;
-      const h = img.height;
-
+    async function upscaleOne(item, scale, mime, useSmooth) {
+      const { img, file, baseName } = item;
       const canvas = document.createElement("canvas");
+      canvas.width  = img.width  * scale;
+      canvas.height = img.height * scale;
       const ctx = canvas.getContext("2d");
-
-      if (!ctx) {
-        throw new Error("Falha ao criar contexto do canvas.");
-      }
-
-      if (tool === "upscale") {
-        canvas.width = w * scale;
-        canvas.height = h * scale;
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = "high";
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      } else {
-        canvas.width = w;
-        canvas.height = h;
-        ctx.drawImage(img, 0, 0);
-      }
-
-      const blob = await canvasToBlob(
-        canvas,
-        mime,
-        tool === "compress" ? quality : 0.95
-      );
-
-      return {
-        baseName,
-        originalFile: file,
-        blob,
-        width: canvas.width,
-        height: canvas.height
-      };
+      ctx.imageSmoothingEnabled = useSmooth;
+      if (useSmooth) ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const blob = await canvasToBlob(canvas, mime, 0.95);
+      return { baseName, originalFile: file, blob, width: canvas.width, height: canvas.height };
     }
 
-    activateBtn.addEventListener("click", () => {
-      const key = licenseInput.value.trim();
-
-      if (VALID_LICENSES.includes(key)) {
-        localStorage.setItem("volynx_pro", "true");
-        isPro = true;
-        updateProUI();
-        alert("PRO Activated Successfully!");
-      } else {
-        alert("Invalid License Key");
-      }
+    pickBtn.addEventListener("click", () => fileEl.click());
+    dropEl.addEventListener("click", () => fileEl.click());
+    dropEl.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileEl.click(); }
     });
-
-    updateProUI();
-
-    qualityEl.addEventListener("input", () => {
-      qualityValEl.textContent = qualityEl.value;
-    });
-
-    pickBtn.addEventListener("click", () => {
-      fileEl.click();
-    });
-
-    dropEl.addEventListener("click", () => {
-      fileEl.click();
-    });
-
-    dropEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        fileEl.click();
-      }
-    });
-
     fileEl.addEventListener("change", async () => {
       const files = Array.from(fileEl.files || []);
-      if (!files.length) return;
-      await loadFiles(files);
+      if (files.length) await loadFiles(files);
     });
-
-    dropEl.addEventListener("dragover", (e) => {
-      e.preventDefault();
-    });
-
-    dropEl.addEventListener("drop", async (e) => {
+    dropEl.addEventListener("dragover", e => e.preventDefault());
+    dropEl.addEventListener("drop", async e => {
       e.preventDefault();
       const files = Array.from((e.dataTransfer && e.dataTransfer.files) || []);
-      if (!files.length) return;
-      await loadFiles(files);
+      if (files.length) await loadFiles(files);
     });
 
     runBtn.addEventListener("click", async () => {
       if (!loadedImages.length) return;
 
       const usage = getUsage();
-      const tool = toolEl.value;
-      const scale = parseInt(scaleEl.value, 10);
-      const mime = fmtEl.value;
-      const quality = parseFloat(qualityEl.value);
-
-      if (!isPro && usage.used + loadedImages.length > FREE_LIMIT) {
-        alert(`No plano free você pode processar até ${FREE_LIMIT} imagens por dia. O lote atual excede esse limite.`);
+      if (usage.used + loadedImages.length > FREE_LIMIT) {
+        alert(`Free plan: up to ${FREE_LIMIT} images per day. Current batch exceeds that limit.`);
         return;
       }
+
+      const scale  = parseInt(scaleEl.value, 10);
+      const mime   = fmtEl.value;
+      const smooth = smoothEl.checked;
 
       runBtn.disabled = true;
       downloadBtn.disabled = true;
       processedResults = [];
-      singleOutBlob = null;
+      singleBlob = null;
 
       try {
         for (let i = 0; i < loadedImages.length; i++) {
-          dropEl.textContent = `Processando ${i + 1}/${loadedImages.length}...`;
-
-          const result = await processOne(loadedImages[i], tool, scale, mime, quality);
+          dropEl.querySelector("p").textContent = `Processing ${i + 1}/${loadedImages.length}...`;
+          const result = await upscaleOne(loadedImages[i], scale, mime, smooth);
           processedResults.push(result);
-
-          if (i === 0) {
-            const url = URL.createObjectURL(result.blob);
-            previewEl.src = url;
-          }
+          if (i === 0) previewEl.src = URL.createObjectURL(result.blob);
         }
 
-        const totalOutBytes = processedResults.reduce((sum, result) => sum + result.blob.size, 0);
-        outMeta.textContent = `${processedResults.length} arquivo(s) • ${(totalOutBytes / 1024 / 1024).toFixed(2)}MB`;
-
-        if (processedResults.length === 1) {
-          singleOutBlob = processedResults[0].blob;
-        }
-
-        if (!isPro) {
-          incrementUsage(processedResults.length);
-        }
-
-        dropEl.textContent = `${processedResults.length} arquivo(s) processado(s) com sucesso`;
+        const totalOut = processedResults.reduce((s, r) => s + r.blob.size, 0);
+        outMeta.textContent = `${processedResults.length} file(s) · ${(totalOut / 1024 / 1024).toFixed(2)} MB`;
+        if (processedResults.length === 1) singleBlob = processedResults[0].blob;
+        incrementUsage(processedResults.length);
+        dropEl.querySelector("p").textContent = `${processedResults.length} file(s) upscaled`;
         downloadBtn.disabled = false;
-      } catch (error) {
-        console.error(error);
-        alert("Ocorreu um erro ao processar as imagens.");
-        dropEl.textContent = "Erro ao processar arquivos";
+      } catch (err) {
+        console.error(err);
+        alert("Error processing images.");
+        dropEl.querySelector("p").textContent = "Error — please try again";
       } finally {
         runBtn.disabled = false;
       }
@@ -409,33 +287,25 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
 
     downloadBtn.addEventListener("click", async () => {
       if (!processedResults.length) return;
-
       const ext = fmtEl.value.split("/")[1];
 
-      if (processedResults.length === 1 && singleOutBlob) {
+      if (processedResults.length === 1 && singleBlob) {
         const a = document.createElement("a");
-        a.href = URL.createObjectURL(singleOutBlob);
-        a.download = `${processedResults[0].baseName}.${ext}`;
+        a.href = URL.createObjectURL(singleBlob);
+        a.download = `${processedResults[0].baseName}-${scaleEl.value}x.${ext}`;
         a.click();
         return;
       }
 
-      if (!window.JSZip) {
-        alert("JSZip não carregado.");
-        return;
-      }
-
+      if (!window.JSZip) { alert("JSZip not loaded."); return; }
       const zip = new window.JSZip();
-
-      for (const result of processedResults) {
-        zip.file(`${result.baseName}.${ext}`, result.blob);
+      for (const r of processedResults) {
+        zip.file(`${r.baseName}-${scaleEl.value}x.${ext}`, r.blob);
       }
-
       const zipBlob = await zip.generateAsync({ type: "blob" });
-
       const a = document.createElement("a");
       a.href = URL.createObjectURL(zipBlob);
-      a.download = "volynx-image-suite-batch.zip";
+      a.download = "volynx-scaler-batch.zip";
       a.click();
     });
   </script>
