@@ -51,3 +51,4 @@ app.post("/create-checkout-session", async (req, res) => {
 app.get("/health", (_, res) => res.json({ ok: true }));
 
 app.listen(process.env.PORT || 3000);
+
