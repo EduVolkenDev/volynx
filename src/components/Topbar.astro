@@ -1,0 +1,144 @@
+---
+interface Props {
+  /** Navigation links for the left side */
+  leftLinks?: { href: string; label: string; i18n?: string }[];
+  /** Content for the right side (slot "right" can also be used) */
+  rightLinks?: { href: string; label: string; i18n?: string; class?: string }[];
+  /** Show language toggle (default: true) */
+  showLang?: boolean;
+}
+
+const {
+  leftLinks = [],
+  rightLinks = [],
+  showLang = true,
+} = Astro.props;
+---
+
+<header class="vx-topbar">
+  <div class="vx-topbar-left">
+    {showLang && (
+      <button type="button" class="vx-topbar-lang" id="vxTopbarLang" aria-label="Toggle language">
+        <span class="vx-topbar-lang-label" data-i18n="widget.lang">EN</span>
+      </button>
+    )}
+    {leftLinks.map(link => (
+      <a href={link.href} data-i18n={link.i18n || undefined}>{link.label}</a>
+    ))}
+    <slot name="left" />
+  </div>
+  <a href="/" class="vx-topbar-brand">
+    <img src="/assets/volynx-icon.webp" alt="VOLYNX" class="vx-topbar-icon" />
+  </a>
+  <div class="vx-topbar-right">
+    {rightLinks.map(link => (
+      <a href={link.href} class={link.class || undefined} data-i18n={link.i18n || undefined}>{link.label}</a>
+    ))}
+    <slot name="right" />
+  </div>
+</header>
+
+<style>
+  .vx-topbar {
+    position: relative;
+    z-index: 10;
+    width: min(1080px, 100% - 40px);
+    margin: 0 auto;
+    padding: 24px 0 12px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+  }
+  .vx-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .vx-topbar-left a {
+    color: rgba(255,255,255,.45);
+    font-size: .88rem;
+    font-weight: 500;
+    transition: color .15s;
+    text-decoration: none;
+  }
+  .vx-topbar-left a:hover { color: #fff; }
+
+  .vx-topbar-brand {
+    display: inline-flex;
+    align-items: center;
+    justify-self: center;
+    text-decoration: none;
+  }
+  .vx-topbar-icon {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    display: block;
+  }
+
+  .vx-topbar-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 14px;
+  }
+  .vx-topbar-right a {
+    color: rgba(255,255,255,.45);
+    font-size: .88rem;
+    font-weight: 500;
+    transition: color .15s;
+    text-decoration: none;
+  }
+  .vx-topbar-right a:hover { color: #fff; }
+
+  .vx-topbar-lang {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px;
+    color: rgba(255,255,255,.45);
+    font-size: .78rem;
+    font-weight: 700;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: color .15s, border-color .15s;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+  .vx-topbar-lang:hover {
+    color: #02fdce;
+    border-color: rgba(0,232,197,.25);
+  }
+
+  @media (max-width: 640px) {
+    .vx-topbar {
+      grid-template-columns: 1fr 1fr;
+      padding-top: 18px;
+    }
+    .vx-topbar-brand {
+      grid-column: 1 / -1;
+      justify-self: center;
+      order: -1;
+      margin-bottom: 8px;
+    }
+    .vx-topbar-left { flex-wrap: wrap; gap: 10px; }
+  }
+</style>
+
+<script is:inline>
+(function() {
+  var btn = document.getElementById('vxTopbarLang');
+  if (!btn) return;
+  var label = btn.querySelector('.vx-topbar-lang-label');
+  var KEY = 'volynx_lang';
+  function upd() { if (label) label.textContent = (localStorage.getItem(KEY) || 'en').toUpperCase(); }
+  upd();
+  btn.addEventListener('click', function() {
+    var cur = localStorage.getItem(KEY) || 'en';
+    var next = cur === 'en' ? 'pt' : 'en';
+    localStorage.setItem(KEY, next);
+    if (window.applyTranslations) window.applyTranslations(next);
+    upd();
+  });
+})();
+</script>

@@ -1,17 +1,26 @@
 /* VOLYNX Lab — Converter app.js */
 
 async function checkPermission(toolName) {
-  const cfg = await fetch('/config.json', { cache: 'no-store' }).then((r) => r.json());
+  const FREE = { allowed: true, plan: 'free', remaining: null };
+  let cfg;
+  try { cfg = await fetch('/config.json', { cache: 'no-store' }).then((r) => r.json()); }
+  catch (_) { return FREE; }
   const apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
-  if (!apiBase) throw new Error('apiBaseUrl não configurado');
+  if (!apiBase) return FREE;
   const token = localStorage.getItem('volynx_access_token') || '';
-  const res = await fetch(`${apiBase}/api/check-permission`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-    body: JSON.stringify({ tool: toolName }),
-  });
-  if (!res.ok) throw new Error(`Erro ${res.status}`);
-  return await res.json();
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 8000);
+    const res = await fetch(`${apiBase}/api/check-permission`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: JSON.stringify({ tool: toolName }),
+      signal: ctrl.signal,
+    });
+    clearTimeout(t);
+    if (!res.ok) return FREE;
+    return await res.json();
+  } catch (_) { return FREE; }
 }
 
 function isHeic(file) {

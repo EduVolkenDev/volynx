@@ -24,25 +24,29 @@
     const cfg = await fetch('/config.json', { cache: 'no-store' }).then((r) => r.json());
     const apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
 
-    // Identify the tool from window.__vxTool set inline before this script
-    const tool = window.__vxTool || 'qr-gen';
+    if (apiBase) {
+      const tool = window.__vxTool || 'qr-gen';
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 8000);
+      const res = await fetch(`${apiBase}/api/check-permission`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ tool }),
+        signal: ctrl.signal,
+      });
+      clearTimeout(t);
 
-    const res = await fetch(`${apiBase}/api/check-permission`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ tool }),
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      plan = data.plan || 'free';
-      proFeatures = data.pro_features || [];
+      if (res.ok) {
+        const data = await res.json();
+        plan = data.plan || 'free';
+        proFeatures = data.pro_features || [];
+      }
     }
   } catch (_) {
-    // Network error — keep plan as 'free', don't block user
+    // Network error or timeout — keep plan as 'free', don't block user
   }
 
   // ── 3. Expose plan globally ────────────────────────────────────────────────

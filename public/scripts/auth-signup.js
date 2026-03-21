@@ -1,4 +1,3 @@
-const LOGIN_PATH = "/login/";
 const DEFAULT_REDIRECT = "/volynx-lab/studio/";
 
 function resolveRedirect() {
@@ -12,7 +11,7 @@ function resolveRedirect() {
 
 async function loadConfig() {
   const res = await fetch("/config.json", { cache: "no-store" });
-  if (!res.ok) throw new Error("config.json não encontrado na raiz pública do deploy.");
+  if (!res.ok) throw new Error("config.json not found.");
   return await res.json();
 }
 
@@ -29,7 +28,7 @@ async function supabaseSignup({ supabaseUrl, supabaseAnonKey, email, password })
 
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const msg = data?.error_description || data?.msg || data?.error || `Erro ${res.status}`;
+    const msg = data?.error_description || data?.msg || data?.error || `Error ${res.status}`;
     throw new Error(msg);
   }
   return data;
@@ -54,33 +53,49 @@ function persistSession(session, email) {
   }));
 }
 
+function showCheckEmail(email) {
+  const signupState = document.getElementById("signupState");
+  const checkState  = document.getElementById("checkEmailState");
+  const checkMsg    = document.getElementById("checkMsg");
+
+  if (signupState) signupState.hidden = true;
+  if (checkState)  checkState.hidden  = false;
+
+  // Inject the user's email into the message
+  if (checkMsg) {
+    const template = checkMsg.getAttribute("data-i18n-template") || checkMsg.innerHTML;
+    checkMsg.setAttribute("data-i18n-template", template);
+    checkMsg.innerHTML = template.replace("{email}", email);
+  }
+}
+
 (function init() {
-  const form = document.getElementById("signupForm");
+  const form    = document.getElementById("signupForm");
   const emailEl = document.getElementById("email");
-  const passEl = document.getElementById("password");
-  const btn = document.getElementById("submitBtn");
-  const msg = document.getElementById("msg");
+  const passEl  = document.getElementById("password");
+  const btn     = document.getElementById("submitBtn");
+  const msg     = document.getElementById("msg");
 
   if (!form || !emailEl || !passEl || !btn || !msg) return;
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const email = String(emailEl.value || "").trim();
+    const email    = String(emailEl.value || "").trim();
     const password = String(passEl.value || "");
 
     if (!email || !password) {
-      setMsg(msg, "Preencha email e senha.", "err");
+      setMsg(msg, "Please fill in email and password.", "err");
       return;
     }
 
     btn.disabled = true;
-    setMsg(msg, "Criando conta…", "");
+    setMsg(msg, "Creating your account...", "");
 
     try {
       const cfg = await loadConfig();
       if (!cfg?.supabaseUrl || !cfg?.supabaseAnonKey || String(cfg.supabaseAnonKey).includes("YOUR_")) {
-        throw new Error("Configure SUPABASE_URL e SUPABASE_ANON_KEY em /config.json.");
+        throw new Error("Configure SUPABASE_URL and SUPABASE_ANON_KEY in /config.json.");
       }
 
       const out = await supabaseSignup({
@@ -90,19 +105,19 @@ function persistSession(session, email) {
         password
       });
 
+      // Rare: auto-login when email confirmation is disabled
       if (out?.session?.access_token) {
         persistSession(out.session, email);
-        setMsg(msg, "Conta criada e logada. Indo para o Studio…", "ok");
+        setMsg(msg, "Account created. Redirecting...", "ok");
         window.location.href = resolveRedirect();
         return;
       }
 
-      setMsg(msg, "Conta criada. Verifique seu email para confirmar e depois faça login.", "ok");
-      setTimeout(() => {
-        window.location.href = `${LOGIN_PATH}?next=${encodeURIComponent(resolveRedirect())}`;
-      }, 1200);
+      // Normal flow: email confirmation required
+      showCheckEmail(email);
+
     } catch (err) {
-      setMsg(msg, err?.message || "Falha ao criar conta.", "err");
+      setMsg(msg, err?.message || "Failed to create account.", "err");
     } finally {
       btn.disabled = false;
     }

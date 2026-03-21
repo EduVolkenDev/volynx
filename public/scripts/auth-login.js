@@ -11,7 +11,7 @@ function resolveRedirect() {
 
 async function loadConfig() {
   const res = await fetch("/config.json", { cache: "no-store" });
-  if (!res.ok) throw new Error("config.json não encontrado na raiz pública do deploy.");
+  if (!res.ok) throw new Error("config.json not found.");
   return await res.json();
 }
 
@@ -28,7 +28,7 @@ async function supabasePasswordGrant({ supabaseUrl, supabaseAnonKey, email, pass
 
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const msg = data?.error_description || data?.msg || data?.error || `Erro ${res.status}`;
+    const msg = data?.error_description || data?.msg || data?.error || `Error ${res.status}`;
     throw new Error(msg);
   }
   return data;
@@ -69,17 +69,17 @@ function persistSession(session, email) {
     const password = String(passEl.value || "");
 
     if (!email || !password) {
-      setMsg(msg, "Preencha email e senha.", "err");
+      setMsg(msg, "Please fill in email and password.", "err");
       return;
     }
 
     btn.disabled = true;
-    setMsg(msg, "Autenticando…", "");
+    setMsg(msg, "Signing in...", "");
 
     try {
       const cfg = await loadConfig();
       if (!cfg?.supabaseUrl || !cfg?.supabaseAnonKey || String(cfg.supabaseAnonKey).includes("YOUR_")) {
-        throw new Error("Configure SUPABASE_URL e SUPABASE_ANON_KEY em /config.json.");
+        throw new Error("Configure SUPABASE_URL and SUPABASE_ANON_KEY in /config.json.");
       }
 
       const session = await supabasePasswordGrant({
@@ -91,10 +91,10 @@ function persistSession(session, email) {
 
       persistSession(session, email);
       localStorage.setItem("volynx_post_login_next", resolveRedirect());
-      setMsg(msg, "Login OK. Redirecionando…", "ok");
+      setMsg(msg, "Welcome back. Redirecting...", "ok");
       window.location.href = "/profile/?welcome=1";
     } catch (err) {
-      setMsg(msg, err?.message || "Falha no login.", "err");
+      setMsg(msg, err?.message || "Sign in failed. Please try again.", "err");
     } finally {
       btn.disabled = false;
     }

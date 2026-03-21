@@ -3,38 +3,75 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import VxHeader from "../../components/VxHeader.astro";
 import SiteFooter from "../../components/SiteFooter.astro";
 
-const title = "Cadastro — VOLYNX";
+const title = "Sign Up — VOLYNX";
 ---
 
 <BaseLayout title={title}>
-  <VxHeader primaryCtaLabel="Entrar" primaryCtaHref="/login/" />
+  <VxHeader primaryCtaLabel="Sign in" primaryCtaHref="/login/" />
+
+  <div class="signup-bg" aria-hidden="true">
+    <video
+      class="bg-video"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      poster="/assets/login-bg-poster.webp"
+    >
+      <source src="/assets/login-bg2.mp4" type="video/mp4" />
+    </video>
+  </div>
 
   <main class="shell signup">
     <section class="wrap">
       <div class="panel">
-        <h1 data-i18n="signup.title">Create your account</h1>
-        <p class="sub" data-i18n="signup.subtitle">Crie sua conta para acessar o Studio e suas ferramentas.</p>
 
-        <form class="form" id="signupForm" action="#" method="get">
-          <label class="field">
-            <span data-i18n="signup.email">Email</span>
-            <input type="email" id="email" name="email" autocomplete="email" required />
-          </label>
+        <!-- State 1: Signup form -->
+        <div id="signupState">
+          <h1 data-i18n="signup.title">Create your account</h1>
+          <p class="sub" data-i18n="signup.subtitle">Create your account to access Studio and your tools.</p>
 
-          <label class="field">
-            <span data-i18n="signup.password">Password</span>
-            <input type="password" id="password" name="password" autocomplete="new-password" required />
-          </label>
+          <form class="form" id="signupForm" action="#" method="get">
+            <label class="field">
+              <span data-i18n="signup.email">Email</span>
+              <input type="email" id="email" name="email" autocomplete="email" required />
+            </label>
 
-          <p id="msg" class="msg" aria-live="polite"></p>
+            <label class="field">
+              <span data-i18n="signup.password">Password</span>
+              <input type="password" id="password" name="password" autocomplete="new-password" required />
+            </label>
 
-          <button class="btn primary" id="submitBtn" type="submit" data-i18n="signup.btn_create">Create account</button>
+            <p id="msg" class="msg" aria-live="polite"></p>
 
-          <div class="row">
-            <a class="link" href="/login/" data-i18n="signup.have_account">Já tenho conta</a>
-            <a class="link" href="/pricing/" data-i18n="signup.pricing">Pricing</a>
+            <button class="btn primary" id="submitBtn" type="submit" data-i18n="signup.btn_create">Create account</button>
+
+            <div class="row">
+              <a class="link" href="/login/" data-i18n="signup.have_account">Already have an account</a>
+              <a class="link" href="/pricing/" data-i18n="signup.pricing">Pricing</a>
+            </div>
+          </form>
+        </div>
+
+        <!-- State 2: Check your email -->
+        <div id="checkEmailState" class="check-email" hidden>
+          <div class="check-icon" aria-hidden="true">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="4" width="20" height="16" rx="2" />
+              <path d="M22 4L12 13 2 4" />
+            </svg>
           </div>
-        </form>
+          <h1 data-i18n="signup.check_title">Check your inbox</h1>
+          <p class="check-msg" id="checkMsg" data-i18n="signup.check_msg">
+            We sent a confirmation link to your email. Click it to activate your account.
+          </p>
+          <p class="check-hint" data-i18n="signup.check_hint">
+            Didn't receive it? Check your spam folder or try signing up again.
+          </p>
+          <a class="btn primary" href="/login/" data-i18n="signup.check_login">Go to login</a>
+        </div>
+
       </div>
     </section>
   </main>
@@ -48,11 +85,25 @@ const title = "Cadastro — VOLYNX";
   @import "../../styles/home.css";
   @import "../../styles/services.css";
 
+  .signup-bg{
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+  }
+  .bg-video{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.03);
+    filter: contrast(1.05) saturate(1.05);
+  }
+
   .signup{
-    min-height: calc(100svh - 120px);
+    min-height: calc(100svh - 80px);
     display: grid;
     place-items: center;
-    padding: 110px 0 70px;
+    padding: 34px 0 70px;
   }
   .wrap{ width: min(520px, 92vw); }
   .panel{
@@ -101,4 +152,48 @@ const title = "Cadastro — VOLYNX";
     opacity: .88;
   }
   .link{ text-decoration: none; }
+
+  /* Check your email state */
+  .check-email{
+    text-align: center;
+    padding: 12px 0 4px;
+  }
+  .check-icon{
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 18px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: rgba(140, 255, 210, .08);
+    border: 1px solid rgba(140, 255, 210, .18);
+    color: rgba(140, 255, 210, .9);
+  }
+  .check-email h1{
+    margin: 0 0 12px;
+    font-size: 24px;
+  }
+  .check-msg{
+    margin: 0 0 14px;
+    line-height: 1.6;
+    color: rgba(255,255,255,.82);
+  }
+  .check-hint{
+    margin: 0 0 20px;
+    font-size: 13px;
+    color: rgba(255,255,255,.5);
+    line-height: 1.5;
+  }
+  .check-email .btn{
+    width: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .bg-video{ display:none; }
+    .signup-bg{
+      background-image: url("/assets/login-bg-poster.webp");
+      background-size: cover;
+      background-position: center;
+    }
+  }
 </style>

@@ -213,11 +213,22 @@ window.VX_TRANS = {
     "signup.btn_create":  "Create account",
     "signup.have_account":"Already have an account",
     "signup.pricing":     "Pricing",
+    "signup.creating":    "Creating your account...",
+    "signup.check_title": "Check your inbox",
+    "signup.check_msg":   "We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account.",
+    "signup.check_hint":  "Didn't receive it? Check your spam folder or try signing up again.",
+    "signup.check_login": "Go to login",
 
     /* === AUTH CONFIRM === */
-    "auth.title": "Verifying email…",
-    "auth.msg":   "Please wait.",
-    "auth.btn":   "Go to login",
+    "auth.verifying_title":   "Verifying your email...",
+    "auth.verifying_msg":     "Please wait a moment.",
+    "auth.success_title":     "Email confirmed",
+    "auth.success_msg":       "Your account is verified. You can now sign in.",
+    "auth.success_redirect":  "Redirecting to login in {n}s...",
+    "auth.error_title":       "Confirmation failed",
+    "auth.error_msg":         "Invalid or expired link. Please try signing up again.",
+    "auth.error_btn":         "Try again",
+    "auth.btn_login":         "Sign in now",
 
     /* === SERVICES PAGE === */
     "services.nav.home":           "Home",
@@ -707,11 +718,22 @@ window.VX_TRANS = {
     "signup.btn_create":  "Criar conta",
     "signup.have_account":"Já tenho conta",
     "signup.pricing":     "Preços",
+    "signup.creating":    "Criando sua conta...",
+    "signup.check_title": "Verifique sua caixa de entrada",
+    "signup.check_msg":   "Enviamos um link de confirmação para <strong>{email}</strong>. Clique nele para ativar sua conta.",
+    "signup.check_hint":  "Não recebeu? Verifique sua pasta de spam ou tente se cadastrar novamente.",
+    "signup.check_login": "Ir para o login",
 
     /* === AUTH CONFIRM === */
-    "auth.title": "Verificando e-mail…",
-    "auth.msg":   "Aguarde um momento.",
-    "auth.btn":   "Ir para o login",
+    "auth.verifying_title":   "Verificando seu e-mail...",
+    "auth.verifying_msg":     "Aguarde um momento.",
+    "auth.success_title":     "E-mail confirmado",
+    "auth.success_msg":       "Sua conta foi verificada. Você já pode entrar.",
+    "auth.success_redirect":  "Redirecionando para o login em {n}s...",
+    "auth.error_title":       "Falha na confirmação",
+    "auth.error_msg":         "Link inválido ou expirado. Tente se cadastrar novamente.",
+    "auth.error_btn":         "Tentar novamente",
+    "auth.btn_login":         "Entrar agora",
 
     /* === SERVICES PAGE === */
     "services.nav.home":           "Início",

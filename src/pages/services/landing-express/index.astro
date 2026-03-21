@@ -2,6 +2,7 @@
 import "../../../styles/landing-express.css";
 import PageWidgets from "../../../components/PageWidgets.astro";
 import SiteFooter from "../../../components/SiteFooter.astro";
+import Topbar from "../../../components/Topbar.astro";
 const pageTitle = "VOLYNX — Landing Express";
 const pageDescription = "Premium, conversion-focused landing page. Delivered in 48–72h. Stripe checkout + contact form included.";
 ---
@@ -29,36 +30,7 @@ const pageDescription = "Premium, conversion-focused landing page. Delivered in 
   <!-- CONFIG: replace LINK_STRIPE_AQUI with your Stripe Payment Link -->
   <script is:inline type="module" src="/scripts/landing-express.js"></script>
 
-  <!-- Topbar -->
-  <header class="topbar">
-    <div class="wrap">
-      <div class="brand">
-        <div class="logo">
-          <img src="/assets/oficial-volynx-eye.webp" alt="VOLYNX Eye" loading="eager" />
-          <img src="/assets/oficial-volynx-logo.webp" alt="VOLYNX" loading="eager" />
-        </div>
-        <div>
-          <div class="name">VOLYNX</div>
-          <div class="tag">Landing Express • 48–72h</div>
-        </div>
-      </div>
-
-      <nav aria-label="Page sections">
-        <a href="#pain">Problem</a>
-        <a href="#solution">Solution</a>
-        <a href="#scope">What's included</a>
-        <a href="#proof">Proof</a>
-        <a href="#contact">Contact</a>
-      </nav>
-
-      <div class="topbarActions">
-        <a class="btn btn--ghost" href="#contact">Bigger project?</a>
-        <a class="btn btn--primary" id="topCta" href="LINK_STRIPE_AQUI" target="_blank" rel="noopener">
-          Get started
-        </a>
-      </div>
-    </div>
-  </header>
+  <Topbar leftLinks={[{ href: "#pain", label: "Problem" }, { href: "#solution", label: "Solution" }, { href: "#scope", label: "Included" }, { href: "#proof", label: "Proof" }, { href: "#contact", label: "Contact" }]} rightLinks={[{ href: "#contact", label: "Get started" }]} />
 
   <main>
     <div class="wrap">

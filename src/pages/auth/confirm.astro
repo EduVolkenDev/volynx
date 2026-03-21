@@ -1,40 +1,182 @@
 ---
-const title = "E-mail confirmado • VOLYNX";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import VxHeader from "../../components/VxHeader.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
+
+const title = "Email Confirmation — VOLYNX";
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{title}</title>
-  <meta name="theme-color" content="#080610" />
-</head>
+<BaseLayout title={title}>
+  <VxHeader primaryCtaLabel="Sign in" primaryCtaHref="/login/" />
 
-<body style="margin:0;min-height:100vh;background:url('/assets/Purple-Universe.jpg') center center / cover no-repeat fixed;color:white;font-family:Inter, Arial, sans-serif;display:grid;place-items:center;padding:24px;">
-  <main style="width:100%;max-width:560px;background:rgba(255,255,255,.04);border:3px outset rgba(255,255,255,.08);border-radius:24px;padding:32px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35); backdrop-filter:blur(10px);">
-    <div id="icon" style="width:100px;height:72px;border-radius:999px;margin:0 auto 18px;display:grid;place-items:center;background:linear-gradient(180deg,#090105,#7a163f,#090105);font-size:32px;">
-      ⏳
-    </div>
-
-    <h1 id="title" data-i18n="auth.title" style="margin:0 0 12px;font-size:28px;line-height:1.1;">
-      Verificando e-mail…
-    </h1>
-
-    <p id="msg" data-i18n="auth.msg" style="margin:0 0 20px;color:rgba(255,255,255,.72);font-size:16px;line-height:1.6;">
-      Aguarde um momento.
-    </p>
-
-    <a
-      id="btn"
-      data-i18n="auth.btn"
-      href="/login"
-      style="display:none;align-items:center;justify-content:center;padding:12px 18px;border-radius:14px;background:#6d123f;color:white;text-decoration:none;font-weight:600;"
+  <div class="confirm-bg" aria-hidden="true">
+    <video
+      class="bg-video"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      poster="/assets/login-bg-poster.webp"
     >
-      Ir para o login
-    </a>
+      <source src="/assets/login-bg2.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <main class="shell confirm">
+    <section class="wrap">
+      <div class="panel">
+        <div class="confirm-content">
+          <div class="confirm-icon" id="confirmIcon">
+            <div class="spinner" id="confirmSpinner"></div>
+          </div>
+
+          <h1 id="confirmTitle" data-i18n="auth.verifying_title">Verifying your email...</h1>
+          <p id="confirmMsg" class="confirm-msg" data-i18n="auth.verifying_msg">Please wait a moment.</p>
+          <p id="confirmCountdown" class="confirm-countdown" hidden></p>
+
+          <a
+            id="confirmBtn"
+            class="btn primary"
+            href="/login/"
+            hidden
+            data-i18n="auth.btn_login"
+          >
+            Sign in now
+          </a>
+
+          <a
+            id="confirmBtnRetry"
+            class="btn secondary"
+            href="/signup/"
+            hidden
+            data-i18n="auth.error_btn"
+          >
+            Try again
+          </a>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <script is:inline type="module" src="/scripts/auth-confirm.js"></script>
-</body>
-</html>
+  <SiteFooter />
+</BaseLayout>
+
+<script is:inline type="module" src="/scripts/auth-confirm.js"></script>
+
+<style>
+  @import "../../styles/home.css";
+  @import "../../styles/services.css";
+
+  .confirm-bg{
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+  }
+  .bg-video{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.03);
+    filter: contrast(1.05) saturate(1.05);
+  }
+
+  .confirm{
+    min-height: calc(100svh - 80px);
+    display: grid;
+    place-items: center;
+    padding: 34px 0 70px;
+  }
+  .wrap{ width: min(520px, 92vw); }
+  .panel{
+    border-radius: 26px;
+    padding: 22px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(10,12,20,.52);
+    backdrop-filter: blur(14px);
+  }
+
+  .confirm-content{
+    text-align: center;
+    padding: 16px 0 4px;
+  }
+
+  .confirm-icon{
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 20px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    font-size: 32px;
+    line-height: 1;
+    transition: background .3s, border-color .3s;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .confirm-icon.is-success{
+    background: rgba(140, 255, 210, .08);
+    border-color: rgba(140, 255, 210, .22);
+    color: rgba(140, 255, 210, .95);
+  }
+  .confirm-icon.is-error{
+    background: rgba(255, 140, 140, .08);
+    border-color: rgba(255, 140, 140, .22);
+    color: rgba(255, 140, 140, .95);
+  }
+
+  /* Spinner */
+  .spinner{
+    width: 28px;
+    height: 28px;
+    border: 3px solid rgba(255,255,255,.12);
+    border-top-color: rgba(140, 255, 210, .7);
+    border-radius: 999px;
+    animation: spin .7s linear infinite;
+  }
+  .spinner[hidden]{ display: none; }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  h1{
+    margin: 0 0 10px;
+    font-size: 24px;
+  }
+  .confirm-msg{
+    margin: 0 0 8px;
+    color: rgba(255,255,255,.78);
+    line-height: 1.6;
+  }
+  .confirm-countdown{
+    margin: 0 0 18px;
+    font-size: 13px;
+    color: rgba(255,255,255,.45);
+  }
+
+  .btn{
+    display: inline-flex;
+    justify-content: center;
+    padding: 12px 18px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.12);
+    text-decoration: none;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .btn.primary{ font-weight: 700; }
+  .btn.secondary{
+    opacity: .85;
+    font-size: 13px;
+    margin-top: 10px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .bg-video{ display:none; }
+    .confirm-bg{
+      background-image: url("/assets/login-bg-poster.webp");
+      background-size: cover;
+      background-position: center;
+    }
+    .spinner{ animation: none; }
+  }
+</style>

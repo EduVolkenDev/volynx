@@ -1,16 +1,25 @@
 (function () {
   async function checkPermission(toolName) {
-    var cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r){ return r.json(); });
+    var FREE = { allowed: true, plan: 'free', remaining: null };
+    var cfg;
+    try { cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r){ return r.json(); }); }
+    catch (_) { return FREE; }
     var apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
-    if (!apiBase) throw new Error('apiBaseUrl não configurado');
+    if (!apiBase) return FREE;
     var token = localStorage.getItem('volynx_access_token') || '';
-    var res = await fetch(apiBase + '/api/check-permission', {
-      method: 'POST',
-      headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
-      body: JSON.stringify({ tool: toolName }),
-    });
-    if (!res.ok) throw new Error('Erro ' + res.status);
-    return await res.json();
+    try {
+      var ctrl = new AbortController();
+      var t = setTimeout(function(){ ctrl.abort(); }, 8000);
+      var res = await fetch(apiBase + '/api/check-permission', {
+        method: 'POST',
+        headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
+        body: JSON.stringify({ tool: toolName }),
+        signal: ctrl.signal,
+      });
+      clearTimeout(t);
+      if (!res.ok) return FREE;
+      return await res.json();
+    } catch (_) { return FREE; }
   }
 
   var fileInput   = document.getElementById('file');
