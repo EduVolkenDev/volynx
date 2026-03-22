@@ -1,6 +1,6 @@
 ---
 import LabBg from "../../components/LabBg.astro";
-import VxHeader from "../../components/VxHeader.astro";
+import Topbar from "../../components/Topbar.astro";
 import SiteFooter from "../../components/SiteFooter.astro";
 import PageWidgets from "../../components/PageWidgets.astro";
 ---
@@ -24,7 +24,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
 
 <body>
   <LabBg src="/assets/lucid3.jpg" />
-  <VxHeader primaryCtaLabel="← Site" primaryCtaHref="/" />
+  <Topbar leftLinks={[{ href: "/volynx-lab/studio/", label: "Studio" }, { href: "/products/", label: "Products" }]} rightLinks={[{ href: "/profile/", label: "Profile" }]} />
 
   <!-- HERO -->
   <section class="hero">
@@ -75,35 +75,123 @@ import PageWidgets from "../../components/PageWidgets.astro";
       </div>
 
       <div class="grid">
-        <!-- NEW PROJECT -->
-        <div class="card">
-          <h3 class="card__title">New project</h3>
-          <div class="row">
-            <div class="field-group">
-              <label class="label" for="pname">Name</label>
-              <input id="pname" class="field" placeholder="Studio Aurora" />
-            </div>
-            <div class="field-group">
-              <label class="label" for="pslug">Slug</label>
-              <input id="pslug" class="field" placeholder="studio-aurora" />
-            </div>
+        <!-- NEW PROJECT WIZARD -->
+        <div class="card card--wizard" id="wizardCard">
+          <!-- Step indicator -->
+          <div class="wizard-steps">
+            <span class="wizard-dot wizard-dot--active" data-step="1">1</span>
+            <span class="wizard-line"></span>
+            <span class="wizard-dot" data-step="2">2</span>
           </div>
-          <div class="row" style="margin-top:12px">
-            <div class="field-group">
-              <label class="label" for="ctaText">CTA label</label>
-              <input id="ctaText" class="field" placeholder="Book now" />
+
+          <!-- STEP 1: Project & Preset -->
+          <div class="wizard-step" id="wizStep1">
+            <h3 class="card__title">New project</h3>
+
+            <div class="preset-picker">
+              <label class="label">Start from a kit</label>
+              <div class="preset-grid" id="presetGrid"></div>
             </div>
-            <div class="field-group">
-              <label class="label" for="ctaHref">CTA link</label>
-              <input id="ctaHref" class="field" placeholder="https://wa.me/..." />
+
+            <!-- Variant selectors (populated by JS per preset) -->
+            <div id="variantSelectors" class="variant-selectors" hidden></div>
+
+            <div class="row" style="margin-top:14px">
+              <div class="field-group">
+                <label class="label" for="pname">Project name</label>
+                <input id="pname" class="field" placeholder="Studio Aurora" />
+              </div>
+              <div class="field-group">
+                <label class="label" for="pslug">Slug</label>
+                <input id="pslug" class="field" placeholder="studio-aurora" />
+              </div>
             </div>
+
+            <button class="btn btn--primary" id="toStep2" style="margin-top:14px;width:100%">
+              Next: Brand & details →
+            </button>
           </div>
-          <button class="btn btn--primary" id="create" style="margin-top:14px;width:100%">
-            Create project →
-          </button>
-          <p class="hint" style="margin-top:10px">
-            Will publish at <code>https://slug.volynx.world</code>
-          </p>
+
+          <!-- STEP 2: Brand & Config -->
+          <div class="wizard-step" id="wizStep2" hidden>
+            <h3 class="card__title">Brand & details</h3>
+
+            <div class="row">
+              <div class="field-group">
+                <label class="label" for="wBrand">Brand name</label>
+                <input id="wBrand" class="field" placeholder="Acme Inc" />
+              </div>
+              <div class="field-group">
+                <label class="label" for="wTagline">Tagline</label>
+                <input id="wTagline" class="field" placeholder="Build faster, ship smarter." />
+              </div>
+            </div>
+
+            <div class="row" style="margin-top:12px">
+              <div class="field-group">
+                <label class="label" for="wCta">Primary CTA label</label>
+                <input id="wCta" class="field" placeholder="Get started" />
+              </div>
+              <div class="field-group">
+                <label class="label" for="wCtaHref">CTA link</label>
+                <input id="wCtaHref" class="field" placeholder="https://..." />
+              </div>
+            </div>
+
+            <div class="row" style="margin-top:12px">
+              <div class="field-group">
+                <label class="label" for="wAudience">Audience</label>
+                <select id="wAudience" class="field">
+                  <option value="b2b">B2B / Companies</option>
+                  <option value="b2c">B2C / Consumers</option>
+                  <option value="developers">Developers</option>
+                  <option value="creators">Creators / Freelancers</option>
+                  <option value="agencies">Agencies</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="label" for="wGoal">Goal</label>
+                <select id="wGoal" class="field">
+                  <option value="leads">Lead generation</option>
+                  <option value="sales">Direct sales</option>
+                  <option value="showcase">Showcase / portfolio</option>
+                  <option value="bookings">Bookings</option>
+                  <option value="waitlist">Waitlist</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row" style="margin-top:12px">
+              <div class="field-group">
+                <label class="label" for="wTone">Tone</label>
+                <select id="wTone" class="field">
+                  <option value="premium">Premium</option>
+                  <option value="minimal">Minimal</option>
+                  <option value="bold">Bold</option>
+                  <option value="futuristic">Futuristic</option>
+                  <option value="organic">Organic</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="label" for="wLang">Language</label>
+                <select id="wLang" class="field">
+                  <option value="en">English</option>
+                  <option value="pt">Português</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Optional sections (populated by JS per preset) -->
+            <div id="optionalToggles" class="optional-toggles" style="margin-top:14px"></div>
+
+            <div style="display:flex;gap:8px;margin-top:16px">
+              <button class="btn btn--ghost" id="backStep1" style="flex:1">← Back</button>
+              <button class="btn btn--primary" id="create" style="flex:2">Create project →</button>
+            </div>
+            <p class="hint" style="margin-top:10px">
+              Will publish at <code>https://<span id="slugPreview">slug</span>.volynx.world</code>
+            </p>
+          </div>
         </div>
 
         <!-- PROJECTS LIST -->
@@ -138,45 +226,386 @@ import PageWidgets from "../../components/PageWidgets.astro";
 </html>
 
 <script>
-  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-  const SUPABASE_URL = "https://yrqaonqflpspjszjkbbs.supabase.co";
-  const SUPABASE_ANON_KEY =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlycWFvbnFmbHBzcGpzemprYmJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0Njk3NzAsImV4cCI6MjA4NTA0NTc3MH0.88ksLpLxDj9bVZrGpNn3O-bSl-1A0VZk3PJRJjGP8fE";
-
-  const supa = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
-  });
+  import { createClient } from "@supabase/supabase-js";
 
   const $ = (id: string) => document.getElementById(id);
+  const log = (msg: string) => console.log(`[builder] ${msg}`);
 
-  const REDIRECT_TO = "https://volynx.world/builder/";
-  const OTP_COOLDOWN_MS = 60_000;
-  const OTP_LAST_KEY = "volynx_last_otp_sent_at";
-
+  let supa: any = null;
   let currentProject: any = null;
+  let presetsData: any = {};
+  let presets: any[] = [];
+  let selectedPresetId = "blank";
+  let selectedVariants: Record<string, string> = {};
+  let wizardStep = 1;
 
-  const setStatus = (t: string) => {
-    const el = $("status");
-    if (el) el.textContent = t || "";
-  };
+  const KEYS = ["volynx_access_token", "volynx_refresh_token", "volynx_user_email"];
+
+  const setStatus = (t: string) => { const el = $("status"); if (el) el.textContent = t || ""; };
 
   const slugify = (s: string) =>
     (s || "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
   const rand4 = () => Math.random().toString(16).slice(2, 6);
 
-  const defaultJSON = (name: string, slug: string, ctaText: string, ctaHref: string) => ({
-    brand: { name, primary: "#7DD3FC", bg: "#070A12", fg: "#E7EEF7" },
-    content: {
-      headline: `${name} — clean tech minimal`,
-      sub: "Premium structure, fast and ready to convert.",
-      ctaText: ctaText || "Talk now",
-      ctaHref: ctaHref || "#contact",
-      features: ["Minimal and elegant layout", "Performance and SEO-friendly", "Publish in 1 click"],
-      faq: [{ q: "How does it work?", a: "You edit, publish and done." }],
-    },
-  });
+  // ── Wizard navigation ──────────────────────────────────────
+  function showWizardStep(step: number) {
+    wizardStep = step;
+    ($("wizStep1") as HTMLElement).hidden = step !== 1;
+    ($("wizStep2") as HTMLElement).hidden = step !== 2;
+    document.querySelectorAll(".wizard-dot").forEach(d => {
+      const s = Number((d as HTMLElement).dataset.step);
+      d.classList.toggle("wizard-dot--active", s <= step);
+    });
+    if (step === 2) {
+      const slug = slugify(($("pname") as HTMLInputElement)?.value || "") || "slug";
+      const preview = $("slugPreview");
+      if (preview) preview.textContent = `${slug}-${rand4()}`;
+      renderOptionalToggles();
+    }
+  }
+
+  // ── Preset picker ──────────────────────────────────────────
+  async function loadPresets() {
+    try {
+      const res = await fetch("/builder/presets.json", { cache: "no-store" });
+      if (!res.ok) return;
+      presetsData = await res.json();
+      presets = presetsData.presets || [];
+      renderPresetPicker();
+      log("presets loaded: " + presets.length);
+    } catch { log("presets unavailable"); }
+  }
+
+  function renderPresetPicker() {
+    const grid = $("presetGrid");
+    if (!grid) return;
+    const blank = `<button type="button" class="preset-card preset-card--active" data-preset="blank">
+      <span class="preset-icon">✏️</span>
+      <span class="preset-name">Custom</span>
+      <span class="preset-tag">Blank</span>
+    </button>`;
+    const cards = presets.map((p: any) => `<button type="button" class="preset-card" data-preset="${p.id}">
+      <span class="preset-icon">${p.icon || "📦"}</span>
+      <span class="preset-name">${p.name}</span>
+      <span class="preset-tag">${p.tag || ""}</span>
+    </button>`).join("");
+    grid.innerHTML = blank + cards;
+
+    grid.querySelectorAll(".preset-card").forEach(btn => {
+      btn.addEventListener("click", () => {
+        grid.querySelectorAll(".preset-card").forEach(b => b.classList.remove("preset-card--active"));
+        btn.classList.add("preset-card--active");
+        selectedPresetId = (btn as HTMLElement).dataset.preset || "blank";
+        selectedVariants = {};
+        renderVariantSelectors();
+        log("preset selected: " + selectedPresetId);
+      });
+    });
+    renderVariantSelectors();
+  }
+
+  // ── Variant selectors (per preset) ─────────────────────────
+  function renderVariantSelectors() {
+    const box = $("variantSelectors") as HTMLElement;
+    if (!box) return;
+    const preset = presets.find((p: any) => p.id === selectedPresetId);
+    if (!preset?.variants) { box.hidden = true; box.innerHTML = ""; return; }
+
+    box.hidden = false;
+    box.innerHTML = Object.entries(preset.variants as Record<string, any>).map(([key, v]: [string, any]) => {
+      selectedVariants[key] = selectedVariants[key] || v.default;
+      return `<div class="field-group field-group--inline">
+        <label class="label">${v.label}</label>
+        <div class="chip-group" data-variant-key="${key}">
+          ${v.options.map((opt: string) => `<button type="button" class="chip ${opt === (selectedVariants[key] || v.default) ? "chip--active" : ""}" data-value="${opt}">${opt}</button>`).join("")}
+        </div>
+      </div>`;
+    }).join("");
+
+    box.querySelectorAll(".chip-group").forEach(group => {
+      const key = (group as HTMLElement).dataset.variantKey!;
+      group.querySelectorAll(".chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+          group.querySelectorAll(".chip").forEach(c => c.classList.remove("chip--active"));
+          chip.classList.add("chip--active");
+          selectedVariants[key] = (chip as HTMLElement).dataset.value || "";
+          log(`variant ${key} = ${selectedVariants[key]}`);
+        });
+      });
+    });
+  }
+
+  // ── Optional section toggles ───────────────────────────────
+  function renderOptionalToggles() {
+    const box = $("optionalToggles") as HTMLElement;
+    if (!box) return;
+    const preset = presets.find((p: any) => p.id === selectedPresetId);
+    if (!preset?.optionalSections) { box.innerHTML = ""; return; }
+
+    box.innerHTML = `<label class="label">Include sections</label><div class="toggle-grid">` +
+      Object.entries(preset.optionalSections as Record<string, any>).map(([key, cfg]: [string, any]) =>
+        `<label class="toggle-item">
+          <input type="checkbox" data-section="${key}" ${cfg.default ? "checked" : ""} />
+          <span>${cfg.label}</span>
+        </label>`
+      ).join("") + `</div>`;
+  }
+
+  function getEnabledSections(): Set<string> {
+    const enabled = new Set<string>();
+    const box = $("optionalToggles");
+    if (!box) return enabled;
+    box.querySelectorAll<HTMLInputElement>("input[data-section]").forEach(cb => {
+      if (cb.checked) enabled.add(cb.dataset.section!);
+    });
+    return enabled;
+  }
+
+  // ── Build project data ─────────────────────────────────────
+  interface WizardInputs {
+    name: string;
+    brand: string;
+    tagline: string;
+    cta: string;
+    ctaHref: string;
+    audience: string;
+    goal: string;
+    tone: string;
+    lang: string;
+  }
+
+  function getWizardInputs(): WizardInputs {
+    return {
+      name: (($("pname") as HTMLInputElement)?.value || "").trim() || "New Site",
+      brand: (($("wBrand") as HTMLInputElement)?.value || "").trim(),
+      tagline: (($("wTagline") as HTMLInputElement)?.value || "").trim(),
+      cta: (($("wCta") as HTMLInputElement)?.value || "").trim(),
+      ctaHref: (($("wCtaHref") as HTMLInputElement)?.value || "").trim(),
+      audience: (($("wAudience") as HTMLSelectElement)?.value || "b2b"),
+      goal: (($("wGoal") as HTMLSelectElement)?.value || "leads"),
+      tone: (($("wTone") as HTMLSelectElement)?.value || "premium"),
+      lang: (($("wLang") as HTMLSelectElement)?.value || "en"),
+    };
+  }
+
+  // ── Intent-aware copy seeds ────────────────────────────────
+  // Keyed by goal → returns hero/cta copy fragments
+  const goalCopy: Record<string, { heroVerb: string; ctaDefault: string; ctaClose: string; urgency: string }> = {
+    leads:    { heroVerb: "attract the right customers",    ctaDefault: "Get a free consultation", ctaClose: "Let's talk about your project.",         urgency: "Limited spots available." },
+    sales:    { heroVerb: "drive revenue and conversions",  ctaDefault: "Start free trial",        ctaClose: "Join thousands of happy customers.",    urgency: "No credit card required." },
+    showcase: { heroVerb: "showcase your best work",        ctaDefault: "See my work",             ctaClose: "Explore what I've built.",               urgency: "" },
+    bookings: { heroVerb: "fill your calendar with clients", ctaDefault: "Book a call",            ctaClose: "Schedule your free session now.",        urgency: "Next available slot this week." },
+    waitlist: { heroVerb: "build anticipation before launch", ctaDefault: "Join the waitlist",     ctaClose: "Be the first to know when we launch.",  urgency: "Early access for the first 500." },
+  };
+
+  const audienceCopy: Record<string, { who: string; proofLabel: string }> = {
+    b2b:        { who: "companies and teams",       proofLabel: "Trusted by leading companies" },
+    b2c:        { who: "people like you",            proofLabel: "Loved by thousands of users" },
+    developers: { who: "developers and engineers",   proofLabel: "Used by developers worldwide" },
+    creators:   { who: "creators and freelancers",   proofLabel: "Chosen by top creators" },
+    agencies:   { who: "agencies and studios",       proofLabel: "Trusted by agencies globally" },
+  };
+
+  const toneBadge: Record<string, string> = {
+    premium:    "Premium experience",
+    minimal:    "Simple by design",
+    bold:       "Built different",
+    futuristic: "Next generation",
+    organic:    "Human-first",
+  };
+
+  function buildMeta(w: WizardInputs): any {
+    return {
+      projectType: selectedPresetId === "blank" ? "custom" : selectedPresetId,
+      goal: w.goal,
+      audience: w.audience,
+      tone: w.tone,
+      language: w.lang,
+      presetId: selectedPresetId,
+      presetVariants: { ...selectedVariants },
+    };
+  }
+
+  function buildProjectData(): any {
+    const w = getWizardInputs();
+    const brandName = w.brand || w.name;
+    const gc = goalCopy[w.goal] || goalCopy.leads;
+    const ac = audienceCopy[w.audience] || audienceCopy.b2b;
+    const badge = toneBadge[w.tone] || "";
+    const cta = w.cta || gc.ctaDefault;
+    const ctaHref = w.ctaHref || "#";
+
+    // ── Blank / custom ──────────────────────────────────────
+    if (selectedPresetId === "blank") {
+      return {
+        meta: buildMeta(w),
+        brand: { name: brandName, tagline: w.tagline || `Helping ${ac.who} ${gc.heroVerb}.`, colors: { primary: "#7DD3FC", bg: "#070A12", fg: "#E7EEF7", accent: "#34D399" } },
+        sections: [
+          { type: "hero", variant: "centered", content: {
+            badge,
+            title: w.tagline || `${brandName} helps ${ac.who} ${gc.heroVerb}.`,
+            subtitle: `The modern solution designed for ${ac.who} who want results, not complexity.`,
+            primaryCta: { label: cta, href: ctaHref },
+          }},
+          { type: "cta", content: { title: gc.ctaClose, subtitle: gc.urgency || `Built for ${ac.who}.`, primaryCta: { label: cta, href: ctaHref } } },
+        ],
+      };
+    }
+
+    // ── Preset-based ────────────────────────────────────────
+    const preset = presets.find((p: any) => p.id === selectedPresetId);
+    if (!preset) { selectedPresetId = "blank"; return buildProjectData(); }
+
+    const data = JSON.parse(JSON.stringify(preset.data));
+    const enabled = getEnabledSections();
+
+    // Inject meta
+    data.meta = buildMeta(w);
+
+    // Inject brand
+    data.brand.name = brandName;
+    if (w.tagline) data.brand.tagline = w.tagline;
+    else data.brand.tagline = `Helping ${ac.who} ${gc.heroVerb}.`;
+
+    // ── Intent-aware section overrides ───────────────────────
+    data.sections.forEach((s: any) => {
+      // Hero: apply variant + inject intent-aware copy
+      if (s.type === "hero") {
+        if (selectedVariants.hero) s.variant = selectedVariants.hero;
+        s.content.badge = badge;
+        if (!w.tagline) {
+          // Only override title/subtitle if user didn't provide custom tagline
+          s.content.title = `${brandName} helps ${ac.who} ${gc.heroVerb}.`;
+          s.content.subtitle = `The modern solution designed for ${ac.who} who want results, not complexity.`;
+        }
+      }
+
+      // Pricing: apply variant
+      if (s.type === "pricing" && selectedVariants.pricing) {
+        s.variant = selectedVariants.pricing;
+      }
+
+      // Logo cloud: audience-aware label
+      if (s.type === "logoCloud") {
+        s.content.title = ac.proofLabel;
+      }
+
+      // CTA: goal-aware closing copy
+      if (s.type === "cta") {
+        s.content.title = gc.ctaClose;
+        if (gc.urgency) s.content.subtitle = gc.urgency;
+      }
+
+      // Override primary CTA labels with user's choice
+      if (w.cta && s.content?.primaryCta) s.content.primaryCta.label = cta;
+      if (w.ctaHref && s.content?.primaryCta) s.content.primaryCta.href = ctaHref;
+
+      // Pricing tier CTAs: override highlighted tier
+      if (s.content?.tiers) {
+        s.content.tiers.forEach((t: any) => {
+          if (t.highlight && t.cta) {
+            if (w.cta) t.cta.label = cta;
+            if (w.ctaHref) t.cta.href = ctaHref;
+          }
+        });
+      }
+    });
+
+    // ── Filter optional sections ────────────────────────────
+    if (preset.optionalSections) {
+      const optionalTypes = new Set(Object.keys(preset.optionalSections));
+      data.sections = data.sections.filter((s: any) => {
+        if (!optionalTypes.has(s.type)) return true;
+        return enabled.has(s.type);
+      });
+    }
+
+    // ── Proof variant filter ────────────────────────────────
+    if (selectedVariants.proof) {
+      const v = selectedVariants.proof;
+      if (v === "none") data.sections = data.sections.filter((s: any) => s.type !== "metrics" && s.type !== "logoCloud");
+      else if (v === "metrics") data.sections = data.sections.filter((s: any) => s.type !== "logoCloud");
+      else if (v === "logos") data.sections = data.sections.filter((s: any) => s.type !== "metrics");
+    }
+
+    // ── Process/showcase variant filter (agency/portfolio) ──
+    if (selectedVariants.process) {
+      const v = selectedVariants.process;
+      if (v === "none") data.sections = data.sections.filter((s: any) => s.type !== "workflow" && s.type !== "featureSplit");
+      else if (v === "workflow") data.sections = data.sections.filter((s: any) => s.type !== "featureSplit" || s.content?.title === "Tech stack");
+      else if (v === "featureSplit") data.sections = data.sections.filter((s: any) => s.type !== "workflow");
+    }
+    if (selectedVariants.showcase) {
+      const v = selectedVariants.showcase;
+      if (v === "none") data.sections = data.sections.filter((s: any) => s.type !== "valueGrid" && s.type !== "featureSplit");
+      else if (v === "valueGrid") data.sections = data.sections.filter((s: any) => !(s.type === "featureSplit" && s.content?.title !== "Tech stack"));
+      else if (v === "featureSplit") data.sections = data.sections.filter((s: any) => s.type !== "valueGrid");
+    }
+
+    // ── Portfolio focus variant ──────────────────────────────
+    if (selectedPresetId === "portfolio" && selectedVariants.focus) {
+      const focus = selectedVariants.focus;
+      const hero = data.sections.find((s: any) => s.type === "hero");
+      const grid = data.sections.find((s: any) => s.type === "valueGrid");
+      const faq = data.sections.find((s: any) => s.type === "faq");
+
+      if (focus === "hire_me") {
+        if (hero && !w.tagline) {
+          hero.content.badge = "Available for hire";
+          hero.content.title = `I help ${ac.who} ship products that actually work.`;
+          hero.content.subtitle = "Full-stack developer with a design eye. I ship fast, write clean code and take ownership from day one.";
+        }
+        if (faq) faq.content.items = [
+          { question: "What's your availability?", answer: "I typically book 2–4 weeks ahead. Reach out early for the best scheduling." },
+          { question: "What's your rate?", answer: "It depends on scope and timeline. Reach out with your project details for a clear quote." },
+          { question: "Do you do retainers?", answer: "Yes — for ongoing work, I offer monthly retainer packages with priority scheduling." },
+        ];
+      } else if (focus === "technical") {
+        if (hero && !w.tagline) {
+          hero.content.badge = "Engineer";
+          hero.content.title = `${brandName} — systems, architecture, shipping.`;
+          hero.content.subtitle = "I build production infrastructure, APIs and full-stack applications. Clean code, zero shortcuts.";
+        }
+        if (grid) {
+          grid.content.title = "Engineering focus";
+          grid.content.cards = [
+            { title: "System design", description: "Distributed systems, event-driven architecture, horizontal scaling." },
+            { title: "API & backend", description: "REST, GraphQL, real-time — built for reliability and performance." },
+            { title: "DevOps & infra", description: "CI/CD, Docker, Kubernetes, monitoring — production-grade from day one." },
+            { title: "Code quality", description: "Tests, type safety, code review culture. No technical debt by default." },
+          ];
+        }
+        if (faq) faq.content.items = [
+          { question: "What languages do you work with?", answer: "TypeScript, Go, Python, Rust — I pick the right tool for each problem." },
+          { question: "Do you work with legacy codebases?", answer: "Yes. I specialize in incremental modernization without full rewrites." },
+          { question: "Can you lead a team?", answer: "Yes — I've led teams of 3–8 engineers on complex multi-month projects." },
+        ];
+      } else if (focus === "creative") {
+        if (hero && !w.tagline) {
+          hero.content.badge = "Designer & developer";
+          hero.content.title = `${brandName} — where design meets engineering.`;
+          hero.content.subtitle = "I create digital experiences that feel intentional. Every interaction, transition and pixel has a reason.";
+        }
+        if (grid) {
+          grid.content.title = "Creative approach";
+          grid.content.cards = [
+            { title: "Visual storytelling", description: "Design that communicates before the user reads a single word." },
+            { title: "Motion & interaction", description: "Subtle animations and micro-interactions that elevate the experience." },
+            { title: "Brand systems", description: "Consistent visual language across every touchpoint — web, mobile, print." },
+            { title: "Design-to-code", description: "I design in Figma and build in code. No handoff, no translation loss." },
+          ];
+        }
+        if (faq) faq.content.items = [
+          { question: "Do you do branding?", answer: "Yes — logos, color systems, typography and brand guidelines are part of my offering." },
+          { question: "What design tools do you use?", answer: "Figma for UI, After Effects for motion, Blender for 3D. All exported production-ready." },
+          { question: "Can you handle both design and development?", answer: "That's my specialty. One person, zero handoff, pixel-perfect execution." },
+        ];
+      }
+    }
+
+    return data;
+  }
 
   function showAuth(show: boolean) {
     const authPanel = $("authPanel") as HTMLElement | null;
@@ -185,48 +614,12 @@ import PageWidgets from "../../components/PageWidgets.astro";
     if (workspace) workspace.hidden = show;
   }
 
-  function setSendLoading(on: boolean, msg?: string) {
-    const btn = $("sendLink") as HTMLButtonElement | null;
-    if (btn) {
-      btn.disabled = !!on;
-      btn.classList.toggle("is-loading", !!on);
-      btn.textContent = on ? "Sending…" : "Get magic link";
-    }
-    const m = $("authMsg");
-    if (m) m.textContent = msg || "";
-  }
-
-  function startCooldown(seconds = 15) {
-    const btn = $("sendLink") as HTMLButtonElement | null;
-    if (!btn) return;
-    let left = seconds;
-    btn.disabled = true;
-    btn.classList.remove("is-loading");
-    const t = setInterval(() => {
-      btn.textContent = `Resend in ${left}s`;
-      left--;
-      if (left < 0) {
-        clearInterval(t);
-        btn.disabled = false;
-        btn.textContent = "Get magic link";
-      }
-    }, 1000);
-  }
-
-  async function refreshUser() {
-    const { data } = await supa.auth.getSession();
-    const user = data?.session?.user || null;
-    const who = $("who");
-    if (who) who.textContent = user?.email || "";
-    showAuth(!user);
-    return user;
-  }
-
-  async function listProjects(user: any) {
-    if (!user) return;
+  async function listProjects(userId: string) {
     const { data, error } = await supa
       .from("projects")
-      .select("id,name,slug,site_json,created_at")
+      .select("id,name,slug,builder_data,status,created_at")
+      .eq("user_id", userId)
+      .is("deleted_at", null)
       .order("created_at", { ascending: false });
 
     if (error) return setStatus(error.message);
@@ -237,7 +630,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
       (data || []).map((p: any) => `
         <button class="project-btn" data-id="${p.id}">
           <span class="project-name">${p.name}</span>
-          <span class="project-slug">${p.slug}</span>
+          <span class="project-slug">${p.slug || "no slug"}</span>
         </button>
       `).join("") || `<span class="hint">No projects yet.</span>`;
 
@@ -251,9 +644,9 @@ import PageWidgets from "../../components/PageWidgets.astro";
   function openProject(p: any) {
     currentProject = p;
     const json = $("json") as HTMLTextAreaElement | null;
-    if (json) json.value = JSON.stringify(p.site_json || {}, null, 2);
+    if (json) json.value = JSON.stringify(p.builder_data || {}, null, 2);
     const link = $("link");
-    if (link) link.innerHTML = `Active: <code>${p.slug}</code>`;
+    if (link) link.innerHTML = p.slug ? `Active: <code>${p.slug}</code>` : "";
     setStatus("Project loaded.");
 
     document.querySelectorAll(".project-btn").forEach((b) => b.classList.remove("active"));
@@ -272,160 +665,174 @@ import PageWidgets from "../../components/PageWidgets.astro";
     }
     const { error } = await supa
       .from("projects")
-      .update({ site_json: parsed })
+      .update({ builder_data: parsed, updated_at: new Date().toISOString() })
       .eq("id", currentProject.id);
     if (error) { setStatus(error.message); return false; }
+    currentProject.builder_data = parsed;
     return true;
   }
 
-  $("sendLink")?.addEventListener("click", async () => {
-    const emailInput = $("email") as HTMLInputElement | null;
-    const email = (emailInput?.value || "").trim();
-    if (!email) return;
+  // ── Boot: use existing Volynx session ──────────────────────────
+  (async function boot() {
+    log("boot start");
 
-    const last = Number(localStorage.getItem(OTP_LAST_KEY) || 0);
-    const left = OTP_COOLDOWN_MS - (Date.now() - last);
-    if (left > 0) {
-      setSendLoading(false, `Wait ${Math.ceil(left / 1000)}s to resend.`);
+    // 1. Load config
+    let cfg: any;
+    try {
+      cfg = await fetch("/config.json", { cache: "no-store" }).then(r => r.json());
+    } catch {
+      showAuth(true);
+      ($("authMsg") as HTMLElement).textContent = "Configuration error.";
       return;
     }
 
-    setSendLoading(true, "Sending magic link…");
-    try {
-      const { error } = await supa.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: REDIRECT_TO },
-      });
-      if (error) {
-        const msg = String(error.message || "");
-        if (msg.toLowerCase().includes("rate limit")) {
-          localStorage.setItem(OTP_LAST_KEY, String(Date.now()));
-          setSendLoading(false, "Too many requests. Wait 60s.");
-          startCooldown(60);
-          return;
-        }
-        setSendLoading(false, msg);
-        return;
+    supa = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+    log("supabase client created");
+
+    // Load presets (non-blocking)
+    await loadPresets();
+
+    // 2. Restore session from Volynx tokens
+    const accessToken = localStorage.getItem("volynx_access_token");
+    const refreshToken = localStorage.getItem("volynx_refresh_token");
+
+    if (!accessToken || !refreshToken) {
+      log("no session tokens — show login prompt");
+      showAuth(true);
+      ($("authMsg") as HTMLElement).textContent = "Sign in to your Volynx account first.";
+      ($("sendLink") as HTMLButtonElement).textContent = "Go to Login";
+      ($("sendLink") as HTMLButtonElement).onclick = () => {
+        window.location.href = "/login/?next=/builder/";
+      };
+      ($("email") as HTMLElement).style.display = "none";
+      return;
+    }
+
+    const { error: sessErr } = await supa.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
+
+    if (sessErr) {
+      log("session restore failed: " + sessErr.message);
+      showAuth(true);
+      ($("authMsg") as HTMLElement).textContent = "Session expired. Please sign in again.";
+      ($("sendLink") as HTMLButtonElement).textContent = "Go to Login";
+      ($("sendLink") as HTMLButtonElement).onclick = () => {
+        window.location.href = "/login/?next=/builder/";
+      };
+      ($("email") as HTMLElement).style.display = "none";
+      return;
+    }
+
+    const { data: authData } = await supa.auth.getUser();
+    const user = authData?.user;
+    if (!user) {
+      log("getUser failed");
+      showAuth(true);
+      return;
+    }
+
+    log("authenticated: " + user.email);
+    const who = $("who");
+    if (who) who.textContent = user.email || "";
+    showAuth(false);
+    await listProjects(user.id);
+
+    // ── Event listeners ────────────────────────────────────────
+    $("logout")?.addEventListener("click", async () => {
+      try { await supa.auth.signOut(); } catch {}
+      KEYS.forEach(k => localStorage.removeItem(k));
+      window.location.href = "/";
+    });
+
+    // Wizard navigation
+    $("toStep2")?.addEventListener("click", () => {
+      const name = (($("pname") as HTMLInputElement)?.value || "").trim();
+      if (!name) { ($("pname") as HTMLInputElement).focus(); return; }
+      // Pre-fill brand with project name if empty
+      const brandInput = $("wBrand") as HTMLInputElement;
+      if (brandInput && !brandInput.value.trim()) brandInput.value = name;
+      showWizardStep(2);
+    });
+
+    $("backStep1")?.addEventListener("click", () => showWizardStep(1));
+
+    // Create project
+    $("create")?.addEventListener("click", async () => {
+      const w = getWizardInputs();
+      const baseSlug = slugify((($("pslug") as HTMLInputElement)?.value || "").trim() || w.name) || "site";
+      const slug = `${baseSlug}-${rand4()}`;
+
+      const builder_data = buildProjectData();
+
+      const { data, error } = await supa
+        .from("projects")
+        .insert({ user_id: user.id, name: w.name, slug, domain_type: "subdomain", builder_data, status: "draft" })
+        .select("id,name,slug,builder_data,status,created_at")
+        .single();
+
+      if (error) return setStatus(error.message);
+      setStatus("Project created.");
+      showWizardStep(1); // reset wizard
+      await listProjects(user.id);
+      openProject(data);
+    });
+
+    $("save")?.addEventListener("click", async () => {
+      if (!currentProject) return setStatus("Select a project.");
+      const ok = await saveCurrent();
+      if (ok) setStatus("Saved ✓");
+    });
+
+    $("copy")?.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(($("json") as HTMLTextAreaElement)?.value || "");
+        setStatus("Copied to clipboard.");
+      } catch { setStatus("Clipboard permission denied."); }
+    });
+
+    $("publish")?.addEventListener("click", async () => {
+      if (!currentProject) return setStatus("Select a project.");
+      setStatus("Saving…");
+      const ok = await saveCurrent();
+      if (!ok) return;
+
+      const { data: sessData } = await supa.auth.getSession();
+      const token = sessData?.session?.access_token;
+      if (!token) return setStatus("Session expired.");
+
+      setStatus("Publishing…");
+      try {
+        const apiBase = (cfg.apiBaseUrl || "").replace(/\/$/, "");
+        if (!apiBase) return setStatus("Publish API not configured.");
+
+        const r = await fetch(`${apiBase}/publish`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ projectId: currentProject.id }),
+        });
+
+        const j: any = await r.json().catch(() => ({}));
+        if (!r.ok) return setStatus(j?.error || "Publish error.");
+
+        const linkEl = $("link");
+        if (linkEl)
+          linkEl.innerHTML = `Published: <a href="${j.url}" target="_blank" rel="noreferrer">${j.url}</a>`;
+        setStatus("Published ✓");
+
+        await supa.from("projects")
+          .update({ status: "published", updated_at: new Date().toISOString() })
+          .eq("id", currentProject.id);
+
+        await listProjects(user.id);
+      } catch {
+        setStatus("Publish API unavailable.");
       }
-      localStorage.setItem(OTP_LAST_KEY, String(Date.now()));
-      setSendLoading(false, "✅ Link sent! Check your inbox and spam.");
-      startCooldown(15);
-    } catch {
-      setSendLoading(false, "Failed to send. Try again.");
-    }
-  });
+    });
 
-  $("logout")?.addEventListener("click", async () => {
-    await supa.auth.signOut();
-    const json = $("json") as HTMLTextAreaElement | null;
-    if (json) json.value = "";
-    const link = $("link");
-    if (link) link.textContent = "";
-    setStatus("");
-    currentProject = null;
-    await refreshUser();
-  });
-
-  $("create")?.addEventListener("click", async () => {
-    const user = await refreshUser();
-    if (!user) return setStatus("Sign in first.");
-
-    const name = (($("pname") as HTMLInputElement)?.value || "").trim() || "New Site";
-    const baseSlug = slugify((($("pslug") as HTMLInputElement)?.value || "").trim() || name) || "site";
-    const slug = `${baseSlug}-${rand4()}`;
-    const ctaText = (($("ctaText") as HTMLInputElement)?.value || "").trim();
-    const ctaHref = (($("ctaHref") as HTMLInputElement)?.value || "").trim();
-
-    const site_json = defaultJSON(name, slug, ctaText, ctaHref);
-
-    const { data, error } = await supa
-      .from("projects")
-      .insert({ user_id: user.id, name, slug, site_json, status: "draft" })
-      .select("id,name,slug,site_json,created_at")
-      .single();
-
-    if (error) return setStatus(error.message);
-    setStatus("Project created.");
-    await listProjects(user);
-    openProject(data);
-  });
-
-  $("save")?.addEventListener("click", async () => {
-    if (!currentProject) return setStatus("Select a project.");
-    const ok = await saveCurrent();
-    if (!ok) return;
-    setStatus("Saved ✓");
-  });
-
-  $("copy")?.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(($("json") as HTMLTextAreaElement)?.value || "");
-      setStatus("Copied to clipboard.");
-    } catch {
-      setStatus("Clipboard permission denied.");
-    }
-  });
-
-  $("publish")?.addEventListener("click", async () => {
-    if (!currentProject) return setStatus("Select a project.");
-    setStatus("Saving…");
-    const ok = await saveCurrent();
-    if (!ok) return;
-
-    const { data } = await supa.auth.getSession();
-    const token = data?.session?.access_token;
-    if (!token) return setStatus("Sign in first.");
-
-    setStatus("Publishing…");
-    try {
-      const r = await fetch("https://api.volynx.world/publish", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ projectId: currentProject.id }),
-      });
-
-      const j = await r.json().catch(() => ({}));
-      if (!r.ok) return setStatus((j as any)?.error || "Publish error.");
-
-      const link = $("link");
-      if (link)
-        link.innerHTML = `Published: <a href="${(j as any).url}" target="_blank" rel="noreferrer">${(j as any).url}</a>`;
-      setStatus("Published ✓");
-      const user = await refreshUser();
-      await listProjects(user);
-    } catch {
-      setStatus("Publish API unavailable.");
-    }
-  });
-
-  supa.auth.onAuthStateChange(async (event) => {
-    if (["SIGNED_IN", "SIGNED_OUT", "TOKEN_REFRESHED"].includes(event)) {
-      const user = await refreshUser();
-      await listProjects(user);
-    }
-  });
-
-  async function boot() {
-    let { data: s1 } = await supa.auth.getSession();
-    if (!s1?.session && window.location.hash.includes("access_token")) {
-      await new Promise((r) => setTimeout(r, 300));
-      ({ data: s1 } = await supa.auth.getSession());
-      if (!s1?.session) {
-        await new Promise((r) => setTimeout(r, 800));
-        ({ data: s1 } = await supa.auth.getSession());
-      }
-    }
-    const user = await refreshUser();
-    await listProjects(user);
-    if (window.location.hash.includes("access_token")) {
-      history.replaceState(null, "", window.location.pathname);
-    }
-  }
-
-  boot();
+    log("boot complete");
+  })();
 </script>
 
 <style>
@@ -620,6 +1027,99 @@ import PageWidgets from "../../components/PageWidgets.astro";
     letter-spacing: .02em;
   }
 
+  /* WIZARD */
+  .card--wizard { overflow: hidden; }
+  .wizard-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 20px;
+  }
+  .wizard-dot {
+    width: 28px; height: 28px; border-radius: 999px;
+    display: grid; place-items: center;
+    font-size: 12px; font-weight: 700;
+    border: 1px solid var(--line);
+    color: var(--mut); background: transparent;
+    transition: all .2s;
+  }
+  .wizard-dot--active {
+    border-color: var(--accent); color: var(--accent);
+    background: rgba(125, 211, 252, .08);
+  }
+  .wizard-line {
+    flex: 1; height: 1px; background: var(--line); margin: 0 8px;
+  }
+
+  /* PRESET PICKER */
+  .preset-picker { margin-bottom: 4px; }
+  .preset-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .preset-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--mut);
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+    text-align: left;
+    font-family: inherit;
+  }
+  .preset-card:hover {
+    border-color: rgba(125, 211, 252, .25);
+    background: rgba(125, 211, 252, .04);
+  }
+  .preset-card--active {
+    border-color: var(--accent);
+    background: rgba(125, 211, 252, .08);
+    color: var(--fg);
+  }
+  .preset-icon { font-size: 18px; line-height: 1; }
+  .preset-name { font-size: 13px; font-weight: 700; color: inherit; }
+  .preset-tag { font-size: 10px; color: var(--mut); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
+  .preset-card--active .preset-tag { color: rgba(125, 211, 252, .6); }
+
+  /* VARIANT SELECTORS */
+  .variant-selectors { margin-top: 14px; display: grid; gap: 10px; }
+  .field-group--inline { display: flex; flex-direction: column; gap: 5px; }
+  .chip-group { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    padding: 5px 12px; border-radius: 999px;
+    font-size: 12px; font-weight: 600; font-family: inherit;
+    border: 1px solid var(--line); background: transparent;
+    color: var(--mut); cursor: pointer; transition: all .15s;
+    text-transform: capitalize;
+  }
+  .chip:hover { border-color: rgba(125, 211, 252, .3); color: var(--fg); }
+  .chip--active {
+    border-color: var(--accent); background: rgba(125, 211, 252, .1); color: var(--accent);
+  }
+
+  /* OPTIONAL TOGGLES */
+  .optional-toggles .toggle-grid {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;
+  }
+  .toggle-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--mut); cursor: pointer;
+  }
+  .toggle-item input { accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer; }
+  .toggle-item span { user-select: none; }
+
+  @media (max-width: 480px) {
+    .preset-grid { grid-template-columns: 1fr 1fr; }
+    .chip { font-size: 11px; padding: 4px 10px; }
+  }
+
   /* FORM ELEMENTS */
   .row {
     display: grid;
@@ -661,6 +1161,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
 
   .field:focus { border-color: rgba(125, 211, 252, .4); }
   .field::placeholder { color: rgba(231, 238, 247, .28); }
+  select.field { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
 
   /* PROJECTS LIST */
   .projects-list {
