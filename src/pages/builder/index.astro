@@ -389,31 +389,143 @@ import PageWidgets from "../../components/PageWidgets.astro";
     };
   }
 
-  // ── Intent-aware copy seeds ────────────────────────────────
-  // Keyed by goal → returns hero/cta copy fragments
-  const goalCopy: Record<string, { heroVerb: string; ctaDefault: string; ctaClose: string; urgency: string }> = {
-    leads:    { heroVerb: "attract the right customers",    ctaDefault: "Get a free consultation", ctaClose: "Let's talk about your project.",         urgency: "Limited spots available." },
-    sales:    { heroVerb: "drive revenue and conversions",  ctaDefault: "Start free trial",        ctaClose: "Join thousands of happy customers.",    urgency: "No credit card required." },
-    showcase: { heroVerb: "showcase your best work",        ctaDefault: "See my work",             ctaClose: "Explore what I've built.",               urgency: "" },
-    bookings: { heroVerb: "fill your calendar with clients", ctaDefault: "Book a call",            ctaClose: "Schedule your free session now.",        urgency: "Next available slot this week." },
-    waitlist: { heroVerb: "build anticipation before launch", ctaDefault: "Join the waitlist",     ctaClose: "Be the first to know when we launch.",  urgency: "Early access for the first 500." },
+  // ── Intent-aware copy engine ─────────────────────────────
+  // Structured by preset × goal × audience → specific copy
+  // Instead of one generic "heroVerb", each combination gets real copy.
+
+  type CopySeed = {
+    title: (brand: string) => string;
+    subtitle: string;
+    ctaLabel: string;
+    ctaClose: string;
+    urgency: string;
+    proofLine: string;
+    tagline: (brand: string) => string;
   };
 
-  const audienceCopy: Record<string, { who: string; proofLabel: string }> = {
-    b2b:        { who: "companies and teams",       proofLabel: "Trusted by leading companies" },
-    b2c:        { who: "people like you",            proofLabel: "Loved by thousands of users" },
-    developers: { who: "developers and engineers",   proofLabel: "Used by developers worldwide" },
-    creators:   { who: "creators and freelancers",   proofLabel: "Chosen by top creators" },
-    agencies:   { who: "agencies and studios",       proofLabel: "Trusted by agencies globally" },
-  };
+  function getCopySeed(preset: string, goal: string, audience: string, tone: string): CopySeed {
+    // ── Audience fragments ──────────────────────────
+    const aud: Record<string, { for: string; proof: string }> = {
+      b2b:        { for: "companies and teams",     proof: "Trusted by leading companies" },
+      b2c:        { for: "thousands of users",       proof: "Loved by thousands of users" },
+      developers: { for: "developers who ship",      proof: "Used by developers worldwide" },
+      creators:   { for: "creators and freelancers", proof: "Chosen by top creators" },
+      agencies:   { for: "agencies and studios",     proof: "Trusted by agencies globally" },
+    };
+    const a = aud[audience] || aud.b2b;
 
-  const toneBadge: Record<string, string> = {
-    premium:    "Premium experience",
-    minimal:    "Simple by design",
-    bold:       "Built different",
-    futuristic: "Next generation",
-    organic:    "Human-first",
-  };
+    // ── Tone modifiers ──────────────────────────────
+    const toneAdj: Record<string, { feel: string; badge: string }> = {
+      premium:    { feel: "premium",       badge: "Premium experience" },
+      minimal:    { feel: "clean",         badge: "Simple by design" },
+      bold:       { feel: "powerful",      badge: "Built different" },
+      futuristic: { feel: "next-gen",      badge: "The future is here" },
+      organic:    { feel: "human",         badge: "Human-first" },
+    };
+    const t = toneAdj[tone] || toneAdj.premium;
+
+    // ── Preset × goal matrix ────────────────────────
+    // SaaS
+    if (preset === "saas") {
+      if (goal === "waitlist") return {
+        title: (b) => `${b} is coming. Get early access before everyone else.`,
+        subtitle: `A ${t.feel} platform built for ${a.for}. We're launching soon — reserve your spot.`,
+        ctaLabel: "Join the waitlist", ctaClose: "Be the first to know.", urgency: "Early access for the first 500.",
+        proofLine: a.proof, tagline: (b) => `${b} — launching soon.`,
+      };
+      if (goal === "sales") return {
+        title: (b) => `${b} — the ${t.feel} way to run your workflow.`,
+        subtitle: `Built for ${a.for} who need speed, clarity and zero friction. Start in minutes.`,
+        ctaLabel: "Start free trial", ctaClose: "Join ${a.for} already on the platform.", urgency: "No credit card required.",
+        proofLine: a.proof, tagline: (b) => `${b} — workflow, simplified.`,
+      };
+      if (goal === "bookings") return {
+        title: (b) => `${b} — see it in action. Book a live demo.`,
+        subtitle: `A ${t.feel} platform for ${a.for}. We'll walk you through everything in 20 minutes.`,
+        ctaLabel: "Book a demo", ctaClose: "Pick a time that works for you.", urgency: "Next available slot this week.",
+        proofLine: a.proof, tagline: (b) => `${b} — built for ${a.for}.`,
+      };
+      // default: leads
+      return {
+        title: (b) => `Stop duct-taping your stack. ${b} replaces the chaos.`,
+        subtitle: `One ${t.feel} platform for ${a.for} who want results, not workarounds.`,
+        ctaLabel: "Get a free demo", ctaClose: "See how it works for your team.", urgency: "Free consultation, no commitment.",
+        proofLine: a.proof, tagline: (b) => `${b} — built for ${a.for}.`,
+      };
+    }
+
+    // Agency
+    if (preset === "agency") {
+      if (goal === "bookings") return {
+        title: (b) => `${b} — strategy, design and code. One call to start.`,
+        subtitle: `We help ${a.for} ship ${t.feel} digital products. No pitch decks — just a real conversation about your project.`,
+        ctaLabel: "Book a call", ctaClose: "Let's talk about what you're building.", urgency: "Usually reply within 24 hours.",
+        proofLine: a.proof, tagline: (b) => `${b} — digital products for ${a.for}.`,
+      };
+      if (goal === "leads") return {
+        title: (b) => `${b} builds digital products for ${a.for} who care about execution.`,
+        subtitle: `Strategy, design and engineering under one roof. ${t.feel.charAt(0).toUpperCase() + t.feel.slice(1)} results, on time, every time.`,
+        ctaLabel: "Start a project", ctaClose: "Tell us what you need. We'll tell you how.", urgency: "Free project assessment.",
+        proofLine: a.proof, tagline: (b) => `${b} — execution over everything.`,
+      };
+      if (goal === "showcase") return {
+        title: (b) => `${b} — we make ${a.for} look as good as their work.`,
+        subtitle: `A ${t.feel} approach to branding, web and product design. See what we've shipped.`,
+        ctaLabel: "See our work", ctaClose: "Explore what we've built.", urgency: "",
+        proofLine: a.proof, tagline: (b) => `${b} — work that speaks.`,
+      };
+      // default
+      return {
+        title: (b) => `${b} — digital products that actually convert.`,
+        subtitle: `We work with ${a.for} who need ${t.feel}, functional products — not just pretty mockups.`,
+        ctaLabel: "Start a project", ctaClose: "Let's build something that works.", urgency: "Free initial consultation.",
+        proofLine: a.proof, tagline: (b) => `${b} — built for ${a.for}.`,
+      };
+    }
+
+    // Portfolio
+    if (preset === "portfolio") {
+      if (goal === "leads") return {
+        title: (b) => `I help ${a.for} ship products that people actually use.`,
+        subtitle: `${t.feel.charAt(0).toUpperCase() + t.feel.slice(1)} execution, clean code, full ownership. No hand-holding required.`,
+        ctaLabel: "Work with me", ctaClose: "Got a project? Let's scope it.", urgency: "Usually reply within 24h.",
+        proofLine: a.proof, tagline: (b) => `${b} — shipping for ${a.for}.`,
+      };
+      if (goal === "showcase") return {
+        title: (b) => `${b} — building ${t.feel} digital products since day one.`,
+        subtitle: `Full-stack work for ${a.for}. I care about craft, speed and things that actually ship.`,
+        ctaLabel: "See my work", ctaClose: "Explore what I've built.", urgency: "",
+        proofLine: a.proof, tagline: (b) => `${b} — the work speaks.`,
+      };
+      if (goal === "bookings") return {
+        title: (b) => `I'm ${b}. Let's talk about your next project.`,
+        subtitle: `I build ${t.feel} products for ${a.for}. Book a free call and let's see if it's a fit.`,
+        ctaLabel: "Book a call", ctaClose: "Pick a time. I'll be there.", urgency: "Next available slot this week.",
+        proofLine: a.proof, tagline: (b) => `${b} — open for new work.`,
+      };
+      if (goal === "waitlist") return {
+        title: (b) => `Something new is coming from ${b}.`,
+        subtitle: `I'm building something for ${a.for}. Sign up to get notified.`,
+        ctaLabel: "Get notified", ctaClose: "Be the first to see it.", urgency: "Launching soon.",
+        proofLine: a.proof, tagline: (b) => `${b} — something new.`,
+      };
+      // default
+      return {
+        title: (b) => `I'm ${b}. I build ${t.feel} products for ${a.for}.`,
+        subtitle: "Full-stack developer. Design-aware. I ship fast and take full ownership.",
+        ctaLabel: "Work with me", ctaClose: "Let's talk.", urgency: "",
+        proofLine: a.proof, tagline: (b) => `${b} — developer & designer.`,
+      };
+    }
+
+    // Fallback (blank / unknown)
+    return {
+      title: (b) => `${b} — built for ${a.for}.`,
+      subtitle: `A ${t.feel} solution that delivers results.`,
+      ctaLabel: "Get started", ctaClose: "Ready to start?", urgency: "",
+      proofLine: a.proof, tagline: (b) => `${b} — ${t.feel} by design.`,
+    };
+  }
 
   function buildMeta(w: WizardInputs): any {
     return {
@@ -430,25 +542,25 @@ import PageWidgets from "../../components/PageWidgets.astro";
   function buildProjectData(): any {
     const w = getWizardInputs();
     const brandName = w.brand || w.name;
-    const gc = goalCopy[w.goal] || goalCopy.leads;
-    const ac = audienceCopy[w.audience] || audienceCopy.b2b;
-    const badge = toneBadge[w.tone] || "";
-    const cta = w.cta || gc.ctaDefault;
+    const seed = getCopySeed(selectedPresetId, w.goal, w.audience, w.tone);
+    const toneAdj: Record<string, string> = { premium: "Premium experience", minimal: "Simple by design", bold: "Built different", futuristic: "The future is here", organic: "Human-first" };
+    const badge = toneAdj[w.tone] || "";
+    const cta = w.cta || seed.ctaLabel;
     const ctaHref = w.ctaHref || "#";
 
     // ── Blank / custom ──────────────────────────────────────
     if (selectedPresetId === "blank") {
       return {
         meta: buildMeta(w),
-        brand: { name: brandName, tagline: w.tagline || `Helping ${ac.who} ${gc.heroVerb}.`, colors: { primary: "#7DD3FC", bg: "#070A12", fg: "#E7EEF7", accent: "#34D399" } },
+        brand: { name: brandName, tagline: w.tagline || seed.tagline(brandName), colors: { primary: "#7DD3FC", bg: "#070A12", fg: "#E7EEF7", accent: "#34D399" } },
         sections: [
           { type: "hero", variant: "centered", content: {
             badge,
-            title: w.tagline || `${brandName} helps ${ac.who} ${gc.heroVerb}.`,
-            subtitle: `The modern solution designed for ${ac.who} who want results, not complexity.`,
+            title: w.tagline || seed.title(brandName),
+            subtitle: seed.subtitle,
             primaryCta: { label: cta, href: ctaHref },
           }},
-          { type: "cta", content: { title: gc.ctaClose, subtitle: gc.urgency || `Built for ${ac.who}.`, primaryCta: { label: cta, href: ctaHref } } },
+          { type: "cta", content: { title: seed.ctaClose, subtitle: seed.urgency || `Built for results.`, primaryCta: { label: cta, href: ctaHref } } },
         ],
       };
     }
@@ -465,43 +577,35 @@ import PageWidgets from "../../components/PageWidgets.astro";
 
     // Inject brand
     data.brand.name = brandName;
-    if (w.tagline) data.brand.tagline = w.tagline;
-    else data.brand.tagline = `Helping ${ac.who} ${gc.heroVerb}.`;
+    data.brand.tagline = w.tagline || seed.tagline(brandName);
 
-    // ── Intent-aware section overrides ───────────────────────
+    // ── Section overrides ───────────────────────────────────
     data.sections.forEach((s: any) => {
-      // Hero: apply variant + inject intent-aware copy
       if (s.type === "hero") {
         if (selectedVariants.hero) s.variant = selectedVariants.hero;
         s.content.badge = badge;
         if (!w.tagline) {
-          // Only override title/subtitle if user didn't provide custom tagline
-          s.content.title = `${brandName} helps ${ac.who} ${gc.heroVerb}.`;
-          s.content.subtitle = `The modern solution designed for ${ac.who} who want results, not complexity.`;
+          s.content.title = seed.title(brandName);
+          s.content.subtitle = seed.subtitle;
         }
       }
 
-      // Pricing: apply variant
       if (s.type === "pricing" && selectedVariants.pricing) {
         s.variant = selectedVariants.pricing;
       }
 
-      // Logo cloud: audience-aware label
       if (s.type === "logoCloud") {
-        s.content.title = ac.proofLabel;
+        s.content.title = seed.proofLine;
       }
 
-      // CTA: goal-aware closing copy
       if (s.type === "cta") {
-        s.content.title = gc.ctaClose;
-        if (gc.urgency) s.content.subtitle = gc.urgency;
+        s.content.title = seed.ctaClose;
+        s.content.subtitle = seed.urgency || s.content.subtitle;
       }
 
-      // Override primary CTA labels with user's choice
+      // Override CTA labels
       if (w.cta && s.content?.primaryCta) s.content.primaryCta.label = cta;
       if (w.ctaHref && s.content?.primaryCta) s.content.primaryCta.href = ctaHref;
-
-      // Pricing tier CTAs: override highlighted tier
       if (s.content?.tiers) {
         s.content.tiers.forEach((t: any) => {
           if (t.highlight && t.cta) {
@@ -794,40 +898,68 @@ import PageWidgets from "../../components/PageWidgets.astro";
 
     $("publish")?.addEventListener("click", async () => {
       if (!currentProject) return setStatus("Select a project.");
+      if (!currentProject.slug) return setStatus("Project has no slug. Edit JSON to add one.");
+
       setStatus("Saving…");
       const ok = await saveCurrent();
       if (!ok) return;
 
       const { data: sessData } = await supa.auth.getSession();
       const token = sessData?.session?.access_token;
-      if (!token) return setStatus("Session expired.");
+      if (!token) return setStatus("Session expired. Please refresh the page.");
 
-      setStatus("Publishing…");
+      const apiBase = ((cfg as any).apiBaseUrl || "").replace(/\/$/, "");
+      if (!apiBase) {
+        setStatus("Publish backend not configured. Add apiBaseUrl to config.json.");
+        log("publish blocked: apiBaseUrl missing from config.json");
+        return;
+      }
+
+      setStatus("Publishing to " + currentProject.slug + ".volynx.world…");
       try {
-        const apiBase = (cfg.apiBaseUrl || "").replace(/\/$/, "");
-        if (!apiBase) return setStatus("Publish API not configured.");
+        const ctrl = new AbortController();
+        const timeout = setTimeout(() => ctrl.abort(), 15000);
 
         const r = await fetch(`${apiBase}/publish`, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify({ projectId: currentProject.id }),
+          signal: ctrl.signal,
         });
+        clearTimeout(timeout);
 
         const j: any = await r.json().catch(() => ({}));
-        if (!r.ok) return setStatus(j?.error || "Publish error.");
+
+        if (!r.ok) {
+          const errMap: Record<string, string> = {
+            missing_token: "Authentication failed. Try signing out and back in.",
+            invalid_token: "Session invalid. Try signing out and back in.",
+            missing_projectId: "Internal error: project ID missing.",
+            project_not_found: "Project not found in the database.",
+            forbidden: "You don't have permission to publish this project.",
+            missing_slug: "Project needs a slug before publishing.",
+          };
+          return setStatus(errMap[j?.error] || j?.error || `Publish failed (HTTP ${r.status}).`);
+        }
 
         const linkEl = $("link");
-        if (linkEl)
-          linkEl.innerHTML = `Published: <a href="${j.url}" target="_blank" rel="noreferrer">${j.url}</a>`;
+        if (linkEl && j.url)
+          linkEl.innerHTML = `Live: <a href="${j.url}" target="_blank" rel="noreferrer">${j.url}</a>`;
         setStatus("Published ✓");
+        currentProject.status = "published";
 
         await supa.from("projects")
           .update({ status: "published", updated_at: new Date().toISOString() })
           .eq("id", currentProject.id);
 
         await listProjects(user.id);
-      } catch {
-        setStatus("Publish API unavailable.");
+      } catch (err: any) {
+        if (err?.name === "AbortError") {
+          setStatus("Publish timed out. The API may be starting up — try again in 30s.");
+        } else {
+          setStatus("Cannot reach publish API. Check that api.volynx.world is configured.");
+          log("publish error: " + (err?.message || err));
+        }
       }
     });
 
