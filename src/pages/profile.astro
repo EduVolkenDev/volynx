@@ -62,9 +62,9 @@ import Topbar from "../components/Topbar.astro";
 								onerror="this.style.display='none';this.nextElementSibling.style.display='grid';" />
 							<div class="avatar-fallback" id="avatarFallback">??</div>
 						</div>
-						<label class="avatar-edit-label" id="avatarToggle">Choose avatar</label>
+						<button type="button" class="avatar-edit-label" id="avatarToggle">Choose avatar</button>
 						<input id="avatarInput" type="file" accept="image/*" hidden />
-						<div class="avatar-picker" id="avatarPicker" hidden>
+						<div class="avatar-picker" id="avatarPicker" style="display:none;">
 							<button type="button" class="avatar-option" data-avatar="/assets/avatarfree/1.png">
 								<img src="/assets/avatarfree/1.png" alt="Avatar 1" />
 							</button>
@@ -469,7 +469,8 @@ import Topbar from "../components/Topbar.astro";
 				// Avatar picker toggle
 				$("avatarToggle")?.addEventListener("click", () => {
 					const picker = $("avatarPicker") as HTMLElement;
-					picker.hidden = !picker.hidden;
+					const visible = picker.style.display !== "none";
+					picker.style.display = visible ? "none" : "flex";
 				});
 
 				// Avatar free options
@@ -479,7 +480,7 @@ import Topbar from "../components/Topbar.astro";
 						avatarPreview.src = url;
 						avatarPreview.style.display = "block";
 						avatarFallback.style.display = "none";
-						($("avatarPicker") as HTMLElement).hidden = true;
+						($("avatarPicker") as HTMLElement).style.display = "none";
 						// Mark as selected for save
 						(avatarPreview as any)._selectedFreeAvatar = url;
 						document.querySelectorAll(".avatar-option").forEach(o => o.classList.remove("avatar-option--selected"));
@@ -494,7 +495,7 @@ import Topbar from "../components/Topbar.astro";
 					avatarPreview.src = URL.createObjectURL(file);
 					avatarPreview.style.display = "block";
 					avatarFallback.style.display = "none";
-					($("avatarPicker") as HTMLElement).hidden = true;
+					($("avatarPicker") as HTMLElement).style.display = "none";
 					(avatarPreview as any)._selectedFreeAvatar = null;
 				});
 
@@ -661,9 +662,12 @@ import Topbar from "../components/Topbar.astro";
 	.avatar-fallback { width: 100%; height: 100%; display: grid; place-items: center;
 		background: linear-gradient(135deg, rgba(120,0,255,.25), rgba(0,200,180,.15));
 		font-size: 2.2rem; font-weight: 800; color: rgba(255,255,255,.8); }
-	.avatar-edit-label { display: block; margin-top: 8px; text-align: center;
-		font-size: .75rem; font-weight: 600; color: var(--muted); cursor: pointer; }
-	.avatar-edit-label { cursor: pointer; }
+	.avatar-edit-label {
+		display: block; margin-top: 8px; text-align: center;
+		font-size: .75rem; font-weight: 600; color: var(--muted);
+		cursor: pointer; background: none; border: none; padding: 4px 8px;
+		font-family: inherit;
+	}
 	.avatar-edit-label:hover { color: var(--accent); }
 	.avatar-picker {
 		display: flex; gap: 8px; margin-top: 10px; justify-content: center;
