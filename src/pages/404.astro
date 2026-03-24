@@ -1,6 +1,5 @@
 ---
 import LabBg from "../components/LabBg.astro";
-import Topbar from "../components/Topbar.astro";
 ---
 
 <!DOCTYPE html>
@@ -23,7 +22,6 @@ import Topbar from "../components/Topbar.astro";
   <canvas id="particles" aria-hidden="true"></canvas>
 
   <div class="shell">
-    <Topbar />
 
     <main class="center">
       <div class="eye-wrap">
@@ -42,25 +40,25 @@ import Topbar from "../components/Topbar.astro";
       </h1>
 
       <p class="sub">
-        This node hasn't gone live yet — or the coordinates you entered don't exist.<br />
-        The lab is always expanding. Check back soon.
+        We're having some trouble connecting to this Operational Base — or the coordinates you entered don't exist.<br />
+        The lab is always expanding. Check back soon or go to the Main Base.
       </p>
 
       <div class="nav-grid">
         <a href="/" class="nav-card">
-          <span class="nav-icon">⌂</span>
+          <span class="nav-icon"><img src="assets/homeicon.webp" ></span>
           <span class="nav-label">Home</span>
         </a>
         <a href="/volynx-lab/" class="nav-card">
-          <span class="nav-icon">⚗</span>
+          <span class="nav-icon"><img src="assets/labicon.webp" ></span>
           <span class="nav-label">Lab</span>
         </a>
         <a href="/products/" class="nav-card">
-          <span class="nav-icon">◈</span>
+          <span class="nav-icon"><img src="assets/producticon.webp" ></span>
           <span class="nav-label">Products</span>
         </a>
         <a href="/contact/" class="nav-card">
-          <span class="nav-icon">◎</span>
+          <span class="nav-icon"><img src="assets/contacticon.webp" ></span>
           <span class="nav-label">Contact</span>
         </a>
       </div>
@@ -307,6 +305,7 @@ import Topbar from "../components/Topbar.astro";
     color: rgba(255,255,255,.7);
     transition: background .2s, border-color .2s, transform .2s, color .2s;
     min-width: 90px;
+    max-width: 130px;
   }
   .nav-card:hover {
     background: rgba(109,94,252,.12);
@@ -316,7 +315,10 @@ import Topbar from "../components/Topbar.astro";
   }
   .nav-icon { font-size: 20px; }
   .nav-label { font-size: 12px; font-weight: 700; letter-spacing: .06em; }
-
+.nav-icon img {
+  max-width: 90px;
+  margin: 0px;
+}
   /* FOOTER */
   .foot {
     display: flex;
