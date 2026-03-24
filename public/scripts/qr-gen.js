@@ -2,26 +2,74 @@ import QRCodeStyling from "https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-c
 
 let qrCode = null;
 
-async function checkPermission(toolName) {
-  const FREE = { allowed: true, plan: 'free', remaining: null };
-  let cfg;
-  try { cfg = await fetch('/config.json', { cache: 'no-store' }).then((r) => r.json()); }
-  catch (_) { return FREE; }
-  const apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
-  if (!apiBase) return FREE;
-  const token = localStorage.getItem('volynx_access_token') || '';
+const FREE_LIMIT = 2;
+const STORAGE_KEY = "volynx_qrgen_usage";
+
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+}
+
+function getLocalUsage() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  const today = todayKey();
+  if (!raw) { const data = { date: today, used: 0 }; localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); return data; }
   try {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 8000);
-    const res = await fetch(`${apiBase}/api/check-permission`, {
+    const data = JSON.parse(raw);
+    if (data.date !== today) { const reset = { date: today, used: 0 }; localStorage.setItem(STORAGE_KEY, JSON.stringify(reset)); return reset; }
+    return data;
+  } catch { const reset = { date: today, used: 0 }; localStorage.setItem(STORAGE_KEY, JSON.stringify(reset)); return reset; }
+}
+
+function incrementLocalUsage(n = 1) {
+  const data = getLocalUsage();
+  data.used += n;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+async function getConfig() {
+  try { return await fetch('/config.json', { cache: 'no-store' }).then(r => r.json()); }
+  catch { return {}; }
+}
+
+async function checkToolPermission(toolName, count) {
+  const cfg = await getConfig();
+  const apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
+  const token = localStorage.getItem('volynx_access_token') || '';
+  if (apiBase) {
+    try {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 8000);
+      const res = await fetch(`${apiBase}/api/check-permission`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ tool: toolName }),
+        signal: ctrl.signal,
+      });
+      clearTimeout(t);
+      if (res.ok) {
+        const perm = await res.json();
+        if (!perm.useLocalStorage) return { allowed: perm.remaining === -1 || perm.remaining >= count, plan: perm.plan, remaining: perm.remaining, limit: perm.limit, source: 'server' };
+      }
+    } catch (_) {}
+  }
+  const usage = getLocalUsage();
+  const remaining = Math.max(0, FREE_LIMIT - usage.used);
+  return { allowed: remaining >= count, plan: 'free', remaining, limit: FREE_LIMIT, source: 'local' };
+}
+
+async function logToolUsage(toolName, amount) {
+  const cfg = await getConfig();
+  const apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
+  const token = localStorage.getItem('volynx_access_token') || '';
+  if (apiBase && token) {
+    fetch(`${apiBase}/api/log-usage`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-      body: JSON.stringify({ tool: toolName }),
-      signal: ctrl.signal,
-    });
-    clearTimeout(t);
-    if (!res.ok) return FREE;
-  return await res.json();
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ tool: toolName, amount }),
+    }).catch(() => {});
+  }
+  incrementLocalUsage(amount);
 }
 
 function $(id){ return document.getElementById(id); }
@@ -114,18 +162,21 @@ function bind() {
     genBtn.disabled = true;
     genBtn.textContent = "Gerando…";
     try {
-      // Try to get plan info; fall back to free on any error
-      let plan = "free";
-      try {
-        const perm = await checkPermission("qr-gen");
-        plan = perm.plan || "free";
-      } catch (_) {}
+      // Check permission before generating
+      const perm = await checkToolPermission("qr-gen", 1);
+      if (!perm.allowed) {
+        alert(`Daily limit reached (${perm.limit}). ${perm.plan === 'free' ? 'Upgrade to Pro for more.' : 'Try again tomorrow.'}`);
+        return;
+      }
 
       generateQR();
 
+      // Log usage after successful generation
+      await logToolUsage("qr-gen", 1);
+
       // Show save hint based on plan
       const loginHint = document.querySelector(".login-hint");
-      if (loginHint && plan !== "free") {
+      if (loginHint && perm.plan !== "free") {
         loginHint.style.display = "none";
       }
     } finally {

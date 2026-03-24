@@ -1,8 +1,8 @@
 ---
-import LabBg from "../../components/LabBg.astro";
-import Topbar from "../../components/Topbar.astro";
-import SiteFooter from "../../components/SiteFooter.astro";
-import PageWidgets from "../../components/PageWidgets.astro";
+import LabBg from "../../../components/LabBg.astro";
+import Topbar from "../../../components/Topbar.astro";
+import SiteFooter from "../../../components/SiteFooter.astro";
+import PageWidgets from "../../../components/PageWidgets.astro";
 ---
 
 <!DOCTYPE html>
@@ -238,8 +238,95 @@ import PageWidgets from "../../components/PageWidgets.astro";
   let selectedPresetId = "blank";
   let selectedVariants: Record<string, string> = {};
   let wizardStep = 1;
+  let userProfile: any = null;
 
   const KEYS = ["volynx_access_token", "volynx_refresh_token", "volynx_user_email"];
+
+  // ── Plan limits ──────────────────────────────────────────
+  const PLAN_LIMITS: Record<string, { maxProjects: number; maxPublishesPerDay: number }> = {
+    free:       { maxProjects: 1,  maxPublishesPerDay: 2 },
+    pro:        { maxProjects: 10, maxPublishesPerDay: 50 },
+    enterprise: { maxProjects: -1, maxPublishesPerDay: -1 }, // -1 = unlimited
+  };
+
+  async function fetchUserProfile(userId: string) {
+    const { data, error } = await supa
+      .from("profiles")
+      .select("id,email,plan,org_id,username")
+      .eq("id", userId)
+      .single();
+    if (error) { log("profile fetch error: " + error.message); return null; }
+    return data;
+  }
+
+  async function countActiveProjects(userId: string): Promise<number> {
+    const { count, error } = await supa
+      .from("projects")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .is("deleted_at", null);
+    if (error) { log("count error: " + error.message); return 0; }
+    return count || 0;
+  }
+
+  async function getTodayUsage(userId: string, toolName: string): Promise<number> {
+    const today = new Date().toISOString().slice(0, 10);
+    const { data, error } = await supa
+      .from("usage_logs")
+      .select("usage_count")
+      .eq("org_id", userProfile?.org_id)
+      .eq("tool_name", toolName)
+      .eq("usage_date", today)
+      .maybeSingle();
+    if (error || !data) return 0;
+    return data.usage_count || 0;
+  }
+
+  async function logUsage(toolName: string) {
+    if (!userProfile) return;
+    const today = new Date().toISOString().slice(0, 10);
+    const orgId = userProfile.org_id;
+    if (!orgId) { log("no org_id, skipping usage log"); return; }
+
+    // Upsert: increment count if row exists for today, else insert
+    const { data: existing } = await supa
+      .from("usage_logs")
+      .select("id,usage_count")
+      .eq("org_id", orgId)
+      .eq("tool_name", toolName)
+      .eq("usage_date", today)
+      .maybeSingle();
+
+    if (existing) {
+      await supa
+        .from("usage_logs")
+        .update({ usage_count: (existing.usage_count || 0) + 1 })
+        .eq("id", existing.id);
+    } else {
+      await supa
+        .from("usage_logs")
+        .insert({ org_id: orgId, tool_name: toolName, usage_date: today, usage_count: 1 });
+    }
+    log(`usage logged: ${toolName}`);
+  }
+
+  function canCreate(plan: string, currentCount: number): { ok: boolean; msg: string } {
+    const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
+    if (limits.maxProjects === -1) return { ok: true, msg: "" };
+    if (currentCount >= limits.maxProjects) {
+      return { ok: false, msg: `Free plan allows ${limits.maxProjects} project${limits.maxProjects > 1 ? "s" : ""}. Upgrade to Pro for more.` };
+    }
+    return { ok: true, msg: "" };
+  }
+
+  function canPublish(plan: string, todayPublishes: number): { ok: boolean; msg: string } {
+    const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
+    if (limits.maxPublishesPerDay === -1) return { ok: true, msg: "" };
+    if (todayPublishes >= limits.maxPublishesPerDay) {
+      return { ok: false, msg: `Daily publish limit reached (${limits.maxPublishesPerDay}). Upgrade to Pro for more.` };
+    }
+    return { ok: true, msg: "" };
+  }
 
   const setStatus = (t: string) => { const el = $("status"); if (el) el.textContent = t || ""; };
 
@@ -657,7 +744,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
       if (focus === "hire_me") {
         if (hero && !w.tagline) {
           hero.content.badge = "Available for hire";
-          hero.content.title = `I help ${ac.who} ship products that actually work.`;
+          hero.content.title = `I help teams ship products that actually work.`;
           hero.content.subtitle = "Full-stack developer with a design eye. I ship fast, write clean code and take ownership from day one.";
         }
         if (faq) faq.content.items = [
@@ -841,6 +928,11 @@ import PageWidgets from "../../components/PageWidgets.astro";
     const who = $("who");
     if (who) who.textContent = user.email || "";
     showAuth(false);
+
+    // Fetch user profile (plan, org_id)
+    userProfile = await fetchUserProfile(user.id);
+    log("plan: " + (userProfile?.plan || "free"));
+
     await listProjects(user.id);
 
     // ── Event listeners ────────────────────────────────────────
@@ -862,8 +954,13 @@ import PageWidgets from "../../components/PageWidgets.astro";
 
     $("backStep1")?.addEventListener("click", () => showWizardStep(1));
 
-    // Create project
+    // Create project (with plan limit check + usage logging)
     $("create")?.addEventListener("click", async () => {
+      const plan = userProfile?.plan || "free";
+      const projectCount = await countActiveProjects(user.id);
+      const check = canCreate(plan, projectCount);
+      if (!check.ok) return setStatus(check.msg);
+
       const w = getWizardInputs();
       const baseSlug = slugify((($("pslug") as HTMLInputElement)?.value || "").trim() || w.name) || "site";
       const slug = `${baseSlug}-${rand4()}`;
@@ -877,6 +974,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
         .single();
 
       if (error) return setStatus(error.message);
+      await logUsage("builder_create");
       setStatus("Project created.");
       showWizardStep(1); // reset wizard
       await listProjects(user.id);
@@ -899,6 +997,12 @@ import PageWidgets from "../../components/PageWidgets.astro";
     $("publish")?.addEventListener("click", async () => {
       if (!currentProject) return setStatus("Select a project.");
       if (!currentProject.slug) return setStatus("Project has no slug. Edit JSON to add one.");
+
+      // Check publish limit
+      const plan = userProfile?.plan || "free";
+      const todayPublishes = await getTodayUsage(user.id, "builder_publish");
+      const pubCheck = canPublish(plan, todayPublishes);
+      if (!pubCheck.ok) return setStatus(pubCheck.msg);
 
       setStatus("Saving…");
       const ok = await saveCurrent();
@@ -947,6 +1051,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
           linkEl.innerHTML = `Live: <a href="${j.url}" target="_blank" rel="noreferrer">${j.url}</a>`;
         setStatus("Published ✓");
         currentProject.status = "published";
+        await logUsage("builder_publish");
 
         await supa.from("projects")
           .update({ status: "published", updated_at: new Date().toISOString() })
