@@ -15,7 +15,7 @@ async function loadConfig() {
   return await res.json();
 }
 
-async function supabaseSignup({ supabaseUrl, supabaseAnonKey, email, password }) {
+async function supabaseSignup({ supabaseUrl, supabaseAnonKey, email, password, fullName, username }) {
   const url = `${supabaseUrl}/auth/v1/signup`;
   const res = await fetch(url, {
     method: "POST",
@@ -23,7 +23,14 @@ async function supabaseSignup({ supabaseUrl, supabaseAnonKey, email, password })
       apikey: supabaseAnonKey,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({
+      email,
+      password,
+      data: {
+        full_name: fullName || null,
+        username: username || null,
+      }
+    })
   });
 
   const data = await res.json().catch(() => ({}));
@@ -70,22 +77,38 @@ function showCheckEmail(email) {
 }
 
 (function init() {
-  const form    = document.getElementById("signupForm");
-  const emailEl = document.getElementById("email");
-  const passEl  = document.getElementById("password");
-  const btn     = document.getElementById("submitBtn");
-  const msg     = document.getElementById("msg");
+  const form      = document.getElementById("signupForm");
+  const fullnameEl = document.getElementById("fullname");
+  const usernameEl = document.getElementById("username");
+  const emailEl   = document.getElementById("email");
+  const passEl    = document.getElementById("password");
+  const btn       = document.getElementById("submitBtn");
+  const msg       = document.getElementById("msg");
 
   if (!form || !emailEl || !passEl || !btn || !msg) return;
+
+  // Auto-format username: lowercase, strip invalid chars
+  if (usernameEl) {
+    usernameEl.addEventListener("input", () => {
+      usernameEl.value = usernameEl.value.toLowerCase().replace(/[^a-z0-9_]/g, "");
+    });
+  }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const fullName = String(fullnameEl?.value || "").trim();
+    const username = String(usernameEl?.value || "").trim();
     const email    = String(emailEl.value || "").trim();
     const password = String(passEl.value || "");
 
-    if (!email || !password) {
-      setMsg(msg, "Please fill in email and password.", "err");
+    if (!fullName || !username || !email || !password) {
+      setMsg(msg, "Please fill in all fields.", "err");
+      return;
+    }
+
+    if (username.length < 3 || username.length > 30) {
+      setMsg(msg, "Username must be 3-30 characters.", "err");
       return;
     }
 
@@ -102,7 +125,9 @@ function showCheckEmail(email) {
         supabaseUrl: cfg.supabaseUrl,
         supabaseAnonKey: cfg.supabaseAnonKey,
         email,
-        password
+        password,
+        fullName,
+        username
       });
 
       // Rare: auto-login when email confirmation is disabled
