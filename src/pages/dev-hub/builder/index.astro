@@ -20,6 +20,7 @@ import PageWidgets from "../../../components/PageWidgets.astro";
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
 </head>
 
 <body>
@@ -79,24 +80,20 @@ import PageWidgets from "../../../components/PageWidgets.astro";
         <div class="card card--wizard" id="wizardCard">
           <!-- Step indicator -->
           <div class="wizard-steps">
-            <span class="wizard-dot wizard-dot--active" data-step="1">1</span>
-            <span class="wizard-line"></span>
-            <span class="wizard-dot" data-step="2">2</span>
+            <div class="wizard-step-dot wizard-step-dot--active" data-step="1"><span>1</span><small>Kit</small></div>
+            <div class="wizard-line-bar"><div class="wizard-line-fill" id="wizProgress"></div></div>
+            <div class="wizard-step-dot" data-step="2"><span>2</span><small>Layout</small></div>
+            <div class="wizard-line-bar"><div class="wizard-line-fill" id="wizProgress2"></div></div>
+            <div class="wizard-step-dot" data-step="3"><span>3</span><small>Brand</small></div>
           </div>
 
-          <!-- STEP 1: Project & Preset -->
+          <!-- STEP 1: Choose Kit -->
           <div class="wizard-step" id="wizStep1">
-            <h3 class="card__title">New project</h3>
+            <h3 class="card__title">Choose your kit</h3>
+            <p class="hint" style="margin-bottom:16px">Pick a starting point — you can customize everything later.</p>
+            <div class="preset-grid" id="presetGrid"></div>
 
-            <div class="preset-picker">
-              <label class="label">Start from a kit</label>
-              <div class="preset-grid" id="presetGrid"></div>
-            </div>
-
-            <!-- Variant selectors (populated by JS per preset) -->
-            <div id="variantSelectors" class="variant-selectors" hidden></div>
-
-            <div class="row" style="margin-top:14px">
+            <div class="row" style="margin-top:16px">
               <div class="field-group">
                 <label class="label" for="pname">Project name</label>
                 <input id="pname" class="field" placeholder="Studio Aurora" />
@@ -108,13 +105,31 @@ import PageWidgets from "../../../components/PageWidgets.astro";
             </div>
 
             <button class="btn btn--primary" id="toStep2" style="margin-top:14px;width:100%">
-              Next: Brand & details →
+              Next: Choose layout →
             </button>
           </div>
 
-          <!-- STEP 2: Brand & Config -->
+          <!-- STEP 2: Layout & Variants -->
           <div class="wizard-step" id="wizStep2" hidden>
+            <h3 class="card__title">Pick your layout</h3>
+            <p class="hint" style="margin-bottom:16px">Choose how each section looks. Mix and match freely.</p>
+
+            <!-- Variant selectors (populated by JS per preset) -->
+            <div id="variantSelectors" class="variant-selectors"></div>
+
+            <!-- Optional sections -->
+            <div id="optionalToggles" class="optional-toggles"></div>
+
+            <div style="display:flex;gap:8px;margin-top:18px">
+              <button class="btn btn--ghost" id="backStep1" style="flex:1">← Back</button>
+              <button class="btn btn--primary" id="toStep3" style="flex:2">Next: Brand details →</button>
+            </div>
+          </div>
+
+          <!-- STEP 3: Brand & Config -->
+          <div class="wizard-step" id="wizStep3" hidden>
             <h3 class="card__title">Brand & details</h3>
+            <p class="hint" style="margin-bottom:16px">Tell us about your brand — we'll generate the copy.</p>
 
             <div class="row">
               <div class="field-group">
@@ -181,15 +196,12 @@ import PageWidgets from "../../../components/PageWidgets.astro";
               </div>
             </div>
 
-            <!-- Optional sections (populated by JS per preset) -->
-            <div id="optionalToggles" class="optional-toggles" style="margin-top:14px"></div>
-
-            <div style="display:flex;gap:8px;margin-top:16px">
-              <button class="btn btn--ghost" id="backStep1" style="flex:1">← Back</button>
+            <div style="display:flex;gap:8px;margin-top:18px">
+              <button class="btn btn--ghost" id="backStep2" style="flex:1">← Back</button>
               <button class="btn btn--primary" id="create" style="flex:2">Create project →</button>
             </div>
-            <p class="hint" style="margin-top:10px">
-              Will publish at <code>https://<span id="slugPreview">slug</span>.volynx.world</code>
+            <p class="hint" style="margin-top:10px;text-align:center">
+              Will publish at <code style="color:var(--accent)">https://<span id="slugPreview">slug</span>.volynx.world</code>
             </p>
           </div>
         </div>
@@ -198,6 +210,23 @@ import PageWidgets from "../../../components/PageWidgets.astro";
         <div class="card card--list">
           <h3 class="card__title">My projects</h3>
           <div id="projects" class="projects-list hint">No projects yet.</div>
+        </div>
+
+        <!-- PROJECT INFO PANEL (shown after selecting a project) -->
+        <div class="card card--info" id="infoPanel" hidden>
+          <div class="info-header">
+            <h3 class="card__title" id="infoName">—</h3>
+            <span class="status-badge" id="infoBadge">draft</span>
+          </div>
+          <div class="info-url-box" id="infoUrlBox" hidden>
+            <span class="info-url-label">Live at</span>
+            <a class="info-url-link" id="infoUrl" href="#" target="_blank" rel="noreferrer">—</a>
+          </div>
+          <div class="info-actions">
+            <a class="btn btn--accent btn--sm" id="visitSite" href="#" target="_blank" rel="noreferrer" hidden>Visit site ↗</a>
+            <button class="btn btn--ghost btn--sm" id="exportZip">Download ZIP</button>
+            <button class="btn btn--ghost btn--sm" id="deleteProject">Delete</button>
+          </div>
         </div>
 
         <!-- JSON EDITOR -->
@@ -340,15 +369,24 @@ import PageWidgets from "../../../components/PageWidgets.astro";
     wizardStep = step;
     ($("wizStep1") as HTMLElement).hidden = step !== 1;
     ($("wizStep2") as HTMLElement).hidden = step !== 2;
-    document.querySelectorAll(".wizard-dot").forEach(d => {
+    ($("wizStep3") as HTMLElement).hidden = step !== 3;
+    document.querySelectorAll(".wizard-step-dot").forEach(d => {
       const s = Number((d as HTMLElement).dataset.step);
-      d.classList.toggle("wizard-dot--active", s <= step);
+      d.classList.toggle("wizard-step-dot--active", s <= step);
     });
+    const p1 = $("wizProgress") as HTMLElement;
+    const p2 = $("wizProgress2") as HTMLElement;
+    if (p1) p1.style.width = step >= 2 ? "100%" : "0%";
+    if (p2) p2.style.width = step >= 3 ? "100%" : "0%";
+
     if (step === 2) {
+      renderVariantSelectors();
+      renderOptionalToggles();
+    }
+    if (step === 3) {
       const slug = slugify(($("pname") as HTMLInputElement)?.value || "") || "slug";
       const preview = $("slugPreview");
       if (preview) preview.textContent = `${slug}-${rand4()}`;
-      renderOptionalToggles();
     }
   }
 
@@ -364,18 +402,30 @@ import PageWidgets from "../../../components/PageWidgets.astro";
     } catch { log("presets unavailable"); }
   }
 
+  // Mini layout SVGs for preset previews
+  const presetPreviews: Record<string, string> = {
+    blank: `<svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="12" width="80" height="6" rx="3" fill="currentColor" opacity=".3"/><rect x="35" y="24" width="50" height="4" rx="2" fill="currentColor" opacity=".15"/><rect x="40" y="36" width="40" height="8" rx="4" fill="currentColor" opacity=".2"/><rect x="10" y="54" width="22" height="16" rx="4" fill="currentColor" opacity=".08"/><rect x="36" y="54" width="22" height="16" rx="4" fill="currentColor" opacity=".08"/><rect x="62" y="54" width="22" height="16" rx="4" fill="currentColor" opacity=".08"/><rect x="88" y="54" width="22" height="16" rx="4" fill="currentColor" opacity=".08"/></svg>`,
+    saas: `<svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="8" width="50" height="5" rx="2.5" fill="#7DD3FC" opacity=".5"/><rect x="8" y="17" width="40" height="3" rx="1.5" fill="currentColor" opacity=".2"/><rect x="8" y="24" width="28" height="7" rx="3.5" fill="#7DD3FC" opacity=".3"/><rect x="70" y="8" width="42" height="28" rx="6" fill="currentColor" opacity=".08"/><rect x="8" y="42" width="24" height="14" rx="4" fill="currentColor" opacity=".06"/><rect x="36" y="42" width="24" height="14" rx="4" fill="#7DD3FC" opacity=".1"/><rect x="64" y="42" width="24" height="14" rx="4" fill="currentColor" opacity=".06"/><rect x="8" y="62" width="104" height="12" rx="4" fill="currentColor" opacity=".04"/></svg>`,
+    agency: `<svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="8" width="80" height="6" rx="3" fill="#A78BFA" opacity=".4"/><rect x="30" y="18" width="60" height="3" rx="1.5" fill="currentColor" opacity=".2"/><rect x="38" y="25" width="44" height="7" rx="3.5" fill="#A78BFA" opacity=".25"/><rect x="8" y="40" width="32" height="8" rx="2" fill="currentColor" opacity=".06"/><rect x="44" y="40" width="32" height="8" rx="2" fill="currentColor" opacity=".06"/><rect x="80" y="40" width="32" height="8" rx="2" fill="currentColor" opacity=".06"/><circle cx="24" cy="60" r="6" fill="currentColor" opacity=".08"/><circle cx="60" cy="60" r="6" fill="currentColor" opacity=".08"/><circle cx="96" cy="60" r="6" fill="currentColor" opacity=".08"/><rect x="15" y="69" width="18" height="3" rx="1.5" fill="currentColor" opacity=".1"/><rect x="51" y="69" width="18" height="3" rx="1.5" fill="currentColor" opacity=".1"/><rect x="87" y="69" width="18" height="3" rx="1.5" fill="currentColor" opacity=".1"/></svg>`,
+    portfolio: `<svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="10" width="60" height="5" rx="2.5" fill="#E4E4E7" opacity=".4"/><rect x="8" y="19" width="45" height="3" rx="1.5" fill="currentColor" opacity=".15"/><rect x="8" y="26" width="25" height="6" rx="3" fill="currentColor" opacity=".12"/><rect x="8" y="40" width="50" height="32" rx="6" fill="currentColor" opacity=".06"/><rect x="62" y="40" width="50" height="15" rx="4" fill="currentColor" opacity=".06"/><rect x="62" y="58" width="50" height="14" rx="4" fill="currentColor" opacity=".04"/></svg>`,
+  };
+
   function renderPresetPicker() {
     const grid = $("presetGrid");
     if (!grid) return;
     const blank = `<button type="button" class="preset-card preset-card--active" data-preset="blank">
-      <span class="preset-icon">✏️</span>
-      <span class="preset-name">Custom</span>
-      <span class="preset-tag">Blank</span>
+      <div class="preset-preview">${presetPreviews.blank}</div>
+      <div class="preset-info">
+        <span class="preset-name">Custom</span>
+        <span class="preset-desc">Start from scratch</span>
+      </div>
     </button>`;
     const cards = presets.map((p: any) => `<button type="button" class="preset-card" data-preset="${p.id}">
-      <span class="preset-icon">${p.icon || "📦"}</span>
-      <span class="preset-name">${p.name}</span>
-      <span class="preset-tag">${p.tag || ""}</span>
+      <div class="preset-preview">${presetPreviews[p.id] || presetPreviews.blank}</div>
+      <div class="preset-info">
+        <span class="preset-name">${p.icon || "📦"} ${p.name}</span>
+        <span class="preset-desc">${p.description || p.tag}</span>
+      </div>
     </button>`).join("");
     grid.innerHTML = blank + cards;
 
@@ -392,31 +442,78 @@ import PageWidgets from "../../../components/PageWidgets.astro";
     renderVariantSelectors();
   }
 
+  // ── Variant mini-layout SVGs ────────────────────────────────
+  const variantIcons: Record<string, Record<string, string>> = {
+    hero: {
+      centered: `<svg viewBox="0 0 64 44"><rect x="12" y="6" width="40" height="4" rx="2" fill="currentColor" opacity=".4"/><rect x="18" y="14" width="28" height="2" rx="1" fill="currentColor" opacity=".15"/><rect x="22" y="20" width="20" height="5" rx="2.5" fill="currentColor" opacity=".25"/></svg>`,
+      split: `<svg viewBox="0 0 64 44"><rect x="4" y="8" width="26" height="4" rx="2" fill="currentColor" opacity=".4"/><rect x="4" y="16" width="20" height="2" rx="1" fill="currentColor" opacity=".15"/><rect x="4" y="22" width="14" height="5" rx="2.5" fill="currentColor" opacity=".25"/><rect x="36" y="6" width="24" height="24" rx="4" fill="currentColor" opacity=".08"/></svg>`,
+      minimal: `<svg viewBox="0 0 64 44"><rect x="4" y="10" width="36" height="4" rx="2" fill="currentColor" opacity=".35"/><rect x="4" y="18" width="24" height="2" rx="1" fill="currentColor" opacity=".12"/><rect x="4" y="24" width="14" height="4" rx="2" fill="currentColor" opacity=".2"/></svg>`,
+      product: `<svg viewBox="0 0 64 44"><rect x="16" y="4" width="32" height="3" rx="1.5" fill="currentColor" opacity=".35"/><rect x="20" y="10" width="24" height="2" rx="1" fill="currentColor" opacity=".12"/><rect x="8" y="18" width="48" height="20" rx="4" fill="currentColor" opacity=".06"/><rect x="22" y="14" width="20" height="5" rx="2.5" fill="currentColor" opacity=".2"/></svg>`,
+    },
+    pricing: {
+      tiered: `<svg viewBox="0 0 64 44"><rect x="2" y="6" width="18" height="32" rx="3" fill="currentColor" opacity=".06"/><rect x="23" y="4" width="18" height="34" rx="3" fill="currentColor" opacity=".12"/><rect x="44" y="6" width="18" height="32" rx="3" fill="currentColor" opacity=".06"/></svg>`,
+      single: `<svg viewBox="0 0 64 44"><rect x="14" y="6" width="36" height="32" rx="4" fill="currentColor" opacity=".1"/><rect x="22" y="12" width="20" height="3" rx="1.5" fill="currentColor" opacity=".2"/><rect x="24" y="20" width="16" height="2" rx="1" fill="currentColor" opacity=".1"/></svg>`,
+      comparison: `<svg viewBox="0 0 64 44"><rect x="4" y="6" width="56" height="32" rx="3" fill="currentColor" opacity=".04"/><line x1="24" y1="6" x2="24" y2="38" stroke="currentColor" opacity=".08"/><line x1="44" y1="6" x2="44" y2="38" stroke="currentColor" opacity=".08"/><rect x="6" y="10" width="14" height="2" rx="1" fill="currentColor" opacity=".15"/></svg>`,
+    },
+    proof: {
+      "metrics+logos": `<svg viewBox="0 0 64 44"><rect x="4" y="6" width="12" height="10" rx="2" fill="currentColor" opacity=".1"/><rect x="20" y="6" width="12" height="10" rx="2" fill="currentColor" opacity=".1"/><rect x="36" y="6" width="12" height="10" rx="2" fill="currentColor" opacity=".1"/><rect x="52" y="6" width="8" height="10" rx="2" fill="currentColor" opacity=".1"/><rect x="8" y="26" width="10" height="3" rx="1.5" fill="currentColor" opacity=".08"/><rect x="22" y="26" width="10" height="3" rx="1.5" fill="currentColor" opacity=".08"/><rect x="36" y="26" width="10" height="3" rx="1.5" fill="currentColor" opacity=".08"/><rect x="50" y="26" width="10" height="3" rx="1.5" fill="currentColor" opacity=".08"/></svg>`,
+      metrics: `<svg viewBox="0 0 64 44"><rect x="4" y="12" width="12" height="14" rx="2" fill="currentColor" opacity=".12"/><rect x="20" y="12" width="12" height="14" rx="2" fill="currentColor" opacity=".12"/><rect x="36" y="12" width="12" height="14" rx="2" fill="currentColor" opacity=".12"/><rect x="52" y="12" width="8" height="14" rx="2" fill="currentColor" opacity=".12"/></svg>`,
+      logos: `<svg viewBox="0 0 64 44"><rect x="6" y="16" width="10" height="4" rx="2" fill="currentColor" opacity=".1"/><rect x="20" y="16" width="10" height="4" rx="2" fill="currentColor" opacity=".1"/><rect x="34" y="16" width="10" height="4" rx="2" fill="currentColor" opacity=".1"/><rect x="48" y="16" width="10" height="4" rx="2" fill="currentColor" opacity=".1"/></svg>`,
+      none: `<svg viewBox="0 0 64 44"><line x1="22" y1="14" x2="42" y2="30" stroke="currentColor" opacity=".15" stroke-width="1.5"/><line x1="42" y1="14" x2="22" y2="30" stroke="currentColor" opacity=".15" stroke-width="1.5"/></svg>`,
+    },
+    process: {
+      workflow: `<svg viewBox="0 0 64 44"><circle cx="12" cy="22" r="6" fill="currentColor" opacity=".1"/><circle cx="32" cy="22" r="6" fill="currentColor" opacity=".1"/><circle cx="52" cy="22" r="6" fill="currentColor" opacity=".1"/><line x1="18" y1="22" x2="26" y2="22" stroke="currentColor" opacity=".12"/><line x1="38" y1="22" x2="46" y2="22" stroke="currentColor" opacity=".12"/></svg>`,
+      featureSplit: `<svg viewBox="0 0 64 44"><rect x="4" y="8" width="26" height="28" rx="3" fill="currentColor" opacity=".06"/><rect x="34" y="10" width="24" height="3" rx="1.5" fill="currentColor" opacity=".12"/><rect x="34" y="17" width="20" height="2" rx="1" fill="currentColor" opacity=".08"/><rect x="34" y="23" width="20" height="2" rx="1" fill="currentColor" opacity=".08"/><rect x="34" y="29" width="20" height="2" rx="1" fill="currentColor" opacity=".08"/></svg>`,
+      none: `<svg viewBox="0 0 64 44"><line x1="22" y1="14" x2="42" y2="30" stroke="currentColor" opacity=".15" stroke-width="1.5"/><line x1="42" y1="14" x2="22" y2="30" stroke="currentColor" opacity=".15" stroke-width="1.5"/></svg>`,
+    },
+    focus: {
+      hire_me: `<svg viewBox="0 0 64 44"><circle cx="32" cy="14" r="6" fill="currentColor" opacity=".15"/><rect x="16" y="24" width="32" height="3" rx="1.5" fill="currentColor" opacity=".2"/><rect x="20" y="31" width="24" height="2" rx="1" fill="currentColor" opacity=".1"/></svg>`,
+      technical: `<svg viewBox="0 0 64 44"><rect x="6" y="8" width="52" height="5" rx="2" fill="currentColor" opacity=".06"/><rect x="8" y="10" width="6" height="1" rx=".5" fill="#34D399" opacity=".4"/><rect x="16" y="10" width="14" height="1" rx=".5" fill="currentColor" opacity=".15"/><rect x="6" y="18" width="52" height="5" rx="2" fill="currentColor" opacity=".06"/><rect x="6" y="28" width="52" height="5" rx="2" fill="currentColor" opacity=".06"/></svg>`,
+      creative: `<svg viewBox="0 0 64 44"><rect x="4" y="6" width="26" height="18" rx="4" fill="currentColor" opacity=".08"/><rect x="34" y="6" width="26" height="18" rx="4" fill="currentColor" opacity=".08"/><rect x="4" y="28" width="56" height="10" rx="3" fill="currentColor" opacity=".05"/></svg>`,
+    },
+    showcase: {
+      valueGrid: `<svg viewBox="0 0 64 44"><rect x="4" y="6" width="26" height="14" rx="3" fill="currentColor" opacity=".08"/><rect x="34" y="6" width="26" height="14" rx="3" fill="currentColor" opacity=".08"/><rect x="4" y="24" width="26" height="14" rx="3" fill="currentColor" opacity=".08"/><rect x="34" y="24" width="26" height="14" rx="3" fill="currentColor" opacity=".08"/></svg>`,
+      featureSplit: `<svg viewBox="0 0 64 44"><rect x="4" y="10" width="26" height="24" rx="3" fill="currentColor" opacity=".06"/><rect x="34" y="12" width="24" height="3" rx="1.5" fill="currentColor" opacity=".12"/><rect x="34" y="19" width="20" height="2" rx="1" fill="currentColor" opacity=".08"/><rect x="34" y="25" width="20" height="2" rx="1" fill="currentColor" opacity=".08"/></svg>`,
+      none: `<svg viewBox="0 0 64 44"><line x1="22" y1="14" x2="42" y2="30" stroke="currentColor" opacity=".15" stroke-width="1.5"/><line x1="42" y1="14" x2="22" y2="30" stroke="currentColor" opacity=".15" stroke-width="1.5"/></svg>`,
+    },
+  };
+
+  const variantLabels: Record<string, string> = {
+    centered: "Centered", split: "Split", minimal: "Minimal", product: "Product",
+    tiered: "Tiered", single: "Single", comparison: "Table",
+    "metrics+logos": "Both", metrics: "Metrics", logos: "Logos", none: "None",
+    workflow: "Steps", featureSplit: "List", valueGrid: "Grid",
+    hire_me: "Hire me", technical: "Technical", creative: "Creative",
+  };
+
   // ── Variant selectors (per preset) ─────────────────────────
   function renderVariantSelectors() {
     const box = $("variantSelectors") as HTMLElement;
     if (!box) return;
     const preset = presets.find((p: any) => p.id === selectedPresetId);
-    if (!preset?.variants) { box.hidden = true; box.innerHTML = ""; return; }
+    if (!preset?.variants) { box.innerHTML = ""; return; }
 
-    box.hidden = false;
     box.innerHTML = Object.entries(preset.variants as Record<string, any>).map(([key, v]: [string, any]) => {
       selectedVariants[key] = selectedVariants[key] || v.default;
-      return `<div class="field-group field-group--inline">
+      const icons = variantIcons[key] || {};
+      return `<div class="variant-group">
         <label class="label">${v.label}</label>
-        <div class="chip-group" data-variant-key="${key}">
-          ${v.options.map((opt: string) => `<button type="button" class="chip ${opt === (selectedVariants[key] || v.default) ? "chip--active" : ""}" data-value="${opt}">${opt}</button>`).join("")}
+        <div class="variant-options" data-variant-key="${key}">
+          ${v.options.map((opt: string) => `<button type="button" class="variant-card ${opt === (selectedVariants[key] || v.default) ? "variant-card--active" : ""}" data-value="${opt}">
+            <div class="variant-card__preview">${icons[opt] || `<span style="font-size:11px;opacity:.3">${opt}</span>`}</div>
+            <span class="variant-card__label">${variantLabels[opt] || opt}</span>
+          </button>`).join("")}
         </div>
       </div>`;
     }).join("");
 
-    box.querySelectorAll(".chip-group").forEach(group => {
+    box.querySelectorAll(".variant-options").forEach(group => {
       const key = (group as HTMLElement).dataset.variantKey!;
-      group.querySelectorAll(".chip").forEach(chip => {
-        chip.addEventListener("click", () => {
-          group.querySelectorAll(".chip").forEach(c => c.classList.remove("chip--active"));
-          chip.classList.add("chip--active");
-          selectedVariants[key] = (chip as HTMLElement).dataset.value || "";
+      group.querySelectorAll(".variant-card").forEach(card => {
+        card.addEventListener("click", () => {
+          group.querySelectorAll(".variant-card").forEach(c => c.classList.remove("variant-card--active"));
+          card.classList.add("variant-card--active");
+          selectedVariants[key] = (card as HTMLElement).dataset.value || "";
           log(`variant ${key} = ${selectedVariants[key]}`);
         });
       });
@@ -820,8 +917,11 @@ import PageWidgets from "../../../components/PageWidgets.astro";
     box.innerHTML =
       (data || []).map((p: any) => `
         <button class="project-btn" data-id="${p.id}">
-          <span class="project-name">${p.name}</span>
-          <span class="project-slug">${p.slug || "no slug"}</span>
+          <div class="project-row">
+            <span class="project-name">${p.name}</span>
+            <span class="project-status project-status--${p.status || 'draft'}">${p.status || 'draft'}</span>
+          </div>
+          <span class="project-slug">${p.slug ? p.slug + '.volynx.world' : 'no slug'}</span>
         </button>
       `).join("") || `<span class="hint">No projects yet.</span>`;
 
@@ -837,8 +937,35 @@ import PageWidgets from "../../../components/PageWidgets.astro";
     const json = $("json") as HTMLTextAreaElement | null;
     if (json) json.value = JSON.stringify(p.builder_data || {}, null, 2);
     const link = $("link");
-    if (link) link.innerHTML = p.slug ? `Active: <code>${p.slug}</code>` : "";
+    if (link) link.innerHTML = "";
     setStatus("Project loaded.");
+
+    // Info panel
+    const infoPanel = $("infoPanel") as HTMLElement;
+    if (infoPanel) infoPanel.hidden = false;
+
+    const infoName = $("infoName");
+    if (infoName) infoName.textContent = p.name;
+
+    const infoBadge = $("infoBadge") as HTMLElement;
+    if (infoBadge) {
+      infoBadge.textContent = p.status || "draft";
+      infoBadge.className = `status-badge status-badge--${p.status || "draft"}`;
+    }
+
+    const liveUrl = p.slug ? `https://${p.slug}.volynx.world/` : "";
+    const infoUrlBox = $("infoUrlBox") as HTMLElement;
+    const infoUrl = $("infoUrl") as HTMLAnchorElement;
+    const visitBtn = $("visitSite") as HTMLAnchorElement;
+
+    if (p.status === "published" && liveUrl) {
+      if (infoUrlBox) infoUrlBox.hidden = false;
+      if (infoUrl) { infoUrl.href = liveUrl; infoUrl.textContent = liveUrl; }
+      if (visitBtn) { visitBtn.hidden = false; visitBtn.href = liveUrl; }
+    } else {
+      if (infoUrlBox) infoUrlBox.hidden = true;
+      if (visitBtn) visitBtn.hidden = true;
+    }
 
     document.querySelectorAll(".project-btn").forEach((b) => b.classList.remove("active"));
     const active = document.querySelector(`[data-id="${p.id}"]`);
@@ -942,17 +1069,96 @@ import PageWidgets from "../../../components/PageWidgets.astro";
       window.location.href = "/";
     });
 
-    // Wizard navigation
+    // Export ZIP
+    $("exportZip")?.addEventListener("click", async () => {
+      if (!currentProject) return setStatus("Select a project.");
+      setStatus("Generating ZIP…");
+      try {
+        const jsonStr = JSON.stringify(currentProject.builder_data || {}, null, 2);
+        const slug = currentProject.slug || "project";
+
+        // Build a simple HTML preview using the builder_data
+        const htmlContent = `<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>${currentProject.name || "VOLYNX Site"}</title>
+<style>body{font-family:system-ui,sans-serif;background:#070A12;color:#E7EEF7;margin:0;padding:40px 24px;max-width:960px;margin:0 auto}
+h1{font-size:2.5em;letter-spacing:-.03em}p{color:rgba(231,238,247,.6);line-height:1.7}
+.badge{display:inline-block;padding:6px 14px;border-radius:999px;background:rgba(125,211,252,.08);border:1px solid rgba(125,211,252,.2);font-size:12px;color:#7DD3FC;margin-bottom:20px}
+section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
+</head>
+<body>
+<p class="badge">${slug}.volynx.world</p>
+<h1>${currentProject.name}</h1>
+<p>This site was built with VOLYNX Builder. Edit the builder_data.json to customize.</p>
+<p>To publish: use the VOLYNX Builder at <a href="https://volynx.world/dev-hub/builder/" style="color:#7DD3FC">volynx.world/dev-hub/builder</a></p>
+</body></html>`;
+
+        // Create ZIP with JSZip (or fallback to JSON download)
+        const blob = new Blob([jsonStr], { type: "application/json" });
+        const htmlBlob = new Blob([htmlContent], { type: "text/html" });
+
+        if (typeof JSZip !== "undefined") {
+          const zip = new JSZip();
+          zip.file("builder_data.json", jsonStr);
+          zip.file("index.html", htmlContent);
+          zip.file("README.txt", `VOLYNX Builder Export\n\nProject: ${currentProject.name}\nSlug: ${slug}\nExported: ${new Date().toISOString()}\n\nFiles:\n- builder_data.json → your site configuration (edit this)\n- index.html → basic preview\n\nTo publish your site:\n1. Go to https://volynx.world/dev-hub/builder/\n2. Import or paste the builder_data.json\n3. Click Publish\n\nYour site will be live at: https://${slug}.volynx.world/\n`);
+          const zipBlob = await zip.generateAsync({ type: "blob" });
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(zipBlob);
+          a.download = `${slug}-volynx-export.zip`;
+          a.click();
+          URL.revokeObjectURL(a.href);
+          setStatus("ZIP downloaded ✓");
+        } else {
+          // Fallback: just download JSON
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = `${slug}-builder_data.json`;
+          a.click();
+          URL.revokeObjectURL(a.href);
+          setStatus("JSON downloaded ✓");
+        }
+      } catch (err: any) {
+        setStatus("Export failed: " + (err?.message || err));
+      }
+    });
+
+    // Delete project (soft delete)
+    $("deleteProject")?.addEventListener("click", async () => {
+      if (!currentProject) return setStatus("Select a project.");
+      if (!confirm(`Delete "${currentProject.name}"? This can't be undone.`)) return;
+
+      const { error } = await supa
+        .from("projects")
+        .update({ deleted_at: new Date().toISOString() })
+        .eq("id", currentProject.id);
+
+      if (error) return setStatus(error.message);
+      setStatus("Project deleted.");
+      currentProject = null;
+      ($("json") as HTMLTextAreaElement).value = "";
+      ($("infoPanel") as HTMLElement).hidden = true;
+      await listProjects(user.id);
+    });
+
+    // Wizard navigation (3 steps)
     $("toStep2")?.addEventListener("click", () => {
       const name = (($("pname") as HTMLInputElement)?.value || "").trim();
       if (!name) { ($("pname") as HTMLInputElement).focus(); return; }
-      // Pre-fill brand with project name if empty
-      const brandInput = $("wBrand") as HTMLInputElement;
-      if (brandInput && !brandInput.value.trim()) brandInput.value = name;
       showWizardStep(2);
     });
 
+    $("toStep3")?.addEventListener("click", () => {
+      // Pre-fill brand with project name if empty
+      const brandInput = $("wBrand") as HTMLInputElement;
+      const pname = (($("pname") as HTMLInputElement)?.value || "").trim();
+      if (brandInput && !brandInput.value.trim()) brandInput.value = pname;
+      showWizardStep(3);
+    });
+
     $("backStep1")?.addEventListener("click", () => showWizardStep(1));
+    $("backStep2")?.addEventListener("click", () => showWizardStep(2));
 
     // Create project (with plan limit check + usage logging)
     $("create")?.addEventListener("click", async () => {
@@ -1046,12 +1252,20 @@ import PageWidgets from "../../../components/PageWidgets.astro";
           return setStatus(errMap[j?.error] || j?.error || `Publish failed (HTTP ${r.status}).`);
         }
 
-        const linkEl = $("link");
-        if (linkEl && j.url)
-          linkEl.innerHTML = `Live: <a href="${j.url}" target="_blank" rel="noreferrer">${j.url}</a>`;
         setStatus("Published ✓");
         currentProject.status = "published";
         await logUsage("builder_publish");
+
+        // Update info panel with live URL
+        const liveUrl = j.url || `https://${currentProject.slug}.volynx.world/`;
+        const infoUrlBox = $("infoUrlBox") as HTMLElement;
+        const infoUrl = $("infoUrl") as HTMLAnchorElement;
+        const visitBtn = $("visitSite") as HTMLAnchorElement;
+        const infoBadge = $("infoBadge") as HTMLElement;
+        if (infoUrlBox) infoUrlBox.hidden = false;
+        if (infoUrl) { infoUrl.href = liveUrl; infoUrl.textContent = liveUrl; }
+        if (visitBtn) { visitBtn.hidden = false; visitBtn.href = liveUrl; }
+        if (infoBadge) { infoBadge.textContent = "published"; infoBadge.className = "status-badge status-badge--published"; }
 
         await supa.from("projects")
           .update({ status: "published", updated_at: new Date().toISOString() })
@@ -1270,75 +1484,134 @@ import PageWidgets from "../../../components/PageWidgets.astro";
     display: flex;
     align-items: center;
     gap: 0;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+    padding: 0 4px;
   }
-  .wizard-dot {
-    width: 28px; height: 28px; border-radius: 999px;
+  .wizard-step-dot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .wizard-step-dot span {
+    width: 32px; height: 32px; border-radius: 999px;
     display: grid; place-items: center;
-    font-size: 12px; font-weight: 700;
+    font-size: 13px; font-weight: 700;
     border: 1px solid var(--line);
-    color: var(--mut); background: transparent;
-    transition: all .2s;
+    color: var(--mut); background: rgba(7,10,18,.8);
+    transition: all .3s;
   }
-  .wizard-dot--active {
+  .wizard-step-dot small {
+    font-size: 10px; font-weight: 600; color: var(--mut);
+    letter-spacing: .04em; transition: color .3s;
+  }
+  .wizard-step-dot--active span {
     border-color: var(--accent); color: var(--accent);
-    background: rgba(125, 211, 252, .08);
+    background: rgba(125,211,252,.08);
+    box-shadow: 0 0 16px rgba(125,211,252,.15);
   }
-  .wizard-line {
-    flex: 1; height: 1px; background: var(--line); margin: 0 8px;
+  .wizard-step-dot--active small { color: var(--accent); }
+
+  .wizard-line-bar {
+    flex: 1; height: 2px; background: var(--line);
+    margin: 0 8px; border-radius: 1px;
+    position: relative; top: -8px; overflow: hidden;
+  }
+  .wizard-line-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent), rgba(99,102,241,.6));
+    border-radius: 1px;
+    transition: width .4s ease;
   }
 
-  /* PRESET PICKER */
-  .preset-picker { margin-bottom: 4px; }
+  /* PRESET PICKER — Visual cards */
   .preset-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    margin-top: 8px;
+    gap: 10px;
   }
   .preset-card {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-    padding: 12px;
-    border-radius: 14px;
+    gap: 0;
+    padding: 0;
+    border-radius: 16px;
     border: 1px solid var(--line);
-    background: transparent;
+    background: rgba(231,238,247,.02);
     color: var(--mut);
     cursor: pointer;
-    transition: border-color .15s, background .15s;
+    transition: all .25s;
     text-align: left;
     font-family: inherit;
+    overflow: hidden;
   }
   .preset-card:hover {
-    border-color: rgba(125, 211, 252, .25);
-    background: rgba(125, 211, 252, .04);
+    border-color: rgba(125,211,252,.25);
+    background: rgba(125,211,252,.03);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,.15);
   }
   .preset-card--active {
-    border-color: var(--accent);
-    background: rgba(125, 211, 252, .08);
+    border-color: rgba(125,211,252,.4);
+    background: rgba(125,211,252,.06);
+    color: var(--fg);
+    box-shadow: 0 0 20px rgba(125,211,252,.08), 0 8px 24px rgba(0,0,0,.15);
+  }
+  .preset-preview {
+    padding: 16px 12px 8px;
     color: var(--fg);
   }
-  .preset-icon { font-size: 18px; line-height: 1; }
-  .preset-name { font-size: 13px; font-weight: 700; color: inherit; }
-  .preset-tag { font-size: 10px; color: var(--mut); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
-  .preset-card--active .preset-tag { color: rgba(125, 211, 252, .6); }
-
-  /* VARIANT SELECTORS */
-  .variant-selectors { margin-top: 14px; display: grid; gap: 10px; }
-  .field-group--inline { display: flex; flex-direction: column; gap: 5px; }
-  .chip-group { display: flex; flex-wrap: wrap; gap: 6px; }
-  .chip {
-    padding: 5px 12px; border-radius: 999px;
-    font-size: 12px; font-weight: 600; font-family: inherit;
-    border: 1px solid var(--line); background: transparent;
-    color: var(--mut); cursor: pointer; transition: all .15s;
-    text-transform: capitalize;
+  .preset-preview svg { width: 100%; height: auto; }
+  .preset-info {
+    padding: 8px 14px 14px;
+    display: flex; flex-direction: column; gap: 2px;
   }
-  .chip:hover { border-color: rgba(125, 211, 252, .3); color: var(--fg); }
-  .chip--active {
-    border-color: var(--accent); background: rgba(125, 211, 252, .1); color: var(--accent);
+  .preset-name { font-size: 14px; font-weight: 700; color: inherit; }
+  .preset-desc { font-size: 11px; color: var(--mut); line-height: 1.4; }
+  .preset-card--active .preset-desc { color: rgba(125,211,252,.5); }
+
+  /* VARIANT SELECTORS — Visual cards */
+  .variant-selectors { display: grid; gap: 16px; }
+  .variant-group { display: flex; flex-direction: column; gap: 8px; }
+  .variant-options { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .variant-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 8px 8px;
+    min-width: 72px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: rgba(231,238,247,.02);
+    color: var(--mut);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .2s;
+  }
+  .variant-card:hover {
+    border-color: rgba(125,211,252,.25);
+    background: rgba(125,211,252,.04);
+    transform: translateY(-1px);
+  }
+  .variant-card--active {
+    border-color: rgba(125,211,252,.4);
+    background: rgba(125,211,252,.08);
+    color: var(--accent);
+    box-shadow: 0 0 12px rgba(125,211,252,.08);
+  }
+  .variant-card__preview {
+    width: 64px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--fg);
+  }
+  .variant-card__preview svg { width: 100%; height: 100%; }
+  .variant-card__label {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: .02em;
   }
 
   /* OPTIONAL TOGGLES */
@@ -1433,15 +1706,101 @@ import PageWidgets from "../../../components/PageWidgets.astro";
     border-color: rgba(125, 211, 252, .2);
   }
 
+  .project-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
   .project-name {
     font-size: 14px;
     font-weight: 700;
   }
 
+  .project-status {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .project-status--draft { background: rgba(231,238,247,.08); color: var(--mut); }
+  .project-status--published { background: rgba(52,211,153,.12); color: #34D399; }
+
   .project-slug {
     font-size: 11px;
     color: var(--mut);
     font-family: ui-monospace, monospace;
+  }
+
+  /* INFO PANEL */
+  .card--info {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, rgba(125,211,252,.04), rgba(99,102,241,.03));
+    border: 1px solid rgba(125,211,252,.12);
+  }
+
+  .info-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .status-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 999px;
+  }
+  .status-badge--draft { background: rgba(231,238,247,.08); color: var(--mut); }
+  .status-badge--published { background: rgba(52,211,153,.12); color: #34D399; }
+
+  .info-url-box {
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: rgba(7,10,18,.5);
+    border: 1px solid rgba(231,238,247,.08);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .info-url-label {
+    font-size: 12px;
+    color: var(--mut);
+    white-space: nowrap;
+  }
+
+  .info-url-link {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    font-family: ui-monospace, monospace;
+    word-break: break-all;
+  }
+  .info-url-link:hover { text-decoration: underline; }
+
+  .info-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .btn--accent {
+    background: rgba(52,211,153,.15);
+    border: 1px solid rgba(52,211,153,.3);
+    color: #34D399;
+  }
+  .btn--accent:hover {
+    background: rgba(52,211,153,.25);
+    transform: translateY(-1px);
   }
 
   /* EDITOR */
