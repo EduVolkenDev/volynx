@@ -75,8 +75,8 @@ const faqs = [
     </section>
 
     <section class="grid">
-      {plans.map((p) => (
-        <article class="card">
+      {plans.map((p, i) => (
+        <article class="card" data-plan-index={i}>
           <div class="card-top">
             <span class="badge">{p.badge}</span>
             <h2>{p.name}</h2>
@@ -91,7 +91,7 @@ const faqs = [
             {p.perks.map((x) => <li>{x}</li>)}
           </ul>
 
-          <a class="btn" href={p.cta.href}>{p.cta.label}</a>
+          <a class="btn" href={p.cta.href} data-plan-cta={i}>{p.cta.label}</a>
         </article>
       ))}
     </section>
@@ -198,6 +198,73 @@ const faqs = [
   </main>
 
   <SiteFooter />
+
+  <script is:inline type="module">
+    // Plan index mapping: 0=free, 1=pro, 2=teams(enterprise)
+    const planToIndex = { free: 0, pro: 1, enterprise: 2 };
+
+    async function detectPlan() {
+      const token = localStorage.getItem("volynx_access_token");
+      const refresh = localStorage.getItem("volynx_refresh_token");
+      if (!token || !refresh) return;
+
+      let cfg;
+      try { cfg = await fetch("/config.json", { cache: "no-store" }).then(r => r.json()); }
+      catch { return; }
+
+      const apiBase = (cfg.apiBaseUrl || "").replace(/\/$/, "");
+      if (!apiBase) return;
+
+      try {
+        const res = await fetch(`${apiBase}/api/check-permission`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ tool: "converter" }),
+        });
+        if (!res.ok) return;
+        const perm = await res.json();
+        const plan = perm.plan || "free";
+        if (perm.useLocalStorage) return; // no valid plan info
+
+        const idx = planToIndex[plan];
+        if (idx === undefined) return;
+
+        // Mark the active plan card
+        const card = document.querySelector(`[data-plan-index="${idx}"]`);
+        if (!card) return;
+
+        card.classList.add("card--current");
+
+        // Replace badge
+        const badge = card.querySelector(".badge");
+        if (badge) {
+          badge.textContent = "Your plan";
+          badge.classList.add("badge--current");
+        }
+
+        // Replace CTA button
+        const cta = document.querySelector(`[data-plan-cta="${idx}"]`);
+        if (cta) {
+          cta.textContent = "Current plan ✓";
+          cta.classList.add("btn--current");
+          cta.removeAttribute("href");
+          cta.style.pointerEvents = "none";
+        }
+
+        // Mark table column header
+        const colHeaders = document.querySelectorAll("thead th");
+        if (colHeaders[idx + 1]) {
+          const th = colHeaders[idx + 1];
+          const marker = document.createElement("div");
+          marker.textContent = "Your plan";
+          marker.style.cssText = "font-size:9px;letter-spacing:.08em;margin-top:4px;color:#34D399;font-weight:700;";
+          th.appendChild(marker);
+        }
+      } catch {}
+    }
+
+    detectPlan();
+  </script>
 </BaseLayout>
 
 <style>
@@ -240,6 +307,27 @@ const faqs = [
     padding: 12px 14px; border-radius: 14px;
     border: 1px solid rgba(255,255,255,.12);
     text-decoration: none;
+    transition: all .2s;
+  }
+
+  /* Current plan indicator */
+  .card--current {
+    border-color: rgba(52,211,153,.3);
+    background: rgba(52,211,153,.04);
+    box-shadow: 0 0 24px rgba(52,211,153,.06);
+  }
+  .badge--current {
+    background: rgba(52,211,153,.12) !important;
+    border-color: rgba(52,211,153,.35) !important;
+    color: #34D399 !important;
+    opacity: 1 !important;
+  }
+  .btn--current {
+    background: rgba(52,211,153,.08);
+    border-color: rgba(52,211,153,.25);
+    color: #34D399;
+    cursor: default;
+    font-weight: 600;
   }
 
   /* Comparison table */
