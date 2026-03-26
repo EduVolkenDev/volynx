@@ -32,7 +32,7 @@ const pageDescription = "Volynx Studio Pro: unlimited image processing, batch mo
     <!-- ═══════════════════════════════════════════════ -->
     <!-- PRO DASHBOARD (hidden by default, shown for pro users) -->
     <!-- ═══════════════════════════════════════════════ -->
-    <div id="proDash" hidden>
+    <div id="proDash" style="display:none">
 
       <!-- Pro header -->
       <div class="pro-header">
@@ -64,7 +64,7 @@ const pageDescription = "Volynx Studio Pro: unlimited image processing, batch mo
         <a href="/volynx-lab/studio/converter/" class="pro-tool-card" data-tool="converter">
           <div class="pro-tool-card__glow" style="--glow:#6D5EFC"></div>
           <div class="pro-tool-card__head">
-            <div class="pro-tool-card__icon"><img src="/assets/proconverter.webp" alt="Converter" /></div>
+            <div class="pro-tool-card__icon"><img src="/assets/proconverter.webp" alt="Converter" width="52" height="52" /></div>
             <div class="pro-tool-card__usage">
               <span class="pro-tool-card__count" data-tool-count="converter">—</span>
               <span class="pro-tool-card__limit" data-tool-limit="converter">/ —</span>
@@ -79,7 +79,7 @@ const pageDescription = "Volynx Studio Pro: unlimited image processing, batch mo
         <a href="/volynx-lab/studio/image-scaler/" class="pro-tool-card" data-tool="image-scaler">
           <div class="pro-tool-card__glow" style="--glow:#3B82F6"></div>
           <div class="pro-tool-card__head">
-            <div class="pro-tool-card__icon"><img src="/assets/proscaler.webp" alt="Image Scaler" /></div>
+            <div class="pro-tool-card__icon"><img src="/assets/proscaler.webp" alt="Image Scaler" width="52" height="52" /></div>
             <div class="pro-tool-card__usage">
               <span class="pro-tool-card__count" data-tool-count="image-scaler">—</span>
               <span class="pro-tool-card__limit" data-tool-limit="image-scaler">/ —</span>
@@ -94,7 +94,7 @@ const pageDescription = "Volynx Studio Pro: unlimited image processing, batch mo
         <a href="/volynx-lab/studio/image-suite/" class="pro-tool-card" data-tool="image-suite">
           <div class="pro-tool-card__glow" style="--glow:#8B5CF6"></div>
           <div class="pro-tool-card__head">
-            <div class="pro-tool-card__icon"><img src="/assets/prosuite.webp" alt="Image Suite" /></div>
+            <div class="pro-tool-card__icon"><img src="/assets/prosuite.webp" alt="Image Suite" width="52" height="52" /></div>
             <div class="pro-tool-card__usage">
               <span class="pro-tool-card__count" data-tool-count="image-suite">—</span>
               <span class="pro-tool-card__limit" data-tool-limit="image-suite">/ —</span>
@@ -109,7 +109,7 @@ const pageDescription = "Volynx Studio Pro: unlimited image processing, batch mo
         <a href="/volynx-lab/studio/qr-gen/" class="pro-tool-card" data-tool="qr-gen">
           <div class="pro-tool-card__glow" style="--glow:#EC4899"></div>
           <div class="pro-tool-card__head">
-            <div class="pro-tool-card__icon"><img src="/assets/proqrgen.webp" alt="QR Generator" /></div>
+            <div class="pro-tool-card__icon"><img src="/assets/proqrgen.webp" alt="QR Generator" width="52" height="52" /></div>
             <div class="pro-tool-card__usage">
               <span class="pro-tool-card__count" data-tool-count="qr-gen">—</span>
               <span class="pro-tool-card__limit" data-tool-limit="qr-gen">/ —</span>
@@ -277,8 +277,8 @@ const pageDescription = "Volynx Studio Pro: unlimited image processing, batch mo
     } catch {}
 
     // Switch to Pro dashboard
-    document.getElementById("salesPage").hidden = true;
-    document.getElementById("proDash").hidden = false;
+    document.getElementById("salesPage").style.display = "none";
+    document.getElementById("proDash").style.display = "block";
     document.getElementById("proName").textContent = userName || "Pro user";
     document.getElementById("proPlan").textContent = plan;
 
@@ -431,10 +431,11 @@ const pageDescription = "Volynx Studio Pro: unlimited image processing, batch mo
   .pro-tool-card__icon {
     width: 52px; height: 52px; border-radius: 14px; overflow: hidden;
     background: rgba(109,94,252,.08); border: 1px solid rgba(109,94,252,.12);
-    flex-shrink: 0;
+    flex-shrink: 0; position: relative;
   }
   .pro-tool-card__icon img {
-    width: 100%; height: 100%; object-fit: cover; display: block;
+    width: 52px; height: 52px; object-fit: cover; display: block;
+    border-radius: 14px;
   }
 
   .pro-tool-card__usage { display: flex; align-items: baseline; gap: 2px; }
