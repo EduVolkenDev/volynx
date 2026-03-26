@@ -85,20 +85,6 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
 
           <button id="runBtn" class="btn" type="button" disabled style="margin-top:16px" data-i18n="suite.btn_process">Processar</button>
 
-          <hr />
-
-          <div class="license-row">
-            <input
-              id="licenseKey"
-              class="license-input"
-              placeholder="Enter PRO License"
-              data-i18n-placeholder="suite.license_placeholder"
-              type="text"
-              aria-label="License key"
-            />
-            <button id="activateBtn" class="btn secondary" type="button" data-i18n="suite.btn_activate">Activate</button>
-          </div>
-
           <div id="proStatus" class="pro-status" aria-live="polite"></div>
 
           <div class="kpis">
@@ -131,7 +117,7 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
   <script is:inline>
     const FREE_LIMIT = 3;
     const STORAGE_KEY = "volynx_suite_usage";
-    const VALID_LICENSES = ["VOLYNX-PRO-2026", "VOLYNX-LIFETIME-001"];
+    // License keys removed — plan is checked server-side via check-permission API
 
     function todayKey() {
       const d = new Date();
@@ -217,11 +203,10 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
     const qualityValEl = $("qualityVal");
     const origMeta = $("origMeta");
     const outMeta = $("outMeta");
-    const licenseInput = $("licenseKey");
-    const activateBtn = $("activateBtn");
     const proStatus = $("proStatus");
 
-    let isPro = localStorage.getItem("volynx_pro") === "true";
+    // isPro determined by server-side plan check, not localStorage
+    let isPro = false;
     let loadedImages = [];
     let processedResults = [];
     let singleOutBlob = null;
@@ -330,19 +315,17 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       };
     }
 
-    activateBtn.addEventListener("click", () => {
-      const key = licenseInput.value.trim();
-
-      if (VALID_LICENSES.includes(key)) {
-        localStorage.setItem("volynx_pro", "true");
-        isPro = true;
-        updateProUI();
-        alert("PRO Activated Successfully!");
-      } else {
-        alert("Invalid License Key");
-      }
-    });
-
+    // Detect pro status from server-side check
+    async function detectPro() {
+      try {
+        const perm = await checkToolPermission("image-suite", 0);
+        if (perm.plan === "pro" || perm.plan === "enterprise") {
+          isPro = true;
+          updateProUI();
+        }
+      } catch {}
+    }
+    detectPro();
     updateProUI();
 
     qualityEl.addEventListener("input", () => {

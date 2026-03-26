@@ -117,18 +117,6 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
 
           <button id="runBtn" class="btn" type="button" disabled style="margin-top:16px" data-i18n="suite.btn_process">Processar</button>
 
-          <hr />
-
-          <div class="license-row">
-            <input
-              id="licenseKey"
-              class="license-input"
-              placeholder="Enter PRO License"
-              type="text"
-              aria-label="License key"
-            />
-            <button id="activateBtn" class="btn secondary" type="button">Activate</button>
-          </div>
           <div id="proStatus" class="pro-status" aria-live="polite"></div>
 
           <div class="kpis">
@@ -189,16 +177,11 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
     const qualityValEl = $("qualityVal") as HTMLElement;
     const origMeta    = $("origMeta") as HTMLElement;
     const outMeta     = $("outMeta") as HTMLElement;
-    const licenseInput = $("licenseKey") as HTMLInputElement;
-    const activateBtn = $("activateBtn") as HTMLButtonElement;
     const proStatus   = $("proStatus") as HTMLElement;
 
-    const VALID_LICENSES = [
-      "VOLYNX-PRO-2026",
-      "VOLYNX-LIFETIME-001"
-    ];
-
-    let isPro = localStorage.getItem("volynx_pro") === "true";
+    // Pro status is determined by Supabase plan via vx-auth-gate.js
+    // No more hardcoded license keys — plan is checked server-side
+    let isPro = false;
 
     // Brand Kit (shared with Studio)
     type BrandKit = { logoDataUrl?: string; primary?: string; neutral?: string; font?: string; updatedAt?: string };
@@ -263,18 +246,16 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       }
     }
 
-    activateBtn.addEventListener("click", () => {
-      const key = licenseInput.value.trim();
-      if (VALID_LICENSES.includes(key)) {
-        localStorage.setItem("volynx_pro", "true");
-        isPro = true;
-        updateProUI();
-        alert("PRO Activated Successfully!");
-      } else {
-        alert("Invalid License Key");
-      }
+    // Listen for plan detection from vx-auth-gate.js
+    window.addEventListener("vx:plan-ready", (e: any) => {
+      const plan = e.detail?.plan || "free";
+      isPro = plan === "pro" || plan === "enterprise";
+      updateProUI();
     });
-
+    // Also check if already resolved
+    if ((window as any).vxPlan === "pro" || (window as any).vxPlan === "enterprise") {
+      isPro = true;
+    }
     updateProUI();
 
     qualityEl.addEventListener("input", () => {

@@ -74,6 +74,23 @@
     if (banner) banner.style.display = '';
   }
 
+  // Block access to pro-only tools for free users
+  const proOnlyTools = ['image-suite']; // tools that require pro plan
+  const currentTool = window.__vxTool || '';
+  if (plan === 'free' && proOnlyTools.includes(currentTool)) {
+    const main = document.querySelector('main');
+    if (main) {
+      main.innerHTML = '<div style="text-align:center;padding:80px 24px;max-width:480px;margin:0 auto;">'
+        + '<div style="font-size:48px;margin-bottom:16px;">🔒</div>'
+        + '<h2 style="font-size:24px;font-weight:800;margin-bottom:10px;">Pro feature</h2>'
+        + '<p style="opacity:.6;line-height:1.6;margin-bottom:24px;">Image Suite is available on the Pro plan. Upgrade to unlock unlimited processing, batch mode, and commercial rights.</p>'
+        + '<a href="/pricing/" style="display:inline-flex;padding:12px 28px;border-radius:12px;background:rgba(109,94,252,.2);border:1px solid rgba(109,94,252,.5);color:rgba(200,185,255,.95);font-weight:600;text-decoration:none;">See pricing</a>'
+        + ' <a href="/volynx-lab/" style="display:inline-flex;padding:12px 20px;border-radius:12px;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);text-decoration:none;margin-left:8px;">Back to Lab</a>'
+        + '</div>';
+    }
+    return; // Don't dispatch plan-ready, blocking the tool scripts
+  }
+
   // Dispatch event so other scripts can react
   window.dispatchEvent(new CustomEvent('vx:plan-ready', { detail: { plan, proFeatures } }));
 })();
