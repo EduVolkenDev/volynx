@@ -75,6 +75,61 @@ const products = [
     descKey: "products.devtools.desc",
   },
   {
+    name: "Studio Pro",
+    slug: "studio-pro",
+    href: "/volynx-lab/studio/",
+    badge: "Pro",
+    icon: "/assets/prostudio.webp",
+    meta: "Unlimited • Batch • Commercial",
+    desc: "The full production pipeline in the browser. No limits, batch processing, and commercial rights.",
+    metaKey: "products.studio.meta",
+    descKey: "products.studio.desc",
+  },
+  {
+    name: "Converter Pro",
+    slug: "converter-pro",
+    href: "/volynx-lab/studio/converter/",
+    badge: "Pro Tool",
+    icon: "/assets/proconverter.webp",
+    meta: "WebP • JPG • PNG • AVIF",
+    desc: "Batch convert images with quality control and resize. No daily limits on Pro.",
+    metaKey: "products.converter.meta",
+    descKey: "products.converter.desc",
+  },
+  {
+    name: "Image Scaler Pro",
+    slug: "scaler-pro",
+    href: "/volynx-lab/studio/image-scaler/",
+    badge: "Pro Tool",
+    icon: "/assets/proscaler.webp",
+    meta: "2× • 3× • 4× Upscale",
+    desc: "Upscale images with maximum resolution and zero quality loss. 100% local processing.",
+    metaKey: "products.scaler.meta",
+    descKey: "products.scaler.desc",
+  },
+  {
+    name: "Image Suite",
+    slug: "suite-pro",
+    href: "/volynx-lab/studio/image-suite/",
+    badge: "Pro Exclusive",
+    icon: "/assets/prosuite.webp",
+    meta: "Upscale • Compress • Convert",
+    desc: "All-in-one image processing suite with brand watermark. Studio Pro exclusive.",
+    metaKey: "products.suite.meta",
+    descKey: "products.suite.desc",
+  },
+  {
+    name: "QR Generator Pro",
+    slug: "qrgen-pro",
+    href: "/volynx-lab/studio/qr-gen/",
+    badge: "Pro Tool",
+    icon: "/assets/proqrgen.webp",
+    meta: "Styled • Logos • High-res",
+    desc: "Generate styled QR codes with logos, gradients, and high-resolution export for campaigns.",
+    metaKey: "products.qrgen.meta",
+    descKey: "products.qrgen.desc",
+  },
+  {
     name: "VOLYNX Builder",
     slug: "builder",
     href: "/builder/",
@@ -122,10 +177,13 @@ const products = [
 
     <section class="grid" aria-label="Product catalog">
       {products.map((p) => (
-        <article class="card">
+        <article class={`card ${p.icon ? 'card--has-icon' : ''} ${p.badge === 'Pro' || p.badge === 'Pro Tool' || p.badge === 'Pro Exclusive' ? 'card--pro' : ''}`}>
           <div class="cardTop">
-            <span class="badge">{p.badge}</span>
-            <span class="meta" data-i18n={p.metaKey}>{p.meta}</span>
+            {p.icon && <img class="card__icon" src={p.icon} alt="" />}
+            <div class="cardTop__text">
+              <span class={`badge ${p.badge === 'Pro' || p.badge === 'Pro Tool' || p.badge === 'Pro Exclusive' ? 'badge--pro' : ''}`}>{p.badge}</span>
+              <span class="meta" data-i18n={p.metaKey}>{p.meta}</span>
+            </div>
           </div>
 
           <h2>{p.name}</h2>
@@ -145,3 +203,43 @@ const products = [
 
   <SiteFooter />
 </BaseLayout>
+
+<style>
+  /* Product card icons */
+  .card__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .card--has-icon .cardTop {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .cardTop__text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  /* Pro card styling */
+  .card--pro {
+    border-color: rgba(109,94,252,.2);
+    background: rgba(109,94,252,.03);
+  }
+
+  .card--pro:hover {
+    border-color: rgba(109,94,252,.35);
+    box-shadow: 0 0 24px rgba(109,94,252,.06);
+  }
+
+  .badge--pro {
+    background: rgba(109,94,252,.15) !important;
+    border-color: rgba(109,94,252,.35) !important;
+    color: #C4B5FD !important;
+  }
+</style>
