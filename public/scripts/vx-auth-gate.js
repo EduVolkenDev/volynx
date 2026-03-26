@@ -7,14 +7,35 @@
   const LOGIN_PATH = '/login/';
   const PRICING_PATH = '/pricing/';
 
-  // ── 1. Check token ──────────────────────────────────────────────────────────
-  const token = localStorage.getItem('volynx_access_token') || '';
+  // ── 1. Check token + auto-refresh if expired ─────────────────────────────
+  var token = localStorage.getItem('volynx_access_token') || '';
+  var refreshToken = localStorage.getItem('volynx_refresh_token') || '';
 
   if (!token) {
-    const next = encodeURIComponent(window.location.pathname + window.location.search);
-    window.location.replace(`${LOGIN_PATH}?next=${next}`);
+    var next = encodeURIComponent(window.location.pathname + window.location.search);
+    window.location.replace(LOGIN_PATH + '?next=' + next);
     return;
   }
+
+  // Try to refresh the session to get a fresh token
+  try {
+    var cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r) { return r.json(); });
+    if (cfg.supabaseUrl && cfg.supabaseAnonKey && refreshToken) {
+      var refreshRes = await fetch(cfg.supabaseUrl + '/auth/v1/token?grant_type=refresh_token', {
+        method: 'POST',
+        headers: { apikey: cfg.supabaseAnonKey, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+      if (refreshRes.ok) {
+        var sess = await refreshRes.json();
+        if (sess.access_token) {
+          token = sess.access_token;
+          localStorage.setItem('volynx_access_token', sess.access_token);
+          if (sess.refresh_token) localStorage.setItem('volynx_refresh_token', sess.refresh_token);
+        }
+      }
+    }
+  } catch (_) {}
 
   // ── 2. Resolve plan from backend ───────────────────────────────────────────
   let plan = 'free';
