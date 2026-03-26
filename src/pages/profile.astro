@@ -524,25 +524,27 @@ import Topbar from "../components/Topbar.astro";
 					avatarPreview.src = DEFAULT_PRO_AVATAR;
 					avatarPreview.style.display = "block";
 					avatarFallback.style.display = "none";
-					// Save the pro avatar to DB
 					await supabase.from("profiles").update({ avatar_url: DEFAULT_PRO_AVATAR }).eq("id", user.id);
 					log("auto-upgraded avatar to pro: " + DEFAULT_PRO_AVATAR);
 				}
 
-				// Avatar option click (free + pro)
-				document.querySelectorAll(".avatar-option[data-avatar]").forEach(btn => {
-					btn.addEventListener("click", () => {
-						const url = (btn as HTMLElement).dataset.avatar!;
-						avatarPreview.src = url;
-						avatarPreview.style.display = "block";
-						avatarFallback.style.display = "none";
-						avatarPanel.hidden = true;
-						(avatarPreview as any)._selectedFreeAvatar = url;
-						(avatarPreview as any)._pendingFile = null;
-						document.querySelectorAll(".avatar-option").forEach(o => o.classList.remove("avatar-option--selected"));
-						btn.classList.add("avatar-option--selected");
+				// Avatar option click (free + pro) — bind AFTER pro avatars are injected
+				function bindAvatarOptions() {
+					document.querySelectorAll(".avatar-option[data-avatar]").forEach(btn => {
+						btn.addEventListener("click", () => {
+							const url = (btn as HTMLElement).dataset.avatar!;
+							avatarPreview.src = url;
+							avatarPreview.style.display = "block";
+							avatarFallback.style.display = "none";
+							avatarPanel.hidden = true;
+							(avatarPreview as any)._selectedFreeAvatar = url;
+							(avatarPreview as any)._pendingFile = null;
+							document.querySelectorAll(".avatar-option").forEach(o => o.classList.remove("avatar-option--selected"));
+							btn.classList.add("avatar-option--selected");
+						});
 					});
-				});
+				}
+				bindAvatarOptions();
 
 				// Custom file upload
 				$("avatarInput")?.addEventListener("change", (e: Event) => {
