@@ -4,8 +4,8 @@ import LabBg from "../../../../components/LabBg.astro";
 import PageWidgets from "../../../../components/PageWidgets.astro";
 import SiteFooter from "../../../../components/SiteFooter.astro";
 import VxHeader from "../../../../components/VxHeader.astro";
-const pageTitle = "VOLYNX Lab • iMage Suite";
-const pageDescription = "Free image suite — upscale, compress and convert images directly in your browser, no upload required.";
+const pageTitle = "VOLYNX Studio • Image Suite";
+const pageDescription = "Pro-exclusive multi-tool: upscale, compress, convert, resize, crop, rotate and watermark — all in one interface.";
 ---
 
 <!DOCTYPE html>
@@ -16,7 +16,6 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
   <meta name="theme-color" content="#080610" />
   <meta name="description" content={pageDescription} />
   <title>{pageTitle}</title>
-
   <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
   <link rel="shortcut icon" href="/assets/favicon.ico" />
@@ -29,258 +28,268 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
   <LabBg />
   <VxHeader />
   <div id="vx-upgrade-banner" style="display:none;background:rgba(108,10,228,.18);border-bottom:1px solid rgba(108,10,228,.35);padding:10px 20px;text-align:center;font-size:.85em;">
-    Você está no plano gratuito — limite de 3 imagens/dia. <a href="/pricing/" style="color:#59c6e8;font-weight:700;">Upgrade para Pro</a> e processe sem limites.
+    Você está no plano gratuito — Image Suite é exclusivo Pro. <a href="/pricing/" style="color:#59c6e8;font-weight:700;">Upgrade para Pro</a>
   </div>
 
   <nav class="vx-back">
-    <a class="pill-back" href="/volynx-lab/" data-i18n="suite.back">← Voltar</a>
+    <a class="pill-back" href="/volynx-lab/studio/" data-i18n="suite.back">← Studio</a>
   </nav>
 
   <main class="wrap">
-    <h1 data-i18n="suite.title">iMage Suite</h1>
+    <h1 class="suite-title">Image Suite <span class="suite-pro-tag">PRO</span></h1>
+    <p class="suite-sub">All-in-one image processing. Choose a tool, configure, process.</p>
 
-    <div class="grid">
-      <div class="card">
-        <div class="cardHead">
-          <strong data-i18n="suite.card_upload">Upload &amp; Config</strong>
-          <button id="pickBtn" class="btn secondary" type="button" data-i18n="suite.btn_select">Selecionar</button>
-          <input id="file" type="file" accept="image/*" hidden aria-label="Select image" />
+    <div class="suite-layout">
+
+      <!-- LEFT: Upload + Tools -->
+      <div class="suite-panel">
+        <!-- Upload -->
+        <div class="suite-section">
+          <div class="suite-section__head">
+            <strong>Upload</strong>
+            <button id="pickBtn" class="suite-btn-sm" type="button">Select file</button>
+            <input id="file" type="file" accept="image/*" hidden />
+          </div>
+          <div id="drop" class="suite-drop" role="button" tabindex="0">
+            <span class="suite-drop__icon">↑</span>
+            <span>Drop image here or click to select</span>
+          </div>
+          <div class="suite-meta" id="origMeta">No file loaded</div>
         </div>
 
-        <div class="cardBody">
-          <div id="drop" class="drop" role="button" tabindex="0" aria-label="Drop zone">
-            <span data-i18n="suite.drop_text">Arraste imagem aqui ou clique para selecionar</span>
+        <!-- Tool selector -->
+        <div class="suite-section">
+          <strong class="suite-section__label">Tool</strong>
+          <div class="suite-tools" id="toolPicker">
+            <button class="suite-tool-btn suite-tool-btn--active" data-tool="upscale">
+              <span class="suite-tool-btn__icon">⬆</span>
+              <span>Upscale</span>
+            </button>
+            <button class="suite-tool-btn" data-tool="compress">
+              <span class="suite-tool-btn__icon">📦</span>
+              <span>Compress</span>
+            </button>
+            <button class="suite-tool-btn" data-tool="convert">
+              <span class="suite-tool-btn__icon">🔄</span>
+              <span>Convert</span>
+            </button>
+            <button class="suite-tool-btn" data-tool="resize">
+              <span class="suite-tool-btn__icon">📐</span>
+              <span>Resize</span>
+            </button>
+            <button class="suite-tool-btn" data-tool="rotate">
+              <span class="suite-tool-btn__icon">↻</span>
+              <span>Rotate</span>
+            </button>
+            <button class="suite-tool-btn" data-tool="watermark">
+              <span class="suite-tool-btn__icon">💧</span>
+              <span>Watermark</span>
+            </button>
           </div>
+        </div>
 
-          <div class="field-group">
-            <label class="field" data-i18n="suite.tool_label">
-              Ferramenta
-              <select id="tool" aria-label="Tool">
-                <option value="upscale" selected data-i18n="suite.tool_upscale">Upscale</option>
-                <option value="compress" data-i18n="suite.tool_compress">Compress</option>
-                <option value="convert" data-i18n="suite.tool_convert">Convert</option>
+        <!-- Config panels (one per tool, toggled by JS) -->
+        <div class="suite-section suite-config" id="cfg-upscale">
+          <strong class="suite-section__label">Upscale settings</strong>
+          <div class="suite-fields">
+            <label class="suite-field">
+              <span>Scale</span>
+              <select id="scale">
+                <option value="2">2×</option>
+                <option value="3">3×</option>
+                <option value="4" selected>4×</option>
               </select>
             </label>
-
-            <label class="field" data-i18n="suite.scale_label">
-              Escala (Upscale)
-              <select id="scale" aria-label="Scale">
-                <option value="2">2x</option>
-                <option value="3">3x</option>
-                <option value="4" selected>4x</option>
-              </select>
-            </label>
-
-            <label class="field" data-i18n="suite.format_label">
-              Formato
-              <select id="format" aria-label="Output format">
-                <option value="image/png">PNG</option>
+            <label class="suite-field">
+              <span>Output format</span>
+              <select id="format">
+                <option value="image/png" selected>PNG</option>
                 <option value="image/webp">WebP</option>
                 <option value="image/jpeg">JPG</option>
               </select>
             </label>
-
-            <label class="field" data-i18n="suite.quality_label">
-              Qualidade (Compress)
-              <input id="quality" type="range" min="0.3" max="1" step="0.05" value="0.85" aria-label="Quality" />
-              <em id="qualityVal" style="font-style:normal;font-size:12px;color:rgba(255,255,255,.68)">0.85</em>
+            <label class="suite-field suite-field--row">
+              <input id="smooth" type="checkbox" checked />
+              <span>High quality smoothing</span>
             </label>
           </div>
+        </div>
 
-          <div class="pro-box" style="margin-top:12px">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-              <strong style="font-size:13px">Brand watermark</strong>
-              <span id="wmGate" style="opacity:.7;font-size:12px"></span>
-            </div>
-            <div style="display:grid;gap:10px;margin-top:10px">
-              <label style="display:flex;gap:10px;align-items:center">
-                <input id="wmEnable" type="checkbox" />
-                <span style="opacity:.85">Aplicar logo do Brand Kit</span>
-              </label>
-
-              <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-                <select id="wmPos" class="select" style="min-width:180px">
-                  <option value="br">Bottom-right</option>
-                  <option value="bl">Bottom-left</option>
-                  <option value="tr">Top-right</option>
-                  <option value="tl">Top-left</option>
-                </select>
-                <label style="display:flex;gap:10px;align-items:center">
-                  <span style="opacity:.75;font-size:12px">Opacidade</span>
-                  <input id="wmOp" type="range" min="0.1" max="1" step="0.05" value="0.85" />
-                </label>
-              </div>
-
-              <a href="/volynx-lab/studio/" style="opacity:.75;font-size:12px;text-decoration:underline">Configurar Brand Kit no Studio</a>
-            </div>
-          </div>
-
-          <button id="runBtn" class="btn" type="button" disabled style="margin-top:16px" data-i18n="suite.btn_process">Processar</button>
-
-          <div id="proStatus" class="pro-status" aria-live="polite"></div>
-
-          <div class="kpis">
-            <div class="kpi"><strong data-i18n="suite.original_label">Original</strong><div id="origMeta">—</div></div>
-            <div class="kpi"><strong data-i18n="suite.result_label">Resultado</strong><div id="outMeta">—</div></div>
+        <div class="suite-section suite-config" id="cfg-compress" hidden>
+          <strong class="suite-section__label">Compression settings</strong>
+          <div class="suite-fields">
+            <label class="suite-field">
+              <span>Quality — <strong id="qualityVal">85</strong>%</span>
+              <input id="quality" type="range" min="10" max="100" step="1" value="85" />
+            </label>
+            <label class="suite-field">
+              <span>Output format</span>
+              <select id="compressFmt">
+                <option value="image/webp" selected>WebP (best)</option>
+                <option value="image/jpeg">JPG</option>
+              </select>
+            </label>
           </div>
         </div>
+
+        <div class="suite-section suite-config" id="cfg-convert" hidden>
+          <strong class="suite-section__label">Convert settings</strong>
+          <div class="suite-fields">
+            <label class="suite-field">
+              <span>Target format</span>
+              <select id="convertFmt">
+                <option value="image/webp">WebP</option>
+                <option value="image/jpeg">JPG</option>
+                <option value="image/png" selected>PNG</option>
+                <option value="image/avif">AVIF</option>
+              </select>
+            </label>
+            <label class="suite-field">
+              <span>Quality — <strong id="convertQualVal">92</strong>%</span>
+              <input id="convertQual" type="range" min="40" max="100" step="1" value="92" />
+            </label>
+          </div>
+        </div>
+
+        <div class="suite-section suite-config" id="cfg-resize" hidden>
+          <strong class="suite-section__label">Resize settings</strong>
+          <div class="suite-fields">
+            <label class="suite-field">
+              <span>Width (px)</span>
+              <input id="resizeW" type="number" placeholder="Auto" min="1" max="10000" />
+            </label>
+            <label class="suite-field">
+              <span>Height (px)</span>
+              <input id="resizeH" type="number" placeholder="Auto" min="1" max="10000" />
+            </label>
+            <label class="suite-field suite-field--row">
+              <input id="resizeLock" type="checkbox" checked />
+              <span>Lock aspect ratio</span>
+            </label>
+            <label class="suite-field">
+              <span>Output format</span>
+              <select id="resizeFmt">
+                <option value="image/png" selected>PNG</option>
+                <option value="image/webp">WebP</option>
+                <option value="image/jpeg">JPG</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="suite-section suite-config" id="cfg-rotate" hidden>
+          <strong class="suite-section__label">Rotate / Flip</strong>
+          <div class="suite-fields">
+            <label class="suite-field">
+              <span>Rotation</span>
+              <select id="rotateDeg">
+                <option value="90">90° clockwise</option>
+                <option value="180">180°</option>
+                <option value="270">90° counter-clockwise</option>
+              </select>
+            </label>
+            <label class="suite-field suite-field--row">
+              <input id="flipH" type="checkbox" />
+              <span>Flip horizontal</span>
+            </label>
+            <label class="suite-field suite-field--row">
+              <input id="flipV" type="checkbox" />
+              <span>Flip vertical</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="suite-section suite-config" id="cfg-watermark" hidden>
+          <strong class="suite-section__label">Watermark settings</strong>
+          <div class="suite-fields">
+            <label class="suite-field">
+              <span>Text</span>
+              <input id="wmText" type="text" placeholder="© Your Brand" value="" />
+            </label>
+            <label class="suite-field">
+              <span>Position</span>
+              <select id="wmPos">
+                <option value="br" selected>Bottom-right</option>
+                <option value="bl">Bottom-left</option>
+                <option value="tr">Top-right</option>
+                <option value="tl">Top-left</option>
+                <option value="center">Center</option>
+              </select>
+            </label>
+            <label class="suite-field">
+              <span>Opacity — <strong id="wmOpVal">70</strong>%</span>
+              <input id="wmOp" type="range" min="10" max="100" step="5" value="70" />
+            </label>
+            <label class="suite-field">
+              <span>Size</span>
+              <select id="wmSize">
+                <option value="small">Small</option>
+                <option value="medium" selected>Medium</option>
+                <option value="large">Large</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <!-- Process button -->
+        <button id="runBtn" class="suite-run-btn" type="button" disabled>Process image</button>
       </div>
 
-      <div class="card">
-        <div class="cardHead">
-          <strong data-i18n="suite.card_result">Resultado</strong>
-          <button id="downloadBtn" class="btn" type="button" disabled data-i18n="suite.btn_download">Baixar</button>
+      <!-- RIGHT: Preview + Download -->
+      <div class="suite-panel suite-panel--preview">
+        <div class="suite-section__head">
+          <strong>Result</strong>
+          <button id="downloadBtn" class="suite-btn-sm" type="button" disabled>Download</button>
         </div>
-        <div class="cardBody">
-          <img id="preview" class="preview" alt="Result preview" />
+        <div class="suite-preview-area">
+          <img id="preview" class="suite-preview-img" alt="Result preview" />
+          <div class="suite-preview-empty" id="previewEmpty">Process an image to see the result</div>
         </div>
+        <div class="suite-meta" id="outMeta">—</div>
       </div>
+
     </div>
   </main>
 
   <script>
-    async function checkPermission(toolName: string) {
-      const FREE = { allowed: true, plan: 'free', remaining: null };
-      let cfg: any;
-      try { cfg = await fetch('/config.json', { cache: 'no-store' }).then((r) => r.json()); }
-      catch (_) { return FREE; }
-      const apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
-      if (!apiBase) return FREE;
-      const token = localStorage.getItem('volynx_access_token') || '';
-      try {
-        const ctrl = new AbortController();
-        const t = setTimeout(() => ctrl.abort(), 8000);
-        const res = await fetch(`${apiBase}/api/check-permission`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-          body: JSON.stringify({ tool: toolName }),
-          signal: ctrl.signal,
-        });
-        clearTimeout(t);
-        if (!res.ok) return FREE;
-        return await res.json();
-      } catch (_) { return FREE; }
-    }
-
     const $ = (id: string) => document.getElementById(id);
 
-    const fileEl      = $("file") as HTMLInputElement;
-    const pickBtn     = $("pickBtn") as HTMLButtonElement;
-    const dropEl      = $("drop") as HTMLElement;
-    const runBtn      = $("runBtn") as HTMLButtonElement;
+    // ── Tool picker ──────────────────────────────────────────
+    let activeTool = "upscale";
+    const allConfigs = ["cfg-upscale", "cfg-compress", "cfg-convert", "cfg-resize", "cfg-rotate", "cfg-watermark"];
+
+    document.querySelectorAll(".suite-tool-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        activeTool = (btn as HTMLElement).dataset.tool!;
+        document.querySelectorAll(".suite-tool-btn").forEach(b => b.classList.remove("suite-tool-btn--active"));
+        btn.classList.add("suite-tool-btn--active");
+        allConfigs.forEach(id => { const el = $(id) as HTMLElement; if (el) el.hidden = id !== `cfg-${activeTool}`; });
+      });
+    });
+
+    // ── File upload ──────────────────────────────────────────
+    const fileEl = $("file") as HTMLInputElement;
+    const pickBtn = $("pickBtn") as HTMLButtonElement;
+    const dropEl = $("drop") as HTMLElement;
+    const runBtn = $("runBtn") as HTMLButtonElement;
     const downloadBtn = $("downloadBtn") as HTMLButtonElement;
-    const previewEl   = $("preview") as HTMLImageElement;
-    const toolEl      = $("tool") as HTMLSelectElement;
-    const scaleEl     = $("scale") as HTMLSelectElement;
-    const fmtEl       = $("format") as HTMLSelectElement;
-    const qualityEl   = $("quality") as HTMLInputElement;
-    const qualityValEl = $("qualityVal") as HTMLElement;
-    const origMeta    = $("origMeta") as HTMLElement;
-    const outMeta     = $("outMeta") as HTMLElement;
-    const proStatus   = $("proStatus") as HTMLElement;
-
-    // Pro status is determined by Supabase plan via vx-auth-gate.js
-    // No more hardcoded license keys — plan is checked server-side
-    let isPro = false;
-
-    // Brand Kit (shared with Studio)
-    type BrandKit = { logoDataUrl?: string; primary?: string; neutral?: string; font?: string; updatedAt?: string };
-    function loadBrand(): BrandKit {
-      try { return JSON.parse(localStorage.getItem("volynx_brandkit") || "{}"); } catch { return {}; }
-    }
-
-    const wmEnable = $("wmEnable") as HTMLInputElement;
-    const wmPos    = $("wmPos") as HTMLSelectElement;
-    const wmOp     = $("wmOp") as HTMLInputElement;
-    const wmGate   = $("wmGate") as HTMLElement;
-
-    async function drawWatermark(ctx: CanvasRenderingContext2D, tw: number, th: number) {
-      const bk = loadBrand();
-      if (!bk.logoDataUrl) return;
-      const logo = new Image();
-      logo.src = bk.logoDataUrl;
-      await logo.decode();
-
-      const pad = Math.round(Math.min(tw, th) * 0.03);
-      const maxW = Math.round(tw * 0.22);
-      const s = Math.min(1, maxW / logo.width);
-      const lw = Math.round(logo.width * s);
-      const lh = Math.round(logo.height * s);
-
-      let x = pad, y = pad;
-      const pos = wmPos.value;
-      if (pos.includes("r")) x = tw - lw - pad;
-      if (pos.includes("b")) y = th - lh - pad;
-
-      ctx.save();
-      ctx.globalAlpha = Number(wmOp.value || "0.85");
-      ctx.drawImage(logo, x, y, lw, lh);
-      ctx.restore();
-    }
+    const previewEl = $("preview") as HTMLImageElement;
+    const previewEmpty = $("previewEmpty") as HTMLElement;
+    const origMeta = $("origMeta") as HTMLElement;
+    const outMeta = $("outMeta") as HTMLElement;
 
     let srcImg: HTMLImageElement | null = null;
     let srcFile: File | null = null;
     let outBlob: Blob | null = null;
     let srcName = "image";
 
-    function updateProUI() {
-      proStatus.textContent = isPro ? "PRO Activated ✔ Unlimited access enabled" : "";
-      const bk = loadBrand();
-      if (!isPro) {
-        wmGate.textContent = "PRO only";
-        wmEnable.checked = false;
-        wmEnable.disabled = true;
-        wmPos.disabled = true;
-        wmOp.disabled = true;
-      } else if (!bk.logoDataUrl) {
-        wmGate.textContent = "Adicione um logo no Studio";
-        wmEnable.checked = false;
-        wmEnable.disabled = true;
-        wmPos.disabled = true;
-        wmOp.disabled = true;
-      } else {
-        wmGate.textContent = "OK";
-        wmEnable.disabled = false;
-        wmPos.disabled = false;
-        wmOp.disabled = false;
-      }
-    }
-
-    // Listen for plan detection from vx-auth-gate.js
-    window.addEventListener("vx:plan-ready", (e: any) => {
-      const plan = e.detail?.plan || "free";
-      isPro = plan === "pro" || plan === "enterprise";
-      updateProUI();
-    });
-    // Also check if already resolved
-    if ((window as any).vxPlan === "pro" || (window as any).vxPlan === "enterprise") {
-      isPro = true;
-    }
-    updateProUI();
-
-    qualityEl.addEventListener("input", () => {
-      qualityValEl.textContent = qualityEl.value;
-    });
-
     pickBtn.addEventListener("click", () => fileEl.click());
     dropEl.addEventListener("click", () => fileEl.click());
-    dropEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") fileEl.click();
-    });
-
-    fileEl.addEventListener("change", async () => {
-      const f = fileEl.files?.[0];
-      if (!f) return;
-      await loadFile(f);
-    });
-
-    dropEl.addEventListener("dragover", (e) => e.preventDefault());
-    dropEl.addEventListener("drop", async (e) => {
-      e.preventDefault();
-      const f = (e as DragEvent).dataTransfer?.files[0];
-      if (!f) return;
-      await loadFile(f);
-    });
+    dropEl.addEventListener("keydown", (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") fileEl.click(); });
+    dropEl.addEventListener("dragover", (e: DragEvent) => { e.preventDefault(); dropEl.classList.add("suite-drop--active"); });
+    dropEl.addEventListener("dragleave", () => dropEl.classList.remove("suite-drop--active"));
+    dropEl.addEventListener("drop", (e: DragEvent) => { e.preventDefault(); dropEl.classList.remove("suite-drop--active"); const f = e.dataTransfer?.files[0]; if (f) loadFile(f); });
+    fileEl.addEventListener("change", () => { const f = fileEl.files?.[0]; if (f) loadFile(f); });
 
     async function loadFile(file: File) {
       srcFile = file;
@@ -291,76 +300,155 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       await img.decode();
       URL.revokeObjectURL(url);
       srcImg = img;
-      origMeta.textContent = `${img.width}x${img.height} • ${(file.size / 1024 / 1024).toFixed(2)}MB`;
+      origMeta.textContent = `${img.width} × ${img.height} · ${(file.size / 1024).toFixed(0)} KB`;
       runBtn.disabled = false;
+      dropEl.innerHTML = `<span style="opacity:.6">Loaded: ${file.name}</span>`;
+
+      // Pre-fill resize with current dimensions
+      ($("resizeW") as HTMLInputElement).value = String(img.width);
+      ($("resizeH") as HTMLInputElement).value = String(img.height);
     }
 
-    runBtn.addEventListener("click", async () => {
-      if (!srcImg) return;
+    // ── Range displays ───────────────────────────────────────
+    $("quality")?.addEventListener("input", () => { ($("qualityVal") as HTMLElement).textContent = ($("quality") as HTMLInputElement).value; });
+    $("convertQual")?.addEventListener("input", () => { ($("convertQualVal") as HTMLElement).textContent = ($("convertQual") as HTMLInputElement).value; });
+    $("wmOp")?.addEventListener("input", () => { ($("wmOpVal") as HTMLElement).textContent = ($("wmOp") as HTMLInputElement).value; });
 
-      runBtn.disabled = true;
-      runBtn.textContent = "Verificando…";
-
-      try {
-        const perm = await checkPermission("image-suite");
-        if (!perm.allowed) {
-          const msg = perm.plan === "public"
-            ? "Limite gratuito atingido. Faça login ou upgrade para continuar."
-            : `Limite do plano ${perm.plan} atingido. Faça upgrade para continuar.`;
-          alert(msg);
-          runBtn.disabled = false;
-          runBtn.textContent = "Processar";
-          return;
-        }
-      } catch (err) {
-        console.warn("check-permission falhou, permitindo uso local:", err);
-      }
-
-      runBtn.disabled = true;
-      const tool    = toolEl.value;
-      const scale   = parseInt(scaleEl.value);
-      const mime    = fmtEl.value;
-      const quality = parseFloat(qualityEl.value);
-
-      const w = srcImg.width;
-      const h = srcImg.height;
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d")!;
-
-      if (tool === "upscale") {
-        canvas.width  = w * scale;
-        canvas.height = h * scale;
-        ctx.imageSmoothingQuality = "high";
-        ctx.drawImage(srcImg, 0, 0, canvas.width, canvas.height);
-        if (isPro && wmEnable.checked) await drawWatermark(ctx, canvas.width, canvas.height);
-        outBlob = await new Promise<Blob | null>(res => canvas.toBlob(res, mime, 0.95));
-      } else {
-        canvas.width  = w;
-        canvas.height = h;
-        ctx.drawImage(srcImg, 0, 0);
-        if (isPro && wmEnable.checked) await drawWatermark(ctx, canvas.width, canvas.height);
-        outBlob = await new Promise<Blob | null>(res => canvas.toBlob(res, mime, tool === "compress" ? quality : 0.95));
-      }
-
-      if (!outBlob) return;
-
-      const url = URL.createObjectURL(outBlob);
-      previewEl.src = url;
-
-      const reduction = ((1 - (outBlob.size / srcFile!.size)) * 100).toFixed(1);
-      outMeta.textContent = `${canvas.width}x${canvas.height} • ${(outBlob.size / 1024 / 1024).toFixed(2)}MB • ${reduction}%`;
-      downloadBtn.disabled = false;
-
-      runBtn.disabled = false;
+    // ── Resize lock ratio ────────────────────────────────────
+    $("resizeW")?.addEventListener("input", () => {
+      if (!srcImg || !($("resizeLock") as HTMLInputElement).checked) return;
+      const w = parseInt(($("resizeW") as HTMLInputElement).value) || 0;
+      if (w > 0) ($("resizeH") as HTMLInputElement).value = String(Math.round(w * (srcImg.height / srcImg.width)));
+    });
+    $("resizeH")?.addEventListener("input", () => {
+      if (!srcImg || !($("resizeLock") as HTMLInputElement).checked) return;
+      const h = parseInt(($("resizeH") as HTMLInputElement).value) || 0;
+      if (h > 0) ($("resizeW") as HTMLInputElement).value = String(Math.round(h * (srcImg.width / srcImg.height)));
     });
 
+    // ── Process ──────────────────────────────────────────────
+    runBtn.addEventListener("click", async () => {
+      if (!srcImg || !srcFile) return;
+      runBtn.disabled = true;
+      runBtn.textContent = "Processing…";
+
+      try {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d")!;
+
+        if (activeTool === "upscale") {
+          const scale = parseInt(($("scale") as HTMLSelectElement).value);
+          canvas.width = srcImg.width * scale;
+          canvas.height = srcImg.height * scale;
+          ctx.imageSmoothingEnabled = ($("smooth") as HTMLInputElement).checked;
+          if (ctx.imageSmoothingEnabled) ctx.imageSmoothingQuality = "high";
+          ctx.drawImage(srcImg, 0, 0, canvas.width, canvas.height);
+          const fmt = ($("format") as HTMLSelectElement).value;
+          outBlob = await toBlob(canvas, fmt, 0.95);
+
+        } else if (activeTool === "compress") {
+          canvas.width = srcImg.width;
+          canvas.height = srcImg.height;
+          ctx.drawImage(srcImg, 0, 0);
+          const q = parseInt(($("quality") as HTMLInputElement).value) / 100;
+          const fmt = ($("compressFmt") as HTMLSelectElement).value;
+          outBlob = await toBlob(canvas, fmt, q);
+
+        } else if (activeTool === "convert") {
+          canvas.width = srcImg.width;
+          canvas.height = srcImg.height;
+          ctx.drawImage(srcImg, 0, 0);
+          const q = parseInt(($("convertQual") as HTMLInputElement).value) / 100;
+          const fmt = ($("convertFmt") as HTMLSelectElement).value;
+          outBlob = await toBlob(canvas, fmt, q);
+
+        } else if (activeTool === "resize") {
+          const w = parseInt(($("resizeW") as HTMLInputElement).value) || srcImg.width;
+          const h = parseInt(($("resizeH") as HTMLInputElement).value) || srcImg.height;
+          canvas.width = w;
+          canvas.height = h;
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
+          ctx.drawImage(srcImg, 0, 0, w, h);
+          const fmt = ($("resizeFmt") as HTMLSelectElement).value;
+          outBlob = await toBlob(canvas, fmt, 0.95);
+
+        } else if (activeTool === "rotate") {
+          const deg = parseInt(($("rotateDeg") as HTMLSelectElement).value);
+          const flipH = ($("flipH") as HTMLInputElement).checked;
+          const flipV = ($("flipV") as HTMLInputElement).checked;
+          const isVertical = deg === 90 || deg === 270;
+          canvas.width = isVertical ? srcImg.height : srcImg.width;
+          canvas.height = isVertical ? srcImg.width : srcImg.height;
+          ctx.save();
+          ctx.translate(canvas.width / 2, canvas.height / 2);
+          ctx.rotate((deg * Math.PI) / 180);
+          ctx.scale(flipH ? -1 : 1, flipV ? -1 : 1);
+          ctx.drawImage(srcImg, -srcImg.width / 2, -srcImg.height / 2);
+          ctx.restore();
+          outBlob = await toBlob(canvas, "image/png", 0.95);
+
+        } else if (activeTool === "watermark") {
+          canvas.width = srcImg.width;
+          canvas.height = srcImg.height;
+          ctx.drawImage(srcImg, 0, 0);
+
+          const text = ($("wmText") as HTMLInputElement).value || "© Watermark";
+          const pos = ($("wmPos") as HTMLSelectElement).value;
+          const opacity = parseInt(($("wmOp") as HTMLInputElement).value) / 100;
+          const sizeMap: Record<string, number> = { small: 0.02, medium: 0.035, large: 0.05 };
+          const fontSize = Math.max(14, Math.round(Math.min(canvas.width, canvas.height) * (sizeMap[($("wmSize") as HTMLSelectElement).value] || 0.035)));
+
+          ctx.save();
+          ctx.globalAlpha = opacity;
+          ctx.font = `bold ${fontSize}px system-ui, sans-serif`;
+          ctx.fillStyle = "#ffffff";
+          ctx.shadowColor = "rgba(0,0,0,.5)";
+          ctx.shadowBlur = 4;
+
+          const m = ctx.measureText(text);
+          const pad = fontSize;
+          let x = pad, y = canvas.height - pad;
+          if (pos.includes("r")) x = canvas.width - m.width - pad;
+          if (pos.includes("t")) y = pad + fontSize;
+          if (pos === "center") { x = (canvas.width - m.width) / 2; y = canvas.height / 2; }
+
+          ctx.fillText(text, x, y);
+          ctx.restore();
+          outBlob = await toBlob(canvas, "image/png", 0.95);
+        }
+
+        if (outBlob) {
+          previewEl.src = URL.createObjectURL(outBlob);
+          previewEl.style.display = "block";
+          previewEmpty.style.display = "none";
+          const pct = ((1 - outBlob.size / srcFile.size) * 100).toFixed(1);
+          outMeta.textContent = `${canvas.width} × ${canvas.height} · ${(outBlob.size / 1024).toFixed(0)} KB · ${pct}% ${Number(pct) >= 0 ? "smaller" : "larger"}`;
+          downloadBtn.disabled = false;
+        }
+      } catch (err: any) {
+        console.error(err);
+        outMeta.textContent = "Error: " + (err?.message || "Processing failed");
+      } finally {
+        runBtn.disabled = false;
+        runBtn.textContent = "Process image";
+      }
+    });
+
+    function toBlob(canvas: HTMLCanvasElement, mime: string, quality: number): Promise<Blob | null> {
+      return new Promise(res => canvas.toBlob(res, mime, quality));
+    }
+
+    // ── Download ─────────────────────────────────────────────
     downloadBtn.addEventListener("click", () => {
       if (!outBlob) return;
-      const ext = fmtEl.value.split("/")[1];
+      const extMap: Record<string, string> = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/avif": "avif" };
+      const ext = extMap[outBlob.type] || "png";
       const a = document.createElement("a");
       a.href = URL.createObjectURL(outBlob);
-      a.download = `${srcName}.${ext}`;
+      a.download = `${srcName}-${activeTool}.${ext}`;
       a.click();
+      URL.revokeObjectURL(a.href);
     });
   </script>
 
@@ -370,3 +458,250 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
   <script is:inline src="/scripts/vx-auth-gate.js"></script>
 </body>
 </html>
+
+<style>
+  .suite-title {
+    font-size: clamp(24px, 4vw, 36px);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    margin-bottom: 4px;
+  }
+  .suite-pro-tag {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(109,94,252,.15);
+    border: 1px solid rgba(109,94,252,.35);
+    color: #C4B5FD;
+    vertical-align: middle;
+    letter-spacing: .1em;
+    font-weight: 700;
+  }
+  .suite-sub {
+    font-size: 15px;
+    opacity: .5;
+    margin-bottom: 24px;
+  }
+
+  .suite-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .suite-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .suite-section {
+    padding: 18px 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,.06);
+    background: rgba(255,255,255,.03);
+    backdrop-filter: blur(8px);
+  }
+
+  .suite-section__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .suite-section__label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    opacity: .4;
+    margin-bottom: 10px;
+  }
+
+  .suite-btn-sm {
+    padding: 6px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.1);
+    background: rgba(255,255,255,.04);
+    color: rgba(255,255,255,.7);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .suite-btn-sm:hover {
+    border-color: rgba(109,94,252,.3);
+    color: #C4B5FD;
+  }
+  .suite-btn-sm:disabled {
+    opacity: .3;
+    cursor: not-allowed;
+  }
+
+  /* Drop zone */
+  .suite-drop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 28px 16px;
+    border-radius: 12px;
+    border: 2px dashed rgba(255,255,255,.08);
+    background: rgba(0,0,0,.15);
+    cursor: pointer;
+    transition: all .2s;
+    font-size: 13px;
+    color: rgba(255,255,255,.4);
+    text-align: center;
+  }
+  .suite-drop:hover, .suite-drop--active {
+    border-color: rgba(109,94,252,.3);
+    background: rgba(109,94,252,.04);
+  }
+  .suite-drop__icon { font-size: 22px; opacity: .3; }
+
+  .suite-meta {
+    font-size: 12px;
+    color: rgba(255,255,255,.35);
+    margin-top: 8px;
+    font-family: ui-monospace, monospace;
+  }
+
+  /* Tool picker */
+  .suite-tools {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .suite-tool-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.06);
+    background: rgba(255,255,255,.02);
+    color: rgba(255,255,255,.5);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    transition: all .2s;
+  }
+  .suite-tool-btn:hover {
+    border-color: rgba(109,94,252,.25);
+    color: rgba(255,255,255,.8);
+    background: rgba(109,94,252,.04);
+  }
+  .suite-tool-btn--active {
+    border-color: rgba(109,94,252,.4);
+    background: rgba(109,94,252,.1);
+    color: #C4B5FD;
+    box-shadow: 0 0 12px rgba(109,94,252,.08);
+  }
+  .suite-tool-btn__icon { font-size: 18px; }
+
+  /* Config fields */
+  .suite-fields { display: flex; flex-direction: column; gap: 10px; }
+
+  .suite-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 12px;
+    color: rgba(255,255,255,.5);
+  }
+  .suite-field--row {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+  .suite-field select,
+  .suite-field input[type="number"],
+  .suite-field input[type="text"] {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(0,0,0,.3);
+    color: rgba(255,255,255,.85);
+    font-family: inherit;
+    font-size: 13px;
+    width: 100%;
+    transition: border-color .2s;
+  }
+  .suite-field select:focus,
+  .suite-field input:focus {
+    outline: none;
+    border-color: rgba(109,94,252,.4);
+  }
+  .suite-field input[type="range"] {
+    width: 100%;
+    accent-color: #8B5CF6;
+  }
+  .suite-field input[type="checkbox"] {
+    accent-color: #8B5CF6;
+  }
+
+  /* Process button */
+  .suite-run-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(109,94,252,.35);
+    background: linear-gradient(135deg, rgba(109,94,252,.2), rgba(139,92,246,.15));
+    color: rgba(200,185,255,.95);
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .suite-run-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(109,94,252,.3), rgba(139,92,246,.25));
+    box-shadow: 0 4px 20px rgba(109,94,252,.15);
+    transform: translateY(-1px);
+  }
+  .suite-run-btn:disabled { opacity: .3; cursor: not-allowed; }
+
+  /* Preview */
+  .suite-panel--preview .suite-section__head { margin-bottom: 0; }
+  .suite-preview-area {
+    margin-top: 12px;
+    min-height: 300px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.06);
+    background: rgba(0,0,0,.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .suite-preview-img {
+    max-width: 100%;
+    max-height: 500px;
+    display: none;
+  }
+  .suite-preview-empty {
+    font-size: 13px;
+    opacity: .25;
+    text-align: center;
+    padding: 40px;
+  }
+
+  @media (max-width: 860px) {
+    .suite-layout { grid-template-columns: 1fr; }
+    .suite-tools { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .suite-tools { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
