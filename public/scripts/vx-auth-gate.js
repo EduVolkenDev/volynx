@@ -91,6 +91,59 @@
     return; // Don't dispatch plan-ready, blocking the tool scripts
   }
 
+  // ── 5. Inject Pro visual layer for pro/enterprise users ────────────────────
+  if (plan === 'pro' || plan === 'enterprise') {
+    // Load Pro CSS
+    var proCSS = document.createElement('link');
+    proCSS.rel = 'stylesheet';
+    proCSS.href = '/styles/studio-pro.css';
+    document.head.appendChild(proCSS);
+
+    // Inject Pro top bar
+    var toolName = (window.__vxTool || '').replace(/-/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+    var proBar = document.createElement('div');
+    proBar.className = 'studio-pro-bar';
+    proBar.innerHTML = ''
+      + '<div class="studio-pro-bar__left">'
+      + '  <span class="studio-pro-bar__badge">Studio Pro</span>'
+      + '  <span class="studio-pro-bar__tool">' + (toolName || 'Tool') + '</span>'
+      + '</div>'
+      + '<div class="studio-pro-bar__right">'
+      + '  <span class="studio-pro-bar__usage" id="proBarUsage">Loading...</span>'
+      + '  <a class="studio-pro-bar__dash" href="/volynx-lab/studio/">Dashboard</a>'
+      + '</div>';
+
+    // Insert after header or at top of body
+    var header = document.querySelector('header') || document.querySelector('.vx-header') || document.querySelector('nav');
+    if (header && header.nextSibling) {
+      header.parentNode.insertBefore(proBar, header.nextSibling);
+    } else {
+      document.body.insertBefore(proBar, document.body.firstChild);
+    }
+
+    // Fetch usage for this tool
+    (async function() {
+      try {
+        var cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r) { return r.json(); });
+        var apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
+        if (!apiBase) return;
+        var res = await fetch(apiBase + '/api/check-permission', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+          body: JSON.stringify({ tool: window.__vxTool || 'converter' }),
+        });
+        if (!res.ok) return;
+        var perm = await res.json();
+        var el = document.getElementById('proBarUsage');
+        if (el) {
+          var used = perm.used || 0;
+          var limit = perm.limit === -1 ? '∞' : perm.limit;
+          el.innerHTML = 'Today: <strong>' + used + '</strong> / ' + limit;
+        }
+      } catch (_) {}
+    })();
+  }
+
   // Dispatch event so other scripts can react
   window.dispatchEvent(new CustomEvent('vx:plan-ready', { detail: { plan, proFeatures } }));
 })();

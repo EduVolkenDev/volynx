@@ -1,0 +1,196 @@
+/* ═══════════════════════════════════════════════════════════
+   VOLYNX Studio Pro — Premium Visual Layer
+   Applied via body[data-plan="pro"] or body[data-plan="enterprise"]
+   Injected by vx-auth-gate.js on all Studio tool pages
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Pro top bar ─────────────────────────────────────────── */
+.studio-pro-bar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 24px;
+  background: linear-gradient(90deg, rgba(109,94,252,.08), rgba(139,92,246,.06), rgba(109,94,252,.08));
+  border-bottom: 1px solid rgba(109,94,252,.15);
+  font-size: 13px;
+  position: relative;
+  z-index: 10;
+}
+
+body[data-plan="pro"] .studio-pro-bar,
+body[data-plan="enterprise"] .studio-pro-bar {
+  display: flex;
+}
+
+.studio-pro-bar__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.studio-pro-bar__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, rgba(109,94,252,.25), rgba(139,92,246,.2));
+  border: 1px solid rgba(109,94,252,.4);
+  color: #C4B5FD;
+}
+
+.studio-pro-bar__badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #A78BFA;
+  box-shadow: 0 0 6px rgba(167,139,250,.6);
+  animation: pro-pulse 2s infinite;
+}
+
+@keyframes pro-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
+}
+
+.studio-pro-bar__tool {
+  font-weight: 600;
+  color: rgba(255,255,255,.6);
+}
+
+.studio-pro-bar__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.studio-pro-bar__usage {
+  font-size: 12px;
+  color: rgba(255,255,255,.4);
+}
+
+.studio-pro-bar__usage strong {
+  color: #C4B5FD;
+  font-weight: 700;
+}
+
+.studio-pro-bar__dash {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(196,181,253,.6);
+  text-decoration: none;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(109,94,252,.2);
+  transition: all .2s;
+}
+
+.studio-pro-bar__dash:hover {
+  border-color: rgba(109,94,252,.4);
+  color: #C4B5FD;
+  background: rgba(109,94,252,.08);
+}
+
+/* ── Hide upgrade banners for pro ────────────────────────── */
+body[data-plan="pro"] #vx-upgrade-banner,
+body[data-plan="enterprise"] #vx-upgrade-banner {
+  display: none !important;
+}
+
+/* ── Pro accent glow on page ─────────────────────────────── */
+body[data-plan="pro"]::after,
+body[data-plan="enterprise"]::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: radial-gradient(ellipse 60% 100% at 50% 0%, rgba(109,94,252,.06), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Pro card styling ────────────────────────────────────── */
+body[data-plan="pro"] .card,
+body[data-plan="enterprise"] .card {
+  border-color: rgba(109,94,252,.12);
+  box-shadow: 0 0 30px rgba(109,94,252,.03);
+}
+
+body[data-plan="pro"] .card:hover,
+body[data-plan="enterprise"] .card:hover {
+  border-color: rgba(109,94,252,.2);
+}
+
+/* ── Pro button accent ───────────────────────────────────── */
+body[data-plan="pro"] .btn:not(.secondary):not(.btn--ghost),
+body[data-plan="enterprise"] .btn:not(.secondary):not(.btn--ghost) {
+  background: linear-gradient(135deg, rgba(109,94,252,.22), rgba(139,92,246,.18));
+  border: 1px solid rgba(109,94,252,.35);
+  color: rgba(200,185,255,.95);
+  box-shadow: 0 2px 12px rgba(109,94,252,.1);
+}
+
+body[data-plan="pro"] .btn:not(.secondary):not(.btn--ghost):hover,
+body[data-plan="enterprise"] .btn:not(.secondary):not(.btn--ghost):hover {
+  background: linear-gradient(135deg, rgba(109,94,252,.32), rgba(139,92,246,.28));
+  border-color: rgba(130,110,255,.5);
+  box-shadow: 0 4px 20px rgba(109,94,252,.15);
+  transform: translateY(-1px);
+}
+
+/* ── Pro drop zone ───────────────────────────────────────── */
+body[data-plan="pro"] .drop,
+body[data-plan="enterprise"] .drop {
+  border-color: rgba(109,94,252,.15);
+}
+
+body[data-plan="pro"] .drop:hover,
+body[data-plan="enterprise"] .drop:hover {
+  border-color: rgba(109,94,252,.3);
+  background: rgba(109,94,252,.03);
+}
+
+/* ── Pro select/input accent ─────────────────────────────── */
+body[data-plan="pro"] select:focus,
+body[data-plan="pro"] input:focus,
+body[data-plan="enterprise"] select:focus,
+body[data-plan="enterprise"] input:focus {
+  border-color: rgba(109,94,252,.4);
+  box-shadow: 0 0 0 2px rgba(109,94,252,.08);
+}
+
+/* ── Pro pill-back link ──────────────────────────────────── */
+body[data-plan="pro"] .pill-back,
+body[data-plan="pro"] .pill,
+body[data-plan="enterprise"] .pill-back,
+body[data-plan="enterprise"] .pill {
+  border-color: rgba(109,94,252,.2);
+}
+
+body[data-plan="pro"] .pill-back:hover,
+body[data-plan="pro"] .pill:hover,
+body[data-plan="enterprise"] .pill-back:hover,
+body[data-plan="enterprise"] .pill:hover {
+  border-color: rgba(109,94,252,.4);
+  color: #C4B5FD;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .studio-pro-bar {
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 16px;
+  }
+  .studio-pro-bar__right {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
