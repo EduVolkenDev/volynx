@@ -56,27 +56,50 @@ import Topbar from "../components/Topbar.astro";
 				<div class="hero-inner">
 					<div class="avatar-zone">
 						<div class="avatar-glow" aria-hidden="true"></div>
-						<div class="avatar-frame">
+						<div class="avatar-frame" id="avatarFrameBtn" role="button" tabindex="0" title="Change avatar">
 							<img id="avatarPreview" class="avatar-img" src="/assets/avatar.webp" alt=""
 								style="display:none;"
 								onerror="this.style.display='none';this.nextElementSibling.style.display='grid';" />
 							<div class="avatar-fallback" id="avatarFallback">??</div>
+							<div class="avatar-overlay" id="avatarOverlay"><span>Change</span></div>
 						</div>
-						<button type="button" class="avatar-edit-label" id="avatarToggle">Choose avatar</button>
 						<input id="avatarInput" type="file" accept="image/*" hidden />
-						<div class="avatar-picker" id="avatarPicker" style="display:none;">
-							<button type="button" class="avatar-option" data-avatar="/assets/avatarfree/1.png">
-								<img src="/assets/avatarfree/1.png" alt="Avatar 1" />
-							</button>
-							<button type="button" class="avatar-option" data-avatar="/assets/avatarfree/2.png">
-								<img src="/assets/avatarfree/2.png" alt="Avatar 2" />
-							</button>
-							<button type="button" class="avatar-option" data-avatar="/assets/avatarfree/avatarfree3.webp">
-								<img src="/assets/avatarfree/avatarfree3.webp" alt="Avatar 3" />
-							</button>
-							<label class="avatar-option avatar-option--upload" for="avatarInput">
-								<span>+</span>
-							</label>
+
+						<!-- Avatar picker panel -->
+						<div class="avatar-panel" id="avatarPanel" hidden>
+							<div class="avatar-panel__header">
+								<span class="avatar-panel__title">Choose avatar</span>
+								<button type="button" class="avatar-panel__close" id="avatarPanelClose">✕</button>
+							</div>
+
+							<div class="avatar-panel__section">
+								<span class="avatar-panel__label">Free</span>
+								<div class="avatar-panel__grid">
+									<button type="button" class="avatar-option" data-avatar="/assets/avatarfree/1.png">
+										<img src="/assets/avatarfree/1.png" alt="Avatar 1" />
+									</button>
+									<button type="button" class="avatar-option" data-avatar="/assets/avatarfree/2.png">
+										<img src="/assets/avatarfree/2.png" alt="Avatar 2" />
+									</button>
+									<button type="button" class="avatar-option" data-avatar="/assets/avatarfree/avatarfree3.webp">
+										<img src="/assets/avatarfree/avatarfree3.webp" alt="Avatar 3" />
+									</button>
+								</div>
+							</div>
+
+							<div class="avatar-panel__section" id="proAvatarSection" hidden>
+								<span class="avatar-panel__label">Pro <span class="avatar-pro-tag">PRO</span></span>
+								<div class="avatar-panel__grid" id="proAvatarGrid"></div>
+							</div>
+
+							<div class="avatar-panel__section">
+								<span class="avatar-panel__label">Custom</span>
+								<div class="avatar-panel__grid">
+									<label class="avatar-option avatar-option--upload" for="avatarInput">
+										<span>+ Upload</span>
+									</label>
+								</div>
+							</div>
 						</div>
 					</div>
 					<div class="hero-identity">
@@ -466,29 +489,47 @@ import Topbar from "../components/Topbar.astro";
 					$("editPanel")?.scrollIntoView({ behavior: "smooth", block: "start" });
 				});
 
-				// Avatar picker toggle
-				$("avatarToggle")?.addEventListener("click", () => {
-					const picker = $("avatarPicker") as HTMLElement;
-					const visible = picker.style.display !== "none";
-					picker.style.display = visible ? "none" : "flex";
+				// Avatar panel toggle — click on avatar frame to open
+				const avatarPanel = $("avatarPanel") as HTMLElement;
+				$("avatarFrameBtn")?.addEventListener("click", () => {
+					avatarPanel.hidden = !avatarPanel.hidden;
 				});
+				$("avatarFrameBtn")?.addEventListener("keydown", (e: KeyboardEvent) => {
+					if (e.key === "Enter" || e.key === " ") { e.preventDefault(); avatarPanel.hidden = !avatarPanel.hidden; }
+				});
+				$("avatarPanelClose")?.addEventListener("click", () => { avatarPanel.hidden = true; });
 
-				// Avatar free options
+				// Load pro avatars if user is pro
+				const proAvatars = [
+					// Will be populated when pro avatars are added to /assets/avatarpro/
+				];
+				if ((userProfile?.plan === "pro" || userProfile?.plan === "enterprise") && proAvatars.length > 0) {
+					const proSection = $("proAvatarSection") as HTMLElement;
+					const proGrid = $("proAvatarGrid") as HTMLElement;
+					if (proSection && proGrid) {
+						proSection.hidden = false;
+						proGrid.innerHTML = proAvatars.map((src: string, i: number) =>
+							`<button type="button" class="avatar-option" data-avatar="${src}"><img src="${src}" alt="Pro Avatar ${i+1}" /></button>`
+						).join("");
+					}
+				}
+
+				// Avatar option click (free + pro)
 				document.querySelectorAll(".avatar-option[data-avatar]").forEach(btn => {
 					btn.addEventListener("click", () => {
 						const url = (btn as HTMLElement).dataset.avatar!;
 						avatarPreview.src = url;
 						avatarPreview.style.display = "block";
 						avatarFallback.style.display = "none";
-						($("avatarPicker") as HTMLElement).style.display = "none";
-						// Mark as selected for save
+						avatarPanel.hidden = true;
 						(avatarPreview as any)._selectedFreeAvatar = url;
+						(avatarPreview as any)._pendingFile = null;
 						document.querySelectorAll(".avatar-option").forEach(o => o.classList.remove("avatar-option--selected"));
 						btn.classList.add("avatar-option--selected");
 					});
 				});
 
-				// Custom file upload (stores file for upload on save)
+				// Custom file upload
 				$("avatarInput")?.addEventListener("change", (e: Event) => {
 					const file = (e.target as HTMLInputElement).files?.[0];
 					if (!file) return;
@@ -496,7 +537,7 @@ import Topbar from "../components/Topbar.astro";
 					avatarPreview.src = URL.createObjectURL(file);
 					avatarPreview.style.display = "block";
 					avatarFallback.style.display = "none";
-					($("avatarPicker") as HTMLElement).style.display = "none";
+					avatarPanel.hidden = true;
 					(avatarPreview as any)._selectedFreeAvatar = null;
 					(avatarPreview as any)._pendingFile = file;
 				});
@@ -682,38 +723,82 @@ import Topbar from "../components/Topbar.astro";
 	.avatar-glow { position: absolute; inset: -20px; border-radius: 999px;
 		background: radial-gradient(circle, rgba(120,0,255,.15), rgba(0,232,197,.06), transparent 70%);
 		filter: blur(28px); z-index: 0; }
-	.avatar-frame { position: relative; z-index: 1; width: 120px; height: 120px; border-radius: 999px; overflow: hidden; }
+	.avatar-frame {
+		position: relative; z-index: 1; width: 120px; height: 120px;
+		border-radius: 999px; overflow: hidden; cursor: pointer;
+		transition: transform .2s;
+	}
+	.avatar-frame:hover { transform: scale(1.04); }
+	.avatar-frame:hover .avatar-overlay { opacity: 1; }
 	.avatar-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 	.avatar-fallback { width: 100%; height: 100%; display: grid; place-items: center;
 		background: linear-gradient(135deg, rgba(120,0,255,.25), rgba(0,200,180,.15));
 		font-size: 2.2rem; font-weight: 800; color: rgba(255,255,255,.8); }
-	.avatar-edit-label {
-		display: block; margin-top: 8px; text-align: center;
-		font-size: .75rem; font-weight: 600; color: var(--muted);
-		cursor: pointer; background: none; border: none; padding: 4px 8px;
-		font-family: inherit;
+	.avatar-overlay {
+		position: absolute; inset: 0; display: grid; place-items: center;
+		background: rgba(0,0,0,.55); backdrop-filter: blur(4px);
+		opacity: 0; transition: opacity .2s;
 	}
-	.avatar-edit-label:hover { color: var(--accent); }
-	.avatar-picker {
-		display: flex; gap: 8px; margin-top: 10px; justify-content: center;
+	.avatar-overlay span {
+		font-size: 12px; font-weight: 700; color: #fff;
+		letter-spacing: .05em; text-transform: uppercase;
 	}
+
+	/* Avatar panel */
+	.avatar-panel {
+		position: absolute; top: calc(100% + 12px); left: 50%; transform: translateX(-50%);
+		z-index: 20; width: 280px;
+		background: rgba(12,14,22,.95); backdrop-filter: blur(16px);
+		border: 1px solid rgba(255,255,255,.1); border-radius: 16px;
+		padding: 16px; box-shadow: 0 16px 48px rgba(0,0,0,.4);
+	}
+	.avatar-panel__header {
+		display: flex; justify-content: space-between; align-items: center;
+		margin-bottom: 14px;
+	}
+	.avatar-panel__title { font-size: 14px; font-weight: 700; }
+	.avatar-panel__close {
+		width: 24px; height: 24px; border-radius: 999px; border: none;
+		background: rgba(255,255,255,.06); color: rgba(255,255,255,.5);
+		font-size: 12px; cursor: pointer; display: grid; place-items: center;
+		transition: all .15s; font-family: inherit;
+	}
+	.avatar-panel__close:hover { background: rgba(255,255,255,.12); color: #fff; }
+
+	.avatar-panel__section { margin-bottom: 14px; }
+	.avatar-panel__section:last-child { margin-bottom: 0; }
+	.avatar-panel__label {
+		display: flex; align-items: center; gap: 6px;
+		font-size: 11px; font-weight: 600; letter-spacing: .08em;
+		text-transform: uppercase; color: rgba(255,255,255,.4);
+		margin-bottom: 8px;
+	}
+	.avatar-pro-tag {
+		font-size: 9px; padding: 2px 6px; border-radius: 999px;
+		background: rgba(109,94,252,.15); border: 1px solid rgba(109,94,252,.35);
+		color: #C4B5FD; letter-spacing: .1em;
+	}
+	.avatar-panel__grid {
+		display: flex; gap: 8px; flex-wrap: wrap;
+	}
+
 	.avatar-option {
-		width: 48px; height: 48px; border-radius: 999px; overflow: hidden;
-		border: 2px solid rgba(255,255,255,.1); background: transparent;
-		cursor: pointer; padding: 0; transition: border-color .15s, transform .15s;
+		width: 52px; height: 52px; border-radius: 999px; overflow: hidden;
+		border: 2px solid rgba(255,255,255,.08); background: transparent;
+		cursor: pointer; padding: 0; transition: all .2s;
 	}
 	.avatar-option img {
 		width: 100%; height: 100%; object-fit: cover; display: block;
-		background: transparent;
 	}
-	.avatar-option:hover { border-color: rgba(0,232,197,.4); transform: scale(1.1); }
-	.avatar-option--selected { border-color: var(--accent); box-shadow: 0 0 12px rgba(0,232,197,.2); }
+	.avatar-option:hover { border-color: rgba(0,232,197,.4); transform: scale(1.1); box-shadow: 0 0 12px rgba(0,232,197,.1); }
+	.avatar-option--selected { border-color: var(--accent); box-shadow: 0 0 16px rgba(0,232,197,.2); }
 	.avatar-option--upload {
 		display: grid; place-items: center;
-		background: rgba(255,255,255,.04); font-size: 20px; color: var(--muted);
-		cursor: pointer;
+		background: rgba(255,255,255,.04); color: rgba(255,255,255,.4);
+		cursor: pointer; font-size: 11px; font-weight: 600;
+		font-family: inherit;
 	}
-	.avatar-option--upload:hover { color: var(--accent); background: rgba(0,232,197,.06); }
+	.avatar-option--upload:hover { color: var(--accent); background: rgba(0,232,197,.06); border-color: rgba(0,232,197,.3); }
 	.hero-identity { flex: 1; min-width: 0; padding-top: 4px; }
 	.hero-name { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800;
 		letter-spacing: -.03em; line-height: 1.1; margin-bottom: 4px; }
