@@ -94,7 +94,7 @@
     } catch (err) {
       console.warn('check-permission falhou, permitindo uso local:', err);
     }
-    var mode = modeSelect.value;
+    var mode = modeSelect ? modeSelect.value : 'local';
     if (mode === 'ai') {
       alert('AI upscale requer upgrade. Usando modo local automaticamente.');
     }
@@ -107,8 +107,8 @@
 
     var scale   = parseInt(scaleSelect.value, 10);
     var format  = formatSelect.value;
-    var sharpen = sharpenChk.checked;
-    var smooth  = smoothChk.checked;
+    var sharpen = sharpenChk ? sharpenChk.checked : false;
+    var smooth  = smoothChk ? smoothChk.checked : true;
 
     var img = new Image();
     var url = URL.createObjectURL(currentFile);
