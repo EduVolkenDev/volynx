@@ -1,63 +1,73 @@
 /**
  * VOLYNX — Stripe Catalog Setup Script
  *
- * Creates all products and prices in Stripe for the VOLYNX platform.
- * Run in TEST mode first, then switch to LIVE when ready.
+ * Creates all products and prices in Stripe (test mode first).
+ * Secrets are read ONLY from environment variables — never logged, committed, or printed.
  *
  * Usage:
- *   STRIPE_SECRET_KEY=sk_test_xxx npx tsx scripts/stripe-catalog-setup.ts
+ *   1. cp scripts/.env.example scripts/.env
+ *   2. Paste your sk_test_ key in scripts/.env
+ *   3. npx tsx scripts/stripe-catalog-setup.ts
  *
- * Or with .env file:
- *   1. Create scripts/.env with STRIPE_SECRET_KEY=sk_test_xxx
- *   2. npx tsx scripts/stripe-catalog-setup.ts
- *
- * Output: scripts/stripe-catalog-output.json
+ * Output: scripts/stripe-catalog-output.json (gitignored)
  */
 
 import Stripe from "stripe";
 import { writeFileSync } from "fs";
-import { resolve } from "path";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
 
-// ── Load env ──────────────────────────────────────────────
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// ── Load .env (never log the key) ────────────────────────
 try {
   const dotenv = await import("dotenv");
-  dotenv.config({ path: resolve(import.meta.dirname || ".", ".env") });
+  dotenv.config({ path: resolve(__dirname, ".env") });
 } catch {}
 
-const STRIPE_KEY = process.env.STRIPE_SECRET_KEY;
-if (!STRIPE_KEY) {
-  console.error("ERROR: Set STRIPE_SECRET_KEY env variable.");
-  console.error("  STRIPE_SECRET_KEY=sk_test_xxx npx tsx scripts/stripe-catalog-setup.ts");
+const STRIPE_KEY = process.env.STRIPE_SECRET_KEY || "";
+if (!STRIPE_KEY || (!STRIPE_KEY.startsWith("sk_test_") && !STRIPE_KEY.startsWith("sk_live_"))) {
+  console.error("ERROR: STRIPE_SECRET_KEY not set or invalid.");
+  console.error("  1. cp scripts/.env.example scripts/.env");
+  console.error("  2. Add your sk_test_ key to scripts/.env");
+  console.error("  3. npx tsx scripts/stripe-catalog-setup.ts");
   process.exit(1);
 }
 
-const isTest = STRIPE_KEY.startsWith("sk_test_");
-const env = isTest ? "test" : "live";
-console.log(`\n🔑 Mode: ${env.toUpperCase()}\n`);
+const mode = STRIPE_KEY.startsWith("sk_test_") ? "test" : "live";
+console.log(`\n  Mode: ${mode.toUpperCase()} (key loaded from env)\n`);
 
-const stripe = new Stripe(STRIPE_KEY, { apiVersion: "2025-04-30.basil" as any });
+const stripe = new Stripe(STRIPE_KEY);
 
 // ── Types ─────────────────────────────────────────────────
-type Currency = "gbp" | "eur" | "brl";
-type PriceDef = { gbp: number; eur: number; brl: number };
+type Cur = "gbp" | "eur" | "brl";
+type Amounts = Record<Cur, number>; // in cents/pence
 
 interface ProductDef {
   name: string;
   description: string;
+  marketingFeatures?: string[];
   lookupPrefix: string;
   metadata: Record<string, string>;
   prices: {
     recurring?: { interval: "month" | "year" };
-    amounts: PriceDef;
+    amounts: Amounts;
   };
 }
 
-// ── Catalog Definition ────────────────────────────────────
+// ── Catalog ───────────────────────────────────────────────
 
-const BUILDER_SUBSCRIPTIONS: ProductDef[] = [
+const BUILDER_SUBS: ProductDef[] = [
   {
     name: "Builder Launch",
-    description: "Entry plan — 1 published site, volynx.world subdomain, basic kits.",
+    description: "Entry plan to launch lean pages quickly. 1 published site on volynx.world subdomain.",
+    marketingFeatures: [
+      "1 published site",
+      "volynx.world subdomain",
+      "Basic kits included",
+      "Basic analytics",
+      "Basic forms",
+    ],
     lookupPrefix: "builder_launch",
     metadata: {
       product_family: "builder",
@@ -73,7 +83,15 @@ const BUILDER_SUBSCRIPTIONS: ProductDef[] = [
   },
   {
     name: "Builder Pro",
-    description: "Anchor plan — 3 published sites, custom domain, remove branding, premium kits.",
+    description: "Best balance of publish, custom domain, and premium presentation. Anchor plan.",
+    marketingFeatures: [
+      "Up to 3 published sites",
+      "Custom domain",
+      "Remove Volynx branding",
+      "Selected premium kits",
+      "1 light icons bonus/month",
+      "Publish priority",
+    ],
     lookupPrefix: "builder_pro",
     metadata: {
       product_family: "builder",
@@ -81,7 +99,7 @@ const BUILDER_SUBSCRIPTIONS: ProductDef[] = [
       billing_type: "subscription",
       currency_scope: "multi",
       includes_tokens: "0",
-      includes_icons: "1/month",
+      includes_icons: "1",
       builder_sites_limit: "3",
       is_addon: "false",
     },
@@ -89,7 +107,15 @@ const BUILDER_SUBSCRIPTIONS: ProductDef[] = [
   },
   {
     name: "Builder Studio",
-    description: "For creators and studios — 10 sites, multiple custom domains, full premium kits.",
+    description: "For creators, freelancers, and small studios publishing frequently.",
+    marketingFeatures: [
+      "Up to 10 sites",
+      "Multiple custom domains",
+      "Full premium kits",
+      "Discount on export package",
+      "Improved analytics",
+      "Bigger icons perks",
+    ],
     lookupPrefix: "builder_studio",
     metadata: {
       product_family: "builder",
@@ -97,7 +123,7 @@ const BUILDER_SUBSCRIPTIONS: ProductDef[] = [
       billing_type: "subscription",
       currency_scope: "multi",
       includes_tokens: "0",
-      includes_icons: "3/month",
+      includes_icons: "3",
       builder_sites_limit: "10",
       is_addon: "false",
     },
@@ -105,7 +131,14 @@ const BUILDER_SUBSCRIPTIONS: ProductDef[] = [
   },
   {
     name: "Builder Teams",
-    description: "Team workspace — 25 sites, central billing, shared assets, priority support.",
+    description: "Workspace for team operations with central billing and shared assets.",
+    marketingFeatures: [
+      "25 sites",
+      "Team workspace",
+      "Central billing",
+      "Shared assets & icons pool",
+      "Priority support",
+    ],
     lookupPrefix: "builder_teams",
     metadata: {
       product_family: "builder",
@@ -123,7 +156,14 @@ const BUILDER_SUBSCRIPTIONS: ProductDef[] = [
 
 const STUDIO_PRO: ProductDef = {
   name: "Studio Pro",
-  description: "Full production pipeline — unlimited tools, batch processing, commercial rights.",
+  description: "Full production pipeline in the browser. Unlimited tools, batch processing, commercial rights.",
+  marketingFeatures: [
+    "Unlimited tool usage",
+    "Batch processing + ZIP download",
+    "Commercial usage rights",
+    "100% local processing",
+    "All Studio tools included",
+  ],
   lookupPrefix: "studio_pro",
   metadata: {
     product_family: "studio",
@@ -141,7 +181,7 @@ const STUDIO_PRO: ProductDef = {
 const TOKEN_PACKS: ProductDef[] = [
   {
     name: "Token Pack — Starter (10)",
-    description: "10 tokens for flexible tool usage.",
+    description: "10 tokens for flexible premium tool usage. Entry pack.",
     lookupPrefix: "tokens_starter",
     metadata: {
       product_family: "tokens",
@@ -157,7 +197,7 @@ const TOKEN_PACKS: ProductDef[] = [
   },
   {
     name: "Token Pack — Core (25)",
-    description: "25 tokens — most popular pack.",
+    description: "25 tokens — most popular pack for regular users.",
     lookupPrefix: "tokens_core",
     metadata: {
       product_family: "tokens",
@@ -173,7 +213,7 @@ const TOKEN_PACKS: ProductDef[] = [
   },
   {
     name: "Token Pack — Pro (60)",
-    description: "60 tokens — best value.",
+    description: "60 tokens — best value for power users.",
     lookupPrefix: "tokens_pro",
     metadata: {
       product_family: "tokens",
@@ -189,7 +229,7 @@ const TOKEN_PACKS: ProductDef[] = [
   },
   {
     name: "Token Pack — Scale (150)",
-    description: "150 tokens — heavy use.",
+    description: "150 tokens — heavy use for agencies and studios.",
     lookupPrefix: "tokens_scale",
     metadata: {
       product_family: "tokens",
@@ -208,10 +248,10 @@ const TOKEN_PACKS: ProductDef[] = [
 const ADDONS: ProductDef[] = [
   {
     name: "Assisted Domain Setup",
-    description: "Faster domain activation with less friction.",
+    description: "Faster domain activation with guided setup and DNS configuration.",
     lookupPrefix: "addon_domain_setup",
     metadata: {
-      product_family: "builder",
+      product_family: "addons",
       plan_tier: "addon",
       billing_type: "one_time",
       currency_scope: "multi",
@@ -224,10 +264,10 @@ const ADDONS: ProductDef[] = [
   },
   {
     name: "Premium Template / Kit",
-    description: "Ready-made kits for premium conversion pages.",
+    description: "Ready-made premium kits for high-conversion landing pages.",
     lookupPrefix: "addon_template_pack",
     metadata: {
-      product_family: "builder",
+      product_family: "addons",
       plan_tier: "addon",
       billing_type: "one_time",
       currency_scope: "multi",
@@ -240,10 +280,10 @@ const ADDONS: ProductDef[] = [
   },
   {
     name: "HTML Export",
-    description: "Exportable package for use outside the platform.",
+    description: "Exportable HTML/CSS package for self-hosting outside the platform.",
     lookupPrefix: "addon_html_export",
     metadata: {
-      product_family: "builder",
+      product_family: "addons",
       plan_tier: "addon",
       billing_type: "one_time",
       currency_scope: "multi",
@@ -256,12 +296,12 @@ const ADDONS: ProductDef[] = [
   },
   {
     name: "Extra Site Slot",
-    description: "More capacity without an immediate plan upgrade.",
+    description: "Add one more published site slot without upgrading your plan.",
     lookupPrefix: "addon_extra_slot",
     metadata: {
-      product_family: "builder",
+      product_family: "addons",
       plan_tier: "addon",
-      billing_type: "subscription",
+      billing_type: "subscription_addon",
       currency_scope: "multi",
       includes_tokens: "0",
       includes_icons: "false",
@@ -272,10 +312,10 @@ const ADDONS: ProductDef[] = [
   },
   {
     name: "Bilingual Pack",
-    description: "Two-language support in published projects.",
+    description: "Two-language support (PT/EN) in published projects.",
     lookupPrefix: "addon_bilingual",
     metadata: {
-      product_family: "builder",
+      product_family: "addons",
       plan_tier: "addon",
       billing_type: "one_time",
       currency_scope: "multi",
@@ -288,10 +328,10 @@ const ADDONS: ProductDef[] = [
   },
   {
     name: "Premium Icon Collection",
-    description: "Extra icon collection to elevate the visual finish.",
+    description: "Curated icon collection to elevate your site's visual finish.",
     lookupPrefix: "addon_icons",
     metadata: {
-      product_family: "builder",
+      product_family: "addons",
       plan_tier: "addon",
       billing_type: "one_time",
       currency_scope: "multi",
@@ -304,36 +344,45 @@ const ADDONS: ProductDef[] = [
   },
 ];
 
-// ── Create helpers ────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────
 
-const currencies: Currency[] = ["gbp", "eur", "brl"];
-const output: any[] = [];
+const currencies: Cur[] = ["gbp", "eur", "brl"];
+const output: Record<string, any>[] = [];
 
 async function createProductWithPrices(def: ProductDef) {
-  console.log(`  Creating product: ${def.name}`);
+  console.log(`  Creating: ${def.name}`);
 
-  const product = await stripe.products.create({
+  const productParams: Stripe.ProductCreateParams = {
     name: def.name,
     description: def.description,
-    metadata: { ...def.metadata, env },
-  });
+    metadata: { ...def.metadata, mode },
+  };
 
-  console.log(`    ✓ Product: ${product.id}`);
+  if (def.marketingFeatures?.length) {
+    productParams.marketing_features = def.marketingFeatures.map((f) => ({ name: f }));
+  }
 
-  for (const currency of currencies) {
-    const amount = def.prices.amounts[currency];
-    const lookupKey = `${def.lookupPrefix}_${currency}`;
+  const product = await stripe.products.create(productParams);
+  console.log(`    product: ${product.id}`);
+
+  for (const cur of currencies) {
+    const amount = def.prices.amounts[cur];
+    const lookupKey = `${def.lookupPrefix}_${cur}`;
 
     const priceParams: Stripe.PriceCreateParams = {
       product: product.id,
-      currency,
+      currency: cur,
       unit_amount: amount,
       lookup_key: lookupKey,
       metadata: {
-        ...def.metadata,
-        currency: currency.toUpperCase(),
+        product_family: def.metadata.product_family,
+        plan_tier: def.metadata.plan_tier,
+        billing_type: def.metadata.billing_type,
+        currency: cur.toUpperCase(),
         lookup_key: lookupKey,
-        env,
+        includes_tokens: def.metadata.includes_tokens,
+        is_addon: def.metadata.is_addon,
+        mode,
       },
     };
 
@@ -342,18 +391,17 @@ async function createProductWithPrices(def: ProductDef) {
     }
 
     const price = await stripe.prices.create(priceParams);
-    console.log(`    ✓ Price ${currency.toUpperCase()}: ${price.id} (${lookupKey})`);
+    console.log(`    price ${cur.toUpperCase()}: ${price.id}`);
 
     output.push({
       product_name: def.name,
       product_id: product.id,
       price_id: price.id,
       lookup_key: lookupKey,
-      currency: currency.toUpperCase(),
-      amount: amount / 100,
+      currency: cur.toUpperCase(),
+      amount_display: `${cur === "gbp" ? "£" : cur === "eur" ? "€" : "R$"}${(amount / 100).toFixed(2)}`,
       recurring: def.prices.recurring?.interval || "one_time",
-      env,
-      metadata: def.metadata,
+      mode,
     });
   }
 
@@ -365,45 +413,45 @@ async function createProductWithPrices(def: ProductDef) {
 async function main() {
   console.log("═══════════════════════════════════════");
   console.log("  VOLYNX Stripe Catalog Setup");
-  console.log(`  Environment: ${env.toUpperCase()}`);
+  console.log(`  Mode: ${mode.toUpperCase()}`);
   console.log("═══════════════════════════════════════\n");
 
-  console.log("── Builder Subscriptions ──────────────\n");
-  for (const def of BUILDER_SUBSCRIPTIONS) {
-    await createProductWithPrices(def);
-  }
+  console.log("── Builder Subscriptions ──\n");
+  for (const def of BUILDER_SUBS) await createProductWithPrices(def);
 
-  console.log("── Studio Pro ────────────────────────\n");
+  console.log("── Studio Pro ──\n");
   await createProductWithPrices(STUDIO_PRO);
 
-  console.log("── Token Packs ───────────────────────\n");
-  for (const def of TOKEN_PACKS) {
-    await createProductWithPrices(def);
-  }
+  console.log("── Token Packs ──\n");
+  for (const def of TOKEN_PACKS) await createProductWithPrices(def);
 
-  console.log("── Add-ons ───────────────────────────\n");
-  for (const def of ADDONS) {
-    await createProductWithPrices(def);
-  }
+  console.log("── Add-ons ──\n");
+  for (const def of ADDONS) await createProductWithPrices(def);
 
-  // Write output
-  const outPath = resolve(import.meta.dirname || ".", "stripe-catalog-output.json");
+  // ── Output file (no secrets, only IDs) ──
+  const outPath = resolve(__dirname, "stripe-catalog-output.json");
   writeFileSync(outPath, JSON.stringify(output, null, 2));
-  console.log(`\n✅ Done! ${output.length} prices created.`);
-  console.log(`📄 Output saved to: ${outPath}`);
 
-  // Summary table
-  console.log("\n── Summary ───────────────────────────\n");
-  const families = [...new Set(output.map((o) => o.metadata.product_family))];
+  // ── Summary ──
+  const productCount = new Set(output.map((o) => o.product_id)).size;
+  console.log("═══════════════════════════════════════");
+  console.log(`  ${productCount} products, ${output.length} prices created`);
+  console.log(`  Output: scripts/stripe-catalog-output.json`);
+  console.log("═══════════════════════════════════════\n");
+
+  const families = [...new Set(output.map((o) => {
+    const m = o.lookup_key.split("_");
+    return m[0];
+  }))];
   for (const fam of families) {
-    const items = output.filter((o) => o.metadata.product_family === fam);
-    const products = [...new Set(items.map((o) => o.product_name))];
-    console.log(`  ${fam.toUpperCase()}: ${products.length} products, ${items.length} prices`);
+    const items = output.filter((o) => o.lookup_key.startsWith(fam));
+    const prods = new Set(items.map((o) => o.product_id)).size;
+    console.log(`  ${fam}: ${prods} products, ${items.length} prices`);
   }
-  console.log(`\n  TOTAL: ${[...new Set(output.map((o) => o.product_id))].length} products, ${output.length} prices\n`);
+  console.log("");
 }
 
 main().catch((err) => {
-  console.error("\n❌ Error:", err.message);
+  console.error("\nError:", err.message || err);
   process.exit(1);
 });
