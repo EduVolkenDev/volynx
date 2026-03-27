@@ -271,88 +271,97 @@ import PageWidgets from "../../../components/PageWidgets.astro";
 
   const KEYS = ["volynx_access_token", "volynx_refresh_token", "volynx_user_email"];
 
-  // ── Plan limits ──────────────────────────────────────────
-  const PLAN_LIMITS: Record<string, { maxProjects: number; maxPublishesPerDay: number }> = {
-    free:       { maxProjects: 1,  maxPublishesPerDay: 2 },
-    pro:        { maxProjects: 10, maxPublishesPerDay: 50 },
-    enterprise: { maxProjects: -1, maxPublishesPerDay: -1 }, // -1 = unlimited
-  };
+  // ── Builder plan limits (loaded from DB at boot) ──────────
+  let planLimits: any = null;
 
   async function fetchUserProfile(userId: string) {
     const { data, error } = await supa
       .from("profiles")
-      .select("id,email,plan,org_id,username")
+      .select("id,email,plan,org_id,username,token_balance,builder_plan")
       .eq("id", userId)
       .single();
     if (error) { log("profile fetch error: " + error.message); return null; }
     return data;
   }
 
-  async function countActiveProjects(userId: string): Promise<number> {
-    const { count, error } = await supa
-      .from("projects")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId)
-      .is("deleted_at", null);
-    if (error) { log("count error: " + error.message); return 0; }
-    return count || 0;
+  async function fetchPlanLimits(builderPlan: string) {
+    const { data, error } = await supa
+      .from("builder_plan_limits")
+      .select("*")
+      .eq("plan", builderPlan)
+      .single();
+    if (error || !data) return { max_drafts: 1, max_published: 0, custom_domain: false, remove_branding: false, premium_kits: false };
+    return data;
   }
 
-  async function getTodayUsage(userId: string, toolName: string): Promise<number> {
-    const today = new Date().toISOString().slice(0, 10);
+  async function countActiveProjects(userId: string): Promise<{ drafts: number; published: number }> {
     const { data, error } = await supa
-      .from("usage_logs")
-      .select("usage_count")
-      .eq("org_id", userProfile?.org_id)
-      .eq("tool_name", toolName)
-      .eq("usage_date", today)
-      .maybeSingle();
-    if (error || !data) return 0;
-    return data.usage_count || 0;
+      .from("projects")
+      .select("id,status")
+      .eq("user_id", userId)
+      .is("deleted_at", null);
+    if (error || !data) return { drafts: 0, published: 0 };
+    const published = data.filter((p: any) => p.status === "published").length;
+    return { drafts: data.length, published };
   }
 
   async function logUsage(toolName: string) {
     if (!userProfile) return;
-    const today = new Date().toISOString().slice(0, 10);
-    const orgId = userProfile.org_id;
-    if (!orgId) { log("no org_id, skipping usage log"); return; }
-
-    // Upsert: increment count if row exists for today, else insert
-    const { data: existing } = await supa
-      .from("usage_logs")
-      .select("id,usage_count")
-      .eq("org_id", orgId)
-      .eq("tool_name", toolName)
-      .eq("usage_date", today)
-      .maybeSingle();
-
-    if (existing) {
-      await supa
-        .from("usage_logs")
-        .update({ usage_count: (existing.usage_count || 0) + 1 })
-        .eq("id", existing.id);
-    } else {
-      await supa
-        .from("usage_logs")
-        .insert({ org_id: orgId, tool_name: toolName, usage_date: today, usage_count: 1 });
-    }
+    // Call API endpoint (server-side logging)
+    try {
+      const cfg = await fetch("/config.json", { cache: "no-store" }).then(r => r.json());
+      const apiBase = (cfg.apiBaseUrl || "").replace(/\/$/, "");
+      const token = localStorage.getItem("volynx_access_token") || "";
+      if (apiBase && token) {
+        fetch(`${apiBase}/api/log-usage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ tool: toolName, amount: 1 }),
+        }).catch(() => {});
+      }
+    } catch {}
     log(`usage logged: ${toolName}`);
   }
 
-  function canCreate(plan: string, currentCount: number): { ok: boolean; msg: string } {
-    const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
-    if (limits.maxProjects === -1) return { ok: true, msg: "" };
-    if (currentCount >= limits.maxProjects) {
-      return { ok: false, msg: `Free plan allows ${limits.maxProjects} project${limits.maxProjects > 1 ? "s" : ""}. Upgrade to Pro for more.` };
+  async function useTokens(actionId: string): Promise<{ ok: boolean; balance?: number; reason?: string }> {
+    try {
+      const cfg = await fetch("/config.json", { cache: "no-store" }).then(r => r.json());
+      const apiBase = (cfg.apiBaseUrl || "").replace(/\/$/, "");
+      const token = localStorage.getItem("volynx_access_token") || "";
+      if (!apiBase || !token) return { ok: true }; // fallback: allow if no API
+      const res = await fetch(`${apiBase}/api/use-tokens`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ action: actionId, tool: "builder" }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        return { ok: false, balance: j.balance, reason: j.reason };
+      }
+      const j = await res.json();
+      return { ok: true, balance: j.balance };
+    } catch { return { ok: true }; } // fallback: allow on error
+  }
+
+  function canCreate(counts: { drafts: number; published: number }): { ok: boolean; msg: string } {
+    if (!planLimits) return { ok: true, msg: "" };
+    const max = planLimits.max_drafts;
+    if (max === -1 || max >= 999) return { ok: true, msg: "" };
+    if (counts.drafts >= max) {
+      return { ok: false, msg: `Your plan allows ${max} project${max > 1 ? "s" : ""}. Upgrade for more.` };
     }
     return { ok: true, msg: "" };
   }
 
-  function canPublish(plan: string, todayPublishes: number): { ok: boolean; msg: string } {
-    const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
-    if (limits.maxPublishesPerDay === -1) return { ok: true, msg: "" };
-    if (todayPublishes >= limits.maxPublishesPerDay) {
-      return { ok: false, msg: `Daily publish limit reached (${limits.maxPublishesPerDay}). Upgrade to Pro for more.` };
+  function canPublish(counts: { drafts: number; published: number }): { ok: boolean; msg: string } {
+    if (!planLimits) return { ok: true, msg: "" };
+    const max = planLimits.max_published;
+    if (max === -1 || max >= 999) return { ok: true, msg: "" };
+    if (max === 0) {
+      return { ok: false, msg: "Publishing requires a paid plan. Upgrade to Launch or Pro." };
+    }
+    if (counts.published >= max) {
+      return { ok: false, msg: `Your plan allows ${max} published site${max > 1 ? "s" : ""}. Upgrade for more.` };
     }
     return { ok: true, msg: "" };
   }
@@ -1056,9 +1065,11 @@ import PageWidgets from "../../../components/PageWidgets.astro";
     if (who) who.textContent = user.email || "";
     showAuth(false);
 
-    // Fetch user profile (plan, org_id)
+    // Fetch user profile (plan, org_id, tokens, builder_plan)
     userProfile = await fetchUserProfile(user.id);
-    log("plan: " + (userProfile?.plan || "free"));
+    const builderPlan = userProfile?.builder_plan || "free";
+    planLimits = await fetchPlanLimits(builderPlan);
+    log("builder_plan: " + builderPlan + " | tokens: " + (userProfile?.token_balance || 0));
 
     await listProjects(user.id);
 
@@ -1160,11 +1171,10 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     $("backStep1")?.addEventListener("click", () => showWizardStep(1));
     $("backStep2")?.addEventListener("click", () => showWizardStep(2));
 
-    // Create project (with plan limit check + usage logging)
+    // Create project (with builder_plan limit check + usage logging)
     $("create")?.addEventListener("click", async () => {
-      const plan = userProfile?.plan || "free";
-      const projectCount = await countActiveProjects(user.id);
-      const check = canCreate(plan, projectCount);
+      const counts = await countActiveProjects(user.id);
+      const check = canCreate(counts);
       if (!check.ok) return setStatus(check.msg);
 
       const w = getWizardInputs();
@@ -1204,10 +1214,9 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
       if (!currentProject) return setStatus("Select a project.");
       if (!currentProject.slug) return setStatus("Project has no slug. Edit JSON to add one.");
 
-      // Check publish limit
-      const plan = userProfile?.plan || "free";
-      const todayPublishes = await getTodayUsage(user.id, "builder_publish");
-      const pubCheck = canPublish(plan, todayPublishes);
+      // Check publish limit based on builder_plan
+      const counts = await countActiveProjects(user.id);
+      const pubCheck = canPublish(counts);
       if (!pubCheck.ok) return setStatus(pubCheck.msg);
 
       setStatus("Saving…");
