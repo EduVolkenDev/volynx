@@ -48,7 +48,7 @@
     if (apiBase) {
       const tool = window.__vxTool || 'qr-gen';
       const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), 8000);
+      const t = setTimeout(() => ctrl.abort(), 3500);
       const res = await fetch(`${apiBase}/api/check-permission`, {
         method: 'POST',
         headers: {

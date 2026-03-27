@@ -9,7 +9,7 @@
     var token = localStorage.getItem('volynx_access_token') || '';
     try {
       var ctrl = new AbortController();
-      var t = setTimeout(function(){ ctrl.abort(); }, 8000);
+      var t = setTimeout(function(){ ctrl.abort(); }, 3500);
       var res = await fetch(apiBase + '/api/check-permission', {
         method: 'POST',
         headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),

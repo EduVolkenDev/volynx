@@ -58,8 +58,8 @@ const title = "Contact — VOLYNX";
         <h2 data-i18n="contact.sales_title">Start a project</h2>
         <p data-i18n="contact.sales_desc">Tell me what you're building. I'll come back with a clear path and what it takes to make it happen.</p>
 
-        <!-- Replace FORM_ID with your Formspree form ID from formspree.io -->
-        <form class="lead-form" method="POST" action="https://formspree.io/f/FORM_ID">
+        <!-- TODO: Replace with your Formspree ID from formspree.io -->
+        <form class="lead-form" id="contactForm" method="POST" action="https://formspree.io/f/FORM_ID" onsubmit="if(this.action.includes('FORM_ID')){event.preventDefault();window.location.href='mailto:hello@volynx.world?subject=New%20Project&body='+encodeURIComponent('Name: '+this.name.value+'\\nEmail: '+this.email.value+'\\nMessage: '+this.message.value);return false}">
           <div class="field-row">
             <div class="field">
               <label for="name" data-i18n="contact.name">Name</label>
