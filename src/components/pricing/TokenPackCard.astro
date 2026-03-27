@@ -1,0 +1,73 @@
+---
+const { pack, locale, currency } = Astro.props;
+---
+<div class="token-card">
+  {pack.badge && <span class="token-pill">{pack.badge[locale]}</span>}
+  <h3 class="token-card__amount">{pack.amount} tokens</h3>
+  <span class="token-card__price">{pack.price[currency]}</span>
+  <p class="token-card__desc">{locale === 'pt' ? 'Pacote avulso para uso flexível das ferramentas.' : 'One-time pack for flexible tool usage.'}</p>
+  <a href="#" class="token-card__cta">{locale === 'pt' ? 'Comprar' : 'Buy'}</a>
+</div>
+
+<style>
+  .token-card {
+    padding: 22px;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,.06);
+    background: rgba(255,255,255,.03);
+    backdrop-filter: blur(10px);
+    text-align: center;
+    transition: all .25s;
+  }
+  .token-card:hover {
+    border-color: rgba(52,211,153,.2);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 36px rgba(0,0,0,.15);
+  }
+  .token-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    background: rgba(52,211,153,.1);
+    border: 1px solid rgba(52,211,153,.25);
+    color: #34D399;
+    margin-bottom: 10px;
+  }
+  .token-card__amount {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    margin: 0 0 6px;
+  }
+  .token-card__price {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -.04em;
+    color: #34D399;
+  }
+  .token-card__desc {
+    font-size: 12px;
+    color: rgba(255,255,255,.4);
+    margin: 10px 0 16px;
+    line-height: 1.5;
+  }
+  .token-card__cta {
+    display: block;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(52,211,153,.2);
+    background: rgba(52,211,153,.06);
+    color: #34D399;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    transition: all .2s;
+  }
+  .token-card__cta:hover {
+    background: rgba(52,211,153,.12);
+  }
+</style>

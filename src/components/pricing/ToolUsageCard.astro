@@ -1,0 +1,73 @@
+---
+const { item, locale, currency } = Astro.props;
+const classColors: Record<string, string> = {
+  A: 'rgba(52,211,153,.15)',
+  B: 'rgba(125,211,252,.15)',
+  C: 'rgba(139,92,246,.15)',
+  D: 'rgba(245,158,11,.15)',
+  E: 'rgba(239,68,68,.15)',
+};
+const classBorders: Record<string, string> = {
+  A: 'rgba(52,211,153,.3)',
+  B: 'rgba(125,211,252,.3)',
+  C: 'rgba(139,92,246,.3)',
+  D: 'rgba(245,158,11,.3)',
+  E: 'rgba(239,68,68,.3)',
+};
+---
+<div class="usage-card">
+  <h3 class="usage-card__label">{item.label[locale]}</h3>
+  <span class="usage-card__tokens" style={`background:${classColors[item.tool_class || 'A']};border-color:${classBorders[item.tool_class || 'A']}`}>{item.tokens}</span>
+  <span class="usage-card__price">{item.price[currency]}</span>
+  <ul class="usage-card__examples">
+    {item.examples[locale].map((ex: string) => <li>{ex}</li>)}
+  </ul>
+</div>
+
+<style>
+  .usage-card {
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,.06);
+    background: rgba(255,255,255,.03);
+    backdrop-filter: blur(10px);
+    transition: all .2s;
+  }
+  .usage-card:hover {
+    border-color: rgba(255,255,255,.1);
+    transform: translateY(-1px);
+  }
+  .usage-card__label {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 10px;
+  }
+  .usage-card__tokens {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    border: 1px solid;
+    margin-bottom: 8px;
+  }
+  .usage-card__price {
+    display: block;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -.03em;
+    margin-bottom: 12px;
+  }
+  .usage-card__examples {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .usage-card__examples li {
+    padding: 6px 0;
+    font-size: 13px;
+    color: rgba(255,255,255,.5);
+    border-bottom: 1px solid rgba(255,255,255,.03);
+  }
+</style>

@@ -2,63 +2,34 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import VxHeader from "../components/VxHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
+import PricingCard from "../components/pricing/PricingCard.astro";
+import TokenPackCard from "../components/pricing/TokenPackCard.astro";
+import ToolUsageCard from "../components/pricing/ToolUsageCard.astro";
+import AddonCard from "../components/pricing/AddonCard.astro";
+import LocaleCurrencyBar from "../components/pricing/LocaleCurrencyBar.astro";
+import { sitePricing } from "../data/pricing";
+
 const title = "Pricing — VOLYNX";
-const plans = [
-  {
-    name: "Free (Lab)",
-    price: "£0",
-    period: "/month",
-    tagline: "Try the tools. No friction.",
-    perks: [
-      "Access to Volynx Lab tools",
-      "Basic limits (fair use)",
-      "Community updates",
-    ],
-    cta: { label: "Open Volynx Lab", href: "/volynx-lab/" },
-    badge: "Starter",
-  },
-  {
-    name: "Studio Pro",
-    price: "£19",
-    period: "/month",
-    tagline: "The full suite. Faster workflows.",
-    perks: [
-      "All Studio tools (Pro)",
-      "Higher limits + batch processing",
-      "Priority updates",
-      "Commercial usage",
-    ],
-    cta: { label: "Go Studio", href: "/volynx-lab/studio/" },
-    badge: "Best value",
-  },
-  {
-    name: "Teams",
-    price: "£49",
-    period: "/month",
-    tagline: "Shared workflows for teams.",
-    perks: [
-      "Team seats",
-      "Shared presets",
-      "Central billing",
-      "Support SLA (lightweight)",
-    ],
-    cta: { label: "Contact sales", href: "/contact/" },
-    badge: "Scale",
-  },
-];
+const lang = Astro.url.searchParams.get('lang') === 'pt' ? 'pt' : 'en';
+const currencyParam = Astro.url.searchParams.get('currency') || '';
+const currency = (['GBP', 'EUR', 'BRL'] as const).includes(currencyParam as any) ? currencyParam as 'GBP'|'EUR'|'BRL' : 'GBP';
 
 const faqs = [
   {
-    q: "Is the Lab really free?",
-    a: "Yes. Lab is for discovery and proof-of-value. Studio is where power users upgrade.",
+    q: { en: "Is the Lab really free?", pt: "O Lab é realmente grátis?" },
+    a: { en: "Yes. Lab is for discovery and proof-of-value. Studio and Builder are where power users upgrade.", pt: "Sim. O Lab é para descoberta. Studio e Builder são onde usuários avançados fazem upgrade." },
   },
   {
-    q: "How does billing work?",
-    a: "Studio runs on a monthly subscription. Cancel anytime—no hostage contracts.",
+    q: { en: "How do tokens work?", pt: "Como funcionam os tokens?" },
+    a: { en: "Each tool action costs tokens based on complexity. Buy packs anytime — they never expire.", pt: "Cada ação consome tokens baseado na complexidade. Compre packs quando quiser — não expiram." },
   },
   {
-    q: "Can I use Studio outputs commercially?",
-    a: "Yes. Studio is designed for production use.",
+    q: { en: "Can I use outputs commercially?", pt: "Posso usar comercialmente?" },
+    a: { en: "Yes. Studio Pro and Builder paid plans include commercial usage rights.", pt: "Sim. Studio Pro e planos pagos do Builder incluem direitos de uso comercial." },
+  },
+  {
+    q: { en: "Can I switch plans anytime?", pt: "Posso trocar de plano?" },
+    a: { en: "Yes. Upgrade, downgrade or cancel at any time from your dashboard.", pt: "Sim. Faça upgrade, downgrade ou cancele a qualquer momento pelo dashboard." },
   },
 ];
 ---
@@ -66,347 +37,310 @@ const faqs = [
 <BaseLayout title={title}>
   <VxHeader />
 
-  <main class="shell pricing">
-    <section class="hero">
-      <h1>Pricing</h1>
-      <p class="sub">
-        Lab is your sandbox. Studio is your production pipeline.
-      </p>
+  <main class="shell pricing-page">
+
+    <!-- HERO -->
+    <section class="pricing-hero">
+      <h1>{sitePricing.labels.pricingTitle[lang]}</h1>
+      <p class="pricing-sub">{sitePricing.labels.pricingSubtitle[lang]}</p>
+      <LocaleCurrencyBar locale={lang} currency={currency} />
     </section>
 
-    <section class="grid">
-      {plans.map((p, i) => (
-        <article class="card" data-plan-index={i}>
-          <div class="card-top">
-            <span class="badge">{p.badge}</span>
-            <h2>{p.name}</h2>
-            <div class="price">
-              <span class="amount">{p.price}</span>
-              <span class="period">{p.period}</span>
-            </div>
-            <p class="tagline">{p.tagline}</p>
-          </div>
-
-          <ul class="perks">
-            {p.perks.map((x) => <li>{x}</li>)}
-          </ul>
-
-          <a class="btn" href={p.cta.href} data-plan-cta={i}>{p.cta.label}</a>
-        </article>
-      ))}
+    <!-- TOKEN UNIT -->
+    <section class="pricing-section">
+      <div class="pricing-token-unit">
+        <div>
+          <span class="pricing-eyebrow">{lang === 'pt' ? 'Unidade de token' : 'Token unit'}</span>
+          <span class="pricing-token-price">{sitePricing.tokenUnitPrice[currency]}</span>
+        </div>
+        <p class="pricing-token-note">{sitePricing.fxDisclaimer[lang]}</p>
+      </div>
     </section>
 
-    <section class="compare">
-      <h2>What's included</h2>
-      <p class="compare-sub">A clear breakdown so you know exactly what you're getting.</p>
-      <div class="table-wrap">
-        <table>
+    <!-- BUILDER PLANS -->
+    <section class="pricing-section">
+      <span class="pricing-eyebrow">{lang === 'pt' ? 'Planos do Builder' : 'Builder Plans'}</span>
+      <h2>{lang === 'pt' ? 'Planos prontos para venda' : 'Plans ready to sell'}</h2>
+      <div class="pricing-grid pricing-grid--plans">
+        {sitePricing.builderPlans.map((plan) => (
+          <PricingCard plan={plan} locale={lang} currency={currency} />
+        ))}
+      </div>
+    </section>
+
+    <!-- TOKEN PACKS -->
+    <section class="pricing-section">
+      <span class="pricing-eyebrow">{lang === 'pt' ? 'Packs de tokens' : 'Token Packs'}</span>
+      <h2>{lang === 'pt' ? 'Compre tokens avulsos' : 'Buy token packs'}</h2>
+      <div class="pricing-grid pricing-grid--4">
+        {sitePricing.tokenPacks.map((pack) => (
+          <TokenPackCard pack={pack} locale={lang} currency={currency} />
+        ))}
+      </div>
+    </section>
+
+    <!-- TOOL USAGE MATRIX -->
+    <section class="pricing-section">
+      <span class="pricing-eyebrow">{lang === 'pt' ? 'Matriz de uso' : 'Usage Matrix'}</span>
+      <h2>{lang === 'pt' ? 'Custo por tipo de ação' : 'Cost per action type'}</h2>
+      <div class="pricing-grid pricing-grid--3">
+        {sitePricing.toolUsage.map((item) => (
+          <ToolUsageCard item={item} locale={lang} currency={currency} />
+        ))}
+      </div>
+    </section>
+
+    <!-- ADDONS -->
+    <section class="pricing-section">
+      <span class="pricing-eyebrow">{lang === 'pt' ? 'Add-ons' : 'Add-ons'}</span>
+      <h2>{lang === 'pt' ? 'Extras para aumentar valor' : 'Extras to boost value'}</h2>
+      <div class="pricing-grid pricing-grid--2">
+        {sitePricing.builderAddons.map((addon) => (
+          <AddonCard addon={addon} locale={lang} currency={currency} />
+        ))}
+      </div>
+    </section>
+
+    <!-- COMPARISON TABLE -->
+    <section class="pricing-section">
+      <span class="pricing-eyebrow">{lang === 'pt' ? 'Comparação' : 'Comparison'}</span>
+      <h2>{lang === 'pt' ? 'O que cada plano inclui' : "What's included"}</h2>
+      <div class="pricing-table-wrap">
+        <table class="pricing-table">
           <thead>
             <tr>
-              <th class="feature-col">Feature</th>
-              <th>Free (Lab)</th>
-              <th class="highlight-col">Studio Pro</th>
+              <th class="pricing-table__feature">{lang === 'pt' ? 'Recurso' : 'Feature'}</th>
+              <th>Free</th>
+              <th>Launch</th>
+              <th class="pricing-table__hl">Pro</th>
+              <th>Studio</th>
               <th>Teams</th>
             </tr>
           </thead>
           <tbody>
-            <tr class="section-row"><td colspan="4">Tools</td></tr>
-            <tr>
-              <td>Image processing tools</td>
-              <td>✓ Basic limits</td>
-              <td class="highlight-col">✓ Unlimited</td>
-              <td>✓ Unlimited</td>
-            </tr>
-            <tr>
-              <td>QR code generator</td>
-              <td>✓ Basic limits</td>
-              <td class="highlight-col">✓ No limits</td>
-              <td>✓ No limits</td>
-            </tr>
-            <tr>
-              <td>File converter</td>
-              <td>✓ Basic limits</td>
-              <td class="highlight-col">✓ Batch mode</td>
-              <td>✓ Batch mode</td>
-            </tr>
-            <tr>
-              <td>Image Suite (Studio)</td>
-              <td>—</td>
-              <td class="highlight-col">✓ Full access</td>
-              <td>✓ Full access</td>
-            </tr>
-            <tr class="section-row"><td colspan="4">Account &amp; Billing</td></tr>
-            <tr>
-              <td>Commercial usage rights</td>
-              <td>—</td>
-              <td class="highlight-col">✓</td>
-              <td>✓</td>
-            </tr>
-            <tr>
-              <td>Team seats</td>
-              <td>—</td>
-              <td class="highlight-col">—</td>
-              <td>✓ Up to 10</td>
-            </tr>
-            <tr>
-              <td>Central billing</td>
-              <td>—</td>
-              <td class="highlight-col">—</td>
-              <td>✓</td>
-            </tr>
-            <tr>
-              <td>Shared presets</td>
-              <td>—</td>
-              <td class="highlight-col">—</td>
-              <td>✓</td>
-            </tr>
-            <tr class="section-row"><td colspan="4">Support</td></tr>
-            <tr>
-              <td>Community access</td>
-              <td>✓</td>
-              <td class="highlight-col">✓</td>
-              <td>✓</td>
-            </tr>
-            <tr>
-              <td>Priority updates</td>
-              <td>—</td>
-              <td class="highlight-col">✓</td>
-              <td>✓</td>
-            </tr>
-            <tr>
-              <td>Support SLA</td>
-              <td>—</td>
-              <td class="highlight-col">—</td>
-              <td>✓ 48h response</td>
-            </tr>
+            <tr><td>{lang === 'pt' ? 'Drafts' : 'Drafts'}</td><td>1</td><td>3</td><td class="pricing-table__hl">10</td><td>50</td><td>100</td></tr>
+            <tr><td>{lang === 'pt' ? 'Sites publicados' : 'Published sites'}</td><td>0</td><td>1</td><td class="pricing-table__hl">3</td><td>10</td><td>25</td></tr>
+            <tr><td>{lang === 'pt' ? 'Domínio custom' : 'Custom domain'}</td><td>—</td><td>—</td><td class="pricing-table__hl">✓</td><td>✓</td><td>✓</td></tr>
+            <tr><td>{lang === 'pt' ? 'Remover branding' : 'Remove branding'}</td><td>—</td><td>—</td><td class="pricing-table__hl">✓</td><td>✓</td><td>✓</td></tr>
+            <tr><td>{lang === 'pt' ? 'Kits premium' : 'Premium kits'}</td><td>—</td><td>—</td><td class="pricing-table__hl">✓</td><td>✓</td><td>✓</td></tr>
+            <tr><td>{lang === 'pt' ? 'Prioridade de publish' : 'Publish priority'}</td><td>—</td><td>—</td><td class="pricing-table__hl">✓</td><td>✓</td><td>✓</td></tr>
+            <tr><td>{lang === 'pt' ? 'Uso comercial' : 'Commercial use'}</td><td>—</td><td>—</td><td class="pricing-table__hl">✓</td><td>✓</td><td>✓</td></tr>
+            <tr><td>Workspace</td><td>—</td><td>—</td><td class="pricing-table__hl">—</td><td>—</td><td>✓</td></tr>
           </tbody>
         </table>
       </div>
     </section>
 
-    <section class="faq">
-      <h2>FAQ</h2>
-      <div class="faq-grid">
+    <!-- FAQ -->
+    <section class="pricing-section">
+      <span class="pricing-eyebrow">FAQ</span>
+      <h2>{lang === 'pt' ? 'Perguntas frequentes' : 'Frequently asked questions'}</h2>
+      <div class="pricing-faq-grid">
         {faqs.map((f) => (
-          <details class="faq-item">
-            <summary>{f.q}</summary>
-            <p>{f.a}</p>
+          <details class="pricing-faq">
+            <summary>{f.q[lang]}</summary>
+            <p>{f.a[lang]}</p>
           </details>
         ))}
       </div>
     </section>
+
   </main>
 
   <SiteFooter />
 
+  <!-- Plan detection for logged-in users -->
   <script is:inline type="module">
-    // Plan index mapping: 0=free, 1=pro, 2=teams(enterprise)
-    const planToIndex = { free: 0, pro: 1, enterprise: 2 };
-
+    const planToIndex = { free: 0, launch: 1, pro: 2, studio: 3, teams: 4 };
     async function detectPlan() {
-      const token = localStorage.getItem("volynx_access_token");
-      const refresh = localStorage.getItem("volynx_refresh_token");
-      if (!token || !refresh) return;
-
+      const token = localStorage.getItem('volynx_access_token');
+      if (!token) return;
       let cfg;
-      try { cfg = await fetch("/config.json", { cache: "no-store" }).then(r => r.json()); }
-      catch { return; }
-
-      const apiBase = (cfg.apiBaseUrl || "").replace(/\/$/, "");
+      try { cfg = await fetch('/config.json', { cache: 'no-store' }).then(r => r.json()); } catch { return; }
+      const apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
       if (!apiBase) return;
-
       try {
-        const res = await fetch(`${apiBase}/api/check-permission`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ tool: "converter" }),
+        const res = await fetch(apiBase + '/api/check-permission', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+          body: JSON.stringify({ tool: 'converter' }),
         });
         if (!res.ok) return;
         const perm = await res.json();
-        const plan = perm.plan || "free";
-        if (perm.useLocalStorage) return; // no valid plan info
-
-        const idx = planToIndex[plan];
-        if (idx === undefined) return;
-
-        // Mark the active plan card
-        const card = document.querySelector(`[data-plan-index="${idx}"]`);
-        if (!card) return;
-
-        card.classList.add("card--current");
-
-        // Replace badge
-        const badge = card.querySelector(".badge");
-        if (badge) {
-          badge.textContent = "Your plan";
-          badge.classList.add("badge--current");
-        }
-
-        // Replace CTA button
-        const cta = document.querySelector(`[data-plan-cta="${idx}"]`);
-        if (cta) {
-          cta.textContent = "Current plan ✓";
-          cta.classList.add("btn--current");
-          cta.removeAttribute("href");
-          cta.style.pointerEvents = "none";
-        }
-
-        // Mark table column header
-        const colHeaders = document.querySelectorAll("thead th");
-        if (colHeaders[idx + 1]) {
-          const th = colHeaders[idx + 1];
-          const marker = document.createElement("div");
-          marker.textContent = "Your plan";
-          marker.style.cssText = "font-size:9px;letter-spacing:.08em;margin-top:4px;color:#34D399;font-weight:700;";
-          th.appendChild(marker);
+        const plan = perm.plan || 'free';
+        if (perm.useLocalStorage) return;
+        // Find the matching plan card
+        const cards = document.querySelectorAll('.pricing-card');
+        const builderPlans = ['free', 'launch', 'pro', 'studio', 'teams'];
+        const idx = builderPlans.indexOf(plan);
+        if (idx >= 0 && cards[idx]) {
+          cards[idx].style.borderColor = 'rgba(52,211,153,.35)';
+          cards[idx].style.boxShadow = '0 0 24px rgba(52,211,153,.08)';
+          const name = cards[idx].querySelector('.pricing-card__name');
+          if (name) {
+            const badge = document.createElement('span');
+            badge.textContent = ' ✓ Your plan';
+            badge.style.cssText = 'font-size:12px;color:#34D399;font-weight:700;';
+            name.appendChild(badge);
+          }
+          const cta = cards[idx].querySelector('.pricing-card__cta');
+          if (cta) {
+            cta.textContent = 'Current plan ✓';
+            cta.style.cssText = 'background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.25);color:#34D399;pointer-events:none;display:flex;justify-content:center;padding:12px;border-radius:14px;text-decoration:none;font-weight:600;font-size:14px;';
+          }
         }
       } catch {}
     }
-
     detectPlan();
   </script>
 </BaseLayout>
 
 <style>
-  @import "../styles/products2.css";
-  @import "../styles/services.css";
-  @import "../styles/legal.css";
+  .pricing-page { padding-bottom: 60px; }
 
-  .pricing .hero { padding: 48px 0 22px; }
-  .pricing .sub { max-width: 64ch; opacity: .85; }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: 18px;
-    margin: 24px 0 44px;
+  .pricing-hero {
+    padding: 48px 0 28px;
+    text-align: center;
   }
-  .card {
-    grid-column: span 4;
-    border-radius: 24px;
-    padding: 22px;
-    border: 1px solid rgba(255,255,255,.08);
-    background: rgba(10,12,20,.55);
-    backdrop-filter: blur(12px);
+  .pricing-hero h1 {
+    font-size: clamp(24px, 4vw, 38px);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    margin-bottom: 8px;
   }
-  .card-top h2 { margin: 10px 0 6px; }
-  .badge {
-    display: inline-flex; align-items: center;
-    padding: 6px 10px; border-radius: 999px;
-    border: 1px solid rgba(255,255,255,.14);
-    font-size: 12px; opacity: .9;
-  }
-  .price { display: flex; gap: 8px; align-items: baseline; margin: 10px 0 6px; }
-  .amount { font-size: 40px; line-height: 1; font-weight: 700; }
-  .period { opacity: .7; }
-  .tagline { opacity: .85; margin-bottom: 14px; }
-  .perks { list-style: none; padding: 0; margin: 14px 0 18px; }
-  .perks li { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.06); opacity: .9; }
-  .btn {
-    display: inline-flex; justify-content: center; width: 100%;
-    padding: 12px 14px; border-radius: 14px;
-    border: 1px solid rgba(255,255,255,.12);
-    text-decoration: none;
-    transition: all .2s;
+  .pricing-sub {
+    font-size: 16px;
+    opacity: .6;
+    max-width: 56ch;
+    margin: 0 auto 24px;
   }
 
-  /* Current plan indicator */
-  .card--current {
-    border-color: rgba(52,211,153,.3);
-    background: rgba(52,211,153,.04);
-    box-shadow: 0 0 24px rgba(52,211,153,.06);
+  .pricing-section {
+    padding: 32px 0;
   }
-  .badge--current {
-    background: rgba(52,211,153,.12) !important;
-    border-color: rgba(52,211,153,.35) !important;
-    color: #34D399 !important;
-    opacity: 1 !important;
-  }
-  .btn--current {
-    background: rgba(52,211,153,.08);
-    border-color: rgba(52,211,153,.25);
-    color: #34D399;
-    cursor: default;
+  .pricing-eyebrow {
+    display: block;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    opacity: .35;
+    margin-bottom: 8px;
     font-weight: 600;
   }
+  .pricing-section h2 {
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 800;
+    letter-spacing: -.02em;
+    margin-bottom: 20px;
+  }
 
-  /* Comparison table */
-  .compare { padding: 16px 0 40px; }
-  .compare h2 { margin-bottom: 6px; }
-  .compare-sub { opacity: .7; font-size: 14px; margin-bottom: 22px; }
+  /* Grids */
+  .pricing-grid { display: grid; gap: 14px; }
+  .pricing-grid--plans { grid-template-columns: repeat(5, 1fr); }
+  .pricing-grid--4 { grid-template-columns: repeat(4, 1fr); }
+  .pricing-grid--3 { grid-template-columns: repeat(3, 1fr); }
+  .pricing-grid--2 { grid-template-columns: repeat(2, 1fr); }
 
-  .table-wrap {
+  /* Token unit */
+  .pricing-token-unit {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 20px 24px;
+    border-radius: 16px;
+    border: 1px solid rgba(52,211,153,.15);
+    background: rgba(52,211,153,.03);
+  }
+  .pricing-token-price {
+    font-size: 32px;
+    font-weight: 800;
+    color: #34D399;
+    margin-left: 12px;
+  }
+  .pricing-token-note {
+    font-size: 12px;
+    opacity: .4;
+    margin: 0;
+    max-width: 50ch;
+  }
+
+  /* Table */
+  .pricing-table-wrap {
     overflow-x: auto;
     border-radius: 16px;
-    border: 1px solid rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.06);
   }
-  table {
+  .pricing-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
   }
-  thead th {
-    padding: 14px 18px;
+  .pricing-table thead th {
+    padding: 14px 16px;
     text-align: center;
     font-size: 12px;
-    letter-spacing: 1px;
+    letter-spacing: .08em;
     text-transform: uppercase;
-    opacity: .6;
-    border-bottom: 1px solid rgba(255,255,255,.07);
-    background: rgba(10,12,20,.6);
-    white-space: nowrap;
-  }
-  thead th.feature-col { text-align: left; }
-  thead th.highlight-col {
-    background: rgba(79,195,247,.06);
-    color: #4fc3f7;
-    opacity: 1;
-    border-left: 1px solid rgba(79,195,247,.15);
-    border-right: 1px solid rgba(79,195,247,.15);
-  }
-
-  tbody tr td {
-    padding: 11px 18px;
-    border-bottom: 1px solid rgba(255,255,255,.05);
-    text-align: center;
-    vertical-align: middle;
-    opacity: .85;
-  }
-  tbody tr td:first-child { text-align: left; opacity: 1; }
-  tbody tr td.highlight-col {
-    background: rgba(79,195,247,.04);
-    border-left: 1px solid rgba(79,195,247,.1);
-    border-right: 1px solid rgba(79,195,247,.1);
-    color: #e0f7ff;
-  }
-  tbody tr:hover td { background: rgba(255,255,255,.02); }
-  tbody tr:last-child td { border-bottom: none; }
-
-  tr.section-row td {
-    padding: 10px 18px;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    opacity: .4;
-    background: rgba(255,255,255,.02);
-    text-align: left !important;
+    opacity: .5;
     border-bottom: 1px solid rgba(255,255,255,.06);
+    background: rgba(0,0,0,.2);
+  }
+  .pricing-table__feature { text-align: left !important; }
+  .pricing-table__hl {
+    background: rgba(109,94,252,.05) !important;
+    color: #C4B5FD !important;
+    opacity: 1 !important;
+    border-left: 1px solid rgba(109,94,252,.12);
+    border-right: 1px solid rgba(109,94,252,.12);
+  }
+  .pricing-table tbody td {
+    padding: 11px 16px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,.03);
+    opacity: .75;
+  }
+  .pricing-table tbody td:first-child { text-align: left; opacity: 1; }
+
+  /* FAQ */
+  .pricing-faq-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .pricing-faq {
+    padding: 16px 20px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.06);
+    background: rgba(255,255,255,.02);
+  }
+  .pricing-faq summary {
+    cursor: pointer;
     font-weight: 600;
+    font-size: 14px;
+    list-style: none;
   }
+  .pricing-faq summary::marker,
+  .pricing-faq summary::-webkit-details-marker { display: none; }
+  .pricing-faq summary::after { content: " +"; opacity: .4; }
+  .pricing-faq[open] summary::after { content: " −"; }
+  .pricing-faq p { margin: 10px 0 0; font-size: 13px; opacity: .6; line-height: 1.6; }
 
-  .faq { padding: 18px 0 70px; }
-  .faq-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; margin-top: 14px; }
-  .faq-item { grid-column: span 6; padding: 16px; border-radius: 18px;
-    border: 1px solid rgba(255,255,255,.08); background: rgba(10,12,20,.35);
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .pricing-grid--plans { grid-template-columns: repeat(3, 1fr); }
   }
-  .faq-item summary { cursor: pointer; font-weight: 600; }
-  .faq-item p { margin: 10px 0 0; opacity: .85; }
-
-  @media (max-width: 980px) {
-    .card { grid-column: span 6; }
-    .faq-item { grid-column: span 12; }
+  @media (max-width: 860px) {
+    .pricing-grid--plans { grid-template-columns: repeat(2, 1fr); }
+    .pricing-grid--4 { grid-template-columns: repeat(2, 1fr); }
+    .pricing-grid--3 { grid-template-columns: repeat(2, 1fr); }
+    .pricing-faq-grid { grid-template-columns: 1fr; }
   }
-  @media (max-width: 640px) {
-    .card { grid-column: span 12; }
+  @media (max-width: 600px) {
+    .pricing-grid--plans,
+    .pricing-grid--4,
+    .pricing-grid--3,
+    .pricing-grid--2 { grid-template-columns: 1fr; }
   }
 </style>

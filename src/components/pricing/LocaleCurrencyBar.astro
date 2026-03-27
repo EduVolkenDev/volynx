@@ -1,0 +1,61 @@
+---
+const { locale = 'en', currency = 'GBP' } = Astro.props;
+const pathname = Astro.url.pathname;
+const currencies = ['GBP', 'EUR', 'BRL'];
+const locales = [
+  { code: 'en', label: 'EN' },
+  { code: 'pt', label: 'PT' }
+];
+const withParams = (l: string, c: string) => `${pathname}?lang=${l}&currency=${c}`;
+---
+<div class="lcbar">
+  <div class="lcbar__group">
+    {locales.map((item) => (
+      <a href={withParams(item.code, currency)} class={`lcbar__pill ${item.code === locale ? 'lcbar__pill--active' : ''}`}>{item.label}</a>
+    ))}
+  </div>
+  <div class="lcbar__group">
+    {currencies.map((c) => (
+      <a href={withParams(locale, c)} class={`lcbar__pill ${c === currency ? 'lcbar__pill--active' : ''}`}>{c}</a>
+    ))}
+  </div>
+</div>
+
+<style>
+  .lcbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 14px 20px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.06);
+    background: rgba(255,255,255,.03);
+  }
+  .lcbar__group {
+    display: flex;
+    gap: 8px;
+  }
+  .lcbar__pill {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.03);
+    color: rgba(255,255,255,.45);
+    transition: all .15s;
+  }
+  .lcbar__pill:hover {
+    border-color: rgba(255,255,255,.15);
+    color: rgba(255,255,255,.7);
+  }
+  .lcbar__pill--active {
+    background: rgba(109,94,252,.12);
+    border-color: rgba(109,94,252,.35);
+    color: #C4B5FD;
+  }
+</style>
