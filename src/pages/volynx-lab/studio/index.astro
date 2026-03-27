@@ -155,7 +155,7 @@ const pageDescription = "Volynx Studio Pro: unlimited image processing, batch mo
           Studio Pro unlocks the full suite with batch processing and commercial rights — for the price of a coffee a week.
         </p>
         <div class="hero__actions">
-          <a class="btn-primary" href="/signup/" data-i18n="studio.btn_start">Start Studio Pro — £19/month</a>
+          <a class="btn-primary" id="studioCtaBuy" href="/signup/" data-i18n="studio.btn_start">Start Studio Pro — £19/month</a>
           <a class="btn-ghost" href="/pricing/" data-i18n="studio.btn_plans">Compare plans</a>
         </div>
         <p class="hero__note" data-i18n="studio.hero_note">Cancel anytime. No contracts.</p>
@@ -212,7 +212,7 @@ const pageDescription = "Volynx Studio Pro: unlimited image processing, batch mo
             <p class="price-strip__desc">All Studio tools. No limits. Commercial rights. Cancel anytime.</p>
           </div>
           <div class="price-strip__right">
-            <a class="btn-primary" href="/signup/">Start Studio Pro</a>
+            <a class="btn-primary" id="studioCtaBuy2" href="/signup/">Start Studio Pro</a>
             <a class="btn-ghost" href="/login/">Sign in</a>
           </div>
         </div>
@@ -327,6 +327,53 @@ const pageDescription = "Volynx Studio Pro: unlimited image processing, batch mo
   }
 
   boot();
+
+  // ── Studio Pro checkout buttons ──
+  async function handleStudioCheckout(e) {
+    e.preventDefault();
+    const btn = e.currentTarget;
+    let token = localStorage.getItem("volynx_access_token") || "";
+    const refreshToken = localStorage.getItem("volynx_refresh_token") || "";
+
+    if (!token) { window.location.href = "/signup/?next=/volynx-lab/studio/"; return; }
+
+    // Refresh token
+    let cfg;
+    try { cfg = await fetch("/config.json", { cache: "no-store" }).then(r => r.json()); } catch { return; }
+    const apiBase = (cfg.apiBaseUrl || "").replace(/\/$/, "");
+
+    if (refreshToken && cfg.supabaseUrl) {
+      try {
+        const rr = await fetch(cfg.supabaseUrl + "/auth/v1/token?grant_type=refresh_token", {
+          method: "POST",
+          headers: { apikey: cfg.supabaseAnonKey, "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh_token: refreshToken }),
+        });
+        if (rr.ok) {
+          const sess = await rr.json();
+          if (sess.access_token) { token = sess.access_token; localStorage.setItem("volynx_access_token", token); }
+          if (sess.refresh_token) localStorage.setItem("volynx_refresh_token", sess.refresh_token);
+        }
+      } catch {}
+    }
+
+    btn.textContent = "Redirecting...";
+    btn.style.pointerEvents = "none";
+
+    try {
+      const res = await fetch(apiBase + "/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+        body: JSON.stringify({ lookup_key: "studio_pro_gbp", success_url: window.location.origin + "/volynx-lab/studio/?payment=success", cancel_url: window.location.origin + "/volynx-lab/studio/" }),
+      });
+      const data = await res.json();
+      if (data.url) { window.location.href = data.url; }
+      else { alert(data.error || "Checkout failed"); btn.textContent = "Start Studio Pro"; btn.style.pointerEvents = ""; }
+    } catch { btn.textContent = "Start Studio Pro"; btn.style.pointerEvents = ""; }
+  }
+
+  document.getElementById("studioCtaBuy")?.addEventListener("click", handleStudioCheckout);
+  document.getElementById("studioCtaBuy2")?.addEventListener("click", handleStudioCheckout);
 </script>
 
 <style>

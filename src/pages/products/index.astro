@@ -194,7 +194,7 @@ const products = [
             <span class="small">Includes: <span data-i18n={p.metaKey}>{p.meta}</span></span>
             <div class="ctaRow">
               <a class="btn" href={p.href ?? `/products/${p.slug}/`} data-i18n="products.view_btn">View</a>
-              <a class="btn secondary" href="/contact/" data-i18n="products.buy_btn">Buy</a>
+              <a class="btn secondary" href={p.badge === 'Pro' || p.badge === 'Pro Tool' || p.badge === 'Pro Exclusive' ? '/pricing/' : '/contact/'} data-i18n="products.buy_btn">{p.badge === 'Pro' || p.badge === 'Pro Tool' || p.badge === 'Pro Exclusive' ? 'Get Pro' : 'Buy'}</a>
             </div>
           </div>
         </article>
