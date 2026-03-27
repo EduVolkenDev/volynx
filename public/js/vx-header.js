@@ -8,6 +8,15 @@
     menu.setAttribute('aria-hidden', String(!open));
     menu.classList.toggle('vx--open', open);
     document.body.classList.toggle('vx-menu-open', open);
+
+    if (open) {
+      menu.removeAttribute('inert');
+      const firstLink = menu.querySelector('a');
+      if (firstLink) firstLink.focus();
+    } else {
+      menu.setAttribute('inert', '');
+      btn.focus();
+    }
   };
 
   btn.addEventListener('click', () => {

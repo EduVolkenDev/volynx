@@ -2,12 +2,13 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import VxHeader from "../../components/VxHeader.astro";
 import SiteFooter from "../../components/SiteFooter.astro";
+import { ROUTES } from "../../data/routes";
 
 const title = "Sign Up — VOLYNX";
 ---
 
-<BaseLayout title={title}>
-  <VxHeader primaryCtaLabel="Sign in" primaryCtaHref="/login/" />
+<BaseLayout title={title} hideUtilBar>
+  <VxHeader primaryCtaLabel="Sign in" primaryCtaHref={ROUTES.login} />
 
   <div class="signup-bg" aria-hidden="true">
     <video
@@ -58,8 +59,8 @@ const title = "Sign Up — VOLYNX";
             <button class="btn primary" id="submitBtn" type="submit" data-i18n="signup.btn_create">Create account</button>
 
             <div class="row">
-              <a class="link" href="/login/" data-i18n="signup.have_account">Already have an account</a>
-              <a class="link" href="/pricing/" data-i18n="signup.pricing">Pricing</a>
+              <a class="link" href={ROUTES.login} data-i18n="signup.have_account">Already have an account</a>
+              <a class="link" href={ROUTES.pricing} data-i18n="signup.pricing">Pricing</a>
             </div>
           </form>
         </div>
@@ -79,7 +80,7 @@ const title = "Sign Up — VOLYNX";
           <p class="check-hint" data-i18n="signup.check_hint">
             Didn't receive it? Check your spam folder or try signing up again.
           </p>
-          <a class="btn primary" href="/login/" data-i18n="signup.check_login">Go to login</a>
+          <a class="btn primary" href={ROUTES.login} data-i18n="signup.check_login">Go to login</a>
         </div>
 
       </div>
@@ -142,6 +143,10 @@ const title = "Sign Up — VOLYNX";
     background: rgba(0,0,0,.18);
     color: inherit;
     outline: none;
+  }
+  input:focus-visible {
+    outline: 2px solid rgba(130, 220, 255, 0.6);
+    outline-offset: 2px;
   }
   .btn{
     display: inline-flex;

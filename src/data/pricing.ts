@@ -163,7 +163,7 @@ export const sitePricing = {
     },
     {
       id: 'pro',
-      badge: { pt: 'Plano âncora', en: 'Anchor plan' },
+      badge: { pt: 'Mais popular', en: 'Most popular' },
       featured: true,
       name: { pt: 'Builder Pro', en: 'Builder Pro' },
       description: {

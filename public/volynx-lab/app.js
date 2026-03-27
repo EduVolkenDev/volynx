@@ -79,6 +79,9 @@ async function logUsage(toolName, amount) {
 
   // Always also track locally
   incrementLocalUsage(amount);
+
+  // Notify usage counter component
+  window.dispatchEvent(new Event('vx:usage-updated'));
 }
 
 function isHeic(file) {
@@ -174,7 +177,7 @@ function formatSize(bytes) {
 }
 
 function updateStats() {
-  stats.textContent = files.length ? `${files.length} arquivo(s)` : '';
+  stats.textContent = files.length ? `${files.length} file(s)` : '';
 }
 
 /* ===== Convert ===== */
@@ -187,6 +190,9 @@ convertBtn.addEventListener('click', async () => {
   // Check permission with file count
   const perm = await checkPermission('converter', files.length);
   if (!perm.allowed) {
+    // Notify usage counter so it can show the limit overlay
+    window.dispatchEvent(new Event('vx:usage-updated'));
+
     const msg = perm.remaining === 0
       ? `Daily limit reached (${perm.limit}). ${perm.plan === 'free' ? 'Upgrade to Pro for more.' : 'Try again tomorrow.'}`
       : `Limit: ${perm.remaining} remaining today. You selected ${files.length} files.`;
@@ -267,7 +273,7 @@ function convertImage(file, mime, quality, maxw) {
       );
     };
 
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Erro ao carregar imagem')); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Error loading image')); };
     img.src = url;
   });
 }

@@ -2,6 +2,7 @@
 import VxHeader from "../../../../components/VxHeader.astro";
 import VxFooter from "../../../../components/VxFooter.astro";
 import PageWidgets from "../../../../components/PageWidgets.astro";
+import { ROUTES } from "../../../../data/routes";
 ---
 
 <!DOCTYPE html>
@@ -10,7 +11,7 @@ import PageWidgets from "../../../../components/PageWidgets.astro";
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VOLYNX QR Generator — Studio</title>
-  <meta name="description" content="Gere QR Codes estilizados com logo, gradientes e muito mais. Faça login para salvar." />
+  <meta name="description" content="Generate styled QR Codes with logos, gradients and more. Sign in to save." />
   <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
   <link rel="shortcut icon" href="/assets/favicon.ico" />
@@ -265,11 +266,11 @@ import PageWidgets from "../../../../components/PageWidgets.astro";
 </head>
 
 <body>
-  <VxHeader primaryCtaLabel="Minha conta" primaryCtaHref="/volynx-lab/studio/" />
+  <VxHeader primaryCtaLabel="My account" primaryCtaHref={ROUTES.studio} />
 
   <!-- Upgrade banner (shown only on free plan) -->
   <div id="vx-upgrade-banner" style="display:none;background:rgba(108,10,228,.18);border-bottom:1px solid rgba(108,10,228,.35);padding:10px 20px;text-align:center;font-size:.85em;">
-    Você está no plano gratuito. <a href="/pricing/" style="color:#59c6e8;font-weight:700;">Faça upgrade para Pro</a> e salve seus QR codes.
+    You're on the free plan. <a href={ROUTES.pricing} style="color:#59c6e8;font-weight:700;">Upgrade to Pro</a> to save your QR codes.
   </div>
 
   <main class="qr-main">
@@ -280,7 +281,7 @@ import PageWidgets from "../../../../components/PageWidgets.astro";
       <h1 data-i18n="qr.title">QR Generator</h1>
 
       <div class="input-wrapper">
-        <input type="text" id="text" placeholder="Digite o texto ou URL para gerar QR" data-i18n-placeholder="qr.input_placeholder" />
+        <input type="text" id="text" placeholder="Enter text or URL to generate QR" data-i18n-placeholder="qr.input_placeholder" />
       </div>
 
       <div class="options-section">
@@ -359,14 +360,14 @@ import PageWidgets from "../../../../components/PageWidgets.astro";
       <button id="downloadBtn" style="display:none;" data-i18n="qr.btn_download">📥 Baixar QR Code</button>
 
       <p class="login-hint">
-        Quer salvar seus QR Codes?
-        <a href="/login">Faça login</a> ou <a href="/signup">crie uma conta grátis</a>.
+        Want to save your QR Codes?
+        <a href={ROUTES.login}>Sign in</a> or <a href={ROUTES.signup}>create a free account</a>.
       </p>
     </div>
   </main>
 
   <VxFooter />
-  <PageWidgets />
+  <PageWidgets hideUtilBar />
 
   <script>window.__vxTool = 'qr-gen';</script>
   <script is:inline src="/scripts/vx-auth-gate.js"></script>

@@ -4,6 +4,7 @@ import LabBg from "../../../../components/LabBg.astro";
 import PageWidgets from "../../../../components/PageWidgets.astro";
 import SiteFooter from "../../../../components/SiteFooter.astro";
 import VxHeader from "../../../../components/VxHeader.astro";
+import { ROUTES } from "../../../../data/routes";
 const pageTitle = "VOLYNX Studio • Image Suite";
 const pageDescription = "Pro-exclusive multi-tool: upscale, compress, convert, resize, crop, rotate and watermark — all in one interface.";
 ---
@@ -28,7 +29,7 @@ const pageDescription = "Pro-exclusive multi-tool: upscale, compress, convert, r
   <LabBg />
   <VxHeader />
   <div id="vx-upgrade-banner" style="display:none;background:rgba(108,10,228,.18);border-bottom:1px solid rgba(108,10,228,.35);padding:10px 20px;text-align:center;font-size:.85em;">
-    Você está no plano gratuito — Image Suite é exclusivo Pro. <a href="/pricing/" style="color:#59c6e8;font-weight:700;">Upgrade para Pro</a>
+    You're on the free plan — Image Suite is Pro exclusive. <a href={ROUTES.pricing} style="color:#59c6e8;font-weight:700;">Upgrade to Pro</a>
   </div>
 
   <nav class="vx-back">
@@ -453,7 +454,7 @@ const pageDescription = "Pro-exclusive multi-tool: upscale, compress, convert, r
   </script>
 
   <SiteFooter />
-  <PageWidgets />
+  <PageWidgets hideUtilBar />
   <script is:inline>window.__vxTool = 'image-suite';</script>
   <script is:inline src="/scripts/vx-auth-gate.js"></script>
 </body>

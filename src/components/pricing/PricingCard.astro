@@ -1,7 +1,8 @@
 ---
 const { plan, locale, currency } = Astro.props;
+const currencies = ['GBP', 'EUR', 'BRL'] as const;
 ---
-<article class={`pricing-card ${plan.featured ? 'pricing-card--featured' : ''}`}>
+<article class={`pricing-card ${plan.featured ? 'pricing-card--featured' : ''}`} data-plan={plan.id}>
   <div class="pricing-card__head">
     <div>
       {plan.badge && <span class="pricing-pill">{plan.badge[locale]}</span>}
@@ -9,7 +10,9 @@ const { plan, locale, currency } = Astro.props;
       <p class="pricing-card__desc">{plan.description[locale]}</p>
     </div>
     <div class="pricing-card__price-block">
-      <span class="pricing-card__price">{plan.price[currency]}</span>
+      {currencies.map((c) => (
+        <span class={`pricing-card__price ${c !== currency ? 'pricing-card__price--hidden' : ''}`} data-currency={c}>{plan.price[c]}</span>
+      ))}
       <span class="pricing-card__billing">{plan.billing[locale]}</span>
     </div>
   </div>
@@ -86,6 +89,9 @@ const { plan, locale, currency } = Astro.props;
     font-size: 32px;
     font-weight: 800;
     letter-spacing: -.04em;
+  }
+  .pricing-card__price--hidden {
+    display: none;
   }
   .pricing-card__billing {
     font-size: 13px;

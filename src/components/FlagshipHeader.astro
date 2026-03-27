@@ -1,0 +1,61 @@
+---
+import { ROUTES } from "../data/routes";
+
+const nav = [
+  { href: ROUTES.home, label: "Home" },
+  { href: ROUTES.products, label: "Products" },
+  { href: ROUTES.lab, label: "Lab" },
+  { href: ROUTES.builder, label: "Builder" },
+  { href: ROUTES.pricing, label: "Pricing" },
+  { href: ROUTES.devHub, label: "Dev Hub" },
+];
+
+interface Props {
+  current?: string;
+  ctaHref?: string;
+  ctaLabel?: string;
+}
+const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro" } = Astro.props;
+---
+<header class="site-header">
+  <div class="shell header-shell">
+    <a href={ROUTES.home} class="brandmark" aria-label="VOLYNX home">
+      <img src="/assets/volynx-icon.webp" alt="VOLYNX" class="brandmark__icon" width="44" height="44" loading="eager" />
+      <img src="/assets/wordmark.webp" alt="VOLYNX" class="brandmark__wordmark" width="122" height="24" loading="eager" />
+    </a>
+
+    <nav class="main-nav" aria-label="Primary navigation">
+      {nav.map((item) => (
+        <a href={item.href} class:list={{ active: current === item.href }}>{item.label}</a>
+      ))}
+    </nav>
+
+    <div class="header-actions">
+      <a href={ROUTES.login} class="header-link">Login</a>
+      <a href={ctaHref} class="button button--gold">{ctaLabel}</a>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile navigation -->
+  <nav class="mobile-nav" id="mobileNav" aria-label="Mobile navigation">
+    {nav.map((item) => (
+      <a href={item.href} class:list={{ active: current === item.href }}>{item.label}</a>
+    ))}
+    <a href={ROUTES.login} class="button button--ghost">Login</a>
+    <a href={ctaHref} class="button button--gold">{ctaLabel}</a>
+  </nav>
+</header>
+
+<script>
+  const btn = document.getElementById("mobileMenuBtn");
+  const nav = document.getElementById("mobileNav");
+  if (btn && nav) {
+    btn.addEventListener("click", () => {
+      const open = nav.classList.toggle("is-open");
+      btn.setAttribute("aria-expanded", String(open));
+    });
+  }
+</script>

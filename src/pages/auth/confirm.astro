@@ -2,12 +2,13 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import VxHeader from "../../components/VxHeader.astro";
 import SiteFooter from "../../components/SiteFooter.astro";
+import { ROUTES } from "../../data/routes";
 
 const title = "Email Confirmation — VOLYNX";
 ---
 
-<BaseLayout title={title}>
-  <VxHeader primaryCtaLabel="Sign in" primaryCtaHref="/login/" />
+<BaseLayout title={title} hideUtilBar>
+  <VxHeader primaryCtaLabel="Sign in" primaryCtaHref={ROUTES.login} />
 
   <div class="confirm-bg" aria-hidden="true">
     <video
@@ -38,7 +39,7 @@ const title = "Email Confirmation — VOLYNX";
           <a
             id="confirmBtn"
             class="btn primary"
-            href="/login/"
+            href={ROUTES.login}
             hidden
             data-i18n="auth.btn_login"
           >
@@ -48,7 +49,7 @@ const title = "Email Confirmation — VOLYNX";
           <a
             id="confirmBtnRetry"
             class="btn secondary"
-            href="/signup/"
+            href={ROUTES.signup}
             hidden
             data-i18n="auth.error_btn"
           >

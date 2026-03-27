@@ -2,6 +2,7 @@
 import SiteFooter from "../../components/SiteFooter.astro";
 import PageWidgets from "../../components/PageWidgets.astro";
 import Topbar from "../../components/Topbar.astro";
+import { ROUTES } from "../../data/routes";
 const pageTitle = "Why VOLYNX? — Manifesto";
 const pageDescription = "VOLYNX exists to democratize intelligent technology with premium design and measurable social impact — ethical, accessible, and built to scale good.";
 ---
@@ -570,7 +571,7 @@ const pageDescription = "VOLYNX exists to democratize intelligent technology wit
 <body>
   <div class="bg" aria-hidden="true"></div>
 
-  <Topbar rightLinks={[{ href: "/", label: "← Back" }]} />
+  <Topbar rightLinks={[{ href: ROUTES.home, label: "← Back" }]} />
 
   <main class="shell">
     <div class="hero">
@@ -664,9 +665,9 @@ const pageDescription = "VOLYNX exists to democratize intelligent technology wit
         <hr class="divider" />
 
         <div class="ctaRow" aria-label="Next steps">
-          <a class="btn primary" href="/volynx-lab/" data-i18n="ctaTools">Explore tools</a>
-          <a class="btn" href="/services/" data-i18n="ctaServices">Services</a>
-          <a class="btn" href="/" data-i18n="ctaMain">Back to main</a>
+          <a class="btn primary" href={ROUTES.lab} data-i18n="ctaTools">Explore tools</a>
+          <a class="btn" href={ROUTES.services} data-i18n="ctaServices">Services</a>
+          <a class="btn" href={ROUTES.home} data-i18n="ctaMain">Back to main</a>
         </div>
 
         <p class="closing" data-i18n="closing">
@@ -696,7 +697,7 @@ const pageDescription = "VOLYNX exists to democratize intelligent technology wit
         <button class="vx-btn vx-btn--soft" id="vxCookieReject" type="button" data-i18n="cookieReject">Reject</button>
         <button class="vx-btn vx-btn--primary" id="vxCookieAccept" type="button" data-i18n="cookieAccept">Accept</button>
       </div>
-      <a class="vx-cookie__link" href="/privacy/" rel="noopener" data-i18n="cookieLink">Privacy policy</a>
+      <a class="vx-cookie__link" href={ROUTES.privacy} rel="noopener" data-i18n="cookieLink">Privacy policy</a>
       <div class="vx-cookie__prefs" id="vxCookiePanel" hidden>
         <div class="vx-cookie__prefsTitle" data-i18n="cookiePrefsTitle">Preferences</div>
         <label class="vx-toggle">
@@ -717,6 +718,6 @@ const pageDescription = "VOLYNX exists to democratize intelligent technology wit
   </div>
 
   <SiteFooter />
-  <PageWidgets />
+  <PageWidgets hideUtilBar />
 </body>
 </html>

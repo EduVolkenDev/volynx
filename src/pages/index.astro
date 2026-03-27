@@ -1,165 +1,172 @@
 ---
-import HomeLayout from "../layouts/HomeLayout.astro";
-import HomeMenus from "../components/HomeMenus.astro";
+import FlagshipLayout from "../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "../components/FlagshipHeader.astro";
+import FlagshipFooter from "../components/FlagshipFooter.astro";
+import { ROUTES } from "../data/routes";
 ---
+<FlagshipLayout title="VOLYNX — Building a Smarter Future" pageClass="page-home">
+  <FlagshipHeader current={ROUTES.home} ctaLabel="Access Studio Pro" />
+  <main>
 
-<HomeLayout>
-  <canvas id="particles" aria-hidden="true" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;"></canvas>
-  <div class="universe-bg" aria-hidden="true"></div>
-
-  <div class="shell">
-    <div class="topbar">
-
-      <!-- Brand / Hero -->
-      <div class="brand">
-        <div class="eye-container">
-          <img src="/assets/volynx-icon.webp" alt="VOLYNX" class="volynx-eye-img" />
-          <span class="eye-sheen" aria-hidden="true"></span>
+    <!-- ═══ HERO ═══ -->
+    <section class="hero hero--home">
+      <div class="shell hero-grid hero-grid--home">
+        <div class="hero-copy">
+          <span class="kicker">Flagship ecosystem</span>
+          <h1>Build premium digital products with purpose, clarity and real momentum.</h1>
+          <p>VOLYNX is the ecosystem for premium kits, browser-based tools and launch systems built for developers, designers and modern internet businesses. Cleaner than a portal. Stronger than a landing page. Structured like a real platform.</p>
+          <div class="hero-actions">
+            <a href="#ecosystem" class="button button--gold">Explore the ecosystem</a>
+            <a href={ROUTES.products} class="button button--ghost">View premium kits</a>
+          </div>
+          <div class="hero-inline-stats">
+            <div><strong>3 layers</strong><span>Lab · Builder · Studio</span></div>
+            <div><strong>Mobile first</strong><span>Refined for tablet, notebook and 16"</span></div>
+            <div><strong>Production logic</strong><span>Free for discovery, Pro for delivery</span></div>
+          </div>
         </div>
-        <div class="brand-logo">
-          <img src="/assets/wordmark.webp" alt="VOLYNX" class="brand-logo-img" />
-          <div class="slogan" data-i18n="home.slogan">Building a Smarter Future.</div>
-        </div>
-      </div>
-
-      <!-- Navigation Panels -->
-      <HomeMenus />
-
-      <!-- CTA Section -->
-      <div class="cta-section">
-        <div class="cta-title" data-i18n="home.cta_primary">ACCESS THE VOLYNX LAB</div>
-        <div class="cta-subtitle" data-i18n="home.cta_explore">
-          Explore technology, social impact, and many possible futures in a unique environment.
-        </div>
-        <div class="cta-buttons">
-          <a href="/products/" class="cta-button primary"><span data-i18n="home.btn_kits">Explore the kits</span></a>
-          <a href="/manifesto/" class="cta-button secondary"><span data-i18n="home.btn_manifesto">Read the manifesto</span></a>
-        </div>
-      </div>
-
-      <div class="volynx-kits">
-        <h2 data-i18n="home.kits_title">VOLYNX Kits</h2>
-        Premium Kits for Devs and Designers — ready to sell and scale.</p>
-        <div class="products-grid">
-          <a class="product-card" href="/products/portfolio-pro-kit/">
-            <div class="card-img"><img src="/assets/newportfolio.webp" alt="Portfolio Kit" /></div>
-            <div class="card-text">
-              <h3>Portfolio Pro-Kit</h3>
-              <p>Premium Structure (Figma + Code) to Launch Fast and Look Expensive.</p>
-            </div>
-          </a>
-          <a class="product-card" href="/products/agency-launch-kit/">
-            <div class="card-img"><img src="/assets/newlaunch.webp" alt="Agency Launch Kit" /></div>
-            <div class="card-text">
-              <h3>Agency Launch Kit</h3>
-              <p>Website + proposal/SOW/onboarding to close more deals without stress.</p>
-            </div>
-          </a>
-          <a class="product-card" href="/products/saas-landing-system/">
-            <div class="card-img"><img src="/assets/saasbig.webp" alt="SaaS Landing System" /></div>
-            <div class="card-text">
-              <h3>SaaS Landing System</h3>
-              <p>Landing "section-first" with base copy/SEO and fast interaction.</p>
-            </div>
-          </a>
+        <div class="hero-visual hero-visual--flagship glass-stage">
+          <div class="floating-asset floating-asset--lg">
+            <img src="/assets/volynx-icon.webp" alt="VOLYNX icon" />
+          </div>
+          <div class="floating-asset floating-asset--sm floating-asset--left"></div>
+          <div class="floating-asset floating-asset--sm floating-asset--right"></div>
+          <div class="glass-card glass-card--metric">
+            <span class="label label--pro">Studio Pro</span>
+            <strong>Operate like a premium studio</strong>
+            <p>Saved presets, brand memory, higher-quality outputs, commercial workflows and a cleaner workspace for users who are shipping for real.</p>
+          </div>
         </div>
       </div>
-      </div>
+    </section>
 
-      <!-- PropertyFlow -->
-      <div class="products-grid">
-          <a class="product-card" href="/products/propertyflow/">
-            <div class="card-img"><img src="/assets/propertyflow.webp" alt="PropertyFlow" /></div>
-            <div class="card-text">
-              <span class="card-badge" data-i18n="home.pf_badge">New · Real Estate SaaS</span>
-              <h3>PropertyFlow</h3>
-              <p>Premium property management for real estate agencies — smart catalogue, bilingual interface, live filters and a polished showcase.</p>
-            </div>
-          </a>
-      </div>
-
-      <!-- VOLYNX Principles -->
-      <section class="volynx-principles" id="volynx" aria-label="VOLYNX Principles">
-        <h2 data-i18n="home.principles_title">VOLYNX Principles</h2>
-        <p>Human touch, zero exposing: clear values, impeccable execution.</p>
-        <div class="principles-grid">
-          <div class="principle-card">
-            <h3 data-i18n="home.p1">Clarity over noise</h3>
-            <p>If not quickly understandable, not to sell!</p>
-          </div>
-          <div class="principle-card">
-            <h3 data-i18n="home.p2">Systems beat one-offs</h3>
-            <p>Design + code as system. Consistency = speed.</p>
-          </div>
-          <div class="principle-card">
-            <h3 data-i18n="home.p3">Shipping is a feature</h3>
-            <p>Real Delivery. No eternal "almost ready".</p>
-          </div>
-          <div class="principle-card">
-            <h3 data-i18n="home.p4">Performance is trust</h3>
-            <p>A fast website looks expensive. Slow website feels amateur.</p>
-          </div>
-          <div class="principle-card">
-            <h3 data-i18n="home.p5">Docs reduce chaos</h3>
-            <p>Documentation decreases support and increases scale.</p>
-          </div>
+    <!-- ═══ ECOSYSTEM ═══ -->
+    <section id="ecosystem" class="page-section">
+      <div class="shell section-head section-head--split">
+        <div>
+          <span class="eyebrow">What Volynx is</span>
+          <h2>An ecosystem, not a pile of pages.</h2>
         </div>
-      </section>
-      
+        <p>The V3 structure turns the homepage into a clear brand narrative: what the platform is, what it sells now, what makes it valuable and what the future portfolio is building toward.</p>
+      </div>
+      <div class="shell grid-3">
+        <article class="panel feature-card premium-frame">
+          <span class="label">Premium Kits</span>
+          <h3>Ship fast with premium systems</h3>
+          <p>Launch-ready structures for portfolios, agencies, SaaS pages and premium vertical products.</p>
+          <ul class="detail-list">
+            <li>Design + copy + code logic</li>
+            <li>Conversion-focused layouts</li>
+            <li>Built for real publishing</li>
+          </ul>
+        </article>
+        <article class="panel feature-card premium-frame">
+          <span class="label label--free">VOLYNX Lab</span>
+          <h3>Useful free tools that create trust</h3>
+          <p>Local-first browser tools that are actually helpful, not bait. Clean enough for discovery. Strong enough to convert into Studio.</p>
+          <ul class="detail-list">
+            <li>Convert, upscale and generate</li>
+            <li>Zero upload logic where possible</li>
+            <li>Low friction trial experience</li>
+          </ul>
+        </article>
+        <article class="panel feature-card premium-frame panel--pro">
+          <span class="label label--pro">Builder + Studio</span>
+          <h3>Production workflow with more command</h3>
+          <p>Publishing, custom domains, brand control, premium exports, workflow memory and a serious Pro workspace.</p>
+          <ul class="detail-list">
+            <li>More power, not just more limits</li>
+            <li>Cleaner dashboard logic</li>
+            <li>Ready for pro and team expansion</li>
+          </ul>
+        </article>
+      </div>
+    </section>
 
-       
+    <!-- ═══ FEATURED PRODUCTS (editorial) ═══ -->
+    <section class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">Featured now</span>
+        <h2>Commercial products first. Vision immediately after.</h2>
+        <p>The homepage now prioritizes what users can buy, use or trust today before it introduces R&amp;D and future-facing concepts.</p>
+      </div>
+      <div class="shell editorial-grid">
+        <article class="panel gallery-card gallery-card--xl" style="background-image:url('/assets/newportfolio.webp')">
+          <span class="label">Flagship kit</span>
+          <h3>Portfolio Pro Kit</h3>
+          <p>Launch fast, look expensive and give your personal brand a real operating system.</p>
+          <div class="actions"><a href={ROUTES.portfolioKit} class="button button--ghost">Open kit</a></div>
+        </article>
+        <article class="panel gallery-card" style="background-image:url('/assets/newlaunch.webp')">
+          <span class="label">For agencies</span>
+          <h3>Agency Launch Kit</h3>
+          <p>Proposal, SOW and premium website structure built to close with less friction.</p>
+          <div class="actions"><a href={ROUTES.agencyKit} class="button button--ghost">Open kit</a></div>
+        </article>
+        <article class="panel gallery-card" style="background-image:url('/assets/saasbig.webp')">
+          <span class="label">For SaaS</span>
+          <h3>SaaS Landing System</h3>
+          <p>Section-first, speed-aware and ready to turn product value into conviction.</p>
+          <div class="actions"><a href={ROUTES.saasSystem} class="button button--ghost">Open kit</a></div>
+        </article>
+      </div>
+      <div class="shell spotlight-row">
+        <article class="panel spotlight-card panel--pro">
+          <div>
+            <span class="label label--pro">New · Real estate SaaS</span>
+            <h3>PropertyFlow deserves its own stage.</h3>
+            <p>A bilingual property platform with stronger catalog logic, polished filtering and a visual language that already feels like a product line, not just a listing page.</p>
+          </div>
+          <a href={ROUTES.propertyflow} class="button button--gold">View PropertyFlow</a>
+        </article>
+      </div>
+    </section>
 
+    <!-- ═══ PRINCIPLES ═══ -->
+    <section class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">Operating philosophy</span>
+        <h2>Premium direction needs principles, not decoration.</h2>
+      </div>
+      <div class="shell grid-2 principles-grid-v3">
+        <article class="panel principle-panel"><h3>Clear by default</h3><p>If users cannot understand the value in seconds, the page is still unfinished.</p></article>
+        <article class="panel principle-panel"><h3>Built as systems</h3><p>Layouts, tools and products need to scale without feeling random or stitched together.</p></article>
+        <article class="panel principle-panel"><h3>Shipped for real use</h3><p>Real publishing, real workflows and real delivery matter more than aspirational mockups alone.</p></article>
+        <article class="panel principle-panel"><h3>Fast enough to feel expensive</h3><p>Performance is part of luxury. Slowness cheapens the whole product experience.</p></article>
+      </div>
+    </section>
 
-      <!-- Products in Development + Kits -->
-      <div class="future-products" id="products">
-        <h2 data-i18n="home.future_title">Innovative Products in Development</h2>
-        <p>Contribute to the future of sustainability and health with AI.</p>
-        <div class="products-grid">
-          <div class="product-card">
-            <div class="card-img"><img src="/assets/carbontracker.webp" alt="Carbon Tracker" /></div>
-            <div class="card-text">
-              <span class="product-chip">IMPACT</span>
-              <h3>Carbon Tracker</h3>
-              <p>Real-time tracking of personal and business carbon impact.</p>
-            </div>
-          </div>
-          <div class="product-card">
-            <div class="card-img"><img src="/assets/safetyguardian.webp" alt="Safety Guardian" /></div>
-            <div class="card-text">
-              <span class="product-chip">SAFETY</span>
-              <h3>Safety Guardian</h3>
-              <p>Smart tools to analyse, route and respond to critical abuse reports.</p>
-            </div>
-          </div>
-          <div class="product-card">
-            <div class="card-img"><img src="/assets/precisionhealth.webp" alt="Precision Health" /></div>
-            <div class="card-text">
-              <span class="product-chip">HEALTH</span>
-              <h3>Precision Health</h3>
-              <p>AI tools for disease prevention and research, including HIV/AIDS and Cancer.</p>
-            </div>
-          </div>
+    <!-- ═══ R&D PORTFOLIO ═══ -->
+    <section class="page-section">
+      <div class="shell section-head section-head--split">
+        <div>
+          <span class="eyebrow">R&amp;D portfolio</span>
+          <h2>Future-facing products, curated instead of crammed.</h2>
         </div>
-    </div><!-- /topbar -->
+        <p>Future ideas sit lower in the page, where they reinforce ambition without competing with immediate monetization.</p>
+      </div>
+      <div class="shell grid-3">
+        <article class="panel product-vision"><span class="label">Impact</span><h3>Carbon Tracker</h3><p>Real-time tracking of personal and business carbon impact with premium visualization.</p></article>
+        <article class="panel product-vision"><span class="label">Safety</span><h3>Safety Guardian</h3><p>Smart systems for routing, triaging and responding to critical abuse reports.</p></article>
+        <article class="panel product-vision"><span class="label">Health</span><h3>Precision Health</h3><p>AI tools for disease prevention, early detection and research operations.</p></article>
+      </div>
+    </section>
 
-       
+    <!-- ═══ FINAL CTA ═══ -->
+    <section class="page-section page-section--last">
+      <div class="shell callout callout--heroic panel panel--pro">
+        <div>
+          <span class="label label--pro">From lab to studio</span>
+          <strong>Free should feel generous. Pro should feel inevitable.</strong>
+          <p>That rule now shapes the entire platform: home, pricing, tools, builder and account surfaces.</p>
+        </div>
+        <div class="hero-actions">
+          <a href={ROUTES.pricing} class="button button--gold">See the pricing logic</a>
+          <a href={ROUTES.profile} class="button button--ghost">Open Pro Command Center</a>
+        </div>
+      </div>
+    </section>
 
-        
-
-    <footer class="home-footer" aria-label="Site links">
-      <a href="/about/">About</a>
-      <span class="sep" aria-hidden="true">·</span>
-      <a href="/manifesto/">Manifesto</a>
-      <span class="sep" aria-hidden="true">·</span>
-      <a href="/contact/">Contact</a>
-      <span class="sep" aria-hidden="true">·</span>
-      <a href="/privacy/">Privacy</a>
-      <span class="sep" aria-hidden="true">·</span>
-      <a href="/terms/">Terms</a>
-      <span class="sep" aria-hidden="true">·</span>
-      <a href="/disclaimer/">Disclaimer</a>
-    </footer>
-  </div><!-- /shell -->
-
-  <script src="/js/particles.js" defer></script>
-</HomeLayout>
+  </main>
+  <FlagshipFooter />
+</FlagshipLayout>

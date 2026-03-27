@@ -39,13 +39,13 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       <div class="card">
         <div class="cardHead">
           <strong data-i18n="suite.card_upload">Upload &amp; Config</strong>
-          <button id="pickBtn" class="btn secondary" type="button" data-i18n="suite.btn_select">Selecionar</button>
+          <button id="pickBtn" class="btn secondary" type="button" data-i18n="suite.btn_select">Select</button>
           <input id="file" type="file" accept="image/*" multiple hidden aria-label="Select images" />
         </div>
 
         <div class="cardBody">
           <div id="drop" class="drop" role="button" tabindex="0" aria-label="Drop zone" data-i18n="suite.drop_text">
-            Arraste imagens aqui ou clique para selecionar
+            Drag images here or click to select
           </div>
 
           <div class="field-group">
@@ -83,7 +83,7 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
             </label>
           </div>
 
-          <button id="runBtn" class="btn" type="button" disabled style="margin-top:16px" data-i18n="suite.btn_process">Processar</button>
+          <button id="runBtn" class="btn" type="button" disabled style="margin-top:16px" data-i18n="suite.btn_process">Process</button>
 
           <div id="proStatus" class="pro-status" aria-live="polite"></div>
 
@@ -239,12 +239,12 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       resetPreview();
 
       if (!validFiles.length) {
-        alert("Nenhuma imagem válida encontrada.");
+        alert("No valid images found.");
         return;
       }
 
       runBtn.disabled = true;
-      dropEl.textContent = `Carregando ${validFiles.length} arquivo(s)...`;
+      dropEl.textContent = `Loading ${validFiles.length} file(s)...`;
 
       for (const file of validFiles) {
         const img = await fileToImage(file);
@@ -256,8 +256,8 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       }
 
       const totalBytes = validFiles.reduce((sum, file) => sum + file.size, 0);
-      origMeta.textContent = `${validFiles.length} arquivo(s) • ${(totalBytes / 1024 / 1024).toFixed(2)}MB`;
-      dropEl.textContent = `${validFiles.length} arquivo(s) pronto(s) para processar`;
+      origMeta.textContent = `${validFiles.length} file(s) • ${(totalBytes / 1024 / 1024).toFixed(2)}MB`;
+      dropEl.textContent = `${validFiles.length} file(s) ready to process`;
       runBtn.disabled = false;
     }
 
@@ -265,7 +265,7 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       return new Promise((resolve, reject) => {
         canvas.toBlob((blob) => {
           if (!blob) {
-            reject(new Error("Falha ao gerar arquivo."));
+            reject(new Error("Failed to generate file."));
             return;
           }
           resolve(blob);
@@ -285,7 +285,7 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       const ctx = canvas.getContext("2d");
 
       if (!ctx) {
-        throw new Error("Falha ao criar contexto do canvas.");
+        throw new Error("Failed to create canvas context.");
       }
 
       if (tool === "upscale") {
@@ -387,7 +387,7 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
 
       try {
         for (let i = 0; i < loadedImages.length; i++) {
-          dropEl.textContent = `Processando ${i + 1}/${loadedImages.length}...`;
+          dropEl.textContent = `Processing ${i + 1}/${loadedImages.length}...`;
 
           const result = await processOne(loadedImages[i], tool, scale, mime, quality);
           processedResults.push(result);
@@ -399,7 +399,7 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
         }
 
         const totalOutBytes = processedResults.reduce((sum, result) => sum + result.blob.size, 0);
-        outMeta.textContent = `${processedResults.length} arquivo(s) • ${(totalOutBytes / 1024 / 1024).toFixed(2)}MB`;
+        outMeta.textContent = `${processedResults.length} file(s) • ${(totalOutBytes / 1024 / 1024).toFixed(2)}MB`;
 
         if (processedResults.length === 1) {
           singleOutBlob = processedResults[0].blob;
@@ -409,12 +409,12 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
           logToolUsage("image-suite", processedResults.length);
         }
 
-        dropEl.textContent = `${processedResults.length} arquivo(s) processado(s) com sucesso`;
+        dropEl.textContent = `${processedResults.length} file(s) processed successfully`;
         downloadBtn.disabled = false;
       } catch (error) {
         console.error(error);
-        alert("Ocorreu um erro ao processar as imagens.");
-        dropEl.textContent = "Erro ao processar arquivos";
+        alert("An error occurred while processing images.");
+        dropEl.textContent = "Error processing files";
       } finally {
         runBtn.disabled = false;
       }
@@ -434,7 +434,7 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       }
 
       if (!window.JSZip) {
-        alert("JSZip não carregado.");
+        alert("JSZip not loaded.");
         return;
       }
 
@@ -455,6 +455,6 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
 
   <LabUpgradeBanner />
   <SiteFooter />
-  <PageWidgets />
+  <PageWidgets hideUtilBar />
 </body>
 </html>

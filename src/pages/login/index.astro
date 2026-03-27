@@ -1,175 +1,57 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import VxHeader from "../../components/VxHeader.astro";
-import SiteFooter from "../../components/SiteFooter.astro";
-
-const title = "Login — VOLYNX";
+import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "../../components/FlagshipHeader.astro";
+import FlagshipFooter from "../../components/FlagshipFooter.astro";
+import { ROUTES } from "../../data/routes";
 ---
+<FlagshipLayout title="Login — VOLYNX" description="Access your VOLYNX account." pageClass="page-login">
+  <FlagshipHeader current={ROUTES.login} ctaLabel="Start Pro" />
+  <main>
 
-<BaseLayout title={title}>
-  <VxHeader primaryCtaLabel="Sign up" primaryCtaHref="/signup/" />
-
-  <div class="login-bg" aria-hidden="true">
-    <video
-      class="bg-video"
-      autoplay
-      muted
-      loop
-      playsinline
-      preload="metadata"
-      poster="/assets/login-bg-poster.webp"
-    >
-      <img src="/assets/clean-bg6.jpg" aria-label="background" />
-    </video>
-    <div class="bg-overlay"></div>
-  </div>
-
-  <main class="shell login">
-    <section class="login-wrap">
-      <div class="panel">
-        <h1 data-i18n="login.title">Access your account</h1>
-        <p class="sub" data-i18n="login.subtitle">
-          Forgot your password? Type your email and a recovery link will be sent to your inbox. If you don't receive it, contact support.
-        </p>
-
-        <form class="form" id="loginForm" action="#" method="get">
-          <label class="field">
-            <span data-i18n="login.email">Email</span>
-            <input type="email" id="email"  name="email" autocomplete="email" required />
-          </label>
-
-          <label class="field">
-            <span data-i18n="login.password">Password</span>
-            <input type="password" id="password"  name="password" autocomplete="current-password" required />
-          </label>
-
-          <button class="btn primary" id="submitBtn" type="submit" data-i18n="login.btn_signin">Sign in</button>
-
-          <p id="msg" class="msg" aria-live="polite"></p>
-
-          <div class="row">
-            <a class="link" href="/auth/recover/" data-i18n="login.forgot">Forgot password?</a>
-            <a class="link" href="/pricing/" data-i18n="login.pricing">Pricing</a>
-          </div>
-
-          <div class="divider" aria-hidden="true"></div>
-
-          <div class="ctaRow">
-            <a class="btn secondary" href="/volynx-lab/studio/" data-i18n="login.studio_btn">Go to Studio</a>
-            <a class="btn secondary" href="/volynx-lab/" data-i18n="login.lab_btn">Try Lab</a>
-          </div>
-        </form>
+    <!-- ═══ LOGIN HERO ═══ -->
+    <section class="hero account-hero">
+      <div class="shell login-shell">
+        <div class="hero-copy">
+          <span class="kicker">Sign in</span>
+          <h1>Access a cleaner command layer, not just an account page.</h1>
+          <p>Post-login should feel like a shift in class. Free users get continuity. Pro users get a premium workspace with more speed, memory and control.</p>
+        </div>
+        <div class="form-card">
+          <form class="form-grid" id="loginForm" action="#" method="get">
+            <div class="field">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" autocomplete="email" placeholder="you@volynx.world" required />
+            </div>
+            <div class="field">
+              <label for="password">Password</label>
+              <input type="password" id="password" name="password" autocomplete="current-password" placeholder="••••••••" required />
+            </div>
+            <button type="submit" id="submitBtn" class="button button--gold" style="width:100%;justify-content:center;">Sign in</button>
+            <p id="msg" class="msg" aria-live="polite"></p>
+            <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;">
+              <a href={ROUTES.authRecover} style="color:var(--muted);transition:color .15s;">Forgot password?</a>
+              <a href={ROUTES.signup} style="color:var(--cyan);transition:color .15s;">Create account</a>
+            </div>
+            <div style="height:1px;background:var(--line);margin:4px 0;"></div>
+            <div style="display:flex;gap:10px;">
+              <a href={ROUTES.studio} class="button button--ghost" style="flex:1;justify-content:center;">Go to Studio</a>
+              <a href={ROUTES.lab} class="button button--ghost" style="flex:1;justify-content:center;">Try Lab</a>
+            </div>
+            <a href={ROUTES.pricing} class="button button--ghost" style="justify-content:center;">Compare Free vs Pro</a>
+          </form>
+        </div>
       </div>
     </section>
-  </main>
 
-  <SiteFooter />
-</BaseLayout>
+  </main>
+  <FlagshipFooter />
 
   <script is:inline type="module" src="/scripts/auth-login.js"></script>
+</FlagshipLayout>
 
 <style>
-  @import "../../styles/home.css";
-  @import "../../styles/services.css";
-
-  .login-bg{
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    overflow: hidden;  }
-  .bg-video{
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transform: scale(1.03);
-    filter: contrast(1.05) saturate(1.05);
-  }
-  /*.bg-overlay{
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(1200px 800px at 20% 30%, rgba(124,247,255,.10), transparent 60%),
-      radial-gradient(900px 700px at 70% 60%, rgba(184,107,255,.08), transparent 55%),
-      linear-gradient(180deg, rgba(7,10,18,.55), rgba(7,10,18,.78));
-    pointer-events: none;
-  }*/
-
-  .login{
-    min-height: calc(100svh - 80px);
-    display: grid;
-    place-items: center;
-    padding: 34px 0 70px;
-  }
-  .login-wrap{ width: min(520px, 92vw); }
-
-  .panel{
-    border-radius: 26px;
-    padding: 22px;
-    border: 1px solid rgba(255,255,255,.10);
-    background: rgba(10,12,20,.52);
-    backdrop-filter: blur(14px);
-  }
-  h1{ margin: 0 0 8px; }
-  .sub{ margin: 0 0 18px; opacity: .85; max-width: 60ch; }
-
-  .msg{ min-height: 18px; margin: 0 0 6px; font-size: 13px; opacity: .92; }
+  .msg{ min-height: 18px; margin: 0; font-size: 13px; }
   .msg.err{ color: rgba(255, 140, 140, .95); }
   .msg.ok{ color: rgba(140, 255, 210, .92); }
-
-  .form{ display: grid; gap: 12px; }
-  .field{ display: grid; gap: 8px; }
-  .field span{ font-size: 13px; opacity: .82; }
-
-  input{
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,.12);
-    background: rgba(0,0,0,.18);
-    color: inherit;
-    outline: none;
-  }
-
-  .btn{
-    display: inline-flex;
-    justify-content: center;
-    padding: 12px 14px;
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,.12);
-    text-decoration: none;
-    cursor: pointer;
-  }
-  .btn.primary{ font-weight: 700; }
-  .btn.secondary{ opacity: .9; }
-
-  .row{
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    font-size: 13px;
-    opacity: .88;
-  }
-  .link{ text-decoration: none; }
-
-  .divider{
-    height: 1px;
-    background: rgba(255,255,255,.08);
-    margin: 6px 0;
-  }
-  .ctaRow{ display:flex; gap:10px; }
-  .ctaRow .btn{ flex:1; }
-
-  @media (max-width: 640px){
-    .ctaRow{ flex-direction: column; }
-    .ctaRow .btn{ width: 100%; }
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    .bg-video{ display:none; }
-    .login-bg{
-      background-image: url("/assets/login-bg-poster.webp");
-      background-size: cover;
-      background-position: center;
-    }
-  }
+  .account-hero{ padding-top: clamp(40px, 6vw, 80px); padding-bottom: clamp(40px, 6vw, 80px); }
 </style>

@@ -3,13 +3,14 @@ import "../styles/global.css";
 import "../styles/legal.css";
 import PageWidgets from "../components/PageWidgets.astro";
 import Topbar from "../components/Topbar.astro";
+import { ROUTES } from "../data/routes";
 
 interface Props {
   title: string;
   description?: string;
 }
 
-const { title, description = "Volynx — Premium Tech Platform" } = Astro.props;
+const { title, description = "VOLYNX — Premium Tech Platform" } = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -25,30 +26,31 @@ const { title, description = "Volynx — Premium Tech Platform" } = Astro.props;
     <link rel="shortcut icon" href="/assets/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="Volynx" />
-    <link rel="manifest" href="/assets/site.webmanifest" />
+    <link rel="manifest" href="/site.webmanifest" />
   </head>
   <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="universe-bg" aria-hidden="true"></div>
 
     <div class="shell">
-      <Topbar leftLinks={[{ href: "/about", label: "About" }, { href: "/contact", label: "Contact" }]} rightLinks={[{ href: "/privacy", label: "Privacy" }, { href: "/terms", label: "Terms" }, { href: "/disclaimer", label: "Disclaimer" }]} />
+      <Topbar leftLinks={[{ href: ROUTES.about, label: "About" }, { href: ROUTES.contact, label: "Contact" }]} rightLinks={[{ href: ROUTES.privacy, label: "Privacy" }, { href: ROUTES.terms, label: "Terms" }, { href: ROUTES.disclaimer, label: "Disclaimer" }]} />
 
       <main class="card">
         <slot />
 
         <div class="footer" role="contentinfo">
           <div class="links">
-            <a href="/about/">About</a>
-            <a href="/contact/">Contact</a>
-            <a href="/privacy/">Privacy</a>
-            <a href="/terms/">Terms</a>
-            <a href="/disclaimer/">Disclaimer</a>
+            <a href={ROUTES.about}>About</a>
+            <a href={ROUTES.contact}>Contact</a>
+            <a href={ROUTES.privacy}>Privacy</a>
+            <a href={ROUTES.terms}>Terms</a>
+            <a href={ROUTES.disclaimer}>Disclaimer</a>
           </div>
-          <div class="meta">© {new Date().getFullYear()} Volynx. All rights reserved.</div>
+          <div class="meta">© {new Date().getFullYear()} VOLYNX. All rights reserved.</div>
         </div>
       </main>
     </div>
 
-    <PageWidgets />
+    <PageWidgets hideUtilBar />
   </body>
 </html>

@@ -3,6 +3,7 @@ import VxHeader from "../../../components/VxHeader.astro";
 import VxFooter from "../../../components/VxFooter.astro";
 import PageWidgets from "../../../components/PageWidgets.astro";
 import LabUpgradeBanner from "../../../components/LabUpgradeBanner.astro";
+import { ROUTES } from "../../../data/routes";
 ---
 
 <!DOCTYPE html>
@@ -11,7 +12,7 @@ import LabUpgradeBanner from "../../../components/LabUpgradeBanner.astro";
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VOLYNX QR Generator — Lab</title>
-  <meta name="description" content="Gere QR Codes estilizados com logo, gradientes e muito mais. Faça login para salvar." />
+  <meta name="description" content="Generate styled QR Codes with logos, gradients and more. Sign in to save." />
   <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
   <link rel="shortcut icon" href="/assets/favicon.ico" />
@@ -266,7 +267,7 @@ import LabUpgradeBanner from "../../../components/LabUpgradeBanner.astro";
 </head>
 
 <body>
-  <VxHeader primaryCtaLabel="Entrar" primaryCtaHref="/login" />
+  <VxHeader primaryCtaLabel="Sign in" primaryCtaHref={ROUTES.login} />
 
   <main class="qr-main">
     <div class="container">
@@ -276,7 +277,7 @@ import LabUpgradeBanner from "../../../components/LabUpgradeBanner.astro";
       <h1 data-i18n="qr.title">QR Generator</h1>
 
       <div class="input-wrapper">
-        <input type="text" id="text" placeholder="Digite o texto ou URL para gerar QR" data-i18n-placeholder="qr.input_placeholder" />
+        <input type="text" id="text" placeholder="Enter text or URL to generate QR" data-i18n-placeholder="qr.input_placeholder" />
       </div>
 
       <div class="options-section">
@@ -355,15 +356,15 @@ import LabUpgradeBanner from "../../../components/LabUpgradeBanner.astro";
       <button id="downloadBtn" style="display:none;" data-i18n="qr.btn_download">📥 Baixar QR Code</button>
 
       <p class="login-hint" data-i18n="qr.login_hint">
-        Quer salvar seus QR Codes?
-        <a href="/login">Faça login</a> ou <a href="/signup">crie uma conta grátis</a>.
+        Want to save your QR Codes?
+        <a href={ROUTES.login}>Sign in</a> or <a href={ROUTES.signup}>create a free account</a>.
       </p>
     </div>
   </main>
 
   <LabUpgradeBanner />
   <VxFooter />
-  <PageWidgets />
+  <PageWidgets hideUtilBar />
 
   <script is:inline type="module" src="/scripts/qr-gen.js"></script>
 </body>

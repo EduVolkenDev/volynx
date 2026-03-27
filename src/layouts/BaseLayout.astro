@@ -5,23 +5,32 @@ import PageWidgets from "../components/PageWidgets.astro";
 interface Props {
   title?: string;
   description?: string;
+  hideUtilBar?: boolean;
 }
 
-const { title = "Volynx", description = "Volynx — Premium Tech Platform" } = Astro.props;
+const { title = "VOLYNX", description = "VOLYNX — Premium Tech Platform", hideUtilBar = false } = Astro.props;
 ---
 
 <!DOCTYPE html>
-<html lang="en-GB">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+
+    <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link rel="shortcut icon" href="/assets/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Volynx" />
+    <link rel="manifest" href="/site.webmanifest" />
   </head>
   <body>
-    <main class="vx-page">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div class="vx-page">
       <slot />
-    </main>
-    <PageWidgets />
+    </div>
+    <PageWidgets hideUtilBar={hideUtilBar} />
   </body>
 </html>

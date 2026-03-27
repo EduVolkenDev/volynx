@@ -1,7 +1,8 @@
 ---
 import "../../../styles/icons-store.css";
 import PageWidgets from "../../../components/PageWidgets.astro";
-const pageTitle = "Volynx Icons Store - Premium SVG Icons & Design Assets";
+import { ROUTES } from "../../../data/routes";
+const pageTitle = "VOLYNX Icons Store - Premium SVG Icons & Design Assets";
 const pageDescription = "Premium SVG icons and design assets for developers. Build faster, design better.";
 ---
 
@@ -26,7 +27,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
   <link rel="shortcut icon" href="/assets/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-  <meta name="apple-mobile-web-app-title" content="Volynx" />
+  <meta name="apple-mobile-web-app-title" content="VOLYNX" />
   <link rel="manifest" href="/site.webmanifest" />
 </head>
 
@@ -36,10 +37,10 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
       <!-- Logo -->
       <div class="brand">
         <div class="brand-icon">
-          <img src="/assets/volynx-icon.webp" alt="Volynx Icon" aria-hidden="true" />
+          <img src="/assets/volynx-icon.webp" alt="VOLYNX Icon" aria-hidden="true" />
         </div>
         <div class="brand-name">
-          <img src="/assets/wordmark.webp" alt="Volynx Wordmark" aria-hidden="true" />
+          <img src="/assets/wordmark.webp" alt="VOLYNX Wordmark" aria-hidden="true" />
         </div>
       </div>
 
@@ -53,12 +54,12 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
           </svg>
           Favorites
         </a>
-        <a href="/pricing/" class="btn-upgrade" id="upgradeBtn" style="display:none;">Upgrade</a>
+        <a href={ROUTES.pricing} class="btn-upgrade" id="upgradeBtn" style="display:none;">Upgrade</a>
       </div>
 
       <!-- Auth Buttons -->
       <div class="nav-actions">
-        <a class="btn btn-primary" id="signInBtn" href="/login/?return=/products/volynx-icons-store/" data-i18n="icons.signin">Sign In</a>
+        <a class="btn btn-primary" id="signInBtn" href={`${ROUTES.login}?return=/products/volynx-icons-store/`} data-i18n="icons.signin">Sign In</a>
 
         <!-- User Menu (hidden by default) -->
         <div class="user-menu" id="userMenu" style="display: none;">
@@ -123,7 +124,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
         </svg>
         Favorites
       </a>
-      <a href="/pricing/" class="mobile-menu-item upgrade" id="mobileUpgradeBtn" style="display:none;">Upgrade to Pro</a>
+      <a href={ROUTES.pricing} class="mobile-menu-item upgrade" id="mobileUpgradeBtn" style="display:none;">Upgrade to Pro</a>
     </div>
   </nav>
 
@@ -248,29 +249,17 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
           <h4 class="footer-title">Product</h4>
           <ul class="footer-links">
             <li><a href="/products/volynx-icons-store/">Gallery</a></li>
-            <li><a href="#">Collections</a></li>
-            <li><a href="#">Pricing</a></li>
-            <li><a href="#">Documentation</a></li>
+            <li><a href="#" id="collectionsFooterBtn">Collections</a></li>
+            <li><a href={ROUTES.pricing}>Pricing</a></li>
           </ul>
         </div>
 
         <div class="footer-col">
-          <h4 class="footer-title">Support</h4>
+          <h4 class="footer-title">Navigate</h4>
           <ul class="footer-links">
-            <li><a href="#">Help Center</a></li>
-            <li><a href="#">API Reference</a></li>
-            <li><a href="/contact/">Contact</a></li>
-            <li><a href="#">License</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-col">
-          <h4 class="footer-title">Company</h4>
-          <ul class="footer-links">
-            <li><a href="/about/">About</a></li>
-            <li><a href="#">Blog</a></li>
-            <li><a href="#">Careers</a></li>
-            <li><a href="#">Press Kit</a></li>
+            <li><a href={ROUTES.home}>Home</a></li>
+            <li><a href={ROUTES.products}>Products</a></li>
+            <li><a href={ROUTES.contact}>Contact</a></li>
           </ul>
         </div>
       </div>
@@ -278,9 +267,9 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
       <div class="footer-bottom">
         <p class="footer-copyright">© <span id="y"></span> Volynx Icons Store. All rights reserved.</p>
         <div class="footer-legal">
-          <a href="/privacy/">Privacy</a>
-          <a href="/terms/">Terms</a>
-          <a href="/disclaimer/">License</a>
+          <a href={ROUTES.privacy}>Privacy</a>
+          <a href={ROUTES.terms}>Terms</a>
+          <a href={ROUTES.disclaimer}>Disclaimer</a>
         </div>
       </div>
     </div>
@@ -356,7 +345,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
         renderGallery();
         updateStats();
       } catch (e) {
-        console.error("Erro ao carregar catálogo:", e);
+        console.error("Error loading catalog:", e);
       }
     }
 
@@ -398,7 +387,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
           <div class="collection-preview">${previews}</div>
           <h3 class="collection-title">${col.label}</h3>
           <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-            <p class="collection-count">${count} ícones</p>
+            <p class="collection-count">${count} icons</p>
             ${isPremium
             ? '<span style="font-size:.75rem;font-weight:700;color:rgba(200,150,255,.9);">PREMIUM</span>'
             : freeCount === count
@@ -537,9 +526,9 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
         <p style="color:rgba(255,255,255,.5);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1.25rem;">${icon.category}</p>
         <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
           <button id="previewDownloadBtn" style="padding:.75rem 2rem;background:linear-gradient(135deg,#00f0ff,#0066ff);color:#000;font-weight:700;border-radius:10px;border:none;font-size:.9rem;cursor:pointer;">
-            ${isPremium ? "Adquirir" : "Download"}
+            ${isPremium ? "Purchase" : "Download"}
           </button>
-          <button id="previewCancelBtn" style="padding:.75rem 1.25rem;background:transparent;color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.15);border-radius:10px;font-size:.9rem;cursor:pointer;">Fechar</button>
+          <button id="previewCancelBtn" style="padding:.75rem 1.25rem;background:transparent;color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.15);border-radius:10px;font-size:.9rem;cursor:pointer;">Close</button>
         </div>
       `);
       document.getElementById("previewDownloadBtn")?.addEventListener("click", () => {
@@ -616,13 +605,13 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
     function showLoginModal(icon: any) {
       openModal(`
         <div style="font-size:2.5rem;margin-bottom:1rem;">🔒</div>
-        <h3 style="color:#fff;margin-bottom:.5rem;">Login necessário</h3>
+        <h3 style="color:#fff;margin-bottom:.5rem;">Login required</h3>
         <p style="color:rgba(255,255,255,.7);font-size:.9rem;margin-bottom:1.5rem;">
-          Faça login para baixar ícones gratuitos — é rápido e grátis.
+          Sign in to download free icons — it's quick and free.
         </p>
         <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
-          <a href="/login/?return=/products/volynx-icons-store/" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#00f0ff,#0066ff);color:#000;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;">Entrar</a>
-          <a href="/signup/?return=/products/volynx-icons-store/" style="padding:.75rem 1.5rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;border:1px solid rgba(255,255,255,.3);">Criar conta grátis</a>
+          <a href="/login/?return=/products/volynx-icons-store/" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#00f0ff,#0066ff);color:#000;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;">Sign in</a>
+          <a href="/signup/?return=/products/volynx-icons-store/" style="padding:.75rem 1.5rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;border:1px solid rgba(255,255,255,.3);">Create free account</a>
         </div>
       `);
     }
@@ -631,24 +620,24 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
       const colPrice = (icon as any).collectionPrice || "£4.99";
       openModal(`
         <img src="${icon.path}" alt="" style="width:80px;height:80px;object-fit:contain;background:#fff;border-radius:12px;padding:8px;margin:0 auto 1rem;display:block;" />
-        <p style="color:rgba(200,150,255,.9);font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem;">Coleção Premium</p>
+        <p style="color:rgba(200,150,255,.9);font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem;">Premium Collection</p>
         <h3 style="color:#fff;font-size:1.25rem;margin-bottom:1.25rem;">${icon.collection}</h3>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.5rem;">
           <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:1rem;text-align:center;">
-            <div style="color:rgba(255,255,255,.5);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.25rem;">Coleção individual</div>
+            <div style="color:rgba(255,255,255,.5);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.25rem;">Individual collection</div>
             <div style="color:#fff;font-size:1.5rem;font-weight:900;">${colPrice}</div>
           </div>
           <div style="background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(255,0,110,.15));border:1px solid rgba(139,92,246,.4);border-radius:12px;padding:1rem;text-align:center;">
-            <div style="color:rgba(200,150,255,.8);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.25rem;">Combo completo</div>
+            <div style="color:rgba(200,150,255,.8);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.25rem;">Full combo</div>
             <div style="color:#fff;font-size:1.5rem;font-weight:900;">£19.99</div>
-            <div style="color:rgba(200,150,255,.7);font-size:.65rem;margin-top:.15rem;">Todas as coleções premium</div>
+            <div style="color:rgba(200,150,255,.7);font-size:.65rem;margin-top:.15rem;">All premium collections</div>
           </div>
         </div>
 
         <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
-          <a href="/pricing/" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#8b5cf6,#ff006e);color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.875rem;">Adquirir esta coleção</a>
-          <a href="/pricing/" style="padding:.75rem 1.5rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.875rem;border:1px solid rgba(255,255,255,.2);">Ver combo</a>
+          <a href="/pricing/" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#8b5cf6,#ff006e);color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.875rem;">Purchase this collection</a>
+          <a href="/pricing/" style="padding:.75rem 1.5rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.875rem;border:1px solid rgba(255,255,255,.2);">View combo</a>
         </div>
       `);
     }
@@ -679,6 +668,6 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
     });
   </script>
 
-  <PageWidgets />
+  <PageWidgets hideUtilBar />
 </body>
 </html>

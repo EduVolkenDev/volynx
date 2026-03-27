@@ -1,6 +1,7 @@
 ---
 import PageWidgets from "../components/PageWidgets.astro";
 import Topbar from "../components/Topbar.astro";
+import { ROUTES } from "../data/routes";
 ---
 
 <html lang="en">
@@ -15,9 +16,9 @@ import Topbar from "../components/Topbar.astro";
 		<div class="orb orb-b" aria-hidden="true"></div>
 
 		<Topbar leftLinks={[
-			{ href: "/volynx-lab/studio/", label: "Studio" },
-			{ href: "/pricing/", label: "Pricing" },
-			{ href: "/contact/", label: "Support" },
+			{ href: ROUTES.studio, label: "Studio" },
+			{ href: ROUTES.pricing, label: "Pricing" },
+			{ href: ROUTES.contact, label: "Support" },
 		]}>
 			<button slot="right" type="button" class="logout-btn" id="logoutBtn">Sign out</button>
 		</Topbar>
@@ -31,7 +32,7 @@ import Topbar from "../components/Topbar.astro";
 		<!-- ═══ VIEW: error ═══ -->
 		<div id="viewError" class="view">
 			<p id="errorMsg" class="error-text">Something went wrong.</p>
-			<a href="/login/" class="btn">Sign in again</a>
+			<a href={ROUTES.login} class="btn">Sign in again</a>
 		</div>
 
 		<!-- ═══ VIEW: profile ═══ -->
@@ -115,13 +116,13 @@ import Topbar from "../components/Topbar.astro";
 						</div>
 						<div class="hero-badges">
 							<span id="heroPlan" class="plan-badge">Free</span>
-							<a id="planCta" href="/pricing/" class="plan-cta">Upgrade plan</a>
+							<a id="planCta" href={ROUTES.pricing} class="plan-cta">Upgrade plan</a>
 							<span id="planHelper" class="plan-helper" style="display:none"></span>
 						</div>
 					</div>
 				</div>
 				<div class="hero-cta">
-					<a href="/volynx-lab/studio/" class="btn">Open Studio</a>
+					<a href={ROUTES.studio} class="btn">Open Studio</a>
 					<button type="button" class="btn btn--ghost" id="scrollToEdit">Edit profile</button>
 				</div>
 			</section>
@@ -503,7 +504,7 @@ import Topbar from "../components/Topbar.astro";
 				const FREE_AVATARS = ["/assets/avatarfree/1.png", "/assets/avatarfree/2.png", "/assets/avatarfree/avatarfree3.webp"];
 				const PRO_AVATARS = ["/assets/avatarpro/avatargoldpro.webp"];
 				const DEFAULT_PRO_AVATAR = PRO_AVATARS[0];
-				const isPro = userProfile?.plan === "pro" || userProfile?.plan === "enterprise";
+				const isPro = profile?.plan === "pro" || profile?.plan === "enterprise";
 
 				// Show pro avatars section if user is pro
 				if (isPro && PRO_AVATARS.length > 0) {
@@ -656,7 +657,7 @@ import Topbar from "../components/Topbar.astro";
 			})();
 		</script>
 
-		<PageWidgets />
+		<PageWidgets hideUtilBar />
 	</body>
 </html>
 
@@ -874,6 +875,9 @@ import Topbar from "../components/Topbar.astro";
 		color: var(--text); outline: none; transition: border-color .15s; }
 	.field input:focus, .field textarea:focus {
 		border-color: rgba(0,232,197,.3); box-shadow: 0 0 0 3px rgba(0,232,197,.05); }
+	.field input:focus-visible, .field textarea:focus-visible {
+		outline: 2px solid rgba(130, 220, 255, 0.6);
+		outline-offset: 2px; }
 	.field input:disabled { opacity: .5; cursor: not-allowed; }
 	.form-footer { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
 	.form-status { margin: 0; font-size: .85rem; color: var(--muted); }

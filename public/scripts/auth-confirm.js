@@ -78,11 +78,10 @@ async function confirm() {
     return;
   }
 
-  // Legacy flow: tokens in hash (#access_token=...)
-  const hash        = new URLSearchParams(window.location.hash.slice(1));
-  const accessToken = hash.get("access_token");
-  if (accessToken) {
-    showSuccess();
+  // Legacy flow: tokens in hash (#access_token=...) — rejected for security.
+  // Hash-based tokens are not verified server-side, so we do NOT trust them.
+  if (window.location.hash && window.location.hash.includes("access_token")) {
+    showError("This confirmation link format is no longer supported. Please request a new confirmation email.");
     return;
   }
 

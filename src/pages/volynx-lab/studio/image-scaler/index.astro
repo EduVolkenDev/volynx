@@ -4,6 +4,7 @@ import LabBg from "../../../../components/LabBg.astro";
 import PageWidgets from "../../../../components/PageWidgets.astro";
 import SiteFooter from "../../../../components/SiteFooter.astro";
 import VxHeader from "../../../../components/VxHeader.astro";
+import { ROUTES } from "../../../../data/routes";
 const pageTitle = "VOLYNX Lab • Image Scaler";
 const pageDescription = "Free image upscaler — amplify small images with high smoothing and optional sharpening, locally in your browser.";
 ---
@@ -29,11 +30,11 @@ const pageDescription = "Free image upscaler — amplify small images with high 
   <LabBg />
   <VxHeader />
   <div id="vx-upgrade-banner" style="display:none;background:rgba(108,10,228,.18);border-bottom:1px solid rgba(108,10,228,.35);padding:10px 20px;text-align:center;font-size:.85em;">
-    Você está no plano gratuito. <a href="/pricing/" style="color:#59c6e8;font-weight:700;">Upgrade para Pro</a> e desbloqueie upscale 4x e uso comercial.
+    You're on the free plan. <a href={ROUTES.pricing} style="color:#59c6e8;font-weight:700;">Upgrade to Pro</a> to unlock 4x upscale and commercial use.
   </div>
 
   <nav class="vx-back">
-    <a class="pill-back" href="/volynx-lab/" data-i18n="scaler.back">← Voltar</a>
+    <a class="pill-back" href={ROUTES.lab} data-i18n="scaler.back">← Back</a>
   </nav>
 
   <img src="/assets/wordmark.webp" alt="" class="brand-logo-img" aria-hidden="true" />
@@ -56,7 +57,7 @@ const pageDescription = "Free image upscaler — amplify small images with high 
         <div class="cardHead">
           <h2 data-i18n="scaler.card_upload">Upload</h2>
           <div class="field-row">
-            <button id="pickBtn" class="btn secondary" type="button" data-i18n="scaler.btn_select">Selecionar arquivo</button>
+            <button id="pickBtn" class="btn secondary" type="button" data-i18n="scaler.btn_select">Select file</button>
             <input id="file" type="file" accept="image/*" hidden aria-label="Select image file" />
           </div>
         </div>
@@ -66,10 +67,10 @@ const pageDescription = "Free image upscaler — amplify small images with high 
             class="drop"
             role="button"
             tabindex="0"
-            aria-label="Arraste e solte a imagem aqui"
+            aria-label="Drag and drop image here"
           >
             <div class="icon">☁︎</div>
-            <p data-i18n="scaler.drop_text"><b>Arraste e solte</b> ou clique em "Selecionar arquivo"</p>
+            <p data-i18n="scaler.drop_text"><b>Drag and drop</b> or click "Select file"</p>
             <p data-i18n="scaler.desc2">Suporta PNG/JPG/WebP. Processamento local (não envia nada).</p>
           </div>
 
@@ -98,7 +99,7 @@ const pageDescription = "Free image upscaler — amplify small images with high 
               <span data-i18n="scaler.smooth_label">Suavização alta</span>
             </label>
 
-            <button id="runBtn" class="btn" type="button" disabled data-i18n="scaler.btn_upscale">Gerar imagem</button>
+            <button id="runBtn" class="btn" type="button" disabled data-i18n="scaler.btn_upscale">Generate image</button>
           </div>
 
           <div class="kpis">
@@ -125,7 +126,7 @@ const pageDescription = "Free image upscaler — amplify small images with high 
   <Fragment set:html={'<script src="/volynx-lab/image-scaler.js" defer></script>'} />
 
   <SiteFooter />
-  <PageWidgets />
+  <PageWidgets hideUtilBar />
   <script is:inline>window.__vxTool = 'image-scaler';</script>
   <script is:inline src="/scripts/vx-auth-gate.js"></script>
 </body>

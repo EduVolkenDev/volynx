@@ -1,10 +1,13 @@
 ---
 const { pack, locale, currency } = Astro.props;
+const currencies = ['GBP', 'EUR', 'BRL'] as const;
 ---
 <div class="token-card">
   {pack.badge && <span class="token-pill">{pack.badge[locale]}</span>}
   <h3 class="token-card__amount">{pack.amount} tokens</h3>
-  <span class="token-card__price">{pack.price[currency]}</span>
+  {currencies.map((c) => (
+    <span class={`token-card__price ${c !== currency ? 'vx-price--hidden' : ''}`} data-currency={c}>{pack.price[c]}</span>
+  ))}
   <p class="token-card__desc">{locale === 'pt' ? 'Pacote avulso para uso flexível das ferramentas.' : 'One-time pack for flexible tool usage.'}</p>
   <button type="button" class="token-card__cta">{locale === 'pt' ? 'Comprar' : 'Buy'}</button>
 </div>

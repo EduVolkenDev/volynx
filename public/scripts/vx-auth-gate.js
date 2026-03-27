@@ -6,6 +6,15 @@
 (async function vxAuthGate() {
   const LOGIN_PATH = '/login/';
   const PRICING_PATH = '/pricing/';
+  const planRank = { free: 0, launch: 1, pro: 2, studio: 3, teams: 4, enterprise: 5 };
+
+  // ── 0. Fetch config once and cache ─────────────────────────────────────────
+  var cfg;
+  try {
+    cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r) { return r.json(); });
+  } catch (_) {
+    cfg = {};
+  }
 
   // ── 1. Check token + auto-refresh if expired ─────────────────────────────
   var token = localStorage.getItem('volynx_access_token') || '';
@@ -19,7 +28,6 @@
 
   // Try to refresh the session to get a fresh token
   try {
-    var cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r) { return r.json(); });
     if (cfg.supabaseUrl && cfg.supabaseAnonKey && refreshToken) {
       var refreshRes = await fetch(cfg.supabaseUrl + '/auth/v1/token?grant_type=refresh_token', {
         method: 'POST',
@@ -42,7 +50,6 @@
   let proFeatures = [];
 
   try {
-    const cfg = await fetch('/config.json', { cache: 'no-store' }).then((r) => r.json());
     const apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
 
     if (apiBase) {
@@ -81,7 +88,6 @@
   // Show/hide elements with data-require-plan="pro"
   document.querySelectorAll('[data-require-plan]').forEach((el) => {
     const required = el.dataset.requirePlan;
-    const planRank = { free: 0, pro: 1, teams: 2 };
     const userRank = planRank[plan] ?? 0;
     const reqRank  = planRank[required] ?? 1;
     if (userRank < reqRank) {
@@ -113,7 +119,7 @@
   }
 
   // ── 5. Inject Pro visual layer for pro/enterprise users ────────────────────
-  if (plan === 'pro' || plan === 'enterprise') {
+  if (planRank[plan] >= 1) {
     // Load Pro CSS
     var proCSS = document.createElement('link');
     proCSS.rel = 'stylesheet';
@@ -145,7 +151,6 @@
     // Fetch usage for this tool
     (async function() {
       try {
-        var cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r) { return r.json(); });
         var apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
         if (!apiBase) return;
         var res = await fetch(apiBase + '/api/check-permission', {

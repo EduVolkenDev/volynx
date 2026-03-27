@@ -1,6 +1,7 @@
 ---
 import PageWidgets from "../../../components/PageWidgets.astro";
 import Topbar from "../../../components/Topbar.astro";
+import { ROUTES } from "../../../data/routes";
 const pageTitle = "PropertyFlow — VOLYNX Real Estate Platform";
 const pageDescription = "Premium property management platform for real estate agencies. Smart catalogue, bilingual interface, filters, and Supabase-ready backend.";
 ---
@@ -250,7 +251,7 @@ const pageDescription = "Premium property management platform for real estate ag
 </head>
 
 <body>
-  <Topbar rightLinks={[{ href: "/products/", label: "← All products" }]} />
+  <Topbar rightLinks={[{ href: ROUTES.products, label: "← All products" }]} />
 
   <main class="shell">
     <div class="hero">
@@ -367,12 +368,12 @@ const pageDescription = "Premium property management platform for real estate ag
         </div>
         <div class="cta-block__actions">
           <a class="btn btn--primary" href="/contact/?product=propertyflow" data-i18n="pf.cta_btn1">Request a demo</a>
-          <a class="btn btn--ghost" href="/products/" data-i18n="pf.cta_btn2">All products</a>
+          <a class="btn btn--ghost" href={ROUTES.products} data-i18n="pf.cta_btn2">All products</a>
         </div>
       </div>
     </section>
   </main>
 
-  <PageWidgets />
+  <PageWidgets hideUtilBar />
 </body>
 </html>

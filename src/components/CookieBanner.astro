@@ -2,10 +2,11 @@
 // CookieBanner — universal consent banner for all Volynx pages
 // Uses localStorage key "volynx_consent_v1"
 // Fires window CustomEvent "volynx:consent" on save
+import { ROUTES } from "../data/routes";
 ---
 
 <!-- Cookie Banner — JS controls visibility via vx-cookie--show class -->
-<div class="vx-cookie" id="vxCookie" role="dialog" aria-modal="true" aria-label="Cookie preferences">
+<div class="vx-cookie" id="vxCookie" role="region" aria-label="Cookie preferences">
   <div class="vx-cookie__card">
     <div class="vx-cookie__glow" aria-hidden="true"></div>
     <div class="vx-cookie__head">
@@ -21,7 +22,7 @@
       <button class="vx-cbtn vx-cbtn--soft"  id="vxCookieReject" type="button" data-i18n="cookie.reject_btn">Reject</button>
       <button class="vx-cbtn vx-cbtn--primary" id="vxCookieAccept" type="button" data-i18n="cookie.accept_btn">Accept all</button>
     </div>
-    <a class="vx-cookie__link" href="/privacy/" rel="noopener" data-i18n="cookie.privacy_link">Privacy policy</a>
+    <a class="vx-cookie__link" href={ROUTES.privacy} rel="noopener" data-i18n="cookie.privacy_link">Privacy policy</a>
     <div class="vx-cookie__prefs" id="vxCookiePanel" style="display:none">
       <div class="vx-cookie__prefsTitle" data-i18n="cookie.prefs_title">Preferences</div>
       <label class="vx-toggle">

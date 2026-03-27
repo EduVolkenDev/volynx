@@ -79,20 +79,20 @@
   runBtn.addEventListener('click', async function () {
     if (!currentFile) return;
     runBtn.disabled = true;
-    runBtn.textContent = 'Verificando…';
+    runBtn.textContent = 'Checking…';
     try {
       var perm = await checkPermission('image-scaler');
       if (!perm.allowed) {
         var msg = perm.plan === 'public'
-          ? 'Limite gratuito atingido. Faça login ou upgrade para continuar.'
-          : 'Limite do plano ' + perm.plan + ' atingido. Faça upgrade para continuar.';
+          ? 'Free limit reached. Sign in or upgrade to continue.'
+          : 'Plan limit reached. Upgrade to continue.';
         alert(msg);
         runBtn.disabled = false;
-        runBtn.textContent = 'Processar';
+        runBtn.textContent = 'Process';
         return;
       }
     } catch (err) {
-      console.warn('check-permission falhou, permitindo uso local:', err);
+      console.warn('check-permission failed, allowing local usage:', err);
     }
     var mode = modeSelect ? modeSelect.value : 'local';
     if (mode === 'ai') {
@@ -103,7 +103,7 @@
 
   function runLocal() {
     runBtn.disabled = true;
-    runBtn.textContent = 'Processando…';
+    runBtn.textContent = 'Processing…';
 
     var scale   = parseInt(scaleSelect.value, 10);
     var format  = formatSelect.value;
@@ -155,15 +155,15 @@
         outMeta.textContent = dstW + ' × ' + dstH + 'px — ' + fmtSize(blob.size) + ' (' + ext.toUpperCase() + ')';
         downloadBtn.disabled = false;
         runBtn.disabled = false;
-        runBtn.textContent = 'Gerar imagem';
+        runBtn.textContent = 'Process';
       }, format, 0.92);
     };
 
     img.onerror = function () {
       URL.revokeObjectURL(url);
-      alert('Erro ao carregar a imagem.');
+      alert('Error loading image.');
       runBtn.disabled = false;
-      runBtn.textContent = 'Gerar imagem';
+      runBtn.textContent = 'Process';
     };
 
     img.src = url;

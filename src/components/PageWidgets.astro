@@ -1,17 +1,20 @@
 ---
 import CookieBanner from "./CookieBanner.astro";
+import { ROUTES } from "../data/routes";
+interface Props { hideUtilBar?: boolean; }
+const { hideUtilBar = false } = Astro.props;
 const isHome = Astro.url.pathname === "/" || Astro.url.pathname === "";
 const isAuth = ["/login/", "/signup/", "/auth/"].some(p => Astro.url.pathname.startsWith(p));
 const isProfile = Astro.url.pathname.startsWith("/profile");
 ---
 
-{!isProfile && (
+{!isProfile && !hideUtilBar && (
 <div class="vx-util-bar" id="vxUtilBar">
   <button id="vxLangToggle" class="vx-widget vx-lang-btn" aria-label="Toggle language" title="Switch language / Mudar idioma">
     <span class="vx-lang-label" data-i18n="widget.lang">EN</span>
   </button>
   {!isAuth && (
-    <a href="/login/" id="vxLoginBtn" class="vx-widget vx-login-btn" data-i18n="widget.login">
+    <a href={ROUTES.login} id="vxLoginBtn" class="vx-widget vx-login-btn" data-i18n="widget.login">
       Login
     </a>
   )}
@@ -19,12 +22,12 @@ const isProfile = Astro.url.pathname.startsWith("/profile");
 )}
 
 {!isHome && (
-  <a href="/" id="vxHomeBtn" class="vx-widget vx-home-btn" aria-label="Go home" data-i18n="widget.home">
+  <a href={ROUTES.home} id="vxHomeBtn" class="vx-widget vx-home-btn" aria-label="Go home" data-i18n="widget.home">
     ← Home
   </a>
 )}
 
-<button id="vxBackTop" class="vx-widget vx-backtop" aria-label="Voltar ao topo" type="button">
+<button id="vxBackTop" class="vx-widget vx-backtop" aria-label="Back to top" type="button">
   ↑
 </button>
 
@@ -90,7 +93,7 @@ const isProfile = Astro.url.pathname.startsWith("/profile");
   .vx-util-bar {
     position: absolute;
   top: 13px;
-  right: 75%;
+  right: 20px;
   z-index: 9990;
   display: flex;
   align-items: center;

@@ -1,12 +1,15 @@
 ---
 const { addon, locale, currency } = Astro.props;
+const currencies = ['GBP', 'EUR', 'BRL'] as const;
 ---
 <div class="addon-card">
   <div class="addon-card__info">
     <h3 class="addon-card__name">{addon.name[locale]}</h3>
     <p class="addon-card__desc">{addon.description[locale]}</p>
   </div>
-  <span class="addon-card__price">{addon.price[currency]}</span>
+  {currencies.map((c) => (
+    <span class={`addon-card__price ${c !== currency ? 'vx-price--hidden' : ''}`} data-currency={c}>{addon.price[c]}</span>
+  ))}
 </div>
 
 <style>

@@ -14,11 +14,14 @@ const classBorders: Record<string, string> = {
   D: 'rgba(245,158,11,.3)',
   E: 'rgba(239,68,68,.3)',
 };
+const currencies = ['GBP', 'EUR', 'BRL'] as const;
 ---
 <div class="usage-card">
   <h3 class="usage-card__label">{item.label[locale]}</h3>
   <span class="usage-card__tokens" style={`background:${classColors[item.tool_class || 'A']};border-color:${classBorders[item.tool_class || 'A']}`}>{item.tokens}</span>
-  <span class="usage-card__price">{item.price[currency]}</span>
+  {currencies.map((c) => (
+    <span class={`usage-card__price ${c !== currency ? 'vx-price--hidden' : ''}`} data-currency={c}>{item.price[c]}</span>
+  ))}
   <ul class="usage-card__examples">
     {item.examples[locale].map((ex: string) => <li>{ex}</li>)}
   </ul>

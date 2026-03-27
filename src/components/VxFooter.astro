@@ -1,16 +1,17 @@
 ---
+import { ROUTES } from "../data/routes";
 // VxFooter — minimal footer for VOLYNX education/lab pages
 ---
 
 <footer class="vxf" role="contentinfo">
   <div class="vxf__inner">
     <span class="vxf__copy">© {new Date().getFullYear()} VOLYNX</span>
-    <nav class="vxf__links" aria-label="Links legais">
-      <a href="/">Home</a>
-      <a href="/products/">Products</a>
-      <a href="/privacy/">Privacy</a>
-      <a href="/terms/">Terms</a>
-      <a href="/disclaimer/">Legal</a>
+    <nav class="vxf__links" aria-label="Legal links">
+      <a href={ROUTES.home}>Home</a>
+      <a href={ROUTES.products}>Products</a>
+      <a href={ROUTES.privacy}>Privacy</a>
+      <a href={ROUTES.terms}>Terms</a>
+      <a href={ROUTES.disclaimer}>Legal</a>
     </nav>
   </div>
 </footer>
@@ -25,7 +26,7 @@
     padding: 18px 24px;
   }
   .vxf__inner {
-    max-width: 1160px;
+    max-width: var(--content-max, 1100px);
     margin: 0 auto;
     display: flex;
     align-items: center;

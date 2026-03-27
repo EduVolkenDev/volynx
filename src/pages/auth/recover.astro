@@ -2,12 +2,13 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import VxHeader from "../../components/VxHeader.astro";
 import SiteFooter from "../../components/SiteFooter.astro";
+import { ROUTES } from "../../data/routes";
 
 const title = "Reset Password — VOLYNX";
 ---
 
-<BaseLayout title={title}>
-  <VxHeader primaryCtaLabel="Sign up" primaryCtaHref="/signup/" />
+<BaseLayout title={title} hideUtilBar>
+  <VxHeader primaryCtaLabel="Sign up" primaryCtaHref={ROUTES.signup} />
 
   <main class="shell recover">
     <section class="recover-wrap">
@@ -27,8 +28,8 @@ const title = "Reset Password — VOLYNX";
             <p id="msg" class="msg" aria-live="polite"></p>
 
             <div class="row">
-              <a class="link" href="/login/">Back to login</a>
-              <a class="link" href="/signup/">Create account</a>
+              <a class="link" href={ROUTES.login}>Back to login</a>
+              <a class="link" href={ROUTES.signup}>Create account</a>
             </div>
           </form>
         </div>
@@ -38,7 +39,7 @@ const title = "Reset Password — VOLYNX";
           <h1>Check your inbox</h1>
           <p class="sub">We sent a password reset link to <strong id="sentEmail">your email</strong>. Click the link to set a new password.</p>
           <p class="hint">Didn't receive it? Check your spam folder or try again.</p>
-          <a class="btn primary" href="/login/">Back to login</a>
+          <a class="btn primary" href={ROUTES.login}>Back to login</a>
         </div>
       </div>
     </section>
@@ -139,6 +140,10 @@ const title = "Reset Password — VOLYNX";
     font-size: 15px;
   }
   input:focus { border-color: rgba(125,211,252,.35); }
+  input:focus-visible {
+    outline: 2px solid rgba(130, 220, 255, 0.6);
+    outline-offset: 2px;
+  }
 
   .btn {
     display: inline-flex;

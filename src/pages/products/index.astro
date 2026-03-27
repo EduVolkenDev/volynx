@@ -1,274 +1,154 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import VxHeader from "../../components/VxHeader.astro";
-import SiteFooter from "../../components/SiteFooter.astro";
-import "../../styles/products.v2.css";
-
-
-const title = "Products — VOLYNX";
-
-const products = [
-  {
-    name: "Agency Launch Kit",
-    slug: "agency-launch-kit",
-    badge: "Kit",
-    meta: "Brand • Pages • Copy",
-    desc: "Launch-ready assets for studios that want speed and consistency.",
-    buyHref: "/products/agency-launch-kit/",
-    buyLabel: "View Kit",
-    metaKey: "products.alkit.meta",
-    descKey: "products.alkit.desc",
-  },
-  {
-    name: "Portfolio Pro Kit",
-    slug: "portfolio-pro-kit",
-    badge: "Kit",
-    meta: "Sections • Motion • SEO",
-    desc: "A premium portfolio system designed to convert, not just look pretty.",
-    buyHref: "/products/portfolio-pro-kit/",
-    buyLabel: "View Kit",
-    metaKey: "products.ppk.meta",
-    descKey: "products.ppk.desc",
-  },
-  {
-    name: "SaaS Landing System",
-    slug: "saas-landing-system",
-    badge: "System",
-    meta: "Blocks • Variants • UI",
-    desc: "Conversion-first landing blocks that scale across offers.",
-    buyHref: "/products/saas-landing-system/",
-    buyLabel: "View System",
-    metaKey: "products.sls.meta",
-    descKey: "products.sls.desc",
-  },
-  {
-    name: "Volynx Icons",
-    slug: "volynx-icons-store",
-    badge: "Icons",
-    meta: "Grid • Styles • Packs",
-    desc: "A curated icon store: sharp, consistent, brand-ready.",
-    buyHref: "/dev-hub/volynx-icons-store/",
-    buyLabel: "Browse Icons",
-    metaKey: "products.icons.meta",
-    descKey: "products.icons.desc",
-  },
-  {
-    name: "Maintenance Plans",
-    slug: "maintenance-plans",
-    href: "/maintenance/",
-    badge: "Plans",
-    meta: "Updates • SEO • Support",
-    desc: "Structured website maintenance and product evolution. Predictable delivery, zero friction.",
-    buyHref: "/maintenance/",
-    buyLabel: "See Plans",
-    metaKey: "products.maintenance.meta",
-    descKey: "products.maintenance.desc",
-  },
-  {
-    name: "Landing Express",
-    slug: "landing-express",
-    href: "/services/landing-express/",
-    badge: "Pages",
-    meta: "Conversion • Copy • Speed",
-    desc: "A serious Landing Page that turns visitors into buyers. Delivered in 48–72h.",
-    buyHref: "/services/landing-express/",
-    buyLabel: "Get Started",
-    metaKey: "products.landing.meta",
-    descKey: "products.landing.desc",
-  },
-  {
-    name: "Dev Tools",
-    slug: "dev-tools",
-    href: "/volynx-lab/",
-    badge: "Tools",
-    icon: "/assets/prostudio.webp",
-    meta: "Convert • Scale • Ship",
-    desc: "Production-grade tools for developers: image processing, QR generation, converters and more.",
-    buyHref: "/volynx-lab/",
-    buyLabel: "Open Lab",
-    metaKey: "products.devtools.meta",
-    descKey: "products.devtools.desc",
-  },
-  {
-    name: "Studio Pro",
-    slug: "studio-pro",
-    href: "/volynx-lab/studio/",
-    badge: "Pro",
-    icon: "/assets/prostudio.webp",
-    meta: "Unlimited • Batch • Commercial",
-    desc: "The full production pipeline in the browser. No limits, batch processing, and commercial rights.",
-    buyHref: "/volynx-lab/studio/",
-    buyLabel: "Get Studio Pro",
-    metaKey: "products.studio.meta",
-    descKey: "products.studio.desc",
-  },
-  {
-    name: "Converter Pro",
-    slug: "converter-pro",
-    href: "/volynx-lab/studio/converter/",
-    badge: "Pro Tool",
-    icon: "/assets/proconverter.webp",
-    meta: "WebP • JPG • PNG • AVIF",
-    desc: "Batch convert images with quality control and resize. No daily limits on Pro.",
-    buyHref: "/volynx-lab/studio/converter/",
-    buyLabel: "Open Tool",
-    metaKey: "products.converter.meta",
-    descKey: "products.converter.desc",
-  },
-  {
-    name: "Image Scaler Pro",
-    slug: "scaler-pro",
-    href: "/volynx-lab/studio/image-scaler/",
-    badge: "Pro Tool",
-    icon: "/assets/proscaler.webp",
-    meta: "2× • 3× • 4× Upscale",
-    desc: "Upscale images with maximum resolution and zero quality loss. 100% local processing.",
-    buyHref: "/volynx-lab/studio/image-scaler/",
-    buyLabel: "Open Tool",
-    metaKey: "products.scaler.meta",
-    descKey: "products.scaler.desc",
-  },
-  {
-    name: "Image Suite",
-    slug: "suite-pro",
-    href: "/volynx-lab/studio/image-suite/",
-    badge: "Pro Exclusive",
-    icon: "/assets/prosuite.webp",
-    meta: "Upscale • Compress • Convert",
-    desc: "All-in-one image processing suite with brand watermark. Studio Pro exclusive.",
-    buyHref: "/pricing/",
-    buyLabel: "Get Pro",
-    metaKey: "products.suite.meta",
-    descKey: "products.suite.desc",
-  },
-  {
-    name: "QR Generator Pro",
-    slug: "qrgen-pro",
-    href: "/volynx-lab/studio/qr-gen/",
-    badge: "Pro Tool",
-    icon: "/assets/proqrgen.webp",
-    meta: "Styled • Logos • High-res",
-    desc: "Generate styled QR codes with logos, gradients, and high-resolution export for campaigns.",
-    buyHref: "/volynx-lab/studio/qr-gen/",
-    buyLabel: "Open Tool",
-    metaKey: "products.qrgen.meta",
-    descKey: "products.qrgen.desc",
-  },
-  {
-    name: "VOLYNX Builder",
-    slug: "builder",
-    href: "/dev-hub/builder/",
-    badge: "Builder",
-    meta: "Sites • JSON • Deploy",
-    desc: "Create and manage mini-sites with a JSON editor, magic link auth and one-click publish.",
-    buyHref: "/pricing/",
-    buyLabel: "See Plans",
-    metaKey: "products.builder.meta",
-    descKey: "products.builder.desc",
-  },
-  {
-    name: "PropertyFlow",
-    slug: "propertyflow",
-    badge: "Real Estate",
-    meta: "Listings • Filters • CMS",
-    desc: "Premium property management platform for real estate agencies. Smart catalogue, bilingual interface, and Supabase-ready backend.",
-    buyHref: "/products/propertyflow/",
-    buyLabel: "View Product",
-    metaKey: "products.propertyflow.meta",
-    descKey: "products.propertyflow.desc",
-  },
-];
+import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "../../components/FlagshipHeader.astro";
+import FlagshipFooter from "../../components/FlagshipFooter.astro";
+import { ROUTES } from "../../data/routes";
 ---
+<FlagshipLayout title="Products — VOLYNX" description="Premium kits, tools and systems for developers, designers and modern internet businesses." pageClass="page-products">
+  <FlagshipHeader current={ROUTES.products} ctaLabel="Open the Ecosystem" />
+  <main>
 
-<BaseLayout title={title}>
-  <VxHeader />
-
-  <main class="shell productsV2">
+    <!-- ═══ HERO ═══ -->
     <section class="hero">
-      <h1 data-i18n="products.title">Products</h1>
-      <p class="sub" data-i18n="products.subtitle">
-        Kits that ship. Systems that convert. Icons that don’t look like 2014.
-      </p>
-
-      <div class="toolbar" role="group" aria-label="Product tools">
-        <div class="search" aria-label="Search (UI only)">
-          <span class="hint" aria-hidden="true">⌘K</span>
-          <input placeholder="Search products…" data-i18n-placeholder="products.search_placeholder" disabled />
+      <div class="shell hero-grid">
+        <div class="hero-copy">
+          <span class="kicker">Products · curated</span>
+          <h1>Kits that ship. Systems that convert. Product lines that feel premium.</h1>
+          <p>The products page is editorial, not a flat catalog. It organizes product categories, plan inclusion and upgrade logic with clear visual status.</p>
+          <div class="hero-actions">
+            <a href="#kits" class="button button--gold">See premium kits</a>
+            <a href={ROUTES.pricing} class="button button--ghost">Compare plans</a>
+          </div>
         </div>
-
-        <div class="filters" aria-label="Quick links">
-          <a class="chip" href="/dev-hub/" data-i18n="products.filter.devhub">Dev Hub</a>
-          <a class="chip" href="/pricing/" data-i18n="products.filter.pricing">Pricing</a>
-          <a class="chip" href="/contact/" data-i18n="products.filter.contact">Contact</a>
+        <div class="hero-card visual-card">
+          <span class="label">Ecosystem map</span>
+          <div class="stack">
+            <div class="metric">Premium Kits</div>
+            <div class="metric">VOLYNX Lab</div>
+            <div class="metric">Builder</div>
+            <div class="metric">Studio Pro</div>
+          </div>
+          <img src="/assets/volynx-icon.webp" alt="Ecosystem" />
         </div>
       </div>
     </section>
 
-    <section class="grid" aria-label="Product catalog">
-      {products.map((p) => (
-        <article class={`card ${p.icon ? 'card--has-icon' : ''} ${p.badge === 'Pro' || p.badge === 'Pro Tool' || p.badge === 'Pro Exclusive' ? 'card--pro' : ''}`}>
-          <div class="cardTop">
-            {p.icon && <img class="card__icon" src={p.icon} alt="" />}
-            <div class="cardTop__text">
-              <span class={`badge ${p.badge === 'Pro' || p.badge === 'Pro Tool' || p.badge === 'Pro Exclusive' ? 'badge--pro' : ''}`}>{p.badge}</span>
-              <span class="meta" data-i18n={p.metaKey}>{p.meta}</span>
-            </div>
-          </div>
-
-          <h2>{p.name}</h2>
-          <p data-i18n={p.descKey}>{p.desc}</p>
-
-          <div class="metaRow">
-            <span class="small">Includes: <span data-i18n={p.metaKey}>{p.meta}</span></span>
-            <div class="ctaRow">
-              <a class="btn" href={p.href ?? `/products/${p.slug}/`} data-i18n="products.view_btn">View</a>
-              <a class="btn secondary" href={p.buyHref ?? '/contact/'}>{p.buyLabel ?? 'Buy'}</a>
-            </div>
-          </div>
+    <!-- ═══ PREMIUM KITS ═══ -->
+    <section id="kits" class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">Premium kits</span>
+        <h2>Launch-ready systems for real businesses</h2>
+        <p>Each kit includes design, copy, code and deployment logic. Built for speed, conversion and premium perception.</p>
+      </div>
+      <div class="shell editorial-grid">
+        <article class="panel gallery-card gallery-card--xl" style="background-image:url('/assets/newportfolio.webp')">
+          <span class="label">Flagship kit</span>
+          <h3>Portfolio Pro Kit</h3>
+          <p>Premium portfolio system with motion, SEO and conversion-first sections. Launch fast and look expensive.</p>
+          <div class="actions"><a href={ROUTES.portfolioKit} class="button button--ghost">View kit</a></div>
         </article>
-      ))}
+        <article class="panel gallery-card" style="background-image:url('/assets/newlaunch.webp')">
+          <span class="label">For agencies</span>
+          <h3>Agency Launch Kit</h3>
+          <p>Brand, pages, proposal and SOW — everything a studio needs to close with less friction.</p>
+          <div class="actions"><a href={ROUTES.agencyKit} class="button button--ghost">View kit</a></div>
+        </article>
+        <article class="panel gallery-card" style="background-image:url('/assets/saasbig.webp')">
+          <span class="label">For SaaS</span>
+          <h3>SaaS Landing System</h3>
+          <p>Conversion-first landing blocks that scale across offers and variant tests.</p>
+          <div class="actions"><a href={ROUTES.saasSystem} class="button button--ghost">View system</a></div>
+        </article>
+      </div>
     </section>
+
+    <!-- ═══ PROPERTYFLOW SPOTLIGHT ═══ -->
+    <section class="page-section">
+      <div class="shell">
+        <article class="panel spotlight-card panel--pro">
+          <div>
+            <span class="label label--pro">New · Real Estate SaaS</span>
+            <h3>PropertyFlow</h3>
+            <p>Premium property management for real estate agencies — smart catalogue, bilingual interface, live filters and a polished showcase that already feels like its own product line.</p>
+          </div>
+          <a href={ROUTES.propertyflow} class="button button--gold">View PropertyFlow</a>
+        </article>
+      </div>
+    </section>
+
+    <!-- ═══ TOOLS & STUDIO ═══ -->
+    <section class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">Tools & studio</span>
+        <h2>Browser-based production tools</h2>
+        <p>Free tools for discovery. Pro tools for serious output. All running locally in the browser.</p>
+      </div>
+      <div class="shell grid-3">
+        <article class="panel product-card">
+          <div class="head-row">
+            <div><span class="label label--free">Free</span><h3>VOLYNX Lab</h3></div>
+          </div>
+          <p>Convert, upscale and generate with no upload logic. Clean enough for discovery, strong enough to convert into Studio.</p>
+          <div class="actions"><a href={ROUTES.lab} class="button button--ghost">Open Lab</a></div>
+        </article>
+        <article class="panel product-card panel--pro">
+          <div class="head-row">
+            <div><span class="label label--pro">Included in Pro</span><h3>Studio Pro</h3></div>
+            <span class="chip">Production</span>
+          </div>
+          <p>The layer for users who care about stronger outputs, saved workflows and cleaner delivery. No daily limits, batch processing, commercial rights.</p>
+          <div class="actions"><a href={ROUTES.studio} class="button button--gold">See Studio Pro</a></div>
+        </article>
+        <article class="panel product-card">
+          <div class="head-row">
+            <div><span class="label">Builder</span><h3>VOLYNX Builder</h3></div>
+          </div>
+          <p>Create and manage premium mini-sites with JSON editor, magic link auth and one-click publish. Custom domains on Pro.</p>
+          <div class="actions"><a href={ROUTES.builder} class="button button--ghost">Open Builder</a></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ═══ MORE PRODUCTS ═══ -->
+    <section class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">More from VOLYNX</span>
+        <h2>Services and assets</h2>
+      </div>
+      <div class="shell grid-3">
+        <article class="panel product-card">
+          <div class="head-row"><div><span class="label">Icons</span><h3>Volynx Icons</h3></div></div>
+          <p>A curated icon store: sharp, consistent, brand-ready. Grid, styles and packs.</p>
+          <div class="actions"><a href={ROUTES.iconsStore} class="button button--ghost">Browse Icons</a></div>
+        </article>
+        <article class="panel product-card">
+          <div class="head-row"><div><span class="label">Plans</span><h3>Maintenance Plans</h3></div></div>
+          <p>Structured website maintenance and product evolution. Predictable delivery, zero friction.</p>
+          <div class="actions"><a href={ROUTES.maintenance} class="button button--ghost">See Plans</a></div>
+        </article>
+        <article class="panel product-card">
+          <div class="head-row"><div><span class="label">Pages</span><h3>Landing Express</h3></div></div>
+          <p>A serious landing page that turns visitors into buyers. Delivered in 48-72h.</p>
+          <div class="actions"><a href={ROUTES.landingExpress} class="button button--ghost">Get Started</a></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ═══ FINAL CTA ═══ -->
+    <section class="page-section page-section--last">
+      <div class="shell callout panel panel--pro">
+        <div>
+          <span class="label label--pro">Full ecosystem</span>
+          <strong>Every product connects. Every tool has a purpose.</strong>
+          <p>From kits to tools to builder to studio — the VOLYNX ecosystem is designed to work together, not compete for attention.</p>
+        </div>
+        <div class="hero-actions">
+          <a href={ROUTES.pricing} class="button button--gold">See pricing</a>
+          <a href={ROUTES.devHub} class="button button--ghost">Explore Dev Hub</a>
+        </div>
+      </div>
+    </section>
+
   </main>
-
-  <SiteFooter />
-</BaseLayout>
-
-<style>
-  /* Product card icons */
-  .card__icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    object-fit: cover;
-    flex-shrink: 0;
-  }
-
-  .card--has-icon .cardTop {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .cardTop__text {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  /* Pro card styling */
-  .card--pro {
-    border-color: rgba(109,94,252,.2);
-    background: rgba(109,94,252,.03);
-  }
-
-  .card--pro:hover {
-    border-color: rgba(109,94,252,.35);
-    box-shadow: 0 0 24px rgba(109,94,252,.06);
-  }
-
-  .badge--pro {
-    background: rgba(109,94,252,.15) !important;
-    border-color: rgba(109,94,252,.35) !important;
-    color: #C4B5FD !important;
-  }
-</style>
+  <FlagshipFooter />
+</FlagshipLayout>

@@ -5,7 +5,7 @@ import SiteFooter from "../components/SiteFooter.astro";
 const title = "Contact — VOLYNX";
 ---
 
-<BaseLayout title={title} description="Talk to Volynx about your project, support needs, or partnership ideas.">
+<BaseLayout title={title} description="Talk to VOLYNX about your project, support needs, or partnership ideas." hideUtilBar>
   <VxHeader />
 
   <main class="shell contact-page">
@@ -111,7 +111,7 @@ const title = "Contact — VOLYNX";
 
           <div class="field">
             <label for="brief" data-i18n="contact.brief">Brief</label>
-            <textarea id="brief" name="brief" rows="4" placeholder="What are you trying to build, and what's the goal?"></textarea>
+            <textarea id="brief" name="brief" rows="4" placeholder="What are you trying to build, and what's the goal?" required></textarea>
           </div>
 
           <button class="submit-btn" type="submit" data-i18n="contact.btn_send">Send brief →</button>
@@ -300,6 +300,12 @@ const title = "Contact — VOLYNX";
     transition: border-color 0.2s;
     outline: none;
     -webkit-appearance: none;
+  }
+  .field input:focus-visible,
+  .field select:focus-visible,
+  .field textarea:focus-visible {
+    outline: 2px solid rgba(130, 220, 255, 0.6);
+    outline-offset: 2px;
   }
   .field select {
     cursor: pointer;

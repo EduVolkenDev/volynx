@@ -1,0 +1,54 @@
+---
+import "../styles/flagship-v3.css";
+import PageWidgets from "../components/PageWidgets.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  pageClass?: string;
+}
+const {
+  title = "VOLYNX — Building a Smarter Future",
+  description = "Premium tools, kits and systems for the modern web.",
+  pageClass = "",
+} = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,date=no,address=no,email=no" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <link rel="preload" as="image" href="/assets/volynx-icon.webp" />
+    <link rel="preload" as="image" href="/assets/wordmark.webp" />
+
+    <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link rel="shortcut icon" href="/assets/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Volynx" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Volynx",
+        "url": "https://volynx.world"
+      }
+    </script>
+  </head>
+  <body class={pageClass}>
+    <!-- Ambient layers -->
+    <div class="backdrop backdrop--one" aria-hidden="true"></div>
+    <div class="backdrop backdrop--two" aria-hidden="true"></div>
+    <div class="noise" aria-hidden="true"></div>
+
+    <slot />
+
+    <PageWidgets hideUtilBar />
+  </body>
+</html>

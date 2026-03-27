@@ -1,25 +1,30 @@
 ---
 const { locale = 'en', currency = 'GBP' } = Astro.props;
-const pathname = Astro.url.pathname;
 const currencies = ['GBP', 'EUR', 'BRL'];
 const locales = [
   { code: 'en', label: 'EN' },
   { code: 'pt', label: 'PT' }
 ];
-const withParams = (l: string, c: string) => `${pathname}?lang=${l}&currency=${c}`;
 ---
 <div class="lcbar">
   <div class="lcbar__group">
     {locales.map((item) => (
-      <a href={withParams(item.code, currency)} class={`lcbar__pill ${item.code === locale ? 'lcbar__pill--active' : ''}`}>{item.label}</a>
+      <button type="button" class={`lcbar__pill ${item.code === locale ? 'lcbar__pill--active' : ''}`} data-locale={item.code}>{item.label}</button>
     ))}
   </div>
   <div class="lcbar__group">
     {currencies.map((c) => (
-      <a href={withParams(locale, c)} class={`lcbar__pill ${c === currency ? 'lcbar__pill--active' : ''}`}>{c}</a>
+      <button type="button" class={`lcbar__pill ${c === currency ? 'lcbar__pill--active' : ''}`} data-switch-currency={c}>{c}</button>
     ))}
   </div>
 </div>
+
+<style is:global>
+  .vx-price--hidden,
+  .pricing-card__price--hidden {
+    display: none !important;
+  }
+</style>
 
 <style>
   .lcbar {
@@ -47,6 +52,7 @@ const withParams = (l: string, c: string) => `${pathname}?lang=${l}&currency=${c
     border: 1px solid rgba(255,255,255,.08);
     background: rgba(255,255,255,.03);
     color: rgba(255,255,255,.45);
+    cursor: pointer;
     transition: all .15s;
   }
   .lcbar__pill:hover {
@@ -59,3 +65,38 @@ const withParams = (l: string, c: string) => `${pathname}?lang=${l}&currency=${c
     color: #C4B5FD;
   }
 </style>
+
+<script>
+  document.querySelectorAll('[data-switch-currency]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = (btn as HTMLElement).dataset.switchCurrency;
+      if (!target) return;
+
+      // Update active pill
+      document.querySelectorAll('[data-switch-currency]').forEach(p => p.classList.remove('lcbar__pill--active'));
+      btn.classList.add('lcbar__pill--active');
+
+      // Show/hide prices
+      document.querySelectorAll('[data-currency]').forEach(el => {
+        const curr = (el as HTMLElement).dataset.currency;
+        el.classList.toggle('vx-price--hidden', curr !== target);
+        el.classList.toggle('pricing-card__price--hidden', curr !== target);
+      });
+
+      // Update URL without reload
+      const url = new URL(window.location.href);
+      url.searchParams.set('currency', target);
+      history.replaceState(null, '', url.toString());
+    });
+  });
+
+  // Locale switch still reloads (server-rendered text)
+  document.querySelectorAll('[data-locale]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const loc = (btn as HTMLElement).dataset.locale;
+      const url = new URL(window.location.href);
+      url.searchParams.set('lang', loc || 'en');
+      window.location.href = url.toString();
+    });
+  });
+</script>

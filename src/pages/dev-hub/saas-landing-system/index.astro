@@ -1,6 +1,7 @@
 ---
 import PageWidgets from "../../../components/PageWidgets.astro";
 import SiteFooter from "../../../components/SiteFooter.astro";
+import { ROUTES } from "../../../data/routes";
 const pageTitle = "VOLYNX — SaaS Landing System";
 const pageDescription = "Conversion-focused landing kit with clean sections, SEO basics, and fast iteration.";
 ---
@@ -201,8 +202,8 @@ const pageDescription = "Conversion-focused landing kit with clean sections, SEO
         <span class="menu-bar"></span><span class="menu-bar"></span><span class="menu-bar"></span>
       </button>
       <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
-        <a href="/volynx-lab/" class="nav-link"><span>Volynx.Lab</span><span class="nav-arrow" aria-hidden="true">→</span></a>
-        <a href="/products/" class="nav-link"><span>Products</span><span class="nav-arrow" aria-hidden="true">→</span></a>
+        <a href={ROUTES.lab} class="nav-link"><span>Volynx.Lab</span><span class="nav-arrow" aria-hidden="true">→</span></a>
+        <a href={ROUTES.products} class="nav-link"><span>Products</span><span class="nav-arrow" aria-hidden="true">→</span></a>
         <a href="/" class="nav-link"><span>Home</span><span class="nav-arrow" aria-hidden="true">→</span></a>
       </nav>
     </div>
@@ -213,7 +214,7 @@ const pageDescription = "Conversion-focused landing kit with clean sections, SEO
       <div class="hero-glow"></div>
       <div class="container">
         <div class="breadcrumb">
-          <a href="/products/">Products</a>
+          <a href={ROUTES.products}>Products</a>
           <span class="breadcrumb-sep">→</span>
           <span data-i18n="sls.breadcrumb">SaaS Landing System</span>
         </div>
@@ -240,7 +241,7 @@ const pageDescription = "Conversion-focused landing kit with clean sections, SEO
             <span data-i18n="sls.btn_buy">Buy Now</span>
             <svg class="btn-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M6 3L11 8L6 13" /></svg>
           </a>
-          <a href="/products/" class="btn btn-secondary"><span data-i18n="sls.btn_back">← Back to Products</span></a>
+          <a href={ROUTES.products} class="btn btn-secondary"><span data-i18n="sls.btn_back">← Back to Products</span></a>
         </div>
         <p style="font-size:13px;color:rgba(255,255,255,.45);margin-top:8px;" data-i18n="sls.note">Purchase is assisted — send a request, receive files + invoice within 24h.</p>
       </div>
@@ -305,7 +306,7 @@ const pageDescription = "Conversion-focused landing kit with clean sections, SEO
               <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg>1 usuário</li>
               <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg>Sem redistribuição</li>
             </ul>
-            <a href="#checkout-personal" class="btn btn-license"><span>Buy Personal</span><svg class="btn-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M6 3L11 8L6 13" /></svg></a>
+            <a href="/contact/?product=saas-landing-system&plan=personal" class="btn btn-license"><span>Buy Personal</span><svg class="btn-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M6 3L11 8L6 13" /></svg></a>
           </div>
           <div class="license-card license-featured">
             <div class="card-glow"></div>
@@ -323,7 +324,7 @@ const pageDescription = "Conversion-focused landing kit with clean sections, SEO
               <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg>Entrega final permitida</li>
               <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg>Sem revenda como template</li>
             </ul>
-            <a href="#checkout-commercial" class="btn btn-license btn-featured"><span>Buy Commercial</span><svg class="btn-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M6 3L11 8L6 13" /></svg></a>
+            <a href="/contact/?product=saas-landing-system&plan=commercial" class="btn btn-license btn-featured"><span>Buy Commercial</span><svg class="btn-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M6 3L11 8L6 13" /></svg></a>
           </div>
           <div class="license-card">
             <div class="card-glow"></div>
@@ -337,7 +338,7 @@ const pageDescription = "Conversion-focused landing kit with clean sections, SEO
               <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg>Uso interno recorrente</li>
               <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg>Updates prioritários</li>
             </ul>
-            <a href="#checkout-studio" class="btn btn-license"><span>Buy Studio</span><svg class="btn-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M6 3L11 8L6 13" /></svg></a>
+            <a href="/contact/?product=saas-landing-system&plan=studio" class="btn btn-license"><span>Buy Studio</span><svg class="btn-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M6 3L11 8L6 13" /></svg></a>
           </div>
         </div>
       </div>
@@ -405,6 +406,6 @@ const pageDescription = "Conversion-focused landing kit with clean sections, SEO
   </script>
 
   <SiteFooter />
-  <PageWidgets />
+  <PageWidgets hideUtilBar />
 </body>
 </html>

@@ -1,159 +1,150 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import VxHeader from "../components/VxHeader.astro";
-import SiteFooter from "../components/SiteFooter.astro";
+import FlagshipLayout from "../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "../components/FlagshipHeader.astro";
+import FlagshipFooter from "../components/FlagshipFooter.astro";
 import PricingCard from "../components/pricing/PricingCard.astro";
 import TokenPackCard from "../components/pricing/TokenPackCard.astro";
 import ToolUsageCard from "../components/pricing/ToolUsageCard.astro";
 import AddonCard from "../components/pricing/AddonCard.astro";
 import LocaleCurrencyBar from "../components/pricing/LocaleCurrencyBar.astro";
 import { sitePricing } from "../data/pricing";
+import { ROUTES } from "../data/routes";
 
-const title = "Pricing — VOLYNX";
 const lang = Astro.url.searchParams.get('lang') === 'pt' ? 'pt' : 'en';
 const currencyParam = Astro.url.searchParams.get('currency') || '';
 const currency = (['GBP', 'EUR', 'BRL'] as const).includes(currencyParam as any) ? currencyParam as 'GBP'|'EUR'|'BRL' : 'GBP';
 
 const faqs = [
-  {
-    q: { en: "Is the Lab really free?", pt: "O Lab é realmente grátis?" },
-    a: { en: "Yes. Lab is for discovery and proof-of-value. Studio and Builder are where power users upgrade.", pt: "Sim. O Lab é para descoberta. Studio e Builder são onde usuários avançados fazem upgrade." },
-  },
-  {
-    q: { en: "How do tokens work?", pt: "Como funcionam os tokens?" },
-    a: { en: "Each tool action costs tokens based on complexity. Buy packs anytime — they never expire.", pt: "Cada ação consome tokens baseado na complexidade. Compre packs quando quiser — não expiram." },
-  },
-  {
-    q: { en: "Can I use outputs commercially?", pt: "Posso usar comercialmente?" },
-    a: { en: "Yes. Studio Pro and Builder paid plans include commercial usage rights.", pt: "Sim. Studio Pro e planos pagos do Builder incluem direitos de uso comercial." },
-  },
-  {
-    q: { en: "Can I switch plans anytime?", pt: "Posso trocar de plano?" },
-    a: { en: "Yes. Upgrade, downgrade or cancel at any time from your dashboard.", pt: "Sim. Faça upgrade, downgrade ou cancele a qualquer momento pelo dashboard." },
-  },
+  { q: { en: "Is the Lab really free?", pt: "O Lab é realmente grátis?" }, a: { en: "Yes. Lab is for discovery and proof-of-value. Studio and Builder are where power users upgrade.", pt: "Sim. O Lab é para descoberta. Studio e Builder são onde usuários avançados fazem upgrade." } },
+  { q: { en: "How do tokens work?", pt: "Como funcionam os tokens?" }, a: { en: "Each tool action costs tokens based on complexity. Buy packs anytime — they never expire.", pt: "Cada ação consome tokens baseado na complexidade. Compre packs quando quiser — não expiram." } },
+  { q: { en: "Can I use outputs commercially?", pt: "Posso usar comercialmente?" }, a: { en: "Yes. Studio Pro and Builder paid plans include commercial usage rights.", pt: "Sim. Studio Pro e planos pagos do Builder incluem direitos de uso comercial." } },
+  { q: { en: "Can I switch plans anytime?", pt: "Posso trocar de plano?" }, a: { en: "Yes. Upgrade, downgrade or cancel at any time from your dashboard.", pt: "Sim. Faça upgrade, downgrade ou cancele a qualquer momento pelo dashboard." } },
 ];
 ---
+<FlagshipLayout title="Pricing — VOLYNX" pageClass="page-pricing">
+  <FlagshipHeader current={ROUTES.pricing} ctaLabel="Start Studio Pro" />
+  <main>
 
-<BaseLayout title={title}>
-  <VxHeader />
-
-  <main class="shell pricing-page">
-
-    <!-- HERO -->
-    <section class="pricing-hero">
-      <h1>{sitePricing.labels.pricingTitle[lang]}</h1>
-      <p class="pricing-sub">{sitePricing.labels.pricingSubtitle[lang]}</p>
-      <LocaleCurrencyBar locale={lang} currency={currency} />
-    </section>
-
-    <!-- TOKEN UNIT -->
-    <section class="pricing-section">
-      <div class="pricing-token-unit">
-        <div>
-          <span class="pricing-eyebrow">{lang === 'pt' ? 'Unidade de token' : 'Token unit'}</span>
-          <span class="pricing-token-price">{sitePricing.tokenUnitPrice[currency]}</span>
+    <!-- ═══ HERO ═══ -->
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div class="hero-copy">
+          <span class="kicker">Pricing logic</span>
+          <h1>Separate discovery from production with premium logic.</h1>
+          <p>The Free layer builds trust. Studio Pro removes friction. Teams adds operational standardization. Designed to sell status, memory and control — not just limits.</p>
+          <div class="hero-actions">
+            <a href="#plans" class="button button--gold">View plans</a>
+            <a href={ROUTES.lab} class="button button--ghost">Open the Lab</a>
+          </div>
         </div>
-        <p class="pricing-token-note">{sitePricing.fxDisclaimer[lang]}</p>
+        <div class="hero-card visual-card">
+          <span class="label label--pro">Pro benefits</span>
+          <div class="stack">
+            <div class="metric">Saved presets</div>
+            <div class="metric">Priority exports</div>
+            <div class="metric">Brand memory</div>
+            <div class="metric">Commercial rights</div>
+          </div>
+          <img src="/assets/volynx-icon.webp" alt="Pro" />
+        </div>
       </div>
     </section>
 
-    <!-- BUILDER PLANS -->
-    <section class="pricing-section">
-      <span class="pricing-eyebrow">{lang === 'pt' ? 'Planos do Builder' : 'Builder Plans'}</span>
-      <h2>{lang === 'pt' ? 'Planos prontos para venda' : 'Plans ready to sell'}</h2>
-      <div class="pricing-grid pricing-grid--plans">
+    <!-- ═══ LOCALE / CURRENCY BAR ═══ -->
+    <section class="page-section" style="padding-top:32px;">
+      <div class="shell">
+        <LocaleCurrencyBar locale={lang} currency={currency} />
+      </div>
+    </section>
+
+    <!-- ═══ PLANS ═══ -->
+    <section id="plans" class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">{lang === 'pt' ? 'Planos do Builder' : 'Builder Plans'}</span>
+        <h2>{lang === 'pt' ? 'Planos prontos para venda' : 'Plans ready to sell'}</h2>
+      </div>
+      <div class="shell pricing-grid pricing-grid--plans">
         {sitePricing.builderPlans.map((plan) => (
           <PricingCard plan={plan} locale={lang} currency={currency} />
         ))}
       </div>
     </section>
 
-    <!-- TOKEN PACKS -->
-    <section class="pricing-section">
-      <span class="pricing-eyebrow">{lang === 'pt' ? 'Packs de tokens' : 'Token Packs'}</span>
-      <h2>{lang === 'pt' ? 'Compre tokens avulsos' : 'Buy token packs'}</h2>
-      <div class="pricing-grid pricing-grid--4">
+    <!-- ═══ WHAT PRO FEELS LIKE ═══ -->
+    <section class="page-section">
+      <div class="shell section-head">
+        <h2>What Pro actually feels like</h2>
+        <p>This reframes the upgrade as a quality-of-work move, not just a cap increase.</p>
+      </div>
+      <div class="shell comparison">
+        <div class="comparison-row"><strong>Workflow memory</strong><span class="check">No memory</span><span class="check pro">Presets, history, reusable recipes</span></div>
+        <div class="comparison-row"><strong>Output quality</strong><span class="check">Basic modes</span><span class="check pro">Premium modes, stronger exports</span></div>
+        <div class="comparison-row"><strong>Comfort and speed</strong><span class="check">Manual repetition</span><span class="check pro">Queues, defaults, faster decision loops</span></div>
+        <div class="comparison-row"><strong>Status</strong><span class="check">Discovery mode</span><span class="check pro">Pro workspace and priority access</span></div>
+      </div>
+    </section>
+
+    <!-- ═══ TOKEN PACKS ═══ -->
+    <section class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">{lang === 'pt' ? 'Packs de tokens' : 'Token Packs'}</span>
+        <h2>{lang === 'pt' ? 'Compre tokens avulsos' : 'Buy token packs'}</h2>
+      </div>
+      <div class="shell grid-2">
         {sitePricing.tokenPacks.map((pack) => (
           <TokenPackCard pack={pack} locale={lang} currency={currency} />
         ))}
       </div>
     </section>
 
-    <!-- TOOL USAGE MATRIX -->
-    <section class="pricing-section">
-      <span class="pricing-eyebrow">{lang === 'pt' ? 'Matriz de uso' : 'Usage Matrix'}</span>
-      <h2>{lang === 'pt' ? 'Custo por tipo de ação' : 'Cost per action type'}</h2>
-      <div class="pricing-grid pricing-grid--3">
+    <!-- ═══ USAGE MATRIX ═══ -->
+    <section class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">{lang === 'pt' ? 'Matriz de uso' : 'Usage Matrix'}</span>
+        <h2>{lang === 'pt' ? 'Custo por tipo de ação' : 'Cost per action type'}</h2>
+      </div>
+      <div class="shell grid-3">
         {sitePricing.toolUsage.map((item) => (
           <ToolUsageCard item={item} locale={lang} currency={currency} />
         ))}
       </div>
     </section>
 
-    <!-- ADDONS -->
-    <section class="pricing-section">
-      <span class="pricing-eyebrow">{lang === 'pt' ? 'Add-ons' : 'Add-ons'}</span>
-      <h2>{lang === 'pt' ? 'Extras para aumentar valor' : 'Extras to boost value'}</h2>
-      <div class="pricing-grid pricing-grid--2">
+    <!-- ═══ ADD-ONS ═══ -->
+    <section class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">Add-ons</span>
+        <h2>{lang === 'pt' ? 'Extras para aumentar valor' : 'Extras to boost value'}</h2>
+      </div>
+      <div class="shell grid-3">
         {sitePricing.builderAddons.map((addon) => (
           <AddonCard addon={addon} locale={lang} currency={currency} />
         ))}
       </div>
     </section>
 
-    <!-- COMPARISON TABLE -->
-    <section class="pricing-section">
-      <span class="pricing-eyebrow">{lang === 'pt' ? 'Comparação' : 'Comparison'}</span>
-      <h2>{lang === 'pt' ? 'O que cada plano inclui' : "What's included"}</h2>
-      <div class="pricing-table-wrap">
-        <table class="pricing-table">
-          <thead>
-            <tr>
-              <th class="pricing-table__feature">{lang === 'pt' ? 'Recurso' : 'Feature'}</th>
-              <th>Free</th>
-              <th>Launch</th>
-              <th class="pricing-table__hl">Pro</th>
-              <th>Studio</th>
-              <th>Teams</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>{lang === 'pt' ? 'Drafts' : 'Drafts'}</td><td>1</td><td>3</td><td class="pricing-table__hl">10</td><td>50</td><td>100</td></tr>
-            <tr><td>{lang === 'pt' ? 'Sites publicados' : 'Published sites'}</td><td>0</td><td>1</td><td class="pricing-table__hl">3</td><td>10</td><td>25</td></tr>
-            <tr><td>{lang === 'pt' ? 'Domínio custom' : 'Custom domain'}</td><td>—</td><td>—</td><td class="pricing-table__hl">✓</td><td>✓</td><td>✓</td></tr>
-            <tr><td>{lang === 'pt' ? 'Remover branding' : 'Remove branding'}</td><td>—</td><td>—</td><td class="pricing-table__hl">✓</td><td>✓</td><td>✓</td></tr>
-            <tr><td>{lang === 'pt' ? 'Kits premium' : 'Premium kits'}</td><td>—</td><td>—</td><td class="pricing-table__hl">✓</td><td>✓</td><td>✓</td></tr>
-            <tr><td>{lang === 'pt' ? 'Prioridade de publish' : 'Publish priority'}</td><td>—</td><td>—</td><td class="pricing-table__hl">✓</td><td>✓</td><td>✓</td></tr>
-            <tr><td>{lang === 'pt' ? 'Uso comercial' : 'Commercial use'}</td><td>—</td><td>—</td><td class="pricing-table__hl">✓</td><td>✓</td><td>✓</td></tr>
-            <tr><td>Workspace</td><td>—</td><td>—</td><td class="pricing-table__hl">—</td><td>—</td><td>✓</td></tr>
-          </tbody>
-        </table>
+    <!-- ═══ FAQ ═══ -->
+    <section class="page-section page-section--last">
+      <div class="shell section-head">
+        <span class="eyebrow">FAQ</span>
+        <h2>{lang === 'pt' ? 'Perguntas frequentes' : 'Frequently asked questions'}</h2>
       </div>
-    </section>
-
-    <!-- FAQ -->
-    <section class="pricing-section">
-      <span class="pricing-eyebrow">FAQ</span>
-      <h2>{lang === 'pt' ? 'Perguntas frequentes' : 'Frequently asked questions'}</h2>
-      <div class="pricing-faq-grid">
+      <div class="shell grid-2">
         {faqs.map((f) => (
-          <details class="pricing-faq">
-            <summary>{f.q[lang]}</summary>
-            <p>{f.a[lang]}</p>
+          <details class="panel" style="cursor:pointer;">
+            <summary style="font-weight:700;font-size:15px;list-style:none;">{f.q[lang]}</summary>
+            <p style="margin:10px 0 0;color:var(--muted);line-height:1.7;">{f.a[lang]}</p>
           </details>
         ))}
       </div>
     </section>
 
   </main>
+  <FlagshipFooter />
 
-  <SiteFooter />
-
-  <!-- Checkout + Plan detection -->
+  <!-- Checkout + Plan detection (preserved from existing) -->
   <script is:inline type="module">
-    // Lookup keys for each plan (index matches card order: free=0, launch=1, pro=2, studio=3, teams=4)
     const PLAN_KEYS = ['free', 'launch', 'pro', 'studio', 'teams'];
-    // Build lookup_key based on current currency from URL
     const urlParams = new URLSearchParams(window.location.search);
     const currency = (urlParams.get('currency') || 'GBP').toLowerCase();
 
@@ -164,7 +155,6 @@ const faqs = [
     try { cfg = await fetch('/config.json', { cache: 'no-store' }).then(r => r.json()); } catch {}
     const apiBase = (cfg?.apiBaseUrl || '').replace(/\/$/, '');
 
-    // Auto-refresh expired token
     if (token && refreshToken && cfg?.supabaseUrl && cfg?.supabaseAnonKey) {
       try {
         const rr = await fetch(cfg.supabaseUrl + '/auth/v1/token?grant_type=refresh_token', {
@@ -183,55 +173,37 @@ const faqs = [
       } catch {}
     }
 
-    // ── Checkout handler: wire all CTA buttons ──
     document.querySelectorAll('.pricing-card__cta').forEach((btn, idx) => {
       const planKey = PLAN_KEYS[idx];
-      if (planKey === 'free') return; // No checkout for free
-
+      if (planKey === 'free') return;
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
         if (!token) { window.location.href = '/login/?next=/pricing/'; return; }
         if (!apiBase) { alert('Checkout not configured.'); return; }
-
-        const lookupKey = planKey === 'teams'
-          ? 'builder_teams_' + currency
-          : 'builder_' + planKey + '_' + currency;
-
+        const lookupKey = planKey === 'teams' ? 'builder_teams_' + currency : 'builder_' + planKey + '_' + currency;
         btn.textContent = 'Redirecting...';
         btn.style.pointerEvents = 'none';
-
         try {
           const res = await fetch(apiBase + '/api/create-checkout-session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-            body: JSON.stringify({
-              lookup_key: lookupKey,
-              success_url: window.location.origin + '/profile/?payment=success',
-              cancel_url: window.location.origin + '/pricing/?payment=cancelled',
-            }),
+            body: JSON.stringify({ lookup_key: lookupKey, success_url: window.location.origin + '/profile/?payment=success', cancel_url: window.location.origin + '/pricing/?payment=cancelled' }),
           });
           const data = await res.json();
-          if (data.url) { window.location.href = data.url; }
+          if (data.url) window.location.href = data.url;
           else { alert(data.error || 'Checkout failed.'); btn.textContent = 'Try again'; btn.style.pointerEvents = ''; }
-        } catch {
-          alert('Network error. Please try again.');
-          btn.textContent = 'Try again';
-          btn.style.pointerEvents = '';
-        }
+        } catch { alert('Network error.'); btn.textContent = 'Try again'; btn.style.pointerEvents = ''; }
       });
     });
 
-    // ── Token pack checkout ──
     document.querySelectorAll('.token-card__cta').forEach((btn, idx) => {
       const packKeys = ['tokens_starter', 'tokens_core', 'tokens_pro', 'tokens_scale'];
       const packKey = packKeys[idx];
       if (!packKey) return;
-
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
         if (!token) { window.location.href = '/login/?next=/pricing/'; return; }
         if (!apiBase) return;
-
         btn.textContent = 'Redirecting...';
         try {
           const res = await fetch(apiBase + '/api/create-checkout-session', {
@@ -246,7 +218,6 @@ const faqs = [
       });
     });
 
-    // ── Plan detection ──
     if (token && apiBase) {
       try {
         const res = await fetch(apiBase + '/api/check-permission', {
@@ -273,154 +244,4 @@ const faqs = [
       } catch {}
     }
   </script>
-</BaseLayout>
-
-<style>
-  .pricing-page { padding-bottom: 60px; }
-
-  .pricing-hero {
-    padding: 48px 0 28px;
-    text-align: center;
-  }
-  .pricing-hero h1 {
-    font-size: clamp(24px, 4vw, 38px);
-    font-weight: 800;
-    letter-spacing: -.03em;
-    margin-bottom: 8px;
-  }
-  .pricing-sub {
-    font-size: 16px;
-    opacity: .6;
-    max-width: 56ch;
-    margin: 0 auto 24px;
-  }
-
-  .pricing-section {
-    padding: 32px 0;
-  }
-  .pricing-eyebrow {
-    display: block;
-    font-size: 11px;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    opacity: .35;
-    margin-bottom: 8px;
-    font-weight: 600;
-  }
-  .pricing-section h2 {
-    font-size: clamp(20px, 3vw, 28px);
-    font-weight: 800;
-    letter-spacing: -.02em;
-    margin-bottom: 20px;
-  }
-
-  /* Grids */
-  .pricing-grid { display: grid; gap: 14px; }
-  .pricing-grid--plans { grid-template-columns: repeat(5, 1fr); }
-  .pricing-grid--4 { grid-template-columns: repeat(4, 1fr); }
-  .pricing-grid--3 { grid-template-columns: repeat(3, 1fr); }
-  .pricing-grid--2 { grid-template-columns: repeat(2, 1fr); }
-
-  /* Token unit */
-  .pricing-token-unit {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-    padding: 20px 24px;
-    border-radius: 16px;
-    border: 1px solid rgba(52,211,153,.15);
-    background: rgba(52,211,153,.03);
-  }
-  .pricing-token-price {
-    font-size: 32px;
-    font-weight: 800;
-    color: #34D399;
-    margin-left: 12px;
-  }
-  .pricing-token-note {
-    font-size: 12px;
-    opacity: .4;
-    margin: 0;
-    max-width: 50ch;
-  }
-
-  /* Table */
-  .pricing-table-wrap {
-    overflow-x: auto;
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,.06);
-  }
-  .pricing-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-  }
-  .pricing-table thead th {
-    padding: 14px 16px;
-    text-align: center;
-    font-size: 12px;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    opacity: .5;
-    border-bottom: 1px solid rgba(255,255,255,.06);
-    background: rgba(0,0,0,.2);
-  }
-  .pricing-table__feature { text-align: left !important; }
-  .pricing-table__hl {
-    background: rgba(109,94,252,.05) !important;
-    color: #C4B5FD !important;
-    opacity: 1 !important;
-    border-left: 1px solid rgba(109,94,252,.12);
-    border-right: 1px solid rgba(109,94,252,.12);
-  }
-  .pricing-table tbody td {
-    padding: 11px 16px;
-    text-align: center;
-    border-bottom: 1px solid rgba(255,255,255,.03);
-    opacity: .75;
-  }
-  .pricing-table tbody td:first-child { text-align: left; opacity: 1; }
-
-  /* FAQ */
-  .pricing-faq-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-  .pricing-faq {
-    padding: 16px 20px;
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,.06);
-    background: rgba(255,255,255,.02);
-  }
-  .pricing-faq summary {
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 14px;
-    list-style: none;
-  }
-  .pricing-faq summary::marker,
-  .pricing-faq summary::-webkit-details-marker { display: none; }
-  .pricing-faq summary::after { content: " +"; opacity: .4; }
-  .pricing-faq[open] summary::after { content: " −"; }
-  .pricing-faq p { margin: 10px 0 0; font-size: 13px; opacity: .6; line-height: 1.6; }
-
-  /* Responsive */
-  @media (max-width: 1100px) {
-    .pricing-grid--plans { grid-template-columns: repeat(3, 1fr); }
-  }
-  @media (max-width: 860px) {
-    .pricing-grid--plans { grid-template-columns: repeat(2, 1fr); }
-    .pricing-grid--4 { grid-template-columns: repeat(2, 1fr); }
-    .pricing-grid--3 { grid-template-columns: repeat(2, 1fr); }
-    .pricing-faq-grid { grid-template-columns: 1fr; }
-  }
-  @media (max-width: 600px) {
-    .pricing-grid--plans,
-    .pricing-grid--4,
-    .pricing-grid--3,
-    .pricing-grid--2 { grid-template-columns: 1fr; }
-  }
-</style>
+</FlagshipLayout>

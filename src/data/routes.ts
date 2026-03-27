@@ -21,6 +21,7 @@ export const ROUTES = {
   authRecover: "/auth/recover/",
 
   // ── Account ───────────────────────────
+  account: "/account/",
   profile: "/profile/",
 
   // ── Products ──────────────────────────
@@ -38,7 +39,8 @@ export const ROUTES = {
 
   // ── Dev Hub ───────────────────────────
   devHub: "/dev-hub/",
-  builder: "/dev-hub/builder/",
+  builder: "/builder/",
+  builderLegacy: "/dev-hub/builder/",
 
   // ── Lab (Free) ────────────────────────
   lab: "/volynx-lab/",

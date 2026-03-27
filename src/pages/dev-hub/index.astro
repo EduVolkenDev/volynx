@@ -1,123 +1,109 @@
 ---
-import "../../styles/lab.css";
-import LabBg from "../../components/LabBg.astro";
-import PageWidgets from "../../components/PageWidgets.astro";
-import SiteFooter from "../../components/SiteFooter.astro";
-import Topbar from "../../components/Topbar.astro";
-const pageTitle = "VOLYNX Dev Hub — Kits & Systems";
-const pageDescription = "Premium kits and systems for developers and agencies. Portfolio, SaaS, icons and more.";
+import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "../../components/FlagshipHeader.astro";
+import FlagshipFooter from "../../components/FlagshipFooter.astro";
+import { ROUTES } from "../../data/routes";
 ---
+<FlagshipLayout title="Dev Hub — VOLYNX" description="The curation layer for systems, kits and useful building blocks developers actually want to revisit." pageClass="page-devhub">
+  <FlagshipHeader current={ROUTES.devHub} ctaLabel="Explore the Hub" />
+  <main>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content={pageDescription} />
-  <title>{pageTitle}</title>
-
-  <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
-  <link rel="shortcut icon" href="/assets/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-  <meta name="apple-mobile-web-app-title" content="Volynx" />
-  <link rel="manifest" href="/site.webmanifest" />
-</head>
-
-<body>
-  <LabBg />
-
-  <Topbar rightLinks={[{ href: "/", label: "← Home" }]} />
-
-  <main class="wrap">
-    <div class="hero">
-      <div class="hero__badge">
-        <span class="hero__badge-dot" aria-hidden="true"></span>
-        <span data-i18n="devhub.title">VOLYNX Dev Hub</span>
+    <!-- ═══ HERO ═══ -->
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div class="hero-copy">
+          <span class="kicker">For devs, by devs</span>
+          <h1>The Dev Hub should feel like a premium collection, not a leftovers page.</h1>
+          <p>The Hub is the curation layer for systems, kits and useful building blocks developers actually want to revisit. Starter systems, premium assets and Pro utilities — all in one place.</p>
+          <div class="hero-actions">
+            <a href="#resources" class="button button--gold">Browse resources</a>
+            <a href={ROUTES.products} class="button button--ghost">All products</a>
+          </div>
+        </div>
+        <div class="hero-card visual-card">
+          <span class="label">Collection logic</span>
+          <div class="stack">
+            <div class="metric">Starter kits</div>
+            <div class="metric">Icons</div>
+            <div class="metric">Templates</div>
+            <div class="metric">Builder tie-ins</div>
+          </div>
+          <img src="/assets/volynx-icon.webp" alt="Dev Hub" />
+        </div>
       </div>
-      <h1 class="hero__title">
-        <span data-i18n="devhub.kicker">Kits &amp; <span class="hero__title-accent">Systems</span></span>
-      </h1>
-      <p class="hero__desc" data-i18n="devhub.subtitle">
-        Products Ready to Deploy. Portfolios, landing pages, icon packs and more.
-        Buy, Customize, Launch.
-      </p>
-    </div>
+    </section>
 
-    <div class="tools-grid">
-      <a href="/dev-hub/portfolio-pro-kit/" class="tool-card">
-        <div class="tool-card__audience" data-i18n="devhub.ppk.for">For: Freelancers · Agencies · Creators</div>
-        <img src="/assets/portfoliokit.webp">
-        <p class="tool-card__desc">
-          Premium Portfolio with the unique VOLYNX System.
-          Sections, motion, SEO — Ready for conversion.
-        </p>
-        <p class="tool-card__usecase">Best for: converting visitors into clients with a polished personal brand.</p>
-        <span class="tool-card__link">
-          See demo
-          <span class="tool-card__link-arrow" aria-hidden="true">→</span>
-        </span>
-      </a>
+    <!-- ═══ RESOURCES ═══ -->
+    <section id="resources" class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">Developer resources</span>
+        <h2>Curated collections for serious builders</h2>
+      </div>
+      <div class="shell grid-3">
+        <article class="panel hub-card">
+          <h3>Starter Systems</h3>
+          <p>Fast foundations for agencies, dev portfolios and modern SaaS pages. Ready-to-deploy structures with design + code logic included.</p>
+          <div class="actions">
+            <a href={ROUTES.portfolioKit} class="button button--ghost">Portfolio Kit</a>
+            <a href={ROUTES.agencyKit} class="button button--ghost">Agency Kit</a>
+          </div>
+        </article>
+        <article class="panel hub-card">
+          <h3>Premium Assets</h3>
+          <p>Icon collections and visual resources that make the whole product line feel more expensive. Grid, styles and packs — curated, not generic.</p>
+          <div class="actions">
+            <a href={ROUTES.iconsStore} class="button button--ghost">Browse Icons</a>
+          </div>
+        </article>
+        <article class="panel hub-card panel--pro">
+          <h3>Pro Utilities</h3>
+          <p>Reserved value for paying users, surfaced elegantly instead of through generic lock states. Studio tools, batch workflows and premium exports.</p>
+          <div class="actions">
+            <a href={ROUTES.studio} class="button button--gold">See Studio Pro</a>
+          </div>
+        </article>
+      </div>
+    </section>
 
-      <a href="/dev-hub/saas-landing-system/" class="tool-card">
-        <div class="tool-card__audience" data-i18n="devhub.sls.for">For: SaaS · Creators · Freelancers</div>
-        <img src="/assets/saaskit.webp">
-        <p class="tool-card__desc">
-          Landing page kit focused on conversion. Clean sections,
-          basic SEO and fast iteration.
-        </p>
-        <p class="tool-card__usecase">Best for: launching a product or offer fast, without starting from scratch.</p>
-        <span class="tool-card__link">
-          See demo
-          <span class="tool-card__link-arrow" aria-hidden="true">→</span>
-        </span>
-      </a>
+    <!-- ═══ BUILDER LINK ═══ -->
+    <section class="page-section">
+      <div class="shell">
+        <article class="panel spotlight-card panel--pro">
+          <div>
+            <span class="label label--pro">Builder</span>
+            <h3>VOLYNX Builder lives here too.</h3>
+            <p>Create and manage premium mini-sites with a JSON editor, magic link auth and one-click publish. Custom domains on Pro plans.</p>
+          </div>
+          <a href={ROUTES.builder} class="button button--gold">Open Builder</a>
+        </article>
+      </div>
+    </section>
 
-      <a href="/products/volynx-icons-store/" class="tool-card">
-        <div class="tool-card__audience" data-i18n="devhub.icons.for">For: Designers · Devs · Agencies</div>
-        <img src="/assets/icons-store.webp">
-        <p class="tool-card__desc">
-          Premium SVG Icons pack. Sharp, consistent, ready to brand.
-          Scale without losing quality.
-        </p>
-        <p class="tool-card__usecase">Best for: adding a professional icon language to any product or client project.</p>
-        <span class="tool-card__link">
-          See store
-          <span class="tool-card__link-arrow" aria-hidden="true">→</span>
-        </span>
-      </a>
+    <!-- ═══ PRODUCT DOCS ═══ -->
+    <section class="page-section page-section--last">
+      <div class="shell section-head">
+        <span class="eyebrow">Product documentation</span>
+        <h2>Kit documentation and setup guides</h2>
+      </div>
+      <div class="shell grid-3">
+        <article class="panel hub-card">
+          <h3>Portfolio Pro Kit</h3>
+          <p>Full setup guide, section variants, motion presets and SEO configuration for the premium portfolio system.</p>
+          <div class="actions"><a href="/dev-hub/portfolio-pro-kit/" class="button button--ghost">View docs</a></div>
+        </article>
+        <article class="panel hub-card">
+          <h3>SaaS Landing System</h3>
+          <p>Block library, variant logic, conversion tracking setup and deployment guide.</p>
+          <div class="actions"><a href="/dev-hub/saas-landing-system/" class="button button--ghost">View docs</a></div>
+        </article>
+        <article class="panel hub-card">
+          <h3>Volynx Icons Store</h3>
+          <p>Icon grid, style variants, pack structure and integration with Builder and Studio.</p>
+          <div class="actions"><a href={ROUTES.iconsStore} class="button button--ghost">View docs</a></div>
+        </article>
+      </div>
+    </section>
 
-      <a href="/builder/" class="tool-card" style="border-color:rgba(125,211,252,.3)">
-        <span class="tool-card__chip" style="background:rgba(125,211,252,.12);border-color:rgba(125,211,252,.3)">Builder</span>
-        <img src="/assets/builder-logo.webp" alt="VOLYNX Builder" style="padding:10px 0">
-        <h2 class="tool-card__title">VOLYNX Builder</h2>
-        <p class="tool-card__desc" data-i18n="devhub.builder.desc">
-          Create and manage mini-sites with a JSON editor,
-          magic link auth and one-click publish.
-        </p>
-        <span class="tool-card__link">
-          Open Builder
-          <span class="tool-card__link-arrow" aria-hidden="true">→</span>
-        </span>
-      </a>
-
-      <a href="/products/" class="tool-card" style="border-color:rgba(109,94,252,.35)">
-        <span class="tool-card__chip" style="background:rgba(109,94,252,.18);border-color:rgba(109,94,252,.35)">All</span>
-        <img src="/assets/studiologo.png" aria-hidden="true">
-        <h2 class="tool-card__title" data-i18n="devhub.all_products">See all Products</h2>
-        <p class="tool-card__desc">
-          Complete catalog of kits, systems and assets by VOLYNX.
-          Agency Launch Kit and more.
-        </p>
-        <span class="tool-card__link">
-          See catalog
-          <span class="tool-card__link-arrow" aria-hidden="true">→</span>
-        </span>
-      </a>
-    </div>
   </main>
-
-  <SiteFooter />
-  <PageWidgets />
-</body>
-</html>
+  <FlagshipFooter />
+</FlagshipLayout>

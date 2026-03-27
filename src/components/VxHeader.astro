@@ -1,4 +1,5 @@
 ---
+import { ROUTES } from "../data/routes";
 interface Props {
   mode?: "default" | "sections";
   primaryCtaLabel?: string;
@@ -7,15 +8,15 @@ interface Props {
 const {
   mode = "default",
   primaryCtaLabel,
-  primaryCtaHref = "/login/",
+  primaryCtaHref = ROUTES.login,
 } = Astro.props;
 ---
 
 <header class="vxh" role="banner">
   <div class="vxh__inner">
-    <a class="vxh__brand" href="/" aria-label="VOLYNX — ir para o início">
-      <img src="/assets/volynx-icon.webp" alt="VOLYNX" class="vxh__icon" width="90" height="90" loading="eager" decoding="async" />
-      <img src="/assets/wordmark.webp" alt="VOLYNX" class="vxh__wordmark" width="160" height="32" loading="eager" decoding="async" />
+    <a class="vxh__brand" href={ROUTES.home} aria-label="VOLYNX — go to home">
+      <img src="/assets/volynx-icon.webp" alt="" class="vxh__icon" width="90" height="90" loading="eager" decoding="async" />
+      <img src="/assets/wordmark.webp" alt="" class="vxh__wordmark" width="160" height="32" loading="eager" decoding="async" />
     </a>
 
     {mode === "sections" && (
@@ -32,14 +33,14 @@ const {
       {primaryCtaLabel && (
         <a class="vxh__cta" href={primaryCtaHref}>{primaryCtaLabel}</a>
       )}
-      <button class="vxh__burger" id="menuBtn" type="button" aria-label="Abrir menu" aria-expanded="false">
+      <button class="vxh__burger" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
     </div>
   </div>
 
   <!-- Mobile menu -->
-  <div class="vxh__mobile" id="mobileMenu" aria-hidden="true">
+  <div class="vxh__mobile" id="mobileMenu" aria-hidden="true" inert>
     <div class="vxh__mobileInner">
       {mode === "sections" && (
         <nav aria-label="Page sections — mobile">
@@ -69,7 +70,7 @@ const {
     -webkit-backdrop-filter: blur(18px);
   }
   .vxh__inner {
-    max-width: 1160px;
+    max-width: var(--content-max, 1100px);
   margin: 0px auto;
   padding: 10px 20px;
   height: auto;
@@ -103,7 +104,7 @@ const {
     border-radius: 8px;
     font-size: 13.5px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.65);
+    color: rgba(255, 255, 255, 0.80);
     text-decoration: none;
     transition: color 0.15s, background 0.15s;
   }
