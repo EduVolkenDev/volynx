@@ -149,49 +149,109 @@ const faqs = [
 
   <SiteFooter />
 
-  <!-- Plan detection for logged-in users -->
+  <!-- Checkout + Plan detection -->
   <script is:inline type="module">
-    const planToIndex = { free: 0, launch: 1, pro: 2, studio: 3, teams: 4 };
-    async function detectPlan() {
-      const token = localStorage.getItem('volynx_access_token');
-      if (!token) return;
-      let cfg;
-      try { cfg = await fetch('/config.json', { cache: 'no-store' }).then(r => r.json()); } catch { return; }
-      const apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
-      if (!apiBase) return;
+    // Lookup keys for each plan (index matches card order: free=0, launch=1, pro=2, studio=3, teams=4)
+    const PLAN_KEYS = ['free', 'launch', 'pro', 'studio', 'teams'];
+    // Build lookup_key based on current currency from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const currency = (urlParams.get('currency') || 'GBP').toLowerCase();
+
+    let cfg = null;
+    let token = localStorage.getItem('volynx_access_token') || '';
+
+    try { cfg = await fetch('/config.json', { cache: 'no-store' }).then(r => r.json()); } catch {}
+    const apiBase = (cfg?.apiBaseUrl || '').replace(/\/$/, '');
+
+    // ── Checkout handler: wire all CTA buttons ──
+    document.querySelectorAll('.pricing-card__cta').forEach((btn, idx) => {
+      const planKey = PLAN_KEYS[idx];
+      if (planKey === 'free') return; // No checkout for free
+
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (!token) { window.location.href = '/login/?next=/pricing/'; return; }
+        if (!apiBase) { alert('Checkout not configured.'); return; }
+
+        const lookupKey = planKey === 'teams'
+          ? 'builder_teams_' + currency
+          : 'builder_' + planKey + '_' + currency;
+
+        btn.textContent = 'Redirecting...';
+        btn.style.pointerEvents = 'none';
+
+        try {
+          const res = await fetch(apiBase + '/api/create-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+            body: JSON.stringify({
+              lookup_key: lookupKey,
+              success_url: window.location.origin + '/profile/?payment=success',
+              cancel_url: window.location.origin + '/pricing/?payment=cancelled',
+            }),
+          });
+          const data = await res.json();
+          if (data.url) { window.location.href = data.url; }
+          else { alert(data.error || 'Checkout failed.'); btn.textContent = 'Try again'; btn.style.pointerEvents = ''; }
+        } catch {
+          alert('Network error. Please try again.');
+          btn.textContent = 'Try again';
+          btn.style.pointerEvents = '';
+        }
+      });
+    });
+
+    // ── Token pack checkout ──
+    document.querySelectorAll('.token-card__cta').forEach((btn, idx) => {
+      const packKeys = ['tokens_starter', 'tokens_core', 'tokens_pro', 'tokens_scale'];
+      const packKey = packKeys[idx];
+      if (!packKey) return;
+
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (!token) { window.location.href = '/login/?next=/pricing/'; return; }
+        if (!apiBase) return;
+
+        btn.textContent = 'Redirecting...';
+        try {
+          const res = await fetch(apiBase + '/api/create-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+            body: JSON.stringify({ lookup_key: packKey + '_' + currency }),
+          });
+          const data = await res.json();
+          if (data.url) window.location.href = data.url;
+          else { alert(data.error || 'Checkout failed.'); btn.textContent = 'Buy'; }
+        } catch { btn.textContent = 'Buy'; }
+      });
+    });
+
+    // ── Plan detection ──
+    if (token && apiBase) {
       try {
         const res = await fetch(apiBase + '/api/check-permission', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
           body: JSON.stringify({ tool: 'converter' }),
         });
-        if (!res.ok) return;
-        const perm = await res.json();
-        const plan = perm.plan || 'free';
-        if (perm.useLocalStorage) return;
-        // Find the matching plan card
-        const cards = document.querySelectorAll('.pricing-card');
-        const builderPlans = ['free', 'launch', 'pro', 'studio', 'teams'];
-        const idx = builderPlans.indexOf(plan);
-        if (idx >= 0 && cards[idx]) {
-          cards[idx].style.borderColor = 'rgba(52,211,153,.35)';
-          cards[idx].style.boxShadow = '0 0 24px rgba(52,211,153,.08)';
-          const name = cards[idx].querySelector('.pricing-card__name');
-          if (name) {
-            const badge = document.createElement('span');
-            badge.textContent = ' ✓ Your plan';
-            badge.style.cssText = 'font-size:12px;color:#34D399;font-weight:700;';
-            name.appendChild(badge);
-          }
-          const cta = cards[idx].querySelector('.pricing-card__cta');
-          if (cta) {
-            cta.textContent = 'Current plan ✓';
-            cta.style.cssText = 'background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.25);color:#34D399;pointer-events:none;display:flex;justify-content:center;padding:12px;border-radius:14px;text-decoration:none;font-weight:600;font-size:14px;';
+        if (res.ok) {
+          const perm = await res.json();
+          const plan = perm.builderPlan || perm.plan || 'free';
+          if (!perm.useLocalStorage) {
+            const cards = document.querySelectorAll('.pricing-card');
+            const idx = PLAN_KEYS.indexOf(plan);
+            if (idx >= 0 && cards[idx]) {
+              cards[idx].style.borderColor = 'rgba(52,211,153,.35)';
+              cards[idx].style.boxShadow = '0 0 24px rgba(52,211,153,.08)';
+              const name = cards[idx].querySelector('.pricing-card__name');
+              if (name) { const b = document.createElement('span'); b.textContent = ' ✓ Your plan'; b.style.cssText = 'font-size:12px;color:#34D399;font-weight:700;'; name.appendChild(b); }
+              const cta = cards[idx].querySelector('.pricing-card__cta');
+              if (cta) { cta.textContent = 'Current plan ✓'; cta.style.cssText = 'background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.25);color:#34D399;pointer-events:none;display:flex;justify-content:center;padding:12px;border-radius:14px;text-decoration:none;font-weight:600;font-size:14px;'; }
+            }
           }
         }
       } catch {}
     }
-    detectPlan();
   </script>
 </BaseLayout>
 
