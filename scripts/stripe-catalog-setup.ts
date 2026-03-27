@@ -349,7 +349,48 @@ const ADDONS: ProductDef[] = [
 const currencies: Cur[] = ["gbp", "eur", "brl"];
 const output: Record<string, any>[] = [];
 
+function formatAmount(cur: Cur, cents: number): string {
+  const sym = cur === "gbp" ? "£" : cur === "eur" ? "€" : "R$";
+  return `${sym}${(cents / 100).toFixed(2)}`;
+}
+
+async function lookupKeyExists(key: string): Promise<boolean> {
+  try {
+    const prices = await stripe.prices.list({ lookup_keys: [key], limit: 1 });
+    return prices.data.length > 0;
+  } catch { return false; }
+}
+
 async function createProductWithPrices(def: ProductDef) {
+  // Check if any price with this prefix already exists
+  const sampleKey = `${def.lookupPrefix}_gbp`;
+  if (await lookupKeyExists(sampleKey)) {
+    console.log(`  SKIP: ${def.name} (lookup_key ${sampleKey} already exists)`);
+    // Still record existing prices in output
+    for (const cur of currencies) {
+      const lk = `${def.lookupPrefix}_${cur}`;
+      try {
+        const existing = await stripe.prices.list({ lookup_keys: [lk], limit: 1 });
+        if (existing.data[0]) {
+          const p = existing.data[0];
+          output.push({
+            product_name: def.name,
+            product_id: p.product as string,
+            price_id: p.id,
+            lookup_key: lk,
+            currency: cur.toUpperCase(),
+            amount_display: formatAmount(cur, p.unit_amount || 0),
+            recurring: p.recurring?.interval || "one_time",
+            mode,
+            status: "existing",
+          });
+        }
+      } catch {}
+    }
+    console.log("");
+    return;
+  }
+
   console.log(`  Creating: ${def.name}`);
 
   const productParams: Stripe.ProductCreateParams = {
@@ -399,9 +440,10 @@ async function createProductWithPrices(def: ProductDef) {
       price_id: price.id,
       lookup_key: lookupKey,
       currency: cur.toUpperCase(),
-      amount_display: `${cur === "gbp" ? "£" : cur === "eur" ? "€" : "R$"}${(amount / 100).toFixed(2)}`,
+      amount_display: formatAmount(cur, amount),
       recurring: def.prices.recurring?.interval || "one_time",
       mode,
+      status: "created",
     });
   }
 
