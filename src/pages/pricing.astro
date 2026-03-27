@@ -159,9 +159,29 @@ const faqs = [
 
     let cfg = null;
     let token = localStorage.getItem('volynx_access_token') || '';
+    const refreshToken = localStorage.getItem('volynx_refresh_token') || '';
 
     try { cfg = await fetch('/config.json', { cache: 'no-store' }).then(r => r.json()); } catch {}
     const apiBase = (cfg?.apiBaseUrl || '').replace(/\/$/, '');
+
+    // Auto-refresh expired token
+    if (token && refreshToken && cfg?.supabaseUrl && cfg?.supabaseAnonKey) {
+      try {
+        const rr = await fetch(cfg.supabaseUrl + '/auth/v1/token?grant_type=refresh_token', {
+          method: 'POST',
+          headers: { apikey: cfg.supabaseAnonKey, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh_token: refreshToken }),
+        });
+        if (rr.ok) {
+          const sess = await rr.json();
+          if (sess.access_token) {
+            token = sess.access_token;
+            localStorage.setItem('volynx_access_token', sess.access_token);
+            if (sess.refresh_token) localStorage.setItem('volynx_refresh_token', sess.refresh_token);
+          }
+        }
+      } catch {}
+    }
 
     // ── Checkout handler: wire all CTA buttons ──
     document.querySelectorAll('.pricing-card__cta').forEach((btn, idx) => {
