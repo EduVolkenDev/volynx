@@ -5,10 +5,20 @@ import PageWidgets from "../components/PageWidgets.astro";
 interface Props {
   title?: string;
   description?: string;
+  ogImage?: string;
+  ogType?: string;
   hideUtilBar?: boolean;
 }
 
-const { title = "VOLYNX", description = "VOLYNX — Premium Tech Platform", hideUtilBar = false } = Astro.props;
+const {
+  title = "VOLYNX",
+  description = "VOLYNX — Premium Tech Platform",
+  ogImage = "/assets/og-default.png",
+  ogType = "website",
+  hideUtilBar = false
+} = Astro.props;
+
+const canonicalUrl = `https://volynx.world${Astro.url.pathname}`;
 ---
 
 <!DOCTYPE html>
@@ -18,6 +28,13 @@ const { title = "VOLYNX", description = "VOLYNX — Premium Tech Platform", hide
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={`https://volynx.world${ogImage}`} />
 
     <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />

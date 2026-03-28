@@ -5,8 +5,10 @@ import PageWidgets from "../../../components/PageWidgets.astro";
 import SiteFooter from "../../../components/SiteFooter.astro";
 import Topbar from "../../../components/Topbar.astro";
 import { ROUTES } from "../../../data/routes";
+import { sitePricing } from "../../../data/pricing";
 const pageTitle = "VOLYNX Studio Pro — Professional Browser Tools";
 const pageDescription = "VOLYNX Studio Pro: unlimited image processing, batch mode, commercial rights. No install, no server.";
+const studioPrice = sitePricing.builderPlans.find(p => p.id === 'studio')?.price.GBP || '£39';
 ---
 
 <!DOCTYPE html>
@@ -156,7 +158,7 @@ const pageDescription = "VOLYNX Studio Pro: unlimited image processing, batch mo
           Studio Pro unlocks the full suite with batch processing and commercial rights — for the price of a coffee a week.
         </p>
         <div class="hero__actions">
-          <a class="btn-primary" id="studioCtaBuy" href={ROUTES.signup} data-i18n="studio.btn_start">Start Studio Pro — £19/month</a>
+          <a class="btn-primary" id="studioCtaBuy" href={ROUTES.signup} data-i18n="studio.btn_start">Start Studio Pro — {studioPrice}/month</a>
           <a class="btn-ghost" href={ROUTES.pricing} data-i18n="studio.btn_plans">Compare plans</a>
         </div>
         <p class="hero__note" data-i18n="studio.hero_note">Cancel anytime. No contracts.</p>
@@ -209,7 +211,7 @@ const pageDescription = "VOLYNX Studio Pro: unlimited image processing, batch mo
       <section class="price-strip">
         <div class="price-strip__inner">
           <div class="price-strip__left">
-            <div class="price-strip__amount">£19<span>/month</span></div>
+            <div class="price-strip__amount">{studioPrice}<span>/month</span></div>
             <p class="price-strip__desc">All Studio tools. No limits. Commercial rights. Cancel anytime.</p>
           </div>
           <div class="price-strip__right">
@@ -237,6 +239,7 @@ const pageDescription = "VOLYNX Studio Pro: unlimited image processing, batch mo
 </body>
 </html>
 
+<script is:inline src="/js/vx-plan.js"></script>
 <script is:inline type="module">
   const TOOLS = ["converter", "image-scaler", "image-suite", "qr-gen"];
 
@@ -249,26 +252,40 @@ const pageDescription = "VOLYNX Studio Pro: unlimited image processing, batch mo
     try { cfg = await fetch("/config.json", { cache: "no-store" }).then(r => r.json()); }
     catch { return; }
 
-    const apiBase = (cfg.apiBaseUrl || "").replace(/\/$/, "");
+    const apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || "").replace(/\/$/, "");
     if (!apiBase) return;
 
     // Check permission for first tool to get plan info
     let plan = "free";
     let userName = "";
+
+    // Try cache first for instant UI
+    const cached = window.VxPlan ? window.VxPlan.getCached() : null;
+    if (cached) plan = cached.plan;
+
     try {
-      const res = await fetch(`${apiBase}/api/check-permission`, {
+      const ctrl = new AbortController();
+      const timeout = setTimeout(() => ctrl.abort(), 5000);
+      const res = await fetch(`${apiBase}/check-permission`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ tool: "converter" }),
+        signal: ctrl.signal,
       });
+      clearTimeout(timeout);
       if (res.ok) {
         const perm = await res.json();
-        plan = perm.plan || "free";
+        plan = window.VxPlan ? window.VxPlan.normalize(perm.plan) : (perm.plan || "free");
+        if (window.VxPlan) window.VxPlan.cache(plan);
       }
-    } catch { return; }
+    } catch {
+      // Use cached plan if available, otherwise stay on sales page
+      if (!cached) return;
+    }
 
-    // Only show dashboard for pro+ users
-    if (plan !== "pro" && plan !== "enterprise") return;
+    // Only show dashboard for paid users (any tier above free)
+    const isPaidUser = window.VxPlan ? window.VxPlan.isPaid(plan) : (plan !== "free");
+    if (!isPaidUser) return;
 
     // Get user name from profile
     try {
@@ -294,7 +311,7 @@ const pageDescription = "VOLYNX Studio Pro: unlimited image processing, batch mo
 
     for (const tool of TOOLS) {
       try {
-        const res = await fetch(`${apiBase}/api/check-permission`, {
+        const res = await fetch(`${apiBase}/check-permission`, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify({ tool }),
@@ -340,7 +357,7 @@ const pageDescription = "VOLYNX Studio Pro: unlimited image processing, batch mo
     // Refresh token
     let cfg;
     try { cfg = await fetch("/config.json", { cache: "no-store" }).then(r => r.json()); } catch { return; }
-    const apiBase = (cfg.apiBaseUrl || "").replace(/\/$/, "");
+    const apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || "").replace(/\/$/, "");
 
     if (refreshToken && cfg.supabaseUrl) {
       try {
@@ -361,7 +378,7 @@ const pageDescription = "VOLYNX Studio Pro: unlimited image processing, batch mo
     btn.style.pointerEvents = "none";
 
     try {
-      const res = await fetch(apiBase + "/api/create-checkout-session", {
+      const res = await fetch(apiBase + "/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
         body: JSON.stringify({ lookup_key: "studio_pro_gbp", success_url: window.location.origin + "/volynx-lab/studio/?payment=success", cancel_url: window.location.origin + "/volynx-lab/studio/" }),

@@ -148,13 +148,13 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
 
     async function checkToolPermission(toolName, count) {
       const cfg = await getConfig();
-      const apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
+      const apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
       const token = localStorage.getItem('volynx_access_token') || '';
       if (apiBase) {
         try {
           const ctrl = new AbortController();
           const t = setTimeout(() => ctrl.abort(), 8000);
-          const res = await fetch(`${apiBase}/api/check-permission`, {
+          const res = await fetch(`${apiBase}/check-permission`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
             body: JSON.stringify({ tool: toolName }),
@@ -174,10 +174,10 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
 
     async function logToolUsage(toolName, amount) {
       const cfg = await getConfig();
-      const apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
+      const apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
       const token = localStorage.getItem('volynx_access_token') || '';
       if (apiBase && token) {
-        fetch(`${apiBase}/api/log-usage`, {
+        fetch(`${apiBase}/log-usage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
           body: JSON.stringify({ tool: toolName, amount }),
@@ -315,18 +315,29 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       };
     }
 
-    // Detect pro status from server-side check
+    // Detect pro status from server-side check (await to avoid race condition)
     async function detectPro() {
       try {
+        // Check VxPlan cache first for instant result
+        if (window.VxPlan) {
+          const cached = window.VxPlan.getCached();
+          if (cached && window.VxPlan.canAccess(cached.plan, 'launch')) {
+            isPro = true;
+          }
+        }
         const perm = await checkToolPermission("image-suite", 0);
-        if (perm.plan === "pro" || perm.plan === "enterprise") {
+        const plan = window.VxPlan ? window.VxPlan.normalize(perm.plan) : (perm.plan || 'free');
+        const hasPaidAccess = window.VxPlan
+          ? window.VxPlan.isPaid(plan)
+          : (plan === "pro" || plan === "enterprise" || plan === "studio" || plan === "teams" || plan === "launch");
+        if (hasPaidAccess) {
           isPro = true;
-          updateProUI();
+          if (window.VxPlan) window.VxPlan.cache(plan);
         }
       } catch {}
+      updateProUI();
     }
-    detectPro();
-    updateProUI();
+    await detectPro();
 
     qualityEl.addEventListener("input", () => {
       qualityValEl.textContent = qualityEl.value;

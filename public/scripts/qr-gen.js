@@ -34,13 +34,13 @@ async function getConfig() {
 
 async function checkToolPermission(toolName, count) {
   const cfg = await getConfig();
-  const apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
+  const apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
   const token = localStorage.getItem('volynx_access_token') || '';
   if (apiBase) {
     try {
       const ctrl = new AbortController();
       const t = setTimeout(() => ctrl.abort(), 3500);
-      const res = await fetch(`${apiBase}/api/check-permission`, {
+      const res = await fetch(`${apiBase}/check-permission`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({ tool: toolName }),
@@ -60,10 +60,10 @@ async function checkToolPermission(toolName, count) {
 
 async function logToolUsage(toolName, amount) {
   const cfg = await getConfig();
-  const apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
+  const apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
   const token = localStorage.getItem('volynx_access_token') || '';
   if (apiBase && token) {
-    fetch(`${apiBase}/api/log-usage`, {
+    fetch(`${apiBase}/log-usage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ tool: toolName, amount }),

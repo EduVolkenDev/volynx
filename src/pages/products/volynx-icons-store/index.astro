@@ -16,7 +16,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
   <meta property="og:title" content={pageTitle} />
   <meta property="og:description" content={pageDescription} />
   <meta property="og:image" content="/assets/volynx-icon.webp" />
-  <meta property="og:url" content="https://volynx.world/products/volynx-icons-store/" />
+  <meta property="og:url" content="https://volynx.world/dev-hub/volynx-icons-store/" />
   <meta name="twitter:card" content="summary_large_image" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -46,9 +46,9 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
 
       <!-- Desktop Navigation -->
       <div class="nav-links desktop-nav">
-        <a href="/products/volynx-icons-store/" class="nav-link active">Gallery</a>
-        <a href="#" class="nav-link" id="collectionsBtn">Collections</a>
-        <a href="#" class="nav-link" id="favoritesBtn" style="display:none;">
+        <a href={ROUTES.iconsStore} class="nav-link active">Gallery</a>
+        <a href="#collections" class="nav-link" id="collectionsBtn">Collections</a>
+        <a href={`${ROUTES.login}?return=${ROUTES.iconsStore}`} class="nav-link" id="favoritesBtn" style="display:none;">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
           </svg>
@@ -59,7 +59,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
 
       <!-- Auth Buttons -->
       <div class="nav-actions">
-        <a class="btn btn-primary" id="signInBtn" href={`${ROUTES.login}?return=/products/volynx-icons-store/`} data-i18n="icons.signin">Sign In</a>
+        <a class="btn btn-primary" id="signInBtn" href={`${ROUTES.login}?return=${ROUTES.iconsStore}`} data-i18n="icons.signin">Sign In</a>
 
         <!-- User Menu (hidden by default) -->
         <div class="user-menu" id="userMenu" style="display: none;">
@@ -79,13 +79,13 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
               </div>
             </div>
             <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item">
+            <a href="#favorites" class="dropdown-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
               </svg>
               My Favorites
             </a>
-            <a href="#" class="dropdown-item">
+            <a href={ROUTES.pricing} class="dropdown-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
                 <line x1="3" y1="6" x2="21" y2="6" />
@@ -116,9 +116,9 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
 
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
-      <a href="/products/volynx-icons-store/" class="mobile-menu-item active">Gallery</a>
-      <a href="#" class="mobile-menu-item" id="mobileCollectionsBtn">Collections</a>
-      <a href="#" class="mobile-menu-item" id="mobileFavoritesBtn" style="display:none;">
+      <a href={ROUTES.iconsStore} class="mobile-menu-item active">Gallery</a>
+      <a href="#collections" class="mobile-menu-item" id="mobileCollectionsBtn">Collections</a>
+      <a href={`${ROUTES.login}?return=${ROUTES.iconsStore}`} class="mobile-menu-item" id="mobileFavoritesBtn" style="display:none;">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
         </svg>
@@ -146,7 +146,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
         </p>
         <div class="hero-actions">
           <a href="#gallery" class="btn btn-primary btn-lg" data-i18n="icons.btn_browse">Browse Gallery</a>
-          <a href="#" class="btn btn-secondary btn-lg" id="pricingBtn" data-i18n="icons.btn_pricing">View Pricing</a>
+          <a href={ROUTES.pricing} class="btn btn-secondary btn-lg" id="pricingBtn" data-i18n="icons.btn_pricing">View Pricing</a>
         </div>
         <div class="hero-stats">
           <div class="stat">
@@ -195,11 +195,11 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
     </section>
 
     <!-- Collections Preview -->
-    <section class="collections-preview">
+    <section class="collections-preview" id="collections">
       <div class="container">
         <div class="section-header">
           <h2 class="section-title" data-i18n="icons.coll_title">Popular Collections</h2>
-          <a href="#" class="view-all" id="viewAllBtn">
+          <a href="#collections" class="view-all" id="viewAllBtn">
             <span data-i18n="icons.coll_view_all">View All</span>
             <svg viewBox="0 0 20 20" fill="currentColor">
               <path d="M7 3l7 7-7 7" />
@@ -219,7 +219,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
           <p class="cta-description" data-i18n="icons.cta_desc">
             Get unlimited downloads, premium collections, and commercial license.
           </p>
-          <a href="#" class="btn btn-primary btn-lg" id="ctaPricingBtn" data-i18n="icons.cta_btn">View Pricing Plans</a>
+          <a href={ROUTES.pricing} class="btn btn-primary btn-lg" id="ctaPricingBtn" data-i18n="icons.cta_btn">View Pricing Plans</a>
         </div>
       </div>
     </section>
@@ -248,8 +248,8 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
         <div class="footer-col">
           <h4 class="footer-title">Product</h4>
           <ul class="footer-links">
-            <li><a href="/products/volynx-icons-store/">Gallery</a></li>
-            <li><a href="#" id="collectionsFooterBtn">Collections</a></li>
+            <li><a href={ROUTES.iconsStore}>Gallery</a></li>
+            <li><a href="#collections" id="collectionsFooterBtn">Collections</a></li>
             <li><a href={ROUTES.pricing}>Pricing</a></li>
           </ul>
         </div>
@@ -610,8 +610,8 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
           Sign in to download free icons — it's quick and free.
         </p>
         <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
-          <a href="/login/?return=/products/volynx-icons-store/" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#00f0ff,#0066ff);color:#000;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;">Sign in</a>
-          <a href="/signup/?return=/products/volynx-icons-store/" style="padding:.75rem 1.5rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;border:1px solid rgba(255,255,255,.3);">Create free account</a>
+          <a href="${ROUTES.login}?return=${ROUTES.iconsStore}" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#00f0ff,#0066ff);color:#000;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;">Sign in</a>
+          <a href="${ROUTES.signup}?return=${ROUTES.iconsStore}" style="padding:.75rem 1.5rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;border:1px solid rgba(255,255,255,.3);">Create free account</a>
         </div>
       `);
     }

@@ -188,11 +188,39 @@ import { ROUTES } from "../data/routes";
     }
 
     // Only show for non-pro users
-    const plan = localStorage.getItem('volynx_plan') || 'free';
-    if (plan === 'free' || !plan) {
-      update();
-      // Listen for usage changes
-      window.addEventListener('vx:usage-updated', update);
+    // Use VxPlan cache (set by vx-auth-gate.js) instead of orphaned localStorage key
+    function shouldShow() {
+      if (window.VxPlan) {
+        var cached = window.VxPlan.getCached();
+        return !cached || !window.VxPlan.isPaid(cached.plan);
+      }
+      return true; // default to showing for safety
+    }
+
+    function init() {
+      if (shouldShow()) {
+        update();
+        window.addEventListener('vx:usage-updated', update);
+      } else {
+        bar.style.display = 'none';
+      }
+    }
+
+    // If plan is already resolved (e.g., from vx-auth-gate), check now
+    if (window.vxPlan !== undefined) {
+      var isPaid = window.VxPlan ? window.VxPlan.isPaid(window.vxPlan) : (window.vxPlan !== 'free');
+      if (!isPaid) { update(); window.addEventListener('vx:usage-updated', update); }
+      else { bar.style.display = 'none'; }
+    } else {
+      // Plan not yet resolved — show by default, hide if plan-ready says paid
+      init();
+      window.addEventListener('vx:plan-ready', function(e) {
+        var isPaid = window.VxPlan ? window.VxPlan.isPaid(e.detail.plan) : (e.detail.plan !== 'free');
+        if (isPaid) {
+          bar.style.display = 'none';
+          window.removeEventListener('vx:usage-updated', update);
+        }
+      });
     }
   })();
 </script>

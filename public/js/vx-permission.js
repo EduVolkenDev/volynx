@@ -14,7 +14,7 @@ async function vxCheckPermission(toolName) {
     return FREE;
   }
 
-  const apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
+  const apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
   if (!apiBase) {
     // No billing backend configured — allow as free tier
     return FREE;
@@ -24,8 +24,8 @@ async function vxCheckPermission(toolName) {
 
   try {
     const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 3500);
-    const res = await fetch(`${apiBase}/api/check-permission`, {
+    const t = setTimeout(() => ctrl.abort(), 5000);
+    const res = await fetch(`${apiBase}/check-permission`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

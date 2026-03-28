@@ -12,7 +12,7 @@ import { ROUTES } from "../../data/routes";
     <section class="hero account-hero">
       <div class="shell command-grid">
         <div class="overview panel panel--pro">
-          <span class="label label--pro" id="planBadge">Studio Pro</span>
+          <span class="label label--pro" id="planBadge">Loading...</span>
           <h1>Pro Command Center</h1>
           <p>Your account surface feels like a cockpit: stronger hierarchy, workflow memory, plan clarity and quick access to serious tools.</p>
           <div class="stats-row">
@@ -86,6 +86,7 @@ import { ROUTES } from "../../data/routes";
   </main>
   <FlagshipFooter />
 
+  <script is:inline src="/js/vx-plan.js"></script>
   <script is:inline type="module">
     // Redirect if not logged in
     const token = localStorage.getItem('volynx_access_token');
@@ -94,28 +95,63 @@ import { ROUTES } from "../../data/routes";
     // Load plan info
     let cfg = null;
     try { cfg = await fetch('/config.json', { cache: 'no-store' }).then(r => r.json()); } catch {}
-    const apiBase = (cfg?.apiBaseUrl || '').replace(/\/$/, '');
+    const apiBase = (cfg?.functionsUrl || cfg?.apiBaseUrl || '').replace(/\/$/, '');
+
+    // Try cache first, then API
+    const cached = window.VxPlan.getCached();
+    if (cached) {
+      const badge = document.getElementById('planBadge');
+      if (badge) badge.textContent = window.VxPlan.label(cached.plan);
+    }
 
     if (token && apiBase) {
       try {
-        const res = await fetch(apiBase + '/api/check-permission', {
+        const res = await fetch(apiBase + '/check-permission', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
           body: JSON.stringify({ tool: 'converter' }),
         });
         if (res.ok) {
           const perm = await res.json();
-          const plan = perm.builderPlan || perm.plan || 'free';
+          const plan = window.VxPlan.normalize(perm.builderPlan || perm.plan);
+          window.VxPlan.cache(plan);
           const badge = document.getElementById('planBadge');
-          if (badge) badge.textContent = plan === 'free' ? 'Free' : plan.charAt(0).toUpperCase() + plan.slice(1);
+          if (badge) badge.textContent = window.VxPlan.label(plan);
+
+          // Update usage stats
+          if (perm.remaining !== undefined && perm.limit !== undefined && perm.used !== undefined) {
+            const remaining = perm.remaining;
+            const limit = perm.limit;
+            const used = perm.used;
+
+            // Calculate percentage for remaining tokens
+            const remainingPercent = Math.round((remaining / limit) * 100);
+            const tokenPercentEl = document.getElementById('tokenPercent');
+            if (tokenPercentEl) {
+              tokenPercentEl.textContent = remainingPercent + '%';
+            }
+
+            // Show "X / Y" usage
+            const usageLabelEl = document.getElementById('usageLabel');
+            if (usageLabelEl) {
+              usageLabelEl.textContent = used + ' / ' + limit;
+            }
+
+            // Set usage bar width percentage
+            const usagePercent = Math.round((used / limit) * 100);
+            const usageBarEl = document.getElementById('usageBar');
+            if (usageBarEl) {
+              usageBarEl.style.width = usagePercent + '%';
+            }
+          }
         }
       } catch {}
     }
 
-    // Logout
+    // Logout — clear all Volynx data
     document.getElementById('logoutBtn')?.addEventListener('click', () => {
-      localStorage.removeItem('volynx_access_token');
-      localStorage.removeItem('volynx_refresh_token');
+      window.VxPlan.clearCache();
+      window.VxPlan.clearAllUsage();
       window.location.href = '/login/';
     });
   </script>

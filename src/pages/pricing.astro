@@ -153,7 +153,7 @@ const faqs = [
     const refreshToken = localStorage.getItem('volynx_refresh_token') || '';
 
     try { cfg = await fetch('/config.json', { cache: 'no-store' }).then(r => r.json()); } catch {}
-    const apiBase = (cfg?.apiBaseUrl || '').replace(/\/$/, '');
+    const apiBase = (cfg?.functionsUrl || cfg?.apiBaseUrl || '').replace(/\/$/, '');
 
     if (token && refreshToken && cfg?.supabaseUrl && cfg?.supabaseAnonKey) {
       try {
@@ -184,7 +184,7 @@ const faqs = [
         btn.textContent = 'Redirecting...';
         btn.style.pointerEvents = 'none';
         try {
-          const res = await fetch(apiBase + '/api/create-checkout-session', {
+          const res = await fetch(apiBase + '/create-checkout-session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
             body: JSON.stringify({ lookup_key: lookupKey, success_url: window.location.origin + '/profile/?payment=success', cancel_url: window.location.origin + '/pricing/?payment=cancelled' }),
@@ -206,7 +206,7 @@ const faqs = [
         if (!apiBase) return;
         btn.textContent = 'Redirecting...';
         try {
-          const res = await fetch(apiBase + '/api/create-checkout-session', {
+          const res = await fetch(apiBase + '/create-checkout-session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
             body: JSON.stringify({ lookup_key: packKey + '_' + currency }),
@@ -220,7 +220,7 @@ const faqs = [
 
     if (token && apiBase) {
       try {
-        const res = await fetch(apiBase + '/api/check-permission', {
+        const res = await fetch(apiBase + '/check-permission', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
           body: JSON.stringify({ tool: 'converter' }),

@@ -4,13 +4,13 @@
     var cfg;
     try { cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r){ return r.json(); }); }
     catch (_) { return FREE; }
-    var apiBase = (cfg.apiBaseUrl || '').replace(/\/$/, '');
+    var apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
     if (!apiBase) return FREE;
     var token = localStorage.getItem('volynx_access_token') || '';
     try {
       var ctrl = new AbortController();
       var t = setTimeout(function(){ ctrl.abort(); }, 3500);
-      var res = await fetch(apiBase + '/api/check-permission', {
+      var res = await fetch(apiBase + '/check-permission', {
         method: 'POST',
         headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
         body: JSON.stringify({ tool: toolName }),

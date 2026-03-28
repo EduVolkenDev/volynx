@@ -9,6 +9,16 @@ import { ROUTES } from "../data/routes";
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Profile — VOLYNX</title>
+		<meta name="description" content="Manage your VOLYNX account, profile settings, and subscription." />
+
+		<!-- Open Graph Tags -->
+		<meta property="og:title" content="Profile — VOLYNX" />
+		<meta property="og:description" content="Manage your VOLYNX account, profile settings, and subscription." />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://volynx.world/profile/" />
+		<meta property="og:image" content="https://volynx.world/assets/og-default.png" />
+
+		<script is:inline src="/js/vx-plan.js"></script>
 	</head>
 
 	<body>
@@ -222,7 +232,14 @@ import { ROUTES } from "../data/routes";
 
 				const KEYS = ["volynx_access_token","volynx_refresh_token","volynx_user_email","volynx_session","volynx_post_login_next"];
 
-				function clearSession() { KEYS.forEach(k => localStorage.removeItem(k)); }
+				function clearSession() {
+					KEYS.forEach(k => localStorage.removeItem(k));
+					// Also clear plan cache and usage data
+					if (window.VxPlan) {
+						window.VxPlan.clearCache();
+						window.VxPlan.clearAllUsage();
+					}
+				}
 
 				function showView(name: string) {
 					["viewLoading","viewError","viewProfile"].forEach(id => {
@@ -430,13 +447,13 @@ import { ROUTES } from "../data/routes";
 				renderPlan("Free", false);
 
 				// Fire-and-forget billing lookup
-				const apiBase = ((cfg as any).apiBaseUrl || "").replace(/\/$/, "");
+				const apiBase = ((cfg as any).functionsUrl || (cfg as any).apiBaseUrl || "").replace(/\/$/, "");
 				if (apiBase) {
 					(async () => {
 						try {
 							const ctrl = new AbortController();
 							const t = setTimeout(() => ctrl.abort(), 8000);
-							const res = await fetch(`${apiBase}/api/check-permission`, {
+							const res = await fetch(`${apiBase}/check-permission`, {
 								method: "POST",
 								headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
 								body: JSON.stringify({ tool: "profile" }),
@@ -504,7 +521,8 @@ import { ROUTES } from "../data/routes";
 				const FREE_AVATARS = ["/assets/avatarfree/1.png", "/assets/avatarfree/2.png", "/assets/avatarfree/avatarfree3.webp"];
 				const PRO_AVATARS = ["/assets/avatarpro/avatargoldpro.webp"];
 				const DEFAULT_PRO_AVATAR = PRO_AVATARS[0];
-				const isPro = profile?.plan === "pro" || profile?.plan === "enterprise";
+				const userPlan = (profile?.plan || "free").trim().toLowerCase();
+			const isPro = window.VxPlan ? window.VxPlan.isPaid(userPlan) : (userPlan !== "free");
 
 				// Show pro avatars section if user is pro
 				if (isPro && PRO_AVATARS.length > 0) {

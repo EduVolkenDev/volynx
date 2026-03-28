@@ -58,8 +58,7 @@ const title = "Contact — VOLYNX";
         <h2 data-i18n="contact.sales_title">Start a project</h2>
         <p data-i18n="contact.sales_desc">Tell me what you're building. I'll come back with a clear path and what it takes to make it happen.</p>
 
-        <!-- TODO: Replace with your Formspree ID from formspree.io -->
-        <form class="lead-form" id="contactForm" method="POST" action="https://formspree.io/f/FORM_ID" onsubmit="if(this.action.includes('FORM_ID')){event.preventDefault();window.location.href='mailto:hello@volynx.world?subject=New%20Project&body='+encodeURIComponent('Name: '+this.name.value+'\\nEmail: '+this.email.value+'\\nMessage: '+this.message.value);return false}">
+        <form class="lead-form" id="contactForm">
           <div class="field-row">
             <div class="field">
               <label for="name" data-i18n="contact.name">Name</label>
@@ -395,8 +394,136 @@ const title = "Contact — VOLYNX";
     .two-col { grid-template-columns: 1fr; }
     .panel { padding: 24px; }
   }
+  .submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .submit-btn .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(79,195,247,.3);
+    border-top-color: #4fc3f7;
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .form-success {
+    padding: 20px 24px;
+    border: 1px solid rgba(76,175,80,.3);
+    border-radius: 14px;
+    background: rgba(76,175,80,.08);
+    color: rgba(76,175,80,.95);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.6;
+    text-align: center;
+  }
+  .form-error {
+    padding: 12px 16px;
+    border: 1px solid rgba(255,100,100,.25);
+    border-radius: 10px;
+    background: rgba(255,100,100,.06);
+    color: rgba(255,150,150,.9);
+    font-size: 13px;
+    margin-top: 4px;
+  }
+  .form-error a { color: #4fc3f7; text-decoration: underline; }
+
+  @media (max-width: 860px) {
+    .two-col { grid-template-columns: 1fr; }
+    .panel { padding: 24px; }
+  }
   @media (max-width: 520px) {
     .field-row { grid-template-columns: 1fr; }
     .hero { padding: 36px 0 24px; }
   }
 </style>
+
+<script is:inline>
+  (function () {
+    var form = document.getElementById('contactForm');
+    if (!form) return;
+
+    var submitBtn = form.querySelector('.submit-btn');
+    var originalBtnText = submitBtn ? submitBtn.textContent : 'Send brief →';
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      // Collect form data
+      var data = {
+        name: form.name.value.trim(),
+        email: form.email.value.trim(),
+        project_type: form.project_type.value,
+        budget: form.budget.value,
+        timeline: form.timeline.value,
+        brief: form.brief.value.trim(),
+      };
+
+      if (!data.name || !data.email || !data.brief) return;
+
+      // Clear previous errors
+      var prevError = form.querySelector('.form-error');
+      if (prevError) prevError.remove();
+
+      // Loading state
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner"></span>Sending...';
+
+      try {
+        var cfg = await fetch('/config.json', { cache: 'no-store' }).then(function (r) { return r.json(); });
+        var apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
+
+        if (!apiBase) throw new Error('no-api');
+
+        var ctrl = new AbortController();
+        var t = setTimeout(function () { ctrl.abort(); }, 8000);
+
+        var res = await fetch(apiBase + '/contact-form', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+          signal: ctrl.signal,
+        });
+        clearTimeout(t);
+
+        if (!res.ok) {
+          var body = await res.json().catch(function () { return {}; });
+          throw new Error(body.error || 'server-error');
+        }
+
+        // Success — replace form with confirmation
+        form.innerHTML = '<div class="form-success">Thanks, ' + escapeHtml(data.name) + '! Your brief has been received.<br>I\'ll review it and get back to you within 24–48h on business days.</div>';
+      } catch (err) {
+        // Restore button
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+
+        // Build mailto fallback
+        var subject = encodeURIComponent('Project brief from ' + data.name);
+        var body = encodeURIComponent(
+          'Name: ' + data.name + '\nEmail: ' + data.email +
+          '\nProject type: ' + data.project_type +
+          '\nBudget: ' + data.budget +
+          '\nTimeline: ' + data.timeline +
+          '\n\nBrief:\n' + data.brief
+        );
+        var mailto = 'mailto:hello@volynx.world?subject=' + subject + '&body=' + body;
+
+        var errorDiv = document.createElement('div');
+        errorDiv.className = 'form-error';
+        errorDiv.innerHTML = 'Could not send right now. <a href="' + mailto + '">Send via email instead</a>';
+        form.appendChild(errorDiv);
+      }
+    });
+
+    function escapeHtml(str) {
+      var div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
+    }
+  })();
+</script>
