@@ -63,7 +63,7 @@ Dark theme, no CSS framework. Feature-specific CSS files in `src/styles/`. Astro
 
 ### Deployment
 
-Static output to `dist/`. Netlify config via `_headers` and `_redirects` in `public/`. API at `api.volynx.world`.
+Static output to `dist/`. Cloudflare Pages config via `_headers` and `_redirects` in `public/`. API at `api.volynx.world`.
 
 ## Conventions
 

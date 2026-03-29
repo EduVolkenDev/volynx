@@ -25,25 +25,31 @@ const faqs = [
   <FlagshipHeader current={ROUTES.pricing} ctaLabel="Start Studio Pro" />
   <main>
 
+    <!-- ═══ PAYMENT CANCELLED BANNER ═══ -->
+    <div id="paymentCancelledBanner" style="display:none;max-width:720px;margin:24px auto 0;padding:16px 20px;border-radius:14px;background:rgba(255,180,0,.06);border:1px solid rgba(255,180,0,.2);font-size:14px;color:#e0e0e0;backdrop-filter:blur(12px);text-align:center;">
+      <span style="margin-right:12px;" data-i18n="price.payment_cancelled">Payment was cancelled. You can try again anytime.</span>
+      <button type="button" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;text-decoration:underline;" data-i18n="price.dismiss" onclick="this.closest('div').style.display='none';history.replaceState({},'','/pricing/');">Dismiss</button>
+    </div>
+
     <!-- ═══ HERO ═══ -->
     <section class="hero">
       <div class="shell hero-grid">
         <div class="hero-copy">
-          <span class="kicker">Pricing logic</span>
-          <h1>Separate discovery from production with premium logic.</h1>
-          <p>The Free layer builds trust. Studio Pro removes friction. Teams adds operational standardization. Designed to sell status, memory and control — not just limits.</p>
+          <span class="kicker" data-i18n="price.hero_kicker">Pricing logic</span>
+          <h1 data-i18n="price.hero_title">Separate discovery from production with premium logic.</h1>
+          <p data-i18n="price.hero_desc">The Free layer builds trust. Studio Pro removes friction. Teams adds operational standardization. Premium features that elevate your work, not just more capacity.</p>
           <div class="hero-actions">
-            <a href="#plans" class="button button--gold">View plans</a>
-            <a href={ROUTES.lab} class="button button--ghost">Open the Lab</a>
+            <a href="#plans" class="button button--gold" data-i18n="price.hero_cta1">View plans</a>
+            <a href={ROUTES.lab} class="button button--ghost" data-i18n="price.hero_cta2">Open the Lab</a>
           </div>
         </div>
         <div class="hero-card visual-card">
-          <span class="label label--pro">Pro benefits</span>
+          <span class="label label--pro" data-i18n="price.pro_benefits">Pro benefits</span>
           <div class="stack">
-            <div class="metric">Saved presets</div>
-            <div class="metric">Priority exports</div>
-            <div class="metric">Brand memory</div>
-            <div class="metric">Commercial rights</div>
+            <div class="metric" data-i18n="price.metric_presets">Saved presets</div>
+            <div class="metric" data-i18n="price.metric_exports">Priority exports</div>
+            <div class="metric" data-i18n="price.metric_memory">Brand memory</div>
+            <div class="metric" data-i18n="price.metric_rights">Commercial rights</div>
           </div>
           <img src="/assets/volynx-icon.webp" alt="Pro" />
         </div>
@@ -73,14 +79,14 @@ const faqs = [
     <!-- ═══ WHAT PRO FEELS LIKE ═══ -->
     <section class="page-section">
       <div class="shell section-head">
-        <h2>What Pro actually feels like</h2>
-        <p>This reframes the upgrade as a quality-of-work move, not just a cap increase.</p>
+        <h2 data-i18n="price.pro_section_title">What Pro actually feels like</h2>
+        <p data-i18n="price.pro_section_desc">Pro is about working smarter, faster, and with more control over your output.</p>
       </div>
       <div class="shell comparison">
-        <div class="comparison-row"><strong>Workflow memory</strong><span class="check">No memory</span><span class="check pro">Presets, history, reusable recipes</span></div>
-        <div class="comparison-row"><strong>Output quality</strong><span class="check">Basic modes</span><span class="check pro">Premium modes, stronger exports</span></div>
-        <div class="comparison-row"><strong>Comfort and speed</strong><span class="check">Manual repetition</span><span class="check pro">Queues, defaults, faster decision loops</span></div>
-        <div class="comparison-row"><strong>Status</strong><span class="check">Discovery mode</span><span class="check pro">Pro workspace and priority access</span></div>
+        <div class="comparison-row"><strong data-i18n="price.comp_memory">Workflow memory</strong><span class="check" data-i18n="price.comp_free_memory">No memory</span><span class="check pro" data-i18n="price.comp_pro_memory">Presets, history, reusable recipes</span></div>
+        <div class="comparison-row"><strong data-i18n="price.comp_quality">Output quality</strong><span class="check" data-i18n="price.comp_free_quality">Basic modes</span><span class="check pro" data-i18n="price.comp_pro_quality">Premium modes, stronger exports</span></div>
+        <div class="comparison-row"><strong data-i18n="price.comp_speed">Comfort and speed</strong><span class="check" data-i18n="price.comp_free_speed">Manual repetition</span><span class="check pro" data-i18n="price.comp_pro_speed">Queues, defaults, faster decision loops</span></div>
+        <div class="comparison-row"><strong data-i18n="price.comp_status">Status</strong><span class="check" data-i18n="price.comp_free_status">Discovery mode</span><span class="check pro" data-i18n="price.comp_pro_status">Pro workspace and priority access</span></div>
       </div>
     </section>
 
@@ -146,6 +152,12 @@ const faqs = [
   <script is:inline type="module">
     const PLAN_KEYS = ['free', 'launch', 'pro', 'studio', 'teams'];
     const urlParams = new URLSearchParams(window.location.search);
+
+    // Show cancelled banner if redirected from Stripe
+    if (urlParams.get('payment') === 'cancelled') {
+      const cb = document.getElementById('paymentCancelledBanner');
+      if (cb) cb.style.display = '';
+    }
     const currency = (urlParams.get('currency') || 'GBP').toLowerCase();
 
     let cfg = null;

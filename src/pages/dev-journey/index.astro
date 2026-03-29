@@ -2,6 +2,7 @@
 import "../../styles/volynx-devjourney.css";
 import VxHeader from "../../components/VxHeader.astro";
 import VxFooter from "../../components/VxFooter.astro";
+import PageWidgets from "../../components/PageWidgets.astro";
 import { ROUTES } from "../../data/routes";
 ---
 
@@ -64,6 +65,8 @@ import { ROUTES } from "../../data/routes";
     </div>
   </div>
 
+  <PageWidgets />
+
   <main id="content">
     <div class="container">
       <!-- HERO -->
@@ -72,8 +75,8 @@ import { ROUTES } from "../../data/routes";
           <div>
             <div class="kicker" data-i18n="dj.hero_title"><i aria-hidden="true"></i> Dev Journey. Less noise. More shipping.</div>
             <h1 data-i18n="dj.hero_subtitle">Build your first live project — self-guided, distraction-free, and with a real deliverable.</h1>
-            <p class="lead">
-              A self-guided track (text + files + checklists) with projects that become portfolio work. You go from "I understood" straight to "I shipped."
+            <p class="lead" data-i18n="dj.hero_lead">
+              A self-guided track (text + files + checklists) with projects that become portfolio work. Learn by building real, publishable projects.
             </p>
 
             <div class="ctaRow" style="margin-top:10px;">
@@ -82,10 +85,10 @@ import { ROUTES } from "../../data/routes";
               <a class="btn ghost" href="#access" data-i18n="dj.btn_login">How login works</a>
             </div>
 
-            <div class="heroNotice" data-i18n="dj.notice" style="margin-top:14px; padding: 12px 14px; border-radius: 16px; border: 1px solid rgba(255,255,255,.14); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); box-shadow: 0 0 0 1px rgba(0,219,255,.06), var(--shadow2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(8px);">
-              <b>Important:</b> the course is free, but requires login to unlock the full experience:
-              save progress, unlock blocks, checklists, and certificate issuance on delivery.
-              <span style="color:rgba(255,255,255,.70)">Without login you see the overview; with login you run the journey.</span>
+            <div style="margin-top:14px; padding: 12px 14px; border-radius: 16px; border: 1px solid rgba(255,255,255,.14); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); box-shadow: 0 0 0 1px rgba(0,219,255,.06), var(--shadow2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(8px);">
+              <b data-i18n="dj.notice_important">Important:</b><span data-i18n="dj.notice_text"> the course is free, but requires login to unlock the full experience:
+              save progress, unlock blocks, checklists, and certificate issuance on delivery.</span>
+              <span style="color:rgba(255,255,255,.70);" data-i18n="dj.notice_subtext">Without login you see the overview; with login you run the journey.</span>
             </div>
 
             <div aria-label="Highlights" class="bullets" style="margin: 20px 0 0;">
@@ -93,28 +96,28 @@ import { ROUTES } from "../../data/routes";
                 <div aria-hidden="true" class="dot"></div>
                 <div>
                   <b data-i18n="dj.highlight1">Sprint with deliverables</b><br />
-                  <span>Short, direct, and publishable. If it showed up on screen, you learned it.</span>
+                  <span data-i18n="dj.highlight1_desc">Short, direct, and publishable. If it showed up on screen, you learned it.</span>
                 </div>
               </div>
               <div class="bulletCard">
                 <div aria-hidden="true" class="dot"></div>
                 <div>
                   <b data-i18n="dj.highlight2">Portfolio first</b><br />
-                  <span>Presentable outputs: landing + interaction + mini-app (Pro and Bundle).</span>
+                  <span data-i18n="dj.highlight2_desc">Presentable outputs: landing + interaction + mini-app (Pro and Bundle).</span>
                 </div>
               </div>
               <div class="bulletCard">
                 <div aria-hidden="true" class="dot"></div>
                 <div>
                   <b data-i18n="dj.highlight3">Self-guided, no filler</b><br />
-                  <span>Text + examples + checklists. Professional method, dev mode from day one.</span>
+                  <span data-i18n="dj.highlight3_desc">Text + examples + checklists. Professional method, dev mode from day one.</span>
                 </div>
               </div>
               <div class="bulletCard">
                 <div aria-hidden="true" class="dot"></div>
                 <div>
                   <b data-i18n="dj.highlight4">Built-in portfolio assets</b><br />
-                  <span>Ready prompts + validation checklists. Use what you built and scale it.</span>
+                  <span data-i18n="dj.highlight4_desc">Ready prompts + validation checklists. Use what you built and scale it.</span>
                 </div>
               </div>
             </div>
@@ -124,32 +127,32 @@ import { ROUTES } from "../../data/routes";
             <div aria-label="VOLYNX seal" class="seal" style="position:absolute; top:8px; right:8px; width:62px; height:48px; border-radius:18px; background: rgba(97,186,230,0.22); box-shadow: 0 0 10px inset rgba(251,249,255,0.22), 0 0 14px rgba(0,219,255,.10); display:grid; place-items:center; overflow:hidden; border: 1px solid rgba(255,255,255,.12);">
               <img alt="VOLYNX official eye" src="/assets/oficial-volynx-eye.png" style="width:44px; height:44px; object-fit:contain; filter: drop-shadow(0 12px 18px rgba(0,0,0,.55));" />
             </div>
-            <h3 style="font-size: var(--h3); margin: 4px 0 8px; font-family: var(--display);">What you'll have in hand</h3>
-            <p style="margin: 0 0 14px; color: var(--muted); font-size: 13.5px; line-height: 1.55;">A track that becomes execution. And execution becomes results. Simple, but not simplistic.</p>
+            <h3 style="font-size: var(--h3); margin: 4px 0 8px; font-family: var(--display);" data-i18n="dj.panel_title">What you'll have in hand</h3>
+            <p style="margin: 0 0 14px; color: var(--muted); font-size: 13.5px; line-height: 1.55;" data-i18n="dj.panel_desc">A track that becomes execution. And execution becomes results. Simple, but not simplistic.</p>
             <div class="stats" role="list" style="margin-top:10px;">
               <div class="stat" role="listitem">
-                <strong>Guided sprint</strong>
-                <span>Short blocks + checkpoints (what should appear on screen).</span>
+                <strong data-i18n="dj.stat_sprint">Guided sprint</strong>
+                <span data-i18n="dj.stat_sprint_desc">Short blocks + checkpoints (what should appear on screen).</span>
               </div>
               <div class="stat" role="listitem">
-                <strong>Deliverables</strong>
-                <span>Social (7 days), Pro (14 days), Bundle (30 days). Published and versioned.</span>
+                <strong data-i18n="dj.stat_deliverables">Deliverables</strong>
+                <span data-i18n="dj.stat_deliverables_desc">Social (7 days), Pro (14 days), Bundle (30 days). Published and versioned.</span>
               </div>
               <div class="stat" role="listitem">
-                <strong>Checkpoints</strong>
-                <span>"If it worked" + "if it didn't" (debug without guessing).</span>
+                <strong data-i18n="dj.stat_checkpoints">Checkpoints</strong>
+                <span data-i18n="dj.stat_checkpoints_desc">"If it worked" + "if it didn't" (debug without guessing).</span>
               </div>
               <div class="stat" role="listitem">
-                <strong>Format</strong>
-                <span>No long videos, no distractions. Text + files + checklists — the method is to create.</span>
+                <strong data-i18n="dj.stat_format">Format</strong>
+                <span data-i18n="dj.stat_format_desc">No long videos, no distractions. Text + files + checklists — the method is to create.</span>
               </div>
             </div>
 
             <div aria-label="Course tags" class="mini" style="margin-top: 12px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.14); display:flex; flex-wrap:wrap; gap: 10px;">
-              <span class="tag">Social Sprint</span>
-              <span class="tag">HTML · CSS · JS</span>
-              <span class="tag">Checklists</span>
-              <span class="tag">Published</span>
+              <span class="tag" data-i18n="dj.tag_social">Social Sprint</span>
+              <span class="tag" data-i18n="dj.tag_stack">HTML · CSS · JS</span>
+              <span class="tag" data-i18n="dj.tag_checklists">Checklists</span>
+              <span class="tag" data-i18n="dj.tag_published">Published</span>
             </div>
           </aside>
         </div>
@@ -160,117 +163,116 @@ import { ROUTES } from "../../data/routes";
         <div class="sectionTitle">
           <div>
             <h2 data-i18n="dj.curriculum_title">Track by blocks (no confusion)</h2>
-            <p>You advance through small, visible deliverables. If it doesn't appear on screen, it hasn't become a skill yet.
-              Select your level to see included blocks:</p>
+            <p data-i18n="dj.curriculum_desc">You advance through small, visible deliverables. Every step produces something real you can show. Select your level to see what's included:</p>
           </div>
           <div aria-label="Filter by plan" class="chips" role="tablist" style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center;">
-            <button class="chip active" data-filter="social" type="button">Social Sprint</button>
-            <button class="chip" data-filter="pro" type="button">Pro (Upgrade)</button>
-            <button class="chip" data-filter="bundle" type="button">Bundle</button>
-            <button class="chip" data-filter="all" type="button">See all</button>
+            <button class="chip active" data-filter="social" type="button" data-i18n="dj.chip_social">Social Sprint</button>
+            <button class="chip" data-filter="pro" type="button" data-i18n="dj.chip_pro">Pro (Upgrade)</button>
+            <button class="chip" data-filter="bundle" type="button" data-i18n="dj.chip_bundle">Bundle</button>
+            <button class="chip" data-filter="all" type="button" data-i18n="dj.chip_all">See all</button>
           </div>
         </div>
 
         <div aria-label="Dev Journey blocks" class="roadmap" style="margin-top: 12px;">
           <article class="blockCard" data-in="social pro bundle">
             <div class="blockTop">
-              <span class="blockNum">Block 0</span>
-              <span class="badge">Start Here</span>
+              <span class="blockNum" data-i18n="dj.block0_num">Block 0</span>
+              <span class="badge" data-i18n="dj.block0_badge">Start Here</span>
             </div>
-            <h3>Setup + how to study the right way</h3>
-            <p class="muted">Environment ready, folder organised, and the VOLYNX method to get out of errors without being stuck for hours.</p>
+            <h3 data-i18n="dj.block0_title">Setup + how to study the right way</h3>
+            <p class="muted" data-i18n="dj.block0_desc">Environment ready, folder organised, and the VOLYNX method to get out of errors without being stuck for hours.</p>
             <ul class="mini">
-              <li>Editor + browser + Live Server (the "why" and the "how")</li>
-              <li>Validatable checklist (you know when you're ready)</li>
-              <li>Certificate rules + submission links</li>
+              <li data-i18n="dj.block0_li1">Editor + browser + Live Server (the "why" and the "how")</li>
+              <li data-i18n="dj.block0_li2">Validatable checklist (you know when you're ready)</li>
+              <li data-i18n="dj.block0_li3">Certificate rules + submission links</li>
             </ul>
           </article>
 
           <article class="blockCard" data-in="social pro bundle">
             <div class="blockTop">
-              <span class="blockNum">Block 1</span>
-              <span class="badge">Foundations</span>
+              <span class="blockNum" data-i18n="dj.block1_num">Block 1</span>
+              <span class="badge" data-i18n="dj.block1_badge">Foundations</span>
             </div>
-            <h3>HTML + CSS + basic JS (with a click on screen)</h3>
-            <p class="muted">First real project: 3 connected files and an interaction working on the page (not just in the console).</p>
+            <h3 data-i18n="dj.block1_title">HTML + CSS + basic JS (with a click on screen)</h3>
+            <p class="muted" data-i18n="dj.block1_desc">First real project: 3 connected files and an interaction working on the page (not just in the console).</p>
             <ul class="mini">
-              <li>Semantic structure + simple responsive layout</li>
-              <li>Buttons, form, and visible feedback</li>
-              <li>Basic debugging: console, common errors, and fixes</li>
+              <li data-i18n="dj.block1_li1">Semantic structure + simple responsive layout</li>
+              <li data-i18n="dj.block1_li2">Buttons, form, and visible feedback</li>
+              <li data-i18n="dj.block1_li3">Basic debugging: console, common errors, and fixes</li>
             </ul>
           </article>
 
           <article class="blockCard" data-in="social pro bundle">
             <div class="blockTop">
-              <span class="blockNum">Block 2</span>
-              <span class="badge">JavaScript + DOM</span>
+              <span class="blockNum" data-i18n="dj.block2_num">Block 2</span>
+              <span class="badge" data-i18n="dj.block2_badge">JavaScript + DOM</span>
             </div>
-            <h3>Real interactivity</h3>
-            <p class="muted">You learn to manipulate the page: events, validation, logic, and data (includes JSON with practical examples).</p>
+            <h3 data-i18n="dj.block2_title">Real interactivity</h3>
+            <p class="muted" data-i18n="dj.block2_desc">You learn to manipulate the page: events, validation, logic, and data (includes JSON with practical examples).</p>
             <ul class="mini">
-              <li>Types, operators, functions, and events</li>
-              <li>DOM: select, change, create elements</li>
-              <li>JSON: what it is, why it exists, and where you use it</li>
+              <li data-i18n="dj.block2_li1">Types, operators, functions, and events</li>
+              <li data-i18n="dj.block2_li2">DOM: select, change, create elements</li>
+              <li data-i18n="dj.block2_li3">JSON: what it is, why it exists, and where you use it</li>
             </ul>
           </article>
 
           <article class="blockCard" data-in="pro bundle">
             <div class="blockTop">
-              <span class="blockNum">Block 3</span>
-              <span class="badge">Incremental project</span>
-              <a class="planChip" href="#upgrade">Unlock with Pro</a>
+              <span class="blockNum" data-i18n="dj.block3_num">Block 3</span>
+              <span class="badge" data-i18n="dj.block3_badge">Incremental project</span>
+              <a class="planChip" href="#upgrade" data-i18n="dj.unlock_pro">Unlock with Pro</a>
             </div>
-            <h3>An app that grows module by module</h3>
-            <p class="muted">Each module adds a visible feature. You finish with a presentable app that's easy to explain.</p>
+            <h3 data-i18n="dj.block3_title">An app that grows module by module</h3>
+            <p class="muted" data-i18n="dj.block3_desc">Each module adds a visible feature. You finish with a presentable app that's easy to explain.</p>
             <ul class="mini">
-              <li>State, simple components, and code organisation</li>
-              <li>Basic persistence (e.g. localStorage) + UX</li>
-              <li>Publishing + quality checklist</li>
+              <li data-i18n="dj.block3_li1">State, simple components, and code organisation</li>
+              <li data-i18n="dj.block3_li2">Basic persistence (e.g. localStorage) + UX</li>
+              <li data-i18n="dj.block3_li3">Publishing + quality checklist</li>
             </ul>
           </article>
 
           <article class="blockCard" data-in="bundle">
             <div class="blockTop">
-              <span class="blockNum">Block 4</span>
-              <span class="badge">Advanced layer</span>
-              <a class="planChip" href="#upgrade">Unlock with Bundle</a>
+              <span class="blockNum" data-i18n="dj.block4_num">Block 4</span>
+              <span class="badge" data-i18n="dj.block4_badge">Advanced layer</span>
+              <a class="planChip" href="#upgrade" data-i18n="dj.unlock_bundle">Unlock with Bundle</a>
             </div>
-            <h3>Architecture + integration</h3>
-            <p class="muted">You learn design patterns, integration, and "product" decisions (what to build first and why).</p>
+            <h3 data-i18n="dj.block4_title">Architecture + integration</h3>
+            <p class="muted" data-i18n="dj.block4_desc">You learn design patterns, integration, and "product" decisions (what to build first and why).</p>
             <ul class="mini">
-              <li>Guided refactor: clarity from names and tags to responsibility</li>
-              <li>Integrations and data (common market flows)</li>
-              <li>Anti-bug checklist before publishing</li>
+              <li data-i18n="dj.block4_li1">Guided refactor: clarity from names and tags to responsibility</li>
+              <li data-i18n="dj.block4_li2">Integrations and data (common market flows)</li>
+              <li data-i18n="dj.block4_li3">Anti-bug checklist before publishing</li>
             </ul>
           </article>
 
           <article class="blockCard" data-in="bundle">
             <div class="blockTop">
-              <span class="blockNum">Block 5</span>
-              <span class="badge">Final delivery</span>
-              <a class="planChip" href="#upgrade">Unlock with Bundle</a>
+              <span class="blockNum" data-i18n="dj.block5_num">Block 5</span>
+              <span class="badge" data-i18n="dj.block5_badge">Final delivery</span>
+              <a class="planChip" href="#upgrade" data-i18n="dj.unlock_bundle">Unlock with Bundle</a>
             </div>
-            <h3>Deploy + professional finishing</h3>
-            <p class="muted">You close the course delivering something complete: documentation and submission — the final version of your project.</p>
+            <h3 data-i18n="dj.block5_title">Deploy + professional finishing</h3>
+            <p class="muted" data-i18n="dj.block5_desc">You close the course delivering something complete: documentation and submission — the final version of your project.</p>
             <ul class="mini">
-              <li>Publishing and validation (GitHub)</li>
-              <li>Final checklist (responsive, accessible, functional)</li>
-              <li>Submission + certificate issuance</li>
+              <li data-i18n="dj.block5_li1">Publishing and validation (GitHub)</li>
+              <li data-i18n="dj.block5_li2">Final checklist (responsive, accessible, functional)</li>
+              <li data-i18n="dj.block5_li3">Submission + certificate issuance</li>
             </ul>
           </article>
 
           <article class="blockCard arsenal" data-in="bundle">
             <div class="blockTop">
-              <span class="blockNum">Arsenal Kit</span>
-              <span class="badge">Bundle Only</span>
-              <a class="planChip" href="#upgrade">Unlock with Bundle</a>
+              <span class="blockNum" data-i18n="dj.arsenal_num">Arsenal Kit</span>
+              <span class="badge" data-i18n="dj.arsenal_badge">Bundle Only</span>
+              <a class="planChip" href="#upgrade" data-i18n="dj.unlock_bundle">Unlock with Bundle</a>
             </div>
-            <h3>A VOLYNX gift to accelerate your progress during and after the course!</h3>
-            <p class="muted">Reusable files so you can build faster (and learn through reverse engineering).</p>
+            <h3 data-i18n="dj.arsenal_title">A VOLYNX gift to accelerate your progress during and after the course!</h3>
+            <p class="muted" data-i18n="dj.arsenal_desc">Reusable files so you can build faster (and learn through reverse engineering).</p>
             <ul class="mini">
-              <li>1 full site + 1 landing page</li>
-              <li>2 ready JavaScript apps</li>
-              <li>Cheatcodes (shortcuts and daily-use patterns)</li>
+              <li data-i18n="dj.arsenal_li1">1 full site + 1 landing page</li>
+              <li data-i18n="dj.arsenal_li2">2 ready JavaScript apps</li>
+              <li data-i18n="dj.arsenal_li3">Cheatcodes (shortcuts and daily-use patterns)</li>
             </ul>
           </article>
         </div>
@@ -287,12 +289,12 @@ import { ROUTES } from "../../data/routes";
 ;">
             <div class="sectionTitle" style="border-top:none; padding-top:0; margin-top:0;">
               <div>
-                <h2>Free access (with login)</h2>
-                <p>The course is free. Login is to save progress, unlock checklists, enable submission, and issue your certificate on delivery.</p>
+                <h2 data-i18n="dj.free_access_title">Free access (with login)</h2>
+                <p data-i18n="dj.free_access_desc">Start free. Login lets you save progress, track your work, submit projects, and earn your certificate when you finish.</p>
               </div>
               <div class="ctaRow" style="gap:10px;">
-                <button class="btn primary" type="button" id="openLogin4">Sign in / Create account</button>
-                <a class="btn ghost" href="#faq">Read the FAQ</a>
+                <button class="btn primary" type="button" id="openLogin4" data-i18n="dj.btn_access">Sign in / Create account</button>
+                <a class="btn ghost" href="#faq" data-i18n="dj.link_faq">Read the FAQ</a>
               </div>
             </div>
           </div>
@@ -301,42 +303,42 @@ import { ROUTES } from "../../data/routes";
 
       <section aria-label="Method" class="reveal" id="method" style="--d:4;">
         <div class="sectionTitle">
-          <h2>VOLYNX.Lab Education method</h2>
-          <p>Train execution. Increase clarity. Reduce friction. Sounds simple because it's the right path.</p>
+          <h2 data-i18n="dj.method_title">VOLYNX.Lab Education method</h2>
+          <p data-i18n="dj.method_desc">Clear direction. Real deliverables. Professional results. Learn by shipping, not by studying.</p>
         </div>
         <div class="grid3">
           <div class="card">
-            <h3>1) Direction</h3>
-            <p>You know what to do and why. No "I'll try".</p>
+            <h3 data-i18n="dj.method_step1">1) Direction</h3>
+            <p data-i18n="dj.method_step1_desc">You know what to do and why. No "I'll try".</p>
           </div>
           <div class="card">
-            <h3>2) Delivery</h3>
-            <p>Every module closes with a publishable result. Visible progress, not subjective.</p>
+            <h3 data-i18n="dj.method_step2">2) Delivery</h3>
+            <p data-i18n="dj.method_step2_desc">Every module closes with a publishable result. Visible progress, not subjective.</p>
           </div>
           <div class="card">
-            <h3>3) Refinement</h3>
-            <p>Review and improvement: the difference between "it works" and "it's professional".</p>
+            <h3 data-i18n="dj.method_step3">3) Refinement</h3>
+            <p data-i18n="dj.method_step3_desc">Review and improvement: the difference between "it works" and "it's professional".</p>
           </div>
         </div>
       </section>
 
       <section aria-label="Projects" class="reveal" id="projects" style="--d:5;">
         <div class="sectionTitle">
-          <h2>Projects that become portfolio</h2>
-          <p>It's not just about "learning". It's about building assets: pages, apps, and case studies that represent you.</p>
+          <h2 data-i18n="dj.projects_title">Projects that become portfolio</h2>
+          <p data-i18n="dj.projects_desc">It's not just about "learning". It's about building assets: pages, apps, and case studies that represent you.</p>
         </div>
         <div class="grid3">
           <div class="card">
-            <h3>Premium landing</h3>
-            <p>Grid, hierarchy, responsiveness, and micro-interactions. The right aesthetic sells.</p>
+            <h3 data-i18n="dj.project_landing">Premium landing</h3>
+            <p data-i18n="dj.project_landing_desc">Grid, hierarchy, responsiveness, and micro-interactions. The right aesthetic sells.</p>
           </div>
           <div class="card">
-            <h3>Web app</h3>
-            <p>Data, states, and UX: interfaces that respond fast and can become a product.</p>
+            <h3 data-i18n="dj.project_app">Web app</h3>
+            <p data-i18n="dj.project_app_desc">Data, states, and UX: interfaces that respond fast and can become a product.</p>
           </div>
           <div class="card">
-            <h3>Final project</h3>
-            <p>Plan, execute, publish, and present. The full cycle, as in the real world.</p>
+            <h3 data-i18n="dj.project_final">Final project</h3>
+            <p data-i18n="dj.project_final_desc">Plan, execute, publish, and present. The full cycle, as in the real world.</p>
           </div>
         </div>
       </section>
@@ -344,47 +346,47 @@ import { ROUTES } from "../../data/routes";
       <!-- UPGRADE / PRICING SECTION -->
       <section aria-label="Course upgrade plans" class="reveal" id="upgrade" style="--d:6;">
         <div class="sectionTitle">
-          <h2>Unlock the full track</h2>
-          <p>Social Sprint is free. Pro and Bundle unlock the advanced blocks, portfolio projects, and the Arsenal Kit.</p>
+          <h2 data-i18n="dj.upgrade_title">Unlock the full track</h2>
+          <p data-i18n="dj.upgrade_desc">Social Sprint is free. Pro and Bundle unlock the advanced blocks, portfolio projects, and the Arsenal Kit.</p>
         </div>
 
         <div class="upgrade-grid">
           <div class="upgrade-card free">
-            <div class="upgrade-badge">Free</div>
+            <div class="upgrade-badge" data-i18n="dj.card_free_badge">Free</div>
             <div class="upgrade-price">£0</div>
             <p class="upgrade-tagline" data-i18n="dj.free_plan">Try the method. No friction.</p>
             <ul class="upgrade-perks">
-              <li>Blocks 0, 1, 2 (Social Sprint)</li>
-              <li>Login to save progress</li>
-              <li>Social Sprint certificate</li>
+              <li data-i18n="dj.free_perk1">Blocks 0, 1, 2 (Social Sprint)</li>
+              <li data-i18n="dj.free_perk2">Login to save progress</li>
+              <li data-i18n="dj.free_perk3">Social Sprint certificate</li>
             </ul>
-            <a class="btn primary" href={ROUTES.signup}>Start free</a>
+            <a class="btn primary" href={ROUTES.signup} data-i18n="dj.btn_free">Start free</a>
           </div>
 
           <div class="upgrade-card pro highlighted">
-            <div class="upgrade-badge best">Pro</div>
-            <div class="upgrade-price">£45<span>/one-time</span></div>
+            <div class="upgrade-badge best" data-i18n="dj.card_pro_badge">Pro</div>
+            <div class="upgrade-price">£45<span data-i18n="dj.price_onetime">/one-time</span></div>
             <p class="upgrade-tagline" data-i18n="dj.pro_plan">Build real apps. Get hired faster.</p>
             <ul class="upgrade-perks">
-              <li>Everything in Free</li>
-              <li>Block 3 — incremental app</li>
-              <li>Pro certificate (14-day track)</li>
-              <li>Priority checklist feedback</li>
+              <li data-i18n="dj.pro_perk1">Everything in Free</li>
+              <li data-i18n="dj.pro_perk2">Block 3 — incremental app</li>
+              <li data-i18n="dj.pro_perk3">Pro certificate (14-day track)</li>
+              <li data-i18n="dj.pro_perk4">Priority checklist feedback</li>
             </ul>
-            <a class="btn primary" href={ROUTES.contact}>Get Pro access →</a>
+            <a class="btn primary" href={ROUTES.contact} data-i18n="dj.btn_pro">Get Pro access →</a>
           </div>
 
           <div class="upgrade-card bundle">
-            <div class="upgrade-badge">Bundle</div>
-            <div class="upgrade-price">£99<span>/one-time</span></div>
+            <div class="upgrade-badge" data-i18n="dj.card_bundle_badge">Bundle</div>
+            <div class="upgrade-price">£99<span data-i18n="dj.price_onetime">/one-time</span></div>
             <p class="upgrade-tagline" data-i18n="dj.bundle_plan">The full stack. Portfolio-ready.</p>
             <ul class="upgrade-perks">
-              <li>Everything in Pro</li>
-              <li>Blocks 4 + 5 — architecture + deploy</li>
-              <li>Bundle certificate (30-day track)</li>
-              <li>Arsenal Kit (4 reusable projects)</li>
+              <li data-i18n="dj.bundle_perk1">Everything in Pro</li>
+              <li data-i18n="dj.bundle_perk2">Blocks 4 + 5 — architecture + deploy</li>
+              <li data-i18n="dj.bundle_perk3">Bundle certificate (30-day track)</li>
+              <li data-i18n="dj.bundle_perk4">Arsenal Kit (4 reusable projects)</li>
             </ul>
-            <a class="btn primary" href={ROUTES.contact}>Get Bundle access →</a>
+            <a class="btn primary" href={ROUTES.contact} data-i18n="dj.btn_bundle">Get Bundle access →</a>
           </div>
         </div>
       </section>
@@ -397,14 +399,14 @@ import { ROUTES } from "../../data/routes";
           <details>
             <summary>
               <div class="sumLeft">
-                <div class="sumTxt"><b>I'm a complete beginner. Do I stand a chance?</b><span class="muted">Yes — the course teaches from "where to click" to "what should appear".</span></div>
+                <div class="sumTxt"><b data-i18n="dj.faq1_q">I'm a complete beginner. Do I stand a chance?</b><span class="muted" data-i18n="dj.faq1_preview">Yes — the course teaches from "where to click" to "what should appear".</span></div>
               </div>
               <div aria-hidden="true" class="chev">›</div>
             </summary>
             <div class="content">
               <ul>
-                <li>You'll learn to edit files, save, and refresh the browser.</li>
-                <li>When something goes wrong, you'll have "what to do" (not just theory).</li>
+                <li data-i18n="dj.faq1_a1">You'll learn to edit files, save, and refresh the browser.</li>
+                <li data-i18n="dj.faq1_a2">When something goes wrong, you'll have "what to do" (not just theory).</li>
               </ul>
             </div>
           </details>
@@ -412,12 +414,12 @@ import { ROUTES } from "../../data/routes";
           <details>
             <summary>
               <div class="sumLeft">
-                <div class="sumTxt"><b>Why do I need to log in if it's free?</b><span class="muted">To save progress, unlock checklists, submission, and certificate.</span></div>
+                <div class="sumTxt"><b data-i18n="dj.faq2_q">Why do I need to log in if it's free?</b><span class="muted" data-i18n="dj.faq2_preview">To save progress, unlock checklists, submission, and certificate.</span></div>
               </div>
               <div aria-hidden="true" class="chev">›</div>
             </summary>
             <div class="content">
-              <p style="margin:0;">The content is free. Login transforms the experience into a journey:
+              <p style="margin:0;" data-i18n="dj.faq2_a">The content is free. Login transforms the experience into a journey:
                 progress, checklists, submission on delivery, and certificate issuance.</p>
             </div>
           </details>
@@ -425,12 +427,12 @@ import { ROUTES } from "../../data/routes";
           <details>
             <summary>
               <div class="sumLeft">
-                <div class="sumTxt"><b>Is there video, community, or support?</b><span class="muted">Self-guided (text + files + projects).</span></div>
+                <div class="sumTxt"><b data-i18n="dj.faq3_q">Is there video, community, or support?</b><span class="muted" data-i18n="dj.faq3_preview">Self-guided (text + files + projects).</span></div>
               </div>
               <div aria-hidden="true" class="chev">›</div>
             </summary>
             <div class="content">
-              <p style="margin:0;">It's self-guided: you get documents + examples + files + checklists. A professional workbook format.
+              <p style="margin:0;" data-i18n="dj.faq3_a">It's self-guided: you get documents + examples + files + checklists. A professional workbook format.
                 Clarity, method, and execution. No long videos, no distractions, with checklist validation.</p>
             </div>
           </details>
@@ -438,14 +440,14 @@ import { ROUTES } from "../../data/routes";
           <details>
             <summary>
               <div class="sumLeft">
-                <div class="sumTxt"><b>Do I need a powerful computer?</b><span class="muted">No. A basic PC is enough.</span></div>
+                <div class="sumTxt"><b data-i18n="dj.faq4_q">Do I need a powerful computer?</b><span class="muted" data-i18n="dj.faq4_preview">No. A basic PC is enough.</span></div>
               </div>
               <div aria-hidden="true" class="chev">›</div>
             </summary>
             <div class="content">
               <ul>
-                <li>Windows, macOS, or Linux.</li>
-                <li>Recommended: 8GB RAM, updated browser, and free storage.</li>
+                <li data-i18n="dj.faq4_a1">Windows, macOS, or Linux.</li>
+                <li data-i18n="dj.faq4_a2">Recommended: 8GB RAM, updated browser, and free storage.</li>
               </ul>
             </div>
           </details>
@@ -453,12 +455,12 @@ import { ROUTES } from "../../data/routes";
           <details>
             <summary>
               <div class="sumLeft">
-                <div class="sumTxt"><b>How does the certificate work?</b><span class="muted">By delivery (submitted project).</span></div>
+                <div class="sumTxt"><b data-i18n="dj.faq5_q">How does the certificate work?</b><span class="muted" data-i18n="dj.faq5_preview">By delivery (submitted project).</span></div>
               </div>
               <div aria-hidden="true" class="chev">›</div>
             </summary>
             <div class="content">
-              <p style="margin:0;">You deliver the project for your level and issue the corresponding certificate (Social / Pro / Bundle).</p>
+              <p style="margin:0;" data-i18n="dj.faq5_a">You deliver the project for your level and issue the corresponding certificate (Social / Pro / Bundle).</p>
             </div>
           </details>
         </div>
@@ -467,27 +469,27 @@ import { ROUTES } from "../../data/routes";
       <!-- CROSS-SELL STRIP -->
       <section aria-label="What's next after Dev Journey" class="reveal" id="whats-next" style="--d:8;">
         <div class="sectionTitle">
-          <h2>Finished a step? Here's what's next.</h2>
-          <p>Your skills are real now — time to use them. Pick your next move.</p>
+          <h2 data-i18n="dj.whats_next_title">Finished a step? Here's what's next.</h2>
+          <p data-i18n="dj.whats_next_desc">Your skills are real now — time to use them. Pick your next move.</p>
         </div>
         <div class="nextstep-grid">
           <a class="nextstep-card" href="/dev-hub/portfolio-pro-kit/">
-            <div class="nextstep-badge">Kit</div>
-            <h3>Need a portfolio?</h3>
-            <p>The Portfolio Pro Kit is the professional version of what you just built. Sections, motion, SEO — ready to deploy.</p>
-            <span class="nextstep-cta">See the kit →</span>
+            <div class="nextstep-badge" data-i18n="dj.next_badge_kit">Kit</div>
+            <h3 data-i18n="dj.next_title_kit">Need a portfolio?</h3>
+            <p data-i18n="dj.next_desc_kit">The Portfolio Pro Kit is the professional version of what you just built. Sections, motion, SEO — ready to deploy.</p>
+            <span class="nextstep-cta" data-i18n="dj.next_cta_kit">See the kit →</span>
           </a>
           <a class="nextstep-card" href={ROUTES.studio}>
-            <div class="nextstep-badge">Studio</div>
-            <h3>Want the pro tools?</h3>
-            <p>Studio Pro unlocks batch processing, advanced export, and commercial usage for your day-to-day workflow.</p>
-            <span class="nextstep-cta">Explore Studio →</span>
+            <div class="nextstep-badge" data-i18n="dj.next_badge_studio">Studio</div>
+            <h3 data-i18n="dj.next_title_studio">Want the pro tools?</h3>
+            <p data-i18n="dj.next_desc_studio">Studio Pro unlocks batch processing, advanced export, and commercial usage for your day-to-day workflow.</p>
+            <span class="nextstep-cta" data-i18n="dj.next_cta_studio">Explore Studio →</span>
           </a>
           <a class="nextstep-card" href="/services/">
-            <div class="nextstep-badge">Services</div>
-            <h3>Need a real site built?</h3>
-            <p>VOLYNX builds it for you — landing pages, full sites, and maintenance plans. You scope it, I execute.</p>
-            <span class="nextstep-cta">Work with VOLYNX →</span>
+            <div class="nextstep-badge" data-i18n="dj.next_badge_services">Services</div>
+            <h3 data-i18n="dj.next_title_services">Need a real site built?</h3>
+            <p data-i18n="dj.next_desc_services">VOLYNX builds it for you — landing pages, full sites, and maintenance plans. You scope it, I execute.</p>
+            <span class="nextstep-cta" data-i18n="dj.next_cta_services">Work with VOLYNX →</span>
           </a>
         </div>
       </section>

@@ -53,6 +53,13 @@ import { ROUTES } from "../data/routes";
 				<p>Complete your profile below to get started.</p>
 			</div>
 
+			<div id="paymentSuccessBanner" class="banner banner--success" style="display:none;">
+				<div class="banner-row">
+					<span>Payment confirmed! Your plan is now active.</span>
+					<button type="button" class="btn btn--sm btn--ghost" onclick="this.closest('.banner').style.display='none';history.replaceState({},'','/profile/');">Dismiss</button>
+				</div>
+			</div>
+
 			<div id="welcomeBanner" class="banner banner--subtle" style="display:none;">
 				<div class="banner-row">
 					<span>Welcome back!</span>
@@ -413,7 +420,11 @@ import { ROUTES } from "../data/routes";
 				}
 
 				const params = new URLSearchParams(window.location.search);
-				if (params.get("welcome") === "1" && !isFirstTime) {
+				if (params.get("payment") === "success") {
+					$("paymentSuccessBanner").style.display = "";
+					// Refresh plan cache after payment
+					if (window.VxPlan) window.VxPlan.clearCache();
+				} else if (params.get("welcome") === "1" && !isFirstTime) {
 					$("welcomeBanner").style.display = "";
 					history.replaceState({}, "", "/profile/");
 				}
@@ -748,6 +759,9 @@ import { ROUTES } from "../data/routes";
 		border: 1px solid rgba(0,232,197,.18); text-align: center; }
 	.banner--welcome h2 { margin: 0 0 4px; font-size: 1.2rem; }
 	.banner--welcome p { margin: 0; color: var(--muted); font-size: .9rem; }
+	.banner--success { background: linear-gradient(135deg, rgba(0,232,120,.08), rgba(0,180,255,.04));
+		border: 1px solid rgba(0,232,120,.25); }
+	.banner--success .banner-row span { color: #00e878; font-weight: 600; }
 	.banner--subtle { background: rgba(255,255,255,.02); border: 1px solid var(--glass-border); }
 	.banner-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 	.banner-row span { font-size: .9rem; }
