@@ -170,6 +170,20 @@ import { ROUTES } from "../data/routes";
 				</form>
 			</section>
 
+			<section class="token-section glass-section">
+				<div class="section-label">Token Balance</div>
+				<div class="token-overview">
+					<div class="token-balance-display">
+						<span class="token-balance-number" id="tokenBalance">—</span>
+						<span class="token-balance-label">tokens available</span>
+					</div>
+					<a href="/pricing/#tokens" class="btn btn--sm" id="buyTokensBtn">Get more tokens</a>
+				</div>
+				<div id="tokenHistory" class="token-history">
+					<p class="text-muted" style="font-size:.85rem;">Loading history...</p>
+				</div>
+			</section>
+
 			<section class="bottom-grid">
 				<div class="glass-section glass-section--compact">
 					<div class="section-label">Activity</div>
@@ -346,15 +360,41 @@ import { ROUTES } from "../data/routes";
 
 					if (profErr) {
 						log("profile query FAILED: " + profErr.message + " code=" + profErr.code);
-						showError(
-							profErr.code === "PGRST116"
-								? "Profile not found. Please contact support or re-register."
-								: "Failed to load profile: " + profErr.message
-						);
-						return;
+
+						// Profile row missing — create it automatically for new users
+						if (profErr.code === "PGRST116") {
+							log("profile not found — creating for new user");
+							const meta = user.user_metadata || {};
+							const newProfile = {
+								id: user.id,
+								email: user.email || "",
+								full_name: meta.full_name || null,
+								username: meta.username || null,
+								plan: "free",
+								builder_plan: "free",
+								token_balance: 0,
+							};
+							const { data: created, error: createErr } = await supabase
+								.from("profiles")
+								.upsert(newProfile, { onConflict: "id" })
+								.select("*")
+								.single();
+
+							if (createErr) {
+								log("profile create FAILED: " + createErr.message);
+								showError("Could not initialize your profile. Please try again or contact support.");
+								return;
+							}
+							profile = created;
+							log("profile created for new user");
+						} else {
+							showError("Failed to load profile: " + profErr.message);
+							return;
+						}
+					} else {
+						profile = profData;
+						log("profile loaded");
 					}
-					profile = profData;
-					log("profile loaded");
 
 				} catch (err) {
 					console.error("[profile] unexpected error:", err);
@@ -488,6 +528,55 @@ import { ROUTES } from "../data/routes";
 					})();
 				} else {
 					log("plan: Free (no billing backend)");
+				}
+
+				// ══════════════════════════════════════════════════════
+				// PHASE 3b: Token balance (non-blocking)
+				// ══════════════════════════════════════════════════════
+				const tokenBalanceEl = $("tokenBalance");
+				const tokenHistoryEl = $("tokenHistory");
+
+				// Show balance from profile (instant)
+				const initialBalance = profile.token_balance || 0;
+				tokenBalanceEl.textContent = String(initialBalance);
+
+				// Fetch recent transactions
+				if (apiBase) {
+					(async () => {
+						try {
+							const ctrl = new AbortController();
+							const t = setTimeout(() => ctrl.abort(), 8000);
+							const res = await fetch(`${apiBase}/get-balance`, {
+								method: "POST",
+								headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+								body: JSON.stringify({}),
+								signal: ctrl.signal,
+							});
+							clearTimeout(t);
+							if (res.ok) {
+								const d = await res.json();
+								tokenBalanceEl.textContent = String(d.balance || 0);
+								const recent = d.recent || [];
+								if (recent.length === 0) {
+									tokenHistoryEl.innerHTML = '<p class="text-muted" style="font-size:.85rem;">No token activity yet.</p>';
+								} else {
+									tokenHistoryEl.innerHTML = recent.slice(0, 8).map((tx: any) => {
+										const isSpend = tx.amount < 0;
+										const sign = isSpend ? "" : "+";
+										const color = isSpend ? "var(--danger)" : "var(--success)";
+										const date = new Date(tx.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+										const desc = tx.description || tx.tool_name || tx.type;
+										return `<div class="token-tx"><span class="token-tx-desc">${desc}</span><span class="token-tx-amount" style="color:${color}">${sign}${tx.amount}</span><span class="token-tx-date">${date}</span></div>`;
+									}).join("");
+								}
+								log("tokens: " + d.balance);
+							} else {
+								tokenHistoryEl.innerHTML = '<p class="text-muted" style="font-size:.85rem;">Could not load history.</p>';
+							}
+						} catch (_) {
+							tokenHistoryEl.innerHTML = '<p class="text-muted" style="font-size:.85rem;">Could not load history.</p>';
+						}
+					})();
 				}
 
 				// ══════════════════════════════════════════════════════
@@ -894,6 +983,21 @@ import { ROUTES } from "../data/routes";
 	.glass-section { padding: 28px; border-radius: 20px;
 		background: var(--glass); border: 1px solid var(--glass-border); backdrop-filter: blur(12px); }
 	.glass-section--compact { padding: 22px; }
+
+	/* Token section */
+	.token-section { border: 1px solid rgba(0,232,197,.12); }
+	.token-overview { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+	.token-balance-display { display: flex; align-items: baseline; gap: 10px; }
+	.token-balance-number { font-size: 2.4rem; font-weight: 800; color: var(--accent); line-height: 1; }
+	.token-balance-label { font-size: .85rem; color: var(--muted); }
+	.token-history { display: grid; gap: 0; }
+	.token-tx { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center;
+		padding: 10px 0; border-top: 1px solid rgba(255,255,255,.04); font-size: .84rem; }
+	.token-tx:first-child { border-top: none; }
+	.token-tx-desc { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	.token-tx-amount { font-weight: 700; font-variant-numeric: tabular-nums; }
+	.token-tx-date { color: var(--muted); font-size: .78rem; }
+
 	.section-label { font-size: .7rem; font-weight: 700; text-transform: uppercase;
 		letter-spacing: .12em; color: var(--accent); margin-bottom: 18px; opacity: .8; }
 

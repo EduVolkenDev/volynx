@@ -21,6 +21,8 @@ import PageWidgets from "../../../components/PageWidgets.astro";
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
+  <script is:inline src="/builder/vx-renderer.js"></script>
+  <script is:inline src="/builder/vx-section-editor.js"></script>
 </head>
 
 <body>
@@ -89,18 +91,21 @@ import PageWidgets from "../../../components/PageWidgets.astro";
 
           <!-- STEP 1: Choose Kit -->
           <div class="wizard-step" id="wizStep1">
-            <h3 class="card__title">Choose your kit</h3>
-            <p class="hint" style="margin-bottom:16px">Pick a starting point — you can customize everything later.</p>
-            <div class="preset-grid" id="presetGrid"></div>
+            <h3 class="card__title">What are you building?</h3>
+            <p class="hint" style="margin-bottom:16px">Choose a starting point. Everything is customizable after creation.</p>
+
+            <div class="archetype-grid" id="presetGrid">
+              <!-- Populated by JS with enhanced archetype cards -->
+            </div>
 
             <div class="row" style="margin-top:16px">
               <div class="field-group">
                 <label class="label" for="pname">Project name</label>
-                <input id="pname" class="field" placeholder="Studio Aurora" />
+                <input id="pname" class="field" placeholder="My landing page" />
               </div>
               <div class="field-group">
                 <label class="label" for="pslug">Slug</label>
-                <input id="pslug" class="field" placeholder="studio-aurora" />
+                <input id="pslug" class="field" placeholder="my-landing-page" />
               </div>
             </div>
 
@@ -229,17 +234,38 @@ import PageWidgets from "../../../components/PageWidgets.astro";
           </div>
         </div>
 
-        <!-- JSON EDITOR -->
+        <!-- EDITOR WORKSPACE -->
         <div class="card card--editor">
           <div class="editor-header">
-            <h3 class="card__title">JSON editor</h3>
+            <div class="editor-tabs">
+              <button class="editor-tab editor-tab--active" id="tabSections" data-tab="sections">Sections</button>
+              <button class="editor-tab" id="tabJson" data-tab="json">JSON</button>
+              <button class="editor-tab" id="tabPreview" data-tab="preview">Preview</button>
+            </div>
             <div class="editor-actions">
               <button class="btn btn--ghost btn--sm" id="copy">Copy</button>
               <button class="btn btn--ghost btn--sm" id="save">Save</button>
               <button class="btn btn--primary btn--sm" id="publish">Publish →</button>
             </div>
           </div>
-          <textarea id="json" class="json-editor" placeholder="Select a project to edit…" spellcheck="false"></textarea>
+
+          <!-- TAB: Section Editor -->
+          <div class="editor-panel" id="panelSections">
+            <div id="sectionEditor" class="section-editor-root">
+              <div class="se-empty">Select a project to start editing</div>
+            </div>
+          </div>
+
+          <!-- TAB: JSON -->
+          <div class="editor-panel" id="panelJson" hidden>
+            <textarea id="json" class="json-editor" placeholder="Select a project to edit…" spellcheck="false"></textarea>
+          </div>
+
+          <!-- TAB: Preview -->
+          <div class="editor-panel" id="panelPreview" hidden>
+            <iframe id="previewFrame" class="preview-frame" sandbox="allow-same-origin" title="Live preview"></iframe>
+          </div>
+
           <div class="editor-footer">
             <p class="hint" id="status"></p>
             <p class="hint" id="link"></p>
@@ -412,43 +438,253 @@ import PageWidgets from "../../../components/PageWidgets.astro";
   }
 
   // Mini layout SVGs for preset previews
-  const presetPreviews: Record<string, string> = {
-    blank: `<svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="12" width="80" height="6" rx="3" fill="currentColor" opacity=".3"/><rect x="35" y="24" width="50" height="4" rx="2" fill="currentColor" opacity=".15"/><rect x="40" y="36" width="40" height="8" rx="4" fill="currentColor" opacity=".2"/><rect x="10" y="54" width="22" height="16" rx="4" fill="currentColor" opacity=".08"/><rect x="36" y="54" width="22" height="16" rx="4" fill="currentColor" opacity=".08"/><rect x="62" y="54" width="22" height="16" rx="4" fill="currentColor" opacity=".08"/><rect x="88" y="54" width="22" height="16" rx="4" fill="currentColor" opacity=".08"/></svg>`,
-    saas: `<svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="8" width="50" height="5" rx="2.5" fill="#7DD3FC" opacity=".5"/><rect x="8" y="17" width="40" height="3" rx="1.5" fill="currentColor" opacity=".2"/><rect x="8" y="24" width="28" height="7" rx="3.5" fill="#7DD3FC" opacity=".3"/><rect x="70" y="8" width="42" height="28" rx="6" fill="currentColor" opacity=".08"/><rect x="8" y="42" width="24" height="14" rx="4" fill="currentColor" opacity=".06"/><rect x="36" y="42" width="24" height="14" rx="4" fill="#7DD3FC" opacity=".1"/><rect x="64" y="42" width="24" height="14" rx="4" fill="currentColor" opacity=".06"/><rect x="8" y="62" width="104" height="12" rx="4" fill="currentColor" opacity=".04"/></svg>`,
-    agency: `<svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="8" width="80" height="6" rx="3" fill="#A78BFA" opacity=".4"/><rect x="30" y="18" width="60" height="3" rx="1.5" fill="currentColor" opacity=".2"/><rect x="38" y="25" width="44" height="7" rx="3.5" fill="#A78BFA" opacity=".25"/><rect x="8" y="40" width="32" height="8" rx="2" fill="currentColor" opacity=".06"/><rect x="44" y="40" width="32" height="8" rx="2" fill="currentColor" opacity=".06"/><rect x="80" y="40" width="32" height="8" rx="2" fill="currentColor" opacity=".06"/><circle cx="24" cy="60" r="6" fill="currentColor" opacity=".08"/><circle cx="60" cy="60" r="6" fill="currentColor" opacity=".08"/><circle cx="96" cy="60" r="6" fill="currentColor" opacity=".08"/><rect x="15" y="69" width="18" height="3" rx="1.5" fill="currentColor" opacity=".1"/><rect x="51" y="69" width="18" height="3" rx="1.5" fill="currentColor" opacity=".1"/><rect x="87" y="69" width="18" height="3" rx="1.5" fill="currentColor" opacity=".1"/></svg>`,
-    portfolio: `<svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="10" width="60" height="5" rx="2.5" fill="#E4E4E7" opacity=".4"/><rect x="8" y="19" width="45" height="3" rx="1.5" fill="currentColor" opacity=".15"/><rect x="8" y="26" width="25" height="6" rx="3" fill="currentColor" opacity=".12"/><rect x="8" y="40" width="50" height="32" rx="6" fill="currentColor" opacity=".06"/><rect x="62" y="40" width="50" height="15" rx="4" fill="currentColor" opacity=".06"/><rect x="62" y="58" width="50" height="14" rx="4" fill="currentColor" opacity=".04"/></svg>`,
+  const presetIcons: Record<string, string> = {
+    blank: "📄",
+    saas: "⚡",
+    agency: "🏢",
+    portfolio: "👤",
+  };
+
+  // Enhanced archetype descriptions
+  const archetypeInfo: Record<string, { outcome: string; ideal: string }> = {
+    saas: {
+      outcome: "A conversion-focused product page with pricing, features and social proof",
+      ideal: "Software products, apps, and platforms that need to convert visitors into users",
+    },
+    agency: {
+      outcome: "A professional services page with process steps, packages and client trust signals",
+      ideal: "Agencies, studios, and consultancies that sell expertise and services",
+    },
+    portfolio: {
+      outcome: "A personal brand page with work showcase, skills and a clear hire-me CTA",
+      ideal: "Developers, designers, and freelancers presenting their work and availability",
+    },
   };
 
   function renderPresetPicker() {
     const grid = $("presetGrid");
     if (!grid) return;
-    const blank = `<button type="button" class="preset-card preset-card--active" data-preset="blank">
-      <div class="preset-preview">${presetPreviews.blank}</div>
-      <div class="preset-info">
-        <span class="preset-name">Custom</span>
-        <span class="preset-desc">Start from scratch</span>
+
+    const blank = `<button type="button" class="archetype-card" data-preset="blank">
+      <div class="archetype-icon">${presetIcons.blank}</div>
+      <div class="archetype-body">
+        <span class="archetype-name">Custom</span>
+        <span class="archetype-outcome">Start from scratch with a blank canvas</span>
+        <span class="archetype-ideal">For experienced users who want full control</span>
       </div>
     </button>`;
-    const cards = presets.map((p: any) => `<button type="button" class="preset-card" data-preset="${p.id}">
-      <div class="preset-preview">${presetPreviews[p.id] || presetPreviews.blank}</div>
-      <div class="preset-info">
-        <span class="preset-name">${p.icon || "📦"} ${p.name}</span>
-        <span class="preset-desc">${p.description || p.tag}</span>
-      </div>
-    </button>`).join("");
-    grid.innerHTML = blank + cards;
 
-    grid.querySelectorAll(".preset-card").forEach(btn => {
+    const cards = presets.map((p: any) => {
+      const info = archetypeInfo[p.id] || { outcome: p.description, ideal: "" };
+      return `<button type="button" class="archetype-card${p.id === 'saas' ? ' archetype-card--active' : ''}" data-preset="${p.id}">
+      <div class="archetype-icon">${presetIcons[p.id] || p.icon || "📦"}</div>
+      <div class="archetype-body">
+        <span class="archetype-name">${p.name}</span>
+        <span class="archetype-outcome">${info.outcome}</span>
+        <span class="archetype-ideal">${info.ideal}</span>
+      </div>
+    </button>`;
+    }).join("");
+
+    // Landing Express quick-start
+    const landingExpress = `<button type="button" class="archetype-card archetype-card--express" data-preset="landing-express">
+      <div class="archetype-icon archetype-icon--express">⚡</div>
+      <div class="archetype-body">
+        <span class="archetype-name">Landing Express</span>
+        <span class="archetype-tag">Guided</span>
+        <span class="archetype-outcome">Answer 3 questions and get a ready-to-edit landing page in seconds</span>
+        <span class="archetype-ideal">The fastest way to launch. Perfect for first-time users.</span>
+      </div>
+    </button>`;
+
+    grid.innerHTML = landingExpress + cards + blank;
+
+    // Default selection
+    selectedPresetId = "saas";
+    grid.querySelector('.archetype-card--active')?.scrollIntoView({ block: "nearest" });
+
+    grid.querySelectorAll(".archetype-card").forEach(btn => {
       btn.addEventListener("click", () => {
-        grid.querySelectorAll(".preset-card").forEach(b => b.classList.remove("preset-card--active"));
-        btn.classList.add("preset-card--active");
-        selectedPresetId = (btn as HTMLElement).dataset.preset || "blank";
+        grid.querySelectorAll(".archetype-card").forEach(b => b.classList.remove("archetype-card--active"));
+        btn.classList.add("archetype-card--active");
+        const preset = (btn as HTMLElement).dataset.preset || "blank";
+
+        // Landing Express redirects to a simplified flow
+        if (preset === "landing-express") {
+          selectedPresetId = "saas"; // default base for express
+          showLandingExpressFlow();
+          return;
+        }
+
+        selectedPresetId = preset;
         selectedVariants = {};
         renderVariantSelectors();
         log("preset selected: " + selectedPresetId);
       });
     });
     renderVariantSelectors();
+  }
+
+  // ── Landing Express guided flow ──
+  function showLandingExpressFlow() {
+    const wizCard = $("wizardCard") as HTMLElement;
+    if (!wizCard) return;
+
+    // Replace wizard content with express flow
+    const expressHtml = `
+      <div class="express-flow" id="expressFlow">
+        <div class="express-header">
+          <span class="express-badge">⚡ Landing Express</span>
+          <h3 class="card__title">Build your landing page in 60 seconds</h3>
+        </div>
+
+        <div class="express-step" id="exStep1">
+          <div class="express-q">What type of business is this for?</div>
+          <div class="express-options" id="exArchetype">
+            <button class="express-opt" data-val="saas">⚡ Software / SaaS</button>
+            <button class="express-opt" data-val="agency">🏢 Agency / Studio</button>
+            <button class="express-opt" data-val="portfolio">👤 Freelancer / Portfolio</button>
+            <button class="express-opt" data-val="local">📍 Local Business</button>
+            <button class="express-opt" data-val="ecommerce">🛒 E-commerce</button>
+            <button class="express-opt" data-val="event">🎯 Event / Launch</button>
+          </div>
+        </div>
+
+        <div class="express-step" id="exStep2" hidden>
+          <div class="express-q">What should visitors do?</div>
+          <div class="express-options" id="exGoal">
+            <button class="express-opt" data-val="leads">📩 Book a call / Get in touch</button>
+            <button class="express-opt" data-val="sales">💳 Buy or subscribe</button>
+            <button class="express-opt" data-val="waitlist">📋 Join a waitlist</button>
+            <button class="express-opt" data-val="showcase">👁 Learn and trust</button>
+          </div>
+        </div>
+
+        <div class="express-step" id="exStep3" hidden>
+          <div class="express-q">Last details</div>
+          <div class="row">
+            <div class="field-group">
+              <label class="label" for="exBrand">Brand name</label>
+              <input id="exBrand" class="field" placeholder="Your brand" />
+            </div>
+            <div class="field-group">
+              <label class="label" for="exTagline">One-line description</label>
+              <input id="exTagline" class="field" placeholder="What you do, in one sentence" />
+            </div>
+          </div>
+          <div class="row" style="margin-top:12px">
+            <div class="field-group">
+              <label class="label" for="exCta">Main button text</label>
+              <input id="exCta" class="field" placeholder="Get started" />
+            </div>
+            <div class="field-group">
+              <label class="label" for="exSlug">Slug</label>
+              <input id="exSlug" class="field" placeholder="my-brand" />
+            </div>
+          </div>
+          <button class="btn btn--primary" id="exGenerate" style="margin-top:18px;width:100%">
+            Generate my landing page →
+          </button>
+        </div>
+
+        <button class="btn btn--ghost btn--sm" id="exBack" style="margin-top:12px">← Back to templates</button>
+      </div>
+    `;
+
+    // Store original wizard content
+    if (!(wizCard as any)._originalHTML) {
+      (wizCard as any)._originalHTML = wizCard.innerHTML;
+    }
+    wizCard.innerHTML = expressHtml;
+
+    let exArchetype = "saas";
+    let exGoal = "leads";
+
+    // Archetype mapping
+    const archetypeToPreset: Record<string, string> = {
+      saas: "saas", agency: "agency", portfolio: "portfolio",
+      local: "agency", ecommerce: "saas", event: "saas",
+    };
+
+    // Step 1: Archetype
+    $("exArchetype")?.querySelectorAll(".express-opt").forEach((btn: any) => {
+      btn.addEventListener("click", () => {
+        $("exArchetype")!.querySelectorAll(".express-opt").forEach((b: any) => b.classList.remove("express-opt--active"));
+        btn.classList.add("express-opt--active");
+        exArchetype = btn.dataset.val;
+        ($("exStep2") as HTMLElement).hidden = false;
+        ($("exStep2") as HTMLElement).scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+    });
+
+    // Step 2: Goal
+    $("exGoal")?.querySelectorAll(".express-opt").forEach((btn: any) => {
+      btn.addEventListener("click", () => {
+        $("exGoal")!.querySelectorAll(".express-opt").forEach((b: any) => b.classList.remove("express-opt--active"));
+        btn.classList.add("express-opt--active");
+        exGoal = btn.dataset.val;
+        ($("exStep3") as HTMLElement).hidden = false;
+        ($("exStep3") as HTMLElement).scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+    });
+
+    // Generate
+    $("exGenerate")?.addEventListener("click", async () => {
+      const brand = ($("exBrand") as HTMLInputElement)?.value?.trim() || "My Brand";
+      const tagline = ($("exTagline") as HTMLInputElement)?.value?.trim() || "";
+      const cta = ($("exCta") as HTMLInputElement)?.value?.trim() || "Get started";
+      const slug = ($("exSlug") as HTMLInputElement)?.value?.trim() || brand.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+      // Restore wizard + use selected archetype
+      selectedPresetId = archetypeToPreset[exArchetype] || "saas";
+
+      // Set wizard inputs programmatically
+      wizCard.innerHTML = (wizCard as any)._originalHTML;
+      renderPresetPicker();
+      renderVariantSelectors();
+
+      // Fill in brand fields
+      ($("pname") as HTMLInputElement).value = brand;
+      ($("pslug") as HTMLInputElement).value = slug;
+      ($("wBrand") as HTMLInputElement).value = brand;
+      ($("wTagline") as HTMLInputElement).value = tagline;
+      ($("wCta") as HTMLInputElement).value = cta;
+      ($("wGoal") as HTMLSelectElement).value = exGoal;
+
+      // Auto-create the project
+      const w = getWizardInputs();
+      w.name = brand;
+      w.brand = brand;
+      w.tagline = tagline;
+      w.cta = cta;
+      w.goal = exGoal;
+
+      const projectName = brand;
+      const projectSlug = slug + "-" + Math.random().toString(36).slice(2, 6);
+      const builder_data = buildProjectData();
+
+      setStatus("Creating your landing page...");
+      const { data, error } = await supa.from("projects")
+        .insert({ user_id: user.id, name: projectName, slug: projectSlug, domain_type: "subdomain", builder_data, status: "draft" })
+        .select("id,name,slug,builder_data,status,created_at")
+        .single();
+
+      if (error) { setStatus(error.message); return; }
+      await logUsage("builder_create");
+      setStatus("Landing page created!");
+      await listProjects(user.id);
+      openProject(data);
+
+      // Switch to sections tab
+      switchTab("sections");
+    });
+
+    // Back button
+    $("exBack")?.addEventListener("click", () => {
+      wizCard.innerHTML = (wizCard as any)._originalHTML;
+      renderPresetPicker();
+      renderVariantSelectors();
+    });
   }
 
   // ── Variant mini-layout SVGs ────────────────────────────────
@@ -979,6 +1215,9 @@ import PageWidgets from "../../../components/PageWidgets.astro";
     document.querySelectorAll(".project-btn").forEach((b) => b.classList.remove("active"));
     const active = document.querySelector(`[data-id="${p.id}"]`);
     if (active) active.classList.add("active");
+
+    // Trigger preview refresh
+    ($("json") as HTMLTextAreaElement)?.dispatchEvent(new Event("input"));
   }
 
   async function saveCurrent() {
@@ -1291,6 +1530,41 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
       }
     });
 
+    // ── Preview Toggle + Live Render ──
+    const previewToggle = $("previewToggle") as HTMLButtonElement;
+    const previewPane = $("previewPane") as HTMLElement;
+    const previewFrame = $("previewFrame") as HTMLIFrameElement;
+    const editorSplit = $("editorSplit") as HTMLElement;
+    let previewActive = false;
+
+    function updatePreview() {
+      if (!previewActive || !previewFrame) return;
+      try {
+        const raw = ($("json") as HTMLTextAreaElement)?.value || "{}";
+        const data = JSON.parse(raw);
+        if (window.VxRenderer && data.sections) {
+          previewFrame.srcdoc = window.VxRenderer.renderPage(data);
+        }
+      } catch (_) {
+        // Invalid JSON — don't update preview
+      }
+    }
+
+    previewToggle?.addEventListener("click", () => {
+      previewActive = !previewActive;
+      previewToggle.classList.toggle("is-active", previewActive);
+      previewPane.hidden = !previewActive;
+      editorSplit.classList.toggle("is-split", previewActive);
+      if (previewActive) updatePreview();
+    });
+
+    // Debounced preview on JSON edit
+    let previewTimer: ReturnType<typeof setTimeout>;
+    ($("json") as HTMLTextAreaElement)?.addEventListener("input", () => {
+      clearTimeout(previewTimer);
+      previewTimer = setTimeout(updatePreview, 400);
+    });
+
     log("boot complete");
   })();
 </script>
@@ -1535,51 +1809,69 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     transition: width .4s ease;
   }
 
-  /* PRESET PICKER — Visual cards */
-  .preset-grid {
+  /* ARCHETYPE PICKER */
+  .archetype-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 10px;
   }
-  .preset-card {
+  .archetype-card {
     display: flex;
-    flex-direction: column;
-    gap: 0;
-    padding: 0;
-    border-radius: 16px;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 18px;
+    border-radius: 14px;
     border: 1px solid var(--line);
     background: rgba(231,238,247,.02);
     color: var(--mut);
     cursor: pointer;
-    transition: all .25s;
+    transition: all .2s;
     text-align: left;
     font-family: inherit;
-    overflow: hidden;
   }
-  .preset-card:hover {
+  .archetype-card:hover {
     border-color: rgba(125,211,252,.25);
     background: rgba(125,211,252,.03);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,.15);
   }
-  .preset-card--active {
+  .archetype-card--active {
     border-color: rgba(125,211,252,.4);
     background: rgba(125,211,252,.06);
     color: var(--fg);
-    box-shadow: 0 0 20px rgba(125,211,252,.08), 0 8px 24px rgba(0,0,0,.15);
+    box-shadow: 0 0 16px rgba(125,211,252,.06);
   }
-  .preset-preview {
-    padding: 16px 12px 8px;
-    color: var(--fg);
+  .archetype-card--express {
+    border-color: rgba(243,225,160,.2);
   }
-  .preset-preview svg { width: 100%; height: auto; }
-  .preset-info {
-    padding: 8px 14px 14px;
-    display: flex; flex-direction: column; gap: 2px;
+  .archetype-card--express:hover, .archetype-card--express.archetype-card--active {
+    border-color: rgba(243,225,160,.45);
+    background: rgba(243,225,160,.05);
+    box-shadow: 0 0 16px rgba(243,225,160,.06);
   }
-  .preset-name { font-size: 14px; font-weight: 700; color: inherit; }
-  .preset-desc { font-size: 11px; color: var(--mut); line-height: 1.4; }
-  .preset-card--active .preset-desc { color: rgba(125,211,252,.5); }
+  .archetype-icon {
+    flex: 0 0 auto;
+    width: 48px; height: 48px;
+    display: grid; place-items: center;
+    font-size: 24px;
+    border-radius: 12px;
+    background: rgba(231,238,247,.04);
+    border: 1px solid rgba(231,238,247,.06);
+  }
+  .archetype-icon--express {
+    background: rgba(243,225,160,.08);
+    border-color: rgba(243,225,160,.15);
+  }
+  .archetype-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .archetype-name { font-size: 14px; font-weight: 700; color: var(--fg); }
+  .archetype-outcome { font-size: 12px; color: var(--mut); line-height: 1.4; }
+  .archetype-ideal { font-size: 11px; color: rgba(231,238,247,.3); line-height: 1.3; }
+  .archetype-tag {
+    display: inline-block; align-self: flex-start;
+    font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 999px;
+    background: rgba(243,225,160,.1); border: 1px solid rgba(243,225,160,.2);
+    color: #f3e1a0;
+  }
+  .archetype-card--active .archetype-outcome { color: rgba(125,211,252,.5); }
 
   /* VARIANT SELECTORS — Visual cards */
   .variant-selectors { display: grid; gap: 16px; }
@@ -1846,6 +2138,15 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
   }
 
   .json-editor:focus { border-color: rgba(125, 211, 252, .35); }
+
+  /* Editor/Preview split */
+  .editor-split { display: flex; gap: 0; }
+  .editor-split .json-editor { flex: 1; min-width: 0; }
+  .editor-split.is-split { gap: 12px; }
+  .editor-split.is-split .json-editor { flex: 1; min-height: 500px; resize: none; }
+  .preview-pane { flex: 1; min-width: 0; border-radius: 12px; border: 1px solid rgba(231,238,247,.14); overflow: hidden; background: #070A12; }
+  .preview-frame { width: 100%; height: 100%; min-height: 500px; border: none; background: #070A12; }
+  #previewToggle.is-active { background: rgba(125,211,252,.12); color: var(--accent); border-color: rgba(125,211,252,.25); }
 
   .editor-footer {
     margin-top: 8px;
