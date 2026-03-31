@@ -2,12 +2,12 @@
 import { ROUTES } from "../data/routes";
 
 const nav = [
-  { href: ROUTES.home, label: "Home" },
-  { href: ROUTES.products, label: "Products" },
-  { href: ROUTES.lab, label: "Lab" },
-  { href: ROUTES.builder, label: "Builder" },
-  { href: ROUTES.pricing, label: "Pricing" },
-  { href: ROUTES.devHub, label: "Dev Hub" },
+  { href: ROUTES.home, label: "Home", i18n: "nav.home" },
+  { href: ROUTES.builder, label: "Builder", i18n: "nav.builder" },
+  { href: ROUTES.products, label: "Products", i18n: "nav.products" },
+  { href: ROUTES.lab, label: "Lab", i18n: "nav.lab" },
+  { href: ROUTES.pricing, label: "Pricing", i18n: "nav.pricing" },
+  { href: ROUTES.devHub, label: "Dev Hub", i18n: "nav.devhub" },
 ];
 
 interface Props {
@@ -26,12 +26,12 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro" } = Astro.pr
 
     <nav class="main-nav" aria-label="Primary navigation">
       {nav.map((item) => (
-        <a href={item.href} class:list={{ active: current === item.href }}>{item.label}</a>
+        <a href={item.href} class:list={{ active: current === item.href }} data-i18n={item.i18n}>{item.label}</a>
       ))}
     </nav>
 
     <div class="header-actions">
-      <a href={ROUTES.login} class="header-link">Login</a>
+      <a href={ROUTES.login} class="header-link" data-i18n="nav.login">Login</a>
       <a href={ctaHref} class="button button--gold">{ctaLabel}</a>
       <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Open menu" aria-expanded="false">
         <span></span><span></span><span></span>
@@ -42,9 +42,9 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro" } = Astro.pr
   <!-- Mobile navigation -->
   <nav class="mobile-nav" id="mobileNav" aria-label="Mobile navigation">
     {nav.map((item) => (
-      <a href={item.href} class:list={{ active: current === item.href }}>{item.label}</a>
+      <a href={item.href} class:list={{ active: current === item.href }} data-i18n={item.i18n}>{item.label}</a>
     ))}
-    <a href={ROUTES.login} class="button button--ghost">Login</a>
+    <a href={ROUTES.login} class="button button--ghost" data-i18n="nav.login">Login</a>
     <a href={ctaHref} class="button button--gold">{ctaLabel}</a>
   </nav>
 </header>

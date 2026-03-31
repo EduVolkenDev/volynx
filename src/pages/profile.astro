@@ -16,7 +16,7 @@ import { ROUTES } from "../data/routes";
 		<meta property="og:description" content="Manage your VOLYNX account, profile settings, and subscription." />
 		<meta property="og:type" content="website" />
 		<meta property="og:url" content="https://volynx.world/profile/" />
-		<meta property="og:image" content="https://volynx.world/assets/og-default.png" />
+		<meta property="og:image" content="https://volynx.world/assets/volynx-icon.webp" />
 
 		<script is:inline src="/js/vx-plan.js"></script>
 	</head>
@@ -26,9 +26,9 @@ import { ROUTES } from "../data/routes";
 		<div class="orb orb-b" aria-hidden="true"></div>
 
 		<Topbar leftLinks={[
+			{ href: ROUTES.builder, label: "Builder" },
 			{ href: ROUTES.studio, label: "Studio" },
 			{ href: ROUTES.pricing, label: "Pricing" },
-			{ href: ROUTES.contact, label: "Support" },
 		]}>
 			<button slot="right" type="button" class="logout-btn" id="logoutBtn">Sign out</button>
 		</Topbar>
@@ -139,7 +139,8 @@ import { ROUTES } from "../data/routes";
 					</div>
 				</div>
 				<div class="hero-cta">
-					<a href={ROUTES.studio} class="btn">Open Studio</a>
+					<a href={ROUTES.builder} class="btn">Open Builder</a>
+					<a href={ROUTES.studio} class="btn btn--ghost">Studio Pro</a>
 					<button type="button" class="btn btn--ghost" id="scrollToEdit">Edit profile</button>
 				</div>
 			</section>
@@ -188,16 +189,11 @@ import { ROUTES } from "../data/routes";
 				<div class="glass-section glass-section--compact">
 					<div class="section-label">Activity</div>
 					<div class="timeline-row"><div class="dot"></div><div><strong>Account created</strong><br/><span id="activityJoined" class="text-muted">—</span></div></div>
-					<p class="coming-soon">Activity tracking coming soon.</p>
 				</div>
 				<div class="glass-section glass-section--compact">
 					<div class="section-label">Security</div>
 					<div class="info-row"><span>Password</span><strong>Set</strong></div>
 					<div class="info-row"><span>2FA</span><strong>Not enabled</strong></div>
-				</div>
-				<div class="glass-section glass-section--compact">
-					<div class="section-label">Preferences</div>
-					<p class="coming-soon">Preference controls coming soon.</p>
 				</div>
 			</section>
 		</div>
@@ -775,7 +771,7 @@ import { ROUTES } from "../data/routes";
 			})();
 		</script>
 
-		<PageWidgets hideUtilBar />
+		<PageWidgets />
 	</body>
 </html>
 

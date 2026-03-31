@@ -1,31 +1,26 @@
 (function initLandingExpress() {
-  const STRIPE_LINK = 'LINK_STRIPE_AQUI';
-  const FORMSPREE_ACTION = 'FORMSPREE_ENDPOINT_AQUI';
+  var STRIPE_LINK = 'LINK_STRIPE_AQUI';
+  var FORMSPREE_ACTION = 'FORMSPREE_ENDPOINT_AQUI';
+  var FALLBACK_URL = '/contact/?product=landing-express';
 
-  const ctas = ['topCta', 'heroCta', 'midCta', 'finalCta']
-    .map((id) => document.getElementById(id))
+  var ctas = ['topCta', 'heroCta', 'midCta', 'finalCta']
+    .map(function(id) { return document.getElementById(id); })
     .filter(Boolean);
 
   if (STRIPE_LINK !== 'LINK_STRIPE_AQUI') {
-    ctas.forEach((el) => el.setAttribute('href', STRIPE_LINK));
+    ctas.forEach(function(el) { el.setAttribute('href', STRIPE_LINK); });
   } else {
-    ctas.forEach((el) => {
-      el.addEventListener('click', (event) => {
-        event.preventDefault();
-        alert('Defina seu link do Stripe em public/scripts/landing-express.js antes do deploy.');
-      });
-    });
+    ctas.forEach(function(el) { el.setAttribute('href', FALLBACK_URL); });
   }
 
-  const form = document.getElementById('briefForm');
+  var form = document.getElementById('briefForm');
   if (!form) return;
 
   if (FORMSPREE_ACTION !== 'FORMSPREE_ENDPOINT_AQUI') {
     form.setAttribute('action', FORMSPREE_ACTION);
   } else {
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
-      alert('Defina seu endpoint do Formspree em public/scripts/landing-express.js antes do deploy.');
-    });
+    form.setAttribute('action', 'mailto:hello@volynx.world?subject=Landing%20Express%20Brief');
+    form.setAttribute('method', 'post');
+    form.setAttribute('enctype', 'text/plain');
   }
 })();

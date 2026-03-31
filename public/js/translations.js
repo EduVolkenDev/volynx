@@ -3,6 +3,15 @@
    Loaded before i18n.js so window.VX_TRANS is available. */
 window.VX_TRANS = {
   en: {
+    /* === NAV === */
+    "nav.home": "Home",
+    "nav.builder": "Builder",
+    "nav.products": "Products",
+    "nav.lab": "Lab",
+    "nav.pricing": "Pricing",
+    "nav.devhub": "Dev Hub",
+    "nav.login": "Login",
+
     /* === WIDGETS === */
     "widget.lang":  "EN",
     "widget.login": "Login",
@@ -1017,6 +1026,13 @@ window.VX_TRANS = {
     "home2.cta_pricing_btn": "See the pricing logic",
     "home2.cta_profile_btn": "Open Pro Command Center",
     "home2.cta_tagline": "Free should feel generous. Pro should feel inevitable.",
+    "home2.icons_store_label": "Premium Asset Store",
+    "home2.icons_store_title": "3,000+ premium icons. Ready to use.",
+    "home2.icons_store_desc": "Curated collections from neon to minimal, futuristic to organic. Free packs to start, premium bundles for serious projects. Every icon handpicked for quality.",
+    "home2.icons_store_stat1": "Collections",
+    "home2.icons_store_stat2": "Icons",
+    "home2.icons_store_stat3": "Starter packs",
+    "home2.icons_store_btn": "Browse Icons Store",
     "home2.eyebrow_ecosystem": "What Volynx is",
     "home2.eyebrow_featured": "Featured now",
     "home2.eyebrow_principles": "Operating philosophy",
@@ -1283,6 +1299,15 @@ window.VX_TRANS = {
   },
 
   pt: {
+    /* === NAV === */
+    "nav.home": "Início",
+    "nav.builder": "Builder",
+    "nav.products": "Produtos",
+    "nav.lab": "Lab",
+    "nav.pricing": "Preços",
+    "nav.devhub": "Dev Hub",
+    "nav.login": "Entrar",
+
     /* === WIDGETS === */
     "widget.lang":  "PT",
     "widget.login": "Entrar",
@@ -2297,6 +2322,13 @@ window.VX_TRANS = {
     "home2.cta_pricing_btn": "Ver a lógica de preços",
     "home2.cta_profile_btn": "Abrir Centro de Comando Pro",
     "home2.cta_tagline": "Grátis deve parecer generoso. Pro deve parecer inevitável.",
+    "home2.icons_store_label": "Loja de Assets Premium",
+    "home2.icons_store_title": "3.000+ ícones premium. Prontos para usar.",
+    "home2.icons_store_desc": "Coleções curadas do neon ao minimalista, futurista ao orgânico. Pacotes gratuitos para começar, bundles premium para projetos sérios. Cada ícone escolhido a dedo pela qualidade.",
+    "home2.icons_store_stat1": "Coleções",
+    "home2.icons_store_stat2": "Ícones",
+    "home2.icons_store_stat3": "Pacotes iniciais",
+    "home2.icons_store_btn": "Explorar Icons Store",
     "home2.eyebrow_ecosystem": "O que é Volynx",
     "home2.eyebrow_featured": "Destaque agora",
     "home2.eyebrow_principles": "Filosofia operacional",

@@ -1,4 +1,8 @@
-import { getSupabaseClient } from "/src/lib/supabase-client.js";
+async function loadConfig() {
+  const res = await fetch("/config.json", { cache: "no-store" });
+  if (!res.ok) throw new Error("config.json not found.");
+  return await res.json();
+}
 
 const iconEl      = document.getElementById("confirmIcon");
 const spinnerEl   = document.getElementById("confirmSpinner");
@@ -9,21 +13,16 @@ const btnLogin    = document.getElementById("confirmBtn");
 const btnRetry    = document.getElementById("confirmBtnRetry");
 
 function showSuccess() {
-  // Icon
   if (spinnerEl) spinnerEl.hidden = true;
   iconEl.classList.add("is-success");
   iconEl.textContent = "";
-  const check = document.createTextNode("\u2713");
-  iconEl.appendChild(check);
+  iconEl.appendChild(document.createTextNode("\u2713"));
 
-  // Text
   titleEl.textContent = "Email confirmed";
   msgEl.textContent   = "Your account is verified. You can now sign in.";
 
-  // Login CTA
   btnLogin.hidden = false;
 
-  // Countdown redirect
   countdownEl.hidden = false;
   let seconds = 5;
   countdownEl.textContent = `Redirecting to login in ${seconds}s...`;
@@ -40,20 +39,15 @@ function showSuccess() {
 }
 
 function showError(errorMsg) {
-  // Icon
   if (spinnerEl) spinnerEl.hidden = true;
   iconEl.classList.add("is-error");
   iconEl.textContent = "";
-  const x = document.createTextNode("\u2715");
-  iconEl.appendChild(x);
+  iconEl.appendChild(document.createTextNode("\u2715"));
 
-  // Text
   titleEl.textContent = "Confirmation failed";
   msgEl.textContent   = errorMsg || "Invalid or expired link. Please try signing up again.";
 
-  // Retry CTA (goes to signup)
   btnRetry.hidden = false;
-  // Also show login as secondary option
   btnLogin.hidden = false;
 }
 
@@ -62,13 +56,27 @@ async function confirm() {
   const token_hash = params.get("token_hash");
   const type       = params.get("type");
 
-  // PKCE flow (current Supabase default)
   if (token_hash && type) {
     try {
-      const supabase = await getSupabaseClient();
-      const { error } = await supabase.auth.verifyOtp({ token_hash, type });
-      if (error) {
-        showError(error.message);
+      const cfg = await loadConfig();
+      if (!cfg?.supabaseUrl || !cfg?.supabaseAnonKey) {
+        showError("Missing Supabase configuration.");
+        return;
+      }
+
+      const res = await fetch(`${cfg.supabaseUrl}/auth/v1/verify`, {
+        method: "POST",
+        headers: {
+          apikey: cfg.supabaseAnonKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token_hash, type }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        showError(data?.error_description || data?.msg || data?.error || "Verification failed.");
       } else {
         showSuccess();
       }
@@ -78,8 +86,6 @@ async function confirm() {
     return;
   }
 
-  // Legacy flow: tokens in hash (#access_token=...) — rejected for security.
-  // Hash-based tokens are not verified server-side, so we do NOT trust them.
   if (window.location.hash && window.location.hash.includes("access_token")) {
     showError("This confirmation link format is no longer supported. Please request a new confirmation email.");
     return;

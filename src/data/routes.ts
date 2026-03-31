@@ -30,7 +30,7 @@ export const ROUTES = {
   portfolioKit: "/products/portfolio-pro-kit/",
   saasSystem: "/products/saas-landing-system/",
   propertyflow: "/products/propertyflow/",
-  iconsStore: "/dev-hub/volynx-icons-store/",
+  iconsStore: "/products/volynx-icons-store/",
 
   // ── Services ──────────────────────────
   services: "/services/",
