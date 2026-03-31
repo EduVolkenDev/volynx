@@ -36,36 +36,36 @@ import { ROUTES } from "../data/routes";
 		<!-- ═══ VIEW: loading ═══ -->
 		<div id="viewLoading" class="view view--active">
 			<div class="spinner"></div>
-			<p>Loading your profile...</p>
+			<p data-i18n="profile.loading">Loading your profile...</p>
 		</div>
 
 		<!-- ═══ VIEW: error ═══ -->
 		<div id="viewError" class="view">
-			<p id="errorMsg" class="error-text">Something went wrong.</p>
-			<a href={ROUTES.login} class="btn">Sign in again</a>
+			<p id="errorMsg" class="error-text" data-i18n="profile.error_generic">Something went wrong.</p>
+			<a href={ROUTES.login} class="btn" data-i18n="profile.btn_signin">Sign in again</a>
 		</div>
 
 		<!-- ═══ VIEW: profile ═══ -->
 		<div id="viewProfile" class="view">
 
 			<div id="firstTimeBanner" class="banner banner--welcome" style="display:none;">
-				<h2>Welcome to VOLYNX</h2>
-				<p>Complete your profile below to get started.</p>
+				<h2 data-i18n="profile.welcome_title">Welcome to VOLYNX</h2>
+				<p data-i18n="profile.welcome_desc">Complete your profile below to get started.</p>
 			</div>
 
 			<div id="paymentSuccessBanner" class="banner banner--success" style="display:none;">
 				<div class="banner-row">
-					<span>Payment confirmed! Your plan is now active.</span>
-					<button type="button" class="btn btn--sm btn--ghost" onclick="this.closest('.banner').style.display='none';history.replaceState({},'','/profile/');">Dismiss</button>
+					<span data-i18n="profile.payment_success">Payment confirmed! Your plan is now active.</span>
+					<button type="button" class="btn btn--sm btn--ghost" data-i18n="profile.btn_dismiss" onclick="this.closest('.banner').style.display='none';history.replaceState({},'','/profile/');">Dismiss</button>
 				</div>
 			</div>
 
 			<div id="welcomeBanner" class="banner banner--subtle" style="display:none;">
 				<div class="banner-row">
-					<span>Welcome back!</span>
+					<span data-i18n="profile.welcome_back">Welcome back!</span>
 					<div class="banner-actions">
-						<button type="button" class="btn btn--sm" id="editProfileBtn">Edit profile</button>
-						<button type="button" class="btn btn--sm btn--ghost" id="continueBtn">Continue</button>
+						<button type="button" class="btn btn--sm" id="editProfileBtn" data-i18n="profile.btn_edit">Edit profile</button>
+						<button type="button" class="btn btn--sm btn--ghost" id="continueBtn" data-i18n="profile.btn_continue">Continue</button>
 					</div>
 				</div>
 			</div>
@@ -79,19 +79,19 @@ import { ROUTES } from "../data/routes";
 								style="display:none;"
 								onerror="this.style.display='none';this.nextElementSibling.style.display='grid';" />
 							<div class="avatar-fallback" id="avatarFallback">??</div>
-							<div class="avatar-overlay" id="avatarOverlay"><span>Change</span></div>
+							<div class="avatar-overlay" id="avatarOverlay"><span data-i18n="profile.avatar_change">Change</span></div>
 						</div>
 						<input id="avatarInput" type="file" accept="image/*" hidden />
 
 						<!-- Avatar picker panel -->
 						<div class="avatar-panel" id="avatarPanel" hidden>
 							<div class="avatar-panel__header">
-								<span class="avatar-panel__title">Choose avatar</span>
+								<span class="avatar-panel__title" data-i18n="profile.avatar_choose">Choose avatar</span>
 								<button type="button" class="avatar-panel__close" id="avatarPanelClose">✕</button>
 							</div>
 
 							<div class="avatar-panel__section">
-								<span class="avatar-panel__label">Free</span>
+								<span class="avatar-panel__label" data-i18n="profile.avatar_free">Free</span>
 								<div class="avatar-panel__grid">
 									<button type="button" class="avatar-option" data-avatar="/assets/avatarfree/1.png">
 										<img src="/assets/avatarfree/1.png" alt="Avatar 1" />
@@ -111,10 +111,10 @@ import { ROUTES } from "../data/routes";
 							</div>
 
 							<div class="avatar-panel__section">
-								<span class="avatar-panel__label">Custom</span>
+								<span class="avatar-panel__label" data-i18n="profile.avatar_custom">Custom</span>
 								<div class="avatar-panel__grid">
 									<label class="avatar-option avatar-option--upload" for="avatarInput">
-										<span>+ Upload</span>
+										<span data-i18n="profile.avatar_upload">+ Upload</span>
 									</label>
 								</div>
 							</div>
@@ -133,67 +133,67 @@ import { ROUTES } from "../data/routes";
 						</div>
 						<div class="hero-badges">
 							<span id="heroPlan" class="plan-badge">Free</span>
-							<a id="planCta" href={ROUTES.pricing} class="plan-cta">Upgrade plan</a>
+							<a id="planCta" href={ROUTES.pricing} class="plan-cta" data-i18n="profile.btn_upgrade">Upgrade plan</a>
 							<span id="planHelper" class="plan-helper" style="display:none"></span>
 						</div>
 					</div>
 				</div>
 				<div class="hero-cta">
-					<a href={ROUTES.builder} class="btn">Open Builder</a>
-					<a href={ROUTES.studio} class="btn btn--ghost">Studio Pro</a>
-					<button type="button" class="btn btn--ghost" id="scrollToEdit">Edit profile</button>
+					<a href={ROUTES.builder} class="btn" data-i18n="profile.btn_builder">Open Builder</a>
+					<a href={ROUTES.studio} class="btn btn--ghost" data-i18n="profile.btn_studio">Studio Pro</a>
+					<button type="button" class="btn btn--ghost" id="scrollToEdit" data-i18n="profile.btn_edit_profile">Edit profile</button>
 				</div>
 			</section>
 
 			<section class="details-strip">
-				<div class="detail-cell"><span class="detail-label">Full name</span><strong id="detailName">—</strong></div>
-				<div class="detail-cell"><span class="detail-label">Username</span><strong id="detailUsername">—</strong></div>
-				<div class="detail-cell"><span class="detail-label">Website</span><strong id="detailWebsite">—</strong></div>
-				<div class="detail-cell"><span class="detail-label">Email</span><strong id="detailEmail">—</strong></div>
+				<div class="detail-cell"><span class="detail-label" data-i18n="profile.label_fullname">Full name</span><strong id="detailName">—</strong></div>
+				<div class="detail-cell"><span class="detail-label" data-i18n="profile.label_username">Username</span><strong id="detailUsername">—</strong></div>
+				<div class="detail-cell"><span class="detail-label" data-i18n="profile.label_website">Website</span><strong id="detailWebsite">—</strong></div>
+				<div class="detail-cell"><span class="detail-label" data-i18n="profile.label_email">Email</span><strong id="detailEmail">—</strong></div>
 			</section>
 
 			<section id="editPanel" class="glass-section">
-				<div class="section-label" id="formLabel">Edit profile</div>
+				<div class="section-label" id="formLabel" data-i18n="profile.section_edit">Edit profile</div>
 				<form id="profileForm" class="edit-form">
 					<div class="form-grid">
-						<label class="field"><span>Full name</span><input id="inputName" type="text" placeholder="Your full name" /></label>
-						<label class="field"><span>Username</span><input id="inputUsername" type="text" placeholder="username" /></label>
-						<label class="field"><span>Email</span><input id="inputEmail" type="email" disabled /></label>
-						<label class="field"><span>Website</span><input id="inputWebsite" type="url" placeholder="https://..." /></label>
-						<label class="field"><span>Location</span><input id="inputLocation" type="text" placeholder="City, Country" /></label>
-						<label class="field field--full"><span>Bio</span><textarea id="inputBio" rows="4" placeholder="Tell us about yourself..."></textarea></label>
+						<label class="field"><span data-i18n="profile.form_fullname">Full name</span><input id="inputName" type="text" placeholder="Your full name" data-i18n-placeholder="profile.ph_fullname" /></label>
+						<label class="field"><span data-i18n="profile.form_username">Username</span><input id="inputUsername" type="text" placeholder="username" data-i18n-placeholder="profile.ph_username" /></label>
+						<label class="field"><span data-i18n="profile.form_email">Email</span><input id="inputEmail" type="email" disabled /></label>
+						<label class="field"><span data-i18n="profile.form_website">Website</span><input id="inputWebsite" type="url" placeholder="https://..." data-i18n-placeholder="profile.ph_website" /></label>
+						<label class="field"><span data-i18n="profile.form_location">Location</span><input id="inputLocation" type="text" placeholder="City, Country" data-i18n-placeholder="profile.ph_location" /></label>
+						<label class="field field--full"><span data-i18n="profile.form_bio">Bio</span><textarea id="inputBio" rows="4" placeholder="Tell us about yourself..." data-i18n-placeholder="profile.ph_bio"></textarea></label>
 					</div>
 					<div class="form-footer">
-						<button type="submit" class="btn" id="saveBtn">Save changes</button>
-						<button type="button" class="btn btn--ghost" id="resetBtn">Reset</button>
+						<button type="submit" class="btn" id="saveBtn" data-i18n="profile.btn_save">Save changes</button>
+						<button type="button" class="btn btn--ghost" id="resetBtn" data-i18n="profile.btn_reset">Reset</button>
 						<p class="form-status" id="saveStatus"></p>
 					</div>
 				</form>
 			</section>
 
 			<section class="token-section glass-section">
-				<div class="section-label">Token Balance</div>
+				<div class="section-label" data-i18n="profile.section_tokens">Token Balance</div>
 				<div class="token-overview">
 					<div class="token-balance-display">
 						<span class="token-balance-number" id="tokenBalance">—</span>
-						<span class="token-balance-label">tokens available</span>
+						<span class="token-balance-label" data-i18n="profile.tokens_available">tokens available</span>
 					</div>
-					<a href="/pricing/#tokens" class="btn btn--sm" id="buyTokensBtn">Get more tokens</a>
+					<a href="/pricing/#tokens" class="btn btn--sm" id="buyTokensBtn" data-i18n="profile.btn_tokens">Get more tokens</a>
 				</div>
 				<div id="tokenHistory" class="token-history">
-					<p class="text-muted" style="font-size:.85rem;">Loading history...</p>
+					<p class="text-muted" style="font-size:.85rem;" data-i18n="profile.loading_history">Loading history...</p>
 				</div>
 			</section>
 
 			<section class="bottom-grid">
 				<div class="glass-section glass-section--compact">
-					<div class="section-label">Activity</div>
-					<div class="timeline-row"><div class="dot"></div><div><strong>Account created</strong><br/><span id="activityJoined" class="text-muted">—</span></div></div>
+					<div class="section-label" data-i18n="profile.section_activity">Activity</div>
+					<div class="timeline-row"><div class="dot"></div><div><strong data-i18n="profile.activity_created">Account created</strong><br/><span id="activityJoined" class="text-muted">—</span></div></div>
 				</div>
 				<div class="glass-section glass-section--compact">
-					<div class="section-label">Security</div>
-					<div class="info-row"><span>Password</span><strong>Set</strong></div>
-					<div class="info-row"><span>2FA</span><strong>Not enabled</strong></div>
+					<div class="section-label" data-i18n="profile.section_security">Security</div>
+					<div class="info-row"><span data-i18n="profile.security_password">Password</span><strong data-i18n="profile.security_set">Set</strong></div>
+					<div class="info-row"><span data-i18n="profile.security_2fa">2FA</span><strong data-i18n="profile.security_not_enabled">Not enabled</strong></div>
 				</div>
 			</section>
 		</div>

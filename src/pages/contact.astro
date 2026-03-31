@@ -5,7 +5,7 @@ import SiteFooter from "../components/SiteFooter.astro";
 const title = "Contact — VOLYNX";
 ---
 
-<BaseLayout title={title} description="Talk to VOLYNX about your project, support needs, or partnership ideas." hideUtilBar>
+<BaseLayout title={title} description="Talk to VOLYNX about your project, support needs, or partnership ideas.">
   <VxHeader />
 
   <main class="shell contact-page">
@@ -40,14 +40,14 @@ const title = "Contact — VOLYNX";
         </ul>
 
         <div class="alt-channels">
-          <div class="channel-label">Or reach out directly</div>
+          <div class="channel-label" data-i18n="contact.direct_label">Or reach out directly</div>
           <a class="channel-btn" href="mailto:hello@volynx.world">
             <span class="channel-icon">✉</span>
-            Email support
+            <span data-i18n="contact.email_support">Email support</span>
           </a>
           <a class="channel-btn" href="mailto:hello@volynx.world">
             <span class="channel-icon">🔒</span>
-            Privacy requests
+            <span data-i18n="contact.privacy_requests">Privacy requests</span>
           </a>
         </div>
       </div>
@@ -56,31 +56,31 @@ const title = "Contact — VOLYNX";
       <div class="panel sales-panel">
         <div class="panel-label" data-i18n="contact.sales_label">Sales &amp; Projects</div>
         <h2 data-i18n="contact.sales_title">Start a project</h2>
-        <p data-i18n="contact.sales_desc">Tell me what you're building. I'll come back with a clear path and what it takes to make it happen.</p>
+        <p data-i18n="contact.sales_desc">Tell us what you're building. We'll come back with a clear path and what it takes.</p>
 
         <form class="lead-form" id="contactForm">
           <div class="field-row">
             <div class="field">
               <label for="name" data-i18n="contact.name">Name</label>
-              <input type="text" id="name" name="name" placeholder="Your name" required />
+              <input type="text" id="name" name="name" placeholder="Your name" data-i18n-placeholder="contact.ph_name" required />
             </div>
             <div class="field">
               <label for="email" data-i18n="contact.email">Email</label>
-              <input type="email" id="email" name="email" placeholder="you@company.com" required />
+              <input type="email" id="email" name="email" placeholder="you@company.com" data-i18n-placeholder="contact.ph_email" required />
             </div>
           </div>
 
           <div class="field">
             <label for="project_type" data-i18n="contact.type">Project type</label>
             <select id="project_type" name="project_type">
-              <option value="">Select a type…</option>
-              <option value="landing-page">Landing Page</option>
-              <option value="portfolio">Portfolio Site</option>
-              <option value="saas-landing">SaaS Landing System</option>
-              <option value="maintenance">Maintenance Plan</option>
-              <option value="agency-kit">Agency Launch Kit</option>
-              <option value="partnership">Partnership / Collaboration</option>
-              <option value="other">Other</option>
+              <option value="" data-i18n="contact.opt_select_type">Select a type...</option>
+              <option value="landing-page" data-i18n="contact.opt_landing">Landing Page</option>
+              <option value="portfolio" data-i18n="contact.opt_portfolio">Portfolio Site</option>
+              <option value="saas-landing" data-i18n="contact.opt_saas">SaaS Landing System</option>
+              <option value="maintenance" data-i18n="contact.opt_maintenance">Maintenance Plan</option>
+              <option value="agency-kit" data-i18n="contact.opt_agency">Agency Launch Kit</option>
+              <option value="partnership" data-i18n="contact.opt_partnership">Partnership / Collaboration</option>
+              <option value="other" data-i18n="contact.opt_other">Other</option>
             </select>
           </div>
 
@@ -88,29 +88,29 @@ const title = "Contact — VOLYNX";
             <div class="field">
               <label for="budget" data-i18n="contact.budget">Budget range</label>
               <select id="budget" name="budget">
-                <option value="">Select range…</option>
-                <option value="under-1k">Under £1,000</option>
-                <option value="1k-3k">£1,000 – £3,000</option>
-                <option value="3k-10k">£3,000 – £10,000</option>
-                <option value="10k-plus">£10,000+</option>
-                <option value="not-sure">Not sure yet</option>
+                <option value="" data-i18n="contact.opt_select_budget">Select range...</option>
+                <option value="under-1k" data-i18n="contact.opt_under1k">Under £1,000</option>
+                <option value="1k-3k" data-i18n="contact.opt_1k3k">£1,000 – £3,000</option>
+                <option value="3k-10k" data-i18n="contact.opt_3k10k">£3,000 – £10,000</option>
+                <option value="10k-plus" data-i18n="contact.opt_10kplus">£10,000+</option>
+                <option value="not-sure" data-i18n="contact.opt_notsure">Not sure yet</option>
               </select>
             </div>
             <div class="field">
               <label for="timeline" data-i18n="contact.timeline">Timeline</label>
               <select id="timeline" name="timeline">
-                <option value="">Select timeline…</option>
-                <option value="asap">ASAP</option>
-                <option value="1-2mo">1–2 months</option>
-                <option value="3-6mo">3–6 months</option>
-                <option value="exploring">Just exploring</option>
+                <option value="" data-i18n="contact.opt_select_timeline">Select timeline...</option>
+                <option value="asap" data-i18n="contact.opt_asap">ASAP</option>
+                <option value="1-2mo" data-i18n="contact.opt_1to2">1–2 months</option>
+                <option value="3-6mo" data-i18n="contact.opt_3to6">3–6 months</option>
+                <option value="exploring" data-i18n="contact.opt_exploring">Just exploring</option>
               </select>
             </div>
           </div>
 
           <div class="field">
             <label for="brief" data-i18n="contact.brief">Brief</label>
-            <textarea id="brief" name="brief" rows="4" placeholder="What are you trying to build, and what's the goal?" required></textarea>
+            <textarea id="brief" name="brief" rows="4" placeholder="What are you trying to build, and what's the goal?" data-i18n-placeholder="contact.ph_brief" required></textarea>
           </div>
 
           <button class="submit-btn" type="submit" data-i18n="contact.btn_send">Send brief →</button>
@@ -121,8 +121,8 @@ const title = "Contact — VOLYNX";
         <div class="next-steps">
           <div class="next-steps__label" data-i18n="contact.next_title">What happens next</div>
           <ol class="next-steps__list">
-            <li data-i18n="contact.next1">I read your brief and assess scope — usually within 24–48h on business days.</li>
-            <li data-i18n="contact.next2">I come back with a clear path: what's included, timeline, and investment.</li>
+            <li data-i18n="contact.next1">We read your brief and assess scope — usually within 24–48h on business days.</li>
+            <li data-i18n="contact.next2">We come back with a clear path: what's included, timeline, and investment.</li>
             <li data-i18n="contact.next3">If it fits, we align on next steps and kick off.</li>
           </ol>
           <a class="whatsapp-btn" href="https://wa.me/447438656769?text=Hi%2C%20I%20have%20a%20project%20for%20VOLYNX" target="_blank" rel="noopener noreferrer">

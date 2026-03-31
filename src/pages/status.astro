@@ -3,61 +3,62 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import VxHeader from "../components/VxHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 const title = "Status — VOLYNX";
-
-const services = [
-  { name: "Website", status: "Operational" },
-  { name: "Volynx Lab", status: "Operational" },
-  { name: "Studio (Pro)", status: "Planned" },
-  { name: "QR Generator", status: "Operational" },
-  { name: "Converter", status: "Operational" },
-  { name: "Image Scaler", status: "Operational" },
-  { name: "Image Suite", status: "Beta" },
-];
-
-const incidents = [
-  {
-    date: "2026-02-24",
-    title: "Deployment migration completed",
-    body: "All routes served from Cloudflare Pages. No ongoing impact.",
-    level: "Resolved",
-  },
-];
 ---
 
-<BaseLayout title={title} hideUtilBar>
+<BaseLayout title={title}>
   <VxHeader />
 
   <main class="shell status">
     <section class="hero">
-      <h1>Status</h1>
-      <p class="sub">Transparency builds trust. Here’s the current platform health.</p>
+      <h1 data-i18n="status.title">Status</h1>
+      <p class="sub" data-i18n="status.subtitle">Transparency builds trust. Here’s the current platform health.</p>
     </section>
 
     <section class="panel">
-      <h2>Services</h2>
+      <h2 data-i18n="status.services_heading">Services</h2>
       <div class="svc-grid">
-        {services.map((s) => (
-          <div class="svc">
-            <span class="svc-name">{s.name}</span>
-            <span class={"pill " + s.status.toLowerCase().replace(/\s+/g, "-")}>{s.status}</span>
-          </div>
-        ))}
+        <div class="svc">
+          <span class="svc-name" data-i18n="status.svc_website">Website</span>
+          <span class="pill operational" data-i18n="status.operational">Operational</span>
+        </div>
+        <div class="svc">
+          <span class="svc-name">Volynx Lab</span>
+          <span class="pill operational" data-i18n="status.operational">Operational</span>
+        </div>
+        <div class="svc">
+          <span class="svc-name">Studio (Pro)</span>
+          <span class="pill planned" data-i18n="status.planned">Planned</span>
+        </div>
+        <div class="svc">
+          <span class="svc-name">QR Generator</span>
+          <span class="pill operational" data-i18n="status.operational">Operational</span>
+        </div>
+        <div class="svc">
+          <span class="svc-name">Converter</span>
+          <span class="pill operational" data-i18n="status.operational">Operational</span>
+        </div>
+        <div class="svc">
+          <span class="svc-name">Image Scaler</span>
+          <span class="pill operational" data-i18n="status.operational">Operational</span>
+        </div>
+        <div class="svc">
+          <span class="svc-name">Image Suite</span>
+          <span class="pill beta">Beta</span>
+        </div>
       </div>
     </section>
 
     <section class="panel">
-      <h2>Recent incidents</h2>
+      <h2 data-i18n="status.incidents_heading">Recent incidents</h2>
       <div class="inc-grid">
-        {incidents.map((i) => (
-          <article class="inc">
-            <div class="inc-top">
-              <span class="pill resolved">{i.level}</span>
-              <time datetime={i.date}>{i.date}</time>
-            </div>
-            <h3>{i.title}</h3>
-            <p>{i.body}</p>
-          </article>
-        ))}
+        <article class="inc">
+          <div class="inc-top">
+            <span class="pill resolved" data-i18n="status.resolved">Resolved</span>
+            <time datetime="2026-02-24">2026-02-24</time>
+          </div>
+          <h3 data-i18n="status.inc1_title">Deployment migration completed</h3>
+          <p data-i18n="status.inc1_body">All routes served from Cloudflare Pages. No ongoing impact.</p>
+        </article>
       </div>
     </section>
   </main>

@@ -7,39 +7,39 @@ import { ROUTES } from "../../data/routes";
 const title = "Reset Password — VOLYNX";
 ---
 
-<BaseLayout title={title} hideUtilBar>
+<BaseLayout title={title}>
   <VxHeader primaryCtaLabel="Sign up" primaryCtaHref={ROUTES.signup} />
 
   <main class="shell recover">
     <section class="recover-wrap">
       <div class="panel">
         <div id="requestState">
-          <h1>Reset your password</h1>
-          <p class="sub">Enter your email and we'll send you a link to reset your password.</p>
+          <h1 data-i18n="recover.title">Reset your password</h1>
+          <p class="sub" data-i18n="recover.desc">Enter your email and we'll send you a link to reset your password.</p>
 
           <form class="form" id="recoverForm" action="#" method="get">
             <label class="field">
-              <span>Email</span>
-              <input type="email" id="email" name="email" autocomplete="email" required placeholder="your@email.com" />
+              <span data-i18n="recover.email_label">Email</span>
+              <input type="email" id="email" name="email" autocomplete="email" required placeholder="your@email.com" data-i18n-placeholder="recover.email_placeholder" />
             </label>
 
-            <button class="btn primary" id="submitBtn" type="submit">Send reset link</button>
+            <button class="btn primary" id="submitBtn" type="submit" data-i18n="recover.btn_send">Send reset link</button>
 
             <p id="msg" class="msg" aria-live="polite"></p>
 
             <div class="row">
-              <a class="link" href={ROUTES.login}>Back to login</a>
-              <a class="link" href={ROUTES.signup}>Create account</a>
+              <a class="link" href={ROUTES.login} data-i18n="recover.back_login">Back to login</a>
+              <a class="link" href={ROUTES.signup} data-i18n="recover.create_account">Create account</a>
             </div>
           </form>
         </div>
 
         <div id="sentState" hidden>
           <div class="check-icon" aria-hidden="true">✉</div>
-          <h1>Check your inbox</h1>
-          <p class="sub">We sent a password reset link to <strong id="sentEmail">your email</strong>. Click the link to set a new password.</p>
-          <p class="hint">Didn't receive it? Check your spam folder or try again.</p>
-          <a class="btn primary" href={ROUTES.login}>Back to login</a>
+          <h1 data-i18n="recover.sent_title">Check your inbox</h1>
+          <p class="sub" data-i18n="recover.sent_desc">We sent a password reset link to your email. Click the link to set a new password.</p>
+          <p class="hint" data-i18n="recover.sent_hint">Didn't receive it? Check your spam folder or try again.</p>
+          <a class="btn primary" href={ROUTES.login} data-i18n="recover.back_login">Back to login</a>
         </div>
       </div>
     </section>

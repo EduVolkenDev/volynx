@@ -4,49 +4,44 @@ import VxHeader from "../components/VxHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 
 const title = "Changelog — VOLYNX";
-
-const releases = [
-  {
-    date: "2026-02-24",
-    title: "Platform deployed on Cloudflare Pages",
-    items: [
-      "Astro static build stabilized",
-      "Routing cleanup for Lab/Studio",
-      "Asset weight reduced (public cleanup)",
-    ],
-    tag: "Release",
-  },
-  {
-    date: "2026-02-20",
-    title: "Volynx Lab tools lineup",
-    items: ["Converter", "Image Scaler", "Image Suite", "QR Generator"],
-    tag: "Update",
-  },
-];
 ---
 
-<BaseLayout title={title} hideUtilBar>
+<BaseLayout title={title}>
   <VxHeader />
 
   <main class="shell changelog">
     <section class="hero">
-      <h1>Changelog</h1>
-      <p class="sub">What’s new. Updates, improvements, and releases.</p>
+      <h1 data-i18n="changelog.title">Changelog</h1>
+      <p class="sub" data-i18n="changelog.subtitle">What’s new. Updates, improvements, and releases.</p>
     </section>
 
     <section class="timeline">
-      {releases.map((r) => (
-        <article class="entry">
-          <div class="meta">
-            <span class="tag">{r.tag}</span>
-            <time datetime={r.date}>{r.date}</time>
-          </div>
-          <h2>{r.title}</h2>
-          <ul>
-            {r.items.map((x) => <li>{x}</li>)}
-          </ul>
-        </article>
-      ))}
+      <article class="entry">
+        <div class="meta">
+          <span class="tag" data-i18n="changelog.r1_tag">Release</span>
+          <time datetime="2026-02-24">2026-02-24</time>
+        </div>
+        <h2 data-i18n="changelog.r1_title">Platform deployed on Cloudflare Pages</h2>
+        <ul>
+          <li data-i18n="changelog.r1_item1">Astro static build stabilized</li>
+          <li data-i18n="changelog.r1_item2">Routing cleanup for Lab/Studio</li>
+          <li data-i18n="changelog.r1_item3">Asset weight reduced (public cleanup)</li>
+        </ul>
+      </article>
+
+      <article class="entry">
+        <div class="meta">
+          <span class="tag" data-i18n="changelog.r2_tag">Update</span>
+          <time datetime="2026-02-20">2026-02-20</time>
+        </div>
+        <h2 data-i18n="changelog.r2_title">Volynx Lab tools lineup</h2>
+        <ul>
+          <li data-i18n="changelog.r2_item1">Converter</li>
+          <li data-i18n="changelog.r2_item2">Image Scaler</li>
+          <li data-i18n="changelog.r2_item3">Image Suite</li>
+          <li data-i18n="changelog.r2_item4">QR Generator</li>
+        </ul>
+      </article>
     </section>
   </main>
 

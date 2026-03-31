@@ -1,0 +1,310 @@
+---
+import { ROUTES } from "../../../data/routes";
+import PageWidgets from "../../../components/PageWidgets.astro";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Black Diamond — VOLYNX VIP Invitation</title>
+  <meta name="description" content="You have been selected for Black Diamond — an exclusive VOLYNX VIP invitation." />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="shortcut icon" href="/assets/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Manrope:wght@300;400;500;600;700;800&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #020204;
+      --diamond: #b8c4d8;
+      --diamond-glow: rgba(184, 196, 216, 0.25);
+      --gold: #f3e1a0;
+      --gold-soft: rgba(243, 225, 160, 0.08);
+      --text: rgba(245, 247, 252, 0.96);
+      --muted: rgba(209, 215, 230, 0.6);
+      --line: rgba(255, 255, 255, 0.06);
+      --violet: #b196ff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "Manrope", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 30% 20%, rgba(184, 196, 216, 0.06), transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(177, 150, 255, 0.04), transparent 40%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .invite-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 80px 24px 60px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .diamond-mark {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 32px;
+      position: relative;
+    }
+
+    .diamond-shape {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--diamond), rgba(255,255,255,0.9));
+      transform: rotate(45deg);
+      border-radius: 4px;
+      margin: 8px auto;
+      box-shadow:
+        0 0 40px var(--diamond-glow),
+        0 0 80px rgba(184, 196, 216, 0.1);
+      animation: diamondPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes diamondPulse {
+      0%, 100% { box-shadow: 0 0 40px var(--diamond-glow), 0 0 80px rgba(184, 196, 216, 0.1); }
+      50% { box-shadow: 0 0 60px var(--diamond-glow), 0 0 120px rgba(184, 196, 216, 0.15); }
+    }
+
+    .invite-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border: 1px solid rgba(184, 196, 216, 0.2);
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--diamond);
+      margin-bottom: 28px;
+    }
+
+    .invite-tag::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--diamond);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--diamond-glow);
+    }
+
+    h1 {
+      font-family: "Sora", system-ui, sans-serif;
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+      max-width: 16ch;
+    }
+
+    .invite-lead {
+      font-size: clamp(1rem, 2.5vw, 1.15rem);
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 52ch;
+      margin-bottom: 40px;
+    }
+
+    .invite-card {
+      width: 100%;
+      padding: 36px 28px;
+      border-radius: 24px;
+      border: 1px solid rgba(184, 196, 216, 0.12);
+      background: rgba(184, 196, 216, 0.03);
+      backdrop-filter: blur(16px);
+      text-align: left;
+      margin-bottom: 36px;
+    }
+
+    .invite-card h2 {
+      font-family: "Sora", system-ui, sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--diamond);
+    }
+
+    .perks-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .perks-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.55;
+    }
+
+    .perks-list li::before {
+      content: '\25C6';
+      color: var(--diamond);
+      font-size: 10px;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    .invite-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 32px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 15px;
+      text-decoration: none;
+      transition: all 0.25s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn--diamond {
+      background: linear-gradient(135deg, var(--diamond), #e0e8f0);
+      color: #0a0a12;
+      box-shadow: 0 8px 32px var(--diamond-glow);
+    }
+
+    .btn--diamond:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 44px rgba(184, 196, 216, 0.35);
+    }
+
+    .btn--ghost {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .btn--ghost:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .invite-note {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 44ch;
+      margin-bottom: 48px;
+    }
+
+    .invite-footer {
+      margin-top: auto;
+      padding-top: 32px;
+      border-top: 1px solid var(--line);
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .invite-footer img {
+      width: 28px;
+      height: 28px;
+    }
+
+    .invite-footer span {
+      font-family: "Sora", system-ui, sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+
+    @media (max-width: 480px) {
+      .invite-wrap { padding: 60px 18px 40px; }
+      .invite-card { padding: 28px 20px; }
+      .invite-actions { flex-direction: column; }
+      .btn { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="invite-wrap">
+    <div class="diamond-mark">
+      <div class="diamond-shape"></div>
+    </div>
+
+    <div class="invite-tag" data-i18n="bd.tag">Black Diamond Invitation</div>
+
+    <h1 data-i18n="bd.title">You have been selected.</h1>
+
+    <p class="invite-lead" data-i18n="bd.lead">
+      This is a private invitation to Black Diamond — the VOLYNX VIP tier reserved for a small group of early believers, partners and collaborators who helped shape this platform before it went public.
+    </p>
+
+    <div class="invite-card">
+      <h2 data-i18n="bd.perks_title">What Black Diamond unlocks</h2>
+      <ul class="perks-list">
+        <li data-i18n="bd.perk1">Priority access to all new products, kits and features before public release</li>
+        <li data-i18n="bd.perk2">Permanent Black Diamond badge on your VOLYNX profile</li>
+        <li data-i18n="bd.perk3">Founding-member pricing locked for life on Builder plans</li>
+        <li data-i18n="bd.perk4">Direct channel to the VOLYNX founder for feedback and requests</li>
+        <li data-i18n="bd.perk5">Free premium icon collection on account activation</li>
+        <li data-i18n="bd.perk6">Exclusive access to future Black Diamond events and releases</li>
+      </ul>
+    </div>
+
+    <div class="invite-actions">
+      <a href={ROUTES.signup} class="btn btn--diamond" data-i18n="bd.btn_accept">Accept invitation</a>
+      <a href={ROUTES.home} class="btn btn--ghost" data-i18n="bd.btn_explore">Explore the platform</a>
+    </div>
+
+    <p class="invite-note" data-i18n="bd.note">
+      This invitation is personal and non-transferable. Black Diamond status is permanent once activated.
+    </p>
+
+    <footer class="invite-footer">
+      <img src="/assets/volynx-icon.webp" alt="VOLYNX" />
+      <span>VOLYNX</span>
+    </footer>
+  </main>
+
+  <PageWidgets />
+</body>
+</html>

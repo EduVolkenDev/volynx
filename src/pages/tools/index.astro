@@ -4,63 +4,65 @@ import VxHeader from "../../components/VxHeader.astro";
 import SiteFooter from "../../components/SiteFooter.astro";
 
 const title = "Tools — VOLYNX";
-
-const tools = [
-  {
-    name: "Converter",
-    desc: "Convert images fast. Keep quality.",
-    lab: "/volynx-lab/converter/",
-    studio: "/volynx-lab/studio/converter/",
-    tag: "Image",
-  },
-  {
-    name: "Image Scaler",
-    desc: "Resize without losing sharpness.",
-    lab: "/volynx-lab/image-scaler/",
-    studio: "/volynx-lab/studio/image-scaler/",
-    tag: "Image",
-  },
-  {
-    name: "Image Suite",
-    desc: "Batch optimize, export, compress.",
-    lab: "/volynx-lab/image-suite/",
-    studio: "/volynx-lab/studio/image-suite/",
-    tag: "Pro-ready",
-  },
-  {
-    name: "QR Generator",
-    desc: "Premium QR codes in seconds.",
-    lab: "/volynx-lab/qr-gen/",
-    studio: "/volynx-lab/studio/qr-gen/",
-    tag: "Utility",
-  },
-];
 ---
 
-<BaseLayout title={title} hideUtilBar>
+<BaseLayout title={title}>
   <VxHeader />
 
   <main class="shell tools">
     <section class="hero">
-      <h1>Tools</h1>
-      <p class="sub">One catalog. Two tiers: Lab (free) and Studio (pro).</p>
+      <h1 data-i18n="tools.title">Tools</h1>
+      <p class="sub" data-i18n="tools.subtitle">One catalog. Two tiers: Lab (free) and Studio (pro).</p>
     </section>
 
     <section class="grid">
-      {tools.map((t) => (
-        <article class="card">
-          <div class="top">
-            <span class="tag">{t.tag}</span>
-            <h2>{t.name}</h2>
-            <p>{t.desc}</p>
-          </div>
+      <article class="card">
+        <div class="top">
+          <span class="tag" data-i18n="tools.tag_image">Image</span>
+          <h2>Converter</h2>
+          <p data-i18n="tools.converter_desc">Convert images fast. Keep quality.</p>
+        </div>
+        <div class="actions">
+          <a class="btn" href="/volynx-lab/converter/" data-i18n="tools.btn_lab">Open Lab</a>
+          <a class="btn secondary" href="/volynx-lab/studio/converter/" data-i18n="tools.btn_studio">Go Studio</a>
+        </div>
+      </article>
 
-          <div class="actions">
-            <a class="btn" href={t.lab}>Open Lab</a>
-            <a class="btn secondary" href={t.studio}>Go Studio</a>
-          </div>
-        </article>
-      ))}
+      <article class="card">
+        <div class="top">
+          <span class="tag" data-i18n="tools.tag_image">Image</span>
+          <h2>Image Scaler</h2>
+          <p data-i18n="tools.scaler_desc">Resize without losing sharpness.</p>
+        </div>
+        <div class="actions">
+          <a class="btn" href="/volynx-lab/image-scaler/" data-i18n="tools.btn_lab">Open Lab</a>
+          <a class="btn secondary" href="/volynx-lab/studio/image-scaler/" data-i18n="tools.btn_studio">Go Studio</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="top">
+          <span class="tag" data-i18n="tools.tag_pro">Pro-ready</span>
+          <h2>Image Suite</h2>
+          <p data-i18n="tools.suite_desc">Batch optimize, export, compress.</p>
+        </div>
+        <div class="actions">
+          <a class="btn" href="/volynx-lab/image-suite/" data-i18n="tools.btn_lab">Open Lab</a>
+          <a class="btn secondary" href="/volynx-lab/studio/image-suite/" data-i18n="tools.btn_studio">Go Studio</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="top">
+          <span class="tag" data-i18n="tools.tag_utility">Utility</span>
+          <h2>QR Generator</h2>
+          <p data-i18n="tools.qr_desc">Premium QR codes in seconds.</p>
+        </div>
+        <div class="actions">
+          <a class="btn" href="/volynx-lab/qr-gen/" data-i18n="tools.btn_lab">Open Lab</a>
+          <a class="btn secondary" href="/volynx-lab/studio/qr-gen/" data-i18n="tools.btn_studio">Go Studio</a>
+        </div>
+      </article>
     </section>
   </main>
 
