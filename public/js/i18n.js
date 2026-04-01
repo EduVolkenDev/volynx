@@ -23,6 +23,15 @@
       }
     }
 
+    /* innerHTML replacement (for elements with HTML content like <strong>, <a>) */
+    var hEls = document.querySelectorAll('[data-i18n-html]');
+    for (var h = 0; h < hEls.length; h++) {
+      var hKey = hEls[h].getAttribute('data-i18n-html');
+      if (Object.prototype.hasOwnProperty.call(dict, hKey)) {
+        hEls[h].innerHTML = dict[hKey];
+      }
+    }
+
     /* placeholder attribute */
     var pEls = document.querySelectorAll('[data-i18n-placeholder]');
     for (var j = 0; j < pEls.length; j++) {

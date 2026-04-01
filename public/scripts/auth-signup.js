@@ -1,5 +1,11 @@
 const DEFAULT_REDIRECT = "/volynx-lab/studio/";
 
+function t(key, fallback) {
+  var lang = localStorage.getItem("volynx_lang") || "en";
+  var dict = window.VX_TRANS && window.VX_TRANS[lang];
+  return (dict && dict[key]) || fallback;
+}
+
 function resolveRedirect() {
   try {
     const url = new URL(window.location.href);
@@ -103,17 +109,17 @@ function showCheckEmail(email) {
     const password = String(passEl.value || "");
 
     if (!fullName || !username || !email || !password) {
-      setMsg(msg, "Please fill in all fields.", "err");
+      setMsg(msg, t("signup.err_fill", "Please fill in all fields."), "err");
       return;
     }
 
     if (username.length < 3 || username.length > 30) {
-      setMsg(msg, "Username must be 3-30 characters.", "err");
+      setMsg(msg, t("signup.err_username_len", "Username must be 3–30 characters."), "err");
       return;
     }
 
     btn.disabled = true;
-    setMsg(msg, "Creating your account...", "");
+    setMsg(msg, t("signup.msg_creating", "Creating your account..."), "");
 
     try {
       const cfg = await loadConfig();
@@ -133,7 +139,7 @@ function showCheckEmail(email) {
       // Rare: auto-login when email confirmation is disabled
       if (out?.session?.access_token) {
         persistSession(out.session, email);
-        setMsg(msg, "Account created. Redirecting...", "ok");
+        setMsg(msg, t("signup.msg_created", "Account created. Redirecting..."), "ok");
         window.location.href = resolveRedirect();
         return;
       }
@@ -142,7 +148,7 @@ function showCheckEmail(email) {
       showCheckEmail(email);
 
     } catch (err) {
-      setMsg(msg, err?.message || "Failed to create account.", "err");
+      setMsg(msg, err?.message || t("signup.err_failed", "Failed to create account."), "err");
     } finally {
       btn.disabled = false;
     }

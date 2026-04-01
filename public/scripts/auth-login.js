@@ -1,5 +1,11 @@
 const DEFAULT_REDIRECT = "/volynx-lab/studio/";
 
+function t(key, fallback) {
+  var lang = localStorage.getItem("volynx_lang") || "en";
+  var dict = window.VX_TRANS && window.VX_TRANS[lang];
+  return (dict && dict[key]) || fallback;
+}
+
 function resolveRedirect() {
   try {
     const url = new URL(window.location.href);
@@ -69,12 +75,12 @@ function persistSession(session, email) {
     const password = String(passEl.value || "");
 
     if (!email || !password) {
-      setMsg(msg, "Please fill in email and password.", "err");
+      setMsg(msg, t("login.err_fill", "Please fill in email and password."), "err");
       return;
     }
 
     btn.disabled = true;
-    setMsg(msg, "Signing in...", "");
+    setMsg(msg, t("login.msg_signing", "Signing in..."), "");
 
     try {
       const cfg = await loadConfig();
@@ -91,10 +97,10 @@ function persistSession(session, email) {
 
       persistSession(session, email);
       localStorage.setItem("volynx_post_login_next", resolveRedirect());
-      setMsg(msg, "Welcome back. Redirecting...", "ok");
+      setMsg(msg, t("login.msg_welcome", "Welcome back. Redirecting..."), "ok");
       window.location.href = "/profile/?welcome=1";
     } catch (err) {
-      setMsg(msg, err?.message || "Sign in failed. Please try again.", "err");
+      setMsg(msg, err?.message || t("login.err_failed", "Sign in failed. Please try again."), "err");
     } finally {
       btn.disabled = false;
     }

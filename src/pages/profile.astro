@@ -25,7 +25,7 @@ import { ROUTES } from "../data/routes";
 		<div class="orb orb-a" aria-hidden="true"></div>
 		<div class="orb orb-b" aria-hidden="true"></div>
 
-		<Topbar leftLinks={[
+		<Topbar showLang={false} leftLinks={[
 			{ href: ROUTES.builder, label: "Builder" },
 			{ href: ROUTES.studio, label: "Studio" },
 			{ href: ROUTES.pricing, label: "Pricing" },
@@ -495,7 +495,7 @@ import { ROUTES } from "../data/routes";
 				}
 
 				// Read plan from profile row (Supabase source of truth)
-				const dbPlan = (profile.builder_plan || profile.plan || "free").toLowerCase().trim();
+				const dbPlan = (profile?.builder_plan || profile?.plan || "free").toLowerCase().trim();
 				const dbPaid = dbPlan && dbPlan !== "free";
 				renderPlan(dbPaid ? dbPlan : "Free", dbPaid);
 				log("plan from DB: " + dbPlan);
@@ -601,7 +601,11 @@ import { ROUTES } from "../data/routes";
 				$("continueBtn")?.addEventListener("click", () => {
 					const next = localStorage.getItem("volynx_post_login_next") || "/volynx-lab/studio/";
 					localStorage.removeItem("volynx_post_login_next");
-					window.location.href = next;
+					if (next.startsWith("/") && !next.startsWith("//")) {
+						window.location.href = next;
+					} else {
+						window.location.href = "/volynx-lab/studio/";
+					}
 				});
 
 				$("scrollToEdit")?.addEventListener("click", () => {
