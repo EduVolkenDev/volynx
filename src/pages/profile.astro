@@ -231,21 +231,25 @@ import { ROUTES } from "../data/routes";
 		})();
 		</script>
 
-		<!--
-			SCRIPT 2: Bundled by Astro. Imports from npm, NOT from CDN.
-			This is the fix: no more esm.sh dependency.
-		-->
-		<script>
-			import { createClient } from "@supabase/supabase-js";
+		<script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+		<script is:inline>
+			console.log("[profile] main script loaded, supabase global:", typeof supabase);
+			if (typeof supabase === "undefined") {
+				console.error("[profile] FATAL: supabase UMD not loaded");
+				document.getElementById("viewLoading").classList.remove("view--active");
+				document.getElementById("viewError").classList.add("view--active");
+				document.getElementById("errorMsg").textContent = "Failed to load dependencies. Please refresh.";
+			} else {
+			var createClient = supabase.createClient;
 
 			(async function main() {
 				const t0 = performance.now();
-				const log = (msg: string) => console.log(`[profile] ${msg} (${Math.round(performance.now() - t0)}ms)`);
+				const log = (msg) => console.log(`[profile] ${msg} (${Math.round(performance.now() - t0)}ms)`);
 
 				log("script start");
 
 				// ── Helpers ──────────────────────────────────────────
-				const $ = (id: string) => document.getElementById(id)!;
+				const $ = (id) => document.getElementById(id);
 
 				const KEYS = ["volynx_access_token","volynx_refresh_token","volynx_user_email","volynx_session","volynx_post_login_next"];
 
@@ -258,15 +262,15 @@ import { ROUTES } from "../data/routes";
 					}
 				}
 
-				function showView(name: string) {
+				function showView(name) {
 					["viewLoading","viewError","viewProfile"].forEach(id => {
-						document.getElementById(id)!.classList.remove("view--active");
+						document.getElementById(id).classList.remove("view--active");
 					});
 					document.getElementById("view" + name.charAt(0).toUpperCase() + name.slice(1))!.classList.add("view--active");
 					log("state → " + name);
 				}
 
-				function showError(msg: string) {
+				function showError(msg) {
 					$("errorMsg").textContent = msg;
 					showView("error");
 				}
@@ -277,7 +281,7 @@ import { ROUTES } from "../data/routes";
 					window.location.href = "/login/?next=/profile/";
 				}
 
-				function initials(name: string, email: string) {
+				function initials(name, email) {
 					if (name?.trim()) {
 						const p = name.trim().split(/\s+/);
 						return (p[0][0] + (p[1]?.[0] || "")).toUpperCase();
@@ -285,13 +289,13 @@ import { ROUTES } from "../data/routes";
 					return email ? email.slice(0, 2).toUpperCase() : "??";
 				}
 
-				function nullIfEmpty(v: string | null | undefined): string | null {
+				function nullIfEmpty(v) {
 					const s = (v || "").trim();
 					return s.length > 0 ? s : null;
 				}
 
 				const USERNAME_RE = /^[a-z0-9][a-z0-9_]*[a-z0-9]$/;
-				function validateUsername(raw: string) {
+				function validateUsername(raw) {
 					if (!raw?.trim()) return null;
 					const v = raw.trim().toLowerCase().replace(/^@/, "");
 					if (v.length < 3 || v.length > 30) return { error: "Username must be 3-30 characters." };
@@ -302,11 +306,11 @@ import { ROUTES } from "../data/routes";
 				// ══════════════════════════════════════════════════════
 				// PHASE 1: Auth + Profile (blocking)
 				// ══════════════════════════════════════════════════════
-				let supabase: ReturnType<typeof createClient>;
-				let user: any;
-				let profile: any;
-				let cfg: any;
-				let accessToken: string;
+				let supabase;
+				let user;
+				let profile;
+				let cfg;
+				let accessToken;
 
 				try {
 					log("reading tokens");
@@ -421,7 +425,7 @@ import { ROUTES } from "../data/routes";
 				$("heroLocation").textContent  = loc || "—";
 				$("heroJoined").textContent    = "Joined " + joinedFmt;
 
-				const avatarPreview  = $("avatarPreview") as HTMLImageElement;
+				const avatarPreview  = $("avatarPreview");
 				const avatarFallback = $("avatarFallback");
 				if (avatarUrl) {
 					avatarPreview.src = avatarUrl;
@@ -441,12 +445,12 @@ import { ROUTES } from "../data/routes";
 					? createdAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
 					: "—";
 
-				($("inputName") as HTMLInputElement).value     = fullName;
-				($("inputUsername") as HTMLInputElement).value  = username;
-				($("inputEmail") as HTMLInputElement).value    = email;
-				($("inputWebsite") as HTMLInputElement).value  = website;
-				($("inputLocation") as HTMLInputElement).value = loc;
-				($("inputBio") as HTMLTextAreaElement).value   = bio;
+				($("inputName")).value     = fullName;
+				($("inputUsername")).value  = username;
+				($("inputEmail")).value    = email;
+				($("inputWebsite")).value  = website;
+				($("inputLocation")).value = loc;
+				($("inputBio")).value   = bio;
 
 				const saved = { name: fullName, username, website, location: loc, bio };
 
@@ -472,10 +476,10 @@ import { ROUTES } from "../data/routes";
 				// PHASE 3: Plan (non-blocking, from billing backend)
 				// ══════════════════════════════════════════════════════
 				const planBadge = $("heroPlan");
-				const planCta = $("planCta") as HTMLAnchorElement;
+				const planCta = $("planCta");
 				const planHelper = $("planHelper");
 
-				function renderPlan(name: string, paid: boolean, helperText?: string) {
+				function renderPlan(name, paid, helperText) {
 					planBadge.textContent = name.charAt(0).toUpperCase() + name.slice(1);
 					if (paid) {
 						planBadge.classList.add("plan-badge--paid");
@@ -494,7 +498,7 @@ import { ROUTES } from "../data/routes";
 				renderPlan("Free", false);
 
 				// Fire-and-forget billing lookup
-				const apiBase = ((cfg as any).functionsUrl || (cfg as any).apiBaseUrl || "").replace(/\/$/, "");
+				const apiBase = ((cfg).functionsUrl || (cfg).apiBaseUrl || "").replace(/\/$/, "");
 				if (apiBase) {
 					(async () => {
 						try {
@@ -556,7 +560,7 @@ import { ROUTES } from "../data/routes";
 								if (recent.length === 0) {
 									tokenHistoryEl.innerHTML = '<p class="text-muted" style="font-size:.85rem;">No token activity yet.</p>';
 								} else {
-									tokenHistoryEl.innerHTML = recent.slice(0, 8).map((tx: any) => {
+									tokenHistoryEl.innerHTML = recent.slice(0, 8).map((tx) => {
 										const isSpend = tx.amount < 0;
 										const sign = isSpend ? "" : "+";
 										const color = isSpend ? "var(--danger)" : "var(--success)";
@@ -579,7 +583,7 @@ import { ROUTES } from "../data/routes";
 				// PHASE 4: Event listeners
 				// ══════════════════════════════════════════════════════
 
-				const logoutEl = $("logoutBtn") as any;
+				const logoutEl = $("logoutBtn");
 				logoutEl._mainHandlerAttached = true;
 				logoutEl.onclick = async () => {
 					try { await supabase.auth.signOut(); } catch (_) {}
@@ -604,11 +608,11 @@ import { ROUTES } from "../data/routes";
 				});
 
 				// Avatar panel toggle — click on avatar frame to open
-				const avatarPanel = $("avatarPanel") as HTMLElement;
+				const avatarPanel = $("avatarPanel");
 				$("avatarFrameBtn")?.addEventListener("click", () => {
 					avatarPanel.hidden = !avatarPanel.hidden;
 				});
-				$("avatarFrameBtn")?.addEventListener("keydown", (e: KeyboardEvent) => {
+				$("avatarFrameBtn")?.addEventListener("keydown", (e) => {
 					if (e.key === "Enter" || e.key === " ") { e.preventDefault(); avatarPanel.hidden = !avatarPanel.hidden; }
 				});
 				$("avatarPanelClose")?.addEventListener("click", () => { avatarPanel.hidden = true; });
@@ -622,11 +626,11 @@ import { ROUTES } from "../data/routes";
 
 				// Show pro avatars section if user is pro
 				if (isPro && PRO_AVATARS.length > 0) {
-					const proSection = $("proAvatarSection") as HTMLElement;
-					const proGrid = $("proAvatarGrid") as HTMLElement;
+					const proSection = $("proAvatarSection");
+					const proGrid = $("proAvatarGrid");
 					if (proSection && proGrid) {
 						proSection.hidden = false;
-						proGrid.innerHTML = PRO_AVATARS.map((src: string, i: number) =>
+						proGrid.innerHTML = PRO_AVATARS.map((src, i) =>
 							`<button type="button" class="avatar-option" data-avatar="${src}"><img src="${src}" alt="Pro Avatar ${i+1}" /></button>`
 						).join("");
 					}
@@ -647,13 +651,13 @@ import { ROUTES } from "../data/routes";
 				function bindAvatarOptions() {
 					document.querySelectorAll(".avatar-option[data-avatar]").forEach(btn => {
 						btn.addEventListener("click", () => {
-							const url = (btn as HTMLElement).dataset.avatar!;
+							const url = (btn).dataset.avatar;
 							avatarPreview.src = url;
 							avatarPreview.style.display = "block";
 							avatarFallback.style.display = "none";
 							avatarPanel.hidden = true;
-							(avatarPreview as any)._selectedFreeAvatar = url;
-							(avatarPreview as any)._pendingFile = null;
+							(avatarPreview)._selectedFreeAvatar = url;
+							(avatarPreview)._pendingFile = null;
 							document.querySelectorAll(".avatar-option").forEach(o => o.classList.remove("avatar-option--selected"));
 							btn.classList.add("avatar-option--selected");
 						});
@@ -662,19 +666,19 @@ import { ROUTES } from "../data/routes";
 				bindAvatarOptions();
 
 				// Custom file upload
-				$("avatarInput")?.addEventListener("change", (e: Event) => {
-					const file = (e.target as HTMLInputElement).files?.[0];
+				$("avatarInput")?.addEventListener("change", (e) => {
+					const file = (e.target).files?.[0];
 					if (!file) return;
 					if (file.size > 2 * 1024 * 1024) { alert("Max 2MB."); return; }
 					avatarPreview.src = URL.createObjectURL(file);
 					avatarPreview.style.display = "block";
 					avatarFallback.style.display = "none";
 					avatarPanel.hidden = true;
-					(avatarPreview as any)._selectedFreeAvatar = null;
-					(avatarPreview as any)._pendingFile = file;
+					(avatarPreview)._selectedFreeAvatar = null;
+					(avatarPreview)._pendingFile = file;
 				});
 
-				function applyToUI(d: Record<string, string | null>) {
+				function applyToUI(d) {
 					$("profileName").textContent   = d.full_name || "Unnamed User";
 					$("profileHandle").textContent = d.username ? "@" + d.username : "";
 					$("heroBio").textContent       = d.bio || "";
@@ -686,12 +690,12 @@ import { ROUTES } from "../data/routes";
 					$("firstTimeBanner").style.display = "none";
 				}
 
-				$("profileForm")?.addEventListener("submit", async (e: Event) => {
+				$("profileForm")?.addEventListener("submit", async (e) => {
 					e.preventDefault();
-					const saveBtn = $("saveBtn") as HTMLButtonElement;
+					const saveBtn = $("saveBtn");
 					const status  = $("saveStatus");
 
-					const usernameResult = validateUsername(($("inputUsername") as HTMLInputElement).value);
+					const usernameResult = validateUsername(($("inputUsername")).value);
 					if (usernameResult && "error" in usernameResult) {
 						status.textContent = usernameResult.error;
 						status.style.color = "var(--danger)";
@@ -702,14 +706,14 @@ import { ROUTES } from "../data/routes";
 					status.textContent = "Saving...";
 					status.style.color = "";
 
-					const selectedAvatar = (avatarPreview as any)._selectedFreeAvatar || null;
-					const pendingFile = (avatarPreview as any)._pendingFile || null;
-					const updates: Record<string, any> = {
-						full_name: nullIfEmpty(($("inputName") as HTMLInputElement).value),
+					const selectedAvatar = (avatarPreview)._selectedFreeAvatar || null;
+					const pendingFile = (avatarPreview)._pendingFile || null;
+					const updates = {
+						full_name: nullIfEmpty(($("inputName")).value),
 						username:  usernameResult?.value ?? null,
-						website:   nullIfEmpty(($("inputWebsite") as HTMLInputElement).value),
-						location:  nullIfEmpty(($("inputLocation") as HTMLInputElement).value),
-						bio:       nullIfEmpty(($("inputBio") as HTMLTextAreaElement).value),
+						website:   nullIfEmpty(($("inputWebsite")).value),
+						location:  nullIfEmpty(($("inputLocation")).value),
+						bio:       nullIfEmpty(($("inputBio")).value),
 					};
 
 					// Avatar: free preset OR custom upload
@@ -731,7 +735,7 @@ import { ROUTES } from "../data/routes";
 						}
 						const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
 						updates.avatar_url = urlData?.publicUrl || "";
-						(avatarPreview as any)._pendingFile = null;
+						(avatarPreview)._pendingFile = null;
 						log("avatar uploaded: " + updates.avatar_url);
 					}
 
@@ -760,15 +764,16 @@ import { ROUTES } from "../data/routes";
 				});
 
 				$("resetBtn")?.addEventListener("click", () => {
-					($("inputName") as HTMLInputElement).value     = saved.name;
-					($("inputUsername") as HTMLInputElement).value  = saved.username;
-					($("inputWebsite") as HTMLInputElement).value  = saved.website;
-					($("inputLocation") as HTMLInputElement).value = saved.location;
-					($("inputBio") as HTMLTextAreaElement).value   = saved.bio;
+					($("inputName")).value     = saved.name;
+					($("inputUsername")).value  = saved.username;
+					($("inputWebsite")).value  = saved.website;
+					($("inputLocation")).value = saved.location;
+					($("inputBio")).value   = saved.bio;
 					$("saveStatus").textContent = "Form reset.";
 					$("saveStatus").style.color = "";
 				});
 			})();
+			} // end supabase check
 		</script>
 
 		<PageWidgets />
