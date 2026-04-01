@@ -1,43 +1,77 @@
-# Astro Starter Kit: Minimal
+# VOLYNX Platform
 
-```sh
-npm create astro@latest -- --template minimal
+Premium ecosystem for developers, designers & businesses: launch kits, browser tools (Lab), production builder/studio, icons store, Stripe subscriptions.
+
+Live: [volynx.world](https://volynx.world)
+
+## 🏗️ Structure
+```
+.
+├── public/           # Static assets, Netlify _headers/_redirects
+├── src/              # Astro pages/components/layouts
+├── index.js          # Express API (Stripe/Supabase auth)
+├── supabase/         # DB migrations/functions
+├── scripts/          # Utils (QR, auth)
+└── TODO.md           # Current tasks
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Frontend: Astro hybrid (static + API routes). Backend: Express API + Supabase.
 
-## 🚀 Project Structure
+## 🚀 Quick Start (Local)
 
-Inside of your Astro project, you'll see the following folders and files:
+1. **Clone & Install**:
+   ```
+   npm install
+   ```
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+2. **Env Setup** (`.env`):
+   ```
+   SUPABASE_URL=https://zdmpzrderifgqmqivjoy.supabase.co
+   SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   STRIPE_SECRET_KEY=sk_test_...
+   STRIPE_PRICE_ID=price_...
+   FRONTEND_ORIGIN=http://localhost:4321
+   PORT=3000
+   ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+3. **DB**:
+   ```
+   cd supabase/migrations
+   supabase db push
+   ```
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+4. **Dev**:
+   - Frontend: `npm run dev` → http://localhost:4321
+   - API: `npm run api` → http://localhost:3000/health
 
-Any static assets, like images, can be placed in the `public/` directory.
+5. **Build/Preview**:
+   ```
+   npm run build
+   npm run preview
+   ```
 
-## 🧞 Commands
+## ☁️ Deploy
+- **Frontend (Netlify)**: Connect repo, `astro build` → `/dist` to `public/`.
+- **API**: Vercel/Render/DigitalOcean (`node index.js`).
+- **Supabase**: Link project, run migrations.
 
-All commands are run from the root of the project, from a terminal:
+## 🔧 Features
+- Subscriptions: Stripe checkout w/ Supabase auth.
+- Schema: Profiles/plans/tokens/projects (RLS).
+- Tools: Image converter/scaler/QR (Lab).
+- Pro: Builder, Studio, premium kits/icons.
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## Commands
+| Command | Purpose |
+|---------|---------|
+| `npm run dev` | Astro dev server |
+| `npm run api` | Express API |
+| `npm run build` | Production build |
+| `npm run start` | API prod |
 
-## 👀 Want to learn more?
+## Next
+See [TODO.md]. Contributions: Fork → PR.
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+---
+Built with ❤️ by VOLYNX Team. Questions? [contact](https://volynx.world/contact)
+
