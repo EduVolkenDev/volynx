@@ -266,7 +266,7 @@ import { ROUTES } from "../data/routes";
 					["viewLoading","viewError","viewProfile"].forEach(id => {
 						document.getElementById(id).classList.remove("view--active");
 					});
-					document.getElementById("view" + name.charAt(0).toUpperCase() + name.slice(1))!.classList.add("view--active");
+					document.getElementById("view" + name.charAt(0).toUpperCase() + name.slice(1)).classList.add("view--active");
 					log("state → " + name);
 				}
 
@@ -494,10 +494,14 @@ import { ROUTES } from "../data/routes";
 					}
 				}
 
-				// Default: Free
-				renderPlan("Free", false);
+				// Read plan from profile row (Supabase source of truth)
+				const dbPlan = (profile.builder_plan || profile.plan || "free").toLowerCase().trim();
+				const dbPaid = dbPlan && dbPlan !== "free";
+				renderPlan(dbPaid ? dbPlan : "Free", dbPaid);
+				log("plan from DB: " + dbPlan);
+				if (window.VxPlan) window.VxPlan.cache(dbPlan);
 
-				// Fire-and-forget billing lookup
+				// Also try billing backend for most up-to-date info
 				const apiBase = ((cfg).functionsUrl || (cfg).apiBaseUrl || "").replace(/\/$/, "");
 				if (apiBase) {
 					(async () => {
@@ -513,17 +517,14 @@ import { ROUTES } from "../data/routes";
 							clearTimeout(t);
 							if (res.ok) {
 								const d = await res.json();
-								const p = (d.plan || "free").toLowerCase().trim();
+								const p = (d.plan || dbPlan || "free").toLowerCase().trim();
 								const paid = p && p !== "free";
 								renderPlan(paid ? p : "Free", paid);
-								log("plan: " + p);
-							} else {
-								renderPlan("Free", false, "Billing info unavailable right now");
-								log("plan: Free (HTTP " + res.status + ")");
+								if (window.VxPlan) window.VxPlan.cache(p);
+								log("plan from API: " + p);
 							}
 						} catch (_) {
-							renderPlan("Free", false, "Billing info unavailable right now");
-							log("plan: Free (network/timeout)");
+							log("plan API unavailable, using DB: " + dbPlan);
 						}
 					})();
 				} else {
