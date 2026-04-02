@@ -394,6 +394,43 @@ import PageWidgets from "../../../components/PageWidgets.astro";
 
   const setStatus = (t: string) => { const el = $("status"); if (el) el.textContent = t || ""; };
 
+  // ── Tab switching ────────────────────────────────────────
+  function switchTab(tab: string) {
+    const panels: Record<string, string> = { sections: "panelSections", json: "panelJson", preview: "panelPreview" };
+    Object.entries(panels).forEach(([t, id]) => {
+      const panel = $(id) as HTMLElement;
+      if (panel) panel.hidden = t !== tab;
+    });
+    document.querySelectorAll(".editor-tab").forEach(el => {
+      el.classList.toggle("editor-tab--active", (el as HTMLElement).dataset.tab === tab);
+    });
+    if (tab === "preview") {
+      try {
+        const raw = ($("json") as HTMLTextAreaElement)?.value || "{}";
+        const data = JSON.parse(raw);
+        const frame = $("previewFrame") as HTMLIFrameElement;
+        if (frame && (window as any).VxRenderer && data.sections) {
+          frame.srcdoc = (window as any).VxRenderer.renderPage(data);
+        }
+      } catch {}
+    }
+  }
+
+  // ── Button loading helper ────────────────────────────────
+  function btnLoading(btn: HTMLButtonElement | null, loading: boolean, label?: string) {
+    if (!btn) return;
+    if (loading) {
+      btn.disabled = true;
+      btn.classList.add("is-loading");
+      if (label) btn.dataset.origLabel = btn.textContent || "";
+      if (label) btn.textContent = label;
+    } else {
+      btn.disabled = false;
+      btn.classList.remove("is-loading");
+      if (btn.dataset.origLabel) { btn.textContent = btn.dataset.origLabel; delete btn.dataset.origLabel; }
+    }
+  }
+
   const slugify = (s: string) =>
     (s || "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
@@ -1410,12 +1447,19 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     $("backStep1")?.addEventListener("click", () => showWizardStep(1));
     $("backStep2")?.addEventListener("click", () => showWizardStep(2));
 
+    // ── Tab click handlers ──
+    document.querySelectorAll(".editor-tab").forEach(tab => {
+      tab.addEventListener("click", () => switchTab((tab as HTMLElement).dataset.tab || "sections"));
+    });
+
     // Create project (with builder_plan limit check + usage logging)
     $("create")?.addEventListener("click", async () => {
+      const btn = $("create") as HTMLButtonElement;
       const counts = await countActiveProjects(user.id);
       const check = canCreate(counts);
       if (!check.ok) return setStatus(check.msg);
 
+      btnLoading(btn, true, "Creating...");
       const w = getWizardInputs();
       const baseSlug = slugify((($("pslug") as HTMLInputElement)?.value || "").trim() || w.name) || "site";
       const slug = `${baseSlug}-${rand4()}`;
@@ -1428,9 +1472,10 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
         .select("id,name,slug,builder_data,status,created_at")
         .single();
 
+      btnLoading(btn, false);
       if (error) return setStatus(error.message);
       await logUsage("builder_create");
-      setStatus("Project created.");
+      setStatus("Project created!");
       showWizardStep(1); // reset wizard
       await listProjects(user.id);
       openProject(data);
@@ -1473,6 +1518,8 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
         return;
       }
 
+      const pubBtn = $("publish") as HTMLButtonElement;
+      btnLoading(pubBtn, true, "Publishing...");
       setStatus("Publishing to " + currentProject.slug + ".volynx.world…");
       try {
         const ctrl = new AbortController();
@@ -1500,6 +1547,7 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
           return setStatus(errMap[j?.error] || j?.error || `Publish failed (HTTP ${r.status}).`);
         }
 
+        btnLoading(pubBtn, false);
         setStatus("Published ✓");
         currentProject.status = "published";
         await logUsage("builder_publish");
@@ -1521,6 +1569,7 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
 
         await listProjects(user.id);
       } catch (err: any) {
+        btnLoading(pubBtn, false);
         if (err?.name === "AbortError") {
           setStatus("Publish timed out. The API may be starting up — try again in 30s.");
         } else {
@@ -2248,6 +2297,138 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     .card { padding: 16px; }
     .json-editor { min-height: 220px; }
     .editor-header { flex-direction: column; align-items: flex-start; }
+  }
+
+  /* EDITOR TABS */
+  .editor-tabs {
+    display: flex;
+    gap: 4px;
+    background: rgba(231,238,247,.04);
+    border-radius: 10px;
+    padding: 3px;
+  }
+
+  .editor-tab {
+    padding: 7px 16px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--mut);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+    letter-spacing: .02em;
+  }
+
+  .editor-tab:hover {
+    background: rgba(231,238,247,.08);
+    color: var(--fg);
+  }
+
+  .editor-tab--active {
+    background: rgba(125,211,252,.14);
+    color: var(--accent);
+    box-shadow: 0 0 12px rgba(125,211,252,.06);
+  }
+
+  /* EDITOR PANELS */
+  .editor-panel { min-height: 300px; }
+
+  /* EXPRESS FLOW */
+  .express-flow { display: flex; flex-direction: column; gap: 20px; }
+  .express-header { text-align: center; }
+  .express-badge {
+    display: inline-block; padding: 4px 12px; border-radius: 999px;
+    font-size: 12px; font-weight: 700; letter-spacing: .06em;
+    background: rgba(243,225,160,.08); border: 1px solid rgba(243,225,160,.2); color: #f3e1a0;
+    margin-bottom: 12px;
+  }
+  .express-q { font-size: 15px; font-weight: 700; margin-bottom: 12px; color: var(--fg); }
+  .express-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .express-opt {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 16px; border-radius: 12px;
+    border: 1px solid var(--line); background: rgba(231,238,247,.03);
+    color: var(--mut); font-family: inherit; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all .2s; text-align: left;
+  }
+  .express-opt:hover { border-color: rgba(125,211,252,.25); background: rgba(125,211,252,.05); color: var(--fg); }
+  .express-opt--active {
+    border-color: rgba(125,211,252,.45); background: rgba(125,211,252,.08);
+    color: var(--accent); box-shadow: 0 0 16px rgba(125,211,252,.08);
+  }
+
+  /* SECTION EDITOR */
+  .section-editor-root { display: flex; flex-direction: column; gap: 2px; }
+
+  .se-empty {
+    text-align: center; padding: 48px 24px; color: var(--mut); font-size: 14px;
+    border: 1px dashed var(--line); border-radius: 12px; background: rgba(231,238,247,.02);
+  }
+
+  .se-section {
+    border: 1px solid var(--line); border-radius: 14px;
+    background: rgba(231,238,247,.02); overflow: hidden; transition: border-color .15s;
+  }
+  .se-section:hover { border-color: rgba(125,211,252,.15); }
+
+  .se-section-header {
+    display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+    cursor: pointer; user-select: none; background: rgba(231,238,247,.03);
+    border-bottom: 1px solid transparent; transition: background .15s;
+  }
+  .se-section-header:hover { background: rgba(125,211,252,.04); }
+  .se-section.is-open .se-section-header { border-bottom-color: var(--line); background: rgba(125,211,252,.05); }
+
+  .se-section-icon { font-size: 18px; flex-shrink: 0; }
+  .se-section-name { font-size: 14px; font-weight: 700; color: var(--fg); flex: 1; }
+  .se-section-desc { font-size: 11px; color: var(--mut); }
+  .se-section-chevron { font-size: 12px; color: var(--mut); transition: transform .2s; }
+  .se-section.is-open .se-section-chevron { transform: rotate(90deg); }
+
+  .se-section-body { padding: 16px; display: none; }
+  .se-section.is-open .se-section-body { display: block; }
+
+  .se-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .se-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+  .se-field--full { grid-column: 1 / -1; }
+  .se-label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); }
+
+  .se-input, .se-textarea, .se-select {
+    width: 100%; padding: 9px 12px; border-radius: 10px;
+    border: 1px solid rgba(231,238,247,.14); background: rgba(7,10,18,.65);
+    color: var(--fg); font-family: inherit; font-size: 13px; outline: none; transition: border-color .15s;
+  }
+  .se-input:focus, .se-textarea:focus, .se-select:focus { border-color: rgba(125,211,252,.4); }
+  .se-textarea { resize: vertical; min-height: 60px; line-height: 1.5; }
+  .se-select {
+    appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;
+  }
+
+  .se-list-item { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; padding: 8px 0; border-bottom: 1px solid rgba(231,238,247,.06); }
+
+  .se-btn {
+    padding: 5px 12px; border-radius: 8px; border: 1px solid var(--line);
+    background: rgba(231,238,247,.04); color: var(--mut);
+    font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .15s;
+  }
+  .se-btn:hover { background: rgba(125,211,252,.08); border-color: rgba(125,211,252,.2); color: var(--fg); }
+  .se-btn--add { background: rgba(125,211,252,.06); border-color: rgba(125,211,252,.15); color: var(--accent); }
+  .se-btn--remove { background: rgba(255,100,100,.06); border-color: rgba(255,100,100,.15); color: #ff6464; }
+
+  /* BUTTON ACTIVE STATES */
+  .btn:active:not([disabled]) { transform: scale(.97); }
+  .btn--primary:active:not([disabled]) { background: linear-gradient(135deg, rgba(125,211,252,.45), rgba(99,102,241,.38)); }
+  .btn--ghost:active:not([disabled]) { background: rgba(231,238,247,.14); }
+
+  @media (max-width: 520px) {
+    .se-row { grid-template-columns: 1fr; }
+    .express-options { grid-template-columns: 1fr; }
   }
 
   @media (prefers-reduced-motion: reduce) {
