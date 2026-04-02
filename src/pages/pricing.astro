@@ -229,7 +229,7 @@ const faqs = [
         });
         if (res.ok) {
           const perm = await res.json();
-          const plan = perm.builderPlan || perm.plan || 'free';
+          const plan = perm.builder_plan || perm.builderPlan || perm.plan || 'free';
           if (!perm.useLocalStorage) {
             const cards = document.querySelectorAll('.pricing-card');
             const idx = PLAN_KEYS.indexOf(plan);
@@ -239,7 +239,35 @@ const faqs = [
               const name = cards[idx].querySelector('.pricing-card__name');
               if (name) { const b = document.createElement('span'); b.textContent = ' ✓ Your plan'; b.style.cssText = 'font-size:12px;color:#34D399;font-weight:700;'; name.appendChild(b); }
               const cta = cards[idx].querySelector('.pricing-card__cta');
-              if (cta) { cta.textContent = 'Current plan ✓'; cta.style.cssText = 'background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.25);color:#34D399;pointer-events:none;display:flex;justify-content:center;padding:12px;border-radius:14px;text-decoration:none;font-weight:600;font-size:14px;'; }
+              if (cta && plan !== 'free') {
+                cta.textContent = 'Current plan ✓';
+                cta.style.cssText = 'background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.25);color:#34D399;pointer-events:none;display:flex;justify-content:center;padding:12px;border-radius:14px;text-decoration:none;font-weight:600;font-size:14px;';
+
+                // Add "Manage subscription" link below the current plan CTA
+                const manageBtn = document.createElement('button');
+                manageBtn.textContent = 'Manage subscription';
+                manageBtn.className = 'pricing-card__manage';
+                manageBtn.style.cssText = 'display:flex;align-items:center;justify-content:center;width:100%;padding:10px;margin-top:8px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:rgba(255,255,255,.5);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;';
+                manageBtn.onmouseenter = () => { manageBtn.style.background = 'rgba(255,80,80,.06)'; manageBtn.style.borderColor = 'rgba(255,80,80,.2)'; manageBtn.style.color = 'rgba(255,120,120,.8)'; };
+                manageBtn.onmouseleave = () => { manageBtn.style.background = 'rgba(255,255,255,.03)'; manageBtn.style.borderColor = 'rgba(255,255,255,.08)'; manageBtn.style.color = 'rgba(255,255,255,.5)'; };
+                manageBtn.addEventListener('click', async () => {
+                  manageBtn.textContent = 'Opening...';
+                  manageBtn.style.pointerEvents = 'none';
+                  try {
+                    const portalRes = await fetch(apiBase + '/create-portal-session', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+                      body: JSON.stringify({ return_url: window.location.origin + '/pricing/' }),
+                    });
+                    const portalData = await portalRes.json();
+                    if (portalData.url) window.location.href = portalData.url;
+                    else { alert(portalData.error || 'Could not open subscription manager.'); manageBtn.textContent = 'Manage subscription'; manageBtn.style.pointerEvents = ''; }
+                  } catch { alert('Connection error.'); manageBtn.textContent = 'Manage subscription'; manageBtn.style.pointerEvents = ''; }
+                });
+                cta.parentElement.appendChild(manageBtn);
+              } else if (cta && plan === 'free') {
+                // Free plan - no change needed
+              }
             }
           }
         }

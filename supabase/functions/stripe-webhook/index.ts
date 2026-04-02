@@ -1,7 +1,7 @@
 /**
  * VOLYNX — Stripe Webhook Handler (Supabase Edge Function)
  *
- * Listens to Stripe events and syncs payment state to Supabase.
+ * Multi-product aware: handles volynx, daily, bundle, and legacy builder_ prefixes.
  * Must be deployed with verify_jwt: false (Stripe doesn't send JWTs).
  *
  * Required secrets (set via Supabase Dashboard > Edge Functions > Secrets):
@@ -35,16 +35,60 @@ const supabase = createClient(
   { auth: { persistSession: false } }
 );
 
-// ── Lookup key → plan mapping ───────────────────────────────
-// Maps the lookup_key prefix to the plan value stored in profiles.builder_plan
+// ── Multi-product plan mapping ──────────────────────────────
+// Maps lookup_key prefix → profile column updates
+// This mirrors src/data/products.ts getProfileUpdates() for the Deno runtime
 
-const LOOKUP_TO_PLAN: Record<string, string> = {
-  builder_launch: "launch",
-  builder_pro: "pro",
-  builder_studio: "studio",
-  builder_teams: "teams",
-  studio_pro: "pro",       // profiles.plan = 'pro' (tool access)
+const PLAN_PROFILE_MAP: Record<string, Record<string, string>> = {
+  // Volynx (new naming)
+  volynx_launch:  { builder_plan: "launch", plan: "pro" },
+  volynx_pro:     { builder_plan: "pro",    plan: "pro" },
+  volynx_studio:  { builder_plan: "studio", plan: "pro" },
+  volynx_teams:   { builder_plan: "teams",  plan: "pro" },
+
+  // Daily
+  daily_pro:      { daily_plan: "pro",     plan: "pro" },
+  daily_diamond:  { daily_plan: "diamond", plan: "pro" },
+
+  // Bundles
+  bundle_volynx_daily_pro:    { builder_plan: "pro",    daily_plan: "pro",     plan: "pro" },
+  bundle_volynx_daily_studio: { builder_plan: "studio", daily_plan: "diamond", plan: "pro" },
+
+  // Legacy (backward compat — existing Stripe prices)
+  builder_launch: { builder_plan: "launch", plan: "pro" },
+  builder_pro:    { builder_plan: "pro",    plan: "pro" },
+  builder_studio: { builder_plan: "studio", plan: "pro" },
+  builder_teams:  { builder_plan: "teams",  plan: "pro" },
+  studio_pro:     { plan: "pro" },
 };
+
+// Downgrade mapping: which profile fields to reset when a plan is canceled
+const PLAN_DOWNGRADE_MAP: Record<string, Record<string, string>> = {
+  volynx_launch:  { builder_plan: "free" },
+  volynx_pro:     { builder_plan: "free" },
+  volynx_studio:  { builder_plan: "free" },
+  volynx_teams:   { builder_plan: "free" },
+  daily_pro:      { daily_plan: "free" },
+  daily_diamond:  { daily_plan: "free" },
+  bundle_volynx_daily_pro:    { builder_plan: "free", daily_plan: "free" },
+  bundle_volynx_daily_studio: { builder_plan: "free", daily_plan: "free" },
+  builder_launch: { builder_plan: "free" },
+  builder_pro:    { builder_plan: "free" },
+  builder_studio: { builder_plan: "free" },
+  builder_teams:  { builder_plan: "free" },
+  studio_pro:     {},
+};
+
+// Product key detection from prefix
+function detectProductKey(prefix: string): string {
+  if (prefix.startsWith("bundle_")) return "bundle";
+  if (prefix.startsWith("daily_")) return "daily";
+  if (prefix.startsWith("volynx_") || prefix.startsWith("builder_")) return "volynx";
+  if (prefix.startsWith("studio_")) return "volynxlab";
+  if (prefix.startsWith("tokens_")) return "tokens";
+  if (prefix.startsWith("addon_")) return "addons";
+  return "volynx";
+}
 
 // Token pack credits (lookup_key prefix → tokens to add)
 const TOKEN_CREDITS: Record<string, number> = {
@@ -57,9 +101,7 @@ const TOKEN_CREDITS: Record<string, number> = {
 // ── Helpers ─────────────────────────────────────────────────
 
 function extractPrefix(lookupKey: string): string {
-  // "builder_pro_gbp" → "builder_pro"
   const parts = lookupKey.split("_");
-  // Remove the currency suffix (last part: gbp/eur/brl)
   const currencies = ["gbp", "eur", "brl"];
   if (currencies.includes(parts[parts.length - 1])) {
     return parts.slice(0, -1).join("_");
@@ -68,7 +110,8 @@ function extractPrefix(lookupKey: string): string {
 }
 
 function isSubscription(prefix: string): boolean {
-  return prefix.startsWith("builder_") || prefix === "studio_pro" || prefix === "addon_extra_slot";
+  return !!(PLAN_PROFILE_MAP[prefix]) ||
+    prefix === "addon_extra_slot";
 }
 
 // ── Core handlers ───────────────────────────────────────────
@@ -80,7 +123,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     return;
   }
 
-  // Expand line items to get the lookup_key
   const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
     expand: ["data.price"],
   });
@@ -94,10 +136,19 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const lookupKey = price.lookup_key || "";
   const prefix = extractPrefix(lookupKey);
   const currency = lookupKey.split("_").pop()?.toUpperCase() || "GBP";
+  const productKey = detectProductKey(prefix);
 
-  console.log(`Processing checkout for user ${userId}, lookup: ${lookupKey}, prefix: ${prefix}`);
+  // Resolve user email for identification in all records
+  const { data: userProfile } = await supabase
+    .from("profiles")
+    .select("email")
+    .eq("id", userId)
+    .single();
+  const userEmail = userProfile?.email || session.customer_details?.email || "";
 
-  // ── Subscription (Builder plan or Studio Pro) ──
+  console.log(`Processing checkout for ${userEmail} (${userId}), lookup: ${lookupKey}, prefix: ${prefix}, product: ${productKey}`);
+
+  // ── Subscription (any product plan or bundle) ──
   if (session.mode === "subscription" && session.subscription) {
     const subId = typeof session.subscription === "string"
       ? session.subscription
@@ -109,49 +160,59 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     await supabase.from("subscriptions").upsert(
       {
         user_id: userId,
+        user_email: userEmail,
         stripe_customer_id: session.customer as string,
         stripe_subscription_id: subId,
         status: subscription.status,
         price_id: price.id,
         plan_key: prefix,
         lookup_key: lookupKey,
+        product_key: productKey,
         current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
         cancel_at_period_end: subscription.cancel_at_period_end,
       },
       { onConflict: "stripe_subscription_id" }
     );
 
-    // Update user plan
-    const planValue = LOOKUP_TO_PLAN[prefix];
-    if (planValue) {
+    // Update user profile with plan
+    const profileUpdates = PLAN_PROFILE_MAP[prefix];
+    if (profileUpdates) {
       const updates: Record<string, any> = {
+        ...profileUpdates,
         stripe_customer_id: session.customer as string,
       };
-
-      if (prefix.startsWith("builder_")) {
-        updates.builder_plan = planValue;
-      }
-      if (prefix === "studio_pro" || prefix.startsWith("builder_")) {
-        // Any paid plan grants 'pro' on profiles.plan
-        updates.plan = "pro";
-      }
 
       await supabase.from("profiles").update(updates).eq("id", userId);
       console.log(`Updated plan for ${userId}: ${JSON.stringify(updates)}`);
     }
 
+    // Track bundle if applicable
+    if (prefix.startsWith("bundle_")) {
+      await supabase.from("active_bundles").upsert(
+        {
+          user_id: userId,
+          user_email: userEmail,
+          bundle_key: prefix,
+          subscription_id: subId,
+          status: "active",
+        },
+        { onConflict: "user_id,bundle_key" }
+      );
+    }
+
     // Log purchase event
     await supabase.from("purchase_events").insert({
       user_id: userId,
+      user_email: userEmail,
       stripe_session_id: session.id,
       stripe_payment_intent_id: session.payment_intent as string || null,
-      product_key: prefix,
+      product_key: productKey,
       lookup_key: lookupKey,
       amount_paid: session.amount_total || 0,
       currency: currency,
       tokens_credited: 0,
       status: "completed",
-      metadata: { mode: session.mode, subscription_id: subId },
+      metadata: { mode: session.mode, subscription_id: subId, plan_key: prefix },
     });
   }
 
@@ -160,7 +221,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     const tokenAmount = TOKEN_CREDITS[prefix] || 0;
 
     if (tokenAmount > 0) {
-      // Credit tokens
       const { data: profile } = await supabase
         .from("profiles")
         .select("token_balance")
@@ -175,9 +235,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         .update({ token_balance: newBalance })
         .eq("id", userId);
 
-      // Log token transaction
       await supabase.from("token_transactions").insert({
         user_id: userId,
+        user_email: userEmail,
         amount: tokenAmount,
         type: "purchase",
         description: `Token pack: ${prefix} (${lookupKey})`,
@@ -189,11 +249,11 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       console.log(`Credited ${tokenAmount} tokens to ${userId}. New balance: ${newBalance}`);
     }
 
-    // Handle add-on purchases
     if (prefix.startsWith("addon_")) {
       const addonId = prefix.replace("addon_", "");
       await supabase.from("addons_purchased").insert({
         user_id: userId,
+        user_email: userEmail,
         addon_id: addonId,
         price_paid: (session.amount_total || 0) / 100,
         currency: currency,
@@ -203,12 +263,12 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       console.log(`Addon ${addonId} activated for ${userId}`);
     }
 
-    // Log purchase event
     await supabase.from("purchase_events").insert({
       user_id: userId,
+      user_email: userEmail,
       stripe_session_id: session.id,
       stripe_payment_intent_id: session.payment_intent as string || null,
-      product_key: prefix,
+      product_key: productKey,
       lookup_key: lookupKey,
       amount_paid: session.amount_total || 0,
       currency: currency,
@@ -233,7 +293,6 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
 
   const { user_id, plan_key } = subRecord.data;
 
-  // Update subscription status
   await supabase
     .from("subscriptions")
     .update({
@@ -246,10 +305,21 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   // If subscription is no longer active, downgrade
   if (["canceled", "unpaid", "past_due"].includes(subscription.status)) {
     const prefix = plan_key || "";
-    if (prefix.startsWith("builder_")) {
-      await supabase.from("profiles").update({ builder_plan: "free" }).eq("id", user_id);
+    const downgrades = PLAN_DOWNGRADE_MAP[prefix] || {};
+
+    if (Object.keys(downgrades).length > 0) {
+      await supabase.from("profiles").update(downgrades).eq("id", user_id);
     }
-    // Check if user has any other active subscriptions before downgrading plan
+
+    // Mark bundle as canceled
+    if (prefix.startsWith("bundle_")) {
+      await supabase.from("active_bundles")
+        .update({ status: "canceled" })
+        .eq("user_id", user_id)
+        .eq("bundle_key", prefix);
+    }
+
+    // Check if user has any other active subscriptions before downgrading global plan
     const { data: activeSubs } = await supabase
       .from("subscriptions")
       .select("id")
@@ -276,16 +346,25 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 
   const { user_id, plan_key } = subRecord.data;
 
-  // Mark subscription as canceled
   await supabase
     .from("subscriptions")
     .update({ status: "canceled" })
     .eq("stripe_subscription_id", subscription.id);
 
-  // Downgrade builder plan
+  // Downgrade the specific product
   const prefix = plan_key || "";
-  if (prefix.startsWith("builder_")) {
-    await supabase.from("profiles").update({ builder_plan: "free" }).eq("id", user_id);
+  const downgrades = PLAN_DOWNGRADE_MAP[prefix] || {};
+
+  if (Object.keys(downgrades).length > 0) {
+    await supabase.from("profiles").update(downgrades).eq("id", user_id);
+  }
+
+  // Mark bundle as canceled
+  if (prefix.startsWith("bundle_")) {
+    await supabase.from("active_bundles")
+      .update({ status: "canceled" })
+      .eq("user_id", user_id)
+      .eq("bundle_key", prefix);
   }
 
   // Check for other active subscriptions
@@ -325,7 +404,6 @@ async function handleInvoiceSucceeded(invoice: Stripe.Invoice) {
 // ── HTTP Handler ────────────────────────────────────────────
 
 serve(async (req: Request) => {
-  // CORS preflight
   if (req.method === "OPTIONS") {
     return new Response("ok", {
       headers: {
@@ -380,7 +458,6 @@ serve(async (req: Request) => {
     }
   } catch (err) {
     console.error(`Error handling ${event.type}:`, (err as Error).message);
-    // Return 200 to prevent Stripe from retrying (we log the error)
     return new Response(JSON.stringify({ received: true, error: (err as Error).message }), {
       status: 200,
       headers: { "Content-Type": "application/json" },

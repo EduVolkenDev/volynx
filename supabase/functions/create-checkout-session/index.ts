@@ -18,11 +18,12 @@ function json(data: Record<string, unknown>, status = 200) {
 const FRONTEND_ORIGIN = Deno.env.get("FRONTEND_ORIGIN") || "https://volynx.world";
 
 function getCheckoutMode(prefix: string): "subscription" | "payment" {
-  const subs = [
-    "builder_launch", "builder_pro", "builder_studio", "builder_teams",
-    "studio_pro", "addon_extra_slot",
-  ];
-  return subs.includes(prefix) ? "subscription" : "payment";
+  // All plan subscriptions: volynx, daily, bundles, legacy builder_
+  if (prefix.startsWith("builder_") || prefix.startsWith("volynx_")) return "subscription";
+  if (prefix.startsWith("daily_")) return "subscription";
+  if (prefix.startsWith("bundle_")) return "subscription";
+  if (prefix === "studio_pro" || prefix === "addon_extra_slot") return "subscription";
+  return "payment";
 }
 
 function extractPrefix(key: string): string {

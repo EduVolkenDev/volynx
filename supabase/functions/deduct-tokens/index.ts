@@ -89,6 +89,7 @@ serve(async (req: Request) => {
     }
 
     const userId = userData.user.id;
+    const userEmail = userData.user.email || "";
 
     // ── Rate limit ──
     if (!checkRateLimit(userId)) {
@@ -182,6 +183,7 @@ serve(async (req: Request) => {
       // Log transaction with retry balance
       await supabase.from("token_transactions").insert({
         user_id: userId,
+        user_email: userEmail,
         amount: -tokensToSpend,
         type: "spend",
         tool_name: tool,
@@ -196,6 +198,7 @@ serve(async (req: Request) => {
     // ── Log transaction ──
     await supabase.from("token_transactions").insert({
       user_id: userId,
+      user_email: userEmail,
       amount: -tokensToSpend,
       type: "spend",
       tool_name: tool,

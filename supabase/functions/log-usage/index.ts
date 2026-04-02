@@ -72,7 +72,7 @@ Deno.serve(async (req: Request) => {
     } else {
       const { error: insertErr } = await supabase
         .from("usage_logs")
-        .insert({ user_id: user.id, tool_name: toolName, usage_date: today, usage_count: increment });
+        .insert({ user_id: user.id, user_email: user.email || "", tool_name: toolName, usage_date: today, usage_count: increment });
 
       if (insertErr) {
         console.error("[log-usage] insert error:", insertErr.message);

@@ -344,6 +344,106 @@ const ADDONS: ProductDef[] = [
   },
 ];
 
+// ── Daily OS Subscriptions ────────────────────────────────
+
+const DAILY_SUBS: ProductDef[] = [
+  {
+    name: "Daily Pro",
+    description: "Full access to VOLYNX Daily tools: Scanner, Summary, Vault, Writing, Decision with cloud sync and exports.",
+    marketingFeatures: [
+      "Unlimited tool usage",
+      "Cloud sync across devices",
+      "Export to PDF/Markdown",
+      "Priority processing",
+      "Premium AI quality",
+    ],
+    lookupPrefix: "daily_pro",
+    metadata: {
+      product_family: "daily",
+      plan_tier: "pro",
+      billing_type: "subscription",
+      currency_scope: "multi",
+      includes_tokens: "0",
+      includes_icons: "false",
+      builder_sites_limit: "0",
+      is_addon: "false",
+    },
+    prices: { recurring: { interval: "month" }, amounts: { gbp: 1200, eur: 1490, brl: 8900 } },
+  },
+  {
+    name: "Daily Diamond",
+    description: "Premium Daily tier with API access, shared vaults, team notes, analytics and priority everything.",
+    marketingFeatures: [
+      "Everything in Pro",
+      "API access",
+      "Shared vaults & team notes",
+      "Admin analytics",
+      "Priority queue",
+    ],
+    lookupPrefix: "daily_diamond",
+    metadata: {
+      product_family: "daily",
+      plan_tier: "diamond",
+      billing_type: "subscription",
+      currency_scope: "multi",
+      includes_tokens: "0",
+      includes_icons: "false",
+      builder_sites_limit: "0",
+      is_addon: "false",
+    },
+    prices: { recurring: { interval: "month" }, amounts: { gbp: 2900, eur: 3490, brl: 19900 } },
+  },
+];
+
+// ── Bundle Subscriptions ─────────────────────────────────
+
+const BUNDLE_SUBS: ProductDef[] = [
+  {
+    name: "VOLYNX + Daily Pro Bundle",
+    description: "Builder Pro + Daily Pro in one subscription. Save vs buying separately.",
+    marketingFeatures: [
+      "Builder Pro (3 sites, custom domain)",
+      "Daily Pro (all tools, sync, export)",
+      "Single subscription",
+      "Bundle discount",
+    ],
+    lookupPrefix: "bundle_volynx_daily_pro",
+    metadata: {
+      product_family: "bundle",
+      plan_tier: "pro",
+      billing_type: "subscription",
+      currency_scope: "multi",
+      includes_tokens: "0",
+      includes_icons: "1",
+      builder_sites_limit: "3",
+      is_addon: "false",
+    },
+    prices: { recurring: { interval: "month" }, amounts: { gbp: 2900, eur: 3490, brl: 19900 } },
+  },
+  {
+    name: "VOLYNX Studio + Daily Diamond Bundle",
+    description: "Builder Studio + Daily Diamond in one subscription. Maximum access to both products.",
+    marketingFeatures: [
+      "Builder Studio (10 sites, full kits)",
+      "Daily Diamond (API, teams, analytics)",
+      "Single subscription",
+      "Best bundle value",
+    ],
+    lookupPrefix: "bundle_volynx_daily_studio",
+    metadata: {
+      product_family: "bundle",
+      plan_tier: "studio",
+      billing_type: "subscription",
+      currency_scope: "multi",
+      includes_tokens: "0",
+      includes_icons: "3",
+      builder_sites_limit: "10",
+      is_addon: "false",
+    },
+    prices: { recurring: { interval: "month" }, amounts: { gbp: 5900, eur: 6990, brl: 39900 } },
+  },
+];
+
 // ── Helpers ───────────────────────────────────────────────
 
 const currencies: Cur[] = ["gbp", "eur", "brl"];
@@ -458,11 +558,17 @@ async function main() {
   console.log(`  Mode: ${mode.toUpperCase()}`);
   console.log("═══════════════════════════════════════\n");
 
-  console.log("── Builder Subscriptions ──\n");
+  console.log("── Builder Subscriptions (Volynx) ──\n");
   for (const def of BUILDER_SUBS) await createProductWithPrices(def);
 
   console.log("── Studio Pro ──\n");
   await createProductWithPrices(STUDIO_PRO);
+
+  console.log("── Daily OS Subscriptions ──\n");
+  for (const def of DAILY_SUBS) await createProductWithPrices(def);
+
+  console.log("── Bundle Subscriptions ──\n");
+  for (const def of BUNDLE_SUBS) await createProductWithPrices(def);
 
   console.log("── Token Packs ──\n");
   for (const def of TOKEN_PACKS) await createProductWithPrices(def);
