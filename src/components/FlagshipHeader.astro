@@ -31,6 +31,9 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro" } = Astro.pr
     </nav>
 
     <div class="header-actions">
+      <button id="vxLangToggle" class="vx-widget vx-lang-btn" aria-label="Toggle language" title="Switch language / Mudar idioma">
+        <span class="vx-lang-label" data-i18n="widget.lang">EN</span>
+      </button>
       <a href={ROUTES.login} class="header-link" data-i18n="nav.login">Login</a>
       <a href={ctaHref} class="button button--gold">{ctaLabel}</a>
       <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Open menu" aria-expanded="false">
@@ -48,6 +51,34 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro" } = Astro.pr
     <a href={ctaHref} class="button button--gold">{ctaLabel}</a>
   </nav>
 </header>
+
+<style>
+  .vx-lang-btn {
+    position: relative;
+    top: unset; right: unset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    padding: 7px 11px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .09em;
+    line-height: 1;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 999px;
+    color: rgba(255,255,255,.82);
+    cursor: pointer;
+    user-select: none;
+    transition: background 160ms, border-color 160ms, color 160ms;
+  }
+  .vx-lang-btn:hover {
+    background: rgba(130,220,255,.13);
+    border-color: rgba(130,220,255,.36);
+    color: #fff;
+  }
+</style>
 
 <script>
   const btn = document.getElementById("mobileMenuBtn");

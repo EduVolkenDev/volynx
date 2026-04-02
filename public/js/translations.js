@@ -159,7 +159,7 @@ window.VX_TRANS = {
     /* === LAB UPGRADE BANNER === */
     "lab_banner.badge": "Studio Pro",
     "lab_banner.limit": "Free tools have daily limits.",
-    "lab_banner.promo": "Studio Pro removes them all — unlimited processing, batch mode, and commercial rights.",
+    "lab_banner.promo": "Studio Pro raises them significantly — much higher limits, batch mode, and commercial rights.",
     "lab_banner.cta":   "Explore Studio — £19/month →",
 
     /* === VXHEADER NAV (sections mode) === */
@@ -221,7 +221,7 @@ window.VX_TRANS = {
     "lab.scaler.desc":    "High-quality upscaling with detail preservation",
     "lab.suite.desc":     "Upscale, compress, and convert inside a single interface",
     "lab.qr.desc":        "Generate styled QR codes and campaign-ready links",
-    "lab.studio.desc":    "No limits. Batch processing. Commercial rights. £19/month",
+    "lab.studio.desc":    "Higher limits. Batch processing. Commercial rights. £19/month",
     "lab.free_badge":     "FREE",
 
     /* === CONVERTER TOOL === */
@@ -720,7 +720,7 @@ window.VX_TRANS = {
     "studio.nav_back":    "← Free Lab",
     "studio.nav_pricing": "See pricing",
     "studio.hero_title":  "Your production pipeline. In the browser.",
-    "studio.hero_desc":   "No installs. No file size anxiety. No daily limits hitting you mid-project. Studio Pro unlocks the full suite with batch processing and commercial rights — for the price of a coffee a week.",
+    "studio.hero_desc":   "No installs. No file size anxiety. Much higher limits throughout your project. Studio Pro unlocks the full suite with batch processing and commercial rights — for the price of a coffee a week.",
     "studio.btn_start":   "Start Studio Pro — £19/month",
     "studio.btn_plans":   "Compare plans",
     "studio.hero_note":   "Cancel anytime. No contracts.",
@@ -1247,6 +1247,7 @@ window.VX_TRANS = {
     // ── lab2 ──
     "lab2.btn_browse_tools": "Browse tools",
     "lab2.btn_see_pro": "See Pro benefits",
+    "lab2.cta_btn": "Open Studio",
     "lab2.cta_desc": "Pro unlocks batch workflows, saved presets, premium export modes and priority features. Work faster with tools built for serious production.",
     "lab2.cta_label": "Studio Pro",
     "lab2.cta_tagline": "Build faster. Export better. Operate like a studio.",
@@ -1382,7 +1383,7 @@ window.VX_TRANS = {
     "prod.tool_lab_title": "VOLYNX Lab",
     "prod.tool_studio_btn": "See Studio Pro",
     "prod.tool_studio_chip": "Production",
-    "prod.tool_studio_desc": "The layer for users who care about stronger outputs, saved workflows and cleaner delivery. No daily limits, batch processing, commercial rights.",
+    "prod.tool_studio_desc": "The layer for users who care about stronger outputs, saved workflows and cleaner delivery. Higher usage limits, batch processing, commercial rights.",
     "prod.tool_studio_label": "Included in Pro",
     "prod.tool_studio_title": "Studio Pro",
 
@@ -1832,7 +1833,7 @@ window.VX_TRANS = {
     /* === LAB UPGRADE BANNER === */
     "lab_banner.badge": "Studio Pro",
     "lab_banner.limit": "Ferramentas gratuitas têm limites diários.",
-    "lab_banner.promo": "O Studio Pro remove todos — processamento ilimitado, modo batch e direitos comerciais.",
+    "lab_banner.promo": "O Studio Pro eleva significativamente — limites muito maiores, modo batch e direitos comerciais.",
     "lab_banner.cta":   "Explorar Studio — £19/mês →",
 
     /* === VXHEADER NAV (sections mode) === */
@@ -1894,7 +1895,7 @@ window.VX_TRANS = {
     "lab.scaler.desc":    "Upscaling de alta qualidade com preservação de detalhes",
     "lab.suite.desc":     "Faça upscale, comprima e converta em uma única interface",
     "lab.qr.desc":        "Gere QR codes estilizados e links prontos para campanha",
-    "lab.studio.desc":    "Sem limites. Processamento em lote. Direitos comerciais. £19/mês",
+    "lab.studio.desc":    "Limites muito maiores. Processamento em lote. Direitos comerciais. £19/mês",
     "lab.free_badge":     "GRÁTIS",
 
     /* === CONVERTER TOOL === */
@@ -2393,7 +2394,7 @@ window.VX_TRANS = {
     "studio.nav_back":    "← Lab Gratuito",
     "studio.nav_pricing": "Ver preços",
     "studio.hero_title":  "Seu pipeline de produção. No navegador.",
-    "studio.hero_desc":   "Sem instalações. Sem ansiedade com tamanho de arquivo. Sem limites diários te atrapalhando no meio de um projeto. O Studio Pro desbloqueia o suite completo com processamento em lote e direitos comerciais — pelo preço de um café por semana.",
+    "studio.hero_desc":   "Sem instalações. Sem ansiedade com tamanho de arquivo. Limites muito maiores ao longo do seu projeto. O Studio Pro desbloqueia o suite completo com processamento em lote e direitos comerciais — pelo preço de um café por semana.",
     "studio.btn_start":   "Começar Studio Pro — £19/mês",
     "studio.btn_plans":   "Comparar planos",
     "studio.hero_note":   "Cancele a qualquer momento. Sem contratos.",
@@ -2880,6 +2881,7 @@ window.VX_TRANS = {
     // ── lab2 ──
     "lab2.btn_browse_tools": "Explorar ferramentas",
     "lab2.btn_see_pro": "Ver benefícios Pro",
+    "lab2.cta_btn": "Abrir Studio",
     "lab2.cta_desc": "Pro libera fluxos de lote, presets salvos, modos de exportação premium e recursos prioritários. Trabalhe mais rápido com ferramentas feitas para produção séria.",
     "lab2.cta_label": "Studio Pro",
     "lab2.cta_tagline": "Construa mais rápido. Exporte melhor. Opere como um estúdio.",
@@ -3022,7 +3024,7 @@ window.VX_TRANS = {
     "prod.tool_lab_title": "VOLYNX Lab",
     "prod.tool_studio_btn": "Ver Studio Pro",
     "prod.tool_studio_chip": "Produção",
-    "prod.tool_studio_desc": "A camada para usuários que se importam com saídas mais fortes, fluxos salvos e entrega mais limpa. Sem limites diários, processamento em lote, direitos comerciais.",
+    "prod.tool_studio_desc": "A camada para usuários que se importam com saídas mais fortes, fluxos salvos e entrega mais limpa. Limites de uso muito maiores, processamento em lote, direitos comerciais.",
     "prod.tool_studio_label": "Incluído em Pro",
     "prod.tool_studio_title": "Studio Pro",
 
