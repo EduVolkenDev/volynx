@@ -553,6 +553,11 @@ import PageWidgets from "../../../components/PageWidgets.astro";
           return;
         }
 
+        // TODO: premium gating — check planLimits.premium_kits here before allowing
+        // non-free presets. If planLimits.premium_kits === false and the selected preset
+        // is a paid kit, block selection and prompt the user to upgrade.
+        // Example: if (!planLimits?.premium_kits && PREMIUM_PRESET_IDS.includes(preset)) { ... }
+
         selectedPresetId = preset;
         selectedVariants = {};
         renderVariantSelectors();
@@ -1348,6 +1353,61 @@ import PageWidgets from "../../../components/PageWidgets.astro";
     log("builder_plan: " + builderPlan + " | tokens: " + (userProfile?.token_balance || 0));
 
     await listProjects(user.id);
+
+    // ── URL parameter handling ──────────────────────────────────
+    // ?preset={id}   → auto-select a preset in the wizard and advance to step 2
+    // ?project={uuid} → load an existing project directly into the editor, skipping the wizard
+    (function handleUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      const presetParam = params.get("preset");
+      const projectParam = params.get("project");
+
+      if (projectParam) {
+        // Load a specific project by UUID directly into the editor
+        log("url param: project=" + projectParam);
+        supa
+          .from("projects")
+          .select("id,name,slug,builder_data,status,created_at")
+          .eq("id", projectParam)
+          .eq("user_id", user.id)
+          .is("deleted_at", null)
+          .single()
+          .then(({ data, error }: { data: any; error: any }) => {
+            if (error || !data) {
+              log("project url param load failed: " + (error?.message || "not found"));
+              setStatus("Project not found or access denied.");
+              return;
+            }
+            openProject(data);
+            log("opened project from url param: " + data.name);
+          });
+        // project param takes priority — skip preset handling
+        return;
+      }
+
+      if (presetParam) {
+        // Auto-select a preset and advance the wizard to step 2
+        log("url param: preset=" + presetParam);
+        const presetGrid = document.getElementById("presetGrid");
+        if (!presetGrid) return;
+
+        const matchingCard = presetGrid.querySelector<HTMLElement>(
+          `[data-preset="${CSS.escape(presetParam)}"]`
+        );
+        if (!matchingCard) {
+          log("preset url param not found in grid: " + presetParam);
+          return;
+        }
+
+        // Simulate a click to trigger existing selection + active styling
+        matchingCard.click();
+        log("preset auto-selected from url param: " + presetParam);
+
+        // Advance to step 2 — the wizard requires a project name first, so
+        // scroll the name field into view and wait for user input before proceeding
+        showWizardStep(2);
+      }
+    })();
 
     // ── Event listeners ────────────────────────────────────────
     $("logout")?.addEventListener("click", async () => {

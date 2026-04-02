@@ -36,8 +36,10 @@
   var sharpenChk  = document.getElementById('sharpen');
   var smoothChk   = document.getElementById('smooth');
 
-  var currentFile = null;
-  var outputBlob  = null;
+  // ── State ─────────────────────────────────────────────────
+  var loadedImages     = [];  // [{ file, img, baseName }]
+  var processedResults = [];  // [{ baseName, blob, width, height }]
+  var singleBlob       = null;
 
   // ── File picker ──────────────────────────────────────────
   pickBtn.addEventListener('click', function () { fileInput.click(); });
@@ -46,8 +48,9 @@
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
   });
 
-  fileInput.addEventListener('change', function () {
-    if (fileInput.files[0]) loadFile(fileInput.files[0]);
+  fileInput.addEventListener('change', async function () {
+    var files = Array.from(fileInput.files || []);
+    if (files.length) await loadFiles(files);
   });
 
   // ── Drag & drop ──────────────────────────────────────────
@@ -58,26 +61,62 @@
   drop.addEventListener('dragleave', function () {
     drop.classList.remove('drag');
   });
-  drop.addEventListener('drop', function (e) {
+  drop.addEventListener('drop', async function (e) {
     e.preventDefault();
     drop.classList.remove('drag');
-    var f = e.dataTransfer.files[0];
-    if (f && f.type.startsWith('image/')) loadFile(f);
+    var files = Array.from((e.dataTransfer && e.dataTransfer.files) || []);
+    if (files.length) await loadFiles(files);
   });
 
-  function loadFile(file) {
-    currentFile = file;
-    outputBlob  = null;
-    downloadBtn.disabled = true;
-    preview.removeAttribute('src');
-    origMeta.textContent = file.name + ' — ' + fmtSize(file.size);
-    outMeta.textContent  = '—';
+  // ── Load files ───────────────────────────────────────────
+  function fileToImage(file) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload  = function () { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('Failed to load ' + file.name)); };
+      img.src = url;
+    });
+  }
+
+  async function loadFiles(files) {
+    var valid = files.filter(function (f) { return f && f.type && f.type.startsWith('image/'); });
+    loadedImages     = [];
+    processedResults = [];
+    singleBlob       = null;
+
+    if (preview) preview.removeAttribute('src');
+    if (outMeta) outMeta.textContent = '—';
+    if (downloadBtn) downloadBtn.disabled = true;
+
+    if (!valid.length) { alert('No valid images found.'); return; }
+
+    runBtn.disabled = true;
+    setDropText('Loading ' + valid.length + ' file(s)…');
+
+    try {
+      for (var i = 0; i < valid.length; i++) {
+        var f = valid[i];
+        var img = await fileToImage(f);
+        loadedImages.push({ file: f, img: img, baseName: f.name.replace(/\.[^/.]+$/, '') });
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error loading image(s).');
+      setDropText('Error — please try again');
+      runBtn.disabled = true;
+      return;
+    }
+
+    var totalBytes = valid.reduce(function (s, f) { return s + f.size; }, 0);
+    if (origMeta) origMeta.textContent = valid.length + ' file(s) · ' + fmtSize(totalBytes);
+    setDropText(valid.length + ' file(s) ready');
     runBtn.disabled = false;
   }
 
   // ── Run upscale ──────────────────────────────────────────
   runBtn.addEventListener('click', async function () {
-    if (!currentFile) return;
+    if (!loadedImages.length) return;
     runBtn.disabled = true;
     runBtn.textContent = 'Checking…';
     try {
@@ -98,75 +137,90 @@
     if (mode === 'ai') {
       alert('AI upscale requer upgrade. Usando modo local automaticamente.');
     }
-    runLocal();
+    await runLocal();
   });
 
-  function runLocal() {
-    runBtn.disabled = true;
-    runBtn.textContent = 'Processing…';
+  async function runLocal() {
+    runBtn.disabled  = true;
+    downloadBtn.disabled = true;
+    processedResults = [];
+    singleBlob       = null;
 
     var scale   = parseInt(scaleSelect.value, 10);
     var format  = formatSelect.value;
     var sharpen = sharpenChk ? sharpenChk.checked : false;
-    var smooth  = smoothChk ? smoothChk.checked : true;
+    var smooth  = smoothChk  ? smoothChk.checked  : true;
+    var ext     = format === 'image/jpeg' ? 'jpg' : format === 'image/webp' ? 'webp' : 'png';
 
-    var img = new Image();
-    var url = URL.createObjectURL(currentFile);
+    try {
+      for (var i = 0; i < loadedImages.length; i++) {
+        var item = loadedImages[i];
+        runBtn.textContent = 'Processing ' + (i + 1) + '/' + loadedImages.length + '…';
+        setDropText('Processing ' + (i + 1) + '/' + loadedImages.length + '…');
 
-    img.onload = function () {
-      URL.revokeObjectURL(url);
+        var result = await upscaleOne(item, scale, format, sharpen, smooth);
+        processedResults.push(result);
 
-      var srcW = img.naturalWidth;
-      var srcH = img.naturalHeight;
-      var dstW = srcW * scale;
-      var dstH = srcH * scale;
+        // Show first result in preview
+        if (i === 0) {
+          preview.src = URL.createObjectURL(result.blob);
+        }
+      }
 
-      // Step 1: draw original onto a source canvas
-      var srcCanvas = document.createElement('canvas');
+      var totalOut = processedResults.reduce(function (s, r) { return s + r.blob.size; }, 0);
+      outMeta.textContent = processedResults.length + ' file(s) · ' + fmtSize(totalOut) + ' (' + ext.toUpperCase() + ')';
+
+      if (processedResults.length === 1) singleBlob = processedResults[0].blob;
+
+      setDropText(processedResults.length + ' file(s) upscaled');
+      downloadBtn.disabled = false;
+    } catch (err) {
+      console.error(err);
+      alert('Error processing images.');
+      setDropText('Error — please try again');
+    } finally {
+      runBtn.disabled  = false;
+      runBtn.textContent = 'Process';
+    }
+  }
+
+  function upscaleOne(item, scale, format, sharpen, smooth) {
+    return new Promise(function (resolve, reject) {
+      var img      = item.img;
+      var srcW     = img.naturalWidth;
+      var srcH     = img.naturalHeight;
+      var dstW     = srcW * scale;
+      var dstH     = srcH * scale;
+
+      // Draw original onto source canvas
+      var srcCanvas    = document.createElement('canvas');
       srcCanvas.width  = srcW;
       srcCanvas.height = srcH;
       var srcCtx = srcCanvas.getContext('2d');
       srcCtx.drawImage(img, 0, 0);
 
-      // Step 2: upscale onto output canvas
-      var dst = document.createElement('canvas');
+      // Upscale onto output canvas
+      var dst    = document.createElement('canvas');
       dst.width  = dstW;
       dst.height = dstH;
       var dstCtx = dst.getContext('2d');
 
       dstCtx.imageSmoothingEnabled = smooth;
       if (smooth) dstCtx.imageSmoothingQuality = 'high';
-
       dstCtx.drawImage(srcCanvas, 0, 0, dstW, dstH);
 
-      // Step 3: optional sharpen via convolution
+      // Optional sharpen via convolution
       if (sharpen) {
         var imageData = dstCtx.getImageData(0, 0, dstW, dstH);
         applySharpen(imageData);
         dstCtx.putImageData(imageData, 0, 0);
       }
 
-      // Step 4: export
-      var ext = format === 'image/jpeg' ? 'jpg' : format === 'image/webp' ? 'webp' : 'png';
       dst.toBlob(function (blob) {
-        outputBlob = blob;
-        var outUrl = URL.createObjectURL(blob);
-        preview.src = outUrl;
-        outMeta.textContent = dstW + ' × ' + dstH + 'px — ' + fmtSize(blob.size) + ' (' + ext.toUpperCase() + ')';
-        downloadBtn.disabled = false;
-        runBtn.disabled = false;
-        runBtn.textContent = 'Process';
+        if (!blob) { reject(new Error('Blob generation failed for ' + item.baseName)); return; }
+        resolve({ baseName: item.baseName, blob: blob, width: dstW, height: dstH });
       }, format, 0.92);
-    };
-
-    img.onerror = function () {
-      URL.revokeObjectURL(url);
-      alert('Error loading image.');
-      runBtn.disabled = false;
-      runBtn.textContent = 'Process';
-    };
-
-    img.src = url;
+    });
   }
 
   // ── Sharpen kernel (3×3 unsharp) ─────────────────────────
@@ -200,16 +254,35 @@
   }
 
   // ── Download ─────────────────────────────────────────────
-  downloadBtn.addEventListener('click', function () {
-    if (!outputBlob) return;
+  downloadBtn.addEventListener('click', async function () {
+    if (!processedResults.length) return;
     var format = formatSelect.value;
-    var ext = format === 'image/jpeg' ? 'jpg' : format === 'image/webp' ? 'webp' : 'png';
-    var scale = scaleSelect.value;
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(outputBlob);
-    a.download = 'upscaled-' + scale + 'x.' + ext;
-    a.click();
-    setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
+    var ext    = format === 'image/jpeg' ? 'jpg' : format === 'image/webp' ? 'webp' : 'png';
+    var scale  = scaleSelect.value;
+
+    // Single file — direct download
+    if (processedResults.length === 1 && singleBlob) {
+      var a = document.createElement('a');
+      a.href     = URL.createObjectURL(singleBlob);
+      a.download = processedResults[0].baseName + '-' + scale + 'x.' + ext;
+      a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
+      return;
+    }
+
+    // Multiple files — ZIP download
+    if (!window.JSZip) { alert('JSZip not loaded. Cannot create ZIP.'); return; }
+    var zip = new window.JSZip();
+    for (var i = 0; i < processedResults.length; i++) {
+      var r = processedResults[i];
+      zip.file(r.baseName + '-' + scale + 'x.' + ext, r.blob);
+    }
+    var zipBlob = await zip.generateAsync({ type: 'blob' });
+    var a2 = document.createElement('a');
+    a2.href     = URL.createObjectURL(zipBlob);
+    a2.download = 'volynx-scaler-batch.zip';
+    a2.click();
+    setTimeout(function () { URL.revokeObjectURL(a2.href); }, 5000);
   });
 
   // ── Helpers ───────────────────────────────────────────────
@@ -218,5 +291,10 @@
     if (bytes < 1024) return bytes + ' B';
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
     return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+  }
+
+  function setDropText(text) {
+    var p = drop ? drop.querySelector('p') : null;
+    if (p) p.textContent = text;
   }
 })();

@@ -87,6 +87,8 @@ function detectProductKey(prefix: string): string {
   if (prefix.startsWith("studio_")) return "volynxlab";
   if (prefix.startsWith("tokens_")) return "tokens";
   if (prefix.startsWith("addon_")) return "addons";
+  if (prefix.startsWith("kit_")) return "kits";
+  if (prefix.startsWith("pf_")) return "propertyflow";
   return "volynx";
 }
 
@@ -261,6 +263,59 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         metadata: { stripe_session_id: session.id, lookup_key: lookupKey },
       });
       console.log(`Addon ${addonId} activated for ${userId}`);
+    }
+
+    // ── Kit purchases → record addon + auto-create Builder project ──
+    if (prefix.startsWith("kit_") || prefix.startsWith("pf_")) {
+      // Record as addon purchase
+      await supabase.from("addons_purchased").insert({
+        user_id: userId,
+        user_email: userEmail,
+        addon_id: prefix,
+        price_paid: (session.amount_total || 0) / 100,
+        currency: currency,
+        status: "active",
+        metadata: { stripe_session_id: session.id, lookup_key: lookupKey },
+      });
+
+      // Auto-create a Builder project with the kit's preset
+      const presetMap: Record<string, string> = {
+        kit_landing_express: "saas",
+        kit_portfolio_personal: "portfolio",
+        kit_portfolio_commercial: "portfolio",
+        kit_agency_personal: "agency",
+        kit_agency_commercial: "agency",
+        kit_saas_personal: "saas",
+        kit_saas_commercial: "saas",
+      };
+
+      const presetId = presetMap[prefix];
+      if (presetId) {
+        try {
+          // Fetch preset data from the public presets.json
+          const presetsRes = await fetch("https://volynx.world/builder/presets.json");
+          if (presetsRes.ok) {
+            const presetsData = await presetsRes.json();
+            const preset = presetsData.presets?.find((p: any) => p.id === presetId);
+            if (preset?.data) {
+              const slug = `${presetId}-${Date.now().toString(36)}`;
+              await supabase.from("projects").insert({
+                user_id: userId,
+                name: `${preset.name} Kit — ${new Date().toLocaleDateString("en-GB")}`,
+                slug: slug,
+                builder_data: preset.data,
+                status: "draft",
+                domain_type: "subdomain",
+              });
+              console.log(`Auto-created Builder project '${slug}' for ${userId} from kit ${prefix}`);
+            }
+          }
+        } catch (e) {
+          console.error(`Failed to auto-create project for kit ${prefix}:`, (e as Error).message);
+        }
+      }
+
+      console.log(`Kit purchase ${prefix} activated for ${userId}`);
     }
 
     await supabase.from("purchase_events").insert({

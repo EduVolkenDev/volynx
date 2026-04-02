@@ -233,6 +233,22 @@ const pageDescription = "Premium property management platform for real estate ag
     .price-card__features li::before { content: "✓ "; color: #34D399; font-weight: 700; }
     .price-card__cta { width: 100%; text-align: center; }
 
+    .price-card__badge { position:absolute; top:12px; right:12px; padding:4px 10px; border-radius:999px; font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; background:rgba(214,179,106,.2); border:1px solid rgba(214,179,106,.3); color:var(--gold); }
+    .price-card--featured { position:relative; }
+
+    /* ─── Template preview grid ─── */
+    .template-preview-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; }
+    .tpl-card { border-radius:var(--radius); border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03); padding:16px; text-align:center; font-size:.85rem; font-weight:600; position:relative; }
+    .tpl-card--pro { opacity:.6; }
+    .tpl-thumb { height:120px; border-radius:12px; margin-bottom:10px; }
+    .tpl-thumb--1 { background:linear-gradient(135deg, rgba(214,179,106,.15), rgba(255,255,255,.05)); background-image:repeating-linear-gradient(0deg, rgba(255,255,255,.06) 0px, rgba(255,255,255,.06) 30px, transparent 30px, transparent 40px), repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0px, rgba(255,255,255,.06) 45%, transparent 45%, transparent 55%); }
+    .tpl-thumb--2 { background:linear-gradient(180deg, rgba(214,179,106,.12), rgba(139,92,246,.08)); background-image:linear-gradient(90deg, rgba(255,255,255,.04) 50%, transparent 50%); }
+    .tpl-thumb--3 { background:linear-gradient(135deg, rgba(59,130,246,.1), rgba(255,255,255,.03)); background-image:repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0px, rgba(255,255,255,.05) 20px, transparent 20px, transparent 28px); }
+    .tpl-thumb--4 { background:linear-gradient(180deg, rgba(214,179,106,.2) 40%, rgba(255,255,255,.03) 40%); }
+    .tpl-thumb--5 { background:linear-gradient(90deg, rgba(214,179,106,.12) 50%, rgba(139,92,246,.08) 50%); }
+    .tpl-thumb--6 { background:linear-gradient(135deg, rgba(214,179,106,.08), rgba(59,130,246,.08)); background-image:repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0px, rgba(255,255,255,.05) 25px, transparent 25px, transparent 30px), repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0px, rgba(255,255,255,.05) 30%, transparent 30%, transparent 36%); }
+    .tpl-pro-tag { position:absolute; top:8px; right:8px; padding:2px 8px; border-radius:999px; font-size:.65rem; font-weight:700; background:rgba(139,92,246,.2); border:1px solid rgba(139,92,246,.3); color:#c4b5fd; }
+
     /* ─── CTA block ─── */
     .cta-block {
       border-radius: 30px; padding: 40px;
@@ -253,10 +269,12 @@ const pageDescription = "Premium property management platform for real estate ag
       .pricing-grid { grid-template-columns: 1fr; max-width: 420px; }
       .audience { grid-template-columns: 1fr; }
       .cta-block { flex-direction: column; align-items: flex-start; }
+      .template-preview-grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 560px) {
       .features { grid-template-columns: 1fr; }
       .cta-block { padding: 24px; }
+      .template-preview-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -371,56 +389,79 @@ const pageDescription = "Premium property management platform for real estate ag
       </div>
     </section>
 
+    <!-- Template Previews -->
+    <section class="section" id="templates">
+      <div class="section__head">
+        <span class="kicker" data-i18n="pf.templates_kicker">Grid Templates</span>
+        <h2 data-i18n="pf.templates_title">Pre-built layouts ready to plug into your site.</h2>
+        <p class="sub" data-i18n="pf.templates_desc">Each template is a different property grid layout — optimized for different listing styles, screen sizes, and use cases. Pick your package, pay once, plug it in.</p>
+      </div>
+      <div class="template-preview-grid">
+        <div class="tpl-card"><div class="tpl-thumb tpl-thumb--1"></div><span>Classic Grid</span></div>
+        <div class="tpl-card"><div class="tpl-thumb tpl-thumb--2"></div><span>Magazine</span></div>
+        <div class="tpl-card"><div class="tpl-thumb tpl-thumb--3"></div><span>Compact List</span></div>
+        <div class="tpl-card tpl-card--pro"><div class="tpl-thumb tpl-thumb--4"></div><span>Gallery Hero</span><span class="tpl-pro-tag">Pro+</span></div>
+        <div class="tpl-card tpl-card--pro"><div class="tpl-thumb tpl-thumb--5"></div><span>Split View</span><span class="tpl-pro-tag">Pro+</span></div>
+        <div class="tpl-card tpl-card--pro"><div class="tpl-thumb tpl-thumb--6"></div><span>Masonry</span><span class="tpl-pro-tag">Pro+</span></div>
+      </div>
+      <p class="sub" style="margin-top:16px;font-size:.85rem;opacity:.5;" data-i18n="pf.templates_note">Enterprise includes 15 templates with all variations. Preview all templates after purchase.</p>
+    </section>
+
     <!-- Pricing -->
     <section class="section" id="pricing">
       <div class="section__head">
         <span class="kicker" data-i18n="pf.pricing_kicker">Pricing</span>
-        <h2 data-i18n="pf.pricing_title">Simple, transparent pricing.</h2>
-        <p class="sub" data-i18n="pf.pricing_desc">One-time purchase. Full source code. No recurring fees for the kit itself.</p>
+        <h2 data-i18n="pf.pricing_title">Buy once. Plug in. Done.</h2>
+        <p class="sub" data-i18n="pf.pricing_desc">One-time purchase. Full source code. Ready-to-use grid templates. No subscription, no recurring fees.</p>
         <div class="vx-currency-bar" style="margin-top:20px;justify-content:flex-start;"></div>
       </div>
       <div class="pricing-grid">
         <div class="price-card">
           <span class="price-card__name" data-i18n="pf.plan1_name">Starter</span>
           <div class="price-card__price"><span data-price-gbp="£149" data-price-eur="€179" data-price-brl="R$1.049">£149</span></div>
-          <div class="price-card__billing" data-i18n="pf.plan1_billing">One-time · Source code</div>
+          <div class="price-card__billing" data-i18n="pf.plan1_billing">One-time · 3 templates</div>
           <ul class="price-card__features">
-            <li data-i18n="pf.plan1_f1">Full React source code</li>
-            <li data-i18n="pf.plan1_f2">Property catalogue + filters</li>
-            <li data-i18n="pf.plan1_f3">Bilingual interface (EN/PT)</li>
-            <li data-i18n="pf.plan1_f4">Responsive design</li>
-            <li data-i18n="pf.plan1_f5">Static data mode</li>
+            <li data-i18n="pf.plan1_f1">3 grid layout templates</li>
+            <li data-i18n="pf.plan1_f2">Full React source code</li>
+            <li data-i18n="pf.plan1_f3">Property catalogue + filters</li>
+            <li data-i18n="pf.plan1_f4">Bilingual interface (EN/PT)</li>
+            <li data-i18n="pf.plan1_f5">Responsive design</li>
+            <li data-i18n="pf.plan1_f6">Static data mode</li>
           </ul>
-          <a class="btn btn--ghost price-card__cta" href="/contact/?product=propertyflow&plan=starter" data-i18n="pf.plan1_cta">Get Starter</a>
+          <button type="button" class="btn btn--ghost price-card__cta pf-checkout" data-lookup="pf_starter" data-i18n="pf.plan1_cta">Buy Starter — £149</button>
         </div>
         <div class="price-card price-card--featured">
           <span class="price-card__name" data-i18n="pf.plan2_name">Professional</span>
+          <div class="price-card__badge">Most popular</div>
           <div class="price-card__price"><span data-price-gbp="£349" data-price-eur="€419" data-price-brl="R$2.449">£349</span></div>
-          <div class="price-card__billing" data-i18n="pf.plan2_billing">One-time · Full kit</div>
+          <div class="price-card__billing" data-i18n="pf.plan2_billing">One-time · 6 templates</div>
           <ul class="price-card__features">
-            <li data-i18n="pf.plan2_f1">Everything in Starter</li>
-            <li data-i18n="pf.plan2_f2">Supabase backend integration</li>
-            <li data-i18n="pf.plan2_f3">Admin dashboard</li>
-            <li data-i18n="pf.plan2_f4">Image gallery + modals</li>
-            <li data-i18n="pf.plan2_f5">Enquiry capture system</li>
-            <li data-i18n="pf.plan2_f6">Deployment guide</li>
+            <li data-i18n="pf.plan2_f1">6 grid layout templates</li>
+            <li data-i18n="pf.plan2_f2">Everything in Starter</li>
+            <li data-i18n="pf.plan2_f3">Supabase backend integration</li>
+            <li data-i18n="pf.plan2_f4">Admin dashboard</li>
+            <li data-i18n="pf.plan2_f5">Image gallery + modals</li>
+            <li data-i18n="pf.plan2_f6">Enquiry capture system</li>
+            <li data-i18n="pf.plan2_f7">Deployment guide</li>
           </ul>
-          <a class="btn btn--primary price-card__cta" href="/contact/?product=propertyflow&plan=professional" data-i18n="pf.plan2_cta">Get Professional</a>
+          <button type="button" class="btn btn--primary price-card__cta pf-checkout" data-lookup="pf_professional" data-i18n="pf.plan2_cta">Buy Professional — £349</button>
         </div>
         <div class="price-card">
-          <span class="price-card__name" data-i18n="pf.plan3_name">White-Label</span>
-          <div class="price-card__price" data-i18n="pf.plan3_price">Custom</div>
-          <div class="price-card__billing" data-i18n="pf.plan3_billing">Tailored to your agency</div>
+          <span class="price-card__name" data-i18n="pf.plan3_name">Enterprise</span>
+          <div class="price-card__price"><span data-price-gbp="£599" data-price-eur="€699" data-price-brl="R$4.199">£599</span></div>
+          <div class="price-card__billing" data-i18n="pf.plan3_billing">One-time · 15 templates</div>
           <ul class="price-card__features">
-            <li data-i18n="pf.plan3_f1">Everything in Professional</li>
-            <li data-i18n="pf.plan3_f2">Custom branding + domain</li>
-            <li data-i18n="pf.plan3_f3">Priority onboarding</li>
-            <li data-i18n="pf.plan3_f4">Data migration support</li>
-            <li data-i18n="pf.plan3_f5">Dedicated support channel</li>
+            <li data-i18n="pf.plan3_f1">15 grid layout templates</li>
+            <li data-i18n="pf.plan3_f2">Everything in Professional</li>
+            <li data-i18n="pf.plan3_f3">Custom branding starter kit</li>
+            <li data-i18n="pf.plan3_f4">Priority onboarding</li>
+            <li data-i18n="pf.plan3_f5">Data migration support</li>
+            <li data-i18n="pf.plan3_f6">Dedicated support channel</li>
           </ul>
-          <a class="btn btn--ghost price-card__cta" href="/contact/?product=propertyflow&plan=whitelabel" data-i18n="pf.plan3_cta">Talk to us</a>
+          <button type="button" class="btn btn--primary price-card__cta pf-checkout" data-lookup="pf_enterprise" data-i18n="pf.plan3_cta">Buy Enterprise — £599</button>
         </div>
       </div>
+      <p class="sub" style="margin-top:20px;font-size:.85rem;text-align:center;opacity:.5;" data-i18n="pf.pricing_note">All packages are one-time purchases. No free updates included. Template updates available at a fixed price — we'll contact you when new layouts are ready.</p>
     </section>
 
     <!-- CTA -->
@@ -428,11 +469,11 @@ const pageDescription = "Premium property management platform for real estate ag
       <div class="cta-block">
         <div>
           <h2 data-i18n="pf.cta_title">Ready to modernise your property showcase?</h2>
-          <p data-i18n="pf.cta_desc">PropertyFlow is available as a white-label solution. Request a demo and we'll walk you through setup and customisation.</p>
+          <p data-i18n="pf.cta_desc">PropertyFlow comes ready to plug into your site. Select your package, pay once, and start showcasing properties in minutes.</p>
         </div>
         <div class="cta-block__actions">
-          <a class="btn btn--primary" href="/contact/?product=propertyflow" data-i18n="pf.cta_btn1">Request a demo</a>
-          <a class="btn btn--ghost" href="#pricing" data-i18n="pf.cta_btn2">See pricing</a>
+          <a class="btn btn--primary" href="#pricing" data-i18n="pf.cta_btn1">Choose your package</a>
+          <a class="btn btn--ghost" href="/contact/?product=propertyflow" data-i18n="pf.cta_btn2">Have questions?</a>
         </div>
       </div>
     </section>
@@ -441,5 +482,41 @@ const pageDescription = "Premium property management platform for real estate ag
   <SiteFooter />
   <PageWidgets hideUtilBar />
   <script is:inline src="/js/vx-currency.js"></script>
+
+  <!-- Checkout handler -->
+  <script is:inline>
+  (function() {
+    document.querySelectorAll('.pf-checkout').forEach(function(btn) {
+      btn.addEventListener('click', async function() {
+        var lookup = btn.getAttribute('data-lookup');
+        var token = localStorage.getItem('volynx_access_token');
+        if (!token) { window.location.href = '/login/?next=/products/propertyflow/%23pricing'; return; }
+
+        btn.textContent = 'Redirecting...';
+        btn.style.pointerEvents = 'none';
+
+        try {
+          var cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r) { return r.json(); });
+          var apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
+          var currency = (localStorage.getItem('volynx_currency') || 'gbp').toLowerCase();
+          var lookupKey = lookup + '_' + currency;
+
+          var res = await fetch(apiBase + '/create-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+            body: JSON.stringify({
+              lookup_key: lookupKey,
+              success_url: window.location.origin + '/profile/?payment=success',
+              cancel_url: window.location.origin + '/products/propertyflow/?payment=cancelled'
+            })
+          });
+          var data = await res.json();
+          if (data.url) window.location.href = data.url;
+          else { alert(data.error || 'Checkout failed. Please try again.'); btn.textContent = 'Try again'; btn.style.pointerEvents = ''; }
+        } catch(e) { alert('Connection error. Please try again.'); btn.textContent = 'Try again'; btn.style.pointerEvents = ''; }
+      });
+    });
+  })();
+  </script>
 </body>
 </html>

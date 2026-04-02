@@ -1,0 +1,332 @@
+---
+import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "../../components/FlagshipHeader.astro";
+import FlagshipFooter from "../../components/FlagshipFooter.astro";
+import { ROUTES } from "../../data/routes";
+---
+<FlagshipLayout title="My Products — VOLYNX" description="Access your purchased kits and products. Open them directly in Builder." pageClass="page-delivery">
+  <FlagshipHeader ctaLabel="Open Builder" ctaHref="/dev-hub/builder/" />
+  <main>
+
+    <!-- ═══ HERO ═══ -->
+    <section class="hero delivery-hero">
+      <div class="shell hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">Your purchases</span>
+          <h1>Products &amp; Kits</h1>
+          <p>Every kit and product you've unlocked — ready to open directly in Builder.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ PURCHASES ═══ -->
+    <section class="page-section">
+      <div class="shell">
+
+        <!-- Loading state -->
+        <div id="deliveryLoading" class="delivery-state">
+          <div class="delivery-spinner" aria-hidden="true"></div>
+          <p class="delivery-state__label">Loading your purchases...</p>
+        </div>
+
+        <!-- Error state -->
+        <div id="deliveryError" class="delivery-state" style="display:none;">
+          <p class="delivery-state__label delivery-state__label--error" id="deliveryErrorMsg">Something went wrong. Please try again.</p>
+          <a href={ROUTES.login + "?next=/delivery/"} class="button button--ghost">Sign in again</a>
+        </div>
+
+        <!-- Empty state -->
+        <div id="deliveryEmpty" class="delivery-state" style="display:none;">
+          <p class="delivery-state__label">No purchases yet.</p>
+          <a href={ROUTES.products} class="button button--gold">Browse products</a>
+        </div>
+
+        <!-- Product grid -->
+        <div id="deliveryGrid" class="delivery-grid" style="display:none;" aria-live="polite"></div>
+
+      </div>
+    </section>
+
+    <!-- ═══ CTA ═══ -->
+    <section class="page-section page-section--last">
+      <div class="shell callout panel panel--pro">
+        <div>
+          <span class="eyebrow">Keep building</span>
+          <strong>Open Builder and start with any of your kits.</strong>
+          <p>Presets are loaded automatically when you follow the link from each product card.</p>
+        </div>
+        <div class="hero-actions">
+          <a href="/dev-hub/builder/" class="button button--gold">Open Builder</a>
+          <a href={ROUTES.products} class="button button--ghost">Browse more products</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  <FlagshipFooter />
+
+  <script is:inline type="module">
+    // ── Auth guard ──────────────────────────────────────────────────────────
+    const token = localStorage.getItem('volynx_access_token');
+    if (!token) {
+      window.location.href = '/login/?next=/delivery/';
+    }
+
+    // ── Helpers ─────────────────────────────────────────────────────────────
+    function show(id) { const el = document.getElementById(id); if (el) el.style.display = ''; }
+    function hide(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
+
+    /** Derive a display name from addon_id.
+     *  e.g. "kit-portfolio-personal" → "Portfolio Pro Kit — Personal"
+     *       "kit-agency-launch"      → "Agency Launch Kit — Launch"
+     *       "kit-saas-standard"      → "SaaS Landing System — Standard"
+     *       "kit-landing-express"    → "Landing Express"
+     */
+    function addonLabel(addonId) {
+      if (!addonId) return 'Unknown Product';
+      const id = addonId.toLowerCase();
+      if (id.startsWith('kit-portfolio')) {
+        const variant = id.replace('kit-portfolio-', '');
+        return 'Portfolio Pro Kit' + (variant ? ' \u2014 ' + titleCase(variant) : '');
+      }
+      if (id.startsWith('kit-agency')) {
+        const variant = id.replace('kit-agency-', '');
+        return 'Agency Launch Kit' + (variant ? ' \u2014 ' + titleCase(variant) : '');
+      }
+      if (id.startsWith('kit-saas')) {
+        const variant = id.replace('kit-saas-', '');
+        return 'SaaS Landing System' + (variant ? ' \u2014 ' + titleCase(variant) : '');
+      }
+      if (id === 'kit-landing-express' || id.startsWith('kit-landing')) {
+        return 'Landing Express';
+      }
+      // Fallback: humanise the raw id
+      return addonId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function titleCase(str) {
+      return str.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    /** Map addon_id to a Builder preset slug. */
+    function addonToPreset(addonId) {
+      if (!addonId) return null;
+      const id = addonId.toLowerCase();
+      if (id.startsWith('kit-portfolio')) return 'portfolio';
+      if (id.startsWith('kit-agency'))    return 'agency';
+      if (id.startsWith('kit-saas'))      return 'saas';
+      if (id === 'kit-landing-express' || id.startsWith('kit-landing')) return 'landing_express';
+      return null;
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '';
+      try {
+        return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+      } catch { return iso; }
+    }
+
+    function formatPrice(amount, currency) {
+      if (!amount && amount !== 0) return '';
+      try {
+        const num = typeof amount === 'number' ? amount : parseFloat(amount);
+        const cur = (currency || 'USD').toUpperCase();
+        // Stripe amounts are in cents for most currencies
+        const divisor = num > 1000 ? 100 : 1;
+        return new Intl.NumberFormat(undefined, { style: 'currency', currency: cur })
+          .format(num / divisor);
+      } catch { return String(amount); }
+    }
+
+    function buildCard(item) {
+      const label   = addonLabel(item.addon_id || item.product_id || '');
+      const preset  = addonToPreset(item.addon_id || item.product_id || '');
+      const date    = formatDate(item.created_at);
+      const price   = formatPrice(item.amount_paid ?? item.amount ?? item.price, item.currency);
+      const builderHref = preset
+        ? '/dev-hub/builder/?preset=' + encodeURIComponent(preset)
+        : '/dev-hub/builder/';
+
+      return `
+        <article class="panel delivery-card">
+          <div class="delivery-card__body">
+            <span class="eyebrow delivery-card__eyebrow">Kit</span>
+            <h3 class="delivery-card__name">${label}</h3>
+            <dl class="delivery-card__meta">
+              ${date  ? `<div><dt>Purchased</dt><dd>${date}</dd></div>` : ''}
+              ${price ? `<div><dt>Paid</dt><dd>${price}</dd></div>` : ''}
+            </dl>
+          </div>
+          <div class="delivery-card__actions">
+            <a href="${builderHref}" class="button button--gold delivery-card__cta">Open in Builder</a>
+          </div>
+        </article>`;
+    }
+
+    // ── Main fetch logic ────────────────────────────────────────────────────
+    (async () => {
+      // Resolve user id from stored session
+      let userId = null;
+      try {
+        const session = JSON.parse(localStorage.getItem('volynx_session') || '{}');
+        userId = session?.user?.id || null;
+      } catch {}
+
+      if (!userId) {
+        window.location.href = '/login/?next=/delivery/';
+        return;
+      }
+
+      // Load Supabase config
+      let cfg = null;
+      try { cfg = await fetch('/config.json', { cache: 'no-store' }).then(r => r.json()); } catch {}
+      const supabaseUrl  = (cfg?.supabaseUrl  || '').replace(/\/$/, '');
+      const anonKey      = cfg?.supabaseAnonKey || cfg?.anonKey || '';
+
+      if (!supabaseUrl || !anonKey) {
+        hide('deliveryLoading');
+        document.getElementById('deliveryErrorMsg').textContent = 'Configuration error. Please contact support.';
+        show('deliveryError');
+        return;
+      }
+
+      const headers = {
+        apikey: anonKey,
+        Authorization: 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      };
+
+      try {
+        // Fetch both tables in parallel
+        const [purchasedRes, eventsRes] = await Promise.all([
+          fetch(`${supabaseUrl}/rest/v1/addons_purchased?select=*&user_id=eq.${userId}&order=created_at.desc`, { headers }),
+          fetch(`${supabaseUrl}/rest/v1/purchase_events?select=*&user_id=eq.${userId}&status=eq.completed&order=created_at.desc`, { headers }),
+        ]);
+
+        let purchased = [];
+        let events = [];
+
+        if (purchasedRes.ok) {
+          try { purchased = await purchasedRes.json(); } catch {}
+        }
+        if (eventsRes.ok) {
+          try { events = await eventsRes.json(); } catch {}
+        }
+
+        // Merge: use addons_purchased as primary, supplement with purchase_events
+        // De-duplicate by addon_id so we don't show the same product twice
+        const seen = new Set();
+        const items = [];
+
+        for (const row of purchased) {
+          const key = row.addon_id || row.product_id || row.id;
+          if (!seen.has(key)) { seen.add(key); items.push(row); }
+        }
+        for (const row of events) {
+          const key = row.addon_id || row.product_id || row.id;
+          if (!seen.has(key)) { seen.add(key); items.push(row); }
+        }
+
+        hide('deliveryLoading');
+
+        if (items.length === 0) {
+          show('deliveryEmpty');
+          return;
+        }
+
+        const grid = document.getElementById('deliveryGrid');
+        grid.innerHTML = items.map(buildCard).join('');
+        grid.style.display = '';
+
+      } catch (err) {
+        hide('deliveryLoading');
+        document.getElementById('deliveryErrorMsg').textContent = 'Failed to load purchases. Please refresh and try again.';
+        show('deliveryError');
+      }
+    })();
+  </script>
+</FlagshipLayout>
+
+<style>
+  /* ── Hero ───────────────────────────────────────────────────────────────── */
+  .delivery-hero { padding-top: clamp(28px, 5vw, 52px); }
+  .delivery-hero .hero-copy h1 { font-size: clamp(2rem, 5vw, 3.2rem); }
+
+  /* ── Loading / states ────────────────────────────────────────────────────── */
+  .delivery-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: clamp(40px, 8vw, 80px) 0;
+    text-align: center;
+  }
+  .delivery-state__label {
+    color: rgba(255, 255, 255, .55);
+    font-size: .95rem;
+    margin: 0;
+  }
+  .delivery-state__label--error { color: rgba(255, 120, 120, .85); }
+
+  .delivery-spinner {
+    width: 32px;
+    height: 32px;
+    border: 2px solid rgba(255, 255, 255, .12);
+    border-top-color: rgba(139, 250, 240, .7);
+    border-radius: 50%;
+    animation: spin 700ms linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Product grid ────────────────────────────────────────────────────────── */
+  .delivery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    gap: 20px;
+  }
+
+  /* ── Product card ────────────────────────────────────────────────────────── */
+  .delivery-card {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 24px;
+  }
+  .delivery-card__body { flex: 1; }
+  .delivery-card__eyebrow { display: block; margin-bottom: 8px; }
+  .delivery-card__name {
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    font-weight: 700;
+    color: rgba(255, 255, 255, .95);
+    margin: 0 0 14px;
+    line-height: 1.3;
+  }
+
+  .delivery-card__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+  }
+  .delivery-card__meta > div {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    font-size: .82rem;
+  }
+  .delivery-card__meta dt {
+    color: rgba(255, 255, 255, .35);
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    font-size: .7rem;
+    min-width: 60px;
+  }
+  .delivery-card__meta dd {
+    color: rgba(255, 255, 255, .7);
+    margin: 0;
+  }
+
+  .delivery-card__actions { margin-top: auto; }
+  .delivery-card__cta { width: 100%; justify-content: center; text-align: center; }
+</style>

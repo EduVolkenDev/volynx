@@ -306,7 +306,7 @@ const pageDescription = "Conversion-focused landing kit with clean sections, SEO
               <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg>1 user</li>
               <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg>No redistribution</li>
             </ul>
-            <a href="/contact/?product=saas-landing-system&license=personal" class="btn btn-license"><span>Request purchase</span><svg class="btn-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M6 3L11 8L6 13" /></svg></a>
+            <button class="btn btn-license vx-checkout-btn" data-lookup="kit_saas_personal" data-label="Buy Personal License">Buy Personal License</button>
           </div>
           <div class="license-card license-featured">
             <div class="card-glow"></div>
@@ -324,7 +324,7 @@ const pageDescription = "Conversion-focused landing kit with clean sections, SEO
               <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg>Final delivery included</li>
               <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg>No resale as template</li>
             </ul>
-            <a href="/contact/?product=saas-landing-system&license=commercial" class="btn btn-license btn-featured"><span>Request purchase</span><svg class="btn-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M6 3L11 8L6 13" /></svg></a>
+            <button class="btn btn-license btn-featured vx-checkout-btn" data-lookup="kit_saas_commercial" data-label="Buy Commercial License">Buy Commercial License</button>
           </div>
           <div class="license-card">
             <div class="card-glow"></div>
@@ -338,7 +338,7 @@ const pageDescription = "Conversion-focused landing kit with clean sections, SEO
               <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg>Recurring internal use</li>
               <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg>Priority updates</li>
             </ul>
-            <a href="/contact/?product=saas-landing-system&license=studio" class="btn btn-license"><span>Request purchase</span><svg class="btn-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M6 3L11 8L6 13" /></svg></a>
+            <button class="btn btn-license vx-checkout-btn" data-lookup="kit_saas_commercial" data-label="Buy Studio License">Buy Studio License</button>
           </div>
         </div>
       </div>
@@ -403,6 +403,58 @@ const pageDescription = "Conversion-focused landing kit with clean sections, SEO
         }
       });
     });
+  </script>
+
+  <script is:inline>
+(function() {
+  document.querySelectorAll('.vx-checkout-btn').forEach(function(btn) {
+    btn.addEventListener('click', async function(e) {
+      e.preventDefault();
+      var lookupBase = btn.dataset.lookup;
+      if (!lookupBase) return;
+
+      var token = localStorage.getItem('volynx_access_token');
+      if (!token) {
+        window.location.href = '/login/?next=' + encodeURIComponent(window.location.pathname);
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
+
+      try {
+        var cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r) { return r.json(); });
+        var apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
+
+        // Use EUR as default currency (can be extended with currency selector)
+        var lookupKey = lookupBase + '_eur';
+
+        var res = await fetch(apiBase + '/api/create-checkout-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+          body: JSON.stringify({
+            lookup_key: lookupKey,
+            success_url: window.location.origin + '/profile/?payment=success',
+            cancel_url: window.location.href + '?payment=cancelled'
+          })
+        });
+
+        var data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          alert(data.error || 'Checkout failed. Please try again.');
+          btn.disabled = false;
+          btn.textContent = btn.dataset.label || 'Buy now';
+        }
+      } catch (err) {
+        alert('Connection error. Please try again.');
+        btn.disabled = false;
+        btn.textContent = btn.dataset.label || 'Buy now';
+      }
+    });
+  });
+})();
   </script>
 
   <SiteFooter />

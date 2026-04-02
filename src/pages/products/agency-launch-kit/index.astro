@@ -306,7 +306,7 @@ const pageDescription = "Website + proposal/SOW/onboarding pack to close faster 
               <li>1 user</li>
               <li>No redistribution</li>
             </ul>
-            <a href="/contact/?product=agency-launch-kit&license=personal" class="btn btn-outline">Request purchase</a>
+            <button class="btn btn-outline vx-checkout-btn" data-lookup="kit_agency_personal" data-label="Buy Personal License">Buy Personal License</button>
           </div>
           <div class="price-card price-featured">
             <div class="featured-label">
@@ -321,7 +321,7 @@ const pageDescription = "Website + proposal/SOW/onboarding pack to close faster 
               <li>Final delivery included</li>
               <li>No resale as template</li>
             </ul>
-            <a href="/contact/?product=agency-launch-kit&license=commercial" class="btn btn-primary">Request purchase</a>
+            <button class="btn btn-primary vx-checkout-btn" data-lookup="kit_agency_commercial" data-label="Buy Commercial License">Buy Commercial License</button>
           </div>
           <div class="price-card">
             <div class="price-tag">ENTERPRISE</div>
@@ -332,7 +332,7 @@ const pageDescription = "Website + proposal/SOW/onboarding pack to close faster 
               <li>Recurring internal use</li>
               <li>Priority updates</li>
             </ul>
-            <a href="/contact/?product=agency-launch-kit&license=studio" class="btn btn-outline">Request purchase</a>
+            <button class="btn btn-outline vx-checkout-btn" data-lookup="kit_agency_commercial" data-label="Buy Studio License">Buy Studio License</button>
           </div>
         </div>
       </div>
@@ -405,6 +405,58 @@ const pageDescription = "Website + proposal/SOW/onboarding pack to close faster 
         }
       });
     });
+  </script>
+
+  <script is:inline>
+(function() {
+  document.querySelectorAll('.vx-checkout-btn').forEach(function(btn) {
+    btn.addEventListener('click', async function(e) {
+      e.preventDefault();
+      var lookupBase = btn.dataset.lookup;
+      if (!lookupBase) return;
+
+      var token = localStorage.getItem('volynx_access_token');
+      if (!token) {
+        window.location.href = '/login/?next=' + encodeURIComponent(window.location.pathname);
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
+
+      try {
+        var cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r) { return r.json(); });
+        var apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
+
+        // Use EUR as default currency (can be extended with currency selector)
+        var lookupKey = lookupBase + '_eur';
+
+        var res = await fetch(apiBase + '/api/create-checkout-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+          body: JSON.stringify({
+            lookup_key: lookupKey,
+            success_url: window.location.origin + '/profile/?payment=success',
+            cancel_url: window.location.href + '?payment=cancelled'
+          })
+        });
+
+        var data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          alert(data.error || 'Checkout failed. Please try again.');
+          btn.disabled = false;
+          btn.textContent = btn.dataset.label || 'Buy now';
+        }
+      } catch (err) {
+        alert('Connection error. Please try again.');
+        btn.disabled = false;
+        btn.textContent = btn.dataset.label || 'Buy now';
+      }
+    });
+  });
+})();
   </script>
 
   <SiteFooter />

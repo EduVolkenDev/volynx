@@ -242,8 +242,8 @@ export const sitePricing = {
     },
     {
       id: 'icons-addon',
-      name: { pt: 'Premium icon collection', en: 'Premium icon collection' },
-      description: { pt: 'Coleção extra para elevar o acabamento visual.', en: 'Extra collection to elevate the visual finish.' },
+      name: { pt: 'Icon Collection Pack (5 premium)', en: 'Icon Collection Pack (5 premium)' },
+      description: { pt: '5 coleções premium permanentes: 3D Icons, Futuristic, Neon, Metal Blue e Nature. Sem expiração.', en: '5 permanent premium collections: 3D Icons, Futuristic, Neon, Metal Blue and Nature. No expiry.' },
       price: { GBP: '£9', EUR: '€10.90', BRL: 'R$59' }
     }
   ] satisfies BuilderAddon[],

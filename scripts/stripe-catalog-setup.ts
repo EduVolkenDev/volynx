@@ -327,8 +327,8 @@ const ADDONS: ProductDef[] = [
     prices: { amounts: { gbp: 700, eur: 890, brl: 4900 } },
   },
   {
-    name: "Premium Icon Collection",
-    description: "Curated icon collection to elevate your site's visual finish.",
+    name: "Icon Collection Pack (5 Premium)",
+    description: "5 permanent premium icon collections: 3D Icons, Futuristic, Neon, Metal Blue, Nature. 200+ icons, no expiry.",
     lookupPrefix: "addon_icons",
     metadata: {
       product_family: "addons",
@@ -441,6 +441,81 @@ const BUNDLE_SUBS: ProductDef[] = [
       is_addon: "false",
     },
     prices: { recurring: { interval: "month" }, amounts: { gbp: 5900, eur: 6990, brl: 39900 } },
+  },
+];
+
+// ── PropertyFlow Products ─────────────────────────────────
+
+const PROPERTYFLOW: ProductDef[] = [
+  {
+    name: "PropertyFlow Starter (3 templates)",
+    description: "Property management platform with 3 grid layout templates. Full React source, catalogue, filters, bilingual.",
+    marketingFeatures: [
+      "3 grid layout templates",
+      "Full React source code",
+      "Property catalogue + filters",
+      "Bilingual interface (EN/PT)",
+      "Responsive design",
+    ],
+    lookupPrefix: "pf_starter",
+    metadata: {
+      product_family: "propertyflow",
+      plan_tier: "starter",
+      billing_type: "one_time",
+      currency_scope: "multi",
+      includes_tokens: "0",
+      includes_icons: "false",
+      builder_sites_limit: "0",
+      is_addon: "false",
+    },
+    prices: { amounts: { gbp: 14900, eur: 17900, brl: 104900 } },
+  },
+  {
+    name: "PropertyFlow Professional (6 templates)",
+    description: "Full PropertyFlow kit with 6 grid templates, Supabase backend, admin dashboard, enquiry capture.",
+    marketingFeatures: [
+      "6 grid layout templates",
+      "Supabase backend integration",
+      "Admin dashboard",
+      "Image gallery + modals",
+      "Enquiry capture system",
+      "Deployment guide",
+    ],
+    lookupPrefix: "pf_professional",
+    metadata: {
+      product_family: "propertyflow",
+      plan_tier: "professional",
+      billing_type: "one_time",
+      currency_scope: "multi",
+      includes_tokens: "0",
+      includes_icons: "false",
+      builder_sites_limit: "0",
+      is_addon: "false",
+    },
+    prices: { amounts: { gbp: 34900, eur: 41900, brl: 244900 } },
+  },
+  {
+    name: "PropertyFlow Enterprise (15 templates)",
+    description: "Complete PropertyFlow with 15 grid templates, custom branding kit, priority onboarding, data migration.",
+    marketingFeatures: [
+      "15 grid layout templates",
+      "Custom branding starter kit",
+      "Priority onboarding",
+      "Data migration support",
+      "Dedicated support channel",
+    ],
+    lookupPrefix: "pf_enterprise",
+    metadata: {
+      product_family: "propertyflow",
+      plan_tier: "enterprise",
+      billing_type: "one_time",
+      currency_scope: "multi",
+      includes_tokens: "0",
+      includes_icons: "false",
+      builder_sites_limit: "0",
+      is_addon: "false",
+    },
+    prices: { amounts: { gbp: 59900, eur: 69900, brl: 419900 } },
   },
 ];
 
@@ -575,6 +650,9 @@ async function main() {
 
   console.log("── Add-ons ──\n");
   for (const def of ADDONS) await createProductWithPrices(def);
+
+  console.log("── PropertyFlow ──\n");
+  for (const def of PROPERTYFLOW) await createProductWithPrices(def);
 
   // ── Output file (no secrets, only IDs) ──
   const outPath = resolve(__dirname, "stripe-catalog-output.json");

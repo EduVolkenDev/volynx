@@ -14,12 +14,13 @@
 window.VxPlan = (function () {
   'use strict';
 
-  var PLAN_IDS = ['free', 'launch', 'pro', 'studio', 'teams', 'enterprise'];
+  var PLAN_IDS = ['free', 'launch', 'pro', 'diamond', 'studio', 'teams', 'enterprise'];
 
   var PLAN_RANK = {
     free: 0,
     launch: 1,
     pro: 2,
+    diamond: 2,
     studio: 3,
     teams: 4,
     enterprise: 5,
@@ -29,6 +30,7 @@ window.VxPlan = (function () {
     free: 'Free',
     launch: 'Launch',
     pro: 'Pro',
+    diamond: 'Diamond',
     studio: 'Studio',
     teams: 'Teams',
     enterprise: 'Enterprise',
@@ -116,6 +118,43 @@ window.VxPlan = (function () {
     } catch (_) {}
   }
 
+  // ── Plan-aware UI gating ───────────────────────────────────
+
+  /**
+   * Auto-hide/show elements based on user plan.
+   * data-vx-hide-if-plan="pro"  → hidden if user is pro or above
+   * data-vx-show-if-plan="pro"  → hidden if user is below pro
+   */
+  function applyPlanGating() {
+    var cached = getCached();
+    if (!cached) return;
+    var userRank = PLAN_RANK[cached.plan] || 0;
+
+    var hideEls = document.querySelectorAll('[data-vx-hide-if-plan]');
+    for (var i = 0; i < hideEls.length; i++) {
+      var threshold = hideEls[i].getAttribute('data-vx-hide-if-plan');
+      if ((PLAN_RANK[normalize(threshold)] || 0) <= userRank) {
+        hideEls[i].style.display = 'none';
+      }
+    }
+
+    var showEls = document.querySelectorAll('[data-vx-show-if-plan]');
+    for (var j = 0; j < showEls.length; j++) {
+      var required = showEls[j].getAttribute('data-vx-show-if-plan');
+      if ((PLAN_RANK[normalize(required)] || 0) > userRank) {
+        showEls[j].style.display = 'none';
+      }
+    }
+  }
+
+  // Auto-apply on load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyPlanGating);
+  } else {
+    applyPlanGating();
+  }
+  window.addEventListener('vx:plan-ready', applyPlanGating);
+
   return {
     PLAN_IDS: PLAN_IDS,
     PLAN_RANK: PLAN_RANK,
@@ -128,5 +167,6 @@ window.VxPlan = (function () {
     getCached: getCached,
     clearCache: clearCache,
     clearAllUsage: clearAllUsage,
+    applyPlanGating: applyPlanGating,
   };
 })();

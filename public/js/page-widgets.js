@@ -23,13 +23,28 @@
   const token = localStorage.getItem('volynx_access_token');
   if (!token) return;
 
+  // Try to get name from session metadata first
+  let displayName = '';
+  try {
+    const sessionRaw = localStorage.getItem('volynx_session');
+    if (sessionRaw) {
+      const session = JSON.parse(sessionRaw);
+      const meta = session?.user?.user_metadata || {};
+      displayName = meta.full_name || meta.username || meta.name || '';
+    }
+  } catch (e) {}
+
   const email = localStorage.getItem('volynx_user_email') || '';
-  const initials = email ? email.slice(0, 2).toUpperCase() : '??';
+  // Show first name, or email prefix as fallback
+  const label = displayName
+    ? displayName.split(' ')[0]
+    : (email ? email.split('@')[0] : '??');
+  const initials = label.slice(0, 2).toUpperCase();
 
   loginBtn.href = '/profile/';
   loginBtn.textContent = initials;
   loginBtn.setAttribute('aria-label', 'Open profile');
-  loginBtn.setAttribute('title', email || 'My profile');
+  loginBtn.setAttribute('title', displayName || email || 'My profile');
   loginBtn.classList.add('vx--logged-in');
   loginBtn.removeAttribute('data-i18n');
 })();

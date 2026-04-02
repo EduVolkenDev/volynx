@@ -48,8 +48,8 @@ const studioPrice = sitePricing.builderPlans.find(p => p.id === 'studio')?.price
           <div class="pro-badge-glow"></div>
           <span class="pro-badge">Pro</span>
           <div>
-            <h1 class="pro-title">Welcome back, <span id="proName">—</span></h1>
-            <p class="pro-sub">Your Studio is ready. All tools unlocked, higher limits.</p>
+            <h1 class="pro-title" data-i18n-html="studio.dash_welcome">Welcome back, <span id="proName">—</span></h1>
+            <p class="pro-sub" data-i18n="studio.dash_sub">Your Studio is ready. All tools unlocked, higher limits.</p>
           </div>
         </div>
         <div class="pro-header__right">
@@ -60,7 +60,7 @@ const studioPrice = sitePricing.builderPlans.find(p => p.id === 'studio')?.price
 
       <!-- Usage overview strip -->
       <div class="usage-strip">
-        <div class="usage-strip__label">Today's usage</div>
+        <div class="usage-strip__label" data-i18n="studio.dash_usage">Today's usage</div>
         <div class="usage-strip__items" id="usageStrip">
           <div class="usage-pill"><span class="usage-pill__name">Loading...</span></div>
         </div>
@@ -78,8 +78,8 @@ const studioPrice = sitePricing.builderPlans.find(p => p.id === 'studio')?.price
               <span class="pro-tool-card__limit" data-tool-limit="converter">/ —</span>
             </div>
           </div>
-          <h2 class="pro-tool-card__title">Converter</h2>
-          <p class="pro-tool-card__desc">WebP, JPG, PNG, AVIF — batch convert with quality control and resize.</p>
+          <h2 class="pro-tool-card__title" data-i18n="studio.tool_converter">Converter</h2>
+          <p class="pro-tool-card__desc" data-i18n="studio.tool_converter_desc">WebP, JPG, PNG, AVIF — batch convert with quality control and resize.</p>
           <div class="pro-tool-card__bar"><div class="pro-tool-card__fill" data-tool-bar="converter"></div></div>
           <span class="pro-tool-card__link">Open tool →</span>
         </a>
@@ -93,8 +93,8 @@ const studioPrice = sitePricing.builderPlans.find(p => p.id === 'studio')?.price
               <span class="pro-tool-card__limit" data-tool-limit="image-scaler">/ —</span>
             </div>
           </div>
-          <h2 class="pro-tool-card__title">Image Scaler</h2>
-          <p class="pro-tool-card__desc">Upscale 2×, 3×, 4× — maximum resolution, zero quality loss.</p>
+          <h2 class="pro-tool-card__title" data-i18n="studio.tool_scaler">Image Scaler</h2>
+          <p class="pro-tool-card__desc" data-i18n="studio.tool_scaler_desc">Upscale 2×, 3×, 4× — maximum resolution, zero quality loss.</p>
           <div class="pro-tool-card__bar"><div class="pro-tool-card__fill" data-tool-bar="image-scaler"></div></div>
           <span class="pro-tool-card__link">Open tool →</span>
         </a>
@@ -108,8 +108,8 @@ const studioPrice = sitePricing.builderPlans.find(p => p.id === 'studio')?.price
               <span class="pro-tool-card__limit" data-tool-limit="image-suite">/ —</span>
             </div>
           </div>
-          <h2 class="pro-tool-card__title">Image Suite</h2>
-          <p class="pro-tool-card__desc">Upscale, compress, convert — all in one interface. Pro exclusive.</p>
+          <h2 class="pro-tool-card__title" data-i18n="studio.tool_suite">Image Suite</h2>
+          <p class="pro-tool-card__desc" data-i18n="studio.tool_suite_desc">Upscale, compress, convert — all in one interface. Pro exclusive.</p>
           <div class="pro-tool-card__bar"><div class="pro-tool-card__fill" data-tool-bar="image-suite"></div></div>
           <span class="pro-tool-card__link">Open tool →</span>
         </a>
@@ -123,8 +123,8 @@ const studioPrice = sitePricing.builderPlans.find(p => p.id === 'studio')?.price
               <span class="pro-tool-card__limit" data-tool-limit="qr-gen">/ —</span>
             </div>
           </div>
-          <h2 class="pro-tool-card__title">QR Generator</h2>
-          <p class="pro-tool-card__desc">Styled QR codes with logos, gradients, and high-res export.</p>
+          <h2 class="pro-tool-card__title" data-i18n="studio.tool_qr">QR Generator</h2>
+          <p class="pro-tool-card__desc" data-i18n="studio.tool_qr_desc">Styled QR codes with logos, gradients, and high-res export.</p>
           <div class="pro-tool-card__bar"><div class="pro-tool-card__fill" data-tool-bar="qr-gen"></div></div>
           <span class="pro-tool-card__link">Open tool →</span>
         </a>
@@ -133,17 +133,22 @@ const studioPrice = sitePricing.builderPlans.find(p => p.id === 'studio')?.price
 
       <!-- Pro features strip -->
       <div class="pro-perks">
-        <div class="pro-perk"><span>↑</span> Much higher limits</div>
-        <div class="pro-perk"><span>⚡</span> Batch + ZIP</div>
-        <div class="pro-perk"><span>✓</span> Commercial rights</div>
-        <div class="pro-perk"><span>🔒</span> 100% local</div>
+        <div class="pro-perk"><span>↑</span> <span data-i18n="studio.perk_limits">Much higher limits</span></div>
+        <div class="pro-perk"><span>⚡</span> <span data-i18n="studio.perk_batch">Batch + ZIP</span></div>
+        <div class="pro-perk"><span>✓</span> <span data-i18n="studio.perk_commercial">Commercial rights</span></div>
+        <div class="pro-perk"><span>🔒</span> <span data-i18n="studio.perk_local">100% local</span></div>
       </div>
     </div>
 
     <!-- ═══════════════════════════════════════════════ -->
     <!-- SALES PAGE (shown for free/anonymous users)    -->
     <!-- ═══════════════════════════════════════════════ -->
-    <div id="salesPage">
+    <!-- Loading state while checking access -->
+    <div id="studioLoading" style="text-align:center;padding:80px 20px;color:rgba(255,255,255,.5);font-size:.9rem;">
+      Checking your access<span class="loading-dots">...</span>
+    </div>
+
+    <div id="salesPage" style="display:none">
 
       <div class="hero">
         <div class="hero__logo">
@@ -167,10 +172,10 @@ const studioPrice = sitePricing.builderPlans.find(p => p.id === 'studio')?.price
       <section class="why-section">
         <div class="why-label" data-i18n="studio.why_label">Why upgrade</div>
         <div class="why-grid">
-          <div class="why-card"><div class="why-icon">↑</div><h3>Much higher limits</h3><p>Process far more files than the free tier. Designed for real production volume.</p></div>
-          <div class="why-card"><div class="why-icon">⚡</div><h3>Batch + ZIP</h3><p>Drop 50 images, convert them all, download a clean ZIP.</p></div>
-          <div class="why-card"><div class="why-icon">✓</div><h3>Commercial rights</h3><p>Use outputs in client work, products, and campaigns.</p></div>
-          <div class="why-card"><div class="why-icon">🔒</div><h3>Local processing</h3><p>Files never leave your device. Fast, private, yours.</p></div>
+          <div class="why-card"><div class="why-icon">↑</div><h3 data-i18n="studio.why_limits_title">Much higher limits</h3><p data-i18n="studio.why_limits_desc">Process far more files than the free tier. Designed for real production volume.</p></div>
+          <div class="why-card"><div class="why-icon">⚡</div><h3 data-i18n="studio.why_batch_title">Batch + ZIP</h3><p data-i18n="studio.why_batch_desc">Drop 50 images, convert them all, download a clean ZIP.</p></div>
+          <div class="why-card"><div class="why-icon">✓</div><h3 data-i18n="studio.why_commercial_title">Commercial rights</h3><p data-i18n="studio.why_commercial_desc">Use outputs in client work, products, and campaigns.</p></div>
+          <div class="why-card"><div class="why-icon">🔒</div><h3 data-i18n="studio.why_local_title">Local processing</h3><p data-i18n="studio.why_local_desc">Files never leave your device. Fast, private, yours.</p></div>
         </div>
       </section>
 
@@ -248,12 +253,17 @@ const studioPrice = sitePricing.builderPlans.find(p => p.id === 'studio')?.price
     const refresh = localStorage.getItem("volynx_refresh_token");
     if (!token || !refresh) return; // not logged in → show sales
 
+    function showSales() {
+      document.getElementById("studioLoading").style.display = "none";
+      document.getElementById("salesPage").style.display = "";
+    }
+
     let cfg;
     try { cfg = await fetch("/config.json", { cache: "no-store" }).then(r => r.json()); }
-    catch { return; }
+    catch { showSales(); return; }
 
     const apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || "").replace(/\/$/, "");
-    if (!apiBase) return;
+    if (!apiBase) { showSales(); return; }
 
     // Check permission for first tool to get plan info
     let plan = "free";
@@ -279,13 +289,13 @@ const studioPrice = sitePricing.builderPlans.find(p => p.id === 'studio')?.price
         if (window.VxPlan) window.VxPlan.cache(plan);
       }
     } catch {
-      // Use cached plan if available, otherwise stay on sales page
-      if (!cached) return;
+      // Use cached plan if available, otherwise show sales page
+      if (!cached) { showSales(); return; }
     }
 
     // Only show dashboard for paid users (any tier above free)
     const isPaidUser = window.VxPlan ? window.VxPlan.isPaid(plan) : (plan !== "free");
-    if (!isPaidUser) return;
+    if (!isPaidUser) { showSales(); return; }
 
     // Get user name from profile
     try {
@@ -300,6 +310,7 @@ const studioPrice = sitePricing.builderPlans.find(p => p.id === 'studio')?.price
     } catch {}
 
     // Switch to Pro dashboard
+    document.getElementById("studioLoading").style.display = "none";
     document.getElementById("salesPage").style.display = "none";
     document.getElementById("proDash").style.display = "block";
     document.getElementById("proName").textContent = userName || "Pro user";
@@ -309,18 +320,18 @@ const studioPrice = sitePricing.builderPlans.find(p => p.id === 'studio')?.price
     const usageStripEl = document.getElementById("usageStrip");
     let stripHtml = "";
 
-    for (const tool of TOOLS) {
+    await Promise.all(TOOLS.map(async (tool) => {
       try {
         const res = await fetch(`${apiBase}/check-permission`, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify({ tool }),
         });
-        if (!res.ok) continue;
+        if (!res.ok) return;
         const perm = await res.json();
 
         const used = perm.used || 0;
-        const limit = perm.limit === -1 ? "∞" : perm.limit;
+        const limit = perm.limit === -1 ? "\u221e" : perm.limit;
         const pct = perm.limit === -1 ? 0 : Math.min(100, (used / perm.limit) * 100);
 
         // Update card
@@ -338,7 +349,7 @@ const studioPrice = sitePricing.builderPlans.find(p => p.id === 'studio')?.price
         const toolName = tool.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
         stripHtml += `<div class="usage-pill"><span class="usage-pill__name">${toolName}</span><span class="usage-pill__val">${used} <small>/ ${limit}</small></span></div>`;
       } catch {}
-    }
+    }));
 
     if (usageStripEl && stripHtml) usageStripEl.innerHTML = stripHtml;
   }

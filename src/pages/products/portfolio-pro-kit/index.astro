@@ -479,11 +479,11 @@ const pageDescription = "Premium portfolio system with Volynx design - Showcase 
         </div>
         <div style="text-align:center;">
           <div class="vx-currency-bar" style="margin-bottom:16px;"></div>
-          <a href="/contact/?product=portfolio-pro-kit&license=personal" class="btn" style="display:inline-flex;align-items:center;gap:8px;padding:14px 32px;font-size:16px;">
-            Request purchase — <span data-price-gbp="£39" data-price-eur="€45" data-price-brl="R$249">£39</span>
+          <button class="btn vx-checkout-btn" style="display:inline-flex;align-items:center;gap:8px;padding:14px 32px;font-size:16px;" data-lookup="kit_portfolio_personal" data-label="Buy Personal License">
+            Buy Personal License — <span data-price-gbp="£39" data-price-eur="€45" data-price-brl="R$249">£39</span>
             <span aria-hidden="true">→</span>
-          </a>
-          <p style="font-size:12px;opacity:.4;margin-top:10px;">Assisted purchase — files + invoice delivered within 24h.</p>
+          </button>
+          <p style="font-size:12px;opacity:.4;margin-top:10px;">Secure checkout — files + invoice delivered automatically.</p>
         </div>
       </section>
 
@@ -597,6 +597,58 @@ const pageDescription = "Premium portfolio system with Volynx design - Showcase 
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
     document.querySelectorAll('.card, .project-card, .timeline-item').forEach(el => observer.observe(el));
+  </script>
+
+  <script is:inline>
+(function() {
+  document.querySelectorAll('.vx-checkout-btn').forEach(function(btn) {
+    btn.addEventListener('click', async function(e) {
+      e.preventDefault();
+      var lookupBase = btn.dataset.lookup;
+      if (!lookupBase) return;
+
+      var token = localStorage.getItem('volynx_access_token');
+      if (!token) {
+        window.location.href = '/login/?next=' + encodeURIComponent(window.location.pathname);
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
+
+      try {
+        var cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r) { return r.json(); });
+        var apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
+
+        // Use EUR as default currency (can be extended with currency selector)
+        var lookupKey = lookupBase + '_eur';
+
+        var res = await fetch(apiBase + '/api/create-checkout-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+          body: JSON.stringify({
+            lookup_key: lookupKey,
+            success_url: window.location.origin + '/profile/?payment=success',
+            cancel_url: window.location.href + '?payment=cancelled'
+          })
+        });
+
+        var data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          alert(data.error || 'Checkout failed. Please try again.');
+          btn.disabled = false;
+          btn.textContent = btn.dataset.label || 'Buy now';
+        }
+      } catch (err) {
+        alert('Connection error. Please try again.');
+        btn.disabled = false;
+        btn.textContent = btn.dataset.label || 'Buy now';
+      }
+    });
+  });
+})();
   </script>
 
   <PageWidgets />

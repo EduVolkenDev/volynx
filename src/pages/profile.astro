@@ -185,6 +185,58 @@ import { ROUTES } from "../data/routes";
 				</div>
 			</section>
 
+			<!-- ═══ SUBSCRIPTIONS (multi-product) ═══ -->
+			<section class="glass-section" id="subscriptionsSection">
+				<div class="section-label">Your Subscriptions</div>
+				<div class="subs-grid" id="subsGrid">
+					<div class="sub-card">
+						<div class="sub-card__icon">&#9881;</div>
+						<div class="sub-card__label">VOLYNX Builder</div>
+						<div class="sub-card__plan" id="subBuilderPlan">Free</div>
+						<a href={ROUTES.pricing} class="sub-card__link" id="subBuilderCta">Upgrade</a>
+					</div>
+					<div class="sub-card">
+						<div class="sub-card__icon">&#9728;</div>
+						<div class="sub-card__label">VOLYNX Daily</div>
+						<div class="sub-card__plan" id="subDailyPlan">Free</div>
+						<a href="https://daily.volynx.world/pricing/" class="sub-card__link" id="subDailyCta">Upgrade</a>
+					</div>
+					<div class="sub-card">
+						<div class="sub-card__icon">&#127912;</div>
+						<div class="sub-card__label">Tokens</div>
+						<div class="sub-card__plan" id="subTokens">0</div>
+						<a href="/pricing/#tokens" class="sub-card__link">Buy tokens</a>
+					</div>
+				</div>
+			</section>
+
+			<!-- ═══ QUICK ACCESS ═══ -->
+			<section class="glass-section">
+				<div class="section-label">Quick Access</div>
+				<div class="quick-grid">
+					<a href={ROUTES.builder} class="quick-card">
+						<span class="quick-card__icon">&#128187;</span>
+						<span class="quick-card__title">Builder</span>
+						<span class="quick-card__desc text-muted">Create & publish sites</span>
+					</a>
+					<a href={ROUTES.studio} class="quick-card">
+						<span class="quick-card__icon">&#127912;</span>
+						<span class="quick-card__title">Studio Pro</span>
+						<span class="quick-card__desc text-muted">Image tools & exports</span>
+					</a>
+					<a href={ROUTES.iconsStore} class="quick-card">
+						<span class="quick-card__icon">&#11088;</span>
+						<span class="quick-card__title">Icons Store</span>
+						<span class="quick-card__desc text-muted">3K+ premium icons</span>
+					</a>
+					<a href="https://daily.volynx.world/tools/my-day/" class="quick-card">
+						<span class="quick-card__icon">&#9728;</span>
+						<span class="quick-card__title">Daily OS</span>
+						<span class="quick-card__desc text-muted">Your daily dashboard</span>
+					</a>
+				</div>
+			</section>
+
 			<section class="bottom-grid">
 				<div class="glass-section glass-section--compact">
 					<div class="section-label" data-i18n="profile.section_activity">Activity</div>
@@ -193,7 +245,21 @@ import { ROUTES } from "../data/routes";
 				<div class="glass-section glass-section--compact">
 					<div class="section-label" data-i18n="profile.section_security">Security</div>
 					<div class="info-row"><span data-i18n="profile.security_password">Password</span><strong data-i18n="profile.security_set">Set</strong></div>
-					<div class="info-row"><span data-i18n="profile.security_2fa">2FA</span><strong data-i18n="profile.security_not_enabled">Not enabled</strong></div>
+					<div class="info-row" style="margin-top:8px;">
+						<button type="button" class="btn btn--sm" id="changePasswordBtn">Change password</button>
+					</div>
+					<div id="passwordForm" hidden style="margin-top:12px;">
+						<div style="display:grid;gap:8px;">
+							<input id="newPassword" type="password" placeholder="New password (min 6 chars)" minlength="6" class="field-input" style="padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#fff;font-size:.9rem;" />
+							<input id="confirmPassword" type="password" placeholder="Confirm new password" class="field-input" style="padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#fff;font-size:.9rem;" />
+							<div style="display:flex;gap:8px;align-items:center;">
+								<button type="button" class="btn btn--sm" id="savePasswordBtn">Save password</button>
+								<button type="button" class="btn btn--sm btn--ghost" id="cancelPasswordBtn">Cancel</button>
+								<span id="passwordMsg" style="font-size:.8rem;"></span>
+							</div>
+						</div>
+					</div>
+					<div class="info-row" style="margin-top:8px;"><span data-i18n="profile.security_2fa">2FA</span><strong data-i18n="profile.security_not_enabled">Not enabled</strong></div>
 				</div>
 			</section>
 		</div>
@@ -480,9 +546,18 @@ import { ROUTES } from "../data/routes";
 				const planHelper = $("planHelper");
 
 				function renderPlan(name, paid, helperText) {
+					var n = name.toLowerCase();
 					planBadge.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+					// Remove old tier classes
+					planBadge.classList.remove("plan-badge--paid","plan-badge--launch","plan-badge--pro","plan-badge--studio","plan-badge--teams");
 					if (paid) {
-						planBadge.classList.add("plan-badge--paid");
+						// Apply tier-specific class, fallback to generic --paid
+						var tierClass = "plan-badge--" + n;
+						if (["launch","pro","studio","teams"].includes(n)) {
+							planBadge.classList.add(tierClass);
+						} else {
+							planBadge.classList.add("plan-badge--paid");
+						}
 						planCta.textContent = "Manage plan";
 					} else {
 						planCta.textContent = "Upgrade plan";
@@ -535,6 +610,77 @@ import { ROUTES } from "../data/routes";
 					})();
 				} else {
 					log("plan: Free (no billing backend)");
+				}
+
+				// ══════════════════════════════════════════════════════
+				// PHASE 3a: Multi-product subscription cards
+				// ══════════════════════════════════════════════════════
+				const builderTier = (profile?.builder_plan || "free").toLowerCase().trim();
+				const dailyTier = (profile?.daily_plan || "free").toLowerCase().trim();
+
+				const subBuilderEl = $("subBuilderPlan");
+				const subDailyEl = $("subDailyPlan");
+				const subTokensEl = $("subTokens");
+				const subBuilderCta = $("subBuilderCta");
+				const subDailyCta = $("subDailyCta");
+
+				if (subBuilderEl) {
+					subBuilderEl.textContent = builderTier.charAt(0).toUpperCase() + builderTier.slice(1);
+					subBuilderEl.setAttribute("data-tier", builderTier);
+					if (builderTier !== "free" && subBuilderCta) {
+						subBuilderCta.textContent = "Manage";
+						subBuilderCta.href = "/pricing/";
+					}
+				}
+				if (subDailyEl) {
+					subDailyEl.textContent = dailyTier.charAt(0).toUpperCase() + dailyTier.slice(1);
+					subDailyEl.setAttribute("data-tier", dailyTier);
+					if (dailyTier !== "free" && subDailyCta) {
+						subDailyCta.textContent = "Manage";
+					}
+				}
+				if (subTokensEl) {
+					subTokensEl.textContent = String(profile?.token_balance || 0);
+				}
+
+				// ══════════════════════════════════════════════════════
+				// PHASE 3a2: Change password
+				// ══════════════════════════════════════════════════════
+				const cpBtn = $("changePasswordBtn");
+				const cpForm = $("passwordForm");
+				const cpSave = $("savePasswordBtn");
+				const cpCancel = $("cancelPasswordBtn");
+				const cpMsg = $("passwordMsg");
+				const cpNew = $("newPassword");
+				const cpConfirm = $("confirmPassword");
+
+				if (cpBtn && cpForm) {
+					cpBtn.addEventListener("click", () => { cpForm.hidden = false; cpBtn.style.display = "none"; });
+					cpCancel.addEventListener("click", () => { cpForm.hidden = true; cpBtn.style.display = ""; cpMsg.textContent = ""; });
+					cpSave.addEventListener("click", async () => {
+						const pw = cpNew.value;
+						const pw2 = cpConfirm.value;
+						if (!pw || pw.length < 6) { cpMsg.textContent = "Min 6 characters"; cpMsg.style.color = "#ef4444"; return; }
+						if (pw !== pw2) { cpMsg.textContent = "Passwords don't match"; cpMsg.style.color = "#ef4444"; return; }
+						cpSave.disabled = true;
+						cpMsg.textContent = "Saving..."; cpMsg.style.color = "var(--muted)";
+						try {
+							const res = await fetch(cfg.supabaseUrl + "/auth/v1/user", {
+								method: "PUT",
+								headers: { apikey: cfg.supabaseAnonKey, Authorization: "Bearer " + accessToken, "Content-Type": "application/json" },
+								body: JSON.stringify({ password: pw }),
+							});
+							if (res.ok) {
+								cpMsg.textContent = "Password updated!"; cpMsg.style.color = "#22c55e";
+								cpNew.value = ""; cpConfirm.value = "";
+								setTimeout(() => { cpForm.hidden = true; cpBtn.style.display = ""; cpMsg.textContent = ""; }, 2000);
+							} else {
+								const err = await res.json().catch(() => ({}));
+								cpMsg.textContent = err.msg || err.error_description || "Failed to update"; cpMsg.style.color = "#ef4444";
+							}
+						} catch(e) { cpMsg.textContent = "Connection error"; cpMsg.style.color = "#ef4444"; }
+						finally { cpSave.disabled = false; }
+					});
 				}
 
 				// ══════════════════════════════════════════════════════
@@ -975,6 +1121,16 @@ import { ROUTES } from "../data/routes";
 	.plan-badge { padding: 4px 12px; border-radius: 999px; background: var(--accent-dim);
 		border: 1px solid rgba(0,232,197,.18); color: var(--accent);
 		font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+	.plan-badge--launch { background: linear-gradient(135deg, rgba(34,197,94,.15), rgba(0,232,197,.1));
+		border-color: rgba(34,197,94,.3); color: #86efac; }
+	.plan-badge--pro { background: linear-gradient(135deg, rgba(120,0,255,.2), rgba(0,232,197,.15));
+		border-color: rgba(120,0,255,.3); color: #d4b0ff; }
+	.plan-badge--studio { background: linear-gradient(135deg, rgba(255,170,0,.2), rgba(255,100,0,.15));
+		border-color: rgba(255,170,0,.35); color: #ffd580;
+		box-shadow: 0 0 12px rgba(255,170,0,.1); }
+	.plan-badge--teams { background: linear-gradient(135deg, rgba(220,38,38,.15), rgba(255,100,0,.12));
+		border-color: rgba(220,38,38,.3); color: #fca5a5;
+		box-shadow: 0 0 16px rgba(220,38,38,.08); }
 	.plan-badge--paid { background: linear-gradient(135deg, rgba(120,0,255,.2), rgba(0,232,197,.15));
 		border-color: rgba(120,0,255,.3); color: #d4b0ff; }
 	.plan-cta { font-size: .78rem; font-weight: 600; color: var(--muted);
@@ -1030,7 +1186,29 @@ import { ROUTES } from "../data/routes";
 	.form-footer { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
 	.form-status { margin: 0; font-size: .85rem; color: var(--muted); }
 
-	.bottom-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+	/* Subscription cards */
+	.subs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+	.sub-card { padding: 18px; border-radius: 16px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); text-align: center; }
+	.sub-card__icon { font-size: 1.5rem; margin-bottom: 6px; }
+	.sub-card__label { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+	.sub-card__plan { font-size: 1.4rem; font-weight: 800; letter-spacing: -.03em; margin: 4px 0; }
+	.sub-card__plan[data-tier="launch"] { color: #86efac; }
+	.sub-card__plan[data-tier="pro"] { color: #d4b0ff; }
+	.sub-card__plan[data-tier="studio"] { color: #ffd580; }
+	.sub-card__plan[data-tier="teams"] { color: #fca5a5; }
+	.sub-card__plan[data-tier="diamond"] { color: #c084fc; }
+	.sub-card__link { display: inline-block; margin-top: 6px; font-size: .78rem; font-weight: 600; color: var(--accent); }
+	.sub-card__link:hover { text-decoration: underline; }
+
+	/* Quick access grid */
+	.quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+	.quick-card { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 20px 12px; border-radius: 16px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); text-align: center; transition: all .2s; }
+	.quick-card:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.12); transform: translateY(-2px); }
+	.quick-card__icon { font-size: 1.8rem; }
+	.quick-card__title { font-size: .9rem; font-weight: 700; }
+	.quick-card__desc { font-size: .75rem; }
+
+	.bottom-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
 	.timeline-row { display: flex; align-items: flex-start; gap: 10px; }
 	.dot { width: 8px; height: 8px; margin-top: 7px; border-radius: 999px;
 		background: var(--accent); box-shadow: 0 0 6px rgba(0,232,197,.2); flex: 0 0 auto; }
@@ -1045,6 +1223,8 @@ import { ROUTES } from "../data/routes";
 	@media (max-width: 900px) {
 		.details-strip { grid-template-columns: 1fr 1fr; }
 		.bottom-grid { grid-template-columns: 1fr; }
+		.subs-grid { grid-template-columns: 1fr 1fr 1fr; }
+		.quick-grid { grid-template-columns: repeat(2, 1fr); }
 	}
 	@media (max-width: 640px) {
 		.hero-inner { flex-direction: column; align-items: center; text-align: center; gap: 20px; }
@@ -1057,6 +1237,8 @@ import { ROUTES } from "../data/routes";
 		.form-grid { grid-template-columns: 1fr; }
 		.glass-section { padding: 18px; border-radius: 16px; }
 		.hero-bio { max-width: none; }
+		.subs-grid { grid-template-columns: 1fr; }
+		.quick-grid { grid-template-columns: repeat(2, 1fr); }
 		.form-footer { flex-direction: column; }
 		.btn { width: 100%; }
 	}

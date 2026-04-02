@@ -4,7 +4,7 @@
  * Used by both Astro components and referenced by client-side scripts.
  */
 
-export const PLAN_IDS = ["free", "launch", "pro", "studio", "teams", "enterprise"] as const;
+export const PLAN_IDS = ["free", "launch", "pro", "diamond", "studio", "teams", "enterprise"] as const;
 export type PlanId = (typeof PLAN_IDS)[number];
 
 /** Numeric rank for plan comparison — higher = more access */
@@ -12,6 +12,7 @@ export const PLAN_RANK: Record<PlanId, number> = {
   free: 0,
   launch: 1,
   pro: 2,
+  diamond: 2,
   studio: 3,
   teams: 4,
   enterprise: 5,

@@ -49,12 +49,12 @@ const pageDescription = "Pro-exclusive multi-tool: upscale, compress, convert, r
         <div class="suite-section">
           <div class="suite-section__head">
             <strong>Upload</strong>
-            <button id="pickBtn" class="suite-btn-sm" type="button">Select file</button>
-            <input id="file" type="file" accept="image/*" hidden />
+            <button id="pickBtn" class="suite-btn-sm" type="button">Select file(s)</button>
+            <input id="file" type="file" accept="image/*" multiple hidden />
           </div>
           <div id="drop" class="suite-drop" role="button" tabindex="0">
             <span class="suite-drop__icon">↑</span>
-            <span>Drop image here or click to select</span>
+            <span>Drop images here or click to select</span>
           </div>
           <div class="suite-meta" id="origMeta">No file loaded</div>
         </div>
@@ -253,6 +253,8 @@ const pageDescription = "Pro-exclusive multi-tool: upscale, compress, convert, r
     </div>
   </main>
 
+  <script is:inline src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
   <script>
     const $ = (id: string) => document.getElementById(id);
 
@@ -280,38 +282,74 @@ const pageDescription = "Pro-exclusive multi-tool: upscale, compress, convert, r
     const origMeta = $("origMeta") as HTMLElement;
     const outMeta = $("outMeta") as HTMLElement;
 
-    let srcImg: HTMLImageElement | null = null;
-    let srcFile: File | null = null;
-    let outBlob: Blob | null = null;
-    let srcName = "image";
+    interface LoadedImage { file: File; img: HTMLImageElement; baseName: string; }
+    interface ProcessedResult { baseName: string; blob: Blob; width: number; height: number; inputBytes: number; keptOriginal: boolean; }
+
+    let loadedImages: LoadedImage[] = [];
+    let processedResults: ProcessedResult[] = [];
+    let singleOutBlob: Blob | null = null;
 
     pickBtn.addEventListener("click", () => fileEl.click());
     dropEl.addEventListener("click", () => fileEl.click());
     dropEl.addEventListener("keydown", (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") fileEl.click(); });
     dropEl.addEventListener("dragover", (e: DragEvent) => { e.preventDefault(); dropEl.classList.add("suite-drop--active"); });
     dropEl.addEventListener("dragleave", () => dropEl.classList.remove("suite-drop--active"));
-    dropEl.addEventListener("drop", (e: DragEvent) => { e.preventDefault(); dropEl.classList.remove("suite-drop--active"); const f = e.dataTransfer?.files[0]; if (f) loadFile(f); });
-    fileEl.addEventListener("change", () => { const f = fileEl.files?.[0]; if (f) loadFile(f); });
+    dropEl.addEventListener("drop", async (e: DragEvent) => {
+      e.preventDefault();
+      dropEl.classList.remove("suite-drop--active");
+      const files = Array.from(e.dataTransfer?.files ?? []);
+      if (files.length) await loadFiles(files);
+    });
+    fileEl.addEventListener("change", async () => {
+      const files = Array.from(fileEl.files ?? []);
+      if (files.length) await loadFiles(files);
+    });
 
-    async function loadFile(file: File) {
-      srcFile = file;
-      srcName = file.name.replace(/\.[^/.]+$/, "");
+    async function fileToImage(file: File): Promise<HTMLImageElement> {
       const url = URL.createObjectURL(file);
       const img = new Image();
       img.src = url;
       await img.decode();
       URL.revokeObjectURL(url);
-      srcImg = img;
-      const M = (window as any).VxFileMetrics;
-      origMeta.textContent = M
-        ? M.formatResultMeta({ width: img.width, height: img.height, outputBytes: file.size })
-        : `${img.width} × ${img.height} · ${(file.size / 1024).toFixed(0)} KB`;
-      runBtn.disabled = false;
-      dropEl.innerHTML = `<span style="opacity:.6">Loaded: ${file.name}</span>`;
+      return img;
+    }
 
-      // Pre-fill resize with current dimensions
-      ($("resizeW") as HTMLInputElement).value = String(img.width);
-      ($("resizeH") as HTMLInputElement).value = String(img.height);
+    async function loadFiles(files: File[]) {
+      const valid = files.filter(f => f.type.startsWith("image/"));
+      if (!valid.length) { alert("No valid images found."); return; }
+
+      loadedImages = [];
+      processedResults = [];
+      singleOutBlob = null;
+      previewEl.style.display = "none";
+      previewEmpty.style.display = "flex";
+      downloadBtn.disabled = true;
+      runBtn.disabled = true;
+
+      dropEl.innerHTML = `<span style="opacity:.6">Loading ${valid.length} file(s)…</span>`;
+
+      for (const file of valid) {
+        const img = await fileToImage(file);
+        loadedImages.push({ file, img, baseName: file.name.replace(/\.[^/.]+$/, "") });
+      }
+
+      const totalBytes = valid.reduce((s, f) => s + f.size, 0);
+      const M = (window as any).VxFileMetrics;
+      if (valid.length === 1) {
+        const img = loadedImages[0].img;
+        origMeta.textContent = M
+          ? M.formatResultMeta({ width: img.width, height: img.height, outputBytes: valid[0].size })
+          : `${img.width} × ${img.height} · ${(valid[0].size / 1024).toFixed(0)} KB`;
+        dropEl.innerHTML = `<span style="opacity:.6">Loaded: ${valid[0].name}</span>`;
+        // Pre-fill resize with current dimensions
+        ($("resizeW") as HTMLInputElement).value = String(img.width);
+        ($("resizeH") as HTMLInputElement).value = String(img.height);
+      } else {
+        origMeta.textContent = `${valid.length} files · ${M ? M.formatBytes(totalBytes) : (totalBytes / 1024).toFixed(0) + " KB"}`;
+        dropEl.innerHTML = `<span style="opacity:.6">${valid.length} files ready to process</span>`;
+      }
+
+      runBtn.disabled = false;
     }
 
     // ── Range displays ───────────────────────────────────────
@@ -319,130 +357,174 @@ const pageDescription = "Pro-exclusive multi-tool: upscale, compress, convert, r
     $("convertQual")?.addEventListener("input", () => { ($("convertQualVal") as HTMLElement).textContent = ($("convertQual") as HTMLInputElement).value; });
     $("wmOp")?.addEventListener("input", () => { ($("wmOpVal") as HTMLElement).textContent = ($("wmOp") as HTMLInputElement).value; });
 
-    // ── Resize lock ratio ────────────────────────────────────
+    // ── Resize lock ratio (uses first loaded image as reference) ─
     $("resizeW")?.addEventListener("input", () => {
-      if (!srcImg || !($("resizeLock") as HTMLInputElement).checked) return;
+      const refImg = loadedImages[0]?.img;
+      if (!refImg || !($("resizeLock") as HTMLInputElement).checked) return;
       const w = parseInt(($("resizeW") as HTMLInputElement).value) || 0;
-      if (w > 0) ($("resizeH") as HTMLInputElement).value = String(Math.round(w * (srcImg.height / srcImg.width)));
+      if (w > 0) ($("resizeH") as HTMLInputElement).value = String(Math.round(w * (refImg.height / refImg.width)));
     });
     $("resizeH")?.addEventListener("input", () => {
-      if (!srcImg || !($("resizeLock") as HTMLInputElement).checked) return;
+      const refImg = loadedImages[0]?.img;
+      if (!refImg || !($("resizeLock") as HTMLInputElement).checked) return;
       const h = parseInt(($("resizeH") as HTMLInputElement).value) || 0;
-      if (h > 0) ($("resizeW") as HTMLInputElement).value = String(Math.round(h * (srcImg.width / srcImg.height)));
+      if (h > 0) ($("resizeW") as HTMLInputElement).value = String(Math.round(h * (refImg.width / refImg.height)));
     });
 
-    // ── Process ──────────────────────────────────────────────
+    // ── Process one image ────────────────────────────────────
+    async function processOne(item: LoadedImage): Promise<ProcessedResult> {
+      const { file, img, baseName } = item;
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d")!;
+
+      if (activeTool === "upscale") {
+        const scale = parseInt(($("scale") as HTMLSelectElement).value);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        ctx.imageSmoothingEnabled = ($("smooth") as HTMLInputElement).checked;
+        if (ctx.imageSmoothingEnabled) ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const fmt = ($("format") as HTMLSelectElement).value;
+        const blob = (await toBlob(canvas, fmt, 0.95))!;
+        return { baseName, blob, width: canvas.width, height: canvas.height, inputBytes: file.size, keptOriginal: false };
+
+      } else if (activeTool === "compress") {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        const q = parseInt(($("quality") as HTMLInputElement).value) / 100;
+        const fmt = ($("compressFmt") as HTMLSelectElement).value;
+        const blob = (await toBlob(canvas, fmt, q))!;
+        const M = (window as any).VxFileMetrics;
+        let finalBlob = blob;
+        let keptOriginal = false;
+        if (M && !M.isCompressionEffective(file.size, blob.size)) {
+          finalBlob = file.slice(0, file.size, file.type) as unknown as Blob;
+          keptOriginal = true;
+        }
+        return { baseName, blob: finalBlob, width: canvas.width, height: canvas.height, inputBytes: file.size, keptOriginal };
+
+      } else if (activeTool === "convert") {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        const q = parseInt(($("convertQual") as HTMLInputElement).value) / 100;
+        const fmt = ($("convertFmt") as HTMLSelectElement).value;
+        const blob = (await toBlob(canvas, fmt, q))!;
+        return { baseName, blob, width: canvas.width, height: canvas.height, inputBytes: file.size, keptOriginal: false };
+
+      } else if (activeTool === "resize") {
+        const w = parseInt(($("resizeW") as HTMLInputElement).value) || img.width;
+        const h = parseInt(($("resizeH") as HTMLInputElement).value) || img.height;
+        canvas.width = w;
+        canvas.height = h;
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(img, 0, 0, w, h);
+        const fmt = ($("resizeFmt") as HTMLSelectElement).value;
+        const blob = (await toBlob(canvas, fmt, 0.95))!;
+        return { baseName, blob, width: canvas.width, height: canvas.height, inputBytes: file.size, keptOriginal: false };
+
+      } else if (activeTool === "rotate") {
+        const deg = parseInt(($("rotateDeg") as HTMLSelectElement).value);
+        const flipH = ($("flipH") as HTMLInputElement).checked;
+        const flipV = ($("flipV") as HTMLInputElement).checked;
+        const isVertical = deg === 90 || deg === 270;
+        canvas.width = isVertical ? img.height : img.width;
+        canvas.height = isVertical ? img.width : img.height;
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate((deg * Math.PI) / 180);
+        ctx.scale(flipH ? -1 : 1, flipV ? -1 : 1);
+        ctx.drawImage(img, -img.width / 2, -img.height / 2);
+        ctx.restore();
+        const blob = (await toBlob(canvas, "image/png", 0.95))!;
+        return { baseName, blob, width: canvas.width, height: canvas.height, inputBytes: file.size, keptOriginal: false };
+
+      } else if (activeTool === "watermark") {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        const text = ($("wmText") as HTMLInputElement).value || "© Watermark";
+        const pos = ($("wmPos") as HTMLSelectElement).value;
+        const opacity = parseInt(($("wmOp") as HTMLInputElement).value) / 100;
+        const sizeMap: Record<string, number> = { small: 0.02, medium: 0.035, large: 0.05 };
+        const fontSize = Math.max(14, Math.round(Math.min(canvas.width, canvas.height) * (sizeMap[($("wmSize") as HTMLSelectElement).value] || 0.035)));
+        ctx.save();
+        ctx.globalAlpha = opacity;
+        ctx.font = `bold ${fontSize}px system-ui, sans-serif`;
+        ctx.fillStyle = "#ffffff";
+        ctx.shadowColor = "rgba(0,0,0,.5)";
+        ctx.shadowBlur = 4;
+        const m = ctx.measureText(text);
+        const pad = fontSize;
+        let x = pad, y = canvas.height - pad;
+        if (pos.includes("r")) x = canvas.width - m.width - pad;
+        if (pos.includes("t")) y = pad + fontSize;
+        if (pos === "center") { x = (canvas.width - m.width) / 2; y = canvas.height / 2; }
+        ctx.fillText(text, x, y);
+        ctx.restore();
+        const blob = (await toBlob(canvas, "image/png", 0.95))!;
+        return { baseName, blob, width: canvas.width, height: canvas.height, inputBytes: file.size, keptOriginal: false };
+      }
+
+      throw new Error("Unknown tool: " + activeTool);
+    }
+
+    // ── Run / Process all ─────────────────────────────────────
     runBtn.addEventListener("click", async () => {
-      if (!srcImg || !srcFile) return;
+      if (!loadedImages.length) return;
       runBtn.disabled = true;
       runBtn.textContent = "Processing…";
+      downloadBtn.disabled = true;
+      processedResults = [];
+      singleOutBlob = null;
 
       try {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d")!;
-
-        if (activeTool === "upscale") {
-          const scale = parseInt(($("scale") as HTMLSelectElement).value);
-          canvas.width = srcImg.width * scale;
-          canvas.height = srcImg.height * scale;
-          ctx.imageSmoothingEnabled = ($("smooth") as HTMLInputElement).checked;
-          if (ctx.imageSmoothingEnabled) ctx.imageSmoothingQuality = "high";
-          ctx.drawImage(srcImg, 0, 0, canvas.width, canvas.height);
-          const fmt = ($("format") as HTMLSelectElement).value;
-          outBlob = await toBlob(canvas, fmt, 0.95);
-
-        } else if (activeTool === "compress") {
-          canvas.width = srcImg.width;
-          canvas.height = srcImg.height;
-          ctx.drawImage(srcImg, 0, 0);
-          const q = parseInt(($("quality") as HTMLInputElement).value) / 100;
-          const fmt = ($("compressFmt") as HTMLSelectElement).value;
-          outBlob = await toBlob(canvas, fmt, q);
-
-        } else if (activeTool === "convert") {
-          canvas.width = srcImg.width;
-          canvas.height = srcImg.height;
-          ctx.drawImage(srcImg, 0, 0);
-          const q = parseInt(($("convertQual") as HTMLInputElement).value) / 100;
-          const fmt = ($("convertFmt") as HTMLSelectElement).value;
-          outBlob = await toBlob(canvas, fmt, q);
-
-        } else if (activeTool === "resize") {
-          const w = parseInt(($("resizeW") as HTMLInputElement).value) || srcImg.width;
-          const h = parseInt(($("resizeH") as HTMLInputElement).value) || srcImg.height;
-          canvas.width = w;
-          canvas.height = h;
-          ctx.imageSmoothingEnabled = true;
-          ctx.imageSmoothingQuality = "high";
-          ctx.drawImage(srcImg, 0, 0, w, h);
-          const fmt = ($("resizeFmt") as HTMLSelectElement).value;
-          outBlob = await toBlob(canvas, fmt, 0.95);
-
-        } else if (activeTool === "rotate") {
-          const deg = parseInt(($("rotateDeg") as HTMLSelectElement).value);
-          const flipH = ($("flipH") as HTMLInputElement).checked;
-          const flipV = ($("flipV") as HTMLInputElement).checked;
-          const isVertical = deg === 90 || deg === 270;
-          canvas.width = isVertical ? srcImg.height : srcImg.width;
-          canvas.height = isVertical ? srcImg.width : srcImg.height;
-          ctx.save();
-          ctx.translate(canvas.width / 2, canvas.height / 2);
-          ctx.rotate((deg * Math.PI) / 180);
-          ctx.scale(flipH ? -1 : 1, flipV ? -1 : 1);
-          ctx.drawImage(srcImg, -srcImg.width / 2, -srcImg.height / 2);
-          ctx.restore();
-          outBlob = await toBlob(canvas, "image/png", 0.95);
-
-        } else if (activeTool === "watermark") {
-          canvas.width = srcImg.width;
-          canvas.height = srcImg.height;
-          ctx.drawImage(srcImg, 0, 0);
-
-          const text = ($("wmText") as HTMLInputElement).value || "© Watermark";
-          const pos = ($("wmPos") as HTMLSelectElement).value;
-          const opacity = parseInt(($("wmOp") as HTMLInputElement).value) / 100;
-          const sizeMap: Record<string, number> = { small: 0.02, medium: 0.035, large: 0.05 };
-          const fontSize = Math.max(14, Math.round(Math.min(canvas.width, canvas.height) * (sizeMap[($("wmSize") as HTMLSelectElement).value] || 0.035)));
-
-          ctx.save();
-          ctx.globalAlpha = opacity;
-          ctx.font = `bold ${fontSize}px system-ui, sans-serif`;
-          ctx.fillStyle = "#ffffff";
-          ctx.shadowColor = "rgba(0,0,0,.5)";
-          ctx.shadowBlur = 4;
-
-          const m = ctx.measureText(text);
-          const pad = fontSize;
-          let x = pad, y = canvas.height - pad;
-          if (pos.includes("r")) x = canvas.width - m.width - pad;
-          if (pos.includes("t")) y = pad + fontSize;
-          if (pos === "center") { x = (canvas.width - m.width) / 2; y = canvas.height / 2; }
-
-          ctx.fillText(text, x, y);
-          ctx.restore();
-          outBlob = await toBlob(canvas, "image/png", 0.95);
-        }
-
-        if (outBlob) {
-          const M = (window as any).VxFileMetrics;
-          const delta = M.calcDelta(srcFile.size, outBlob.size);
-
-          // Compress protection: if output grew, warn user and offer original
-          if (activeTool === "compress" && delta.direction === "larger") {
-            outMeta.textContent = M.formatResultMeta({ width: canvas.width, height: canvas.height, outputBytes: srcFile.size, inputBytes: srcFile.size })
-              + " · kept original (compression not effective)";
-            // Preserve original file instead of the larger blob
-            outBlob = srcFile.slice(0, srcFile.size, srcFile.type) as unknown as Blob;
-            previewEl.src = URL.createObjectURL(srcFile);
-          } else {
-            outMeta.textContent = M.formatResultMeta({ width: canvas.width, height: canvas.height, outputBytes: outBlob.size, inputBytes: srcFile.size });
-            previewEl.src = URL.createObjectURL(outBlob);
+        for (let i = 0; i < loadedImages.length; i++) {
+          if (loadedImages.length > 1) {
+            dropEl.innerHTML = `<span style="opacity:.6">Processing ${i + 1}/${loadedImages.length}…</span>`;
           }
+          const result = await processOne(loadedImages[i]);
+          processedResults.push(result);
 
-          previewEl.style.display = "block";
-          previewEmpty.style.display = "none";
-          downloadBtn.disabled = false;
+          // Show first result in preview
+          if (i === 0) {
+            previewEl.src = URL.createObjectURL(result.blob);
+            previewEl.style.display = "block";
+            previewEmpty.style.display = "none";
+          }
         }
+
+        const totalOut = processedResults.reduce((s, r) => s + r.blob.size, 0);
+        const totalIn = processedResults.reduce((s, r) => s + r.inputBytes, 0);
+        const M = (window as any).VxFileMetrics;
+        const keptCount = processedResults.filter(r => r.keptOriginal).length;
+
+        if (processedResults.length === 1) {
+          const r = processedResults[0];
+          outMeta.textContent = M
+            ? M.formatResultMeta({ width: r.width, height: r.height, outputBytes: r.blob.size, inputBytes: r.inputBytes })
+              + (r.keptOriginal ? " · kept original (compression not effective)" : "")
+            : `${r.width} × ${r.height} · ${(r.blob.size / 1024).toFixed(0)} KB`;
+          singleOutBlob = r.blob;
+        } else {
+          if (M) {
+            const delta = M.calcDelta(totalIn, totalOut);
+            let txt = `${processedResults.length} files · ${M.formatBytes(totalOut)}`;
+            if (delta.direction !== "same") txt += ` · ${delta.label}`;
+            if (keptCount > 0) txt += ` · ${keptCount} kept original`;
+            outMeta.textContent = txt;
+          } else {
+            outMeta.textContent = `${processedResults.length} files · ${(totalOut / 1024).toFixed(0)} KB`;
+          }
+        }
+
+        if (loadedImages.length > 1) {
+          dropEl.innerHTML = `<span style="opacity:.6">${processedResults.length} files processed</span>`;
+        }
+
+        downloadBtn.disabled = false;
       } catch (err: any) {
         console.error(err);
         outMeta.textContent = "Error: " + (err?.message || "Processing failed");
@@ -457,13 +539,42 @@ const pageDescription = "Pro-exclusive multi-tool: upscale, compress, convert, r
     }
 
     // ── Download ─────────────────────────────────────────────
-    downloadBtn.addEventListener("click", () => {
-      if (!outBlob) return;
+    downloadBtn.addEventListener("click", async () => {
+      if (!processedResults.length) return;
+
       const extMap: Record<string, string> = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/avif": "avif" };
-      const ext = extMap[outBlob.type] || "png";
+
+      // Determine the output extension based on active tool settings
+      function getExt(blob: Blob) {
+        return extMap[blob.type] || "png";
+      }
+
+      if (processedResults.length === 1 && singleOutBlob) {
+        const ext = getExt(singleOutBlob);
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(singleOutBlob);
+        a.download = `${processedResults[0].baseName}-${activeTool}.${ext}`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        return;
+      }
+
+      // Batch: zip all results
+      if (!(window as any).JSZip) {
+        alert("JSZip not loaded. Please refresh and try again.");
+        return;
+      }
+
+      const zip = new (window as any).JSZip();
+      for (const result of processedResults) {
+        const ext = getExt(result.blob);
+        zip.file(`${result.baseName}-${activeTool}.${ext}`, result.blob);
+      }
+
+      const zipBlob = await zip.generateAsync({ type: "blob" });
       const a = document.createElement("a");
-      a.href = URL.createObjectURL(outBlob);
-      a.download = `${srcName}-${activeTool}.${ext}`;
+      a.href = URL.createObjectURL(zipBlob);
+      a.download = "volynx-image-suite-batch.zip";
       a.click();
       URL.revokeObjectURL(a.href);
     });

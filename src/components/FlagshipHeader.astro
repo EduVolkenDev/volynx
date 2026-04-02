@@ -5,7 +5,9 @@ const nav = [
   { href: ROUTES.home, label: "Home", i18n: "nav.home" },
   { href: ROUTES.builder, label: "Builder", i18n: "nav.builder" },
   { href: ROUTES.products, label: "Products", i18n: "nav.products" },
+  { href: ROUTES.services, label: "Services", i18n: "nav.services" },
   { href: ROUTES.lab, label: "Lab", i18n: "nav.lab" },
+  { href: "https://daily.volynx.world", label: "Daily", i18n: "nav.daily" },
   { href: ROUTES.pricing, label: "Pricing", i18n: "nav.pricing" },
   { href: ROUTES.devHub, label: "Dev Hub", i18n: "nav.devhub" },
 ];
@@ -34,8 +36,9 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro" } = Astro.pr
       <button id="vxLangToggle" class="vx-widget vx-lang-btn" aria-label="Toggle language" title="Switch language / Mudar idioma">
         <span class="vx-lang-label" data-i18n="widget.lang">EN</span>
       </button>
-      <a href={ROUTES.login} class="header-link" data-i18n="nav.login">Login</a>
-      <a href={ctaHref} class="button button--gold">{ctaLabel}</a>
+      <a href={ROUTES.login} class="header-link vx-login-link" data-i18n="nav.login">Login</a>
+      <a href={ROUTES.profile} class="vx-user-badge" id="vxUserBadge" aria-label="Profile"></a>
+      <a href={ctaHref} class="button button--gold" data-vx-hide-if-plan="pro">{ctaLabel}</a>
       <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Open menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -48,11 +51,34 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro" } = Astro.pr
       <a href={item.href} class:list={{ active: current === item.href }} data-i18n={item.i18n}>{item.label}</a>
     ))}
     <a href={ROUTES.login} class="button button--ghost" data-i18n="nav.login">Login</a>
-    <a href={ctaHref} class="button button--gold">{ctaLabel}</a>
+    <a href={ctaHref} class="button button--gold" data-vx-hide-if-plan="pro">{ctaLabel}</a>
   </nav>
 </header>
 
 <style>
+  /* Auth flash prevention — hide login, show badge instantly when authed */
+  .vx-user-badge { display: none; }
+  :global(.vx-authed) .vx-login-link { display: none !important; }
+  :global(.vx-authed) .vx-user-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(139,250,240,.2), rgba(177,150,255,.25));
+    border: 1px solid rgba(255,255,255,.15);
+    color: rgba(255,255,255,.9);
+    font-size: 12px;
+    font-weight: 800;
+    text-decoration: none;
+    letter-spacing: .03em;
+  }
+  :global(.vx-authed) .vx-user-badge:hover {
+    background: linear-gradient(135deg, rgba(139,250,240,.3), rgba(177,150,255,.35));
+    border-color: rgba(255,255,255,.25);
+  }
+
   .vx-lang-btn {
     position: relative;
     top: unset; right: unset;
