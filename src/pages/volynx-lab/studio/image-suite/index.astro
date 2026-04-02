@@ -23,6 +23,7 @@ const pageDescription = "Pro-exclusive multi-tool: upscale, compress, convert, r
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
   <meta name="apple-mobile-web-app-title" content="Volynx" />
   <link rel="manifest" href="/site.webmanifest" />
+  <script is:inline src="/js/vx-file-metrics.js"></script>
 </head>
 
 <body>
@@ -301,7 +302,10 @@ const pageDescription = "Pro-exclusive multi-tool: upscale, compress, convert, r
       await img.decode();
       URL.revokeObjectURL(url);
       srcImg = img;
-      origMeta.textContent = `${img.width} × ${img.height} · ${(file.size / 1024).toFixed(0)} KB`;
+      const M = (window as any).VxFileMetrics;
+      origMeta.textContent = M
+        ? M.formatResultMeta({ width: img.width, height: img.height, outputBytes: file.size })
+        : `${img.width} × ${img.height} · ${(file.size / 1024).toFixed(0)} KB`;
       runBtn.disabled = false;
       dropEl.innerHTML = `<span style="opacity:.6">Loaded: ${file.name}</span>`;
 
@@ -420,11 +424,23 @@ const pageDescription = "Pro-exclusive multi-tool: upscale, compress, convert, r
         }
 
         if (outBlob) {
-          previewEl.src = URL.createObjectURL(outBlob);
+          const M = (window as any).VxFileMetrics;
+          const delta = M.calcDelta(srcFile.size, outBlob.size);
+
+          // Compress protection: if output grew, warn user and offer original
+          if (activeTool === "compress" && delta.direction === "larger") {
+            outMeta.textContent = M.formatResultMeta({ width: canvas.width, height: canvas.height, outputBytes: srcFile.size, inputBytes: srcFile.size })
+              + " · kept original (compression not effective)";
+            // Preserve original file instead of the larger blob
+            outBlob = srcFile.slice(0, srcFile.size, srcFile.type) as unknown as Blob;
+            previewEl.src = URL.createObjectURL(srcFile);
+          } else {
+            outMeta.textContent = M.formatResultMeta({ width: canvas.width, height: canvas.height, outputBytes: outBlob.size, inputBytes: srcFile.size });
+            previewEl.src = URL.createObjectURL(outBlob);
+          }
+
           previewEl.style.display = "block";
           previewEmpty.style.display = "none";
-          const pct = ((1 - outBlob.size / srcFile.size) * 100).toFixed(1);
-          outMeta.textContent = `${canvas.width} × ${canvas.height} · ${(outBlob.size / 1024).toFixed(0)} KB · ${pct}% ${Number(pct) >= 0 ? "smaller" : "larger"}`;
           downloadBtn.disabled = false;
         }
       } catch (err: any) {

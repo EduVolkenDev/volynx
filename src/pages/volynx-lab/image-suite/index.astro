@@ -25,6 +25,7 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
   <meta name="apple-mobile-web-app-title" content="Volynx" />
   <link rel="manifest" href="/site.webmanifest" />
+  <script is:inline src="/js/vx-file-metrics.js"></script>
 </head>
 
 <body>
@@ -83,6 +84,7 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
             </label>
           </div>
 
+          <p id="fmtHint" class="fmt-hint" hidden></p>
           <button id="runBtn" class="btn" type="button" disabled style="margin-top:16px" data-i18n="suite.btn_process">Process</button>
 
           <div id="proStatus" class="pro-status" aria-live="polite"></div>
@@ -256,7 +258,8 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       }
 
       const totalBytes = validFiles.reduce((sum, file) => sum + file.size, 0);
-      origMeta.textContent = `${validFiles.length} file(s) • ${(totalBytes / 1024 / 1024).toFixed(2)}MB`;
+      const M = window.VxFileMetrics;
+      origMeta.textContent = `${validFiles.length} file(s) • ${M ? M.formatBytes(totalBytes) : (totalBytes / 1024 / 1024).toFixed(2) + "MB"}`;
       dropEl.textContent = `${validFiles.length} file(s) ready to process`;
       runBtn.disabled = false;
     }
@@ -306,12 +309,23 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
         tool === "compress" ? quality : 0.95
       );
 
+      // Compress protection: if output grew, preserve original
+      const M = window.VxFileMetrics;
+      let finalBlob = blob;
+      let kept = false;
+      if (tool === "compress" && M && !M.isCompressionEffective(file.size, blob.size)) {
+        finalBlob = file.slice(0, file.size, file.type);
+        kept = true;
+      }
+
       return {
         baseName,
         originalFile: file,
-        blob,
+        blob: finalBlob,
         width: canvas.width,
-        height: canvas.height
+        height: canvas.height,
+        inputBytes: file.size,
+        keptOriginal: kept,
       };
     }
 
@@ -342,6 +356,29 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
     qualityEl.addEventListener("input", () => {
       qualityValEl.textContent = qualityEl.value;
     });
+
+    // ── Format mismatch warning for Compress ────────────────
+    const fmtHint = $("fmtHint");
+    function checkFmtHint() {
+      if (!fmtHint) return;
+      const isCompress = toolEl.value === "compress";
+      const isPng = fmtEl.value === "image/png";
+      if (isCompress && isPng) {
+        fmtHint.textContent = "Tip: PNG is lossless — switch to WebP or JPG for smaller files.";
+        fmtHint.hidden = false;
+      } else {
+        fmtHint.hidden = true;
+      }
+    }
+    toolEl.addEventListener("change", () => {
+      checkFmtHint();
+      // Auto-switch to WebP when entering Compress mode with PNG selected
+      if (toolEl.value === "compress" && fmtEl.value === "image/png") {
+        fmtEl.value = "image/webp";
+        checkFmtHint();
+      }
+    });
+    fmtEl.addEventListener("change", checkFmtHint);
 
     pickBtn.addEventListener("click", () => {
       fileEl.click();
@@ -410,7 +447,18 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
         }
 
         const totalOutBytes = processedResults.reduce((sum, result) => sum + result.blob.size, 0);
-        outMeta.textContent = `${processedResults.length} file(s) • ${(totalOutBytes / 1024 / 1024).toFixed(2)}MB`;
+        const totalInBytes = processedResults.reduce((sum, result) => sum + result.inputBytes, 0);
+        const M = window.VxFileMetrics;
+        if (M) {
+          const delta = M.calcDelta(totalInBytes, totalOutBytes);
+          const keptCount = processedResults.filter(r => r.keptOriginal).length;
+          let metaText = `${processedResults.length} file(s) • ${M.formatBytes(totalOutBytes)}`;
+          if (delta.direction !== "same") metaText += ` • ${delta.label}`;
+          if (keptCount > 0) metaText += ` • ${keptCount} kept original`;
+          outMeta.textContent = metaText;
+        } else {
+          outMeta.textContent = `${processedResults.length} file(s) • ${(totalOutBytes / 1024 / 1024).toFixed(2)}MB`;
+        }
 
         if (processedResults.length === 1) {
           singleOutBlob = processedResults[0].blob;
