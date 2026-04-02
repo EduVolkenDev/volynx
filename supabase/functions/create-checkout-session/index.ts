@@ -1,35 +1,6 @@
-/**
- * VOLYNX — Create Checkout Session (Supabase Edge Function)
- *
- * Accepts a lookup_key from the frontend, resolves the Stripe price,
- * and creates a checkout session (subscription or payment).
- *
- * Required secrets:
- *   STRIPE_SECRET_KEY
- *   SUPABASE_SERVICE_ROLE_KEY (for user lookup)
- *
- * Request body:
- *   { lookup_key: string, success_url?: string, cancel_url?: string }
- *
- * Auth: Bearer token (Supabase JWT) in Authorization header
- */
-
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "jsr:@supabase/supabase-js@2";
 import Stripe from "https://esm.sh/stripe@14.14.0?target=deno";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-
-const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
-  apiVersion: "2023-10-16",
-  httpClient: Stripe.createFetchHttpClient(),
-});
-
-const supabase = createClient(
-  Deno.env.get("SUPABASE_URL")!,
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-  { auth: { persistSession: false } }
-);
-
-const FRONTEND_ORIGIN = Deno.env.get("FRONTEND_ORIGIN") || "https://volynx.world";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -37,75 +8,79 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-// ── Lookup key prefix → checkout mode ───────────────────────
-
-function getCheckoutMode(prefix: string): "subscription" | "payment" {
-  const subscriptionPrefixes = [
-    "builder_launch",
-    "builder_pro",
-    "builder_studio",
-    "builder_teams",
-    "studio_pro",
-    "addon_extra_slot",
-  ];
-  return subscriptionPrefixes.includes(prefix) ? "subscription" : "payment";
+function json(data: Record<string, unknown>, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+  });
 }
 
-function extractPrefix(lookupKey: string): string {
-  const parts = lookupKey.split("_");
+const FRONTEND_ORIGIN = Deno.env.get("FRONTEND_ORIGIN") || "https://volynx.world";
+
+function getCheckoutMode(prefix: string): "subscription" | "payment" {
+  const subs = [
+    "builder_launch", "builder_pro", "builder_studio", "builder_teams",
+    "studio_pro", "addon_extra_slot",
+  ];
+  return subs.includes(prefix) ? "subscription" : "payment";
+}
+
+function extractPrefix(key: string): string {
+  const parts = key.split("_");
   const currencies = ["gbp", "eur", "brl"];
   if (currencies.includes(parts[parts.length - 1])) {
     return parts.slice(0, -1).join("_");
   }
-  return lookupKey;
+  return key;
 }
 
-serve(async (req: Request) => {
-  // CORS preflight
+Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: CORS_HEADERS });
   }
 
   if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-    });
+    return json({ error: "Method not allowed" }, 405);
   }
 
   try {
-    // ── Authenticate user ──
-    const authHeader = req.headers.get("authorization") || "";
+    const authHeader = req.headers.get("Authorization") || "";
     const token = authHeader.replace("Bearer ", "");
     if (!token) {
-      return new Response(JSON.stringify({ error: "Missing authorization token" }), {
-        status: 401,
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-      });
+      return json({ error: "Missing authorization token" }, 401);
     }
 
-    const { data: userData, error: authError } = await supabase.auth.getUser(token);
-    if (authError || !userData?.user) {
-      return new Response(JSON.stringify({ error: "Invalid or expired token" }), {
-        status: 401,
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-      });
+    // Create Supabase client with user's JWT (anon key — no service role needed)
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+    const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+    });
+
+    const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
+    if (authErr || !user) {
+      return json({ error: "Invalid or expired token. Please log in again." }, 401);
     }
 
-    const user = userData.user;
-
-    // ── Parse request ──
     const body = await req.json();
     const { lookup_key, success_url, cancel_url } = body;
 
     if (!lookup_key || typeof lookup_key !== "string") {
-      return new Response(JSON.stringify({ error: "Missing lookup_key" }), {
-        status: 400,
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-      });
+      return json({ error: "Missing lookup_key" }, 400);
     }
 
-    // ── Resolve Stripe price by lookup_key ──
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    if (!stripeKey) {
+      console.error("[checkout] STRIPE_SECRET_KEY not set");
+      return json({ error: "Payment system not configured. Contact support." }, 500);
+    }
+
+    const stripe = new Stripe(stripeKey, {
+      apiVersion: "2023-10-16",
+      httpClient: Stripe.createFetchHttpClient(),
+    });
+
+    // Resolve Stripe price
     const prices = await stripe.prices.list({
       lookup_keys: [lookup_key],
       limit: 1,
@@ -113,17 +88,15 @@ serve(async (req: Request) => {
     });
 
     if (!prices.data.length) {
-      return new Response(JSON.stringify({ error: `No price found for lookup_key: ${lookup_key}` }), {
-        status: 404,
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-      });
+      console.error("[checkout] No price for lookup_key:", lookup_key);
+      return json({ error: `Price not found for: ${lookup_key}` }, 404);
     }
 
     const price = prices.data[0];
     const prefix = extractPrefix(lookup_key);
     const mode = getCheckoutMode(prefix);
 
-    // ── Get or create Stripe customer ──
+    // Get or create Stripe customer (RLS: user can read/update own profile)
     const { data: profile } = await supabase
       .from("profiles")
       .select("stripe_customer_id")
@@ -133,57 +106,39 @@ serve(async (req: Request) => {
     let customerId = profile?.stripe_customer_id;
 
     if (!customerId) {
-      // Create new Stripe customer
       const customer = await stripe.customers.create({
         email: user.email,
         metadata: { supabase_user_id: user.id },
       });
       customerId = customer.id;
-
-      // Save to profile
-      await supabase
-        .from("profiles")
-        .update({ stripe_customer_id: customerId })
-        .eq("id", user.id);
+      await supabase.from("profiles").update({ stripe_customer_id: customerId }).eq("id", user.id);
     }
 
-    // ── Create checkout session ──
-    const sessionParams: Stripe.Checkout.SessionCreateParams = {
+    // Build session
+    const params: Record<string, unknown> = {
       customer: customerId,
       mode,
       line_items: [{ price: price.id, quantity: 1 }],
       metadata: { user_id: user.id, lookup_key, product_family: prefix },
       success_url: success_url || `${FRONTEND_ORIGIN}/profile/?payment=success`,
       cancel_url: cancel_url || `${FRONTEND_ORIGIN}/pricing/?payment=cancelled`,
+      allow_promotion_codes: true,
     };
 
-    // For subscriptions, allow promotion codes and set billing anchor
     if (mode === "subscription") {
-      sessionParams.allow_promotion_codes = true;
-      sessionParams.subscription_data = {
+      params.subscription_data = {
         metadata: { user_id: user.id, lookup_key, plan_key: prefix },
       };
-    }
-
-    // For one-time payments, allow promotion codes
-    if (mode === "payment") {
-      sessionParams.allow_promotion_codes = true;
-      sessionParams.payment_intent_data = {
+    } else {
+      params.payment_intent_data = {
         metadata: { user_id: user.id, lookup_key },
       };
     }
 
-    const session = await stripe.checkout.sessions.create(sessionParams);
-
-    return new Response(JSON.stringify({ url: session.url }), {
-      status: 200,
-      headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-    });
+    const session = await stripe.checkout.sessions.create(params as any);
+    return json({ url: session.url });
   } catch (err) {
-    console.error("create-checkout-session error:", (err as Error).message);
-    return new Response(JSON.stringify({ error: "Server error" }), {
-      status: 500,
-      headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-    });
+    console.error("[checkout] error:", (err as Error).message);
+    return json({ error: "Server error" }, 500);
   }
 });

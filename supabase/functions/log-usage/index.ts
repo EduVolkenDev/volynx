@@ -41,7 +41,6 @@ Deno.serve(async (req: Request) => {
       global: { headers: { Authorization: `Bearer ${token}` } },
     });
 
-    // Authenticate user
     const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
     if (authErr || !user) {
       return json({ error: "Unauthorized" }, 401);
@@ -49,15 +48,8 @@ Deno.serve(async (req: Request) => {
 
     const today = new Date().toISOString().slice(0, 10);
 
-    // Use service role for the upsert to bypass RLS
-    const serviceClient = createClient(
-      supabaseUrl,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "",
-      { auth: { persistSession: false } },
-    );
-
-    // Check if row exists for today
-    const { data: existing } = await serviceClient
+    // Check if row exists for today (RLS: user_id = auth.uid())
+    const { data: existing } = await supabase
       .from("usage_logs")
       .select("id, usage_count")
       .eq("user_id", user.id)
@@ -66,8 +58,7 @@ Deno.serve(async (req: Request) => {
       .maybeSingle();
 
     if (existing) {
-      // Increment existing row
-      const { error: updateErr } = await serviceClient
+      const { error: updateErr } = await supabase
         .from("usage_logs")
         .update({ usage_count: existing.usage_count + increment })
         .eq("id", existing.id);
@@ -77,34 +68,18 @@ Deno.serve(async (req: Request) => {
         return json({ error: "Failed to update usage" }, 500);
       }
 
-      return json({
-        logged: true,
-        tool: toolName,
-        used: existing.usage_count + increment,
-        date: today,
-      });
+      return json({ logged: true, tool: toolName, used: existing.usage_count + increment, date: today });
     } else {
-      // Insert new row
-      const { error: insertErr } = await serviceClient
+      const { error: insertErr } = await supabase
         .from("usage_logs")
-        .insert({
-          user_id: user.id,
-          tool_name: toolName,
-          usage_date: today,
-          usage_count: increment,
-        });
+        .insert({ user_id: user.id, tool_name: toolName, usage_date: today, usage_count: increment });
 
       if (insertErr) {
         console.error("[log-usage] insert error:", insertErr.message);
         return json({ error: "Failed to log usage" }, 500);
       }
 
-      return json({
-        logged: true,
-        tool: toolName,
-        used: increment,
-        date: today,
-      });
+      return json({ logged: true, tool: toolName, used: increment, date: today });
     }
   } catch (err) {
     console.error("[log-usage] error:", (err as Error).message);

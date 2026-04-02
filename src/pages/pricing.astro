@@ -193,8 +193,8 @@ const faqs = [
           });
           const data = await res.json();
           if (data.url) window.location.href = data.url;
-          else { alert(data.error || 'Checkout failed.'); btn.textContent = 'Try again'; btn.style.pointerEvents = ''; }
-        } catch { alert('Network error.'); btn.textContent = 'Try again'; btn.style.pointerEvents = ''; }
+          else { alert(data.error || data.msg || data.message || 'Checkout failed. Please try again.'); btn.textContent = 'Try again'; btn.style.pointerEvents = ''; }
+        } catch { alert('Connection error. Please check your network and try again.'); btn.textContent = 'Try again'; btn.style.pointerEvents = ''; }
       });
     });
 
@@ -215,7 +215,7 @@ const faqs = [
           });
           const data = await res.json();
           if (data.url) window.location.href = data.url;
-          else { alert(data.error || 'Checkout failed.'); btn.textContent = 'Buy'; }
+          else { alert(data.error || data.msg || data.message || 'Checkout failed. Please try again.'); btn.textContent = 'Buy'; }
         } catch { btn.textContent = 'Buy'; }
       });
     });

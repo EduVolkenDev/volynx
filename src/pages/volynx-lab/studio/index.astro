@@ -385,7 +385,7 @@ const studioPrice = sitePricing.builderPlans.find(p => p.id === 'studio')?.price
       });
       const data = await res.json();
       if (data.url) { window.location.href = data.url; }
-      else { alert(data.error || "Checkout failed"); btn.textContent = "Start Studio Pro"; btn.style.pointerEvents = ""; }
+      else { alert(data.error || data.msg || data.message || "Checkout failed. Please try again."); btn.textContent = "Start Studio Pro"; btn.style.pointerEvents = ""; }
     } catch { btn.textContent = "Start Studio Pro"; btn.style.pointerEvents = ""; }
   }
 
