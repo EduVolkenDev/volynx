@@ -2,6 +2,8 @@
 import "../../../styles/icons-store.css";
 import PageWidgets from "../../../components/PageWidgets.astro";
 import { ROUTES } from "../../../data/routes";
+// PageWidgets provides floating lang/login — hide its util bar since icons store has its own nav auth
+
 const pageTitle = "VOLYNX Icons Store - Premium SVG Icons & Design Assets";
 const pageDescription = "Premium SVG icons and design assets for developers. Build faster, design better.";
 ---
@@ -150,16 +152,16 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
         </div>
         <div class="hero-stats">
           <div class="stat">
-            <span class="stat-number">3K+</span>
+            <span class="stat-number" id="heroIconCount">1,160+</span>
             <span class="stat-label">Icons</span>
           </div>
           <div class="stat">
-            <span class="stat-number">100+</span>
+            <span class="stat-number">27</span>
             <span class="stat-label">Collections</span>
           </div>
           <div class="stat">
-            <span class="stat-number">10K+</span>
-            <span class="stat-label">Downloads</span>
+            <span class="stat-number">SVG & WebP</span>
+            <span class="stat-label">Formats</span>
           </div>
         </div>
       </div>
@@ -351,10 +353,12 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
 
     function updateStats() {
       const total = allIcons.length;
+      const collections = new Set(allIcons.map(i => i.collection)).size;
+      const heroCount = document.getElementById('heroIconCount');
+      if (heroCount) heroCount.textContent = total.toLocaleString() + '+';
       const statEls = document.querySelectorAll<HTMLElement>(".stat-number");
-      if (statEls[0]) statEls[0].textContent = total + "+";
-      if (statEls[1]) statEls[1].textContent = "23";
-      if (statEls[2]) statEls[2].textContent = "10K+";
+      if (statEls[0]) statEls[0].textContent = total.toLocaleString() + '+';
+      if (statEls[1]) statEls[1].textContent = String(collections);
       renderCollections();
     }
 
@@ -695,6 +699,6 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
     });
   </script>
 
-  <PageWidgets />
+  <PageWidgets hideUtilBar={true} />
 </body>
 </html>

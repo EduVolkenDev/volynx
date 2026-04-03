@@ -68,6 +68,10 @@ export const ROUTES = {
   terms: "/terms/",
   disclaimer: "/disclaimer/",
 
+  // ── Ecosystem (subdomains) ────────────
+  cvitae: "https://cvitae.volynx.world",
+  daily: "https://daily.volynx.world",
+
   // ── External ──────────────────────────
   whatsapp: "https://wa.me/447438656769",
   email: "mailto:hello@volynx.world",
