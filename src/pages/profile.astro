@@ -572,9 +572,9 @@ import { ROUTES } from "../data/routes";
 				// Read plan from profile row (Supabase source of truth)
 				// Use the higher of plan vs builder_plan
 				const _planRank = { free: 0, launch: 1, pro: 2, studio: 3, teams: 4, enterprise: 5 };
-				const _p1 = (profile?.plan || "free").toLowerCase().trim();
-				const _p2 = (profile?.builder_plan || "free").toLowerCase().trim();
-				const dbPlan = (_planRank[_p2] || 0) > (_planRank[_p1] || 0) ? _p2 : _p1;
+				const _allPlans = [profile?.plan, profile?.builder_plan, profile?.daily_plan, profile?.cvitae_plan]
+					.map(p => (p || "free").toLowerCase().trim());
+				const dbPlan = _allPlans.reduce((best, p) => (_planRank[p] || 0) > (_planRank[best] || 0) ? p : best, "free");
 				const dbPaid = dbPlan && dbPlan !== "free";
 				renderPlan(dbPaid ? dbPlan : "Free", dbPaid);
 				log("plan from DB: " + dbPlan);
@@ -596,9 +596,9 @@ import { ROUTES } from "../data/routes";
 							clearTimeout(t);
 							if (res.ok) {
 								const d = await res.json();
-								const _ap1 = (d.plan || "free").toLowerCase().trim();
-								const _ap2 = (d.builder_plan || "free").toLowerCase().trim();
-								const p = (_planRank[_ap2] || 0) > (_planRank[_ap1] || 0) ? _ap2 : _ap1;
+								const _apiPlans = [d.plan, d.builder_plan, d.daily_plan, d.cvitae_plan]
+									.map(pp => (pp || "free").toLowerCase().trim());
+								const p = _apiPlans.reduce((best, pp) => (_planRank[pp] || 0) > (_planRank[best] || 0) ? pp : best, "free");
 								const paid = p && p !== "free";
 								renderPlan(paid ? p : "Free", paid);
 								if (window.VxPlan) window.VxPlan.cache(p);

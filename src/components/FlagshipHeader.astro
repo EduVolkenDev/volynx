@@ -60,23 +60,23 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro" } = Astro.pr
   .vx-user-badge { display: none; }
   :global(.vx-authed) .vx-login-link { display: none !important; }
   :global(.vx-authed) .vx-user-badge {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, rgba(139,250,240,.2), rgba(177,150,255,.25));
-    border: 1px solid rgba(255,255,255,.15);
-    color: rgba(255,255,255,.9);
-    font-size: 12px;
-    font-weight: 800;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(139,250,240,.08);
+    border: 1px solid rgba(139,250,240,.2);
+    color: rgba(139,250,240,.9);
+    font-size: 11px;
+    font-weight: 700;
     text-decoration: none;
     letter-spacing: .03em;
+    white-space: nowrap;
   }
   :global(.vx-authed) .vx-user-badge:hover {
-    background: linear-gradient(135deg, rgba(139,250,240,.3), rgba(177,150,255,.35));
-    border-color: rgba(255,255,255,.25);
+    background: rgba(139,250,240,.14);
+    border-color: rgba(139,250,240,.35);
   }
 
   .vx-lang-btn {
@@ -85,8 +85,8 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro" } = Astro.pr
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 48px;
-    padding: 7px 11px;
+    min-width: 40px;
+    padding: 6px 10px;
     font-size: 11px;
     font-weight: 800;
     letter-spacing: .09em;
@@ -103,6 +103,18 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro" } = Astro.pr
     background: rgba(130,220,255,.13);
     border-color: rgba(130,220,255,.36);
     color: #fff;
+  }
+
+  /* Tablet and smaller: compact header */
+  @media (max-width: 640px) {
+    .header-actions .button--gold { display: none; }
+    .header-actions { gap: 6px; }
+    .brandmark__wordmark { width: 90px; }
+  }
+  /* Narrow phones: hide wordmark entirely */
+  @media (max-width: 380px) {
+    .brandmark__wordmark { display: none; }
+    .vx-lang-btn { min-width: 36px; padding: 5px 8px; font-size: 10px; }
   }
 </style>
 

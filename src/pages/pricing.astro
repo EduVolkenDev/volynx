@@ -6,7 +6,6 @@ import PricingCard from "../components/pricing/PricingCard.astro";
 import TokenPackCard from "../components/pricing/TokenPackCard.astro";
 import ToolUsageCard from "../components/pricing/ToolUsageCard.astro";
 import AddonCard from "../components/pricing/AddonCard.astro";
-import LocaleCurrencyBar from "../components/pricing/LocaleCurrencyBar.astro";
 import { sitePricing } from "../data/pricing";
 import { ROUTES } from "../data/routes";
 
@@ -46,10 +45,17 @@ const faqs = [
       </div>
     </section>
 
-    <!-- ═══ LOCALE / CURRENCY BAR ═══ -->
+    <!-- ═══ CURRENCY BAR (lang toggle removed — already in topbar) ═══ -->
     <section class="page-section" style="padding-top:32px;">
       <div class="shell">
-        <LocaleCurrencyBar locale={lang} currency={currency} />
+        <div class="currency-bar">
+          <span style="font-size:12px;font-weight:700;letter-spacing:.06em;color:rgba(255,255,255,.45);text-transform:uppercase;">Currency</span>
+          <div style="display:flex;gap:8px;">
+            {['GBP', 'EUR', 'BRL'].map((c) => (
+              <button type="button" class={`lcbar__pill ${c === currency ? 'lcbar__pill--active' : ''}`} data-switch-currency={c}>{c}</button>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
 
@@ -136,6 +142,35 @@ const faqs = [
     </section>
 
   </main>
+
+  <style>
+    .currency-bar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 20px; border-radius:14px; border:1px solid rgba(255,255,255,.06); background:rgba(255,255,255,.03); }
+    .lcbar__pill { padding:6px 14px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:.06em; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03); color:rgba(255,255,255,.45); cursor:pointer; transition:all .15s; }
+    .lcbar__pill:hover { border-color:rgba(255,255,255,.15); color:rgba(255,255,255,.7); }
+    .lcbar__pill--active { background:rgba(109,94,252,.12); border-color:rgba(109,94,252,.35); color:#C4B5FD; }
+    .vx-price--hidden, .pricing-card__price--hidden { display:none !important; }
+  </style>
+
+  <script is:inline>
+    // Currency switcher
+    document.querySelectorAll('[data-switch-currency]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var target = btn.dataset.switchCurrency;
+        if (!target) return;
+        document.querySelectorAll('[data-switch-currency]').forEach(function(p) { p.classList.remove('lcbar__pill--active'); });
+        btn.classList.add('lcbar__pill--active');
+        document.querySelectorAll('[data-currency]').forEach(function(el) {
+          var curr = el.dataset.currency;
+          el.classList.toggle('vx-price--hidden', curr !== target);
+          el.classList.toggle('pricing-card__price--hidden', curr !== target);
+        });
+        var url = new URL(window.location.href);
+        url.searchParams.set('currency', target);
+        history.replaceState(null, '', url.toString());
+      });
+    });
+  </script>
+
   <FlagshipFooter />
 
   <!-- Checkout + Plan detection (preserved from existing) -->

@@ -122,13 +122,24 @@
     try {
       var perm = await checkPermission('image-scaler');
       if (!perm.allowed) {
-        var msg = perm.plan === 'public'
-          ? 'Free limit reached. Sign in or upgrade to continue.'
-          : 'Plan limit reached. Upgrade to continue.';
-        alert(msg);
-        runBtn.disabled = false;
-        runBtn.textContent = 'Process';
-        return;
+        if (window.VxTokens) {
+          var tokenResult = await VxTokens.spend('image-scaler', 'medium', {
+            description: 'Scale images (limit exceeded)'
+          });
+          if (!tokenResult.ok) {
+            runBtn.disabled = false;
+            runBtn.textContent = 'Process';
+            return;
+          }
+        } else {
+          var msg = perm.plan === 'public'
+            ? 'Free limit reached. Sign in or upgrade to continue.'
+            : 'Plan limit reached. Upgrade to continue.';
+          alert(msg);
+          runBtn.disabled = false;
+          runBtn.textContent = 'Process';
+          return;
+        }
       }
     } catch (err) {
       console.warn('check-permission failed, allowing local usage:', err);

@@ -93,7 +93,7 @@ const pageDescription = "Premium property management platform for real estate ag
     .topbar__back:hover { color: var(--text); background: rgba(255,255,255,0.07); }
 
     /* ─── Shell ─── */
-    .shell { max-width: var(--max); margin: 0 auto; padding: 0 20px 80px; }
+    .shell { max-width: var(--max); margin: 0 auto; padding: 0 20px 48px; overflow-x: hidden; }
 
     /* ─── Hero ─── */
     .hero {
@@ -177,20 +177,33 @@ const pageDescription = "Premium property management platform for real estate ag
     .section p.sub { margin: 14px 0 0; color: var(--muted); line-height: 1.8; max-width: 60ch; }
 
     /* ─── Feature grid ─── */
-    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .features {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
     .feature {
-      border-radius: var(--radius); padding: 24px;
+      border-radius: var(--radius); padding: 28px;
       border: 1px solid rgba(255,255,255,0.08);
       background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
       box-shadow: var(--shadow);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
     }
     .feature__icon {
-      width: 40px; height: 40px; border-radius: 14px; margin-bottom: 16px;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
-      font-size: 1.1rem;
+      width: 120px;
+      height: 120px;
+      flex-shrink: 0;
     }
-    .feature h3 { margin: 0 0 8px; font-size: 1rem; }
+    .feature__icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .feature h3 { margin: 0; font-size: 1rem; }
     .feature p { margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.7; }
 
     /* ─── Stack row ─── */
@@ -262,19 +275,39 @@ const pageDescription = "Premium property management platform for real estate ag
     .cta-block__actions { display: flex; gap: 12px; flex-shrink: 0; flex-wrap: wrap; }
 
     /* ─── Responsive ─── */
-    @media (max-width: 860px) {
-      .hero { grid-template-columns: 1fr; }
-      .hero__visual { min-height: auto; }
+    @media (min-width: 561px) {
       .features { grid-template-columns: 1fr 1fr; }
-      .pricing-grid { grid-template-columns: 1fr; max-width: 420px; }
+      .feature__icon { width: 140px; height: 140px; }
+    }
+    @media (min-width: 861px) {
+      .features { grid-template-columns: 1fr 1fr 1fr; }
+      .feature__icon { width: 160px; height: 160px; }
+    }
+    @media (max-width: 860px) {
+      .shell { padding: 0 16px 32px; }
+      .hero { grid-template-columns: 1fr; padding: 40px 0 32px; }
+      .hero__visual { min-height: auto; }
+      .hero h1 { font-size: clamp(2rem, 8vw, 3rem); }
+      .pricing-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
       .audience { grid-template-columns: 1fr; }
       .cta-block { flex-direction: column; align-items: flex-start; }
       .template-preview-grid { grid-template-columns: repeat(2, 1fr); }
+      .stack { justify-content: center; }
+      .section h2 { font-size: clamp(1.4rem, 5vw, 2.2rem); }
     }
     @media (max-width: 560px) {
-      .features { grid-template-columns: 1fr; }
-      .cta-block { padding: 24px; }
+      .shell { padding: 0 14px 24px; }
+      .hero { padding: 28px 0 20px; }
+      .hero p { font-size: 0.95rem; }
+      .hero__actions { justify-content: center; }
+      .feature { padding: 20px; }
+      .cta-block { padding: 20px; border-radius: 20px; text-align: center; align-items: center; }
+      .cta-block__actions { justify-content: center; width: 100%; }
+      .cta-block__actions .btn { width: 100%; text-align: center; }
       .template-preview-grid { grid-template-columns: 1fr; }
+      .section__head { text-align: center; }
+      .section p.sub { margin-left: auto; margin-right: auto; }
+      .price-card { padding: 24px 20px; }
     }
   </style>
 </head>
@@ -318,12 +351,12 @@ const pageDescription = "Premium property management platform for real estate ag
 
       <div class="features">
         <div class="feature">
-          <div class="feature__icon"><img src="/assets/smartcatalogue.png"></div>
+          <div class="feature__icon"><img src="/assets/smartcatalogue.webp"></div>
           <h3 data-i18n="pf.f1_title">Smart Catalogue</h3>
           <p data-i18n="pf.f1_desc">Property grid with cover images, meta tags, featured badges and detail modals with full gallery.</p>
         </div>
         <div class="feature">
-          <div class="feature__icon"><img src="/assets/livefilters.png"></div>
+          <div class="feature__icon"><img src="/assets/livefilters.webp"></div>
           <h3 data-i18n="pf.f2_title">Live Filters</h3>
           <p data-i18n="pf.f2_desc">Search by name, neighbourhood or city. Filter by purpose (sale / rent), type and price range.</p>
         </div>
@@ -343,7 +376,7 @@ const pageDescription = "Premium property management platform for real estate ag
           <p data-i18n="pf.f5_desc">Dark luxury aesthetic with glassmorphism, gold accents and VOLYNX design tokens throughout.</p>
         </div>
         <div class="feature">
-          <div class="feature__icon"><img src="/assets/fullyresponsive.png"></div>
+          <div class="feature__icon"><img src="/assets/responsive.webp"></div>
           <h3 data-i18n="pf.f6_title">Fully Responsive</h3>
           <p data-i18n="pf.f6_desc">Mobile-first layouts. Filter bar, property grid and modal all adapt cleanly to any screen size.</p>
         </div>

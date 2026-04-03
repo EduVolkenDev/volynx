@@ -191,15 +191,27 @@ convertBtn.addEventListener('click', async () => {
   // Check permission with file count
   const perm = await checkPermission('converter', files.length);
   if (!perm.allowed) {
-    // Notify usage counter so it can show the limit overlay
     window.dispatchEvent(new Event('vx:usage-updated'));
 
-    const msg = perm.remaining === 0
-      ? `Daily limit reached (${perm.limit}). ${perm.plan === 'free' ? 'Upgrade to Pro for more.' : 'Try again tomorrow.'}`
-      : `Limit: ${perm.remaining} remaining today. You selected ${files.length} files.`;
-    alert(msg);
-    convertBtn.disabled = false;
-    return;
+    // Offer token bypass if VxTokens is available
+    if (window.VxTokens) {
+      const tokenResult = await VxTokens.spend('converter', 'medium', {
+        description: `Convert ${files.length} files (limit exceeded)`
+      });
+      if (tokenResult.ok) {
+        // Tokens spent successfully — proceed with conversion
+      } else {
+        convertBtn.disabled = false;
+        return;
+      }
+    } else {
+      const msg = perm.remaining === 0
+        ? `Daily limit reached (${perm.limit}). ${perm.plan === 'free' ? 'Upgrade to Pro for more.' : 'Try again tomorrow.'}`
+        : `Limit: ${perm.remaining} remaining today. You selected ${files.length} files.`;
+      alert(msg);
+      convertBtn.disabled = false;
+      return;
+    }
   }
 
   const format  = formatSel.value;

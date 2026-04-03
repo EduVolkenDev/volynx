@@ -165,8 +165,15 @@ function bind() {
       // Check permission before generating
       const perm = await checkToolPermission("qr-gen", 1);
       if (!perm.allowed) {
-        alert(`Daily limit reached (${perm.limit}). ${perm.plan === 'free' ? 'Upgrade to Pro for more.' : 'Try again tomorrow.'}`);
-        return;
+        if (window.VxTokens) {
+          const tokenResult = await VxTokens.spend('qr-gen', 'light', {
+            description: 'Generate QR code (limit exceeded)'
+          });
+          if (!tokenResult.ok) return;
+        } else {
+          alert(`Daily limit reached (${perm.limit}). ${perm.plan === 'free' ? 'Upgrade to Pro for more.' : 'Try again tomorrow.'}`);
+          return;
+        }
       }
 
       generateQR();
