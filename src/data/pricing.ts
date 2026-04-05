@@ -209,6 +209,69 @@ export const sitePricing = {
       }
     }
   ] satisfies Plan[],
+  dailyPlans: [
+    {
+      id: 'daily_free',
+      name: { pt: 'Daily Free', en: 'Daily Free' },
+      description: { pt: 'Todas as 6 ferramentas com limites diários. Armazenamento local.', en: 'All 6 tools with daily limits. Local storage.' },
+      price: { GBP: '£0', EUR: '€0', BRL: 'R$0' },
+      billing: { pt: 'sem custo', en: 'no cost' },
+      cta: { pt: 'Começar grátis', en: 'Start free' },
+      features: {
+        pt: ['6 ferramentas com limites diários', 'armazenamento local', 'processamento básico'],
+        en: ['6 tools with daily limits', 'local storage', 'basic processing']
+      }
+    },
+    {
+      id: 'daily_pro',
+      badge: { pt: 'Mais popular', en: 'Most popular' },
+      featured: true,
+      name: { pt: 'Daily Pro', en: 'Daily Pro' },
+      description: { pt: 'Quotas maiores, sync na nuvem, exportação e processamento avançado.', en: 'Higher quotas, cloud sync, export and smart processing.' },
+      price: { GBP: '£12', EUR: '€14.90', BRL: 'R$79' },
+      billing: { pt: '/mês', en: '/month' },
+      cta: { pt: 'Ir de Pro', en: 'Go Pro' },
+      features: {
+        pt: ['quotas 10x maiores', 'sync na nuvem entre dispositivos', 'exportação de dados', 'processamento avançado', 'histórico de uso'],
+        en: ['10x higher quotas', 'cloud sync across devices', 'data export', 'smart processing', 'usage history']
+      }
+    },
+    {
+      id: 'daily_diamond',
+      name: { pt: 'Daily Diamond', en: 'Daily Diamond' },
+      description: { pt: 'Uso ilimitado, acesso API, compartilhamento em equipe e analytics.', en: 'Unlimited usage, API access, team sharing and analytics.' },
+      price: { GBP: '£29', EUR: '€34.90', BRL: 'R$199' },
+      billing: { pt: '/mês', en: '/month' },
+      cta: { pt: 'Ir de Diamond', en: 'Go Diamond' },
+      features: {
+        pt: ['uso ilimitado', 'acesso API', 'compartilhamento em equipe', 'dashboard de analytics', 'processamento prioritário'],
+        en: ['unlimited usage', 'API access', 'team sharing', 'analytics dashboard', 'priority processing']
+      }
+    }
+  ] satisfies Plan[],
+  bundles: [
+    {
+      id: 'bundle_essential',
+      name: { pt: 'VOLYNX Essential', en: 'VOLYNX Essential' },
+      includes: { pt: 'Builder Pro + Daily Pro', en: 'Builder Pro + Daily Pro' },
+      description: { pt: 'Para criadores solo que constroem sites e usam ferramentas diárias.', en: 'For solo creators who build sites and use daily tools.' },
+      price: { GBP: '£29', EUR: '€34.90', BRL: 'R$199' },
+      billing: { pt: '/mês', en: '/month' },
+      savings: { pt: 'Economize vs. separado', en: 'Save vs. separate' },
+      cta: { pt: 'Assinar Essential', en: 'Get Essential' }
+    },
+    {
+      id: 'bundle_complete',
+      badge: { pt: 'Melhor valor', en: 'Best value' },
+      name: { pt: 'VOLYNX Complete', en: 'VOLYNX Complete' },
+      includes: { pt: 'Builder Studio + Daily Diamond', en: 'Builder Studio + Daily Diamond' },
+      description: { pt: 'Para agências e power users que precisam de tudo.', en: 'For agencies and power users who need everything.' },
+      price: { GBP: '£59', EUR: '€69.90', BRL: 'R$399' },
+      billing: { pt: '/mês', en: '/month' },
+      savings: { pt: 'Economize 13% vs. separado', en: 'Save 13% vs. separate' },
+      cta: { pt: 'Assinar Complete', en: 'Get Complete' }
+    }
+  ],
   builderAddons: [
     {
       id: 'domain-setup',

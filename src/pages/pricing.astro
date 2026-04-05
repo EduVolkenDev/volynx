@@ -14,10 +14,14 @@ const currencyParam = Astro.url.searchParams.get('currency') || '';
 const currency = (['GBP', 'EUR', 'BRL'] as const).includes(currencyParam as any) ? currencyParam as 'GBP'|'EUR'|'BRL' : 'GBP';
 
 const faqs = [
-  { q: { en: "Is the Lab really free?", pt: "O Lab é realmente grátis?" }, a: { en: "Yes. Lab is for discovery and proof-of-value. Studio and Builder are where power users upgrade.", pt: "Sim. O Lab é para descoberta. Studio e Builder são onde usuários avançados fazem upgrade." } },
-  { q: { en: "How do tokens work?", pt: "Como funcionam os tokens?" }, a: { en: "Each tool action costs tokens based on complexity. Buy packs anytime — they never expire.", pt: "Cada ação consome tokens baseado na complexidade. Compre packs quando quiser — não expiram." } },
-  { q: { en: "Can I use outputs commercially?", pt: "Posso usar comercialmente?" }, a: { en: "Yes. All paid Builder plans include commercial usage rights. Studio Pro tools are included with the Builder Studio plan.", pt: "Sim. Todos os planos pagos do Builder incluem direitos de uso comercial. Ferramentas Studio Pro estão incluídas no plano Builder Studio." } },
-  { q: { en: "Can I switch plans anytime?", pt: "Posso trocar de plano?" }, a: { en: "Yes. Upgrade, downgrade or cancel at any time from your dashboard.", pt: "Sim. Faça upgrade, downgrade ou cancele a qualquer momento pelo dashboard." } },
+  { q: { en: "Is the Lab really free?", pt: "O Lab é realmente grátis?" }, a: { en: "Yes. Lab tools are always free. No account needed. Files are processed locally in your browser.", pt: "Sim. Ferramentas do Lab são sempre grátis. Sem necessidade de conta. Arquivos processados localmente no seu navegador." } },
+  { q: { en: "How do tokens work?", pt: "Como funcionam os tokens?" }, a: { en: "Tokens are the universal currency across the VOLYNX ecosystem. Use them for Builder exports, CVitae downloads, Daily overages, and more. Buy once, use anywhere. They never expire.", pt: "Tokens são a moeda universal do ecossistema VOLYNX. Use no Builder, CVitae, Daily e mais. Compre uma vez, use em qualquer lugar. Sem expiração." } },
+  { q: { en: "Can I use outputs commercially?", pt: "Posso usar comercialmente?" }, a: { en: "Yes. All paid plans include commercial usage rights for the outputs you create.", pt: "Sim. Todos os planos pagos incluem direitos de uso comercial para o que você criar." } },
+  { q: { en: "Can I switch plans anytime?", pt: "Posso trocar de plano?" }, a: { en: "Yes. Upgrade, downgrade or cancel at any time from your profile dashboard.", pt: "Sim. Faça upgrade, downgrade ou cancele a qualquer momento pelo seu painel." } },
+  { q: { en: "What's the difference between Builder and Daily plans?", pt: "Qual a diferença entre planos Builder e Daily?" }, a: { en: "Builder plans are for creating and publishing websites. Daily plans are for everyday tools: scanning, summarizing, writing, organizing, and deciding. They are separate subscriptions, or you can bundle them to save.", pt: "Planos Builder são para criar e publicar sites. Planos Daily são para ferramentas do dia a dia: escanear, resumir, escrever, organizar e decidir. São assinaturas separadas, ou você pode combinar em bundle e economizar." } },
+  { q: { en: "How do bundles work?", pt: "Como funcionam os bundles?" }, a: { en: "Bundles combine Builder and Daily subscriptions at a discount. One subscription, both products, shared token balance.", pt: "Bundles combinam assinaturas Builder e Daily com desconto. Uma assinatura, ambos os produtos, saldo de tokens compartilhado." } },
+  { q: { en: "Does CVitae require a subscription?", pt: "CVitae precisa de assinatura?" }, a: { en: "No. CVitae is free to build and preview. You only pay when you export — 2 tokens per clean PDF. No subscription needed for most users. A Business tier exists for professionals who need unlimited exports.", pt: "Não. CVitae é grátis para criar e visualizar. Você só paga ao exportar — 2 tokens por PDF limpo. Sem necessidade de assinatura para a maioria dos usuários. Um tier Business existe para profissionais que precisam de exports ilimitados." } },
+  { q: { en: "Can I use tokens across different products?", pt: "Posso usar tokens em produtos diferentes?" }, a: { en: "Yes. Your VOLYNX token balance works across Builder, Daily, CVitae, and all future products. One balance, one account.", pt: "Sim. Seu saldo de tokens VOLYNX funciona no Builder, Daily, CVitae e em todos os futuros produtos. Um saldo, uma conta." } },
 ];
 ---
 <FlagshipLayout title="Pricing — VOLYNX" pageClass="page-pricing">
@@ -34,9 +38,9 @@ const faqs = [
     <section class="hero">
       <div class="shell hero-grid">
         <div class="hero-copy">
-          <span class="kicker" data-i18n="price.hero_kicker">Pricing logic</span>
-          <h1 data-i18n="price.hero_title">Separate discovery from production with premium logic.</h1>
-          <p data-i18n="price.hero_desc">Builder Free builds trust. Pro removes friction. Studio and Teams add operational power. Premium features that elevate your work, not just more capacity.</p>
+          <span class="kicker" data-i18n="price.hero_kicker">Ecosystem pricing</span>
+          <h1 data-i18n="price.hero_title">One ecosystem. Clear pricing. Premium at every tier.</h1>
+          <p data-i18n="price.hero_desc">VOLYNX products share one account and one token system. Subscribe to what you use, bundle to save, or pay-per-use with tokens.</p>
           <div class="hero-actions">
             <a href="#plans" class="button button--gold" data-i18n="price.hero_cta1">View plans</a>
             <a href={ROUTES.lab} class="button button--ghost" data-i18n="price.hero_cta2">Open the Lab</a>
@@ -59,7 +63,28 @@ const faqs = [
       </div>
     </section>
 
-    <!-- ═══ PLANS ═══ -->
+    <!-- ═══ ECOSYSTEM OVERVIEW ═══ -->
+    <section class="page-section" style="padding-bottom:0;">
+      <div class="shell grid-3" style="gap:16px;">
+        <div class="panel" style="text-align:center;padding:20px;">
+          <strong>VOLYNX Builder</strong>
+          <p style="margin:6px 0 0;color:var(--muted);font-size:13px;">{lang === 'pt' ? 'Crie e publique sites premium' : 'Build and publish premium sites'}</p>
+          <span style="display:inline-block;margin-top:8px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(34,197,94,.1);color:#22c55e;">LIVE</span>
+        </div>
+        <div class="panel" style="text-align:center;padding:20px;">
+          <strong>VOLYNX Daily</strong>
+          <p style="margin:6px 0 0;color:var(--muted);font-size:13px;">{lang === 'pt' ? 'Organize, escaneie, resuma, escreva, decida' : 'Organize, scan, summarize, write, decide'}</p>
+          <span style="display:inline-block;margin-top:8px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(34,197,94,.1);color:#22c55e;">LIVE</span>
+        </div>
+        <div class="panel" style="text-align:center;padding:20px;">
+          <strong>CVitae</strong>
+          <p style="margin:6px 0 0;color:var(--muted);font-size:13px;">{lang === 'pt' ? 'CVs profissionais. Grátis para criar, pague para exportar' : 'Professional CVs. Free to build, pay to export'}</p>
+          <span style="display:inline-block;margin-top:8px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(34,197,94,.1);color:#22c55e;">LIVE</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ BUILDER PLANS ═══ -->
     <section id="plans" class="page-section">
       <div class="shell section-head">
         <span class="eyebrow">{lang === 'pt' ? 'Planos do Builder' : 'Builder Plans'}</span>
@@ -86,11 +111,79 @@ const faqs = [
       </div>
     </section>
 
+    <!-- ═══ DAILY PLANS ═══ -->
+    <section id="daily-plans" class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">{lang === 'pt' ? 'VOLYNX Daily' : 'VOLYNX Daily'}</span>
+        <h2>{lang === 'pt' ? 'Seu kit diário. Comece grátis, evolua com Pro.' : 'Your daily toolkit. Free to start, Pro to unlock.'}</h2>
+      </div>
+      <div class="shell pricing-grid pricing-grid--plans" style="max-width:960px;">
+        {sitePricing.dailyPlans.map((plan) => (
+          <PricingCard plan={plan} locale={lang} currency={currency} />
+        ))}
+      </div>
+    </section>
+
+    <!-- ═══ CVITAE ═══ -->
+    <section id="cvitae" class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">CVitae by VOLYNX</span>
+        <h2>{lang === 'pt' ? 'CVs profissionais. Grátis para criar. Pague para exportar.' : 'Professional CVs. Free to build. Pay to export.'}</h2>
+      </div>
+      <div class="shell grid-3" style="max-width:960px;gap:16px;">
+        <div class="panel" style="padding:24px;">
+          <strong>{lang === 'pt' ? 'Grátis' : 'Free'}</strong>
+          <p style="margin:8px 0 0;color:var(--muted);font-size:13px;line-height:1.6;">{lang === 'pt' ? 'Editor completo, preview ao vivo, todas as seções. Seu CV se constrói enquanto você digita.' : 'Full editor, live preview, all sections. Your CV builds as you type.'}</p>
+        </div>
+        <div class="panel" style="padding:24px;border-color:rgba(13,148,136,.3);background:rgba(13,148,136,.04);">
+          <strong>{lang === 'pt' ? 'Exportação profissional' : 'Professional export'}</strong>
+          <div style="font-size:1.5rem;font-weight:700;margin:8px 0;">2 tokens</div>
+          <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.6;">{lang === 'pt' ? 'PDF limpo, sem marca d\'água, pronto para qualquer candidatura.' : 'Clean PDF, no watermark, ready for any application.'}</p>
+        </div>
+        <div class="panel" style="padding:24px;">
+          <strong>{lang === 'pt' ? 'CVitae Business' : 'CVitae Business'}</strong>
+          <div style="font-size:1.1rem;font-weight:700;margin:8px 0;color:var(--muted);">
+            <span class="vx-price" data-currency="GBP">£15</span>
+            <span class="vx-price vx-price--hidden" data-currency="EUR">€17.90</span>
+            <span class="vx-price vx-price--hidden" data-currency="BRL">R$99</span>
+            <span style="font-size:13px;font-weight:400;">{lang === 'pt' ? '/mês' : '/month'}</span>
+          </div>
+          <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.6;">{lang === 'pt' ? 'Exports ilimitados, templates premium, gestão de múltiplos CVs.' : 'Unlimited exports, premium templates, multi-CV management.'}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ BUNDLES ═══ -->
+    <section id="bundles" class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">{lang === 'pt' ? 'Economize com bundles' : 'Save with bundles'}</span>
+        <h2>{lang === 'pt' ? 'Usa mais de um produto? Combine e economize.' : 'Use more than one product? Bundle and save.'}</h2>
+      </div>
+      <div class="shell grid-2" style="max-width:720px;gap:16px;">
+        {sitePricing.bundles.map((b) => (
+          <div class="panel" style="padding:24px;border-color:rgba(109,94,252,.2);background:rgba(109,94,252,.03);">
+            {b.badge && <span style="display:inline-block;margin-bottom:8px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(109,94,252,.12);color:#C4B5FD;">{b.badge[lang]}</span>}
+            <strong style="display:block;font-size:1.1rem;">{b.name[lang]}</strong>
+            <p style="margin:4px 0;color:var(--muted);font-size:13px;">{b.includes[lang]}</p>
+            <div style="font-size:1.3rem;font-weight:700;margin:8px 0;">
+              <span class="vx-price" data-currency="GBP">{b.price.GBP}</span>
+              <span class="vx-price vx-price--hidden" data-currency="EUR">{b.price.EUR}</span>
+              <span class="vx-price vx-price--hidden" data-currency="BRL">{b.price.BRL}</span>
+              <span style="font-size:13px;font-weight:400;">{b.billing[lang]}</span>
+            </div>
+            <p style="margin:0 0 12px;color:var(--muted);font-size:12px;">{b.savings[lang]}</p>
+            <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.5;">{b.description[lang]}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
     <!-- ═══ TOKEN PACKS ═══ -->
     <section class="page-section">
       <div class="shell section-head">
-        <span class="eyebrow">{lang === 'pt' ? 'Packs de tokens' : 'Token Packs'}</span>
-        <h2>{lang === 'pt' ? 'Compre tokens avulsos' : 'Buy token packs'}</h2>
+        <span class="eyebrow">{lang === 'pt' ? 'VOLYNX Tokens' : 'VOLYNX Tokens'}</span>
+        <h2>{lang === 'pt' ? 'Uma moeda. Todo o ecossistema. Sem expiração.' : 'One currency. Every product. Never expire.'}</h2>
+        <p style="color:var(--muted);max-width:560px;margin:8px auto 0;font-size:14px;line-height:1.6;">{lang === 'pt' ? 'Use tokens no Builder, Daily, CVitae e em todos os futuros produtos. Compre uma vez, use em qualquer lugar.' : 'Use tokens across Builder, Daily, CVitae and all future products. Buy once, use anywhere.'}</p>
       </div>
       <div class="shell grid-2">
         {sitePricing.tokenPacks.map((pack) => (
@@ -182,6 +275,7 @@ const faqs = [
     if (urlParams.get('payment') === 'cancelled') {
       const cb = document.getElementById('paymentCancelledBanner');
       if (cb) cb.style.display = '';
+      history.replaceState({}, '', '/pricing/');
     }
     const currency = (urlParams.get('currency') || 'GBP').toLowerCase();
 
