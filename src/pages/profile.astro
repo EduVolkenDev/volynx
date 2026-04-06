@@ -40,13 +40,13 @@ import { ROUTES } from "../data/routes";
 		</div>
 
 		<!-- ═══ VIEW: error ═══ -->
-		<div id="viewError" class="view">
+		<div id="viewError" class="view" style="display:none;">
 			<p id="errorMsg" class="error-text" data-i18n="profile.error_generic">Something went wrong.</p>
 			<a href={ROUTES.login} class="btn" data-i18n="profile.btn_signin">Sign in again</a>
 		</div>
 
 		<!-- ═══ VIEW: profile ═══ -->
-		<div id="viewProfile" class="view">
+		<div id="viewProfile" class="view" style="display:none;">
 
 			<div id="firstTimeBanner" class="banner banner--welcome" style="display:none;">
 				<h2 data-i18n="profile.welcome_title">Welcome to VOLYNX</h2>
@@ -330,9 +330,13 @@ import { ROUTES } from "../data/routes";
 
 				function showView(name) {
 					["viewLoading","viewError","viewProfile"].forEach(id => {
-						document.getElementById(id).classList.remove("view--active");
+						var el = document.getElementById(id);
+						el.classList.remove("view--active");
+						el.style.display = "none";
 					});
-					document.getElementById("view" + name.charAt(0).toUpperCase() + name.slice(1)).classList.add("view--active");
+					var target = document.getElementById("view" + name.charAt(0).toUpperCase() + name.slice(1));
+					target.classList.add("view--active");
+					target.style.display = "";
 					log("state → " + name);
 				}
 
@@ -528,8 +532,8 @@ import { ROUTES } from "../data/routes";
 				const params = new URLSearchParams(window.location.search);
 				if (params.get("payment") === "success") {
 					$("paymentSuccessBanner").style.display = "";
-					// Refresh plan cache after payment
 					if (window.VxPlan) window.VxPlan.clearCache();
+					history.replaceState({}, "", "/profile/");
 				} else if (params.get("welcome") === "1" && !isFirstTime) {
 					$("welcomeBanner").style.display = "";
 					history.replaceState({}, "", "/profile/");
