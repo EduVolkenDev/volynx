@@ -22,7 +22,7 @@ import PageWidgets from "../../../components/PageWidgets.astro";
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
+    :root {z
       --bg: #020204;
       --diamond: #b8c4d8;
       --diamond-glow: rgba(184, 196, 216, 0.25);
@@ -290,10 +290,13 @@ import PageWidgets from "../../../components/PageWidgets.astro";
       </ul>
     </div>
 
-    <div class="invite-actions">
-      <a href={ROUTES.signup} class="btn btn--diamond" data-i18n="bd.btn_accept">Accept invitation</a>
+    <div class="invite-actions" id="inviteActions">
+      <!-- Populated by JS: claim (logged in) or sign-in-first (logged out) -->
+      <a href={ROUTES.signup + "?bd=1"} class="btn btn--diamond" id="acceptBtn">Accept invitation</a>
       <a href={ROUTES.home} class="btn btn--ghost" data-i18n="bd.btn_explore">Explore the platform</a>
     </div>
+
+    <div id="claimMsg" style="display:none;padding:16px 20px;border-radius:14px;text-align:center;font-size:0.95rem;line-height:1.6;"></div>
 
     <p class="invite-note" data-i18n="bd.note">
       This invitation is personal and non-transferable. Black Diamond status is permanent once activated.
@@ -306,5 +309,71 @@ import PageWidgets from "../../../components/PageWidgets.astro";
   </main>
 
   <PageWidgets />
+
+  <script>
+    (async function () {
+      const acceptBtn = document.getElementById('acceptBtn');
+      const claimMsg = document.getElementById('claimMsg');
+
+      function showMsg(html, ok) {
+        claimMsg.style.display = 'block';
+        claimMsg.style.background = ok ? 'rgba(34,197,94,.08)' : 'rgba(239,68,68,.08)';
+        claimMsg.style.border = ok ? '1px solid rgba(34,197,94,.2)' : '1px solid rgba(239,68,68,.2)';
+        claimMsg.style.color = ok ? '#4ade80' : '#f87171';
+        claimMsg.innerHTML = html;
+      }
+
+      const token = localStorage.getItem('volynx_access_token');
+      if (!token) {
+        // Not logged in — button goes to signup, coming back here after auth
+        acceptBtn.href = '/login/?next=/invite/black-diamond/';
+        acceptBtn.textContent = 'Sign in to claim';
+        return;
+      }
+
+      // Logged in — swap button to claim
+      acceptBtn.textContent = 'Claim your Black Diamond';
+      acceptBtn.href = '#';
+      acceptBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        acceptBtn.textContent = 'Activating…';
+        acceptBtn.style.opacity = '0.7';
+        acceptBtn.style.pointerEvents = 'none';
+
+        try {
+          let cfg = {};
+          try { cfg = await fetch('/config.json').then(r => r.json()); } catch {}
+          const base = (cfg.functionsUrl || 'https://zdmpzrderifgqmqivjoy.supabase.co/functions/v1').replace(/\/$/, '');
+
+          const res = await fetch(base + '/claim-black-diamond', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+          });
+          const data = await res.json();
+
+          if (data.ok && data.already_claimed) {
+            showMsg('◆ Black Diamond already active on your account. Welcome back, founding member.', true);
+            acceptBtn.style.display = 'none';
+          } else if (data.ok) {
+            showMsg(`◆ Black Diamond activated. <strong>${data.tokens_granted} tokens</strong> credited to your account. Welcome to the founding circle.`, true);
+            acceptBtn.textContent = 'Go to your profile →';
+            acceptBtn.href = '/profile/';
+            acceptBtn.style.opacity = '1';
+            acceptBtn.style.pointerEvents = 'auto';
+          } else {
+            showMsg('Something went wrong: ' + (data.error || 'unknown error'), false);
+            acceptBtn.textContent = 'Try again';
+            acceptBtn.style.opacity = '1';
+            acceptBtn.style.pointerEvents = 'auto';
+          }
+        } catch (err) {
+          showMsg('Network error. Please try again.', false);
+          acceptBtn.textContent = 'Try again';
+          acceptBtn.style.opacity = '1';
+          acceptBtn.style.pointerEvents = 'auto';
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

@@ -24,7 +24,8 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const MODEL = "claude-sonnet-4-6";
+// Configurable via Supabase secret AI_MODEL — defaults to Haiku
+const MODEL = Deno.env.get("AI_MODEL") || "claude-haiku-4-5-20251001";
 
 const SCHEMA_REFERENCE = `
 VxOS builder_data JSON schema — ALL output must match this exactly.

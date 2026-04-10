@@ -23,7 +23,8 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const MODEL = "claude-haiku-4-5-20251001";
+// Configurable via Supabase secret AI_MODEL — defaults to Haiku
+const MODEL = Deno.env.get("AI_MODEL") || "claude-haiku-4-5-20251001";
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
