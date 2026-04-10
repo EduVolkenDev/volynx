@@ -241,6 +241,7 @@ import PageWidgets from "../../../components/PageWidgets.astro";
               <button class="editor-tab editor-tab--active" id="tabSections" data-tab="sections">Sections</button>
               <button class="editor-tab" id="tabJson" data-tab="json">JSON</button>
               <button class="editor-tab" id="tabPreview" data-tab="preview">Preview</button>
+              <button class="editor-tab editor-tab--ai" id="tabAI" data-tab="ai">✦ AI</button>
             </div>
             <div class="editor-actions">
               <button class="btn btn--ghost btn--sm" id="copy">Copy</button>
@@ -264,6 +265,22 @@ import PageWidgets from "../../../components/PageWidgets.astro";
           <!-- TAB: Preview -->
           <div class="editor-panel" id="panelPreview" hidden>
             <iframe id="previewFrame" class="preview-frame" sandbox="allow-same-origin" title="Live preview"></iframe>
+          </div>
+
+          <!-- TAB: AI Generate / Refine -->
+          <div class="editor-panel ai-panel" id="panelAI" hidden>
+            <div class="ai-panel-inner">
+              <div class="ai-panel-header">
+                <span class="ai-panel-badge">✦ AI Builder</span>
+                <p class="ai-panel-sub">Describe the site you want — AI will generate valid VxOS sections for you.</p>
+              </div>
+              <textarea id="aiPrompt" class="ai-textarea" rows="5" placeholder="Ex: A SaaS landing page for a project management tool for remote teams. Include pricing with 3 tiers, a workflow section showing 3 steps, and a FAQ."></textarea>
+              <div class="ai-actions">
+                <button class="btn btn--primary" id="aiGenerate">✦ Generate site</button>
+                <button class="btn btn--ghost" id="aiRefine" disabled title="Select a project first to refine it">Refine current</button>
+              </div>
+              <div id="aiStatus" class="ai-status" hidden></div>
+            </div>
           </div>
 
           <div class="editor-footer">
@@ -396,7 +413,7 @@ import PageWidgets from "../../../components/PageWidgets.astro";
 
   // ── Tab switching ────────────────────────────────────────
   function switchTab(tab: string) {
-    const panels: Record<string, string> = { sections: "panelSections", json: "panelJson", preview: "panelPreview" };
+    const panels: Record<string, string> = { sections: "panelSections", json: "panelJson", preview: "panelPreview", ai: "panelAI" };
     Object.entries(panels).forEach(([t, id]) => {
       const panel = $(id) as HTMLElement;
       if (panel) panel.hidden = t !== tab;
@@ -1258,6 +1275,13 @@ import PageWidgets from "../../../components/PageWidgets.astro";
     const active = document.querySelector(`[data-id="${p.id}"]`);
     if (active) active.classList.add("active");
 
+    // Enable "Refine current" in AI tab
+    const aiRefineBtn = $("aiRefine") as HTMLButtonElement;
+    if (aiRefineBtn) {
+      aiRefineBtn.disabled = false;
+      aiRefineBtn.title = "Refine " + p.name + " with AI";
+    }
+
     // Trigger preview refresh
     ($("json") as HTMLTextAreaElement)?.dispatchEvent(new Event("input"));
   }
@@ -1673,6 +1697,115 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
       clearTimeout(previewTimer);
       previewTimer = setTimeout(updatePreview, 400);
     });
+
+    // ── AI Generate / Refine ──────────────────────────────────
+    const functionsBase = ((cfg as any).functionsUrl || "https://zdmpzrderifgqmqivjoy.supabase.co/functions/v1").replace(/\/$/, "");
+
+    async function callAIBuilder(description: string, refine: boolean, current: any) {
+      const token = localStorage.getItem("volynx_access_token") || "";
+      const res = await fetch(`${functionsBase}/ai-builder`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { "Authorization": "Bearer " + token } : {}),
+        },
+        body: JSON.stringify({ description, refine, current }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      return data.builderData;
+    }
+
+    function setAIStatus(msg: string, type: "info" | "error" | "success" = "info") {
+      const el = $("aiStatus") as HTMLElement;
+      if (!el) return;
+      el.hidden = !msg;
+      el.textContent = msg;
+      el.className = `ai-status ai-status--${type}`;
+    }
+
+    async function runAI(refine: boolean) {
+      const prompt = ($("aiPrompt") as HTMLTextAreaElement)?.value?.trim();
+      if (!prompt) {
+        setAIStatus("Please describe the site you want to build.", "error");
+        return;
+      }
+      const generateBtn = $("aiGenerate") as HTMLButtonElement;
+      const refineBtn = $("aiRefine") as HTMLButtonElement;
+
+      // Deduct a token first
+      const token = localStorage.getItem("volynx_access_token");
+      if (!token) {
+        setAIStatus("Sign in to use AI Builder.", "error");
+        return;
+      }
+      setAIStatus("Checking balance…", "info");
+      try {
+        const deductRes = await fetch(`${functionsBase}/deduct-tokens`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+          body: JSON.stringify({ tool: "builder", action_class: "pro", description: "AI Builder site generation" }),
+        });
+        const deductData = await deductRes.json();
+        if (!deductData.ok && deductData.error === "insufficient_balance") {
+          setAIStatus("Not enough tokens. Add more to use AI Builder.", "error");
+          ($("aiStatus") as HTMLElement).innerHTML +=
+            ' <a href="/pricing/" class="btn btn--primary btn--sm" style="margin-left:8px;">Add tokens</a>';
+          return;
+        }
+      } catch { /* allow on network error */ }
+
+      generateBtn.disabled = true;
+      refineBtn.disabled = true;
+      setAIStatus("Generating site with AI… this may take a few seconds.", "info");
+
+      try {
+        const current = refine && currentProject ? currentProject.builder_data : undefined;
+        const builderData = await callAIBuilder(prompt, refine, current);
+
+        if (refine && currentProject) {
+          // Update existing project JSON in editor
+          const jsonEl = $("json") as HTMLTextAreaElement;
+          if (jsonEl) {
+            jsonEl.value = JSON.stringify(builderData, null, 2);
+            jsonEl.dispatchEvent(new Event("input"));
+          }
+          currentProject.builder_data = builderData;
+          setAIStatus("Sections updated! Switch to Sections or JSON to review, then Save.", "success");
+          switchTab("sections");
+        } else {
+          // Create a new draft project with AI-generated data
+          const slug = "ai-" + (prompt.slice(0, 20).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "site") + "-" + rand4();
+          const name = prompt.slice(0, 40).replace(/[^\w\s-]/g, "").trim() || "AI Generated Site";
+          const counts = await countActiveProjects(user.id);
+          const check = canCreate(counts);
+          if (!check.ok) {
+            setAIStatus(check.msg, "error");
+            return;
+          }
+          const { data, error } = await supa
+            .from("projects")
+            .insert({ user_id: user.id, name, slug, domain_type: "subdomain", builder_data: builderData, status: "draft" })
+            .select("id,name,slug,builder_data,status,created_at")
+            .single();
+
+          if (error) { setAIStatus(error.message, "error"); return; }
+          await logUsage("builder_ai");
+          setAIStatus("Site generated! Switch to Sections to review and edit.", "success");
+          await listProjects(user.id);
+          openProject(data);
+          switchTab("sections");
+        }
+      } catch (err: any) {
+        setAIStatus("Error: " + (err?.message || "AI generation failed."), "error");
+      } finally {
+        generateBtn.disabled = false;
+        if (currentProject) refineBtn.disabled = false;
+      }
+    }
+
+    $("aiGenerate")?.addEventListener("click", () => runAI(false));
+    $("aiRefine")?.addEventListener("click", () => runAI(true));
 
     log("boot complete");
   })();
@@ -2392,6 +2525,46 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     color: var(--accent);
     box-shadow: 0 0 12px rgba(125,211,252,.06);
   }
+
+  .editor-tab--ai {
+    color: rgba(167,139,250,.7);
+  }
+  .editor-tab--ai:hover { color: #a78bfa; background: rgba(167,139,250,.07); }
+  .editor-tab--ai.editor-tab--active {
+    background: rgba(167,139,250,.12);
+    color: #a78bfa;
+    box-shadow: 0 0 12px rgba(167,139,250,.08);
+  }
+
+  /* AI PANEL */
+  .ai-panel { padding: 0; }
+  .ai-panel-inner {
+    display: flex; flex-direction: column; gap: 16px;
+    padding: 20px 24px;
+  }
+  .ai-panel-header { display: flex; flex-direction: column; gap: 6px; }
+  .ai-panel-badge {
+    display: inline-block; width: fit-content;
+    padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+    background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.22); color: #a78bfa;
+  }
+  .ai-panel-sub { margin: 0; font-size: 13px; color: var(--mut); line-height: 1.6; }
+  .ai-textarea {
+    width: 100%; min-height: 120px; padding: 12px 14px;
+    background: rgba(231,238,247,.04); border: 1px solid var(--line);
+    border-radius: 12px; color: var(--fg); font-family: inherit; font-size: 13px;
+    line-height: 1.6; resize: vertical; outline: none; transition: border-color .15s;
+  }
+  .ai-textarea:focus { border-color: rgba(167,139,250,.4); }
+  .ai-textarea::placeholder { color: var(--mut); }
+  .ai-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ai-status {
+    font-size: 13px; padding: 10px 14px; border-radius: 10px; line-height: 1.5;
+  }
+  .ai-status--info { background: rgba(125,211,252,.06); color: var(--accent); border: 1px solid rgba(125,211,252,.15); }
+  .ai-status--error { background: rgba(239,68,68,.06); color: #f87171; border: 1px solid rgba(239,68,68,.15); }
+  .ai-status--success { background: rgba(34,197,94,.06); color: #4ade80; border: 1px solid rgba(34,197,94,.15); }
 
   /* EDITOR PANELS */
   .editor-panel { min-height: 300px; }

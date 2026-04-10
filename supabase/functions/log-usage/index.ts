@@ -7,6 +7,9 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
+// Daily OS tools write to daily_usage_logs; all others write to usage_logs
+const DAILY_TOOLS = new Set(["scanner", "summary", "vault", "writing", "decision", "my-day"]);
+
 function json(data: Record<string, unknown>, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -35,22 +38,28 @@ Deno.serve(async (req: Request) => {
 
     const increment = Math.max(1, Math.floor(Number(amount) || 1));
 
+    // Use service role to bypass RLS — user is authenticated via JWT below
     const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-    const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
-    const supabase = createClient(supabaseUrl, supabaseKey, {
-      global: { headers: { Authorization: `Bearer ${token}` } },
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+    const supabase = createClient(supabaseUrl, serviceKey, {
+      auth: { persistSession: false },
     });
 
-    const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
+    // Verify user identity via their JWT
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
+    const authClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+    });
+    const { data: { user }, error: authErr } = await authClient.auth.getUser(token);
     if (authErr || !user) {
       return json({ error: "Unauthorized" }, 401);
     }
 
     const today = new Date().toISOString().slice(0, 10);
+    const table = DAILY_TOOLS.has(toolName) ? "daily_usage_logs" : "usage_logs";
 
-    // Check if row exists for today (RLS: user_id = auth.uid())
     const { data: existing } = await supabase
-      .from("usage_logs")
+      .from(table)
       .select("id, usage_count")
       .eq("user_id", user.id)
       .eq("tool_name", toolName)
@@ -59,7 +68,7 @@ Deno.serve(async (req: Request) => {
 
     if (existing) {
       const { error: updateErr } = await supabase
-        .from("usage_logs")
+        .from(table)
         .update({ usage_count: existing.usage_count + increment })
         .eq("id", existing.id);
 
@@ -71,7 +80,7 @@ Deno.serve(async (req: Request) => {
       return json({ logged: true, tool: toolName, used: existing.usage_count + increment, date: today });
     } else {
       const { error: insertErr } = await supabase
-        .from("usage_logs")
+        .from(table)
         .insert({ user_id: user.id, user_email: user.email || "", tool_name: toolName, usage_date: today, usage_count: increment });
 
       if (insertErr) {
