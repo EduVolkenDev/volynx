@@ -264,6 +264,68 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       runBtn.disabled = false;
     }
 
+    // ── AI Upscaler (Real-ESRGAN via UpscalerJS + TF.js, lazy-loaded) ──────────
+    let _aiUpscaler = null;
+
+    function loadScriptOnce(src) {
+      if (document.querySelector(`script[src="${src}"]`)) return Promise.resolve();
+      return new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = src; s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      });
+    }
+
+    async function initAIUpscaler() {
+      if (_aiUpscaler) return _aiUpscaler;
+      dropEl.textContent = 'Loading AI model (first time ~3 MB, cached after)…';
+      await loadScriptOnce('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js');
+      await loadScriptOnce('https://cdn.jsdelivr.net/npm/upscaler@1.0.0-beta.19/dist/browser/umd/upscaler.min.js');
+      _aiUpscaler = new window.Upscaler({
+        model: {
+          path: 'https://cdn.jsdelivr.net/npm/@upscalerjs/esrgan-slim@1.0.0-beta.1/models/2x/model.json',
+          scale: 2
+        }
+      });
+      return _aiUpscaler;
+    }
+
+    async function aiUpscaleToCanvas(img, targetScale) {
+      try {
+        const upscaler = await initAIUpscaler();
+        dropEl.textContent = 'AI upscaling… 0%';
+        const base64 = await upscaler.upscale(img, {
+          output: 'base64',
+          patchSize: 64,
+          padding: 4,
+          progress: (pct) => { dropEl.textContent = `AI upscaling… ${Math.round(pct * 100)}%`; }
+        });
+        const upscaledImg = new Image();
+        upscaledImg.src = base64;
+        await upscaledImg.decode();
+        const canvas = document.createElement('canvas');
+        if (targetScale <= 2) {
+          canvas.width = upscaledImg.width;
+          canvas.height = upscaledImg.height;
+          canvas.getContext('2d').drawImage(upscaledImg, 0, 0);
+        } else {
+          // AI did 2x, canvas does the remaining scale (3x → ×1.5, 4x → ×2)
+          const rem = targetScale / 2;
+          canvas.width = upscaledImg.width * rem;
+          canvas.height = upscaledImg.height * rem;
+          const ctx2 = canvas.getContext('2d');
+          ctx2.imageSmoothingEnabled = true;
+          ctx2.imageSmoothingQuality = 'high';
+          ctx2.drawImage(upscaledImg, 0, 0, canvas.width, canvas.height);
+        }
+        return canvas;
+      } catch (e) {
+        console.warn('[AI upscale] failed, falling back to canvas:', e);
+        return null;
+      }
+    }
+    // ────────────────────────────────────────────────────────────────────────────
+
     function canvasToBlob(canvas, mime, quality) {
       return new Promise((resolve, reject) => {
         canvas.toBlob((blob) => {
@@ -292,11 +354,19 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       }
 
       if (tool === "upscale") {
-        canvas.width = w * scale;
-        canvas.height = h * scale;
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = "high";
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const aiCanvas = await aiUpscaleToCanvas(img, scale);
+        if (aiCanvas) {
+          canvas.width = aiCanvas.width;
+          canvas.height = aiCanvas.height;
+          ctx.drawImage(aiCanvas, 0, 0);
+        } else {
+          // Fallback: canvas interpolation
+          canvas.width = w * scale;
+          canvas.height = h * scale;
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        }
       } else {
         canvas.width = w;
         canvas.height = h;

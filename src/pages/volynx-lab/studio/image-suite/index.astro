@@ -371,6 +371,64 @@ const pageDescription = "Pro-exclusive multi-tool: upscale, compress, convert, r
       if (h > 0) ($("resizeW") as HTMLInputElement).value = String(Math.round(h * (refImg.width / refImg.height)));
     });
 
+    // ── AI Upscaler (Real-ESRGAN via UpscalerJS + TF.js, lazy-loaded) ──────────
+    let _aiUpscaler: any = null;
+
+    function loadScriptOnce(src: string): Promise<void> {
+      if (document.querySelector(`script[src="${src}"]`)) return Promise.resolve();
+      return new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = src; s.onload = () => res(); s.onerror = rej;
+        document.head.appendChild(s);
+      });
+    }
+
+    async function initAIUpscaler(): Promise<any> {
+      if (_aiUpscaler) return _aiUpscaler;
+      if (dropEl) dropEl.textContent = 'Loading AI model (first time ~3 MB, cached after)…';
+      await loadScriptOnce('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js');
+      await loadScriptOnce('https://cdn.jsdelivr.net/npm/upscaler@1.0.0-beta.19/dist/browser/umd/upscaler.min.js');
+      _aiUpscaler = new (window as any).Upscaler({
+        model: {
+          path: 'https://cdn.jsdelivr.net/npm/@upscalerjs/esrgan-slim@1.0.0-beta.1/models/2x/model.json',
+          scale: 2
+        }
+      });
+      return _aiUpscaler;
+    }
+
+    async function aiUpscaleToCanvas(img: HTMLImageElement, targetScale: number): Promise<HTMLCanvasElement | null> {
+      try {
+        const upscaler = await initAIUpscaler();
+        if (dropEl) dropEl.textContent = 'AI upscaling… 0%';
+        const base64: string = await upscaler.upscale(img, {
+          output: 'base64',
+          patchSize: 64,
+          padding: 4,
+          progress: (pct: number) => { if (dropEl) dropEl.textContent = `AI upscaling… ${Math.round(pct * 100)}%`; }
+        });
+        const upscaledImg = new Image();
+        upscaledImg.src = base64;
+        await upscaledImg.decode();
+        const c = document.createElement('canvas');
+        if (targetScale <= 2) {
+          c.width = upscaledImg.width; c.height = upscaledImg.height;
+          c.getContext('2d')!.drawImage(upscaledImg, 0, 0);
+        } else {
+          const rem = targetScale / 2;
+          c.width = upscaledImg.width * rem; c.height = upscaledImg.height * rem;
+          const ctx2 = c.getContext('2d')!;
+          ctx2.imageSmoothingEnabled = true; ctx2.imageSmoothingQuality = 'high';
+          ctx2.drawImage(upscaledImg, 0, 0, c.width, c.height);
+        }
+        return c;
+      } catch (e) {
+        console.warn('[AI upscale] failed, falling back to canvas:', e);
+        return null;
+      }
+    }
+    // ────────────────────────────────────────────────────────────────────────────
+
     // ── Process one image ────────────────────────────────────
     async function processOne(item: LoadedImage): Promise<ProcessedResult> {
       const { file, img, baseName } = item;
@@ -379,12 +437,17 @@ const pageDescription = "Pro-exclusive multi-tool: upscale, compress, convert, r
 
       if (activeTool === "upscale") {
         const scale = parseInt(($("scale") as HTMLSelectElement).value);
-        canvas.width = img.width * scale;
-        canvas.height = img.height * scale;
-        ctx.imageSmoothingEnabled = ($("smooth") as HTMLInputElement).checked;
-        if (ctx.imageSmoothingEnabled) ctx.imageSmoothingQuality = "high";
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         const fmt = ($("format") as HTMLSelectElement).value;
+        const aiCanvas = await aiUpscaleToCanvas(img, scale);
+        if (aiCanvas) {
+          canvas.width = aiCanvas.width; canvas.height = aiCanvas.height;
+          ctx.drawImage(aiCanvas, 0, 0);
+        } else {
+          canvas.width = img.width * scale; canvas.height = img.height * scale;
+          ctx.imageSmoothingEnabled = ($("smooth") as HTMLInputElement).checked;
+          if (ctx.imageSmoothingEnabled) ctx.imageSmoothingQuality = "high";
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        }
         const blob = (await toBlob(canvas, fmt, 0.95))!;
         return { baseName, blob, width: canvas.width, height: canvas.height, inputBytes: file.size, keptOriginal: false };
 
