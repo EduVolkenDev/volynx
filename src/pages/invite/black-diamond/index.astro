@@ -8,8 +8,8 @@ import PageWidgets from "../../../components/PageWidgets.astro";
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Black Diamond — VOLYNX VIP Invitation</title>
-  <meta name="description" content="You have been selected for Black Diamond — an exclusive VOLYNX VIP invitation." />
+  <title>Black Diamond — Private Invitation</title>
+  <meta name="description" content="You have been personally selected for Black Diamond, the VOLYNX founding tier." />
   <meta name="robots" content="noindex, nofollow" />
 
   <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
@@ -17,21 +17,23 @@ import PageWidgets from "../../../components/PageWidgets.astro";
   <link rel="shortcut icon" href="/assets/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
 
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Manrope:wght@300;400;500;600;700;800&display=swap');
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
+  <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #020204;
-      --diamond: #b8c4d8;
-      --diamond-glow: rgba(184, 196, 216, 0.25);
-      --gold: #f3e1a0;
-      --gold-soft: rgba(243, 225, 160, 0.08);
-      --text: rgba(245, 247, 252, 0.96);
-      --muted: rgba(209, 215, 230, 0.6);
-      --line: rgba(255, 255, 255, 0.06);
-      --violet: #b196ff;
+      --bg:       #07070d;
+      --surface:  rgba(255,255,255,0.03);
+      --line:     rgba(255,255,255,0.07);
+      --d:        #c8d4ea;
+      --d-glow:   rgba(200,212,234,0.18);
+      --d-dim:    rgba(200,212,234,0.5);
+      --gold:     #c9a96e;
+      --text:     rgba(248,250,255,0.94);
+      --muted:    rgba(200,210,230,0.52);
     }
 
     html { scroll-behavior: smooth; }
@@ -44,333 +46,586 @@ import PageWidgets from "../../../components/PageWidgets.astro";
       overflow-x: hidden;
     }
 
+    /* Grain overlay */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background:
-        radial-gradient(ellipse at 30% 20%, rgba(184, 196, 216, 0.06), transparent 50%),
-        radial-gradient(ellipse at 70% 80%, rgba(177, 150, 255, 0.04), transparent 40%);
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      background-size: 180px 180px;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.6;
+    }
+
+    /* Ambient glow */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -20vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 600px;
+      background: radial-gradient(ellipse at center, rgba(200,212,234,0.07) 0%, transparent 65%);
       pointer-events: none;
       z-index: 0;
     }
 
-    .invite-wrap {
+    /* ── Layout ── */
+    .wrap {
       position: relative;
       z-index: 1;
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 80px 24px 60px;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 64px 24px 80px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 560px;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
     }
 
-    .diamond-mark {
-      width: 64px;
-      height: 64px;
-      margin-bottom: 32px;
-      position: relative;
-    }
-
-    .diamond-shape {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, var(--diamond), rgba(255,255,255,0.9));
-      transform: rotate(45deg);
-      border-radius: 4px;
-      margin: 8px auto;
-      box-shadow:
-        0 0 40px var(--diamond-glow),
-        0 0 80px rgba(184, 196, 216, 0.1);
-      animation: diamondPulse 4s ease-in-out infinite;
-    }
-
-    @keyframes diamondPulse {
-      0%, 100% { box-shadow: 0 0 40px var(--diamond-glow), 0 0 80px rgba(184, 196, 216, 0.1); }
-      50% { box-shadow: 0 0 60px var(--diamond-glow), 0 0 120px rgba(184, 196, 216, 0.15); }
-    }
-
-    .invite-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 16px;
-      border: 1px solid rgba(184, 196, 216, 0.2);
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--diamond);
-      margin-bottom: 28px;
-    }
-
-    .invite-tag::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      background: var(--diamond);
-      border-radius: 50%;
-      box-shadow: 0 0 8px var(--diamond-glow);
-    }
-
-    h1 {
-      font-family: "Sora", system-ui, sans-serif;
-      font-size: clamp(2rem, 6vw, 3.2rem);
-      font-weight: 800;
-      line-height: 1.12;
-      letter-spacing: -0.02em;
-      margin-bottom: 20px;
-      max-width: 16ch;
-    }
-
-    .invite-lead {
-      font-size: clamp(1rem, 2.5vw, 1.15rem);
-      color: var(--muted);
-      line-height: 1.7;
-      max-width: 52ch;
-      margin-bottom: 40px;
-    }
-
-    .invite-card {
-      width: 100%;
-      padding: 36px 28px;
-      border-radius: 24px;
-      border: 1px solid rgba(184, 196, 216, 0.12);
-      background: rgba(184, 196, 216, 0.03);
-      backdrop-filter: blur(16px);
-      text-align: left;
-      margin-bottom: 36px;
-    }
-
-    .invite-card h2 {
-      font-family: "Sora", system-ui, sans-serif;
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 20px;
-      color: var(--diamond);
-    }
-
-    .perks-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .perks-list li {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      font-size: 0.95rem;
-      color: rgba(255, 255, 255, 0.8);
-      line-height: 1.55;
-    }
-
-    .perks-list li::before {
-      content: '\25C6';
-      color: var(--diamond);
-      font-size: 10px;
-      margin-top: 5px;
-      flex-shrink: 0;
-    }
-
-    .invite-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      justify-content: center;
-      margin-bottom: 40px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 14px 32px;
-      border-radius: 14px;
-      font-weight: 700;
-      font-size: 15px;
-      text-decoration: none;
-      transition: all 0.25s;
-      cursor: pointer;
-      border: none;
-    }
-
-    .btn--diamond {
-      background: linear-gradient(135deg, var(--diamond), #e0e8f0);
-      color: #0a0a12;
-      box-shadow: 0 8px 32px var(--diamond-glow);
-    }
-
-    .btn--diamond:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 44px rgba(184, 196, 216, 0.35);
-    }
-
-    .btn--ghost {
-      background: transparent;
-      border: 1px solid var(--line);
-      color: var(--muted);
-    }
-
-    .btn--ghost:hover {
-      border-color: rgba(255, 255, 255, 0.15);
-      color: var(--text);
-      background: rgba(255, 255, 255, 0.03);
-    }
-
-    .invite-note {
-      font-size: 0.82rem;
-      color: var(--muted);
-      line-height: 1.6;
-      max-width: 44ch;
-      margin-bottom: 48px;
-    }
-
-    .invite-footer {
-      margin-top: auto;
-      padding-top: 32px;
-      border-top: 1px solid var(--line);
-      width: 100%;
+    /* ── Wordmark ── */
+    .wordmark {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 12px;
+      gap: 10px;
+      margin-bottom: 56px;
     }
 
-    .invite-footer img {
-      width: 28px;
-      height: 28px;
+    .wordmark-img {
+      width: 26px;
+      height: 26px;
+      opacity: 0.7;
     }
 
-    .invite-footer span {
+    .wordmark-text {
       font-family: "Sora", system-ui, sans-serif;
       font-size: 13px;
       font-weight: 700;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
       color: var(--muted);
     }
 
+    /* ── Diamond SVG mark ── */
+    .gem-wrap {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 40px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gem-wrap svg {
+      width: 64px;
+      height: 64px;
+      filter: drop-shadow(0 0 28px rgba(200,212,234,0.3)) drop-shadow(0 0 8px rgba(200,212,234,0.15));
+      animation: gemPulse 5s ease-in-out infinite;
+    }
+
+    @keyframes gemPulse {
+      0%, 100% { filter: drop-shadow(0 0 28px rgba(200,212,234,0.3)) drop-shadow(0 0 8px rgba(200,212,234,0.15)); }
+      50%       { filter: drop-shadow(0 0 44px rgba(200,212,234,0.45)) drop-shadow(0 0 16px rgba(200,212,234,0.22)); }
+    }
+
+    /* ── Eyebrow ── */
+    .eyebrow {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--d-dim);
+      margin-bottom: 20px;
+    }
+
+    /* ── "Reserved for" block ── */
+    .reserved-for {
+      font-family: "Sora", system-ui, sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .recipient-name {
+      font-family: "Sora", system-ui, sans-serif;
+      font-size: clamp(2.4rem, 7vw, 3.8rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 40px;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      margin-bottom: 40px;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+
+    .divider-gem {
+      width: 6px;
+      height: 6px;
+      background: var(--d);
+      transform: rotate(45deg);
+      border-radius: 1px;
+      box-shadow: 0 0 10px var(--d-glow);
+      flex-shrink: 0;
+    }
+
+    /* ── Body copy ── */
+    .body-text {
+      font-size: 1rem;
+      line-height: 1.75;
+      color: var(--muted);
+      max-width: 44ch;
+      margin-bottom: 44px;
+    }
+
+    /* ── Perks ── */
+    .perks {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      margin-bottom: 44px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.015);
+      backdrop-filter: blur(12px);
+    }
+
+    .perk {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+    }
+
+    .perk:last-child { border-bottom: none; }
+
+    .perk-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(200,212,234,0.06);
+      border: 1px solid rgba(200,212,234,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 14px;
+    }
+
+    .perk-text {
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: rgba(248,250,255,0.75);
+    }
+
+    .perk-text strong {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--text);
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    /* ── CTA ── */
+    .cta-wrap {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .btn-primary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 17px 32px;
+      border-radius: 14px;
+      font-family: "Sora", system-ui, sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      background: linear-gradient(135deg, #c8d4ea 0%, #e8eef8 50%, #c0cee4 100%);
+      color: #0a0c14;
+      box-shadow: 0 8px 40px rgba(200,212,234,0.2), 0 2px 8px rgba(0,0,0,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 56px rgba(200,212,234,0.28), 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    .btn-primary:hover::before { opacity: 1; }
+
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-ghost {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 14px 32px;
+      border-radius: 14px;
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+
+    .btn-ghost:hover {
+      border-color: rgba(255,255,255,0.14);
+      color: var(--text);
+      background: rgba(255,255,255,0.03);
+    }
+
+    /* ── Claim message ── */
+    #claimMsg {
+      display: none;
+      width: 100%;
+      padding: 16px 20px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    /* ── Invite code ── */
+    .invite-code-block {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.02);
+      margin-bottom: 28px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .invite-code-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .invite-code-value {
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      color: var(--d);
+    }
+
+    /* ── Fine print ── */
+    .fine-print {
+      font-size: 11.5px;
+      color: var(--muted);
+      opacity: 0.6;
+      line-height: 1.7;
+      margin-bottom: 56px;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-top: 28px;
+      border-top: 1px solid var(--line);
+      width: 100%;
+      justify-content: center;
+    }
+
+    .footer img { width: 22px; height: 22px; opacity: 0.6; }
+
+    .footer-text {
+      font-family: "Sora", system-ui, sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0.7;
+    }
+
+    /* ── Reveal animation ── */
+    .card > * {
+      opacity: 0;
+      transform: translateY(12px);
+      animation: fadeUp 0.6s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card > *:nth-child(1)  { animation-delay: 0.05s; }
+    .card > *:nth-child(2)  { animation-delay: 0.12s; }
+    .card > *:nth-child(3)  { animation-delay: 0.18s; }
+    .card > *:nth-child(4)  { animation-delay: 0.24s; }
+    .card > *:nth-child(5)  { animation-delay: 0.30s; }
+    .card > *:nth-child(6)  { animation-delay: 0.36s; }
+    .card > *:nth-child(7)  { animation-delay: 0.42s; }
+    .card > *:nth-child(8)  { animation-delay: 0.48s; }
+    .card > *:nth-child(9)  { animation-delay: 0.54s; }
+    .card > *:nth-child(10) { animation-delay: 0.60s; }
+    .card > *:nth-child(11) { animation-delay: 0.64s; }
+    .card > *:nth-child(12) { animation-delay: 0.68s; }
+
     @media (max-width: 480px) {
-      .invite-wrap { padding: 60px 18px 40px; }
-      .invite-card { padding: 28px 20px; }
-      .invite-actions { flex-direction: column; }
-      .btn { width: 100%; justify-content: center; }
+      .wrap { padding: 48px 20px 60px; }
+      .recipient-name { font-size: 2.2rem; }
     }
   </style>
 </head>
 
 <body>
-  <main class="invite-wrap">
-    <div class="diamond-mark">
-      <div class="diamond-shape"></div>
+  <main class="wrap">
+    <div class="card">
+
+      <!-- Wordmark -->
+      <div class="wordmark">
+        <img class="wordmark-img" src="/assets/volynx-icon.webp" alt="VOLYNX" />
+        <span class="wordmark-text">VOLYNX</span>
+      </div>
+
+      <!-- Diamond gem SVG -->
+      <div class="gem-wrap">
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <polygon points="32,4 58,20 58,44 32,60 6,44 6,20" fill="none" stroke="rgba(200,212,234,0.25)" stroke-width="0.8"/>
+          <polygon points="32,4 58,20 32,32" fill="rgba(200,212,234,0.18)"/>
+          <polygon points="32,4 6,20 32,32" fill="rgba(200,212,234,0.10)"/>
+          <polygon points="6,20 6,44 32,32" fill="rgba(200,212,234,0.08)"/>
+          <polygon points="58,20 58,44 32,32" fill="rgba(200,212,234,0.22)"/>
+          <polygon points="6,44 32,60 32,32" fill="rgba(200,212,234,0.12)"/>
+          <polygon points="32,60 58,44 32,32" fill="rgba(200,212,234,0.16)"/>
+          <polygon points="6,20 32,4 58,20 32,32" fill="none" stroke="rgba(200,212,234,0.4)" stroke-width="0.5"/>
+          <polygon points="6,44 32,60 58,44 32,32" fill="none" stroke="rgba(200,212,234,0.3)" stroke-width="0.5"/>
+          <line x1="6" y1="20" x2="58" y2="20" stroke="rgba(200,212,234,0.35)" stroke-width="0.5"/>
+          <line x1="6" y1="44" x2="58" y2="44" stroke="rgba(200,212,234,0.2)" stroke-width="0.5"/>
+        </svg>
+      </div>
+
+      <!-- Eyebrow -->
+      <div class="eyebrow">Private Invitation · Black Diamond</div>
+
+      <!-- Reserved for -->
+      <div class="reserved-for">Reserved for</div>
+      <div class="recipient-name" id="recipientName">You</div>
+
+      <!-- Divider -->
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-gem"></div>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- Body copy -->
+      <p class="body-text">
+        Black Diamond is the VOLYNX founding tier — extended only to a small group of early believers who helped shape this platform before it was public. This invitation is yours alone.
+      </p>
+
+      <!-- Perks -->
+      <div class="perks">
+        <div class="perk">
+          <div class="perk-icon">◆</div>
+          <div class="perk-text">
+            <strong>60 tokens on activation</strong>
+            Spend across every tool — Daily, Builder, Lab and future products.
+          </div>
+        </div>
+        <div class="perk">
+          <div class="perk-icon">∞</div>
+          <div class="perk-text">
+            <strong>Founding-member pricing, locked for life</strong>
+            Builder plans frozen at the price you see today.
+          </div>
+        </div>
+        <div class="perk">
+          <div class="perk-icon">⬡</div>
+          <div class="perk-text">
+            <strong>Black Diamond badge on your profile</strong>
+            Permanent. Visible to everyone on the platform.
+          </div>
+        </div>
+        <div class="perk">
+          <div class="perk-icon">→</div>
+          <div class="perk-text">
+            <strong>Priority access & direct channel</strong>
+            First look at new releases and a direct line to the founder.
+          </div>
+        </div>
+      </div>
+
+      <!-- Claim message -->
+      <div id="claimMsg"></div>
+
+      <!-- CTA -->
+      <div class="cta-wrap">
+        <a href="#" class="btn-primary" id="acceptBtn">
+          Accept invitation
+        </a>
+        <a href={ROUTES.home} class="btn-ghost">Explore the platform</a>
+      </div>
+
+      <!-- Invite code -->
+      <div class="invite-code-block" id="codeBlock" style="display:none">
+        <span class="invite-code-label">Invite code</span>
+        <span class="invite-code-value" id="inviteCode"></span>
+      </div>
+
+      <!-- Fine print -->
+      <p class="fine-print">
+        Personal and non-transferable · Black Diamond status is permanent once activated
+      </p>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <img src="/assets/volynx-icon.webp" alt="VOLYNX" />
+        <span class="footer-text">VOLYNX · 2026</span>
+      </footer>
+
     </div>
-
-    <div class="invite-tag" data-i18n="bd.tag">Black Diamond Invitation</div>
-
-    <h1 data-i18n="bd.title">You have been selected.</h1>
-
-    <p class="invite-lead" data-i18n="bd.lead">
-      This is a private invitation to Black Diamond — the VOLYNX VIP tier reserved for a small group of early believers, partners and collaborators who helped shape this platform before it went public.
-    </p>
-
-    <div class="invite-card">
-      <h2 data-i18n="bd.perks_title">What Black Diamond unlocks</h2>
-      <ul class="perks-list">
-        <li data-i18n="bd.perk1">Priority access to all new products, kits and features before public release</li>
-        <li data-i18n="bd.perk2">Permanent Black Diamond badge on your VOLYNX profile</li>
-        <li data-i18n="bd.perk3">Founding-member pricing locked for life on Builder plans</li>
-        <li data-i18n="bd.perk4">Direct channel to the VOLYNX founder for feedback and requests</li>
-        <li data-i18n="bd.perk5">Free premium icon collection on account activation</li>
-        <li data-i18n="bd.perk6">Exclusive access to future Black Diamond events and releases</li>
-      </ul>
-    </div>
-
-    <div class="invite-actions" id="inviteActions">
-      <!-- Populated by JS: claim (logged in) or sign-in-first (logged out) -->
-      <a href={ROUTES.signup + "?bd=1"} class="btn btn--diamond" id="acceptBtn">Accept invitation</a>
-      <a href={ROUTES.home} class="btn btn--ghost" data-i18n="bd.btn_explore">Explore the platform</a>
-    </div>
-
-    <div id="claimMsg" style="display:none;padding:16px 20px;border-radius:14px;text-align:center;font-size:0.95rem;line-height:1.6;"></div>
-
-    <p class="invite-note" data-i18n="bd.note">
-      This invitation is personal and non-transferable. Black Diamond status is permanent once activated.
-    </p>
-
-    <footer class="invite-footer">
-      <img src="/assets/volynx-icon.webp" alt="VOLYNX" />
-      <span>VOLYNX</span>
-    </footer>
   </main>
 
   <PageWidgets />
 
   <script>
     (async function () {
-      const acceptBtn = document.getElementById('acceptBtn');
-      const claimMsg = document.getElementById('claimMsg');
+      const params     = new URLSearchParams(window.location.search);
+      const rawName    = params.get('to') || '';
+      const inviteCode = params.get('code') || '';
 
-      function showMsg(html, ok) {
+      // Personalise recipient name
+      const nameEl = document.getElementById('recipientName');
+      if (rawName && nameEl) {
+        const name = decodeURIComponent(rawName).replace(/[<>"'&]/g, '');
+        nameEl.textContent = name;
+      }
+
+      // Show invite code if present
+      const codeBlock = document.getElementById('codeBlock');
+      const codeEl    = document.getElementById('inviteCode');
+      if (inviteCode && codeBlock && codeEl) {
+        codeEl.textContent = inviteCode.toUpperCase();
+        codeBlock.style.display = 'flex';
+      }
+
+      const acceptBtn = document.getElementById('acceptBtn') as HTMLAnchorElement;
+      const claimMsg  = document.getElementById('claimMsg') as HTMLElement;
+
+      function showMsg(html: string, ok: boolean) {
         claimMsg.style.display = 'block';
-        claimMsg.style.background = ok ? 'rgba(34,197,94,.08)' : 'rgba(239,68,68,.08)';
-        claimMsg.style.border = ok ? '1px solid rgba(34,197,94,.2)' : '1px solid rgba(239,68,68,.2)';
-        claimMsg.style.color = ok ? '#4ade80' : '#f87171';
-        claimMsg.innerHTML = html;
+        claimMsg.style.background = ok ? 'rgba(34,197,94,.07)' : 'rgba(239,68,68,.07)';
+        claimMsg.style.border     = ok ? '1px solid rgba(34,197,94,.18)' : '1px solid rgba(239,68,68,.18)';
+        claimMsg.style.color      = ok ? '#4ade80' : '#f87171';
+        claimMsg.innerHTML        = html;
       }
 
       const token = localStorage.getItem('volynx_access_token');
+
       if (!token) {
-        // Not logged in — button goes to signup, coming back here after auth
-        acceptBtn.href = '/login/?next=/invite/black-diamond/';
+        const next = encodeURIComponent(window.location.pathname + window.location.search);
+        acceptBtn.href        = `/login/?next=${next}`;
         acceptBtn.textContent = 'Sign in to claim';
         return;
       }
 
-      // Logged in — swap button to claim
-      acceptBtn.textContent = 'Claim your Black Diamond';
+      // Logged in — switch to claim mode
+      acceptBtn.textContent = 'Claim Black Diamond';
       acceptBtn.href = '#';
+
       acceptBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         acceptBtn.textContent = 'Activating…';
-        acceptBtn.style.opacity = '0.7';
-        acceptBtn.style.pointerEvents = 'none';
+        (acceptBtn as HTMLElement).style.opacity        = '0.65';
+        (acceptBtn as HTMLElement).style.pointerEvents  = 'none';
 
         try {
-          let cfg = {};
+          let cfg: any = {};
           try { cfg = await fetch('/config.json').then(r => r.json()); } catch {}
           const base = (cfg.functionsUrl || 'https://zdmpzrderifgqmqivjoy.supabase.co/functions/v1').replace(/\/$/, '');
 
-          const res = await fetch(base + '/claim-black-diamond', {
+          const res  = await fetch(`${base}/claim-black-diamond`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           });
           const data = await res.json();
 
           if (data.ok && data.already_claimed) {
-            showMsg('◆ Black Diamond already active on your account. Welcome back, founding member.', true);
+            showMsg('◆ Black Diamond is already active on your account. Welcome back, founding member.', true);
             acceptBtn.style.display = 'none';
           } else if (data.ok) {
-            showMsg(`◆ Black Diamond activated. <strong>${data.tokens_granted} tokens</strong> credited to your account. Welcome to the founding circle.`, true);
+            showMsg(`◆ Activated. <strong>${data.tokens_granted} tokens</strong> have been credited to your account. Welcome to the founding circle.`, true);
             acceptBtn.textContent = 'Go to your profile →';
             acceptBtn.href = '/profile/';
-            acceptBtn.style.opacity = '1';
-            acceptBtn.style.pointerEvents = 'auto';
+            (acceptBtn as HTMLElement).style.opacity       = '1';
+            (acceptBtn as HTMLElement).style.pointerEvents = 'auto';
           } else {
             showMsg('Something went wrong: ' + (data.error || 'unknown error'), false);
             acceptBtn.textContent = 'Try again';
-            acceptBtn.style.opacity = '1';
-            acceptBtn.style.pointerEvents = 'auto';
+            (acceptBtn as HTMLElement).style.opacity       = '1';
+            (acceptBtn as HTMLElement).style.pointerEvents = 'auto';
           }
-        } catch (err) {
+        } catch {
           showMsg('Network error. Please try again.', false);
           acceptBtn.textContent = 'Try again';
-          acceptBtn.style.opacity = '1';
-          acceptBtn.style.pointerEvents = 'auto';
+          (acceptBtn as HTMLElement).style.opacity       = '1';
+          (acceptBtn as HTMLElement).style.pointerEvents = 'auto';
         }
       });
     })();
