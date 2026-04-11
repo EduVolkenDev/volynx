@@ -132,7 +132,8 @@
             return;
           }
         } else {
-          var msg = perm.plan === 'public'
+          var isFreeUser = window.VxPlan ? !window.VxPlan.isPaid(perm.plan) : (perm.plan === 'free');
+          var msg = isFreeUser
             ? 'Free limit reached. Sign in or upgrade to continue.'
             : 'Plan limit reached. Upgrade to continue.';
           alert(msg);

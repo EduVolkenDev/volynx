@@ -358,7 +358,7 @@ const faqs = [
         });
         if (res.ok) {
           const perm = await res.json();
-          const plan = perm.builder_plan || perm.builderPlan || perm.plan || 'free';
+          const plan = perm.effective_tier || perm.builder_plan || perm.builderPlan || perm.plan || 'free';
           if (!perm.useLocalStorage) {
             const cards = document.querySelectorAll('.pricing-card');
             const idx = PLAN_KEYS.indexOf(plan);

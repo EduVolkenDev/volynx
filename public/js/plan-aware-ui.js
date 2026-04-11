@@ -47,7 +47,7 @@
       }).then(function (rows) {
         if (!rows || !rows[0]) return;
         // Resolve highest plan across all products
-        var _rank = { free: 0, launch: 1, pro: 2, studio: 3, teams: 4, enterprise: 5 };
+        var _rank = { free: 0, launch: 1, pro: 2, diamond: 2, studio: 3, teams: 4, enterprise: 5 };
         var _plans = [rows[0].plan, rows[0].builder_plan, rows[0].daily_plan, rows[0].cvitae_plan]
           .map(function(p) { return (p || 'free').toLowerCase().trim(); });
         var plan = _plans.reduce(function(best, p) {
