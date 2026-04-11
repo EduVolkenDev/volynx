@@ -81,7 +81,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
               </div>
             </div>
             <div class="dropdown-divider"></div>
-            <a href="#favorites" class="dropdown-item">
+            <a href="#favorites" class="dropdown-item" id="dropdownFavoritesBtn">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
               </svg>
@@ -201,7 +201,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
       <div class="container">
         <div class="section-header">
           <h2 class="section-title" data-i18n="icons.coll_title">Popular Collections</h2>
-          <a href="#collections" class="view-all" id="viewAllBtn">
+          <a href="#gallery" class="view-all" id="viewAllBtn">
             <span data-i18n="icons.coll_view_all">View All</span>
             <svg viewBox="0 0 20 20" fill="currentColor">
               <path d="M7 3l7 7-7 7" />
@@ -337,6 +337,43 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
       const signInBtn = document.getElementById("signInBtn");
       const logoutBtn = document.getElementById("logoutBtn");
       if (logoutBtn) logoutBtn.addEventListener("click", logout);
+
+      // Favorites links — no favorites section exists on this page yet
+      const favoritesLinks = [
+        document.getElementById("dropdownFavoritesBtn"),
+        document.getElementById("favoritesBtn"),
+        document.getElementById("mobileFavoritesBtn"),
+      ];
+      favoritesLinks.forEach(el => {
+        if (!el) return;
+        el.addEventListener("click", (e) => {
+          e.preventDefault();
+          document.getElementById("dropdownMenu")?.classList.remove("show");
+          // Close mobile menu if open
+          document.getElementById("mobileMenu")?.classList.remove("show");
+          document.getElementById("mobileMenuBtn")?.classList.remove("active");
+          if (isLoggedIn) {
+            showNotification("Favorites coming soon — stay tuned!");
+          } else {
+            showNotification("Sign in to save favorites");
+          }
+        });
+      });
+
+      // "View All" collections button — scroll to gallery and reset filter to show all
+      const viewAllBtn = document.getElementById("viewAllBtn");
+      if (viewAllBtn) {
+        viewAllBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          currentFilter = "all";
+          document.querySelectorAll<HTMLButtonElement>(".filter-btn").forEach(b => {
+            b.classList.toggle("active", b.dataset.filter === "all");
+          });
+          visibleCount = 48;
+          renderGallery();
+          document.getElementById("gallery")?.scrollIntoView({ behavior: "smooth" });
+        });
+      }
     }
 
     // ===== CATALOG =====
@@ -694,6 +731,9 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
         if (target) {
           e.preventDefault();
           target.scrollIntoView({ behavior: "smooth", block: "start" });
+          // Close mobile menu if open
+          document.getElementById("mobileMenu")?.classList.remove("show");
+          document.getElementById("mobileMenuBtn")?.classList.remove("active");
         }
       });
     });
