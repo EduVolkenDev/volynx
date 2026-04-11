@@ -1,6 +1,5 @@
 ---
 import { ROUTES } from "../../../data/routes";
-import PageWidgets from "../../../components/PageWidgets.astro";
 ---
 
 <!DOCTYPE html>
@@ -8,32 +7,52 @@ import PageWidgets from "../../../components/PageWidgets.astro";
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Black Diamond — Private Invitation</title>
-  <meta name="description" content="You have been personally selected for Black Diamond, the VOLYNX founding tier." />
+  <title>Black Diamond — Private Founding Invitation</title>
+  <meta name="description" content="A private founding invitation from Volynx, issued exclusively to its intended recipient." />
   <meta name="robots" content="noindex, nofollow" />
-
   <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
   <link rel="shortcut icon" href="/assets/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Render name+code immediately before paint to avoid flash of "—" -->
+  <script is:inline>
+    (function(){
+      var p = new URLSearchParams(location.search);
+      var n = (p.get('to')||'').replace(/[<>"'&]/g,'').slice(0,80);
+      var c = (p.get('code')||'').replace(/[^A-Za-z0-9\-]/g,'').toUpperCase().slice(0,20);
+      // Store on window so main script can read
+      window.__bdName = n;
+      window.__bdCode = c;
+      // Apply as soon as elements exist (DOMContentLoaded)
+      document.addEventListener('DOMContentLoaded', function(){
+        if(n){
+          var h=document.getElementById('heroName'); if(h) h.textContent=n;
+          var d=document.getElementById('detailName'); if(d) d.textContent=n;
+        }
+        if(c){
+          var v=document.getElementById('codeValue'); if(v) v.textContent=c;
+          var b=document.getElementById('codeBlock'); if(b) b.style.display='flex';
+        }
+      });
+    })();
+  </script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #07070d;
-      --surface:  rgba(255,255,255,0.03);
-      --line:     rgba(255,255,255,0.07);
-      --d:        #c8d4ea;
-      --d-glow:   rgba(200,212,234,0.18);
-      --d-dim:    rgba(200,212,234,0.5);
-      --gold:     #c9a96e;
-      --text:     rgba(248,250,255,0.94);
-      --muted:    rgba(200,210,230,0.52);
+      --bg:      #060609;
+      --c:       #bfcfe8;
+      --c-glow:  rgba(191,207,232,0.18);
+      --c-dim:   rgba(191,207,232,0.46);
+      --text:    rgba(246,249,255,0.95);
+      --sub:     rgba(191,207,232,0.52);
+      --line:    rgba(255,255,255,0.065);
+      --surf:    rgba(255,255,255,0.028);
     }
 
     html { scroll-behavior: smooth; }
@@ -42,593 +61,673 @@ import PageWidgets from "../../../components/PageWidgets.astro";
       font-family: "Manrope", system-ui, sans-serif;
       background: var(--bg);
       color: var(--text);
-      min-height: 100vh;
+      min-height: 100dvh;
       overflow-x: hidden;
     }
 
-    /* Grain overlay */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      background-size: 180px 180px;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.6;
+    /* Ambient + grain */
+    .ambient {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(ellipse 90% 55% at 50% -5%, rgba(191,207,232,0.10) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 35% at 80% 95%, rgba(110,90,190,0.04) 0%, transparent 60%);
+    }
+    .grain {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.4;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
     }
 
-    /* Ambient glow */
-    body::after {
-      content: '';
+    /* ── Lang toggle — top right ── */
+    .lang-toggle {
       position: fixed;
-      top: -20vh;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 900px;
-      height: 600px;
-      background: radial-gradient(ellipse at center, rgba(200,212,234,0.07) 0%, transparent 65%);
-      pointer-events: none;
-      z-index: 0;
+      top: 16px; right: 20px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 6px;
+      backdrop-filter: blur(12px);
+    }
+    .lang-btn {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--sub);
+      transition: all 0.18s;
+    }
+    .lang-btn.active {
+      background: rgba(191,207,232,0.12);
+      color: var(--c);
     }
 
     /* ── Layout ── */
-    .wrap {
-      position: relative;
-      z-index: 1;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 64px 24px 80px;
+    .page {
+      position: relative; z-index: 1;
+      min-height: 100dvh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 60px 20px 72px;
     }
 
-    .card {
-      width: 100%;
-      max-width: 560px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
+    .inner {
+      width: 100%; max-width: 480px;
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center;
     }
+
+    /* Stagger animation */
+    .inner > * {
+      opacity: 0; transform: translateY(14px);
+      animation: up 0.72s cubic-bezier(0.22,1,0.36,1) forwards;
+    }
+    @keyframes up { to { opacity:1; transform:translateY(0); } }
+
+    .inner > *:nth-child(1)  { animation-delay:0.06s; }
+    .inner > *:nth-child(2)  { animation-delay:0.14s; }
+    .inner > *:nth-child(3)  { animation-delay:0.20s; }
+    .inner > *:nth-child(4)  { animation-delay:0.26s; }
+    .inner > *:nth-child(5)  { animation-delay:0.32s; }
+    .inner > *:nth-child(6)  { animation-delay:0.38s; }
+    .inner > *:nth-child(7)  { animation-delay:0.44s; }
+    .inner > *:nth-child(8)  { animation-delay:0.50s; }
+    .inner > *:nth-child(9)  { animation-delay:0.55s; }
+    .inner > *:nth-child(10) { animation-delay:0.60s; }
+    .inner > *:nth-child(11) { animation-delay:0.65s; }
 
     /* ── Wordmark ── */
-    .wordmark {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 56px;
+    .wm {
+      display:flex; align-items:center; gap:9px;
+      margin-bottom: 52px;
+    }
+    .wm img { width:21px; height:21px; opacity:0.5; }
+    .wm-text {
+      font-family:"Sora",system-ui,sans-serif;
+      font-size:11px; font-weight:700;
+      letter-spacing:0.22em; text-transform:uppercase;
+      color: var(--sub);
     }
 
-    .wordmark-img {
-      width: 26px;
-      height: 26px;
-      opacity: 0.7;
+    /* ── Gem ── */
+    .gem {
+      width:72px; height:72px; margin-bottom:32px;
+      display:flex; align-items:center; justify-content:center;
     }
-
-    .wordmark-text {
-      font-family: "Sora", system-ui, sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
+    .gem svg {
+      width:64px; height:64px;
+      animation: shimmer 6s ease-in-out infinite;
     }
-
-    /* ── Diamond SVG mark ── */
-    .gem-wrap {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 40px;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .gem-wrap svg {
-      width: 64px;
-      height: 64px;
-      filter: drop-shadow(0 0 28px rgba(200,212,234,0.3)) drop-shadow(0 0 8px rgba(200,212,234,0.15));
-      animation: gemPulse 5s ease-in-out infinite;
-    }
-
-    @keyframes gemPulse {
-      0%, 100% { filter: drop-shadow(0 0 28px rgba(200,212,234,0.3)) drop-shadow(0 0 8px rgba(200,212,234,0.15)); }
-      50%       { filter: drop-shadow(0 0 44px rgba(200,212,234,0.45)) drop-shadow(0 0 16px rgba(200,212,234,0.22)); }
+    @keyframes shimmer {
+      0%,100% { filter: drop-shadow(0 0 22px rgba(191,207,232,0.28)) drop-shadow(0 0 6px rgba(191,207,232,0.12)); }
+      50%      { filter: drop-shadow(0 0 38px rgba(191,207,232,0.44)) drop-shadow(0 0 14px rgba(191,207,232,0.20)); }
     }
 
     /* ── Eyebrow ── */
     .eyebrow {
-      font-size: 10.5px;
-      font-weight: 700;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--d-dim);
-      margin-bottom: 20px;
+      font-size:10px; font-weight:700;
+      letter-spacing:0.28em; text-transform:uppercase;
+      color: var(--c-dim);
+      margin-bottom:14px;
     }
 
-    /* ── "Reserved for" block ── */
-    .reserved-for {
-      font-family: "Sora", system-ui, sans-serif;
-      font-size: 13px;
-      font-weight: 400;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      margin-bottom: 8px;
-      text-transform: uppercase;
-    }
-
-    .recipient-name {
-      font-family: "Sora", system-ui, sans-serif;
-      font-size: clamp(2.4rem, 7vw, 3.8rem);
-      font-weight: 800;
-      line-height: 1.05;
-      letter-spacing: -0.03em;
+    /* ── Title ── */
+    .title {
+      font-family:"Sora",system-ui,sans-serif;
+      font-size: clamp(2.8rem,8vw,4.2rem);
+      font-weight:800; letter-spacing:-0.035em; line-height:1;
       color: var(--text);
-      margin-bottom: 40px;
+      margin-bottom: 18px;
     }
 
-    /* ── Divider ── */
-    .divider {
-      display: flex;
+    /* ── Issued-to block (hero name) ── */
+    .issued-to {
+      margin-bottom: 44px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 6px;
+    }
+    .issued-to-label {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--sub);
+    }
+    .issued-to-name {
+      font-family:"Sora",system-ui,sans-serif;
+      font-size: clamp(1.7rem,5vw,2.4rem);
+      font-weight:700; letter-spacing:-0.02em; line-height:1.1;
+      color: var(--c);
+      text-shadow: 0 0 48px rgba(191,207,232,0.22);
+    }
+
+    /* ── Code spotlight ── */
+    .code-block {
+      width:100%;
+      border: 1px solid rgba(191,207,232,0.14);
+      border-radius: 16px;
+      background: rgba(191,207,232,0.04);
+      backdrop-filter: blur(14px);
+      padding: 24px 28px;
+      margin-bottom: 32px;
+      display: none; /* shown by JS when code present */
+      flex-direction: column;
       align-items: center;
-      gap: 16px;
-      width: 100%;
-      margin-bottom: 40px;
+      gap: 10px;
     }
+    .code-label {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.24em; text-transform: uppercase;
+      color: var(--c-dim);
+    }
+    .code-value {
+      font-family:"SF Mono","Fira Code",ui-monospace,monospace;
+      font-size: clamp(1.5rem,5vw,2rem);
+      font-weight: 700; letter-spacing: 0.18em;
+      color: var(--c);
+      text-shadow: 0 0 32px rgba(191,207,232,0.3);
+    }
+    .code-copy {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(191,207,232,0.15);
+      background: transparent;
+      color: var(--sub); font-size: 11px; font-weight: 600;
+      cursor: pointer; letter-spacing: 0.06em;
+      transition: all 0.18s;
+    }
+    .code-copy:hover {
+      background: rgba(191,207,232,0.08);
+      border-color: rgba(191,207,232,0.28);
+      color: var(--c);
+    }
+    .code-copy.copied { color: #4ade80; border-color: rgba(74,222,128,0.25); }
 
-    .divider-line {
-      flex: 1;
-      height: 1px;
-      background: var(--line);
+    /* ── Auth details card ── */
+    .auth-card {
+      width:100%;
+      border: 1px solid var(--line); border-radius:16px;
+      overflow:hidden; background: var(--surf);
+      backdrop-filter:blur(16px);
+      margin-bottom: 32px;
     }
-
-    .divider-gem {
-      width: 6px;
-      height: 6px;
-      background: var(--d);
-      transform: rotate(45deg);
-      border-radius: 1px;
-      box-shadow: 0 0 10px var(--d-glow);
-      flex-shrink: 0;
+    .auth-head {
+      padding:13px 20px; border-bottom:1px solid var(--line);
+      display:flex; align-items:center; gap:8px;
     }
+    .auth-dot {
+      width:5px; height:5px; border-radius:50%;
+      background:#4ade80; box-shadow:0 0 6px rgba(74,222,128,0.55);
+      flex-shrink:0;
+    }
+    .auth-head-label {
+      font-size:10px; font-weight:700;
+      letter-spacing:0.2em; text-transform:uppercase; color:var(--sub);
+    }
+    .auth-head-status {
+      margin-left:auto; font-size:10px; font-weight:700;
+      letter-spacing:0.12em; text-transform:uppercase; color:#4ade80;
+    }
+    .auth-row {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 20px; border-bottom:1px solid var(--line); gap:12px;
+    }
+    .auth-row:last-child { border-bottom:none; }
+    .auth-key {
+      font-size:11px; font-weight:600;
+      letter-spacing:0.08em; text-transform:uppercase; color:var(--sub);
+      flex-shrink:0;
+    }
+    .auth-val {
+      font-size:13px; font-weight:600;
+      color:var(--text); text-align:right;
+    }
+    .auth-val.muted { color:var(--sub); font-weight:500; }
 
     /* ── Body copy ── */
-    .body-text {
-      font-size: 1rem;
-      line-height: 1.75;
-      color: var(--muted);
-      max-width: 44ch;
-      margin-bottom: 44px;
-    }
-
-    /* ── Perks ── */
-    .perks {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      margin-bottom: 44px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      overflow: hidden;
-      background: rgba(255,255,255,0.015);
-      backdrop-filter: blur(12px);
-    }
-
-    .perk {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 18px 22px;
-      border-bottom: 1px solid var(--line);
-      text-align: left;
-    }
-
-    .perk:last-child { border-bottom: none; }
-
-    .perk-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      background: rgba(200,212,234,0.06);
-      border: 1px solid rgba(200,212,234,0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-size: 14px;
-    }
-
-    .perk-text {
-      font-size: 0.88rem;
-      line-height: 1.5;
-      color: rgba(248,250,255,0.75);
-    }
-
-    .perk-text strong {
-      display: block;
-      font-size: 0.9rem;
-      color: var(--text);
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-
-    /* ── CTA ── */
-    .cta-wrap {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+    .body {
+      font-size:0.875rem; line-height:1.8;
+      color:var(--sub); max-width:42ch;
       margin-bottom: 32px;
     }
 
-    .btn-primary {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      padding: 17px 32px;
-      border-radius: 14px;
-      font-family: "Sora", system-ui, sans-serif;
-      font-weight: 700;
-      font-size: 15px;
-      text-decoration: none;
-      cursor: pointer;
-      border: none;
-      background: linear-gradient(135deg, #c8d4ea 0%, #e8eef8 50%, #c0cee4 100%);
-      color: #0a0c14;
-      box-shadow: 0 8px 40px rgba(200,212,234,0.2), 0 2px 8px rgba(0,0,0,0.4);
-      transition: transform 0.2s, box-shadow 0.2s;
-      position: relative;
-      overflow: hidden;
+    /* ── Pillars ── */
+    .pillars {
+      width:100%;
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:1px; background:var(--line);
+      border:1px solid var(--line); border-radius:16px;
+      overflow:hidden; margin-bottom:32px;
     }
-
-    .btn-primary::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
-      opacity: 0;
-      transition: opacity 0.2s;
+    .pillar {
+      background:var(--surf); padding:20px 18px; text-align:left;
     }
+    .pillar-icon { font-size:15px; margin-bottom:9px; display:block; opacity:0.65; }
+    .pillar-title { font-size:0.82rem; font-weight:700; color:var(--text); margin-bottom:4px; line-height:1.3; }
+    .pillar-desc  { font-size:0.77rem; color:var(--sub); line-height:1.55; }
 
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 16px 56px rgba(200,212,234,0.28), 0 4px 12px rgba(0,0,0,0.4);
-    }
-
-    .btn-primary:hover::before { opacity: 1; }
-
-    .btn-primary:active { transform: translateY(0); }
-
-    .btn-ghost {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      padding: 14px 32px;
-      border-radius: 14px;
-      font-weight: 600;
-      font-size: 14px;
-      text-decoration: none;
-      cursor: pointer;
-      background: transparent;
-      border: 1px solid var(--line);
-      color: var(--muted);
-      transition: all 0.2s;
-    }
-
-    .btn-ghost:hover {
-      border-color: rgba(255,255,255,0.14);
-      color: var(--text);
-      background: rgba(255,255,255,0.03);
-    }
-
-    /* ── Claim message ── */
+    /* ── Claim msg ── */
     #claimMsg {
-      display: none;
-      width: 100%;
-      padding: 16px 20px;
-      border-radius: 12px;
-      font-size: 0.9rem;
-      line-height: 1.6;
-      text-align: center;
-      margin-bottom: 24px;
+      display:none; width:100%;
+      padding:16px 20px; border-radius:12px;
+      font-size:0.875rem; line-height:1.65;
+      text-align:center; margin-bottom:20px;
     }
 
-    /* ── Invite code ── */
-    .invite-code-block {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 20px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: rgba(255,255,255,0.02);
-      margin-bottom: 28px;
-      width: 100%;
-      justify-content: center;
+    /* ── CTA ── */
+    .cta-block {
+      width:100%; display:flex; flex-direction:column;
+      gap:10px; margin-bottom:28px;
     }
+    .btn-activate {
+      position:relative; overflow:hidden;
+      display:flex; align-items:center; justify-content:center;
+      width:100%; padding:18px 32px; border-radius:14px;
+      font-family:"Sora",system-ui,sans-serif;
+      font-size:15px; font-weight:700; letter-spacing:0.01em;
+      text-decoration:none; cursor:pointer; border:none;
+      background:linear-gradient(135deg,#c0ceea 0%,#dde8f6 48%,#b8c8e0 100%);
+      color:#080c18;
+      box-shadow:0 8px 40px rgba(191,207,232,0.22),inset 0 1px 0 rgba(255,255,255,0.35);
+      transition:transform 0.22s, box-shadow 0.22s;
+    }
+    .btn-activate::after {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(135deg,rgba(255,255,255,0.22) 0%,transparent 55%);
+      opacity:0; transition:opacity 0.2s;
+    }
+    .btn-activate:hover { transform:translateY(-2px); box-shadow:0 14px 52px rgba(191,207,232,0.32),inset 0 1px 0 rgba(255,255,255,0.35); }
+    .btn-activate:hover::after { opacity:1; }
+    .btn-activate:active { transform:translateY(0); }
 
-    .invite-code-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
+    .btn-terms {
+      display:flex; align-items:center; justify-content:center;
+      width:100%; padding:13px 32px; border-radius:12px;
+      font-size:13px; font-weight:600; text-decoration:none;
+      cursor:pointer; background:transparent;
+      border:1px solid var(--line); color:var(--sub);
+      transition:all 0.2s;
     }
-
-    .invite-code-value {
-      font-family: "SF Mono", "Fira Code", monospace;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.15em;
-      color: var(--d);
-    }
+    .btn-terms:hover { border-color:rgba(255,255,255,0.12); color:var(--text); background:rgba(255,255,255,0.025); }
 
     /* ── Fine print ── */
-    .fine-print {
-      font-size: 11.5px;
-      color: var(--muted);
-      opacity: 0.6;
-      line-height: 1.7;
-      margin-bottom: 56px;
+    .fine {
+      font-size:11px; letter-spacing:0.04em;
+      color:var(--sub); opacity:0.5; margin-bottom:48px;
     }
+    .fine span { opacity:0.5; margin:0 6px; }
 
     /* ── Footer ── */
-    .footer {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding-top: 28px;
-      border-top: 1px solid var(--line);
-      width: 100%;
-      justify-content: center;
+    .foot {
+      display:flex; align-items:center; gap:10px;
+      padding-top:22px; border-top:1px solid var(--line);
+      width:100%; justify-content:center;
+    }
+    .foot img { width:18px; height:18px; opacity:0.38; }
+    .foot-txt {
+      font-family:"Sora",system-ui,sans-serif;
+      font-size:10px; font-weight:700;
+      letter-spacing:0.2em; text-transform:uppercase;
+      color:var(--sub); opacity:0.45;
     }
 
-    .footer img { width: 22px; height: 22px; opacity: 0.6; }
-
-    .footer-text {
-      font-family: "Sora", system-ui, sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--muted);
-      opacity: 0.7;
-    }
-
-    /* ── Reveal animation ── */
-    .card > * {
-      opacity: 0;
-      transform: translateY(12px);
-      animation: fadeUp 0.6s ease forwards;
-    }
-
-    @keyframes fadeUp {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .card > *:nth-child(1)  { animation-delay: 0.05s; }
-    .card > *:nth-child(2)  { animation-delay: 0.12s; }
-    .card > *:nth-child(3)  { animation-delay: 0.18s; }
-    .card > *:nth-child(4)  { animation-delay: 0.24s; }
-    .card > *:nth-child(5)  { animation-delay: 0.30s; }
-    .card > *:nth-child(6)  { animation-delay: 0.36s; }
-    .card > *:nth-child(7)  { animation-delay: 0.42s; }
-    .card > *:nth-child(8)  { animation-delay: 0.48s; }
-    .card > *:nth-child(9)  { animation-delay: 0.54s; }
-    .card > *:nth-child(10) { animation-delay: 0.60s; }
-    .card > *:nth-child(11) { animation-delay: 0.64s; }
-    .card > *:nth-child(12) { animation-delay: 0.68s; }
-
-    @media (max-width: 480px) {
-      .wrap { padding: 48px 20px 60px; }
-      .recipient-name { font-size: 2.2rem; }
+    @media (max-width:520px) {
+      .page { padding:48px 18px 60px; }
+      .pillars { grid-template-columns:1fr; }
+      .title { font-size:2.6rem; }
+      .lang-toggle { top:12px; right:14px; }
     }
   </style>
 </head>
 
 <body>
-  <main class="wrap">
-    <div class="card">
+  <div class="ambient"></div>
+  <div class="grain"></div>
 
-      <!-- Wordmark -->
-      <div class="wordmark">
-        <img class="wordmark-img" src="/assets/volynx-icon.webp" alt="VOLYNX" />
-        <span class="wordmark-text">VOLYNX</span>
+  <!-- Language toggle -->
+  <div class="lang-toggle" aria-label="Language toggle">
+    <button class="lang-btn active" data-lang="en">EN</button>
+    <button class="lang-btn" data-lang="pt">PT</button>
+  </div>
+
+  <main class="page">
+    <div class="inner">
+
+      <!-- 1 · Wordmark -->
+      <div class="wm">
+        <img src="/assets/volynx-icon.webp" alt="VOLYNX" />
+        <span class="wm-text">VOLYNX</span>
       </div>
 
-      <!-- Diamond gem SVG -->
-      <div class="gem-wrap">
+      <!-- 2 · Gem -->
+      <div class="gem">
         <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <polygon points="32,4 58,20 58,44 32,60 6,44 6,20" fill="none" stroke="rgba(200,212,234,0.25)" stroke-width="0.8"/>
-          <polygon points="32,4 58,20 32,32" fill="rgba(200,212,234,0.18)"/>
-          <polygon points="32,4 6,20 32,32" fill="rgba(200,212,234,0.10)"/>
-          <polygon points="6,20 6,44 32,32" fill="rgba(200,212,234,0.08)"/>
-          <polygon points="58,20 58,44 32,32" fill="rgba(200,212,234,0.22)"/>
-          <polygon points="6,44 32,60 32,32" fill="rgba(200,212,234,0.12)"/>
-          <polygon points="32,60 58,44 32,32" fill="rgba(200,212,234,0.16)"/>
-          <polygon points="6,20 32,4 58,20 32,32" fill="none" stroke="rgba(200,212,234,0.4)" stroke-width="0.5"/>
-          <polygon points="6,44 32,60 58,44 32,32" fill="none" stroke="rgba(200,212,234,0.3)" stroke-width="0.5"/>
-          <line x1="6" y1="20" x2="58" y2="20" stroke="rgba(200,212,234,0.35)" stroke-width="0.5"/>
-          <line x1="6" y1="44" x2="58" y2="44" stroke="rgba(200,212,234,0.2)" stroke-width="0.5"/>
+          <polygon points="32,4 56,20 56,44 32,60 8,44 8,20" fill="none" stroke="rgba(191,207,232,0.22)" stroke-width="0.8"/>
+          <polygon points="32,4 56,20 32,28"  fill="rgba(191,207,232,0.20)"/>
+          <polygon points="32,4 8,20 32,28"   fill="rgba(191,207,232,0.11)"/>
+          <polygon points="8,20 8,44 32,28"   fill="rgba(191,207,232,0.07)"/>
+          <polygon points="56,20 56,44 32,28"  fill="rgba(191,207,232,0.24)"/>
+          <polygon points="8,44 32,60 32,28"   fill="rgba(191,207,232,0.10)"/>
+          <polygon points="32,60 56,44 32,28"  fill="rgba(191,207,232,0.16)"/>
+          <line x1="8"  y1="20" x2="56" y2="20" stroke="rgba(191,207,232,0.32)" stroke-width="0.6"/>
+          <line x1="8"  y1="44" x2="56" y2="44" stroke="rgba(191,207,232,0.18)" stroke-width="0.6"/>
+          <polygon points="8,20 32,4 56,20 32,28"  fill="none" stroke="rgba(191,207,232,0.38)" stroke-width="0.5"/>
+          <polygon points="8,44 32,60 56,44 32,28" fill="none" stroke="rgba(191,207,232,0.24)" stroke-width="0.5"/>
         </svg>
       </div>
 
-      <!-- Eyebrow -->
-      <div class="eyebrow">Private Invitation · Black Diamond</div>
+      <!-- 3 · Eyebrow -->
+      <div class="eyebrow" data-i="eyebrow">Founding Access</div>
 
-      <!-- Reserved for -->
-      <div class="reserved-for">Reserved for</div>
-      <div class="recipient-name" id="recipientName">You</div>
+      <!-- 4 · Title -->
+      <h1 class="title">Black Diamond</h1>
 
-      <!-- Divider -->
-      <div class="divider">
-        <div class="divider-line"></div>
-        <div class="divider-gem"></div>
-        <div class="divider-line"></div>
+      <!-- 5 · Issued-to (hero name) -->
+      <div class="issued-to">
+        <span class="issued-to-label" data-i="issued_label">Issued to</span>
+        <span class="issued-to-name" id="heroName">—</span>
       </div>
 
-      <!-- Body copy -->
-      <p class="body-text">
-        Black Diamond is the VOLYNX founding tier — extended only to a small group of early believers who helped shape this platform before it was public. This invitation is yours alone.
+      <!-- 6 · Invitation code spotlight -->
+      <div class="code-block" id="codeBlock">
+        <span class="code-label" data-i="code_label">Invitation Code</span>
+        <span class="code-value" id="codeValue"></span>
+        <button class="code-copy" id="codeCopy" data-i="code_copy">Copy code</button>
+      </div>
+
+      <!-- 7 · Auth details -->
+      <div class="auth-card">
+        <div class="auth-head">
+          <div class="auth-dot"></div>
+          <span class="auth-head-label" data-i="details_label">Invitation Details</span>
+          <span class="auth-head-status" data-i="verified">Verified</span>
+        </div>
+        <div class="auth-row">
+          <span class="auth-key" data-i="row_recipient">Recipient</span>
+          <span class="auth-val" id="detailName">—</span>
+        </div>
+        <div class="auth-row">
+          <span class="auth-key" data-i="row_tier">Access Tier</span>
+          <span class="auth-val">Black Diamond</span>
+        </div>
+        <div class="auth-row">
+          <span class="auth-key" data-i="row_transfer">Transferability</span>
+          <span class="auth-val muted" data-i="nontransfer_val">Non-transferable</span>
+        </div>
+      </div>
+
+      <!-- 8 · Body copy -->
+      <p class="body" data-i="body">
+        Black Diamond is a private Volynx founding invitation, individually issued to a limited number of early members. It grants permanent recognition, locked founding pricing, activation tokens, and priority access to what comes next.
       </p>
 
-      <!-- Perks -->
-      <div class="perks">
-        <div class="perk">
-          <div class="perk-icon">◆</div>
-          <div class="perk-text">
-            <strong>60 tokens on activation</strong>
-            Spend across every tool — Daily, Builder, Lab and future products.
-          </div>
+      <!-- 9 · Pillars -->
+      <div class="pillars">
+        <div class="pillar">
+          <span class="pillar-icon">◆</span>
+          <div class="pillar-title" data-i="p1_title">Permanent Founding Badge</div>
+          <div class="pillar-desc"  data-i="p1_desc">A lasting Black Diamond identity across the Volynx ecosystem.</div>
         </div>
-        <div class="perk">
-          <div class="perk-icon">∞</div>
-          <div class="perk-text">
-            <strong>Founding-member pricing, locked for life</strong>
-            Builder plans frozen at the price you see today.
-          </div>
+        <div class="pillar">
+          <span class="pillar-icon">∞</span>
+          <div class="pillar-title" data-i="p2_title">Locked Pricing for Life</div>
+          <div class="pillar-desc"  data-i="p2_desc">Your founding pricing remains protected as Volynx evolves.</div>
         </div>
-        <div class="perk">
-          <div class="perk-icon">⬡</div>
-          <div class="perk-text">
-            <strong>Black Diamond badge on your profile</strong>
-            Permanent. Visible to everyone on the platform.
-          </div>
+        <div class="pillar">
+          <span class="pillar-icon">◈</span>
+          <div class="pillar-title" data-i="p3_title">60 Activation Tokens</div>
+          <div class="pillar-desc"  data-i="p3_desc">Spend across current and future Volynx products.</div>
         </div>
-        <div class="perk">
-          <div class="perk-icon">→</div>
-          <div class="perk-text">
-            <strong>Priority access & direct channel</strong>
-            First look at new releases and a direct line to the founder.
-          </div>
+        <div class="pillar">
+          <span class="pillar-icon">→</span>
+          <div class="pillar-title" data-i="p4_title">Priority Access</div>
+          <div class="pillar-desc"  data-i="p4_desc">Early releases and a direct channel to the founder.</div>
         </div>
       </div>
 
-      <!-- Claim message -->
+      <!-- 10 · Claim message -->
       <div id="claimMsg"></div>
 
-      <!-- CTA -->
-      <div class="cta-wrap">
-        <a href="#" class="btn-primary" id="acceptBtn">
-          Accept invitation
-        </a>
-        <a href={ROUTES.home} class="btn-ghost">Explore the platform</a>
+      <!-- 11 · CTA -->
+      <div class="cta-block">
+        <a href="#" class="btn-activate" id="acceptBtn" data-i="cta_activate">Activate My Invitation</a>
+        <a href={ROUTES.terms} class="btn-terms" data-i="cta_terms">View invitation terms</a>
       </div>
 
-      <!-- Invite code -->
-      <div class="invite-code-block" id="codeBlock" style="display:none">
-        <span class="invite-code-label">Invite code</span>
-        <span class="invite-code-value" id="inviteCode"></span>
-      </div>
-
-      <!-- Fine print -->
-      <p class="fine-print">
-        Personal and non-transferable · Black Diamond status is permanent once activated
+      <!-- 12 · Fine print -->
+      <p class="fine">
+        <span data-i="fine1">Issued privately</span><span>·</span><span data-i="fine2">Reserved exclusively</span><span>·</span><span data-i="fine3">Permanent once activated</span>
       </p>
 
-      <!-- Footer -->
-      <footer class="footer">
+      <!-- 13 · Footer -->
+      <footer class="foot">
         <img src="/assets/volynx-icon.webp" alt="VOLYNX" />
-        <span class="footer-text">VOLYNX · 2026</span>
+        <span class="foot-txt" data-i="footer_txt">Issued by Volynx · Private Founding Access</span>
       </footer>
 
     </div>
   </main>
 
-  <PageWidgets />
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', function () {
 
-  <script>
-    (async function () {
-      const params     = new URLSearchParams(window.location.search);
-      const rawName    = params.get('to') || '';
-      const inviteCode = params.get('code') || '';
+      // ── i18n ───────────────────────────────────────────────────────────────
+      var STRINGS = {
+        en: {
+          eyebrow:        'Founding Access',
+          issued_label:   'Issued to',
+          code_label:     'Invitation Code',
+          code_copy:      'Copy code',
+          details_label:  'Invitation Details',
+          verified:       'Verified',
+          row_recipient:  'Recipient',
+          row_tier:       'Access Tier',
+          row_transfer:   'Transferability',
+          nontransfer_val:'Non-transferable',
+          body:           'Black Diamond is a private Volynx founding invitation, individually issued to a limited number of early members. It grants permanent recognition, locked founding pricing, activation tokens, and priority access to what comes next.',
+          p1_title: 'Permanent Founding Badge',
+          p1_desc:  'A lasting Black Diamond identity across the Volynx ecosystem.',
+          p2_title: 'Locked Pricing for Life',
+          p2_desc:  'Your founding pricing remains protected as Volynx evolves.',
+          p3_title: '60 Activation Tokens',
+          p3_desc:  'Spend across current and future Volynx products.',
+          p4_title: 'Priority Access',
+          p4_desc:  'Early releases and a direct channel to the founder.',
+          cta_activate: 'Activate My Invitation',
+          cta_terms:    'View invitation terms',
+          fine1: 'Issued privately',
+          fine2: 'Reserved exclusively',
+          fine3: 'Permanent once activated',
+          footer_txt: 'Issued by Volynx · Private Founding Access',
+          sign_in_cta: 'Sign in to activate',
+          activated_msg: '◆ Activated. <strong>{n} tokens</strong> have been credited to your account. Welcome to the founding circle.',
+          already_msg:   '◆ Black Diamond is already active on your account. Welcome back, founding member.',
+          error_msg:     'Something went wrong: ',
+          goto_profile:  'Go to your profile →',
+          try_again:     'Try again',
+          activating:    'Activating…',
+          network_error: 'Network error. Please try again.',
+          copy_done:     'Copied',
+        },
+        pt: {
+          eyebrow:        'Acesso Fundador',
+          issued_label:   'Emitido para',
+          code_label:     'Código do Convite',
+          code_copy:      'Copiar código',
+          details_label:  'Detalhes do Convite',
+          verified:       'Verificado',
+          row_recipient:  'Destinatário',
+          row_tier:       'Nível de Acesso',
+          row_transfer:   'Transferibilidade',
+          nontransfer_val:'Intransferível',
+          body:           'Black Diamond é um convite fundador privado da Volynx, emitido individualmente para um número limitado de membros iniciais. Concede reconhecimento permanente, preço fundador travado, tokens de ativação e acesso prioritário ao que vem a seguir.',
+          p1_title: 'Badge Permanente de Fundador',
+          p1_desc:  'Uma identidade Black Diamond permanente em todo o ecossistema Volynx.',
+          p2_title: 'Preço Travado para Sempre',
+          p2_desc:  'Seu preço de fundador permanece protegido à medida que a Volynx evolui.',
+          p3_title: '60 Tokens de Ativação',
+          p3_desc:  'Disponíveis para uso nas experiências atuais e futuras da Volynx.',
+          p4_title: 'Acesso Prioritário',
+          p4_desc:  'Lançamentos antecipados e canal direto com o fundador.',
+          cta_activate: 'Ativar Meu Convite',
+          cta_terms:    'Ver termos do convite',
+          fine1: 'Emitido de forma privada',
+          fine2: 'Reservado com exclusividade',
+          fine3: 'Permanente após ativação',
+          footer_txt: 'Emitido por Volynx · Acesso Fundador Privado',
+          sign_in_cta: 'Entrar para ativar',
+          activated_msg: '◆ Ativado. <strong>{n} tokens</strong> foram creditados na sua conta. Bem-vindo ao círculo fundador.',
+          already_msg:   '◆ Black Diamond já está ativo na sua conta. Bem-vindo de volta, membro fundador.',
+          error_msg:     'Algo correu mal: ',
+          goto_profile:  'Ir para o seu perfil →',
+          try_again:     'Tentar novamente',
+          activating:    'A ativar…',
+          network_error: 'Erro de rede. Por favor tente novamente.',
+          copy_done:     'Copiado',
+        }
+      };
 
-      // Personalise recipient name
-      const nameEl = document.getElementById('recipientName');
-      if (rawName && nameEl) {
-        const name = decodeURIComponent(rawName).replace(/[<>"'&]/g, '');
-        nameEl.textContent = name;
+      var lang = localStorage.getItem('bd_lang') || (navigator.language.startsWith('pt') ? 'pt' : 'en');
+
+      function applyLang(l) {
+        lang = l;
+        localStorage.setItem('bd_lang', l);
+        var s = STRINGS[l];
+
+        // update all data-i elements (except dynamic ones handled separately)
+        document.querySelectorAll('[data-i]').forEach(function(el) {
+          var key = el.getAttribute('data-i');
+          if (key && s[key] !== undefined) {
+            // don't overwrite cta_activate if already in claim state
+            if (key === 'cta_activate' && acceptBtn && acceptBtn._claimed) return;
+            el.textContent = s[key];
+          }
+        });
+
+        // update lang buttons
+        document.querySelectorAll('.lang-btn').forEach(function(btn) {
+          btn.classList.toggle('active', btn.dataset.lang === l);
+        });
       }
 
-      // Show invite code if present
-      const codeBlock = document.getElementById('codeBlock');
-      const codeEl    = document.getElementById('inviteCode');
-      if (inviteCode && codeBlock && codeEl) {
-        codeEl.textContent = inviteCode.toUpperCase();
-        codeBlock.style.display = 'flex';
+      // Lang toggle click
+      document.querySelectorAll('.lang-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() { applyLang(btn.dataset.lang); });
+      });
+
+      // ── URL params (already rendered by head script, re-read for logic) ──
+      var name = window.__bdName || '';
+      var code = window.__bdCode || '';
+
+      // Ensure they're set (redundant safety net)
+      var heroNameEl   = document.getElementById('heroName');
+      var detailNameEl = document.getElementById('detailName');
+      var codeValueEl  = document.getElementById('codeValue');
+      var codeBlock    = document.getElementById('codeBlock');
+
+      if (name) {
+        if (heroNameEl)   heroNameEl.textContent   = name;
+        if (detailNameEl) detailNameEl.textContent  = name;
+      } else {
+        if (heroNameEl)   heroNameEl.textContent   = lang === 'pt' ? 'Membro convidado' : 'Invited member';
+        if (detailNameEl) detailNameEl.textContent  = lang === 'pt' ? 'Membro convidado' : 'Invited member';
       }
 
-      const acceptBtn = document.getElementById('acceptBtn') as HTMLAnchorElement;
-      const claimMsg  = document.getElementById('claimMsg') as HTMLElement;
+      if (code) {
+        if (codeValueEl) codeValueEl.textContent  = code;
+        if (codeBlock)   codeBlock.style.display  = 'flex';
+      }
 
-      function showMsg(html: string, ok: boolean) {
-        claimMsg.style.display = 'block';
-        claimMsg.style.background = ok ? 'rgba(34,197,94,.07)' : 'rgba(239,68,68,.07)';
+      // Copy button
+      var codeCopy = document.getElementById('codeCopy');
+      if (codeCopy) {
+        codeCopy.addEventListener('click', function() {
+          navigator.clipboard.writeText(code).then(function() {
+            codeCopy.textContent = STRINGS[lang].copy_done;
+            codeCopy.classList.add('copied');
+            setTimeout(function() {
+              codeCopy.textContent = STRINGS[lang].code_copy;
+              codeCopy.classList.remove('copied');
+            }, 2000);
+          }).catch(function() {});
+        });
+      }
+
+      // Apply initial lang (after DOM is populated)
+      applyLang(lang);
+
+      // ── Auth flow ─────────────────────────────────────────────────────────
+      var acceptBtn = document.getElementById('acceptBtn');
+      var claimMsg  = document.getElementById('claimMsg');
+
+      function showMsg(html, ok) {
+        claimMsg.style.display    = 'block';
+        claimMsg.style.background = ok ? 'rgba(34,197,94,.07)'           : 'rgba(239,68,68,.07)';
         claimMsg.style.border     = ok ? '1px solid rgba(34,197,94,.18)' : '1px solid rgba(239,68,68,.18)';
         claimMsg.style.color      = ok ? '#4ade80' : '#f87171';
         claimMsg.innerHTML        = html;
       }
 
-      const token = localStorage.getItem('volynx_access_token');
+      var token = localStorage.getItem('volynx_access_token');
 
       if (!token) {
-        const next = encodeURIComponent(window.location.pathname + window.location.search);
-        acceptBtn.href        = `/login/?next=${next}`;
-        acceptBtn.textContent = 'Sign in to claim';
+        var next = encodeURIComponent(window.location.pathname + window.location.search);
+        acceptBtn.href        = '/login/?next=' + next;
+        acceptBtn.textContent = STRINGS[lang].sign_in_cta;
         return;
       }
 
-      // Logged in — switch to claim mode
-      acceptBtn.textContent = 'Claim Black Diamond';
-      acceptBtn.href = '#';
-
-      acceptBtn.addEventListener('click', async (e) => {
+      acceptBtn.addEventListener('click', async function(e) {
         e.preventDefault();
-        acceptBtn.textContent = 'Activating…';
-        (acceptBtn as HTMLElement).style.opacity        = '0.65';
-        (acceptBtn as HTMLElement).style.pointerEvents  = 'none';
+        acceptBtn.textContent         = STRINGS[lang].activating;
+        acceptBtn.style.opacity       = '0.65';
+        acceptBtn.style.pointerEvents = 'none';
 
         try {
-          let cfg: any = {};
-          try { cfg = await fetch('/config.json').then(r => r.json()); } catch {}
-          const base = (cfg.functionsUrl || 'https://zdmpzrderifgqmqivjoy.supabase.co/functions/v1').replace(/\/$/, '');
+          var cfg = {};
+          try { cfg = await fetch('/config.json').then(function(r){ return r.json(); }); } catch(_) {}
+          var base = ((cfg.functionsUrl || 'https://zdmpzrderifgqmqivjoy.supabase.co/functions/v1') + '').replace(/\/$/, '');
 
-          const res  = await fetch(`${base}/claim-black-diamond`, {
+          var res  = await fetch(base + '/claim-black-diamond', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
           });
-          const data = await res.json();
+          var data = await res.json();
+          var s = STRINGS[lang];
 
           if (data.ok && data.already_claimed) {
-            showMsg('◆ Black Diamond is already active on your account. Welcome back, founding member.', true);
+            showMsg(s.already_msg, true);
             acceptBtn.style.display = 'none';
           } else if (data.ok) {
-            showMsg(`◆ Activated. <strong>${data.tokens_granted} tokens</strong> have been credited to your account. Welcome to the founding circle.`, true);
-            acceptBtn.textContent = 'Go to your profile →';
-            acceptBtn.href = '/profile/';
-            (acceptBtn as HTMLElement).style.opacity       = '1';
-            (acceptBtn as HTMLElement).style.pointerEvents = 'auto';
+            showMsg(s.activated_msg.replace('{n}', data.tokens_granted), true);
+            acceptBtn._claimed        = true;
+            acceptBtn.textContent     = s.goto_profile;
+            acceptBtn.href            = '/profile/';
+            acceptBtn.style.opacity       = '1';
+            acceptBtn.style.pointerEvents = 'auto';
           } else {
-            showMsg('Something went wrong: ' + (data.error || 'unknown error'), false);
-            acceptBtn.textContent = 'Try again';
-            (acceptBtn as HTMLElement).style.opacity       = '1';
-            (acceptBtn as HTMLElement).style.pointerEvents = 'auto';
+            showMsg(s.error_msg + (data.error || 'unknown error'), false);
+            acceptBtn.textContent         = s.try_again;
+            acceptBtn.style.opacity       = '1';
+            acceptBtn.style.pointerEvents = 'auto';
           }
-        } catch {
-          showMsg('Network error. Please try again.', false);
-          acceptBtn.textContent = 'Try again';
-          (acceptBtn as HTMLElement).style.opacity       = '1';
-          (acceptBtn as HTMLElement).style.pointerEvents = 'auto';
+        } catch(_) {
+          var s2 = STRINGS[lang];
+          showMsg(s2.network_error, false);
+          acceptBtn.textContent         = s2.try_again;
+          acceptBtn.style.opacity       = '1';
+          acceptBtn.style.pointerEvents = 'auto';
         }
       });
-    })();
+
+    });
   </script>
 </body>
 </html>
