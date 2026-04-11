@@ -695,11 +695,40 @@ import { ROUTES } from "../../../data/routes";
           try { cfg = await fetch('/config.json').then(function(r){ return r.json(); }); } catch(_) {}
           var base = ((cfg.functionsUrl || 'https://zdmpzrderifgqmqivjoy.supabase.co/functions/v1') + '').replace(/\/$/, '');
 
-          var res  = await fetch(base + '/claim-black-diamond', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-          });
-          var data = await res.json();
+          var data;
+
+          // If a voucher code is present, try the new voucher system first
+          if (code) {
+            var vRes = await fetch(base + '/redeem-voucher', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+              body: JSON.stringify({ code: code }),
+            });
+            var vData = await vRes.json();
+
+            if (vData.ok) {
+              // Voucher redeemed successfully
+              data = { ok: true, already_claimed: false, tokens_granted: (vData.grants_applied && vData.grants_applied.tokens) || 0 };
+            } else if (vData.error === 'already_redeemed') {
+              data = { ok: true, already_claimed: true, tokens_granted: 0 };
+            } else if (vData.error === 'invalid_code') {
+              // Code not in voucher system — fall back to legacy claim
+              data = null;
+            } else {
+              // Other voucher error
+              data = { ok: false, error: vData.error };
+            }
+          }
+
+          // Fall back to legacy claim-black-diamond if no code or voucher not found
+          if (!data) {
+            var res = await fetch(base + '/claim-black-diamond', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            });
+            data = await res.json();
+          }
+
           var s = STRINGS[lang];
 
           if (data.ok && data.already_claimed) {
@@ -712,6 +741,8 @@ import { ROUTES } from "../../../data/routes";
             acceptBtn.href            = '/profile/';
             acceptBtn.style.opacity       = '1';
             acceptBtn.style.pointerEvents = 'auto';
+            // Clear plan cache so profile shows updated state
+            if (window.VxPlan) window.VxPlan.clearCache();
           } else {
             showMsg(s.error_msg + (data.error || 'unknown error'), false);
             acceptBtn.textContent         = s.try_again;

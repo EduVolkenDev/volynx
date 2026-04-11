@@ -102,6 +102,12 @@ Deno.serve(async (req: Request) => {
     const rank = PLAN_RANK[activePlan] ?? 0;
     const isPaid = rank >= 1;
 
+    // Compute highest effective tier across all products (for badge/cache)
+    const allPlans = [globalPlan, builderPlan, dailyPlan];
+    const effectiveTier = allPlans.reduce((best, p) =>
+      (PLAN_RANK[p] ?? 0) > (PLAN_RANK[best] ?? 0) ? p : best, "free"
+    );
+
     // For paid users: unlimited daily usage
     if (isPaid) {
       const today = new Date().toISOString().slice(0, 10);
@@ -123,6 +129,7 @@ Deno.serve(async (req: Request) => {
         plan: globalPlan,
         builder_plan: builderPlan,
         daily_plan: dailyPlan,
+        effective_tier: effectiveTier,
         product: productKey,
         allowed: true,
         limit: -1,
@@ -173,6 +180,7 @@ Deno.serve(async (req: Request) => {
       plan: globalPlan,
       builder_plan: builderPlan,
       daily_plan: dailyPlan,
+      effective_tier: effectiveTier,
       product: productKey,
       allowed: remaining > 0,
       limit,

@@ -413,7 +413,7 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
         const plan = window.VxPlan ? window.VxPlan.normalize(perm.plan) : (perm.plan || 'free');
         const hasPaidAccess = window.VxPlan
           ? window.VxPlan.isPaid(plan)
-          : (plan === "pro" || plan === "enterprise" || plan === "studio" || plan === "teams" || plan === "launch");
+          : (plan !== "free" && plan !== "");
         if (hasPaidAccess) {
           isPro = true;
           if (window.VxPlan) window.VxPlan.cache(plan);
@@ -493,7 +493,8 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       if (!isPro) {
         const perm = await checkToolPermission("image-suite", loadedImages.length);
         if (!perm.allowed) {
-          alert(`Daily limit reached (${perm.limit}). ${perm.plan === 'free' ? 'Upgrade to Pro for more.' : 'Try again tomorrow.'}`);
+          const isFreeUser = window.VxPlan ? !window.VxPlan.isPaid(perm.plan) : (perm.plan === 'free');
+          alert(`Daily limit reached (${perm.limit}). ${isFreeUser ? 'Upgrade to Pro for more.' : 'Try again tomorrow.'}`);
           return;
         }
       }

@@ -76,7 +76,7 @@ const PLAN_DOWNGRADE_MAP: Record<string, Record<string, string>> = {
   builder_pro:    { builder_plan: "free" },
   builder_studio: { builder_plan: "free" },
   builder_teams:  { builder_plan: "free" },
-  studio_pro:     {},
+  studio_pro:     { builder_plan: "free" },
 };
 
 // Product key detection from prefix

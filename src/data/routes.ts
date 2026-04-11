@@ -56,7 +56,8 @@ export const ROUTES = {
   studioImageSuite: "/volynx-lab/studio/image-suite/",
   studioQrGen: "/volynx-lab/studio/qr-gen/",
 
-  // ── VIP ──────────────────────────────
+  // ── VIP / Vouchers ──────────────────
+  activate: "/activate/",
   blackDiamond: "/invite/black-diamond/",
 
   // ── Other ─────────────────────────────

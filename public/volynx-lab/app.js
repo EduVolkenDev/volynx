@@ -206,7 +206,7 @@ convertBtn.addEventListener('click', async () => {
       }
     } else {
       const msg = perm.remaining === 0
-        ? `Daily limit reached (${perm.limit}). ${perm.plan === 'free' ? 'Upgrade to Pro for more.' : 'Try again tomorrow.'}`
+        ? `Daily limit reached (${perm.limit}). ${(window.VxPlan ? !window.VxPlan.isPaid(perm.plan) : perm.plan === 'free') ? 'Upgrade to Pro for more.' : 'Try again tomorrow.'}`
         : `Limit: ${perm.remaining} remaining today. You selected ${files.length} files.`;
       alert(msg);
       convertBtn.disabled = false;

@@ -557,7 +557,7 @@ import { ROUTES } from "../data/routes";
 					if (paid) {
 						// Apply tier-specific class, fallback to generic --paid
 						var tierClass = "plan-badge--" + n;
-						if (["launch","pro","studio","teams"].includes(n)) {
+						if (["launch","pro","diamond","studio","teams"].includes(n)) {
 							planBadge.classList.add(tierClass);
 						} else {
 							planBadge.classList.add("plan-badge--paid");
@@ -575,7 +575,7 @@ import { ROUTES } from "../data/routes";
 
 				// Read plan from profile row (Supabase source of truth)
 				// Use the higher of plan vs builder_plan
-				const _planRank = { free: 0, launch: 1, pro: 2, studio: 3, teams: 4, enterprise: 5 };
+				const _planRank = { free: 0, launch: 1, pro: 2, diamond: 2, studio: 3, teams: 4, enterprise: 5 };
 				const _allPlans = [profile?.plan, profile?.builder_plan, profile?.daily_plan, profile?.cvitae_plan]
 					.map(p => (p || "free").toLowerCase().trim());
 				const dbPlan = _allPlans.reduce((best, p) => (_planRank[p] || 0) > (_planRank[best] || 0) ? p : best, "free");
@@ -600,9 +600,10 @@ import { ROUTES } from "../data/routes";
 							clearTimeout(t);
 							if (res.ok) {
 								const d = await res.json();
-								const _apiPlans = [d.plan, d.builder_plan, d.daily_plan, d.cvitae_plan]
-									.map(pp => (pp || "free").toLowerCase().trim());
-								const p = _apiPlans.reduce((best, pp) => (_planRank[pp] || 0) > (_planRank[best] || 0) ? pp : best, "free");
+								// Use server-computed effective_tier if available, else compute from all plans
+								const p = d.effective_tier || [d.plan, d.builder_plan, d.daily_plan, d.cvitae_plan]
+									.map(pp => (pp || "free").toLowerCase().trim())
+									.reduce((best, pp) => (_planRank[pp] || 0) > (_planRank[best] || 0) ? pp : best, "free");
 								const paid = p && p !== "free";
 								renderPlan(paid ? p : "Free", paid);
 								if (window.VxPlan) window.VxPlan.cache(p);

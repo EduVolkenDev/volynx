@@ -78,9 +78,13 @@
 
       if (res.ok) {
         var data = await res.json();
-        plan = window.VxPlan ? window.VxPlan.normalize(data.plan) : (data.plan || 'free');
+        // Use effective_tier for accurate hierarchy (studio, teams, etc.)
+        // Fall back to plan field for backward compat
+        plan = window.VxPlan
+          ? window.VxPlan.normalize(data.effective_tier || data.builder_plan || data.plan)
+          : (data.effective_tier || data.builder_plan || data.plan || 'free');
         proFeatures = data.pro_features || [];
-        // Update plan cache
+        // Update plan cache with actual tier, not the binary plan flag
         if (window.VxPlan) window.VxPlan.cache(plan);
       }
     }

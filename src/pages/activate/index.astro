@@ -1,0 +1,559 @@
+---
+import { ROUTES } from "../../data/routes";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Activate — VOLYNX</title>
+  <meta name="description" content="Redeem your VOLYNX invitation code, voucher, or activation key." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="shortcut icon" href="/assets/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:    #060609;
+      --text:  rgba(246,249,255,0.95);
+      --sub:   rgba(191,207,232,0.52);
+      --c:     #bfcfe8;
+      --c-dim: rgba(191,207,232,0.46);
+      --line:  rgba(255,255,255,0.065);
+      --surf:  rgba(255,255,255,0.028);
+      --ok:    #4ade80;
+      --err:   #f87171;
+      --accent: rgba(109,94,252,0.9);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "Manrope", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    .ambient {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(ellipse 90% 55% at 50% -5%, rgba(109,94,252,0.08) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 35% at 80% 95%, rgba(191,207,232,0.04) 0%, transparent 60%);
+    }
+    .grain {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.35;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+    }
+
+    .page {
+      position: relative; z-index: 1;
+      min-height: 100dvh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 60px 20px 72px;
+    }
+
+    .inner {
+      width: 100%; max-width: 440px;
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center;
+    }
+
+    .inner > * {
+      opacity: 0; transform: translateY(14px);
+      animation: up 0.72s cubic-bezier(0.22,1,0.36,1) forwards;
+    }
+    @keyframes up { to { opacity:1; transform:translateY(0); } }
+    .inner > *:nth-child(1) { animation-delay:0.06s; }
+    .inner > *:nth-child(2) { animation-delay:0.14s; }
+    .inner > *:nth-child(3) { animation-delay:0.20s; }
+    .inner > *:nth-child(4) { animation-delay:0.26s; }
+    .inner > *:nth-child(5) { animation-delay:0.32s; }
+    .inner > *:nth-child(6) { animation-delay:0.38s; }
+
+    .wm {
+      display: flex; align-items: center; gap: 9px;
+      margin-bottom: 48px;
+    }
+    .wm img { width: 21px; height: 21px; opacity: 0.5; }
+    .wm-text {
+      font-family: "Sora", system-ui, sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--sub);
+    }
+
+    .eyebrow {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--c-dim);
+      margin-bottom: 14px;
+    }
+
+    .title {
+      font-family: "Sora", system-ui, sans-serif;
+      font-size: clamp(2.2rem, 7vw, 3.2rem);
+      font-weight: 800; letter-spacing: -0.035em; line-height: 1;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      font-size: 0.9rem; line-height: 1.7;
+      color: var(--sub); max-width: 38ch;
+      margin-bottom: 40px;
+    }
+
+    /* ── Code input ── */
+    .input-group {
+      width: 100%;
+      margin-bottom: 16px;
+    }
+
+    .code-input {
+      width: 100%;
+      padding: 18px 24px;
+      border-radius: 14px;
+      border: 1px solid rgba(191,207,232,0.14);
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(12px);
+      font-family: "SF Mono", "Fira Code", ui-monospace, monospace;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-align: center;
+      text-transform: uppercase;
+      color: var(--c);
+      outline: none;
+      transition: all 0.2s;
+    }
+    .code-input::placeholder {
+      color: rgba(191,207,232,0.22);
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: none;
+    }
+    .code-input:focus {
+      border-color: rgba(109,94,252,0.45);
+      box-shadow: 0 0 0 3px rgba(109,94,252,0.08), 0 0 32px rgba(109,94,252,0.06);
+    }
+
+    /* ── Result message ── */
+    #resultMsg {
+      display: none;
+      width: 100%;
+      padding: 16px 20px;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      line-height: 1.65;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    #resultMsg.ok {
+      background: rgba(74,222,128,0.06);
+      border: 1px solid rgba(74,222,128,0.18);
+      color: var(--ok);
+    }
+    #resultMsg.err {
+      background: rgba(248,113,113,0.06);
+      border: 1px solid rgba(248,113,113,0.18);
+      color: var(--err);
+    }
+
+    /* ── Grants card (shown on success) ── */
+    #grantsCard {
+      display: none;
+      width: 100%;
+      border: 1px solid rgba(74,222,128,0.15);
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(74,222,128,0.03);
+      backdrop-filter: blur(16px);
+      margin-bottom: 24px;
+    }
+    .grants-head {
+      padding: 13px 20px;
+      border-bottom: 1px solid rgba(74,222,128,0.1);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .grants-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--ok);
+      box-shadow: 0 0 6px rgba(74,222,128,0.55);
+    }
+    .grants-head-label {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--sub);
+    }
+    .grants-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .grants-row:last-child { border-bottom: none; }
+    .grants-key {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--sub);
+    }
+    .grants-val {
+      font-size: 13px; font-weight: 600;
+      color: var(--text);
+    }
+
+    /* ── CTA ── */
+    .btn-redeem {
+      position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; padding: 18px 32px; border-radius: 14px;
+      font-family: "Sora", system-ui, sans-serif;
+      font-size: 15px; font-weight: 700; letter-spacing: 0.01em;
+      text-decoration: none; cursor: pointer; border: none;
+      background: linear-gradient(135deg, rgba(109,94,252,0.85) 0%, rgba(140,120,255,0.85) 100%);
+      color: #fff;
+      box-shadow: 0 8px 40px rgba(109,94,252,0.2), inset 0 1px 0 rgba(255,255,255,0.15);
+      transition: transform 0.22s, box-shadow 0.22s, opacity 0.2s;
+      margin-bottom: 12px;
+    }
+    .btn-redeem::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 55%);
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .btn-redeem:hover { transform: translateY(-2px); box-shadow: 0 14px 52px rgba(109,94,252,0.3); }
+    .btn-redeem:hover::after { opacity: 1; }
+    .btn-redeem:active { transform: translateY(0); }
+    .btn-redeem:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .btn-profile {
+      display: none;
+      width: 100%; padding: 14px 32px; border-radius: 12px;
+      font-size: 13px; font-weight: 600; text-decoration: none;
+      text-align: center;
+      border: 1px solid rgba(74,222,128,0.2);
+      color: var(--ok);
+      background: transparent;
+      transition: all 0.2s;
+      margin-bottom: 24px;
+    }
+    .btn-profile:hover {
+      border-color: rgba(74,222,128,0.35);
+      background: rgba(74,222,128,0.04);
+    }
+
+    .back-link {
+      font-size: 12px; color: var(--sub);
+      text-decoration: none; opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+    .back-link:hover { opacity: 1; }
+
+    /* ── Footer ── */
+    .foot {
+      display: flex; align-items: center; gap: 10px;
+      padding-top: 32px; margin-top: 16px;
+      border-top: 1px solid var(--line);
+      width: 100%; justify-content: center;
+    }
+    .foot img { width: 18px; height: 18px; opacity: 0.38; }
+    .foot-txt {
+      font-family: "Sora", system-ui, sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--sub); opacity: 0.45;
+    }
+
+    @media (max-width: 520px) {
+      .page { padding: 48px 18px 60px; }
+      .title { font-size: 2.4rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="ambient"></div>
+  <div class="grain"></div>
+
+  <main class="page">
+    <div class="inner">
+
+      <div class="wm">
+        <img src="/assets/volynx-icon.webp" alt="VOLYNX" />
+        <span class="wm-text">VOLYNX</span>
+      </div>
+
+      <div class="eyebrow" id="eyebrow">Activate</div>
+
+      <h1 class="title" id="title">Redeem Code</h1>
+
+      <p class="subtitle" id="subtitle">Enter your invitation code, voucher, or activation key below.</p>
+
+      <div class="input-group">
+        <input
+          type="text"
+          class="code-input"
+          id="codeInput"
+          placeholder="Enter your code"
+          maxlength="40"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+
+      <div id="resultMsg"></div>
+
+      <div id="grantsCard">
+        <div class="grants-head">
+          <div class="grants-dot"></div>
+          <span class="grants-head-label" id="grantsLabel">Activated</span>
+        </div>
+        <div id="grantsRows"></div>
+      </div>
+
+      <button class="btn-redeem" id="redeemBtn">Redeem</button>
+
+      <a href="/profile/" class="btn-profile" id="profileBtn">Go to your profile</a>
+
+      <a href="/" class="back-link" id="backLink">Back to VOLYNX</a>
+
+      <footer class="foot">
+        <img src="/assets/volynx-icon.webp" alt="VOLYNX" />
+        <span class="foot-txt">VOLYNX</span>
+      </footer>
+
+    </div>
+  </main>
+
+  <script is:inline>
+  document.addEventListener('DOMContentLoaded', function () {
+
+    // ── i18n ──────────────────────────────────────────────────────
+    var S = {
+      en: {
+        eyebrow: 'Activate',
+        title: 'Redeem Code',
+        subtitle: 'Enter your invitation code, voucher, or activation key below.',
+        placeholder: 'Enter your code',
+        redeem: 'Redeem',
+        redeeming: 'Redeeming...',
+        goto_profile: 'Go to your profile',
+        back: 'Back to VOLYNX',
+        grants_label: 'Activated',
+        sign_in: 'Sign in to redeem',
+        // Error messages
+        missing_code: 'Please enter a code.',
+        invalid_code: 'Invalid code. Please check and try again.',
+        expired: 'This code has expired.',
+        max_uses_reached: 'This code has already been fully redeemed.',
+        wrong_recipient: 'This code was issued to a different recipient and is non-transferable.',
+        already_redeemed: 'You have already redeemed this code.',
+        grant_failed: 'Something went wrong applying the grant. Please try again.',
+        network_error: 'Network error. Please check your connection.',
+        unknown_error: 'Something went wrong. Please try again.',
+        // Grant labels
+        grant_tokens: 'Tokens credited',
+        grant_builder: 'Builder plan',
+        grant_daily: 'Daily plan',
+        grant_badge: 'Badge',
+      },
+      pt: {
+        eyebrow: 'Ativar',
+        title: 'Resgatar Codigo',
+        subtitle: 'Insira seu codigo de convite, voucher ou chave de ativacao abaixo.',
+        placeholder: 'Insira seu codigo',
+        redeem: 'Resgatar',
+        redeeming: 'Resgatando...',
+        goto_profile: 'Ir para o perfil',
+        back: 'Voltar para VOLYNX',
+        grants_label: 'Ativado',
+        sign_in: 'Entrar para resgatar',
+        missing_code: 'Por favor insira um codigo.',
+        invalid_code: 'Codigo invalido. Verifique e tente novamente.',
+        expired: 'Este codigo expirou.',
+        max_uses_reached: 'Este codigo ja foi totalmente resgatado.',
+        wrong_recipient: 'Este codigo foi emitido para outro destinatario e nao e transferivel.',
+        already_redeemed: 'Voce ja resgatou este codigo.',
+        grant_failed: 'Erro ao aplicar o beneficio. Tente novamente.',
+        network_error: 'Erro de rede. Verifique sua conexao.',
+        unknown_error: 'Algo deu errado. Tente novamente.',
+        grant_tokens: 'Tokens creditados',
+        grant_builder: 'Plano Builder',
+        grant_daily: 'Plano Daily',
+        grant_badge: 'Badge',
+      }
+    };
+
+    var lang = localStorage.getItem('volynx_lang') || (navigator.language.startsWith('pt') ? 'pt' : 'en');
+    var s = S[lang] || S.en;
+
+    // Apply static text
+    var eyebrow = document.getElementById('eyebrow');
+    var titleEl = document.getElementById('title');
+    var subtitleEl = document.getElementById('subtitle');
+    var codeInput = document.getElementById('codeInput');
+    var redeemBtn = document.getElementById('redeemBtn');
+    var resultMsg = document.getElementById('resultMsg');
+    var grantsCard = document.getElementById('grantsCard');
+    var grantsLabel = document.getElementById('grantsLabel');
+    var grantsRows = document.getElementById('grantsRows');
+    var profileBtn = document.getElementById('profileBtn');
+    var backLink = document.getElementById('backLink');
+
+    eyebrow.textContent = s.eyebrow;
+    titleEl.textContent = s.title;
+    subtitleEl.textContent = s.subtitle;
+    codeInput.placeholder = s.placeholder;
+    redeemBtn.textContent = s.redeem;
+    profileBtn.textContent = s.goto_profile;
+    backLink.textContent = s.back;
+    grantsLabel.textContent = s.grants_label;
+
+    // ── Pre-fill from URL param ──────────────────────────────────
+    var params = new URLSearchParams(location.search);
+    var preCode = (params.get('code') || '').replace(/[^A-Za-z0-9\-_]/g, '').toUpperCase();
+    if (preCode) {
+      codeInput.value = preCode;
+    }
+
+    // ── Auth check ───────────────────────────────────────────────
+    var token = localStorage.getItem('volynx_access_token');
+    if (!token) {
+      var next = encodeURIComponent(window.location.pathname + window.location.search);
+      redeemBtn.textContent = s.sign_in;
+      redeemBtn.addEventListener('click', function () {
+        window.location.href = '/login/?next=' + next;
+      });
+      return;
+    }
+
+    // ── Show message ─────────────────────────────────────────────
+    function showResult(text, ok) {
+      resultMsg.style.display = 'block';
+      resultMsg.className = ok ? 'ok' : 'err';
+      resultMsg.innerHTML = text;
+    }
+
+    function hideResult() {
+      resultMsg.style.display = 'none';
+    }
+
+    // ── Show grants card ─────────────────────────────────────────
+    function showGrants(data) {
+      grantsRows.innerHTML = '';
+      var ga = data.grants_applied || {};
+
+      if (ga.tokens && ga.tokens > 0) {
+        addGrantRow(s.grant_tokens, '+' + ga.tokens);
+      }
+      if (ga.builder_plan) {
+        addGrantRow(s.grant_builder, ga.builder_plan.charAt(0).toUpperCase() + ga.builder_plan.slice(1));
+      }
+      if (ga.daily_plan) {
+        addGrantRow(s.grant_daily, ga.daily_plan.charAt(0).toUpperCase() + ga.daily_plan.slice(1));
+      }
+      if (ga.badge) {
+        var badgeLabel = ga.badge.replace(/_/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+        addGrantRow(s.grant_badge, badgeLabel);
+      }
+
+      if (grantsRows.children.length > 0) {
+        grantsCard.style.display = 'block';
+      }
+    }
+
+    function addGrantRow(key, val) {
+      var row = document.createElement('div');
+      row.className = 'grants-row';
+      row.innerHTML = '<span class="grants-key">' + key + '</span><span class="grants-val">' + val + '</span>';
+      grantsRows.appendChild(row);
+    }
+
+    // ── Redeem flow ──────────────────────────────────────────────
+    redeemBtn.addEventListener('click', async function () {
+      var code = codeInput.value.trim().toUpperCase();
+      if (!code) {
+        showResult(s.missing_code, false);
+        return;
+      }
+
+      hideResult();
+      grantsCard.style.display = 'none';
+      redeemBtn.textContent = s.redeeming;
+      redeemBtn.disabled = true;
+
+      try {
+        var cfg = {};
+        try { cfg = await fetch('/config.json').then(function(r) { return r.json(); }); } catch (_) {}
+        var base = ((cfg.functionsUrl || 'https://zdmpzrderifgqmqivjoy.supabase.co/functions/v1') + '').replace(/\/$/, '');
+
+        var res = await fetch(base + '/redeem-voucher', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token,
+          },
+          body: JSON.stringify({ code: code }),
+        });
+
+        var data = await res.json();
+
+        if (data.ok) {
+          // Success
+          var label = data.label || data.voucher_type || 'Code';
+          var labelDisplay = label.replace(/_/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+          showResult(labelDisplay + ' activated successfully.', true);
+          showGrants(data);
+
+          // Clear plan cache so UI refreshes
+          if (window.VxPlan) window.VxPlan.clearCache();
+
+          redeemBtn.style.display = 'none';
+          codeInput.disabled = true;
+          codeInput.style.opacity = '0.4';
+          profileBtn.style.display = 'block';
+
+        } else {
+          // Error
+          var errKey = data.error || 'unknown_error';
+          var errMsg = s[errKey] || s.unknown_error;
+          showResult(errMsg, false);
+          redeemBtn.textContent = s.redeem;
+          redeemBtn.disabled = false;
+        }
+
+      } catch (_) {
+        showResult(s.network_error, false);
+        redeemBtn.textContent = s.redeem;
+        redeemBtn.disabled = false;
+      }
+    });
+
+    // Submit on Enter
+    codeInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        redeemBtn.click();
+      }
+    });
+
+    // Auto-submit if code came from URL
+    if (preCode && token) {
+      // Small delay for visual feedback
+      setTimeout(function () { redeemBtn.click(); }, 400);
+    }
+  });
+  </script>
+</body>
+</html>
