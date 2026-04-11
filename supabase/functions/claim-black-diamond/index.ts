@@ -73,15 +73,26 @@ Deno.serve(async (req: Request) => {
     const currentBalance = profile.token_balance || 0;
     const newBalance = currentBalance + BD_TOKENS;
 
-    // Grant Black Diamond + tokens atomically
-    const { error: updateErr } = await supabase
+    // Grant Black Diamond + tokens — conditional update prevents race condition
+    const { error: updateErr, count } = await supabase
       .from("profiles")
       .update({
         is_black_diamond: true,
         black_diamond_claimed_at: new Date().toISOString(),
         token_balance: newBalance,
       })
-      .eq("id", userId);
+      .eq("id", userId)
+      .eq("is_black_diamond", false); // Only update if not already claimed
+
+    // If no rows matched, another request already claimed
+    if (!updateErr && count === 0) {
+      return json({
+        ok: true,
+        already_claimed: true,
+        tokens_granted: 0,
+        balance: currentBalance,
+      });
+    }
 
     if (updateErr) {
       console.error("[claim-black-diamond] update error:", updateErr.message);

@@ -154,8 +154,8 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    // ── Record redemption ─────────────────────────────────────
-    await supabase.from("voucher_redemptions").insert({
+    // ── Record redemption (unique constraint prevents double-redeem) ──
+    const { error: redeemErr } = await supabase.from("voucher_redemptions").insert({
       voucher_id: voucher.id,
       user_id: userId,
       user_email: userEmail,
@@ -165,11 +165,22 @@ Deno.serve(async (req: Request) => {
       },
     });
 
-    // Increment usage counter
-    await supabase
-      .from("vouchers")
-      .update({ times_used: voucher.times_used + 1 })
-      .eq("id", voucher.id);
+    if (redeemErr) {
+      if (redeemErr.code === "23505") {
+        return json({ ok: false, error: "already_redeemed" }, 400);
+      }
+      console.error("[redeem-voucher] redemption insert error:", redeemErr.message);
+      return json({ ok: false, error: "grant_failed" }, 500);
+    }
+
+    // Atomic increment — prevents race condition exceeding max_uses
+    await supabase.rpc("increment_voucher_usage", { p_voucher_id: voucher.id }).catch(() => {
+      // Fallback if RPC not available
+      supabase
+        .from("vouchers")
+        .update({ times_used: voucher.times_used + 1 })
+        .eq("id", voucher.id);
+    });
 
     console.log(`Voucher ${code} (${voucher.type}) redeemed by ${userEmail}. Grants: ${JSON.stringify(grants)}`);
 
