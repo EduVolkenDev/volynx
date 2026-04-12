@@ -46,6 +46,9 @@ const faqs = [
             <a href={ROUTES.lab} class="button button--ghost" data-i18n="price.hero_cta2">Open the Lab</a>
           </div>
         </div>
+        <div class="pricing-hero-visual" aria-hidden="true">
+          <img src="/assets/volynx-icon.webp" alt="" class="pricing-hero-icon" width="200" height="200" loading="eager" />
+        </div>
       </div>
     </section>
 
@@ -237,6 +240,29 @@ const faqs = [
   </main>
 
   <style>
+    .pricing-hero-visual {
+      display:none;
+      place-items:center;
+      justify-content:center;
+      border-right:1px inset white;
+      margin-right:-90px;
+      padding:20px 90px 20px 0;
+      overflow:hidden;
+    }
+    .pricing-hero-icon {
+      font-size:5rem;
+      width:min(200px, 60%);
+      height:auto;
+      filter:drop-shadow(0 20px 50px rgba(139,250,240,.18)) drop-shadow(0 8px 24px rgba(0,0,0,.3));
+      animation:floatIcon 4s ease-in-out infinite;
+    }
+    @keyframes floatIcon {
+      0%, 100% { transform:translateY(0); }
+      50% { transform:translateY(-12px); }
+    }
+    @media (min-width:1024px) {
+      .pricing-hero-visual { display:grid; }
+    }
     .currency-bar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 20px; border-radius:14px; border:1px solid rgba(255,255,255,.06); background:rgba(255,255,255,.03); }
     .lcbar__pill { padding:6px 14px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:.06em; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03); color:rgba(255,255,255,.45); cursor:pointer; transition:all .15s; }
     .lcbar__pill:hover { border-color:rgba(255,255,255,.15); color:rgba(255,255,255,.7); }
