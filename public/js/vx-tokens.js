@@ -218,14 +218,90 @@ window.VxTokens = (function () {
     window.location.href = '/login/?next=' + next;
   }
 
+  // ── Transaction History ──
+
+  var HISTORY_KEY = 'volynx_token_history';
+
+  function setCachedHistory(transactions) {
+    try {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(transactions));
+    } catch (_) {}
+  }
+
+  function getCachedHistory() {
+    try {
+      var ts = parseInt(localStorage.getItem(BALANCE_TS_KEY) || '0', 10);
+      if (Date.now() - ts > CACHE_TTL) return null;
+      var raw = localStorage.getItem(HISTORY_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /**
+   * Fetch balance + recent transactions from server.
+   * Returns { balance: number, recent: Array<transaction> }
+   */
+  async function getBalanceWithHistory(forceRefresh) {
+    if (!forceRefresh) {
+      var cachedBal = getCachedBalance();
+      var cachedHist = getCachedHistory();
+      if (cachedBal !== null && cachedHist !== null) {
+        return { balance: cachedBal, recent: cachedHist };
+      }
+    }
+
+    var token = getAccessToken();
+    if (!token) return { balance: 0, recent: [] };
+
+    var apiBase = await getApiBase();
+    if (!apiBase) return { balance: 0, recent: [] };
+
+    try {
+      var res = await fetch(apiBase + '/get-balance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+        },
+        body: JSON.stringify({}),
+      });
+      if (!res.ok) return { balance: 0, recent: [] };
+      var data = await res.json();
+      var balance = data.balance || 0;
+      var recent = data.recent || [];
+      setCachedBalance(balance);
+      setCachedHistory(recent);
+      return { balance: balance, recent: recent };
+    } catch (_) {
+      return { balance: 0, recent: [] };
+    }
+  }
+
+  // ── Events ──
+
+  /** Dispatch a custom event when balance changes (for dashboard live update) */
+  function notifyBalanceChange(newBalance) {
+    setCachedBalance(newBalance);
+    try {
+      window.dispatchEvent(new CustomEvent('vx:balance-changed', {
+        detail: { balance: newBalance },
+      }));
+    } catch (_) {}
+  }
+
   return {
     CLASS_COSTS: CLASS_COSTS,
     getBalance: getBalance,
+    getBalanceWithHistory: getBalanceWithHistory,
     getCachedBalance: getCachedBalance,
+    getCachedHistory: getCachedHistory,
     setCachedBalance: setCachedBalance,
-    clearCache: clearCache,
+    clearCache: function () { clearCache(); try { localStorage.removeItem(HISTORY_KEY); } catch (_) {} },
     costFor: costFor,
     spend: spend,
     canAfford: canAfford,
+    notifyBalanceChange: notifyBalanceChange,
   };
 })();

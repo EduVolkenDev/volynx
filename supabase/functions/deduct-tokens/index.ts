@@ -1,8 +1,8 @@
 /**
  * VOLYNX — Deduct Tokens (Supabase Edge Function)
  *
- * Atomically checks balance and deducts tokens for a tool action.
- * Returns the new balance or an insufficient_balance error.
+ * Atomically checks balance and deducts tokens via Postgres RPC.
+ * Uses SELECT ... FOR UPDATE inside the RPC — no race conditions.
  *
  * Required secrets:
  *   SUPABASE_SERVICE_ROLE_KEY
@@ -15,7 +15,7 @@
  * Response:
  *   200: { ok: true, balance: number, spent: number }
  *   402: { ok: false, error: "insufficient_balance", balance: number, required: number }
- *   400/401/500: { ok: false, error: string }
+ *   400/401/429/500: { ok: false, error: string }
  */
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
@@ -29,7 +29,8 @@ const supabase = createClient(
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
@@ -42,7 +43,7 @@ const CLASS_COSTS: Record<string, number> = {
   premium: 12,
 };
 
-// Rate limit: max deductions per user per minute
+// In-memory rate limiter (per isolate instance)
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 30;
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -76,27 +77,30 @@ serve(async (req: Request) => {
   }
 
   try {
-    // ── Authenticate ──
+    // ── Authenticate via JWT ──
     const authHeader = req.headers.get("authorization") || "";
     const token = authHeader.replace("Bearer ", "");
     if (!token) {
       return json({ ok: false, error: "Missing authorization token" }, 401);
     }
 
-    const { data: userData, error: authError } = await supabase.auth.getUser(token);
+    const { data: userData, error: authError } =
+      await supabase.auth.getUser(token);
     if (authError || !userData?.user) {
       return json({ ok: false, error: "Invalid or expired token" }, 401);
     }
 
     const userId = userData.user.id;
-    const userEmail = userData.user.email || "";
 
     // ── Rate limit ──
     if (!checkRateLimit(userId)) {
-      return json({ ok: false, error: "Rate limit exceeded. Try again in a minute." }, 429);
+      return json(
+        { ok: false, error: "Rate limit exceeded. Try again in a minute." },
+        429
+      );
     }
 
-    // ── Parse request ──
+    // ── Parse & validate request ──
     const body = await req.json();
     const { tool, action_class, tokens: customTokens, description } = body;
 
@@ -105,112 +109,57 @@ serve(async (req: Request) => {
     }
 
     if (!action_class || !CLASS_COSTS[action_class]) {
-      return json({ ok: false, error: `Invalid action_class. Must be one of: ${Object.keys(CLASS_COSTS).join(", ")}` }, 400);
+      return json(
+        {
+          ok: false,
+          error: `Invalid action_class. Must be one of: ${Object.keys(CLASS_COSTS).join(", ")}`,
+        },
+        400
+      );
     }
 
-    // Allow custom token amount for premium class (12-20 range), otherwise use class default
+    // Premium class allows custom amount in 12-20 range
     let tokensToSpend = CLASS_COSTS[action_class];
     if (action_class === "premium" && typeof customTokens === "number") {
       if (customTokens < 12 || customTokens > 20) {
-        return json({ ok: false, error: "Premium class tokens must be between 12 and 20" }, 400);
+        return json(
+          { ok: false, error: "Premium class tokens must be between 12 and 20" },
+          400
+        );
       }
       tokensToSpend = customTokens;
     }
 
-    // ── Atomic balance check + deduct ──
-    // Use a transaction-like approach: read, validate, update with conditional check
-    const { data: profile, error: fetchErr } = await supabase
-      .from("profiles")
-      .select("token_balance")
-      .eq("id", userId)
-      .single();
-
-    if (fetchErr || !profile) {
-      return json({ ok: false, error: "Profile not found" }, 404);
-    }
-
-    const currentBalance = profile.token_balance || 0;
-
-    if (currentBalance < tokensToSpend) {
-      return json({
-        ok: false,
-        error: "insufficient_balance",
-        balance: currentBalance,
-        required: tokensToSpend,
-      }, 402);
-    }
-
-    const newBalance = currentBalance - tokensToSpend;
-
-    // Conditional update: only succeed if balance hasn't changed (optimistic lock)
-    const { data: updated, error: updateErr } = await supabase
-      .from("profiles")
-      .update({ token_balance: newBalance })
-      .eq("id", userId)
-      .eq("token_balance", currentBalance)
-      .select("token_balance")
-      .single();
-
-    if (updateErr || !updated) {
-      // Balance changed between read and write — retry once
-      const { data: retry } = await supabase
-        .from("profiles")
-        .select("token_balance")
-        .eq("id", userId)
-        .single();
-
-      const retryBalance = retry?.token_balance || 0;
-      if (retryBalance < tokensToSpend) {
-        return json({
-          ok: false,
-          error: "insufficient_balance",
-          balance: retryBalance,
-          required: tokensToSpend,
-        }, 402);
+    // ── Atomic deduction via Postgres RPC ──
+    // deduct_tokens_atomic uses SELECT ... FOR UPDATE — true atomicity
+    const { data: result, error: rpcErr } = await supabase.rpc(
+      "deduct_tokens_atomic",
+      {
+        p_user_id: userId,
+        p_amount: tokensToSpend,
+        p_tool_name: tool,
+        p_description: description || null,
+        p_action_class: action_class,
+        p_metadata: JSON.stringify({ action_class, tokens_spent: tokensToSpend }),
       }
+    );
 
-      const retryNew = retryBalance - tokensToSpend;
-      const { error: retryErr } = await supabase
-        .from("profiles")
-        .update({ token_balance: retryNew })
-        .eq("id", userId)
-        .eq("token_balance", retryBalance);
-
-      if (retryErr) {
-        return json({ ok: false, error: "Concurrent token operation. Please try again." }, 409);
-      }
-
-      // Log transaction with retry balance
-      await supabase.from("token_transactions").insert({
-        user_id: userId,
-        user_email: userEmail,
-        amount: -tokensToSpend,
-        type: "spend",
-        tool_name: tool,
-        description: description || `${tool} — ${action_class} action`,
-        balance_after: retryNew,
-        metadata: { action_class, tokens_spent: tokensToSpend },
-      });
-
-      return json({ ok: true, balance: retryNew, spent: tokensToSpend });
+    if (rpcErr) {
+      console.error("deduct_tokens_atomic RPC error:", rpcErr.message);
+      return json({ ok: false, error: "Server error" }, 500);
     }
 
-    // ── Log transaction ──
-    await supabase.from("token_transactions").insert({
-      user_id: userId,
-      user_email: userEmail,
-      amount: -tokensToSpend,
-      type: "spend",
-      tool_name: tool,
-      description: description || `${tool} — ${action_class} action`,
-      balance_after: newBalance,
-      metadata: { action_class, tokens_spent: tokensToSpend },
-    });
+    // RPC returns JSONB: { ok, balance, spent } or { ok, error, balance, required }
+    if (!result.ok) {
+      const status = result.error === "insufficient_balance" ? 402 : 400;
+      return json(result, status);
+    }
 
-    console.log(`Deducted ${tokensToSpend} tokens from ${userId} for ${tool}. Balance: ${newBalance}`);
+    console.log(
+      `Deducted ${tokensToSpend} tokens from ${userId} for ${tool}. Balance: ${result.balance}`
+    );
 
-    return json({ ok: true, balance: newBalance, spent: tokensToSpend });
-
+    return json(result);
   } catch (err) {
     console.error("deduct-tokens error:", (err as Error).message);
     return json({ ok: false, error: "Server error" }, 500);

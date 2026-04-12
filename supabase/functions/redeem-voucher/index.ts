@@ -115,30 +115,30 @@ Deno.serve(async (req: Request) => {
       profileUpdates.black_diamond_claimed_at = new Date().toISOString();
     }
 
-    // Token grants
+    // Token grants — atomic credit via Postgres RPC
     if (grants.tokens && grants.tokens > 0) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("token_balance")
-        .eq("id", userId)
-        .single();
+      const { data: creditResult, error: creditErr } = await supabase.rpc(
+        "credit_tokens_atomic",
+        {
+          p_user_id: userId,
+          p_amount: grants.tokens,
+          p_type: "grant",
+          p_description: `Voucher redeemed: ${voucher.label || voucher.type} (${code})`,
+          p_metadata: JSON.stringify({
+            source: "voucher",
+            voucher_id: voucher.id,
+            voucher_type: voucher.type,
+          }),
+        }
+      );
 
-      const currentBalance = profile?.token_balance || 0;
-      const newBalance = currentBalance + grants.tokens;
-      profileUpdates.token_balance = newBalance;
+      if (creditErr) {
+        console.error("[redeem-voucher] credit_tokens_atomic error:", creditErr.message);
+        return json({ ok: false, error: "grant_failed" }, 500);
+      }
+
       tokensGranted = grants.tokens;
-
-      // Log token transaction
-      await supabase.from("token_transactions").insert({
-        user_id: userId,
-        user_email: userEmail,
-        amount: grants.tokens,
-        type: "grant",
-        tool_name: null,
-        description: `Voucher redeemed: ${voucher.label || voucher.type} (${code})`,
-        balance_after: newBalance,
-        metadata: { source: "voucher", voucher_id: voucher.id, voucher_type: voucher.type },
-      });
+      // Don't add token_balance to profileUpdates — RPC already handled it
     }
 
     // Apply profile updates if any

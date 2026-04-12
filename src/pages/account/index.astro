@@ -4,159 +4,568 @@ import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import FlagshipFooter from "../../components/FlagshipFooter.astro";
 import { ROUTES } from "../../data/routes";
 ---
-<FlagshipLayout title="Command Center — VOLYNX" description="Your Pro workspace: plan usage, presets, brand memory and quick access to tools." pageClass="page-account">
+<FlagshipLayout title="Account — VOLYNX" description="Your account dashboard: plan, tokens, transaction history, and quick access to all tools." pageClass="page-account">
   <FlagshipHeader ctaLabel="Manage plan" />
   <main>
 
-    <!-- ═══ COMMAND CENTER ═══ -->
+    <!-- ═══ HERO: Plan + Token Balance ═══ -->
     <section class="hero account-hero">
-      <div class="shell command-grid">
-        <div class="overview panel panel--pro">
+      <div class="shell account-top-grid">
+
+        <!-- Plan Overview -->
+        <div class="panel panel--pro acct-plan-card">
           <span class="label label--pro" id="planBadge">Free</span>
-          <h1 data-i18n="acct.title">Pro Command Center</h1>
-          <p data-i18n="acct.desc">Your workspace. View your plan details, access saved settings, and launch your tools — all from one dashboard.</p>
-          <div class="stats-row">
-            <div class="stat-block"><b id="tokenPercent">0</b><span data-i18n="acct.stat_tokens">token reserve</span></div>
-            <div class="stat-block"><b id="presetCount">0</b><span data-i18n="acct.stat_presets">saved presets</span></div>
-            <div class="stat-block"><b id="brandCount">0</b><span data-i18n="acct.stat_brands">brand profiles</span></div>
-            <div class="stat-block"><b id="projectCount">0</b><span data-i18n="acct.stat_projects">projects</span></div>
+          <h1 data-i18n="acct.title">Your Account</h1>
+          <p class="muted" data-i18n="acct.desc">Manage your plan, tokens, and access all VOLYNX products from one place.</p>
+          <div class="acct-plan-details">
+            <div class="plan-row">
+              <span class="muted" data-i18n="acct.builder_plan">Builder</span>
+              <strong id="builderPlanLabel">Free</strong>
+            </div>
+            <div class="plan-row">
+              <span class="muted" data-i18n="acct.daily_plan">Daily</span>
+              <strong id="dailyPlanLabel">Free</strong>
+            </div>
+            <div class="plan-row">
+              <span class="muted" data-i18n="acct.member_since">Member since</span>
+              <strong id="memberSince">—</strong>
+            </div>
+          </div>
+          <div class="acct-plan-actions">
+            <a href={ROUTES.pricing} class="button button--gold" data-i18n="acct.manage_plan">Manage plan</a>
+            <button type="button" id="portalBtn" class="button button--ghost" data-i18n="acct.billing">Billing</button>
           </div>
         </div>
-        <div class="stack" style="display:grid;gap:16px;">
-          <div class="panel">
-            <span class="label" data-i18n="acct.plan_usage_label">Plan usage</span>
-            <div class="split-header"><h3 data-i18n="acct.monthly_usage">Monthly usage</h3><span id="usageLabel">— / —</span></div>
-            <div class="progress"><span id="usageBar" style="width:0%"></span></div>
+
+        <!-- Token Balance -->
+        <div class="panel acct-token-card">
+          <div class="token-header">
+            <span class="label" data-i18n="acct.token_balance_label">Token balance</span>
+            <button type="button" id="refreshBalanceBtn" class="refresh-btn" title="Refresh" aria-label="Refresh balance">&#8635;</button>
           </div>
-          <div class="panel">
-            <span class="label" data-i18n="acct.quick_actions_label">Quick actions</span>
-            <ul class="detail-list">
-              <li><a href={ROUTES.studioConverter} style="color:var(--text);" data-i18n="acct.open_converter">Open Converter Pro</a></li>
-              <li><a href={ROUTES.studioImageSuite} style="color:var(--text);" data-i18n="acct.open_image_suite">Open Image Suite</a></li>
-              <li><a href={ROUTES.builder} style="color:var(--text);" data-i18n="acct.open_builder">Open Builder</a></li>
-              <li><a href={ROUTES.profile} style="color:var(--text);" data-i18n="acct.edit_profile">Edit profile</a></li>
-            </ul>
+          <div class="token-big-number" id="tokenBalance">—</div>
+          <p class="muted token-subtitle" data-i18n="acct.tokens_desc">Tokens are used for exports, premium kits, AI tools, and more.</p>
+          <a href={ROUTES.pricing + "#tokens"} class="button button--accent acct-buy-btn" id="buyTokensBtn" data-i18n="acct.buy_tokens">
+            Recarregar tokens
+          </a>
+          <button type="button" class="acct-pix-quick" id="quickPixBtn" style="display:none" data-i18n="acct.pay_with_pix">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:4px;"><path d="M17.7 6.3c-1.2-1.2-2.8-1.8-4.5-1.8s-3.3.6-4.5 1.8L5.4 9.6l2.1 2.1 3.3-3.3c.6-.6 1.4-.9 2.4-.9s1.8.3 2.4.9l3.3 3.3 2.1-2.1-3.3-3.3z" fill="currentColor"/><path d="M6.3 17.7c1.2 1.2 2.8 1.8 4.5 1.8s3.3-.6 4.5-1.8l3.3-3.3-2.1-2.1-3.3 3.3c-.6.6-1.4.9-2.4.9s-1.8-.3-2.4-.9l-3.3-3.3-2.1 2.1 3.3 3.3z" fill="currentColor"/></svg>
+            Pix rápido — 25 tokens
+          </button>
+          <div class="token-unit-price muted" data-i18n="acct.token_unit">from R$6.90 / token</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══ TRANSACTION HISTORY ═══ -->
+    <section class="page-section">
+      <div class="shell">
+        <div class="panel acct-history-panel">
+          <div class="history-header">
+            <div>
+              <span class="label" data-i18n="acct.history_label">History</span>
+              <h3 data-i18n="acct.history_title">Recent token transactions</h3>
+            </div>
+          </div>
+          <div id="historyContainer">
+            <div class="history-loading muted" data-i18n="acct.loading">Loading...</div>
+          </div>
+          <div id="historyEmpty" class="history-empty muted" style="display:none" data-i18n="acct.no_transactions">
+            No transactions yet. Tokens appear here when you purchase or use them.
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ═══ FAVORITES & HISTORY ═══ -->
+    <!-- ═══ QUICK ACCESS ═══ -->
     <section class="page-section">
       <div class="shell grid-3">
         <article class="panel">
-          <span class="label label--pro" data-i18n="acct.favorites_label">Favorites</span>
-          <h3 data-i18n="acct.favorites_title">Fast access to premium tools</h3>
-          <p data-i18n="acct.favorites_desc">Converter Pro, Image Suite and Builder Pro — one tap away from your most-used workflows.</p>
+          <span class="label label--pro" data-i18n="acct.tools_label">Tools</span>
+          <h3 data-i18n="acct.tools_title">Quick access</h3>
           <div class="actions" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;">
-            <a href={ROUTES.studioConverter} class="button button--ghost" data-i18n="acct.btn_converter">Converter</a>
-            <a href={ROUTES.studioImageScaler} class="button button--ghost" data-i18n="acct.btn_scaler">Scaler</a>
-            <a href={ROUTES.studioQrGen} class="button button--ghost" data-i18n="acct.btn_qr_gen">QR Gen</a>
+            <a href={ROUTES.studioConverter} class="button button--ghost">Converter</a>
+            <a href={ROUTES.studioImageScaler} class="button button--ghost">Scaler</a>
+            <a href={ROUTES.studioQrGen} class="button button--ghost">QR Gen</a>
+            <a href={ROUTES.builder} class="button button--ghost">Builder</a>
           </div>
         </article>
         <article class="panel">
-          <span class="label" data-i18n="acct.history_label">History</span>
-          <h3 data-i18n="acct.history_title">Recent outputs</h3>
-          <p data-i18n="acct.history_desc">View your processing history. Every export and output stays accessible so you can revisit, reuse, or rebuild from your past work.</p>
+          <span class="label" data-i18n="acct.ecosystem_label">Ecosystem</span>
+          <h3 data-i18n="acct.ecosystem_title">Your products</h3>
+          <div class="actions" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;">
+            <a href={ROUTES.daily} class="button button--ghost" target="_blank">Daily OS</a>
+            <a href={ROUTES.cvitae} class="button button--ghost" target="_blank">CVitae</a>
+            <a href={ROUTES.lab} class="button button--ghost">Lab</a>
+          </div>
         </article>
         <article class="panel">
-          <span class="label" data-i18n="acct.brand_memory_label">Brand Memory</span>
-          <h3 data-i18n="acct.brand_memory_title">Saved defaults</h3>
-          <p data-i18n="acct.brand_memory_desc">Store your colors, export presets, and naming conventions. One setup saves hours across all your projects.</p>
+          <span class="label" data-i18n="acct.voucher_label">Voucher</span>
+          <h3 data-i18n="acct.voucher_title">Redeem a code</h3>
+          <div class="voucher-form" style="margin-top:16px;">
+            <input type="text" id="voucherInput" placeholder="BD-XXXX-YYYY" class="vx-input" maxlength="20" autocomplete="off" spellcheck="false" />
+            <button type="button" id="redeemBtn" class="button button--gold" data-i18n="acct.redeem">Redeem</button>
+          </div>
+          <p id="voucherMsg" class="voucher-msg muted" style="display:none"></p>
         </article>
       </div>
     </section>
 
-    <!-- ═══ PLAN CTA ═══ -->
+    <!-- ═══ SIGN OUT ═══ -->
     <section class="page-section page-section--last">
-      <div class="shell callout panel panel--pro">
-        <div>
-          <span class="label label--pro" data-i18n="acct.your_plan_label">Your plan</span>
-          <strong data-i18n="acct.plan_cta_title">Upgrade, manage or explore what Pro unlocks.</strong>
-          <p data-i18n="acct.plan_cta_desc">The Command Center is where Pro status translates into real workflow advantages.</p>
-        </div>
-        <div class="hero-actions">
-          <a href={ROUTES.pricing} class="button button--gold" data-i18n="acct.manage_plan">Manage plan</a>
-          <a href={ROUTES.profile} class="button button--ghost" data-i18n="acct.edit_profile2">Edit profile</a>
-          <button type="button" id="logoutBtn" class="button button--ghost" data-i18n="acct.sign_out" style="border-color:rgba(255,100,100,.2);color:rgba(255,150,150,.9);">Sign out</button>
-        </div>
+      <div class="shell" style="text-align:center;">
+        <button type="button" id="logoutBtn" class="button button--ghost" data-i18n="acct.sign_out" style="border-color:rgba(255,100,100,.2);color:rgba(255,150,150,.9);">Sign out</button>
       </div>
     </section>
 
   </main>
   <FlagshipFooter />
 
+  <!-- Dependencies -->
   <script is:inline src="/js/vx-plan.js"></script>
+  <script is:inline src="/js/vx-tokens.js"></script>
+  <script is:inline src="/js/vx-pix.js"></script>
+
   <script is:inline type="module">
-    // Redirect if not logged in
+    // ── Auth guard ──
     const token = localStorage.getItem('volynx_access_token');
     if (!token) { window.location.href = '/login/?next=/account/'; }
 
-    // Load plan info
+    // ── Config ──
     let cfg = null;
     try { cfg = await fetch('/config.json', { cache: 'no-store' }).then(r => r.json()); } catch {}
     const apiBase = (cfg?.functionsUrl || cfg?.apiBaseUrl || '').replace(/\/$/, '');
 
-    // Try cache first, then API
-    const cached = window.VxPlan.getCached();
-    if (cached) {
-      const badge = document.getElementById('planBadge');
-      if (badge) badge.textContent = window.VxPlan.label(cached.plan);
-    }
+    // ── Plan info ──
+    async function loadPlanInfo() {
+      // Show cached immediately
+      const cached = window.VxPlan?.getCached();
+      if (cached) {
+        document.getElementById('planBadge').textContent = window.VxPlan.label(cached.plan);
+      }
 
-    if (token && apiBase) {
+      if (!token || !apiBase) return;
+
       try {
         const res = await fetch(apiBase + '/check-permission', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-          body: JSON.stringify({ tool: 'converter' }),
+          body: JSON.stringify({ tool: 'account' }),
         });
-        if (res.ok) {
-          const perm = await res.json();
-          const plan = window.VxPlan.normalize(perm.builderPlan || perm.plan);
-          window.VxPlan.cache(plan);
-          const badge = document.getElementById('planBadge');
-          if (badge) badge.textContent = window.VxPlan.label(plan);
+        if (!res.ok) return;
+        const perm = await res.json();
 
-          // Update usage stats
-          if (perm.remaining !== undefined && perm.limit !== undefined && perm.used !== undefined) {
-            const remaining = perm.remaining;
-            const limit = perm.limit;
-            const used = perm.used;
+        const globalPlan = perm.plan || 'free';
+        const builderPlan = perm.builder_plan || 'free';
+        const dailyPlan = perm.daily_plan || 'free';
 
-            // Calculate percentage for remaining tokens
-            const remainingPercent = Math.round((remaining / limit) * 100);
-            const tokenPercentEl = document.getElementById('tokenPercent');
-            if (tokenPercentEl) {
-              tokenPercentEl.textContent = remainingPercent + '%';
-            }
+        // Determine highest plan for badge
+        const effectivePlan = perm.effective_tier || globalPlan;
+        window.VxPlan?.cache(effectivePlan);
 
-            // Show "X / Y" usage
-            const usageLabelEl = document.getElementById('usageLabel');
-            if (usageLabelEl) {
-              usageLabelEl.textContent = used + ' / ' + limit;
-            }
+        document.getElementById('planBadge').textContent = window.VxPlan?.label(effectivePlan) || 'Free';
+        document.getElementById('builderPlanLabel').textContent = window.VxPlan?.label(builderPlan) || 'Free';
+        document.getElementById('dailyPlanLabel').textContent = window.VxPlan?.label(dailyPlan) || 'Free';
+      } catch {}
 
-            // Set usage bar width percentage
-            const usagePercent = Math.round((used / limit) * 100);
-            const usageBarEl = document.getElementById('usageBar');
-            if (usageBarEl) {
-              usageBarEl.style.width = usagePercent + '%';
-            }
-          }
+      // Member since from session
+      try {
+        const session = JSON.parse(localStorage.getItem('volynx_session') || '{}');
+        if (session?.user?.created_at) {
+          const d = new Date(session.user.created_at);
+          document.getElementById('memberSince').textContent = d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
         }
       } catch {}
     }
 
-    // Logout — clear all Volynx data
+    // ── Token balance + history ──
+    async function loadTokens(forceRefresh) {
+      const balEl = document.getElementById('tokenBalance');
+      const container = document.getElementById('historyContainer');
+      const emptyEl = document.getElementById('historyEmpty');
+
+      try {
+        const data = await window.VxTokens.getBalanceWithHistory(forceRefresh);
+
+        // Balance
+        balEl.textContent = data.balance;
+        balEl.classList.toggle('balance-zero', data.balance === 0);
+
+        // History
+        if (!data.recent || data.recent.length === 0) {
+          container.innerHTML = '';
+          emptyEl.style.display = 'block';
+          return;
+        }
+
+        emptyEl.style.display = 'none';
+        container.innerHTML = data.recent.map(tx => {
+          const isSpend = tx.amount < 0;
+          const sign = isSpend ? '' : '+';
+          const cls = isSpend ? 'tx-spend' : 'tx-credit';
+          const icon = isSpend ? '&#9660;' : '&#9650;';
+          const date = new Date(tx.created_at);
+          const dateStr = date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+          const timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+          const desc = tx.description || tx.tool_name || tx.type;
+
+          return `<div class="tx-row ${cls}">
+            <span class="tx-icon">${icon}</span>
+            <div class="tx-info">
+              <span class="tx-desc">${escapeHtml(desc)}</span>
+              <span class="tx-date">${dateStr} ${timeStr}</span>
+            </div>
+            <span class="tx-amount">${sign}${tx.amount}</span>
+          </div>`;
+        }).join('');
+      } catch {
+        balEl.textContent = '—';
+      }
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ── Billing portal ──
+    document.getElementById('portalBtn')?.addEventListener('click', async () => {
+      const btn = document.getElementById('portalBtn');
+      btn.disabled = true;
+      btn.textContent = '...';
+      try {
+        const res = await fetch(apiBase + '/create-portal-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+          body: JSON.stringify({ return_url: window.location.href }),
+        });
+        const data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          btn.textContent = data.error || 'No subscription';
+          setTimeout(() => { btn.textContent = 'Billing'; btn.disabled = false; }, 2500);
+        }
+      } catch {
+        btn.textContent = 'Error';
+        setTimeout(() => { btn.textContent = 'Billing'; btn.disabled = false; }, 2500);
+      }
+    });
+
+    // ── Refresh balance ──
+    document.getElementById('refreshBalanceBtn')?.addEventListener('click', () => {
+      loadTokens(true);
+    });
+
+    // ── Voucher redemption ──
+    document.getElementById('redeemBtn')?.addEventListener('click', async () => {
+      const input = document.getElementById('voucherInput');
+      const msg = document.getElementById('voucherMsg');
+      const code = (input?.value || '').trim();
+      if (!code) return;
+
+      msg.style.display = 'block';
+      msg.textContent = 'Redeeming...';
+      msg.style.color = 'var(--muted)';
+
+      try {
+        const res = await fetch(apiBase + '/redeem-voucher', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+          body: JSON.stringify({ code }),
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+          msg.style.color = 'var(--cyan)';
+          const parts = [];
+          if (data.grants_applied?.tokens) parts.push(data.grants_applied.tokens + ' tokens');
+          if (data.grants_applied?.builder_plan) parts.push('Builder ' + data.grants_applied.builder_plan);
+          if (data.grants_applied?.daily_plan) parts.push('Daily ' + data.grants_applied.daily_plan);
+          if (data.grants_applied?.badge) parts.push(data.grants_applied.badge + ' badge');
+          msg.textContent = 'Redeemed! ' + (parts.join(' + ') || data.label || 'Success');
+          input.value = '';
+          // Refresh everything
+          loadTokens(true);
+          loadPlanInfo();
+        } else {
+          msg.style.color = 'var(--color-danger, #ff4d6a)';
+          const errors = {
+            invalid_code: 'Invalid code. Check and try again.',
+            expired: 'This code has expired.',
+            max_uses_reached: 'This code has been fully used.',
+            wrong_recipient: 'This code is for a different account.',
+            already_redeemed: 'You already redeemed this code.',
+          };
+          msg.textContent = errors[data.error] || data.error || 'Something went wrong.';
+        }
+      } catch {
+        msg.style.color = 'var(--color-danger, #ff4d6a)';
+        msg.textContent = 'Network error. Try again.';
+      }
+    });
+
+    // ── Logout ──
     document.getElementById('logoutBtn')?.addEventListener('click', () => {
-      window.VxPlan.clearCache();
-      window.VxPlan.clearAllUsage();
+      window.VxPlan?.clearCache();
+      window.VxPlan?.clearAllUsage();
+      window.VxTokens?.clearCache();
       window.location.href = '/login/';
+    });
+
+    // ── Quick Pix button (show for BR users) ──
+    const lang = localStorage.getItem('volynx_lang') || 'en';
+    const quickPixBtn = document.getElementById('quickPixBtn');
+    if (quickPixBtn && lang === 'pt') {
+      quickPixBtn.style.display = 'inline-flex';
+      quickPixBtn.addEventListener('click', () => {
+        if (window.VxPix) {
+          window.VxPix.checkout('tokens_core_brl', {
+            onSuccess: () => loadTokens(true),
+          });
+        }
+      });
+    }
+
+    // ── Init ──
+    loadPlanInfo();
+    loadTokens(false);
+
+    // Listen for balance changes from other tabs/components
+    window.addEventListener('vx:balance-changed', (e) => {
+      const balEl = document.getElementById('tokenBalance');
+      if (balEl && e.detail?.balance !== undefined) {
+        balEl.textContent = e.detail.balance;
+      }
     });
   </script>
 </FlagshipLayout>
 
 <style>
-  .account-hero{ padding-top: clamp(28px, 5vw, 52px); }
+  .account-hero { padding-top: clamp(28px, 5vw, 52px); }
+
+  .account-top-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  @media (min-width: 768px) {
+    .account-top-grid { grid-template-columns: 1.2fr 1fr; }
+  }
+
+  /* Plan card */
+  .acct-plan-card h1 {
+    font-size: clamp(1.3rem, 3vw, 1.7rem);
+    margin: 0 0 6px;
+  }
+  .acct-plan-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 20px 0;
+    padding: 16px;
+    background: rgba(255,255,255,.03);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.06);
+  }
+  .plan-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: .9rem;
+  }
+  .acct-plan-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* Token card */
+  .acct-token-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+  }
+  .token-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .refresh-btn {
+    background: none;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 999px;
+    color: var(--muted);
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: grid;
+    place-items: center;
+    transition: all .2s ease;
+  }
+  .refresh-btn:hover {
+    border-color: rgba(255,255,255,.16);
+    color: var(--text);
+  }
+  .token-big-number {
+    font-family: var(--display);
+    font-size: clamp(2.4rem, 6vw, 3.6rem);
+    font-weight: 700;
+    color: var(--cyan);
+    line-height: 1.1;
+    margin: 8px 0 4px;
+  }
+  .token-big-number.balance-zero {
+    color: var(--muted);
+  }
+  .token-subtitle {
+    font-size: .85rem;
+    margin: 0 0 16px;
+  }
+  .acct-buy-btn {
+    width: 100%;
+    max-width: 280px;
+    text-align: center;
+    font-weight: 700;
+    font-size: .95rem;
+  }
+  .token-unit-price {
+    font-size: .78rem;
+    margin-top: 8px;
+  }
+
+  /* History */
+  .acct-history-panel { max-height: 500px; overflow-y: auto; }
+  .history-header { margin-bottom: 16px; }
+  .history-header h3 { margin: 4px 0 0; font-size: 1.05rem; }
+  .history-loading, .history-empty {
+    text-align: center;
+    padding: 32px 16px;
+    font-size: .9rem;
+  }
+
+  .tx-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+  }
+  .tx-row:last-child { border-bottom: none; }
+  .tx-icon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    font-size: .7rem;
+  }
+  .tx-spend .tx-icon {
+    background: rgba(255,77,106,.12);
+    color: #ff4d6a;
+  }
+  .tx-credit .tx-icon {
+    background: rgba(139,250,240,.1);
+    color: var(--cyan);
+  }
+  .tx-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .tx-desc {
+    font-size: .88rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .tx-date {
+    font-size: .75rem;
+    color: var(--soft);
+  }
+  .tx-amount {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: .95rem;
+    flex-shrink: 0;
+  }
+  .tx-spend .tx-amount { color: #ff4d6a; }
+  .tx-credit .tx-amount { color: var(--cyan); }
+
+  /* Voucher form */
+  .voucher-form {
+    display: flex;
+    gap: 8px;
+  }
+  .vx-input {
+    flex: 1;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 12px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-size: .9rem;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .vx-input:focus {
+    border-color: rgba(139,250,240,.3);
+  }
+  .voucher-msg {
+    margin-top: 8px;
+    font-size: .82rem;
+    min-height: 1.3em;
+  }
+
+  /* Utility */
+  .muted { color: var(--muted); }
+
+  /* Quick Pix button */
+  .acct-pix-quick {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 8px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-size: .85rem;
+    font-weight: 600;
+    border: 1px solid rgba(0,186,228,.2);
+    background: rgba(0,186,228,.06);
+    color: #00bae4;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .acct-pix-quick:hover {
+    background: rgba(0,186,228,.12);
+    border-color: rgba(0,186,228,.35);
+  }
+
+  /* Button accent */
+  .button--accent {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    border-radius: 999px;
+    font-weight: 700;
+    border: 1px solid rgba(139,250,240,.25);
+    background: linear-gradient(135deg, rgba(139,250,240,.14), rgba(177,150,255,.08));
+    color: var(--cyan);
+    text-decoration: none;
+    transition: all .2s ease;
+  }
+  .button--accent:hover {
+    border-color: rgba(139,250,240,.4);
+    background: linear-gradient(135deg, rgba(139,250,240,.22), rgba(177,150,255,.12));
+  }
 </style>

@@ -223,32 +223,26 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     const tokenAmount = TOKEN_CREDITS[prefix] || 0;
 
     if (tokenAmount > 0) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("token_balance")
-        .eq("id", userId)
-        .single();
+      // Atomic credit via Postgres RPC — SELECT ... FOR UPDATE inside
+      const { data: creditResult, error: creditErr } = await supabase.rpc(
+        "credit_tokens_atomic",
+        {
+          p_user_id: userId,
+          p_amount: tokenAmount,
+          p_type: "purchase",
+          p_description: `Token pack: ${prefix} (${lookupKey})`,
+          p_metadata: JSON.stringify({
+            stripe_session_id: session.id,
+            lookup_key: lookupKey,
+          }),
+        }
+      );
 
-      const currentBalance = profile?.token_balance || 0;
-      const newBalance = currentBalance + tokenAmount;
-
-      await supabase
-        .from("profiles")
-        .update({ token_balance: newBalance })
-        .eq("id", userId);
-
-      await supabase.from("token_transactions").insert({
-        user_id: userId,
-        user_email: userEmail,
-        amount: tokenAmount,
-        type: "purchase",
-        description: `Token pack: ${prefix} (${lookupKey})`,
-        tool_name: null,
-        balance_after: newBalance,
-        metadata: { stripe_session_id: session.id, lookup_key: lookupKey },
-      });
-
-      console.log(`Credited ${tokenAmount} tokens to ${userId}. New balance: ${newBalance}`);
+      if (creditErr) {
+        console.error(`credit_tokens_atomic error for ${userId}:`, creditErr.message);
+      } else {
+        console.log(`Credited ${tokenAmount} tokens to ${userId}. New balance: ${creditResult?.balance}`);
+      }
     }
 
     if (prefix.startsWith("addon_")) {

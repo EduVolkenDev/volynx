@@ -266,7 +266,10 @@ const faqs = [
 
   <FlagshipFooter />
 
-  <!-- Checkout + Plan detection (preserved from existing) -->
+  <!-- Pix checkout helper -->
+  <script is:inline src="/js/vx-pix.js"></script>
+
+  <!-- Checkout + Plan detection -->
   <script is:inline type="module">
     const PLAN_KEYS = ['free', 'launch', 'pro', 'studio', 'teams'];
     const urlParams = new URLSearchParams(window.location.search);
@@ -327,6 +330,7 @@ const faqs = [
       });
     });
 
+    // ── Token pack: Stripe checkout (card) ──
     document.querySelectorAll('.token-card__cta').forEach((btn, idx) => {
       const packKeys = ['tokens_starter', 'tokens_core', 'tokens_pro', 'tokens_scale'];
       const packKey = packKeys[idx];
@@ -346,6 +350,24 @@ const faqs = [
           if (data.url) window.location.href = data.url;
           else { alert(data.error || data.msg || data.message || 'Checkout failed. Please try again.'); btn.textContent = 'Buy'; }
         } catch { btn.textContent = 'Buy'; }
+      });
+    });
+
+    // ── Token pack: Pix checkout (BRL only) ──
+    // Show Pix buttons when currency is BRL
+    if (currency === 'brl') {
+      document.querySelectorAll('.token-card__pix').forEach(btn => {
+        btn.style.display = 'flex';
+      });
+    }
+
+    document.querySelectorAll('.token-card__pix').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (!token) { window.location.href = '/login/?next=/pricing/'; return; }
+        const packLookup = btn.getAttribute('data-pix-pack');
+        if (!packLookup || !window.VxPix) return;
+        window.VxPix.checkout(packLookup);
       });
     });
 
