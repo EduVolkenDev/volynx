@@ -241,19 +241,7 @@ const faqs = [
 
   <style>
     .page-pricing .hero-copy h1 {
-      font-family:var(--display);
-      font-size:clamp(2.2rem, 5vw, 4rem);
-      font-weight:700;
-      line-height:1.05;
-      letter-spacing:-.03em;
-      margin:89px auto;
-      max-width:10.4ch;
-    }
-    @media (min-width:1280px) {
-      .page-pricing .hero-copy h1 { max-width:10ch; }
-    }
-    @media (min-width:1440px) {
-      .page-pricing .hero-copy h1 { font-size:4rem; }
+      margin:48px auto;
     }
     .pricing-hero-visual {
       display:none;
@@ -409,6 +397,40 @@ const faqs = [
         const packLookup = btn.getAttribute('data-pix-pack');
         if (!packLookup || !window.VxPix) return;
         window.VxPix.checkout(packLookup);
+      });
+    });
+
+    // ── Add-ons: checkout via Stripe ──
+    document.querySelectorAll('.addon-card__cta').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!token) { window.location.href = '/login/?next=/pricing/'; return; }
+        if (!apiBase) return;
+        const addonKey = btn.getAttribute('data-addon-key');
+        if (!addonKey) return;
+        const lookupKey = addonKey + '_' + currency;
+        btn.textContent = '...';
+        btn.style.pointerEvents = 'none';
+        try {
+          const res = await fetch(apiBase + '/create-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+            body: JSON.stringify({ lookup_key: lookupKey }),
+          });
+          const data = await res.json();
+          if (data.url) window.location.href = data.url;
+          else { alert(data.error || 'Checkout failed.'); btn.textContent = 'Add'; btn.style.pointerEvents = ''; }
+        } catch { btn.textContent = 'Add'; btn.style.pointerEvents = ''; }
+      });
+    });
+
+    // Clicking the card itself also triggers the button
+    document.querySelectorAll('.addon-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.addon-card__cta')) return;
+        const btn = card.querySelector('.addon-card__cta');
+        if (btn) btn.click();
       });
     });
 

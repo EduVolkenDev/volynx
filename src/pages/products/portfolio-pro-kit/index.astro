@@ -620,10 +620,10 @@ const pageDescription = "Premium portfolio system with Volynx design - Showcase 
         var cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r) { return r.json(); });
         var apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
 
-        // Use EUR as default currency (can be extended with currency selector)
-        var lookupKey = lookupBase + '_eur';
+        var currency = (localStorage.getItem('volynx_currency') || 'gbp').toLowerCase();
+        var lookupKey = lookupBase + '_' + currency;
 
-        var res = await fetch(apiBase + '/api/create-checkout-session', {
+        var res = await fetch(apiBase + '/create-checkout-session', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
           body: JSON.stringify({
