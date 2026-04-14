@@ -5,7 +5,7 @@ import FlagshipFooter from "../../components/FlagshipFooter.astro";
 import { ROUTES } from "../../data/routes";
 ---
 <FlagshipLayout title="My Products — VOLYNX" description="Access your purchased kits and products. Open them directly in Builder." pageClass="page-delivery">
-  <FlagshipHeader ctaLabel="Open Builder" ctaHref="/dev-hub/builder/" />
+  <FlagshipHeader ctaLabel="Open Builder" ctaHref="/builder/" />
   <main>
 
     <!-- ═══ HERO ═══ -->
@@ -56,7 +56,7 @@ import { ROUTES } from "../../data/routes";
           <p>Presets are loaded automatically when you follow the link from each product card.</p>
         </div>
         <div class="hero-actions">
-          <a href="/dev-hub/builder/" class="button button--gold">Open Builder</a>
+          <a href="/builder/" class="button button--gold">Open Builder</a>
           <a href={ROUTES.products} class="button button--ghost">Browse more products</a>
         </div>
       </div>
@@ -144,8 +144,8 @@ import { ROUTES } from "../../data/routes";
       const date    = formatDate(item.created_at);
       const price   = formatPrice(item.amount_paid ?? item.amount ?? item.price, item.currency);
       const builderHref = preset
-        ? '/dev-hub/builder/?preset=' + encodeURIComponent(preset)
-        : '/dev-hub/builder/';
+        ? '/builder/?preset=' + encodeURIComponent(preset)
+        : '/builder/';
 
       return `
         <article class="panel delivery-card">

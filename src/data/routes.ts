@@ -40,7 +40,7 @@ export const ROUTES = {
   // ── Dev Hub ───────────────────────────
   devHub: "/dev-hub/",
   builder: "/builder/",
-  builderLegacy: "/dev-hub/builder/",
+  builderLegacy: "/builder/",  // alias for backwards-compat (unified into /builder/)
 
   // ── Lab (Free) ────────────────────────
   lab: "/volynx-lab/",

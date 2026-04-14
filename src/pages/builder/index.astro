@@ -1,148 +1,2690 @@
 ---
-import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
-import FlagshipHeader from "../../components/FlagshipHeader.astro";
-import FlagshipFooter from "../../components/FlagshipFooter.astro";
-import { ROUTES } from "../../data/routes";
+import LabBg from "../../components/LabBg.astro";
+import Topbar from "../../components/Topbar.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
+import PageWidgets from "../../components/PageWidgets.astro";
 ---
-<FlagshipLayout title="Builder — VOLYNX" description="Create and manage premium mini-sites with a JSON editor, magic link auth and one-click publish." pageClass="page-builder">
-  <FlagshipHeader current={ROUTES.builder} ctaLabel="Open Builder" ctaHref={ROUTES.builderLegacy} />
-  <main>
 
-    <!-- ═══ HERO ═══ -->
-    <section class="hero">
-      <div class="shell hero-grid">
-        <div class="hero-copy">
-          <span class="kicker" data-i18n="builder2.hero_kicker">Builder flagship</span>
-          <h1 data-i18n="builder2.hero_title">Create, publish and scale premium websites — from draft to production.</h1>
-          <p data-i18n="builder2.hero_desc">VOLYNX Builder is the main product of the platform. Premium kits, guided flows, one-click deploy and custom domains. Five plans from Free to Teams.</p>
-          <div class="hero-actions">
-            <a href={ROUTES.builderLegacy} class="button button--gold" data-i18n="builder2.start_building">Start building</a>
-            <a href="#plans" class="button button--ghost" data-i18n="builder2.compare_plans">Compare plans</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VOLYNX Builder — Create & Manage Sites</title>
+  <meta name="description" content="Create and manage mini-sites with a JSON editor, magic link auth and one-click publish." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="shortcut icon" href="/assets/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
+  <script is:inline src="/builder/vx-renderer.js"></script>
+  <script is:inline src="/builder/vx-section-editor.js"></script>
+</head>
+
+<body>
+  <LabBg src="/assets/lucid3.jpg" />
+  <Topbar leftLinks={[{ href: "/volynx-lab/studio/", label: "Studio" }, { href: "/products/", label: "Products" }]} rightLinks={[{ href: "/profile/", label: "Profile" }]} />
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero__badge">
+      <span class="badge-dot" aria-hidden="true"></span>
+      <span data-i18n="builder.badge">VOLYNX Builder</span>
+    </div>
+    <h1 class="hero__title" data-i18n="builder.title">
+      Build &amp; <span class="accent">Deploy</span> Sites
+    </h1>
+    <p class="hero__sub" data-i18n="builder.subtitle">
+      Create mini-sites with JSON, manage them in one place,
+      and publish to your own subdomain.
+    </p>
+  </section>
+
+  <!-- APP SHELL -->
+  <main class="app" id="app">
+
+    <!-- AUTH PANEL (shown when logged out) -->
+    <div class="panel auth-panel" id="authPanel">
+      <div class="panel__icon" aria-hidden="true">⚡</div>
+      <h2 class="panel__title" data-i18n="builder.auth.title">Sign in to Builder</h2>
+      <p class="panel__sub" data-i18n="builder.auth.subtitle">Enter your email — we'll send a magic link. No password needed.</p>
+      <div class="auth-form">
+        <input
+          id="email"
+          type="email"
+          placeholder="your@email.com"
+          autocomplete="email"
+          class="field"
+        />
+        <button class="btn btn--primary" id="sendLink" data-i18n="builder.auth.cta">Get magic link</button>
+        <p class="auth-msg" id="authMsg"></p>
+      </div>
+    </div>
+
+    <!-- BUILDER WORKSPACE (shown when logged in) -->
+    <div class="workspace" id="workspace" hidden>
+
+      <!-- Session bar -->
+      <div class="session-bar">
+        <div class="session-who">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="who" class="session-email">...</span>
+        </div>
+        <button id="logout" class="btn btn--ghost btn--sm">Sign out</button>
+      </div>
+
+      <div class="grid">
+        <!-- NEW PROJECT WIZARD -->
+        <div class="card card--wizard" id="wizardCard">
+          <!-- Step indicator -->
+          <div class="wizard-steps">
+            <div class="wizard-step-dot wizard-step-dot--active" data-step="1"><span>1</span><small>Kit</small></div>
+            <div class="wizard-line-bar"><div class="wizard-line-fill" id="wizProgress"></div></div>
+            <div class="wizard-step-dot" data-step="2"><span>2</span><small>Layout</small></div>
+            <div class="wizard-line-bar"><div class="wizard-line-fill" id="wizProgress2"></div></div>
+            <div class="wizard-step-dot" data-step="3"><span>3</span><small>Brand</small></div>
+          </div>
+
+          <!-- STEP 1: Choose Kit -->
+          <div class="wizard-step" id="wizStep1">
+            <h3 class="card__title">What are you building?</h3>
+            <p class="hint" style="margin-bottom:16px">Choose a starting point. Everything is customizable after creation.</p>
+
+            <div class="archetype-grid" id="presetGrid">
+              <!-- Populated by JS with enhanced archetype cards -->
+            </div>
+
+            <div class="row" style="margin-top:16px">
+              <div class="field-group">
+                <label class="label" for="pname">Project name</label>
+                <input id="pname" class="field" placeholder="My landing page" />
+              </div>
+              <div class="field-group">
+                <label class="label" for="pslug">Slug</label>
+                <input id="pslug" class="field" placeholder="my-landing-page" />
+              </div>
+            </div>
+
+            <button class="btn btn--primary" id="toStep2" style="margin-top:14px;width:100%">
+              Next: Choose layout →
+            </button>
+          </div>
+
+          <!-- STEP 2: Layout & Variants -->
+          <div class="wizard-step" id="wizStep2" hidden>
+            <h3 class="card__title">Pick your layout</h3>
+            <p class="hint" style="margin-bottom:16px">Choose how each section looks. Mix and match freely.</p>
+
+            <!-- Variant selectors (populated by JS per preset) -->
+            <div id="variantSelectors" class="variant-selectors"></div>
+
+            <!-- Optional sections -->
+            <div id="optionalToggles" class="optional-toggles"></div>
+
+            <div style="display:flex;gap:8px;margin-top:18px">
+              <button class="btn btn--ghost" id="backStep1" style="flex:1">← Back</button>
+              <button class="btn btn--primary" id="toStep3" style="flex:2">Next: Brand details →</button>
+            </div>
+          </div>
+
+          <!-- STEP 3: Brand & Config -->
+          <div class="wizard-step" id="wizStep3" hidden>
+            <h3 class="card__title">Brand & details</h3>
+            <p class="hint" style="margin-bottom:16px">Tell us about your brand — we'll generate the copy.</p>
+
+            <div class="row">
+              <div class="field-group">
+                <label class="label" for="wBrand">Brand name</label>
+                <input id="wBrand" class="field" placeholder="Acme Inc" />
+              </div>
+              <div class="field-group">
+                <label class="label" for="wTagline">Tagline</label>
+                <input id="wTagline" class="field" placeholder="Build faster, ship smarter." />
+              </div>
+            </div>
+
+            <div class="row" style="margin-top:12px">
+              <div class="field-group">
+                <label class="label" for="wCta">Primary CTA label</label>
+                <input id="wCta" class="field" placeholder="Get started" />
+              </div>
+              <div class="field-group">
+                <label class="label" for="wCtaHref">CTA link</label>
+                <input id="wCtaHref" class="field" placeholder="https://..." />
+              </div>
+            </div>
+
+            <div class="row" style="margin-top:12px">
+              <div class="field-group">
+                <label class="label" for="wAudience">Audience</label>
+                <select id="wAudience" class="field">
+                  <option value="b2b">B2B / Companies</option>
+                  <option value="b2c">B2C / Consumers</option>
+                  <option value="developers">Developers</option>
+                  <option value="creators">Creators / Freelancers</option>
+                  <option value="agencies">Agencies</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="label" for="wGoal">Goal</label>
+                <select id="wGoal" class="field">
+                  <option value="leads">Lead generation</option>
+                  <option value="sales">Direct sales</option>
+                  <option value="showcase">Showcase / portfolio</option>
+                  <option value="bookings">Bookings</option>
+                  <option value="waitlist">Waitlist</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row" style="margin-top:12px">
+              <div class="field-group">
+                <label class="label" for="wTone">Tone</label>
+                <select id="wTone" class="field">
+                  <option value="premium">Premium</option>
+                  <option value="minimal">Minimal</option>
+                  <option value="bold">Bold</option>
+                  <option value="futuristic">Futuristic</option>
+                  <option value="organic">Organic</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="label" for="wLang">Language</label>
+                <select id="wLang" class="field">
+                  <option value="en">English</option>
+                  <option value="pt">Português</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-top:18px">
+              <button class="btn btn--ghost" id="backStep2" style="flex:1">← Back</button>
+              <button class="btn btn--primary" id="create" style="flex:2">Create project →</button>
+            </div>
+            <p class="hint" style="margin-top:10px;text-align:center">
+              Will publish at <code style="color:var(--accent)">https://<span id="slugPreview">slug</span>.volynx.world</code>
+            </p>
           </div>
         </div>
-        <div class="hero-visual hero-visual--float">
-          <img src="/assets/buildericon.webp" alt="Builder" class="hero-float-icon" />
+
+        <!-- PROJECTS LIST -->
+        <div class="card card--list">
+          <h3 class="card__title">My projects</h3>
+          <div id="projects" class="projects-list hint">No projects yet.</div>
         </div>
-      </div>
-    </section>
 
-    <!-- ═══ PLANS OVERVIEW ═══ -->
-    <section id="plans" class="page-section">
-      <div class="shell section-head">
-        <span class="eyebrow" data-i18n="builder2.plans_eyebrow">Builder plans</span>
-        <h2 data-i18n="builder2.plans_title">From draft to production, at your pace</h2>
-        <p data-i18n="builder2.plans_desc">Free is generous enough to test the flow. Pro is the serious layer for custom domains, premium kits and clean deployment.</p>
-      </div>
-      <div class="shell pricing-grid pricing-grid--plans">
-        <article class="panel feature-card">
-          <span class="label label--free" data-i18n="builder2.free_label">Free</span>
-          <h3 data-i18n="builder2.tier1_title">Draft and learn</h3>
-          <p data-i18n="builder2.tier1_desc">Test the flow, create drafts and experience the VOLYNX system.</p>
-          <ul class="detail-list">
-            <li data-i18n="builder2.tier1_item1">1 draft project</li>
-            <li data-i18n="builder2.tier1_item2">Full editor access</li>
-            <li data-i18n="builder2.tier1_item3">Preview mode</li>
-            <li data-i18n="builder2.tier1_item4">Volynx branding visible</li>
-          </ul>
-          <a href={ROUTES.builderLegacy} class="button button--ghost" style="margin-top:auto;" data-i18n="builder2.start_free">Start for free</a>
-        </article>
-        <article class="panel feature-card">
-          <span class="label" data-i18n="builder2.launch_label">Launch</span>
-          <h3 data-i18n="builder2.launch_title">Ship your first site</h3>
-          <p data-i18n="builder2.launch_desc">Entry plan to launch lean pages quickly with a volynx.world subdomain.</p>
-          <ul class="detail-list">
-            <li data-i18n="builder2.launch_item1">1 published site</li>
-            <li data-i18n="builder2.launch_item2">volynx.world subdomain</li>
-            <li data-i18n="builder2.launch_item3">Basic kits</li>
-            <li data-i18n="builder2.launch_item4">Basic analytics and forms</li>
-          </ul>
-          <a href={ROUTES.pricing} class="button button--ghost" style="margin-top:auto;" data-i18n="builder2.get_launch">Get Launch</a>
-        </article>
-        <article class="panel feature-card panel--pro">
-          <span class="label label--pro" data-i18n="builder2.pro_label">Pro</span>
-          <h3 data-i18n="builder2.tier2_title">Publish with confidence</h3>
-          <p data-i18n="builder2.tier2_desc">Custom domains, premium kits, brand control and a cleaner deployment experience.</p>
-          <ul class="detail-list">
-            <li data-i18n="builder2.tier2_item1">Up to 3 published sites</li>
-            <li data-i18n="builder2.tier2_item2">Custom domain</li>
-            <li data-i18n="builder2.tier2_item3">Remove Volynx branding</li>
-            <li data-i18n="builder2.tier2_item4">Selected premium kits</li>
-            <li data-i18n="builder2.tier2_item5">Publish priority</li>
-          </ul>
-          <a href={ROUTES.pricing} class="button button--gold" style="margin-top:auto;" data-i18n="builder2.go_pro" data-vx-hide-if-plan="pro">Go Pro</a>
-        </article>
-        <article class="panel feature-card">
-          <span class="label" data-i18n="builder2.studio_label">Studio</span>
-          <h3 data-i18n="builder2.studio_title">Scale your publishing</h3>
-          <p data-i18n="builder2.studio_desc">For creators and studios publishing frequently with multiple domains.</p>
-          <ul class="detail-list">
-            <li data-i18n="builder2.studio_item1">Up to 10 sites</li>
-            <li data-i18n="builder2.studio_item2">Multiple custom domains</li>
-            <li data-i18n="builder2.studio_item3">Full premium kits</li>
-            <li data-i18n="builder2.studio_item4">Improved analytics</li>
-            <li data-i18n="builder2.studio_item5">Bigger icons perks</li>
-          </ul>
-          <a href={ROUTES.pricing} class="button button--ghost" style="margin-top:auto;" data-i18n="builder2.get_studio">Get Studio</a>
-        </article>
-        <article class="panel feature-card">
-          <span class="label" data-i18n="builder2.teams_label">Teams</span>
-          <h3 data-i18n="builder2.tier3_title">Shared publishing operations</h3>
-          <p data-i18n="builder2.tier3_desc">Workspace for team operations with central billing and shared assets.</p>
-          <ul class="detail-list">
-            <li data-i18n="builder2.tier3_item1">25 sites</li>
-            <li data-i18n="builder2.tier3_item2">Workspace</li>
-            <li data-i18n="builder2.tier3_item3">Central billing</li>
-            <li data-i18n="builder2.tier3_item4">Shared assets and icons pool</li>
-            <li data-i18n="builder2.tier3_item5">Priority support</li>
-          </ul>
-          <a href={ROUTES.contact} class="button button--ghost" style="margin-top:auto;" data-i18n="builder2.talk_to_volynx">Talk to Volynx</a>
-        </article>
-      </div>
-    </section>
-
-    <!-- ═══ COMPARISON ═══ -->
-    <section class="page-section">
-      <div class="shell section-head">
-        <h2 data-i18n="builder2.comparison_title">What changes with each tier</h2>
-      </div>
-      <div class="shell comparison">
-        <div class="comparison-row"><strong data-i18n="builder2.comp_label1">Project overview</strong><span class="check" data-i18n="builder2.comp_val1_free">Basic list</span><span class="check pro" data-i18n="builder2.comp_val1_pro">Command center cards with status and usage</span></div>
-        <div class="comparison-row"><strong data-i18n="builder2.comp_label2">Publishing</strong><span class="check" data-i18n="builder2.comp_val2_free">Subdomain and preview</span><span class="check pro" data-i18n="builder2.comp_val2_pro">Custom domain, priority publish and restore</span></div>
-        <div class="comparison-row"><strong data-i18n="builder2.comp_label3">Templates</strong><span class="check" data-i18n="builder2.comp_val3_free">Base options</span><span class="check pro" data-i18n="builder2.comp_val3_pro">Premium systems and stronger defaults</span></div>
-        <div class="comparison-row"><strong data-i18n="builder2.comp_label4">Branding</strong><span class="check" data-i18n="builder2.comp_val4_free">Volynx watermark</span><span class="check pro" data-i18n="builder2.comp_val4_pro">Full white-label control</span></div>
-        <div class="comparison-row"><strong data-i18n="builder2.comp_label5">Export</strong><span class="check" data-i18n="builder2.comp_val5_free">Preview only</span><span class="check pro" data-i18n="builder2.comp_val5_pro">HTML export + asset packages</span></div>
-      </div>
-    </section>
-
-    <!-- ═══ CVITAE ═══ -->
-    <section class="page-section">
-      <div class="shell">
-        <article class="panel spotlight-card" style="border-color:rgba(13,148,136,.2);background:rgba(13,148,136,.03);">
-          <div>
-            <span class="label" style="color:#0D9488;border-color:rgba(13,148,136,.3);" data-i18n="builder2.cvitae_label">New · Career tool</span>
-            <h3 data-i18n="builder2.cvitae_title">CVitae — Professional CV Builder</h3>
-            <p data-i18n="builder2.cvitae_desc">Build, edit and manage your curriculum vitae with guided steps and live preview. Part of the VOLYNX ecosystem — your Builder plan unlocks extra CVs, templates and cloud sync.</p>
+        <!-- PROJECT INFO PANEL (shown after selecting a project) -->
+        <div class="card card--info" id="infoPanel" hidden>
+          <div class="info-header">
+            <h3 class="card__title" id="infoName">—</h3>
+            <span class="status-badge" id="infoBadge">draft</span>
           </div>
-          <a href={ROUTES.cvitae} class="button button--ghost" style="border-color:rgba(13,148,136,.3);color:#0D9488;" data-i18n="builder2.cvitae_btn">Open CVitae</a>
-        </article>
-      </div>
-    </section>
-
-    <!-- ═══ CTA ═══ -->
-    <section class="page-section page-section--last">
-      <div class="shell callout panel panel--pro">
-        <div>
-          <span class="label label--pro" data-i18n="builder2.cta_label">Launch today</span>
-          <strong data-i18n="builder2.cta_title">Faster than a generic builder. More premium than a cheap solution.</strong>
-          <p data-i18n="builder2.cta_desc">Premium kits, simple publishing, custom domains, icons integration and a guided flow that gets you live faster.</p>
+          <div class="info-url-box" id="infoUrlBox" hidden>
+            <span class="info-url-label">Live at</span>
+            <a class="info-url-link" id="infoUrl" href="#" target="_blank" rel="noreferrer">—</a>
+          </div>
+          <div class="info-actions">
+            <a class="btn btn--accent btn--sm" id="visitSite" href="#" target="_blank" rel="noreferrer" hidden>Visit site ↗</a>
+            <button class="btn btn--ghost btn--sm" id="exportZip">Download ZIP</button>
+            <button class="btn btn--ghost btn--sm" id="deleteProject">Delete</button>
+          </div>
         </div>
-        <div class="hero-actions">
-          <a href={ROUTES.pricing} class="button button--gold" data-i18n="builder2.see_pricing">See pricing</a>
-          <a href={ROUTES.builderLegacy} class="button button--ghost" data-i18n="builder2.open_builder">Open Builder</a>
+
+        <!-- EDITOR WORKSPACE -->
+        <div class="card card--editor">
+          <div class="editor-header">
+            <div class="editor-tabs">
+              <button class="editor-tab editor-tab--active" id="tabSections" data-tab="sections">Sections</button>
+              <button class="editor-tab" id="tabJson" data-tab="json">JSON</button>
+              <button class="editor-tab" id="tabPreview" data-tab="preview">Preview</button>
+              <button class="editor-tab editor-tab--ai" id="tabAI" data-tab="ai">✦ AI</button>
+            </div>
+            <div class="editor-actions">
+              <button class="btn btn--ghost btn--sm" id="copy">Copy</button>
+              <button class="btn btn--ghost btn--sm" id="save">Save</button>
+              <button class="btn btn--primary btn--sm" id="publish">Publish →</button>
+            </div>
+          </div>
+
+          <!-- TAB: Section Editor -->
+          <div class="editor-panel" id="panelSections">
+            <div id="sectionEditor" class="section-editor-root">
+              <div class="se-empty">Select a project to start editing</div>
+            </div>
+          </div>
+
+          <!-- TAB: JSON -->
+          <div class="editor-panel" id="panelJson" hidden>
+            <textarea id="json" class="json-editor" placeholder="Select a project to edit…" spellcheck="false"></textarea>
+          </div>
+
+          <!-- TAB: Preview -->
+          <div class="editor-panel" id="panelPreview" hidden>
+            <iframe id="previewFrame" class="preview-frame" sandbox="allow-same-origin" title="Live preview"></iframe>
+          </div>
+
+          <!-- TAB: AI Generate / Refine -->
+          <div class="editor-panel ai-panel" id="panelAI" hidden>
+            <div class="ai-panel-inner">
+              <div class="ai-panel-header">
+                <span class="ai-panel-badge">✦ AI Builder</span>
+                <p class="ai-panel-sub">Describe the site you want — AI will generate valid VxOS sections for you.</p>
+              </div>
+              <textarea id="aiPrompt" class="ai-textarea" rows="5" placeholder="Ex: A SaaS landing page for a project management tool for remote teams. Include pricing with 3 tiers, a workflow section showing 3 steps, and a FAQ."></textarea>
+              <div class="ai-actions">
+                <button class="btn btn--primary" id="aiGenerate">✦ Generate site</button>
+                <button class="btn btn--ghost" id="aiRefine" disabled title="Select a project first to refine it">Refine current</button>
+              </div>
+              <div id="aiStatus" class="ai-status" hidden></div>
+            </div>
+          </div>
+
+          <div class="editor-footer">
+            <p class="hint" id="status"></p>
+            <p class="hint" id="link"></p>
+          </div>
         </div>
       </div>
-    </section>
-
+    </div>
   </main>
-  <FlagshipFooter />
-</FlagshipLayout>
+
+  <SiteFooter />
+  <PageWidgets hideUtilBar />
+</body>
+</html>
+
+<script>
+  import { createClient } from "@supabase/supabase-js";
+
+  const $ = (id: string) => document.getElementById(id);
+  const log = (msg: string) => console.log(`[builder] ${msg}`);
+
+  let supa: any = null;
+  let currentProject: any = null;
+  let presetsData: any = {};
+  let presets: any[] = [];
+  let selectedPresetId = "blank";
+  let selectedVariants: Record<string, string> = {};
+  let wizardStep = 1;
+  let userProfile: any = null;
+
+  const KEYS = ["volynx_access_token", "volynx_refresh_token", "volynx_user_email"];
+
+  // ── Builder plan limits (loaded from DB at boot) ──────────
+  let planLimits: any = null;
+
+  async function fetchUserProfile(userId: string) {
+    const { data, error } = await supa
+      .from("profiles")
+      .select("id,email,plan,org_id,username,token_balance,builder_plan")
+      .eq("id", userId)
+      .single();
+    if (error) { log("profile fetch error: " + error.message); return null; }
+    return data;
+  }
+
+  async function fetchPlanLimits(builderPlan: string) {
+    const { data, error } = await supa
+      .from("builder_plan_limits")
+      .select("*")
+      .eq("plan", builderPlan)
+      .single();
+    if (error || !data) return { max_drafts: 1, max_published: 0, custom_domain: false, remove_branding: false, premium_kits: false };
+    return data;
+  }
+
+  async function countActiveProjects(userId: string): Promise<{ drafts: number; published: number }> {
+    const { data, error } = await supa
+      .from("projects")
+      .select("id,status")
+      .eq("user_id", userId)
+      .is("deleted_at", null);
+    if (error || !data) return { drafts: 0, published: 0 };
+    const published = data.filter((p: any) => p.status === "published").length;
+    return { drafts: data.length, published };
+  }
+
+  async function logUsage(toolName: string) {
+    if (!userProfile) return;
+    // Call API endpoint (server-side logging)
+    try {
+      const cfg = await fetch("/config.json", { cache: "no-store" }).then(r => r.json());
+      const apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || "").replace(/\/$/, "");
+      const token = localStorage.getItem("volynx_access_token") || "";
+      if (apiBase && token) {
+        fetch(`${apiBase}/log-usage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ tool: toolName, amount: 1 }),
+        }).catch(() => {});
+      }
+    } catch {}
+    log(`usage logged: ${toolName}`);
+  }
+
+  async function useTokens(actionId: string): Promise<{ ok: boolean; balance?: number; reason?: string }> {
+    try {
+      const cfg = await fetch("/config.json", { cache: "no-store" }).then(r => r.json());
+      const apiBase = (cfg.apiBaseUrl || "").replace(/\/$/, "");
+      const token = localStorage.getItem("volynx_access_token") || "";
+      if (!apiBase || !token) return { ok: true }; // fallback: allow if no API
+      const res = await fetch(`${apiBase}/api/use-tokens`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ action: actionId, tool: "builder" }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        return { ok: false, balance: j.balance, reason: j.reason };
+      }
+      const j = await res.json();
+      return { ok: true, balance: j.balance };
+    } catch { return { ok: true }; } // fallback: allow on error
+  }
+
+  function canCreate(counts: { drafts: number; published: number }): { ok: boolean; msg: string } {
+    if (!planLimits) return { ok: true, msg: "" };
+    const max = planLimits.max_drafts;
+    if (max === -1 || max >= 999) return { ok: true, msg: "" };
+    if (counts.drafts >= max) {
+      return { ok: false, msg: `Your plan allows ${max} project${max > 1 ? "s" : ""}. Upgrade for more.` };
+    }
+    return { ok: true, msg: "" };
+  }
+
+  function canPublish(counts: { drafts: number; published: number }): { ok: boolean; msg: string } {
+    if (!planLimits) return { ok: true, msg: "" };
+    const max = planLimits.max_published;
+    if (max === -1 || max >= 999) return { ok: true, msg: "" };
+    if (max === 0) {
+      return { ok: false, msg: "Publishing requires a paid plan. Upgrade to Launch or Pro." };
+    }
+    if (counts.published >= max) {
+      return { ok: false, msg: `Your plan allows ${max} published site${max > 1 ? "s" : ""}. Upgrade for more.` };
+    }
+    return { ok: true, msg: "" };
+  }
+
+  const setStatus = (t: string) => { const el = $("status"); if (el) el.textContent = t || ""; };
+
+  // ── Tab switching ────────────────────────────────────────
+  function switchTab(tab: string) {
+    const panels: Record<string, string> = { sections: "panelSections", json: "panelJson", preview: "panelPreview", ai: "panelAI" };
+    Object.entries(panels).forEach(([t, id]) => {
+      const panel = $(id) as HTMLElement;
+      if (panel) panel.hidden = t !== tab;
+    });
+    document.querySelectorAll(".editor-tab").forEach(el => {
+      el.classList.toggle("editor-tab--active", (el as HTMLElement).dataset.tab === tab);
+    });
+    if (tab === "preview") {
+      try {
+        const raw = ($("json") as HTMLTextAreaElement)?.value || "{}";
+        const data = JSON.parse(raw);
+        const frame = $("previewFrame") as HTMLIFrameElement;
+        if (frame && (window as any).VxRenderer && data.sections) {
+          frame.srcdoc = (window as any).VxRenderer.renderPage(data);
+        }
+      } catch {}
+    }
+  }
+
+  // ── Button loading helper ────────────────────────────────
+  function btnLoading(btn: HTMLButtonElement | null, loading: boolean, label?: string) {
+    if (!btn) return;
+    if (loading) {
+      btn.disabled = true;
+      btn.classList.add("is-loading");
+      if (label) btn.dataset.origLabel = btn.textContent || "";
+      if (label) btn.textContent = label;
+    } else {
+      btn.disabled = false;
+      btn.classList.remove("is-loading");
+      if (btn.dataset.origLabel) { btn.textContent = btn.dataset.origLabel; delete btn.dataset.origLabel; }
+    }
+  }
+
+  const slugify = (s: string) =>
+    (s || "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+  const rand4 = () => Math.random().toString(16).slice(2, 6);
+
+  // ── Wizard navigation ──────────────────────────────────────
+  function showWizardStep(step: number) {
+    wizardStep = step;
+    ($("wizStep1") as HTMLElement).hidden = step !== 1;
+    ($("wizStep2") as HTMLElement).hidden = step !== 2;
+    ($("wizStep3") as HTMLElement).hidden = step !== 3;
+    document.querySelectorAll(".wizard-step-dot").forEach(d => {
+      const s = Number((d as HTMLElement).dataset.step);
+      d.classList.toggle("wizard-step-dot--active", s <= step);
+    });
+    const p1 = $("wizProgress") as HTMLElement;
+    const p2 = $("wizProgress2") as HTMLElement;
+    if (p1) p1.style.width = step >= 2 ? "100%" : "0%";
+    if (p2) p2.style.width = step >= 3 ? "100%" : "0%";
+
+    if (step === 2) {
+      renderVariantSelectors();
+      renderOptionalToggles();
+    }
+    if (step === 3) {
+      const slug = slugify(($("pname") as HTMLInputElement)?.value || "") || "slug";
+      const preview = $("slugPreview");
+      if (preview) preview.textContent = `${slug}-${rand4()}`;
+    }
+  }
+
+  // ── Preset picker ──────────────────────────────────────────
+  async function loadPresets() {
+    try {
+      const res = await fetch("/builder/presets.json", { cache: "no-store" });
+      if (!res.ok) return;
+      presetsData = await res.json();
+      presets = presetsData.presets || [];
+      renderPresetPicker();
+      log("presets loaded: " + presets.length);
+    } catch { log("presets unavailable"); }
+  }
+
+  // Mini layout SVGs for preset previews
+  const presetIcons: Record<string, string> = {
+    blank: "📄",
+    saas: "⚡",
+    agency: "🏢",
+    portfolio: "👤",
+  };
+
+  // Enhanced archetype descriptions
+  const archetypeInfo: Record<string, { outcome: string; ideal: string }> = {
+    saas: {
+      outcome: "A conversion-focused product page with pricing, features and social proof",
+      ideal: "Software products, apps, and platforms that need to convert visitors into users",
+    },
+    agency: {
+      outcome: "A professional services page with process steps, packages and client trust signals",
+      ideal: "Agencies, studios, and consultancies that sell expertise and services",
+    },
+    portfolio: {
+      outcome: "A personal brand page with work showcase, skills and a clear hire-me CTA",
+      ideal: "Developers, designers, and freelancers presenting their work and availability",
+    },
+  };
+
+  function renderPresetPicker() {
+    const grid = $("presetGrid");
+    if (!grid) return;
+
+    const blank = `<button type="button" class="archetype-card" data-preset="blank">
+      <div class="archetype-icon">${presetIcons.blank}</div>
+      <div class="archetype-body">
+        <span class="archetype-name">Custom</span>
+        <span class="archetype-outcome">Start from scratch with a blank canvas</span>
+        <span class="archetype-ideal">For experienced users who want full control</span>
+      </div>
+    </button>`;
+
+    const cards = presets.map((p: any) => {
+      const info = archetypeInfo[p.id] || { outcome: p.description, ideal: "" };
+      return `<button type="button" class="archetype-card${p.id === 'saas' ? ' archetype-card--active' : ''}" data-preset="${p.id}">
+      <div class="archetype-icon">${presetIcons[p.id] || p.icon || "📦"}</div>
+      <div class="archetype-body">
+        <span class="archetype-name">${p.name}</span>
+        <span class="archetype-outcome">${info.outcome}</span>
+        <span class="archetype-ideal">${info.ideal}</span>
+      </div>
+    </button>`;
+    }).join("");
+
+    // Landing Express quick-start
+    const landingExpress = `<button type="button" class="archetype-card archetype-card--express" data-preset="landing-express">
+      <div class="archetype-icon archetype-icon--express">⚡</div>
+      <div class="archetype-body">
+        <span class="archetype-name">Landing Express</span>
+        <span class="archetype-tag">Guided</span>
+        <span class="archetype-outcome">Answer 3 questions and get a ready-to-edit landing page in seconds</span>
+        <span class="archetype-ideal">The fastest way to launch. Perfect for first-time users.</span>
+      </div>
+    </button>`;
+
+    grid.innerHTML = landingExpress + cards + blank;
+
+    // Default selection
+    selectedPresetId = "saas";
+    grid.querySelector('.archetype-card--active')?.scrollIntoView({ block: "nearest" });
+
+    grid.querySelectorAll(".archetype-card").forEach(btn => {
+      btn.addEventListener("click", () => {
+        grid.querySelectorAll(".archetype-card").forEach(b => b.classList.remove("archetype-card--active"));
+        btn.classList.add("archetype-card--active");
+        const preset = (btn as HTMLElement).dataset.preset || "blank";
+
+        // Landing Express redirects to a simplified flow
+        if (preset === "landing-express") {
+          selectedPresetId = "saas"; // default base for express
+          showLandingExpressFlow();
+          return;
+        }
+
+        // TODO: premium gating — check planLimits.premium_kits here before allowing
+        // non-free presets. If planLimits.premium_kits === false and the selected preset
+        // is a paid kit, block selection and prompt the user to upgrade.
+        // Example: if (!planLimits?.premium_kits && PREMIUM_PRESET_IDS.includes(preset)) { ... }
+
+        selectedPresetId = preset;
+        selectedVariants = {};
+        renderVariantSelectors();
+        log("preset selected: " + selectedPresetId);
+      });
+    });
+    renderVariantSelectors();
+  }
+
+  // ── Landing Express guided flow ──
+  function showLandingExpressFlow() {
+    const wizCard = $("wizardCard") as HTMLElement;
+    if (!wizCard) return;
+
+    // Replace wizard content with express flow
+    const expressHtml = `
+      <div class="express-flow" id="expressFlow">
+        <div class="express-header">
+          <span class="express-badge">⚡ Landing Express</span>
+          <h3 class="card__title">Build your landing page in 60 seconds</h3>
+        </div>
+
+        <div class="express-step" id="exStep1">
+          <div class="express-q">What type of business is this for?</div>
+          <div class="express-options" id="exArchetype">
+            <button class="express-opt" data-val="saas">⚡ Software / SaaS</button>
+            <button class="express-opt" data-val="agency">🏢 Agency / Studio</button>
+            <button class="express-opt" data-val="portfolio">👤 Freelancer / Portfolio</button>
+            <button class="express-opt" data-val="local">📍 Local Business</button>
+            <button class="express-opt" data-val="ecommerce">🛒 E-commerce</button>
+            <button class="express-opt" data-val="event">🎯 Event / Launch</button>
+          </div>
+        </div>
+
+        <div class="express-step" id="exStep2" hidden>
+          <div class="express-q">What should visitors do?</div>
+          <div class="express-options" id="exGoal">
+            <button class="express-opt" data-val="leads">📩 Book a call / Get in touch</button>
+            <button class="express-opt" data-val="sales">💳 Buy or subscribe</button>
+            <button class="express-opt" data-val="waitlist">📋 Join a waitlist</button>
+            <button class="express-opt" data-val="showcase">👁 Learn and trust</button>
+          </div>
+        </div>
+
+        <div class="express-step" id="exStep3" hidden>
+          <div class="express-q">Last details</div>
+          <div class="row">
+            <div class="field-group">
+              <label class="label" for="exBrand">Brand name</label>
+              <input id="exBrand" class="field" placeholder="Your brand" />
+            </div>
+            <div class="field-group">
+              <label class="label" for="exTagline">One-line description</label>
+              <input id="exTagline" class="field" placeholder="What you do, in one sentence" />
+            </div>
+          </div>
+          <div class="row" style="margin-top:12px">
+            <div class="field-group">
+              <label class="label" for="exCta">Main button text</label>
+              <input id="exCta" class="field" placeholder="Get started" />
+            </div>
+            <div class="field-group">
+              <label class="label" for="exSlug">Slug</label>
+              <input id="exSlug" class="field" placeholder="my-brand" />
+            </div>
+          </div>
+          <button class="btn btn--primary" id="exGenerate" style="margin-top:18px;width:100%">
+            Generate my landing page →
+          </button>
+        </div>
+
+        <button class="btn btn--ghost btn--sm" id="exBack" style="margin-top:12px">← Back to templates</button>
+      </div>
+    `;
+
+    // Store original wizard content
+    if (!(wizCard as any)._originalHTML) {
+      (wizCard as any)._originalHTML = wizCard.innerHTML;
+    }
+    wizCard.innerHTML = expressHtml;
+
+    let exArchetype = "saas";
+    let exGoal = "leads";
+
+    // Archetype mapping
+    const archetypeToPreset: Record<string, string> = {
+      saas: "saas", agency: "agency", portfolio: "portfolio",
+      local: "agency", ecommerce: "saas", event: "saas",
+    };
+
+    // Step 1: Archetype
+    $("exArchetype")?.querySelectorAll(".express-opt").forEach((btn: any) => {
+      btn.addEventListener("click", () => {
+        $("exArchetype")!.querySelectorAll(".express-opt").forEach((b: any) => b.classList.remove("express-opt--active"));
+        btn.classList.add("express-opt--active");
+        exArchetype = btn.dataset.val;
+        ($("exStep2") as HTMLElement).hidden = false;
+        ($("exStep2") as HTMLElement).scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+    });
+
+    // Step 2: Goal
+    $("exGoal")?.querySelectorAll(".express-opt").forEach((btn: any) => {
+      btn.addEventListener("click", () => {
+        $("exGoal")!.querySelectorAll(".express-opt").forEach((b: any) => b.classList.remove("express-opt--active"));
+        btn.classList.add("express-opt--active");
+        exGoal = btn.dataset.val;
+        ($("exStep3") as HTMLElement).hidden = false;
+        ($("exStep3") as HTMLElement).scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+    });
+
+    // Generate
+    $("exGenerate")?.addEventListener("click", async () => {
+      const brand = ($("exBrand") as HTMLInputElement)?.value?.trim() || "My Brand";
+      const tagline = ($("exTagline") as HTMLInputElement)?.value?.trim() || "";
+      const cta = ($("exCta") as HTMLInputElement)?.value?.trim() || "Get started";
+      const slug = ($("exSlug") as HTMLInputElement)?.value?.trim() || brand.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+      // Restore wizard + use selected archetype
+      selectedPresetId = archetypeToPreset[exArchetype] || "saas";
+
+      // Set wizard inputs programmatically
+      wizCard.innerHTML = (wizCard as any)._originalHTML;
+      renderPresetPicker();
+      renderVariantSelectors();
+
+      // Fill in brand fields
+      ($("pname") as HTMLInputElement).value = brand;
+      ($("pslug") as HTMLInputElement).value = slug;
+      ($("wBrand") as HTMLInputElement).value = brand;
+      ($("wTagline") as HTMLInputElement).value = tagline;
+      ($("wCta") as HTMLInputElement).value = cta;
+      ($("wGoal") as HTMLSelectElement).value = exGoal;
+
+      // Auto-create the project
+      const w = getWizardInputs();
+      w.name = brand;
+      w.brand = brand;
+      w.tagline = tagline;
+      w.cta = cta;
+      w.goal = exGoal;
+
+      const projectName = brand;
+      const projectSlug = slug + "-" + Math.random().toString(36).slice(2, 6);
+      const builder_data = buildProjectData();
+
+      setStatus("Creating your landing page...");
+      const { data, error } = await supa.from("projects")
+        .insert({ user_id: user.id, name: projectName, slug: projectSlug, domain_type: "subdomain", builder_data, status: "draft" })
+        .select("id,name,slug,builder_data,status,created_at")
+        .single();
+
+      if (error) { setStatus(error.message); return; }
+      await logUsage("builder_create");
+      setStatus("Landing page created!");
+      await listProjects(user.id);
+      openProject(data);
+
+      // Switch to sections tab
+      switchTab("sections");
+    });
+
+    // Back button
+    $("exBack")?.addEventListener("click", () => {
+      wizCard.innerHTML = (wizCard as any)._originalHTML;
+      renderPresetPicker();
+      renderVariantSelectors();
+    });
+  }
+
+  // ── Variant mini-layout SVGs ────────────────────────────────
+  const variantIcons: Record<string, Record<string, string>> = {
+    hero: {
+      centered: `<svg viewBox="0 0 64 44"><rect x="12" y="6" width="40" height="4" rx="2" fill="currentColor" opacity=".4"/><rect x="18" y="14" width="28" height="2" rx="1" fill="currentColor" opacity=".15"/><rect x="22" y="20" width="20" height="5" rx="2.5" fill="currentColor" opacity=".25"/></svg>`,
+      split: `<svg viewBox="0 0 64 44"><rect x="4" y="8" width="26" height="4" rx="2" fill="currentColor" opacity=".4"/><rect x="4" y="16" width="20" height="2" rx="1" fill="currentColor" opacity=".15"/><rect x="4" y="22" width="14" height="5" rx="2.5" fill="currentColor" opacity=".25"/><rect x="36" y="6" width="24" height="24" rx="4" fill="currentColor" opacity=".08"/></svg>`,
+      minimal: `<svg viewBox="0 0 64 44"><rect x="4" y="10" width="36" height="4" rx="2" fill="currentColor" opacity=".35"/><rect x="4" y="18" width="24" height="2" rx="1" fill="currentColor" opacity=".12"/><rect x="4" y="24" width="14" height="4" rx="2" fill="currentColor" opacity=".2"/></svg>`,
+      product: `<svg viewBox="0 0 64 44"><rect x="16" y="4" width="32" height="3" rx="1.5" fill="currentColor" opacity=".35"/><rect x="20" y="10" width="24" height="2" rx="1" fill="currentColor" opacity=".12"/><rect x="8" y="18" width="48" height="20" rx="4" fill="currentColor" opacity=".06"/><rect x="22" y="14" width="20" height="5" rx="2.5" fill="currentColor" opacity=".2"/></svg>`,
+    },
+    pricing: {
+      tiered: `<svg viewBox="0 0 64 44"><rect x="2" y="6" width="18" height="32" rx="3" fill="currentColor" opacity=".06"/><rect x="23" y="4" width="18" height="34" rx="3" fill="currentColor" opacity=".12"/><rect x="44" y="6" width="18" height="32" rx="3" fill="currentColor" opacity=".06"/></svg>`,
+      single: `<svg viewBox="0 0 64 44"><rect x="14" y="6" width="36" height="32" rx="4" fill="currentColor" opacity=".1"/><rect x="22" y="12" width="20" height="3" rx="1.5" fill="currentColor" opacity=".2"/><rect x="24" y="20" width="16" height="2" rx="1" fill="currentColor" opacity=".1"/></svg>`,
+      comparison: `<svg viewBox="0 0 64 44"><rect x="4" y="6" width="56" height="32" rx="3" fill="currentColor" opacity=".04"/><line x1="24" y1="6" x2="24" y2="38" stroke="currentColor" opacity=".08"/><line x1="44" y1="6" x2="44" y2="38" stroke="currentColor" opacity=".08"/><rect x="6" y="10" width="14" height="2" rx="1" fill="currentColor" opacity=".15"/></svg>`,
+    },
+    proof: {
+      "metrics+logos": `<svg viewBox="0 0 64 44"><rect x="4" y="6" width="12" height="10" rx="2" fill="currentColor" opacity=".1"/><rect x="20" y="6" width="12" height="10" rx="2" fill="currentColor" opacity=".1"/><rect x="36" y="6" width="12" height="10" rx="2" fill="currentColor" opacity=".1"/><rect x="52" y="6" width="8" height="10" rx="2" fill="currentColor" opacity=".1"/><rect x="8" y="26" width="10" height="3" rx="1.5" fill="currentColor" opacity=".08"/><rect x="22" y="26" width="10" height="3" rx="1.5" fill="currentColor" opacity=".08"/><rect x="36" y="26" width="10" height="3" rx="1.5" fill="currentColor" opacity=".08"/><rect x="50" y="26" width="10" height="3" rx="1.5" fill="currentColor" opacity=".08"/></svg>`,
+      metrics: `<svg viewBox="0 0 64 44"><rect x="4" y="12" width="12" height="14" rx="2" fill="currentColor" opacity=".12"/><rect x="20" y="12" width="12" height="14" rx="2" fill="currentColor" opacity=".12"/><rect x="36" y="12" width="12" height="14" rx="2" fill="currentColor" opacity=".12"/><rect x="52" y="12" width="8" height="14" rx="2" fill="currentColor" opacity=".12"/></svg>`,
+      logos: `<svg viewBox="0 0 64 44"><rect x="6" y="16" width="10" height="4" rx="2" fill="currentColor" opacity=".1"/><rect x="20" y="16" width="10" height="4" rx="2" fill="currentColor" opacity=".1"/><rect x="34" y="16" width="10" height="4" rx="2" fill="currentColor" opacity=".1"/><rect x="48" y="16" width="10" height="4" rx="2" fill="currentColor" opacity=".1"/></svg>`,
+      none: `<svg viewBox="0 0 64 44"><line x1="22" y1="14" x2="42" y2="30" stroke="currentColor" opacity=".15" stroke-width="1.5"/><line x1="42" y1="14" x2="22" y2="30" stroke="currentColor" opacity=".15" stroke-width="1.5"/></svg>`,
+    },
+    process: {
+      workflow: `<svg viewBox="0 0 64 44"><circle cx="12" cy="22" r="6" fill="currentColor" opacity=".1"/><circle cx="32" cy="22" r="6" fill="currentColor" opacity=".1"/><circle cx="52" cy="22" r="6" fill="currentColor" opacity=".1"/><line x1="18" y1="22" x2="26" y2="22" stroke="currentColor" opacity=".12"/><line x1="38" y1="22" x2="46" y2="22" stroke="currentColor" opacity=".12"/></svg>`,
+      featureSplit: `<svg viewBox="0 0 64 44"><rect x="4" y="8" width="26" height="28" rx="3" fill="currentColor" opacity=".06"/><rect x="34" y="10" width="24" height="3" rx="1.5" fill="currentColor" opacity=".12"/><rect x="34" y="17" width="20" height="2" rx="1" fill="currentColor" opacity=".08"/><rect x="34" y="23" width="20" height="2" rx="1" fill="currentColor" opacity=".08"/><rect x="34" y="29" width="20" height="2" rx="1" fill="currentColor" opacity=".08"/></svg>`,
+      none: `<svg viewBox="0 0 64 44"><line x1="22" y1="14" x2="42" y2="30" stroke="currentColor" opacity=".15" stroke-width="1.5"/><line x1="42" y1="14" x2="22" y2="30" stroke="currentColor" opacity=".15" stroke-width="1.5"/></svg>`,
+    },
+    focus: {
+      hire_me: `<svg viewBox="0 0 64 44"><circle cx="32" cy="14" r="6" fill="currentColor" opacity=".15"/><rect x="16" y="24" width="32" height="3" rx="1.5" fill="currentColor" opacity=".2"/><rect x="20" y="31" width="24" height="2" rx="1" fill="currentColor" opacity=".1"/></svg>`,
+      technical: `<svg viewBox="0 0 64 44"><rect x="6" y="8" width="52" height="5" rx="2" fill="currentColor" opacity=".06"/><rect x="8" y="10" width="6" height="1" rx=".5" fill="#34D399" opacity=".4"/><rect x="16" y="10" width="14" height="1" rx=".5" fill="currentColor" opacity=".15"/><rect x="6" y="18" width="52" height="5" rx="2" fill="currentColor" opacity=".06"/><rect x="6" y="28" width="52" height="5" rx="2" fill="currentColor" opacity=".06"/></svg>`,
+      creative: `<svg viewBox="0 0 64 44"><rect x="4" y="6" width="26" height="18" rx="4" fill="currentColor" opacity=".08"/><rect x="34" y="6" width="26" height="18" rx="4" fill="currentColor" opacity=".08"/><rect x="4" y="28" width="56" height="10" rx="3" fill="currentColor" opacity=".05"/></svg>`,
+    },
+    showcase: {
+      valueGrid: `<svg viewBox="0 0 64 44"><rect x="4" y="6" width="26" height="14" rx="3" fill="currentColor" opacity=".08"/><rect x="34" y="6" width="26" height="14" rx="3" fill="currentColor" opacity=".08"/><rect x="4" y="24" width="26" height="14" rx="3" fill="currentColor" opacity=".08"/><rect x="34" y="24" width="26" height="14" rx="3" fill="currentColor" opacity=".08"/></svg>`,
+      featureSplit: `<svg viewBox="0 0 64 44"><rect x="4" y="10" width="26" height="24" rx="3" fill="currentColor" opacity=".06"/><rect x="34" y="12" width="24" height="3" rx="1.5" fill="currentColor" opacity=".12"/><rect x="34" y="19" width="20" height="2" rx="1" fill="currentColor" opacity=".08"/><rect x="34" y="25" width="20" height="2" rx="1" fill="currentColor" opacity=".08"/></svg>`,
+      none: `<svg viewBox="0 0 64 44"><line x1="22" y1="14" x2="42" y2="30" stroke="currentColor" opacity=".15" stroke-width="1.5"/><line x1="42" y1="14" x2="22" y2="30" stroke="currentColor" opacity=".15" stroke-width="1.5"/></svg>`,
+    },
+  };
+
+  const variantLabels: Record<string, string> = {
+    centered: "Centered", split: "Split", minimal: "Minimal", product: "Product",
+    tiered: "Tiered", single: "Single", comparison: "Table",
+    "metrics+logos": "Both", metrics: "Metrics", logos: "Logos", none: "None",
+    workflow: "Steps", featureSplit: "List", valueGrid: "Grid",
+    hire_me: "Hire me", technical: "Technical", creative: "Creative",
+  };
+
+  // ── Variant selectors (per preset) ─────────────────────────
+  function renderVariantSelectors() {
+    const box = $("variantSelectors") as HTMLElement;
+    if (!box) return;
+    const preset = presets.find((p: any) => p.id === selectedPresetId);
+    if (!preset?.variants) { box.innerHTML = ""; return; }
+
+    box.innerHTML = Object.entries(preset.variants as Record<string, any>).map(([key, v]: [string, any]) => {
+      selectedVariants[key] = selectedVariants[key] || v.default;
+      const icons = variantIcons[key] || {};
+      return `<div class="variant-group">
+        <label class="label">${v.label}</label>
+        <div class="variant-options" data-variant-key="${key}">
+          ${v.options.map((opt: string) => `<button type="button" class="variant-card ${opt === (selectedVariants[key] || v.default) ? "variant-card--active" : ""}" data-value="${opt}">
+            <div class="variant-card__preview">${icons[opt] || `<span style="font-size:11px;opacity:.3">${opt}</span>`}</div>
+            <span class="variant-card__label">${variantLabels[opt] || opt}</span>
+          </button>`).join("")}
+        </div>
+      </div>`;
+    }).join("");
+
+    box.querySelectorAll(".variant-options").forEach(group => {
+      const key = (group as HTMLElement).dataset.variantKey!;
+      group.querySelectorAll(".variant-card").forEach(card => {
+        card.addEventListener("click", () => {
+          group.querySelectorAll(".variant-card").forEach(c => c.classList.remove("variant-card--active"));
+          card.classList.add("variant-card--active");
+          selectedVariants[key] = (card as HTMLElement).dataset.value || "";
+          log(`variant ${key} = ${selectedVariants[key]}`);
+        });
+      });
+    });
+  }
+
+  // ── Optional section toggles ───────────────────────────────
+  function renderOptionalToggles() {
+    const box = $("optionalToggles") as HTMLElement;
+    if (!box) return;
+    const preset = presets.find((p: any) => p.id === selectedPresetId);
+    if (!preset?.optionalSections) { box.innerHTML = ""; return; }
+
+    box.innerHTML = `<label class="label">Include sections</label><div class="toggle-grid">` +
+      Object.entries(preset.optionalSections as Record<string, any>).map(([key, cfg]: [string, any]) =>
+        `<label class="toggle-item">
+          <input type="checkbox" data-section="${key}" ${cfg.default ? "checked" : ""} />
+          <span>${cfg.label}</span>
+        </label>`
+      ).join("") + `</div>`;
+  }
+
+  function getEnabledSections(): Set<string> {
+    const enabled = new Set<string>();
+    const box = $("optionalToggles");
+    if (!box) return enabled;
+    box.querySelectorAll<HTMLInputElement>("input[data-section]").forEach(cb => {
+      if (cb.checked) enabled.add(cb.dataset.section!);
+    });
+    return enabled;
+  }
+
+  // ── Build project data ─────────────────────────────────────
+  interface WizardInputs {
+    name: string;
+    brand: string;
+    tagline: string;
+    cta: string;
+    ctaHref: string;
+    audience: string;
+    goal: string;
+    tone: string;
+    lang: string;
+  }
+
+  function getWizardInputs(): WizardInputs {
+    return {
+      name: (($("pname") as HTMLInputElement)?.value || "").trim() || "New Site",
+      brand: (($("wBrand") as HTMLInputElement)?.value || "").trim(),
+      tagline: (($("wTagline") as HTMLInputElement)?.value || "").trim(),
+      cta: (($("wCta") as HTMLInputElement)?.value || "").trim(),
+      ctaHref: (($("wCtaHref") as HTMLInputElement)?.value || "").trim(),
+      audience: (($("wAudience") as HTMLSelectElement)?.value || "b2b"),
+      goal: (($("wGoal") as HTMLSelectElement)?.value || "leads"),
+      tone: (($("wTone") as HTMLSelectElement)?.value || "premium"),
+      lang: (($("wLang") as HTMLSelectElement)?.value || "en"),
+    };
+  }
+
+  // ── Intent-aware copy engine ─────────────────────────────
+  // Structured by preset × goal × audience → specific copy
+  // Instead of one generic "heroVerb", each combination gets real copy.
+
+  type CopySeed = {
+    title: (brand: string) => string;
+    subtitle: string;
+    ctaLabel: string;
+    ctaClose: string;
+    urgency: string;
+    proofLine: string;
+    tagline: (brand: string) => string;
+  };
+
+  function getCopySeed(preset: string, goal: string, audience: string, tone: string): CopySeed {
+    // ── Audience fragments ──────────────────────────
+    const aud: Record<string, { for: string; proof: string }> = {
+      b2b:        { for: "companies and teams",     proof: "Trusted by leading companies" },
+      b2c:        { for: "thousands of users",       proof: "Loved by thousands of users" },
+      developers: { for: "developers who ship",      proof: "Used by developers worldwide" },
+      creators:   { for: "creators and freelancers", proof: "Chosen by top creators" },
+      agencies:   { for: "agencies and studios",     proof: "Trusted by agencies globally" },
+    };
+    const a = aud[audience] || aud.b2b;
+
+    // ── Tone modifiers ──────────────────────────────
+    const toneAdj: Record<string, { feel: string; badge: string }> = {
+      premium:    { feel: "premium",       badge: "Premium experience" },
+      minimal:    { feel: "clean",         badge: "Simple by design" },
+      bold:       { feel: "powerful",      badge: "Built different" },
+      futuristic: { feel: "next-gen",      badge: "The future is here" },
+      organic:    { feel: "human",         badge: "Human-first" },
+    };
+    const t = toneAdj[tone] || toneAdj.premium;
+
+    // ── Preset × goal matrix ────────────────────────
+    // SaaS
+    if (preset === "saas") {
+      if (goal === "waitlist") return {
+        title: (b) => `${b} is coming. Get early access before everyone else.`,
+        subtitle: `A ${t.feel} platform built for ${a.for}. We're launching soon — reserve your spot.`,
+        ctaLabel: "Join the waitlist", ctaClose: "Be the first to know.", urgency: "Early access for the first 500.",
+        proofLine: a.proof, tagline: (b) => `${b} — launching soon.`,
+      };
+      if (goal === "sales") return {
+        title: (b) => `${b} — the ${t.feel} way to run your workflow.`,
+        subtitle: `Built for ${a.for} who need speed, clarity and zero friction. Start in minutes.`,
+        ctaLabel: "Start free trial", ctaClose: "Join ${a.for} already on the platform.", urgency: "No credit card required.",
+        proofLine: a.proof, tagline: (b) => `${b} — workflow, simplified.`,
+      };
+      if (goal === "bookings") return {
+        title: (b) => `${b} — see it in action. Book a live demo.`,
+        subtitle: `A ${t.feel} platform for ${a.for}. We'll walk you through everything in 20 minutes.`,
+        ctaLabel: "Book a demo", ctaClose: "Pick a time that works for you.", urgency: "Next available slot this week.",
+        proofLine: a.proof, tagline: (b) => `${b} — built for ${a.for}.`,
+      };
+      // default: leads
+      return {
+        title: (b) => `Stop duct-taping your stack. ${b} replaces the chaos.`,
+        subtitle: `One ${t.feel} platform for ${a.for} who want results, not workarounds.`,
+        ctaLabel: "Get a free demo", ctaClose: "See how it works for your team.", urgency: "Free consultation, no commitment.",
+        proofLine: a.proof, tagline: (b) => `${b} — built for ${a.for}.`,
+      };
+    }
+
+    // Agency
+    if (preset === "agency") {
+      if (goal === "bookings") return {
+        title: (b) => `${b} — strategy, design and code. One call to start.`,
+        subtitle: `We help ${a.for} ship ${t.feel} digital products. No pitch decks — just a real conversation about your project.`,
+        ctaLabel: "Book a call", ctaClose: "Let's talk about what you're building.", urgency: "Usually reply within 24 hours.",
+        proofLine: a.proof, tagline: (b) => `${b} — digital products for ${a.for}.`,
+      };
+      if (goal === "leads") return {
+        title: (b) => `${b} builds digital products for ${a.for} who care about execution.`,
+        subtitle: `Strategy, design and engineering under one roof. ${t.feel.charAt(0).toUpperCase() + t.feel.slice(1)} results, on time, every time.`,
+        ctaLabel: "Start a project", ctaClose: "Tell us what you need. We'll tell you how.", urgency: "Free project assessment.",
+        proofLine: a.proof, tagline: (b) => `${b} — execution over everything.`,
+      };
+      if (goal === "showcase") return {
+        title: (b) => `${b} — we make ${a.for} look as good as their work.`,
+        subtitle: `A ${t.feel} approach to branding, web and product design. See what we've shipped.`,
+        ctaLabel: "See our work", ctaClose: "Explore what we've built.", urgency: "",
+        proofLine: a.proof, tagline: (b) => `${b} — work that speaks.`,
+      };
+      // default
+      return {
+        title: (b) => `${b} — digital products that actually convert.`,
+        subtitle: `We work with ${a.for} who need ${t.feel}, functional products — not just pretty mockups.`,
+        ctaLabel: "Start a project", ctaClose: "Let's build something that works.", urgency: "Free initial consultation.",
+        proofLine: a.proof, tagline: (b) => `${b} — built for ${a.for}.`,
+      };
+    }
+
+    // Portfolio
+    if (preset === "portfolio") {
+      if (goal === "leads") return {
+        title: (b) => `I help ${a.for} ship products that people actually use.`,
+        subtitle: `${t.feel.charAt(0).toUpperCase() + t.feel.slice(1)} execution, clean code, full ownership. No hand-holding required.`,
+        ctaLabel: "Work with me", ctaClose: "Got a project? Let's scope it.", urgency: "Usually reply within 24h.",
+        proofLine: a.proof, tagline: (b) => `${b} — shipping for ${a.for}.`,
+      };
+      if (goal === "showcase") return {
+        title: (b) => `${b} — building ${t.feel} digital products since day one.`,
+        subtitle: `Full-stack work for ${a.for}. I care about craft, speed and things that actually ship.`,
+        ctaLabel: "See my work", ctaClose: "Explore what I've built.", urgency: "",
+        proofLine: a.proof, tagline: (b) => `${b} — the work speaks.`,
+      };
+      if (goal === "bookings") return {
+        title: (b) => `I'm ${b}. Let's talk about your next project.`,
+        subtitle: `I build ${t.feel} products for ${a.for}. Book a free call and let's see if it's a fit.`,
+        ctaLabel: "Book a call", ctaClose: "Pick a time. I'll be there.", urgency: "Next available slot this week.",
+        proofLine: a.proof, tagline: (b) => `${b} — open for new work.`,
+      };
+      if (goal === "waitlist") return {
+        title: (b) => `Something new is coming from ${b}.`,
+        subtitle: `I'm building something for ${a.for}. Sign up to get notified.`,
+        ctaLabel: "Get notified", ctaClose: "Be the first to see it.", urgency: "Launching soon.",
+        proofLine: a.proof, tagline: (b) => `${b} — something new.`,
+      };
+      // default
+      return {
+        title: (b) => `I'm ${b}. I build ${t.feel} products for ${a.for}.`,
+        subtitle: "Full-stack developer. Design-aware. I ship fast and take full ownership.",
+        ctaLabel: "Work with me", ctaClose: "Let's talk.", urgency: "",
+        proofLine: a.proof, tagline: (b) => `${b} — developer & designer.`,
+      };
+    }
+
+    // Fallback (blank / unknown)
+    return {
+      title: (b) => `${b} — built for ${a.for}.`,
+      subtitle: `A ${t.feel} solution that delivers results.`,
+      ctaLabel: "Get started", ctaClose: "Ready to start?", urgency: "",
+      proofLine: a.proof, tagline: (b) => `${b} — ${t.feel} by design.`,
+    };
+  }
+
+  function buildMeta(w: WizardInputs): any {
+    return {
+      projectType: selectedPresetId === "blank" ? "custom" : selectedPresetId,
+      goal: w.goal,
+      audience: w.audience,
+      tone: w.tone,
+      language: w.lang,
+      presetId: selectedPresetId,
+      presetVariants: { ...selectedVariants },
+    };
+  }
+
+  function buildProjectData(): any {
+    const w = getWizardInputs();
+    const brandName = w.brand || w.name;
+    const seed = getCopySeed(selectedPresetId, w.goal, w.audience, w.tone);
+    const toneAdj: Record<string, string> = { premium: "Premium experience", minimal: "Simple by design", bold: "Built different", futuristic: "The future is here", organic: "Human-first" };
+    const badge = toneAdj[w.tone] || "";
+    const cta = w.cta || seed.ctaLabel;
+    const ctaHref = w.ctaHref || "#";
+
+    // ── Blank / custom ──────────────────────────────────────
+    if (selectedPresetId === "blank") {
+      return {
+        meta: buildMeta(w),
+        brand: { name: brandName, tagline: w.tagline || seed.tagline(brandName), colors: { primary: "#7DD3FC", bg: "#070A12", fg: "#E7EEF7", accent: "#34D399" } },
+        sections: [
+          { type: "hero", variant: "centered", content: {
+            badge,
+            title: w.tagline || seed.title(brandName),
+            subtitle: seed.subtitle,
+            primaryCta: { label: cta, href: ctaHref },
+          }},
+          { type: "cta", content: { title: seed.ctaClose, subtitle: seed.urgency || `Built for results.`, primaryCta: { label: cta, href: ctaHref } } },
+        ],
+      };
+    }
+
+    // ── Preset-based ────────────────────────────────────────
+    const preset = presets.find((p: any) => p.id === selectedPresetId);
+    if (!preset) { selectedPresetId = "blank"; return buildProjectData(); }
+
+    const data = JSON.parse(JSON.stringify(preset.data));
+    const enabled = getEnabledSections();
+
+    // Inject meta
+    data.meta = buildMeta(w);
+
+    // Inject brand
+    data.brand.name = brandName;
+    data.brand.tagline = w.tagline || seed.tagline(brandName);
+
+    // ── Section overrides ───────────────────────────────────
+    data.sections.forEach((s: any) => {
+      if (s.type === "hero") {
+        if (selectedVariants.hero) s.variant = selectedVariants.hero;
+        s.content.badge = badge;
+        if (!w.tagline) {
+          s.content.title = seed.title(brandName);
+          s.content.subtitle = seed.subtitle;
+        }
+      }
+
+      if (s.type === "pricing" && selectedVariants.pricing) {
+        s.variant = selectedVariants.pricing;
+      }
+
+      if (s.type === "logoCloud") {
+        s.content.title = seed.proofLine;
+      }
+
+      if (s.type === "cta") {
+        s.content.title = seed.ctaClose;
+        s.content.subtitle = seed.urgency || s.content.subtitle;
+      }
+
+      // Override CTA labels
+      if (w.cta && s.content?.primaryCta) s.content.primaryCta.label = cta;
+      if (w.ctaHref && s.content?.primaryCta) s.content.primaryCta.href = ctaHref;
+      if (s.content?.tiers) {
+        s.content.tiers.forEach((t: any) => {
+          if (t.highlight && t.cta) {
+            if (w.cta) t.cta.label = cta;
+            if (w.ctaHref) t.cta.href = ctaHref;
+          }
+        });
+      }
+    });
+
+    // ── Filter optional sections ────────────────────────────
+    if (preset.optionalSections) {
+      const optionalTypes = new Set(Object.keys(preset.optionalSections));
+      data.sections = data.sections.filter((s: any) => {
+        if (!optionalTypes.has(s.type)) return true;
+        return enabled.has(s.type);
+      });
+    }
+
+    // ── Proof variant filter ────────────────────────────────
+    if (selectedVariants.proof) {
+      const v = selectedVariants.proof;
+      if (v === "none") data.sections = data.sections.filter((s: any) => s.type !== "metrics" && s.type !== "logoCloud");
+      else if (v === "metrics") data.sections = data.sections.filter((s: any) => s.type !== "logoCloud");
+      else if (v === "logos") data.sections = data.sections.filter((s: any) => s.type !== "metrics");
+    }
+
+    // ── Process/showcase variant filter (agency/portfolio) ──
+    if (selectedVariants.process) {
+      const v = selectedVariants.process;
+      if (v === "none") data.sections = data.sections.filter((s: any) => s.type !== "workflow" && s.type !== "featureSplit");
+      else if (v === "workflow") data.sections = data.sections.filter((s: any) => s.type !== "featureSplit" || s.content?.title === "Tech stack");
+      else if (v === "featureSplit") data.sections = data.sections.filter((s: any) => s.type !== "workflow");
+    }
+    if (selectedVariants.showcase) {
+      const v = selectedVariants.showcase;
+      if (v === "none") data.sections = data.sections.filter((s: any) => s.type !== "valueGrid" && s.type !== "featureSplit");
+      else if (v === "valueGrid") data.sections = data.sections.filter((s: any) => !(s.type === "featureSplit" && s.content?.title !== "Tech stack"));
+      else if (v === "featureSplit") data.sections = data.sections.filter((s: any) => s.type !== "valueGrid");
+    }
+
+    // ── Portfolio focus variant ──────────────────────────────
+    if (selectedPresetId === "portfolio" && selectedVariants.focus) {
+      const focus = selectedVariants.focus;
+      const hero = data.sections.find((s: any) => s.type === "hero");
+      const grid = data.sections.find((s: any) => s.type === "valueGrid");
+      const faq = data.sections.find((s: any) => s.type === "faq");
+
+      if (focus === "hire_me") {
+        if (hero && !w.tagline) {
+          hero.content.badge = "Available for hire";
+          hero.content.title = `I help teams ship products that actually work.`;
+          hero.content.subtitle = "Full-stack developer with a design eye. I ship fast, write clean code and take ownership from day one.";
+        }
+        if (faq) faq.content.items = [
+          { question: "What's your availability?", answer: "I typically book 2–4 weeks ahead. Reach out early for the best scheduling." },
+          { question: "What's your rate?", answer: "It depends on scope and timeline. Reach out with your project details for a clear quote." },
+          { question: "Do you do retainers?", answer: "Yes — for ongoing work, I offer monthly retainer packages with priority scheduling." },
+        ];
+      } else if (focus === "technical") {
+        if (hero && !w.tagline) {
+          hero.content.badge = "Engineer";
+          hero.content.title = `${brandName} — systems, architecture, shipping.`;
+          hero.content.subtitle = "I build production infrastructure, APIs and full-stack applications. Clean code, zero shortcuts.";
+        }
+        if (grid) {
+          grid.content.title = "Engineering focus";
+          grid.content.cards = [
+            { title: "System design", description: "Distributed systems, event-driven architecture, horizontal scaling." },
+            { title: "API & backend", description: "REST, GraphQL, real-time — built for reliability and performance." },
+            { title: "DevOps & infra", description: "CI/CD, Docker, Kubernetes, monitoring — production-grade from day one." },
+            { title: "Code quality", description: "Tests, type safety, code review culture. No technical debt by default." },
+          ];
+        }
+        if (faq) faq.content.items = [
+          { question: "What languages do you work with?", answer: "TypeScript, Go, Python, Rust — I pick the right tool for each problem." },
+          { question: "Do you work with legacy codebases?", answer: "Yes. I specialize in incremental modernization without full rewrites." },
+          { question: "Can you lead a team?", answer: "Yes — I've led teams of 3–8 engineers on complex multi-month projects." },
+        ];
+      } else if (focus === "creative") {
+        if (hero && !w.tagline) {
+          hero.content.badge = "Designer & developer";
+          hero.content.title = `${brandName} — where design meets engineering.`;
+          hero.content.subtitle = "I create digital experiences that feel intentional. Every interaction, transition and pixel has a reason.";
+        }
+        if (grid) {
+          grid.content.title = "Creative approach";
+          grid.content.cards = [
+            { title: "Visual storytelling", description: "Design that communicates before the user reads a single word." },
+            { title: "Motion & interaction", description: "Subtle animations and micro-interactions that elevate the experience." },
+            { title: "Brand systems", description: "Consistent visual language across every touchpoint — web, mobile, print." },
+            { title: "Design-to-code", description: "I design in Figma and build in code. No handoff, no translation loss." },
+          ];
+        }
+        if (faq) faq.content.items = [
+          { question: "Do you do branding?", answer: "Yes — logos, color systems, typography and brand guidelines are part of my offering." },
+          { question: "What design tools do you use?", answer: "Figma for UI, After Effects for motion, Blender for 3D. All exported production-ready." },
+          { question: "Can you handle both design and development?", answer: "That's my specialty. One person, zero handoff, pixel-perfect execution." },
+        ];
+      }
+    }
+
+    return data;
+  }
+
+  function showAuth(show: boolean) {
+    const authPanel = $("authPanel") as HTMLElement | null;
+    const workspace = $("workspace") as HTMLElement | null;
+    if (authPanel) authPanel.hidden = !show;
+    if (workspace) workspace.hidden = show;
+  }
+
+  async function listProjects(userId: string) {
+    const { data, error } = await supa
+      .from("projects")
+      .select("id,name,slug,builder_data,status,created_at")
+      .eq("user_id", userId)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false });
+
+    if (error) return setStatus(error.message);
+    const box = $("projects");
+    if (!box) return;
+
+    box.innerHTML =
+      (data || []).map((p: any) => `
+        <button class="project-btn" data-id="${p.id}">
+          <div class="project-row">
+            <span class="project-name">${p.name}</span>
+            <span class="project-status project-status--${p.status || 'draft'}">${p.status || 'draft'}</span>
+          </div>
+          <span class="project-slug">${p.slug ? p.slug + '.volynx.world' : 'no slug'}</span>
+        </button>
+      `).join("") || `<span class="hint">No projects yet.</span>`;
+
+    box.querySelectorAll(".project-btn").forEach((btn) => {
+      btn.addEventListener("click", () =>
+        openProject((data || []).find((x: any) => x.id === (btn as HTMLElement).dataset.id))
+      );
+    });
+  }
+
+  function openProject(p: any) {
+    currentProject = p;
+    const json = $("json") as HTMLTextAreaElement | null;
+    if (json) json.value = JSON.stringify(p.builder_data || {}, null, 2);
+    const link = $("link");
+    if (link) link.innerHTML = "";
+    setStatus("Project loaded.");
+
+    // Info panel
+    const infoPanel = $("infoPanel") as HTMLElement;
+    if (infoPanel) infoPanel.hidden = false;
+
+    const infoName = $("infoName");
+    if (infoName) infoName.textContent = p.name;
+
+    const infoBadge = $("infoBadge") as HTMLElement;
+    if (infoBadge) {
+      infoBadge.textContent = p.status || "draft";
+      infoBadge.className = `status-badge status-badge--${p.status || "draft"}`;
+    }
+
+    const liveUrl = p.slug ? `https://${p.slug}.volynx.world/` : "";
+    const infoUrlBox = $("infoUrlBox") as HTMLElement;
+    const infoUrl = $("infoUrl") as HTMLAnchorElement;
+    const visitBtn = $("visitSite") as HTMLAnchorElement;
+
+    if (p.status === "published" && liveUrl) {
+      if (infoUrlBox) infoUrlBox.hidden = false;
+      if (infoUrl) { infoUrl.href = liveUrl; infoUrl.textContent = liveUrl; }
+      if (visitBtn) { visitBtn.hidden = false; visitBtn.href = liveUrl; }
+    } else {
+      if (infoUrlBox) infoUrlBox.hidden = true;
+      if (visitBtn) visitBtn.hidden = true;
+    }
+
+    document.querySelectorAll(".project-btn").forEach((b) => b.classList.remove("active"));
+    const active = document.querySelector(`[data-id="${p.id}"]`);
+    if (active) active.classList.add("active");
+
+    // Enable "Refine current" in AI tab
+    const aiRefineBtn = $("aiRefine") as HTMLButtonElement;
+    if (aiRefineBtn) {
+      aiRefineBtn.disabled = false;
+      aiRefineBtn.title = "Refine " + p.name + " with AI";
+    }
+
+    // Trigger preview refresh
+    ($("json") as HTMLTextAreaElement)?.dispatchEvent(new Event("input"));
+  }
+
+  async function saveCurrent() {
+    if (!currentProject) return false;
+    let parsed;
+    try {
+      parsed = JSON.parse(($("json") as HTMLTextAreaElement)?.value || "{}");
+    } catch {
+      setStatus("Invalid JSON.");
+      return false;
+    }
+    const { error } = await supa
+      .from("projects")
+      .update({ builder_data: parsed, updated_at: new Date().toISOString() })
+      .eq("id", currentProject.id);
+    if (error) { setStatus(error.message); return false; }
+    currentProject.builder_data = parsed;
+    return true;
+  }
+
+  // ── Boot: use existing Volynx session ──────────────────────────
+  (async function boot() {
+    log("boot start");
+
+    // 1. Load config
+    let cfg: any;
+    try {
+      cfg = await fetch("/config.json", { cache: "no-store" }).then(r => r.json());
+    } catch {
+      showAuth(true);
+      ($("authMsg") as HTMLElement).textContent = "Configuration error.";
+      return;
+    }
+
+    supa = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+    log("supabase client created");
+
+    // Load presets (non-blocking)
+    await loadPresets();
+
+    // 2. Restore session from Volynx tokens
+    const accessToken = localStorage.getItem("volynx_access_token");
+    const refreshToken = localStorage.getItem("volynx_refresh_token");
+
+    if (!accessToken || !refreshToken) {
+      log("no session tokens — show login prompt");
+      showAuth(true);
+      ($("authMsg") as HTMLElement).textContent = "Sign in to your Volynx account first.";
+      ($("sendLink") as HTMLButtonElement).textContent = "Go to Login";
+      ($("sendLink") as HTMLButtonElement).onclick = () => {
+        window.location.href = "/login/?next=/builder/";
+      };
+      ($("email") as HTMLElement).style.display = "none";
+      return;
+    }
+
+    const { error: sessErr } = await supa.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
+
+    if (sessErr) {
+      log("session restore failed: " + sessErr.message);
+      showAuth(true);
+      ($("authMsg") as HTMLElement).textContent = "Session expired. Please sign in again.";
+      ($("sendLink") as HTMLButtonElement).textContent = "Go to Login";
+      ($("sendLink") as HTMLButtonElement).onclick = () => {
+        window.location.href = "/login/?next=/builder/";
+      };
+      ($("email") as HTMLElement).style.display = "none";
+      return;
+    }
+
+    const { data: authData } = await supa.auth.getUser();
+    const user = authData?.user;
+    if (!user) {
+      log("getUser failed");
+      showAuth(true);
+      return;
+    }
+
+    log("authenticated: " + user.email);
+    const who = $("who");
+    if (who) who.textContent = user.email || "";
+    showAuth(false);
+
+    // Fetch user profile (plan, org_id, tokens, builder_plan)
+    userProfile = await fetchUserProfile(user.id);
+    const builderPlan = userProfile?.builder_plan || "free";
+    planLimits = await fetchPlanLimits(builderPlan);
+    log("builder_plan: " + builderPlan + " | tokens: " + (userProfile?.token_balance || 0));
+
+    await listProjects(user.id);
+
+    // ── URL parameter handling ──────────────────────────────────
+    // ?preset={id}   → auto-select a preset in the wizard and advance to step 2
+    // ?project={uuid} → load an existing project directly into the editor, skipping the wizard
+    (function handleUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      const presetParam = params.get("preset");
+      const projectParam = params.get("project");
+
+      if (projectParam) {
+        // Load a specific project by UUID directly into the editor
+        log("url param: project=" + projectParam);
+        supa
+          .from("projects")
+          .select("id,name,slug,builder_data,status,created_at")
+          .eq("id", projectParam)
+          .eq("user_id", user.id)
+          .is("deleted_at", null)
+          .single()
+          .then(({ data, error }: { data: any; error: any }) => {
+            if (error || !data) {
+              log("project url param load failed: " + (error?.message || "not found"));
+              setStatus("Project not found or access denied.");
+              return;
+            }
+            openProject(data);
+            log("opened project from url param: " + data.name);
+          });
+        // project param takes priority — skip preset handling
+        return;
+      }
+
+      if (presetParam) {
+        // Auto-select a preset and advance the wizard to step 2
+        log("url param: preset=" + presetParam);
+        const presetGrid = document.getElementById("presetGrid");
+        if (!presetGrid) return;
+
+        const matchingCard = presetGrid.querySelector<HTMLElement>(
+          `[data-preset="${CSS.escape(presetParam)}"]`
+        );
+        if (!matchingCard) {
+          log("preset url param not found in grid: " + presetParam);
+          return;
+        }
+
+        // Simulate a click to trigger existing selection + active styling
+        matchingCard.click();
+        log("preset auto-selected from url param: " + presetParam);
+
+        // Advance to step 2 — the wizard requires a project name first, so
+        // scroll the name field into view and wait for user input before proceeding
+        showWizardStep(2);
+      }
+    })();
+
+    // ── Event listeners ────────────────────────────────────────
+    $("logout")?.addEventListener("click", async () => {
+      try { await supa.auth.signOut(); } catch {}
+      KEYS.forEach(k => localStorage.removeItem(k));
+      window.location.href = "/";
+    });
+
+    // Export ZIP
+    $("exportZip")?.addEventListener("click", async () => {
+      if (!currentProject) return setStatus("Select a project.");
+      setStatus("Generating ZIP…");
+      try {
+        const jsonStr = JSON.stringify(currentProject.builder_data || {}, null, 2);
+        const slug = currentProject.slug || "project";
+
+        // Build a simple HTML preview using the builder_data
+        const htmlContent = `<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>${currentProject.name || "VOLYNX Site"}</title>
+<style>body{font-family:system-ui,sans-serif;background:#070A12;color:#E7EEF7;margin:0;padding:40px 24px;max-width:960px;margin:0 auto}
+h1{font-size:2.5em;letter-spacing:-.03em}p{color:rgba(231,238,247,.6);line-height:1.7}
+.badge{display:inline-block;padding:6px 14px;border-radius:999px;background:rgba(125,211,252,.08);border:1px solid rgba(125,211,252,.2);font-size:12px;color:#7DD3FC;margin-bottom:20px}
+section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
+</head>
+<body>
+<p class="badge">${slug}.volynx.world</p>
+<h1>${currentProject.name}</h1>
+<p>This site was built with VOLYNX Builder. Edit the builder_data.json to customize.</p>
+<p>To publish: use the VOLYNX Builder at <a href="https://volynx.world/builder/" style="color:#7DD3FC">volynx.world/builder</a></p>
+</body></html>`;
+
+        // Create ZIP with JSZip (or fallback to JSON download)
+        const blob = new Blob([jsonStr], { type: "application/json" });
+        const htmlBlob = new Blob([htmlContent], { type: "text/html" });
+
+        if (typeof JSZip !== "undefined") {
+          const zip = new JSZip();
+          zip.file("builder_data.json", jsonStr);
+          zip.file("index.html", htmlContent);
+          zip.file("README.txt", `VOLYNX Builder Export\n\nProject: ${currentProject.name}\nSlug: ${slug}\nExported: ${new Date().toISOString()}\n\nFiles:\n- builder_data.json → your site configuration (edit this)\n- index.html → basic preview\n\nTo publish your site:\n1. Go to https://volynx.world/builder/\n2. Import or paste the builder_data.json\n3. Click Publish\n\nYour site will be live at: https://${slug}.volynx.world/\n`);
+          const zipBlob = await zip.generateAsync({ type: "blob" });
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(zipBlob);
+          a.download = `${slug}-volynx-export.zip`;
+          a.click();
+          URL.revokeObjectURL(a.href);
+          setStatus("ZIP downloaded ✓");
+        } else {
+          // Fallback: just download JSON
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = `${slug}-builder_data.json`;
+          a.click();
+          URL.revokeObjectURL(a.href);
+          setStatus("JSON downloaded ✓");
+        }
+      } catch (err: any) {
+        setStatus("Export failed: " + (err?.message || err));
+      }
+    });
+
+    // Delete project (soft delete)
+    $("deleteProject")?.addEventListener("click", async () => {
+      if (!currentProject) return setStatus("Select a project.");
+      if (!confirm(`Delete "${currentProject.name}"? This can't be undone.`)) return;
+
+      const { error } = await supa
+        .from("projects")
+        .update({ deleted_at: new Date().toISOString() })
+        .eq("id", currentProject.id);
+
+      if (error) return setStatus(error.message);
+      setStatus("Project deleted.");
+      currentProject = null;
+      ($("json") as HTMLTextAreaElement).value = "";
+      ($("infoPanel") as HTMLElement).hidden = true;
+      await listProjects(user.id);
+    });
+
+    // Wizard navigation (3 steps)
+    $("toStep2")?.addEventListener("click", () => {
+      const name = (($("pname") as HTMLInputElement)?.value || "").trim();
+      if (!name) { ($("pname") as HTMLInputElement).focus(); return; }
+      showWizardStep(2);
+    });
+
+    $("toStep3")?.addEventListener("click", () => {
+      // Pre-fill brand with project name if empty
+      const brandInput = $("wBrand") as HTMLInputElement;
+      const pname = (($("pname") as HTMLInputElement)?.value || "").trim();
+      if (brandInput && !brandInput.value.trim()) brandInput.value = pname;
+      showWizardStep(3);
+    });
+
+    $("backStep1")?.addEventListener("click", () => showWizardStep(1));
+    $("backStep2")?.addEventListener("click", () => showWizardStep(2));
+
+    // ── Tab click handlers ──
+    document.querySelectorAll(".editor-tab").forEach(tab => {
+      tab.addEventListener("click", () => switchTab((tab as HTMLElement).dataset.tab || "sections"));
+    });
+
+    // Create project (with builder_plan limit check + usage logging)
+    $("create")?.addEventListener("click", async () => {
+      const btn = $("create") as HTMLButtonElement;
+      const counts = await countActiveProjects(user.id);
+      const check = canCreate(counts);
+      if (!check.ok) return setStatus(check.msg);
+
+      btnLoading(btn, true, "Creating...");
+      const w = getWizardInputs();
+      const baseSlug = slugify((($("pslug") as HTMLInputElement)?.value || "").trim() || w.name) || "site";
+      const slug = `${baseSlug}-${rand4()}`;
+
+      const builder_data = buildProjectData();
+
+      const { data, error } = await supa
+        .from("projects")
+        .insert({ user_id: user.id, name: w.name, slug, domain_type: "subdomain", builder_data, status: "draft" })
+        .select("id,name,slug,builder_data,status,created_at")
+        .single();
+
+      btnLoading(btn, false);
+      if (error) return setStatus(error.message);
+      await logUsage("builder_create");
+      setStatus("Project created!");
+      showWizardStep(1); // reset wizard
+      await listProjects(user.id);
+      openProject(data);
+    });
+
+    $("save")?.addEventListener("click", async () => {
+      if (!currentProject) return setStatus("Select a project.");
+      const ok = await saveCurrent();
+      if (ok) setStatus("Saved ✓");
+    });
+
+    $("copy")?.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(($("json") as HTMLTextAreaElement)?.value || "");
+        setStatus("Copied to clipboard.");
+      } catch { setStatus("Clipboard permission denied."); }
+    });
+
+    $("publish")?.addEventListener("click", async () => {
+      if (!currentProject) return setStatus("Select a project.");
+      if (!currentProject.slug) return setStatus("Project has no slug. Edit JSON to add one.");
+
+      // Check publish limit based on builder_plan
+      const counts = await countActiveProjects(user.id);
+      const pubCheck = canPublish(counts);
+      if (!pubCheck.ok) return setStatus(pubCheck.msg);
+
+      setStatus("Saving…");
+      const ok = await saveCurrent();
+      if (!ok) return;
+
+      const { data: sessData } = await supa.auth.getSession();
+      const token = sessData?.session?.access_token;
+      if (!token) return setStatus("Session expired. Please refresh the page.");
+
+      const apiBase = ((cfg as any).apiBaseUrl || "").replace(/\/$/, "");
+      if (!apiBase) {
+        setStatus("Publish backend not configured. Add apiBaseUrl to config.json.");
+        log("publish blocked: apiBaseUrl missing from config.json");
+        return;
+      }
+
+      const pubBtn = $("publish") as HTMLButtonElement;
+      btnLoading(pubBtn, true, "Publishing...");
+      setStatus("Publishing to " + currentProject.slug + ".volynx.world…");
+      try {
+        const ctrl = new AbortController();
+        const timeout = setTimeout(() => ctrl.abort(), 15000);
+
+        const r = await fetch(`${apiBase}/publish`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ projectId: currentProject.id }),
+          signal: ctrl.signal,
+        });
+        clearTimeout(timeout);
+
+        const j: any = await r.json().catch(() => ({}));
+
+        if (!r.ok) {
+          const errMap: Record<string, string> = {
+            missing_token: "Authentication failed. Try signing out and back in.",
+            invalid_token: "Session invalid. Try signing out and back in.",
+            missing_projectId: "Internal error: project ID missing.",
+            project_not_found: "Project not found in the database.",
+            forbidden: "You don't have permission to publish this project.",
+            missing_slug: "Project needs a slug before publishing.",
+          };
+          return setStatus(errMap[j?.error] || j?.error || `Publish failed (HTTP ${r.status}).`);
+        }
+
+        btnLoading(pubBtn, false);
+        setStatus("Published ✓");
+        currentProject.status = "published";
+        await logUsage("builder_publish");
+
+        // Update info panel with live URL
+        const liveUrl = j.url || `https://${currentProject.slug}.volynx.world/`;
+        const infoUrlBox = $("infoUrlBox") as HTMLElement;
+        const infoUrl = $("infoUrl") as HTMLAnchorElement;
+        const visitBtn = $("visitSite") as HTMLAnchorElement;
+        const infoBadge = $("infoBadge") as HTMLElement;
+        if (infoUrlBox) infoUrlBox.hidden = false;
+        if (infoUrl) { infoUrl.href = liveUrl; infoUrl.textContent = liveUrl; }
+        if (visitBtn) { visitBtn.hidden = false; visitBtn.href = liveUrl; }
+        if (infoBadge) { infoBadge.textContent = "published"; infoBadge.className = "status-badge status-badge--published"; }
+
+        await supa.from("projects")
+          .update({ status: "published", updated_at: new Date().toISOString() })
+          .eq("id", currentProject.id);
+
+        await listProjects(user.id);
+      } catch (err: any) {
+        btnLoading(pubBtn, false);
+        if (err?.name === "AbortError") {
+          setStatus("Publish timed out. The API may be starting up — try again in 30s.");
+        } else {
+          setStatus("Cannot reach publish API. Check that api.volynx.world is configured.");
+          log("publish error: " + (err?.message || err));
+        }
+      }
+    });
+
+    // ── Preview Toggle + Live Render ──
+    const previewToggle = $("previewToggle") as HTMLButtonElement;
+    const previewPane = $("previewPane") as HTMLElement;
+    const previewFrame = $("previewFrame") as HTMLIFrameElement;
+    const editorSplit = $("editorSplit") as HTMLElement;
+    let previewActive = false;
+
+    function updatePreview() {
+      if (!previewActive || !previewFrame) return;
+      try {
+        const raw = ($("json") as HTMLTextAreaElement)?.value || "{}";
+        const data = JSON.parse(raw);
+        if (window.VxRenderer && data.sections) {
+          previewFrame.srcdoc = window.VxRenderer.renderPage(data);
+        }
+      } catch (_) {
+        // Invalid JSON — don't update preview
+      }
+    }
+
+    previewToggle?.addEventListener("click", () => {
+      previewActive = !previewActive;
+      previewToggle.classList.toggle("is-active", previewActive);
+      previewPane.hidden = !previewActive;
+      editorSplit.classList.toggle("is-split", previewActive);
+      if (previewActive) updatePreview();
+    });
+
+    // Debounced preview on JSON edit
+    let previewTimer: ReturnType<typeof setTimeout>;
+    ($("json") as HTMLTextAreaElement)?.addEventListener("input", () => {
+      clearTimeout(previewTimer);
+      previewTimer = setTimeout(updatePreview, 400);
+    });
+
+    // ── AI Generate / Refine ──────────────────────────────────
+    const functionsBase = ((cfg as any).functionsUrl || "https://zdmpzrderifgqmqivjoy.supabase.co/functions/v1").replace(/\/$/, "");
+
+    async function callAIBuilder(description: string, refine: boolean, current: any) {
+      const token = localStorage.getItem("volynx_access_token") || "";
+      const res = await fetch(`${functionsBase}/ai-builder`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { "Authorization": "Bearer " + token } : {}),
+        },
+        body: JSON.stringify({ description, refine, current }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      return data.builderData;
+    }
+
+    function setAIStatus(msg: string, type: "info" | "error" | "success" = "info") {
+      const el = $("aiStatus") as HTMLElement;
+      if (!el) return;
+      el.hidden = !msg;
+      el.textContent = msg;
+      el.className = `ai-status ai-status--${type}`;
+    }
+
+    async function runAI(refine: boolean) {
+      const prompt = ($("aiPrompt") as HTMLTextAreaElement)?.value?.trim();
+      if (!prompt) {
+        setAIStatus("Please describe the site you want to build.", "error");
+        return;
+      }
+      const generateBtn = $("aiGenerate") as HTMLButtonElement;
+      const refineBtn = $("aiRefine") as HTMLButtonElement;
+
+      // Deduct a token first
+      const token = localStorage.getItem("volynx_access_token");
+      if (!token) {
+        setAIStatus("Sign in to use AI Builder.", "error");
+        return;
+      }
+      setAIStatus("Checking balance…", "info");
+      try {
+        const deductRes = await fetch(`${functionsBase}/deduct-tokens`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+          body: JSON.stringify({ tool: "builder", action_class: "pro", description: "AI Builder site generation" }),
+        });
+        const deductData = await deductRes.json();
+        if (!deductData.ok && deductData.error === "insufficient_balance") {
+          setAIStatus("Not enough tokens. Add more to use AI Builder.", "error");
+          ($("aiStatus") as HTMLElement).innerHTML +=
+            ' <a href="/pricing/" class="btn btn--primary btn--sm" style="margin-left:8px;">Add tokens</a>';
+          return;
+        }
+      } catch { /* allow on network error */ }
+
+      generateBtn.disabled = true;
+      refineBtn.disabled = true;
+      setAIStatus("Generating site with AI… this may take a few seconds.", "info");
+
+      try {
+        const current = refine && currentProject ? currentProject.builder_data : undefined;
+        const builderData = await callAIBuilder(prompt, refine, current);
+
+        if (refine && currentProject) {
+          // Update existing project JSON in editor
+          const jsonEl = $("json") as HTMLTextAreaElement;
+          if (jsonEl) {
+            jsonEl.value = JSON.stringify(builderData, null, 2);
+            jsonEl.dispatchEvent(new Event("input"));
+          }
+          currentProject.builder_data = builderData;
+          setAIStatus("Sections updated! Switch to Sections or JSON to review, then Save.", "success");
+          switchTab("sections");
+        } else {
+          // Create a new draft project with AI-generated data
+          const slug = "ai-" + (prompt.slice(0, 20).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "site") + "-" + rand4();
+          const name = prompt.slice(0, 40).replace(/[^\w\s-]/g, "").trim() || "AI Generated Site";
+          const counts = await countActiveProjects(user.id);
+          const check = canCreate(counts);
+          if (!check.ok) {
+            setAIStatus(check.msg, "error");
+            return;
+          }
+          const { data, error } = await supa
+            .from("projects")
+            .insert({ user_id: user.id, name, slug, domain_type: "subdomain", builder_data: builderData, status: "draft" })
+            .select("id,name,slug,builder_data,status,created_at")
+            .single();
+
+          if (error) { setAIStatus(error.message, "error"); return; }
+          await logUsage("builder_ai");
+          setAIStatus("Site generated! Switch to Sections to review and edit.", "success");
+          await listProjects(user.id);
+          openProject(data);
+          switchTab("sections");
+        }
+      } catch (err: any) {
+        setAIStatus("Error: " + (err?.message || "AI generation failed."), "error");
+      } finally {
+        generateBtn.disabled = false;
+        if (currentProject) refineBtn.disabled = false;
+      }
+    }
+
+    $("aiGenerate")?.addEventListener("click", () => runAI(false));
+    $("aiRefine")?.addEventListener("click", () => runAI(true));
+
+    log("boot complete");
+  })();
+</script>
+
+<style>
+  :root {
+    --bg: #070A12;
+    --fg: #E7EEF7;
+    --mut: rgba(231, 238, 247, .55);
+    --line: rgba(231, 238, 247, .10);
+    --accent: #7DD3FC;
+    --card-bg: rgba(231, 238, 247, .04);
+    --card-border: rgba(231, 238, 247, .10);
+    --r: 20px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    background: var(--bg);
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Orbitron", ui-sans-serif, system-ui, sans-serif;
+    color: var(--fg);
+    background: transparent;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    text-align: center;
+    padding: 56px 24px 40px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(125, 211, 252, .22);
+    background: rgba(125, 211, 252, .06);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+  }
+
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .3; }
+  }
+
+  .hero__title {
+    margin: 0 0 14px;
+    font-size: clamp(32px, 6vw, 56px);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    line-height: 1.05;
+  }
+
+  .accent {
+    background: linear-gradient(90deg, #7DD3FC, #a78bfa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero__sub {
+    margin: 0;
+    font-size: clamp(14px, 2vw, 16px);
+    color: var(--mut);
+    line-height: 1.7;
+  }
+
+  /* APP */
+  .app {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  /* AUTH PANEL */
+  .panel {
+    max-width: 440px;
+    margin: 0 auto 60px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--r);
+    padding: 36px 32px;
+    text-align: center;
+    backdrop-filter: blur(16px);
+  }
+
+  .panel__icon { font-size: 36px; margin-bottom: 16px; }
+  .panel__title { margin: 0 0 8px; font-size: 20px; font-weight: 700; }
+  .panel__sub { margin: 0 0 24px; font-size: 14px; color: var(--mut); line-height: 1.6; }
+
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .auth-msg {
+    font-size: 13px;
+    color: var(--mut);
+    min-height: 18px;
+    margin: 0;
+  }
+
+  /* SESSION BAR */
+  .session-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: rgba(125, 211, 252, .04);
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+
+  .session-who {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .session-email {
+    font-size: 13px;
+    color: var(--mut);
+    font-weight: 600;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 5px rgba(125, 211, 252, .12);
+    flex-shrink: 0;
+  }
+
+  /* GRID */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .card--editor {
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 800px) {
+    .grid { grid-template-columns: 1fr; }
+    .card--editor { grid-column: auto; }
+  }
+
+  /* CARD */
+  .card {
+    border: 1px solid var(--card-border);
+    border-radius: var(--r);
+    padding: 22px;
+    background: var(--card-bg);
+    backdrop-filter: blur(14px);
+  }
+
+  .card__title {
+    margin: 0 0 16px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: .02em;
+  }
+
+  /* WIZARD */
+  .card--wizard { overflow: hidden; }
+  .wizard-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 24px;
+    padding: 0 4px;
+  }
+  .wizard-step-dot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .wizard-step-dot span {
+    width: 32px; height: 32px; border-radius: 999px;
+    display: grid; place-items: center;
+    font-size: 13px; font-weight: 700;
+    border: 1px solid var(--line);
+    color: var(--mut); background: rgba(7,10,18,.8);
+    transition: all .3s;
+  }
+  .wizard-step-dot small {
+    font-size: 10px; font-weight: 600; color: var(--mut);
+    letter-spacing: .04em; transition: color .3s;
+  }
+  .wizard-step-dot--active span {
+    border-color: var(--accent); color: var(--accent);
+    background: rgba(125,211,252,.08);
+    box-shadow: 0 0 16px rgba(125,211,252,.15);
+  }
+  .wizard-step-dot--active small { color: var(--accent); }
+
+  .wizard-line-bar {
+    flex: 1; height: 2px; background: var(--line);
+    margin: 0 8px; border-radius: 1px;
+    position: relative; top: -8px; overflow: hidden;
+  }
+  .wizard-line-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent), rgba(99,102,241,.6));
+    border-radius: 1px;
+    transition: width .4s ease;
+  }
+
+  /* ARCHETYPE PICKER */
+  .archetype-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    border: 0.5px outset #9b14d8;
+    border-radius: 20px;
+    padding: 20px;
+    margin: 30px auto;
+  }
+  .archetype-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: rgba(231,238,247,.02);
+    color: var(--mut);
+    cursor: pointer;
+    transition: all .2s;
+    text-align: left;
+    font-family: inherit;
+  }
+  .archetype-card:hover {
+    border-color: rgba(125,211,252,.25);
+    background: rgba(125,211,252,.03);
+  }
+  .archetype-card--active {
+    border-color: rgba(125,211,252,.4);
+    background: rgba(125,211,252,.06);
+    color: var(--fg);
+    box-shadow: 0 0 16px rgba(125,211,252,.06);
+  }
+  .archetype-card--express {
+    background: radial-gradient(white -10%, #0000ff30 100%);
+    border-radius: 20px;
+    font-size: 1rem;
+    padding: 15px;
+    text-shadow: 0 0 5px white;
+    line-height: 1.4;
+    margin: 10px;
+    border-color: rgba(243,225,160,.2);
+  }
+  .archetype-card--express:hover, .archetype-card--express.archetype-card--active {
+    border-color: rgba(243,225,160,.45);
+    background: rgba(243,225,160,.05);
+    box-shadow: 0 0 16px rgba(243,225,160,.06);
+  }
+  .archetype-icon {
+    flex: 0 0 auto;
+    width: 48px; height: 48px;
+    display: grid; place-items: center;
+    font-size: 24px;
+    border-radius: 12px;
+    background: rgba(231,238,247,.04);
+    border: 1px solid rgba(231,238,247,.06);
+  }
+  .archetype-icon--express {
+    background: rgba(243,225,160,.08);
+    border-color: rgba(243,225,160,.15);
+  }
+  .archetype-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .archetype-name { font-size: 14px; font-weight: 700; color: var(--fg); }
+  .archetype-outcome { font-size: 12px; color: var(--mut); line-height: 1.4; }
+  .archetype-ideal { font-size: 11px; color: rgba(231,238,247,.3); line-height: 1.3; }
+  .archetype-tag {
+    display: inline-block; align-self: flex-start;
+    font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 999px;
+    background: rgba(243,225,160,.1); border: 1px solid rgba(243,225,160,.2);
+    color: #f3e1a0;
+  }
+  .archetype-card--active .archetype-outcome { color: rgba(125,211,252,.5); }
+
+  /* VARIANT SELECTORS — Visual cards */
+  .variant-selectors { display: grid; gap: 16px; }
+  .variant-group { display: flex; flex-direction: column; gap: 8px; }
+  .variant-options { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .variant-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 8px 8px;
+    min-width: 72px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: rgba(231,238,247,.02);
+    color: var(--mut);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .2s;
+  }
+  .variant-card:hover {
+    border-color: rgba(125,211,252,.25);
+    background: rgba(125,211,252,.04);
+    transform: translateY(-1px);
+  }
+  .variant-card--active {
+    border-color: rgba(125,211,252,.4);
+    background: rgba(125,211,252,.08);
+    color: var(--accent);
+    box-shadow: 0 0 12px rgba(125,211,252,.08);
+  }
+  .variant-card__preview {
+    width: 64px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--fg);
+  }
+  .variant-card__preview svg { width: 100%; height: 100%; }
+  .variant-card__label {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: .02em;
+  }
+
+  /* OPTIONAL TOGGLES */
+  .optional-toggles .toggle-grid {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;
+  }
+  .toggle-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--mut); cursor: pointer;
+  }
+  .toggle-item input { accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer; }
+  .toggle-item span { user-select: none; }
+
+  @media (max-width: 480px) {
+    .preset-grid { grid-template-columns: 1fr 1fr; }
+    .chip { font-size: 11px; padding: 4px 10px; }
+  }
+
+  /* FORM ELEMENTS */
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  @media (max-width: 520px) {
+    .row { grid-template-columns: 1fr; }
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--mut);
+  }
+
+  .field {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(231, 238, 247, .14);
+    background: rgba(7, 10, 18, .65);
+    color: var(--fg);
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: border-color .15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .field:focus { border-color: rgba(125, 211, 252, .4); }
+  .field::placeholder { color: rgba(231, 238, 247, .28); }
+  select.field { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
+
+  /* PROJECTS CARD */
+  .card--list {
+    border: 0.5px outset #d4a017;
+    border-radius: 20px;
+    padding: 20px;
+    margin: 30px auto;
+    background: radial-gradient(rgba(255,215,0,.04) 0%, transparent 70%);
+  }
+
+  /* PROJECTS LIST */
+  .projects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 260px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+
+  .project-btn {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    background: rgba(231, 238, 247, .04);
+    color: var(--fg);
+    cursor: pointer;
+    text-align: left;
+    transition: background .15s, border-color .15s;
+    width: 100%;
+    font-family: inherit;
+  }
+
+  .project-btn:hover,
+  .project-btn.active {
+    background: rgba(125, 211, 252, .08);
+    border-color: rgba(125, 211, 252, .2);
+  }
+
+  .project-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .project-name {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .project-status {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .project-status--draft { background: rgba(231,238,247,.08); color: var(--mut); }
+  .project-status--published { background: rgba(52,211,153,.12); color: #34D399; }
+
+  .project-slug {
+    font-size: 11px;
+    color: var(--mut);
+    font-family: ui-monospace, monospace;
+  }
+
+  /* INFO PANEL */
+  .card--info {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, rgba(125,211,252,.04), rgba(99,102,241,.03));
+    border: 1px solid rgba(125,211,252,.12);
+  }
+
+  .info-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .status-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 999px;
+  }
+  .status-badge--draft { background: rgba(231,238,247,.08); color: var(--mut); }
+  .status-badge--published { background: rgba(52,211,153,.12); color: #34D399; }
+
+  .info-url-box {
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: rgba(7,10,18,.5);
+    border: 1px solid rgba(231,238,247,.08);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .info-url-label {
+    font-size: 12px;
+    color: var(--mut);
+    white-space: nowrap;
+  }
+
+  .info-url-link {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    font-family: ui-monospace, monospace;
+    word-break: break-all;
+  }
+  .info-url-link:hover { text-decoration: underline; }
+
+  .info-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .btn--accent {
+    background: rgba(52,211,153,.15);
+    border: 1px solid rgba(52,211,153,.3);
+    color: #34D399;
+  }
+  .btn--accent:hover {
+    background: rgba(52,211,153,.25);
+    transform: translateY(-1px);
+  }
+
+  /* EDITOR */
+  .editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .editor-header .card__title { margin: 0; }
+
+  .editor-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .json-editor {
+    width: 100%;
+    min-height: 300px;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(231, 238, 247, .14);
+    background: rgba(7, 10, 18, .75);
+    color: var(--accent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    outline: none;
+    resize: vertical;
+    transition: border-color .15s;
+  }
+
+  .json-editor:focus { border-color: rgba(125, 211, 252, .35); }
+
+  /* Editor/Preview split */
+  .editor-split { display: flex; gap: 0; }
+  .editor-split .json-editor { flex: 1; min-width: 0; }
+  .editor-split.is-split { gap: 12px; }
+  .editor-split.is-split .json-editor { flex: 1; min-height: 500px; resize: none; }
+  .preview-pane { flex: 1; min-width: 0; border-radius: 12px; border: 1px solid rgba(231,238,247,.14); overflow: hidden; background: #070A12; }
+  .preview-frame { width: 100%; height: 100%; min-height: 500px; border: none; background: #070A12; }
+  #previewToggle.is-active { background: rgba(125,211,252,.12); color: var(--accent); border-color: rgba(125,211,252,.25); }
+
+  .editor-footer {
+    margin-top: 8px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 20px;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: background .15s, transform .1s, opacity .15s;
+    letter-spacing: .02em;
+  }
+
+  .btn--primary {
+    background: linear-gradient(135deg, rgba(125, 211, 252, .28), rgba(99, 102, 241, .22));
+    border: 1px solid rgba(125, 211, 252, .3);
+    color: var(--fg);
+  }
+
+  .btn--primary:hover {
+    background: linear-gradient(135deg, rgba(125, 211, 252, .38), rgba(99, 102, 241, .32));
+    transform: translateY(-1px);
+  }
+
+  .btn--ghost {
+    background: rgba(231, 238, 247, .06);
+    border: 1px solid var(--line);
+    color: var(--mut);
+  }
+
+  .btn--ghost:hover {
+    background: rgba(231, 238, 247, .10);
+    color: var(--fg);
+  }
+
+  .btn--sm {
+    padding: 7px 14px;
+    font-size: 12px;
+    border-radius: 10px;
+  }
+
+  .btn[disabled] {
+    opacity: .5;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  .btn.is-loading::after {
+    content: "";
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(231, 238, 247, .4);
+    border-top-color: var(--fg);
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 8px;
+    vertical-align: -2px;
+    animation: spin .7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* MISC */
+  .hint {
+    font-size: 12px;
+    color: var(--mut);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  code {
+    font-family: ui-monospace, monospace;
+    background: rgba(125, 211, 252, .1);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 11px;
+    color: var(--accent);
+  }
+
+  a { color: inherit; }
+
+  .btn[disabled] { opacity: .5; cursor: not-allowed; }
+
+  /* Mobile */
+  @media (max-width: 680px) {
+    .hero { padding: 40px 16px 28px; }
+    .panel { padding: 28px 20px; }
+    .card { padding: 16px; }
+    .json-editor { min-height: 220px; }
+    .editor-header { flex-direction: column; align-items: flex-start; }
+  }
+
+  /* EDITOR TABS */
+  .editor-tabs {
+    display: flex;
+    gap: 4px;
+    background: rgba(231,238,247,.04);
+    border-radius: 10px;
+    padding: 3px;
+  }
+
+  .editor-tab {
+    padding: 7px 16px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--mut);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+    letter-spacing: .02em;
+  }
+
+  .editor-tab:hover {
+    background: rgba(231,238,247,.08);
+    color: var(--fg);
+  }
+
+  .editor-tab--active {
+    background: rgba(125,211,252,.14);
+    color: var(--accent);
+    box-shadow: 0 0 12px rgba(125,211,252,.06);
+  }
+
+  .editor-tab--ai {
+    color: rgba(167,139,250,.7);
+  }
+  .editor-tab--ai:hover { color: #a78bfa; background: rgba(167,139,250,.07); }
+  .editor-tab--ai.editor-tab--active {
+    background: rgba(167,139,250,.12);
+    color: #a78bfa;
+    box-shadow: 0 0 12px rgba(167,139,250,.08);
+  }
+
+  /* AI PANEL */
+  .ai-panel { padding: 0; }
+  .ai-panel-inner {
+    display: flex; flex-direction: column; gap: 16px;
+    padding: 20px 24px;
+  }
+  .ai-panel-header { display: flex; flex-direction: column; gap: 6px; }
+  .ai-panel-badge {
+    display: inline-block; width: fit-content;
+    padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+    background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.22); color: #a78bfa;
+  }
+  .ai-panel-sub { margin: 0; font-size: 13px; color: var(--mut); line-height: 1.6; }
+  .ai-textarea {
+    width: 100%; min-height: 120px; padding: 12px 14px;
+    background: rgba(231,238,247,.04); border: 1px solid var(--line);
+    border-radius: 12px; color: var(--fg); font-family: inherit; font-size: 13px;
+    line-height: 1.6; resize: vertical; outline: none; transition: border-color .15s;
+  }
+  .ai-textarea:focus { border-color: rgba(167,139,250,.4); }
+  .ai-textarea::placeholder { color: var(--mut); }
+  .ai-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ai-status {
+    font-size: 13px; padding: 10px 14px; border-radius: 10px; line-height: 1.5;
+  }
+  .ai-status--info { background: rgba(125,211,252,.06); color: var(--accent); border: 1px solid rgba(125,211,252,.15); }
+  .ai-status--error { background: rgba(239,68,68,.06); color: #f87171; border: 1px solid rgba(239,68,68,.15); }
+  .ai-status--success { background: rgba(34,197,94,.06); color: #4ade80; border: 1px solid rgba(34,197,94,.15); }
+
+  /* EDITOR PANELS */
+  .editor-panel { min-height: 300px; }
+
+  /* EXPRESS FLOW */
+  .express-flow { display: flex; flex-direction: column; gap: 20px; }
+  .express-header { text-align: center; }
+  .express-badge {
+    display: inline-block; padding: 4px 12px; border-radius: 999px;
+    font-size: 12px; font-weight: 700; letter-spacing: .06em;
+    background: rgba(243,225,160,.08); border: 1px solid rgba(243,225,160,.2); color: #f3e1a0;
+    margin-bottom: 12px;
+  }
+  .express-q { font-size: 15px; font-weight: 700; margin-bottom: 12px; color: var(--fg); }
+  .express-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .express-opt {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 16px; border-radius: 12px;
+    border: 1px solid var(--line); background: rgba(231,238,247,.03);
+    color: var(--mut); font-family: inherit; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all .2s; text-align: left;
+  }
+  .express-opt:hover { border-color: rgba(125,211,252,.25); background: rgba(125,211,252,.05); color: var(--fg); }
+  .express-opt--active {
+    border-color: rgba(125,211,252,.45); background: rgba(125,211,252,.08);
+    color: var(--accent); box-shadow: 0 0 16px rgba(125,211,252,.08);
+  }
+
+  /* SECTION EDITOR */
+  .section-editor-root { display: flex; flex-direction: column; gap: 2px; }
+
+  .se-empty {
+    text-align: center; padding: 48px 24px; color: var(--mut); font-size: 14px;
+    border: 1px dashed var(--line); border-radius: 12px; background: rgba(231,238,247,.02);
+  }
+
+  .se-section {
+    border: 1px solid var(--line); border-radius: 14px;
+    background: rgba(231,238,247,.02); overflow: hidden; transition: border-color .15s;
+  }
+  .se-section:hover { border-color: rgba(125,211,252,.15); }
+
+  .se-section-header {
+    display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+    cursor: pointer; user-select: none; background: rgba(231,238,247,.03);
+    border-bottom: 1px solid transparent; transition: background .15s;
+  }
+  .se-section-header:hover { background: rgba(125,211,252,.04); }
+  .se-section.is-open .se-section-header { border-bottom-color: var(--line); background: rgba(125,211,252,.05); }
+
+  .se-section-icon { font-size: 18px; flex-shrink: 0; }
+  .se-section-name { font-size: 14px; font-weight: 700; color: var(--fg); flex: 1; }
+  .se-section-desc { font-size: 11px; color: var(--mut); }
+  .se-section-chevron { font-size: 12px; color: var(--mut); transition: transform .2s; }
+  .se-section.is-open .se-section-chevron { transform: rotate(90deg); }
+
+  .se-section-body { padding: 16px; display: none; }
+  .se-section.is-open .se-section-body { display: block; }
+
+  .se-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .se-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+  .se-field--full { grid-column: 1 / -1; }
+  .se-label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); }
+
+  .se-input, .se-textarea, .se-select {
+    width: 100%; padding: 9px 12px; border-radius: 10px;
+    border: 1px solid rgba(231,238,247,.14); background: rgba(7,10,18,.65);
+    color: var(--fg); font-family: inherit; font-size: 13px; outline: none; transition: border-color .15s;
+  }
+  .se-input:focus, .se-textarea:focus, .se-select:focus { border-color: rgba(125,211,252,.4); }
+  .se-textarea { resize: vertical; min-height: 60px; line-height: 1.5; }
+  .se-select {
+    appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;
+  }
+
+  .se-list-item { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; padding: 8px 0; border-bottom: 1px solid rgba(231,238,247,.06); }
+
+  .se-btn {
+    padding: 5px 12px; border-radius: 8px; border: 1px solid var(--line);
+    background: rgba(231,238,247,.04); color: var(--mut);
+    font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .15s;
+  }
+  .se-btn:hover { background: rgba(125,211,252,.08); border-color: rgba(125,211,252,.2); color: var(--fg); }
+  .se-btn--add { background: rgba(125,211,252,.06); border-color: rgba(125,211,252,.15); color: var(--accent); }
+  .se-btn--remove { background: rgba(255,100,100,.06); border-color: rgba(255,100,100,.15); color: #ff6464; }
+
+  /* BUTTON ACTIVE STATES */
+  .btn:active:not([disabled]) { transform: scale(.97); }
+  .btn--primary:active:not([disabled]) { background: linear-gradient(135deg, rgba(125,211,252,.45), rgba(99,102,241,.38)); }
+  .btn--ghost:active:not([disabled]) { background: rgba(231,238,247,.14); }
+
+  @media (max-width: 520px) {
+    .se-row { grid-template-columns: 1fr; }
+    .express-options { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>

@@ -117,14 +117,17 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro" } = Astro.pr
     transform: translateY(0) scale(.97);
   }
 
-  /* Mobile: hide label inside token pill, keep just the count */
+  /* Responsive progressive disclosure */
   @media (max-width: 767px) {
     .vx-token-pill .vx-token-label { display: none; }
     .vx-token-pill { padding: 6px 10px; font-size: 11px; }
     .vx-recharge-btn { padding: 7px 14px; font-size: 11px; }
   }
-  @media (max-width: 480px) {
-    .vx-token-pill { display: none !important; }
+  @media (max-width: 520px) {
+    :global(.vx-authed) .vx-token-pill { display: none !important; }
+  }
+  @media (max-width: 380px) {
+    :global(.vx-authed) .vx-recharge-btn { padding: 6px 12px; font-size: 10.5px; }
   }
 
   /* Auth flash prevention — hide login, show badge instantly when authed */
