@@ -185,6 +185,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       };
 
       await supabase.from("profiles").update(updates).eq("id", userId);
+      // Sync plan to JWT app_metadata for zero-query auth
+      await supabase.rpc("sync_plan_to_app_metadata", { p_user_id: userId });
       console.log(`Updated plan for ${userId}: ${JSON.stringify(updates)}`);
     }
 
@@ -380,6 +382,9 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
       await supabase.from("profiles").update({ plan: "free" }).eq("id", user_id);
     }
 
+    // Sync downgraded plan to JWT app_metadata
+    await supabase.rpc("sync_plan_to_app_metadata", { p_user_id: user_id });
+
     console.log(`Subscription ${subscription.id} status: ${subscription.status} for user ${user_id}`);
   }
 }
@@ -426,6 +431,9 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   if (!activeSubs || activeSubs.length === 0) {
     await supabase.from("profiles").update({ plan: "free" }).eq("id", user_id);
   }
+
+  // Sync downgraded plan to JWT app_metadata
+  await supabase.rpc("sync_plan_to_app_metadata", { p_user_id: user_id });
 
   console.log(`Subscription deleted: ${subscription.id}, user ${user_id} downgraded`);
 }

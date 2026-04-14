@@ -152,6 +152,11 @@ Deno.serve(async (req: Request) => {
         console.error("[redeem-voucher] profile update error:", updateErr.message);
         return json({ ok: false, error: "grant_failed" }, 500);
       }
+
+      // Sync plan to JWT app_metadata
+      if (grants.builder_plan || grants.daily_plan || grants.plan) {
+        await supabase.rpc("sync_plan_to_app_metadata", { p_user_id: userId });
+      }
     }
 
     // ── Record redemption (unique constraint prevents double-redeem) ──
