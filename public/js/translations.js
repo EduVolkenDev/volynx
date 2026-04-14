@@ -116,6 +116,8 @@ window.VX_TRANS = {
     /* === WIDGETS === */
     "widget.lang":  "EN",
     "widget.login": "Login",
+    "widget.tokens": "tokens",
+    "widget.recharge": "Recharge",
     "widget.home":  "← Home",
 
     /* === SITE FOOTER === */
@@ -1963,6 +1965,8 @@ window.VX_TRANS = {
     /* === WIDGETS === */
     "widget.lang":  "PT",
     "widget.login": "Entrar",
+    "widget.tokens": "tokens",
+    "widget.recharge": "Recarregar",
     "widget.home":  "← Início",
 
     /* === SITE FOOTER === */

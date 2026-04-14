@@ -33,6 +33,16 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro" } = Astro.pr
     </nav>
 
     <div class="header-actions">
+      <!-- Token balance pill — only visible when authed -->
+      <a href={ROUTES.account} class="vx-token-pill" id="vxTokenPill" aria-label="Token balance" title="View your tokens">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v10M8 10h8M8 14h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="vx-token-count" id="vxTokenCount">—</span>
+        <span class="vx-token-label" data-i18n="widget.tokens">tokens</span>
+      </a>
+
+      <!-- Recharge CTA — only visible when authed -->
+      <a href={ROUTES.pricing + "#tokens"} class="vx-recharge-btn" data-i18n="widget.recharge">Recarregar</a>
+
       <button id="vxLangToggle" class="vx-widget vx-lang-btn" aria-label="Toggle language" title="Switch language / Mudar idioma">
         <span class="vx-lang-label" data-i18n="widget.lang">EN</span>
       </button>
@@ -56,6 +66,67 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro" } = Astro.pr
 </header>
 
 <style>
+  /* Token pill + recharge: hidden by default, shown when authed */
+  .vx-token-pill, .vx-recharge-btn { display: none; }
+  :global(.vx-authed) .vx-token-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(139,250,240,.2);
+    color: rgba(242,244,248,.9);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all .15s;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  :global(.vx-authed) .vx-token-pill:hover {
+    background: rgba(139,250,240,.08);
+    border-color: rgba(139,250,240,.4);
+  }
+  .vx-token-pill svg { color: #8bfaf0; flex-shrink: 0; }
+  .vx-token-pill .vx-token-count { color: #fff; font-size: 13px; }
+  .vx-token-pill .vx-token-label { color: rgba(242,244,248,.45); font-size: 10px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+
+  :global(.vx-authed) .vx-recharge-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: #fff;
+    color: #0c0e16;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .01em;
+    text-decoration: none;
+    transition: all .15s;
+    box-shadow: 0 4px 16px rgba(255,255,255,.12);
+    white-space: nowrap;
+  }
+  :global(.vx-authed) .vx-recharge-btn:hover {
+    background: #f0f4f8;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(255,255,255,.2);
+  }
+  :global(.vx-authed) .vx-recharge-btn:active {
+    transform: translateY(0) scale(.97);
+  }
+
+  /* Mobile: hide label inside token pill, keep just the count */
+  @media (max-width: 767px) {
+    .vx-token-pill .vx-token-label { display: none; }
+    .vx-token-pill { padding: 6px 10px; font-size: 11px; }
+    .vx-recharge-btn { padding: 7px 14px; font-size: 11px; }
+  }
+  @media (max-width: 480px) {
+    .vx-token-pill { display: none !important; }
+  }
+
   /* Auth flash prevention — hide login, show badge instantly when authed */
   .vx-user-badge { display: none; }
   :global(.vx-authed) .vx-login-link { display: none !important; }
@@ -131,4 +202,38 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro" } = Astro.pr
       btn.setAttribute("aria-expanded", String(open));
     });
   }
+
+  // Wire up token balance pill (uses VxTokens)
+  (function wireTokenPill() {
+    const countEl = document.getElementById("vxTokenCount");
+    if (!countEl) return;
+
+    function setCount(n: number | string | null | undefined) {
+      if (n === null || n === undefined) { countEl.textContent = "—"; return; }
+      const num = typeof n === "number" ? n : parseFloat(String(n));
+      if (isNaN(num)) { countEl.textContent = "—"; return; }
+      countEl.textContent = num.toLocaleString();
+    }
+
+    // @ts-ignore — VxTokens is a global loaded via /js/vx-tokens.js
+    const VxTokens = (window as any).VxTokens;
+    if (VxTokens) {
+      const cached = VxTokens.getCachedBalance();
+      if (cached !== null) setCount(cached);
+      VxTokens.getBalance?.().then((b: number) => setCount(b)).catch(() => {});
+    }
+
+    // Listen for realtime / local balance changes
+    window.addEventListener("vx:balance-changed", (e: any) => {
+      if (e.detail && typeof e.detail.balance === "number") {
+        setCount(e.detail.balance);
+        // Flash animation on change
+        const pill = document.getElementById("vxTokenPill");
+        if (pill) {
+          pill.style.borderColor = "rgba(139,250,240,.6)";
+          setTimeout(() => { pill.style.borderColor = ""; }, 800);
+        }
+      }
+    });
+  })();
 </script>
