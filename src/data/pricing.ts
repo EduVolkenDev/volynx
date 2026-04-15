@@ -21,6 +21,7 @@ type Plan = {
   cta: Record<Locale, string>;
   featured?: boolean;
   features: Record<Locale, string[]>;
+  image?: string;
 };
 
 type TokenPack = {
@@ -133,6 +134,7 @@ export const sitePricing = {
   builderPlans: [
     {
       id: 'free',
+      image: '/assets/builderfree.webp',
       name: { pt: 'Builder Free', en: 'Builder Free' },
       description: {
         pt: 'Para testar o fluxo, criar rascunhos e sentir a experiência Volynx.',
@@ -148,6 +150,7 @@ export const sitePricing = {
     },
     {
       id: 'launch',
+      image: '/assets/builderlaunch.webp',
       name: { pt: 'Builder Launch', en: 'Builder Launch' },
       description: {
         pt: 'Plano de entrada para lançar páginas enxutas com velocidade.',
@@ -163,6 +166,7 @@ export const sitePricing = {
     },
     {
       id: 'pro',
+      image: '/assets/builderpro.webp',
       badge: { pt: 'Mais popular', en: 'Most popular' },
       featured: true,
       name: { pt: 'Builder Pro', en: 'Builder Pro' },
@@ -180,6 +184,7 @@ export const sitePricing = {
     },
     {
       id: 'studio',
+      image: '/assets/builderstudio.webp',
       name: { pt: 'Builder Studio', en: 'Builder Studio' },
       description: {
         pt: 'Para creators, freelancers e estúdios pequenos que publicam com frequência.',
@@ -195,6 +200,7 @@ export const sitePricing = {
     },
     {
       id: 'teams',
+      image: '/assets/builderteams.webp',
       name: { pt: 'Builder Teams', en: 'Builder Teams' },
       description: {
         pt: 'Workspace para operação em equipe com billing central e shared assets.',

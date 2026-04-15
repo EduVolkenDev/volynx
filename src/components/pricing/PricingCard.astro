@@ -2,7 +2,8 @@
 const { plan, locale, currency } = Astro.props;
 const currencies = ['GBP', 'EUR', 'BRL'] as const;
 ---
-<article class={`pricing-card ${plan.featured ? 'pricing-card--featured' : ''}`} data-plan={plan.id}>
+<article class={`pricing-card ${plan.featured ? 'pricing-card--featured' : ''}${plan.image ? ' has-card-asset' : ''}`} data-plan={plan.id}>
+  {plan.image && <img src={plan.image} alt="" class="card-asset" loading="lazy" />}
   <div class="pricing-card__head">
     <div>
       {plan.badge && <span class="pricing-pill"><span class="i18n-en">{plan.badge.en}</span><span class="i18n-pt">{plan.badge.pt}</span></span>}
@@ -34,6 +35,31 @@ const currencies = ['GBP', 'EUR', 'BRL'] as const;
     display: flex;
     flex-direction: column;
     transition: all .25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Floating plan icon — top-right, matches home card-asset pattern but scaled for pricing cards */
+  .pricing-card > .card-asset {
+    position: absolute;
+    top: -18px;
+    right: -18px;
+    width: 110px;
+    height: auto;
+    opacity: 0.55;
+    pointer-events: none;
+    z-index: 0;
+    transition: opacity .35s ease, transform .35s ease;
+    filter: drop-shadow(0 10px 28px rgba(0,0,0,.35));
+    mix-blend-mode: normal;
+  }
+  .pricing-card:hover > .card-asset {
+    opacity: 0.8;
+    transform: scale(1.06) rotate(-3deg);
+  }
+  .pricing-card > *:not(.card-asset) { position: relative; z-index: 1; }
+  @media (min-width: 768px) {
+    .pricing-card > .card-asset { width: 130px; top: -22px; right: -22px; }
   }
   .pricing-card:hover {
     border-color: rgba(255,255,255,.12);
