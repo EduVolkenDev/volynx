@@ -11,6 +11,38 @@
 
 import type { Currency, Locale } from './pricing';
 
+// ── Product Icon Map ─────────────────────────────────────────
+// SINGLE SOURCE OF TRUTH for all product icons.
+// Import this and use PRODUCT_ICONS.x — never hardcode paths in pages.
+
+export const PRODUCT_ICONS = {
+  // Builder (generic + per-tier)
+  builder:       '/assets/builder.webp',
+  builderFree:   '/assets/builderfree.webp',
+  builderLaunch: '/assets/builderlaunch.webp',
+  builderPro:    '/assets/builderpro.webp',
+  builderStudio: '/assets/builderstudio.webp',
+  builderTeams:  '/assets/builderteams.webp',
+  // Daily (free/pro share same generic icon; diamond has its own)
+  daily:         '/assets/daily-icon.webp',
+  dailyFree:     '/assets/daily-icon.webp',
+  dailyPro:      '/assets/daily-icon.webp',
+  dailyDiamond:  '/assets/daily-diamond.webp',
+  // CVitae
+  cvitae:        '/assets/cvitae.webp',
+  // Lab & Studio
+  lab:           '/assets/labicon.webp',
+  studio:        '/assets/studioiconofi.webp',
+  // Icons Store
+  iconsStore:    '/assets/icons-logo.webp',
+  // Landing Express
+  landingExpress: '/assets/express.webp',
+  // Maintenance Plans
+  maintenance:   '/assets/producticon.webp',
+} as const;
+
+export type ProductIconKey = keyof typeof PRODUCT_ICONS;
+
 // ── Product keys ────────────────────────────────────────────
 
 export type ProductKey = 'volynx' | 'daily' | 'bundle' | 'volynxlab';

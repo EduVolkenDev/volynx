@@ -3,6 +3,7 @@ import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
 import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import FlagshipFooter from "../../components/FlagshipFooter.astro";
 import { ROUTES } from "../../data/routes";
+import { PRODUCT_ICONS } from "../../data/products";
 ---
 <FlagshipLayout title="Products — VOLYNX" description="Premium kits, tools and systems for developers, designers and modern internet businesses." pageClass="page-products">
   <FlagshipHeader current={ROUTES.products} ctaLabel="Open Builder" ctaI18n="nav.open_builder" ctaHref={ROUTES.builder} />
@@ -70,46 +71,65 @@ import { ROUTES } from "../../data/routes";
       </div>
     </section>
 
-    <!-- ═══ TOOLS & STUDIO ═══ -->
+    <!-- ═══ CORE PRODUCTS ═══ -->
     <section class="page-section">
       <div class="shell section-head">
-        <span class="eyebrow" data-i18n="prod.eyebrow_tools">Tools & studio</span>
-        <h2 data-i18n="prod.section_tools_title">Browser-based production tools</h2>
-        <p data-i18n="prod.section_tools_desc">Free tools for discovery. Pro tools for serious output. All running locally in the browser.</p>
+        <span class="eyebrow" data-i18n="prod.eyebrow_tools">Core products</span>
+        <h2 data-i18n="prod.section_tools_title">The VOLYNX ecosystem</h2>
+        <p data-i18n="prod.section_tools_desc">One account. Shared tokens. Four products that work together.</p>
       </div>
       <div class="shell grid-3">
+
+        <!-- Builder -->
         <article class="panel product-card product-card--iconic panel--pro">
-          <img src="/assets/builder.webp" alt="" class="product-card__float-icon" />
+          <img src={PRODUCT_ICONS.builder} alt="" class="product-card__float-icon" />
           <div class="head-row">
             <div><span class="label label--pro" data-i18n="prod.tool_builder_label">Main product</span><h3 data-i18n="prod.tool_builder_title">VOLYNX Builder</h3></div>
           </div>
           <p data-i18n="prod.tool_builder_desc">Create and publish premium sites with guided flows, premium kits and one-click deploy. Five plans from Free to Teams.</p>
           <div class="actions"><a href={ROUTES.builder} class="button button--gold" data-i18n="prod.tool_builder_btn">Open Builder</a></div>
         </article>
+
+        <!-- Daily -->
         <article class="panel product-card product-card--iconic">
-          <img src="/assets/labicon.webp" alt="" class="product-card__float-icon" />
+          <img src={PRODUCT_ICONS.daily} alt="" class="product-card__float-icon" />
           <div class="head-row">
-            <div><span class="label label--free" data-i18n="prod.tool_lab_label">Free</span><h3 data-i18n="prod.tool_lab_title">VOLYNX Lab</h3></div>
+            <div><span class="label label--pro" data-i18n="prod.tool_daily_label">Daily tools</span><h3 data-i18n="prod.tool_daily_title">VOLYNX Daily</h3></div>
           </div>
-          <p data-i18n="prod.tool_lab_desc">Convert, upscale and generate with no upload logic. Free browser tools for discovery. Upgrade to Studio Pro for more power.</p>
-          <div class="actions"><a href={ROUTES.lab} class="button button--ghost" data-i18n="prod.tool_lab_btn">Open Lab</a></div>
+          <p data-i18n="prod.tool_daily_desc">Six tools for your real routine — scan, summarize, save, write and decide. Free to start, Pro and Diamond for power users.</p>
+          <div class="actions"><a href={ROUTES.daily} class="button button--ghost" data-i18n="prod.tool_daily_btn">Open Daily</a></div>
         </article>
+
+        <!-- CVitae -->
         <article class="panel product-card product-card--iconic">
-          <img src="/assets/studioiconofi.webp" alt="" class="product-card__float-icon" />
-          <div class="head-row">
-            <div><span class="label label--pro" data-i18n="prod.tool_studio_label">Premium tools</span><h3 data-i18n="prod.tool_studio_title">Studio Pro</h3></div>
-          </div>
-          <p data-i18n="prod.tool_studio_desc">Higher usage limits, batch processing and commercial rights. The premium upgrade for Lab tools.</p>
-          <div class="actions"><a href={ROUTES.studio} class="button button--ghost" data-i18n="prod.tool_studio_btn">See Studio Pro</a></div>
-        </article>
-        <article class="panel product-card product-card--iconic">
-          <img src="/assets/cvitae.webp" alt="" class="product-card__float-icon" />
+          <img src={PRODUCT_ICONS.cvitae} alt="" class="product-card__float-icon" />
           <div class="head-row">
             <div><span class="label label--free" data-i18n="prod.tool_cvitae_label">Free to start</span><h3 data-i18n="prod.tool_cvitae_title">CVitae</h3></div>
           </div>
           <p data-i18n="prod.tool_cvitae_desc">Professional CV builder with guided steps, live preview and plan-based limits. Build your career story in minutes.</p>
           <div class="actions"><a href={ROUTES.cvitae} class="button button--ghost" data-i18n="prod.tool_cvitae_btn">Build your CV</a></div>
         </article>
+
+        <!-- Lab -->
+        <article class="panel product-card product-card--iconic">
+          <img src={PRODUCT_ICONS.lab} alt="" class="product-card__float-icon" />
+          <div class="head-row">
+            <div><span class="label label--free" data-i18n="prod.tool_lab_label">Free</span><h3 data-i18n="prod.tool_lab_title">VOLYNX Lab</h3></div>
+          </div>
+          <p data-i18n="prod.tool_lab_desc">Convert, upscale and generate with no upload logic. Free browser tools for discovery. Upgrade to Studio Pro for more power.</p>
+          <div class="actions"><a href={ROUTES.lab} class="button button--ghost" data-i18n="prod.tool_lab_btn">Open Lab</a></div>
+        </article>
+
+        <!-- Studio -->
+        <article class="panel product-card product-card--iconic">
+          <img src={PRODUCT_ICONS.studio} alt="" class="product-card__float-icon" />
+          <div class="head-row">
+            <div><span class="label label--pro" data-i18n="prod.tool_studio_label">Premium tools</span><h3 data-i18n="prod.tool_studio_title">Studio Pro</h3></div>
+          </div>
+          <p data-i18n="prod.tool_studio_desc">Higher usage limits, batch processing and commercial rights. The premium upgrade for Lab tools.</p>
+          <div class="actions"><a href={ROUTES.studio} class="button button--ghost" data-i18n="prod.tool_studio_btn">See Studio Pro</a></div>
+        </article>
+
       </div>
     </section>
 
@@ -121,19 +141,19 @@ import { ROUTES } from "../../data/routes";
       </div>
       <div class="shell grid-3">
         <article class="panel product-card product-card--iconic">
-          <img src="/assets/icons-logo.webp" alt="" class="product-card__float-icon" />
+          <img src={PRODUCT_ICONS.iconsStore} alt="" class="product-card__float-icon" />
           <div class="head-row"><div><span class="label" data-i18n="prod.service_icons_label">Icons</span><h3 data-i18n="prod.service_icons_title">Volynx Icons</h3></div></div>
           <p data-i18n="prod.service_icons_desc">A curated icon store: sharp, consistent, brand-ready. Grid, styles and packs.</p>
           <div class="actions"><a href={ROUTES.iconsStore} class="button button--ghost" data-i18n="prod.service_icons_btn">Browse Icons</a></div>
         </article>
         <article class="panel product-card product-card--iconic">
-          <img src="/assets/producticon.webp" alt="" class="product-card__float-icon" />
+          <img src={PRODUCT_ICONS.maintenance} alt="" class="product-card__float-icon" />
           <div class="head-row"><div><span class="label" data-i18n="prod.service_maintenance_label">Plans</span><h3 data-i18n="prod.service_maintenance_title">Maintenance Plans</h3></div></div>
           <p data-i18n="prod.service_maintenance_desc">Structured website maintenance and product evolution. Predictable delivery, zero friction.</p>
           <div class="actions"><a href={ROUTES.maintenance} class="button button--ghost" data-i18n="prod.service_maintenance_btn">See Plans</a></div>
         </article>
         <article class="panel product-card product-card--iconic">
-          <img src="/assets/express.webp" alt="" class="product-card__float-icon" />
+          <img src={PRODUCT_ICONS.landingExpress} alt="" class="product-card__float-icon" />
           <div class="head-row"><div><span class="label" data-i18n="prod.service_landing_label">Builder mode</span><h3 data-i18n="prod.service_landing_title">Landing Express</h3></div></div>
           <p data-i18n="prod.service_landing_desc">Guided Builder mode for conversion-focused landing pages. Premium structure, fast setup.</p>
           <div class="actions"><a href={ROUTES.landingExpress} class="button button--ghost" data-i18n="prod.service_landing_btn">Get Started</a></div>

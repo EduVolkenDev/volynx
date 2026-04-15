@@ -134,7 +134,7 @@ export const sitePricing = {
   builderPlans: [
     {
       id: 'free',
-      image: '/assets/builderfree.webp',
+      image: '/assets/builderfree.webp', // PRODUCT_ICONS.builderFree
       name: { pt: 'Builder Free', en: 'Builder Free' },
       description: {
         pt: 'Para testar o fluxo, criar rascunhos e sentir a experiência Volynx.',
@@ -150,7 +150,7 @@ export const sitePricing = {
     },
     {
       id: 'launch',
-      image: '/assets/builderlaunch.webp',
+      image: '/assets/builderlaunch.webp', // PRODUCT_ICONS.builderLaunch
       name: { pt: 'Builder Launch', en: 'Builder Launch' },
       description: {
         pt: 'Plano de entrada para lançar páginas enxutas com velocidade.',
@@ -166,7 +166,7 @@ export const sitePricing = {
     },
     {
       id: 'pro',
-      image: '/assets/builderpro.webp',
+      image: '/assets/builderpro.webp', // PRODUCT_ICONS.builderPro
       badge: { pt: 'Mais popular', en: 'Most popular' },
       featured: true,
       name: { pt: 'Builder Pro', en: 'Builder Pro' },
@@ -184,7 +184,7 @@ export const sitePricing = {
     },
     {
       id: 'studio',
-      image: '/assets/builderstudio.webp',
+      image: '/assets/builderstudio.webp', // PRODUCT_ICONS.builderStudio
       name: { pt: 'Builder Studio', en: 'Builder Studio' },
       description: {
         pt: 'Para creators, freelancers e estúdios pequenos que publicam com frequência.',
@@ -200,7 +200,7 @@ export const sitePricing = {
     },
     {
       id: 'teams',
-      image: '/assets/builderteams.webp',
+      image: '/assets/builderteams.webp', // PRODUCT_ICONS.builderTeams
       name: { pt: 'Builder Teams', en: 'Builder Teams' },
       description: {
         pt: 'Workspace para operação em equipe com billing central e shared assets.',
@@ -218,7 +218,7 @@ export const sitePricing = {
   dailyPlans: [
     {
       id: 'daily_free',
-      image: '/assets/daily-icon.webp',
+      image: '/assets/daily-icon.webp', // PRODUCT_ICONS.dailyFree
       name: { pt: 'Daily Free', en: 'Daily Free' },
       description: { pt: 'Todas as 6 ferramentas com limites diários. Armazenamento local.', en: 'All 6 tools with daily limits. Local storage.' },
       price: { GBP: '£0', EUR: '€0', BRL: 'R$0' },
@@ -231,7 +231,7 @@ export const sitePricing = {
     },
     {
       id: 'daily_pro',
-      image: '/assets/daily-icon.webp',
+      image: '/assets/daily-icon.webp', // PRODUCT_ICONS.dailyPro
       badge: { pt: 'Mais popular', en: 'Most popular' },
       featured: true,
       name: { pt: 'Daily Pro', en: 'Daily Pro' },
@@ -246,7 +246,7 @@ export const sitePricing = {
     },
     {
       id: 'daily_diamond',
-      image: '/assets/daily-diamond.webp',
+      image: '/assets/daily-diamond.webp', // PRODUCT_ICONS.dailyDiamond
       name: { pt: 'Daily Diamond', en: 'Daily Diamond' },
       description: { pt: 'Uso ilimitado, acesso API, compartilhamento em equipe e analytics.', en: 'Unlimited usage, API access, team sharing and analytics.' },
       price: { GBP: '£29', EUR: '€34.90', BRL: 'R$199' },
