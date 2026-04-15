@@ -8,28 +8,54 @@ import { ROUTES } from "../data/routes";
   <FlagshipHeader current={ROUTES.home} ctaLabel="Open Builder" ctaHref={ROUTES.builder} />
   <main>
 
-    <!-- ═══ HERO ═══ -->
-    <section class="hero hero--home">
-      <div class="shell hero-grid hero-grid--home">
-        <div class="hero-copy">
-          <span class="kicker" data-i18n="home2.kicker_flagship">Premium technology ecosystem</span>
-          <h1 data-i18n="home2.hero_title">Premium technology for people who create, organize and build forward.</h1>
-          <p data-i18n="home2.hero_subtitle">VOLYNX is an ecosystem of premium tools: a site builder, daily productivity utilities, professional career presentation, and free image tools. One account. Every product. Built to feel like the future.</p>
-          <div class="hero-actions">
-            <a href="#ecosystem" class="button button--gold" data-i18n="home2.btn_explore_ecosystem">Explore the ecosystem</a>
-            <a href={ROUTES.products} class="button button--ghost" data-i18n="home2.btn_view_kits">View premium kits</a>
+    <!-- ═══ HERO (v2 — premium emotional) ═══ -->
+    <section class="hero-v2">
+      <div class="hero-v2__bg" aria-hidden="true"></div>
+      <div class="shell hero-v2__inner">
+        <div class="hero-v2__copy">
+          <div class="hero-v2__pill">
+            <span class="hero-v2__pill-dot" aria-hidden="true"></span>
+            <span data-i18n="home2.kicker_flagship">Ecossistema Brasileiro Premium</span>
           </div>
-          <div class="hero-inline-stats">
-            <div><strong data-i18n="home2.stat_layers">4 products</strong><span data-i18n="home2.stat_layers_desc">Builder · Daily · CVitae · Lab</span></div>
-            <div><strong data-i18n="home2.stat_mobile">Mobile first</strong><span data-i18n="home2.stat_mobile_desc">Refined responsivity</span></div>
-            <div><strong data-i18n="home2.stat_production">Production-ready</strong><span data-i18n="home2.stat_production_desc">Free for discovery, Pro for delivery</span></div>
+
+          <h1 class="hero-v2__title" data-i18n-html="home2.hero_title_html">
+            Tudo que você precisa<br />
+            para construir sua carreira<br />
+            <span class="gradient-text">em um só lugar</span>
+          </h1>
+
+          <p class="hero-v2__desc" data-i18n-html="home2.hero_subtitle_html">
+            Site profissional · Rotina produtiva · CV de alto impacto · Ativos imobiliários.<br />
+            Uma conta. Um ecossistema. Resultados reais.
+          </p>
+
+          <div class="hero-v2__actions">
+            <a href="#ecosystem" class="hero-v2__cta-main" data-i18n="home2.btn_start_free">Começar grátis agora</a>
+            <a href={ROUTES.products} class="hero-v2__cta-ghost" data-i18n="home2.btn_view_kits">Ver os produtos</a>
+          </div>
+
+          <div class="hero-v2__trust">
+            <span><span class="check">✓</span> <span data-i18n="home2.trust_free">Free generoso</span></span>
+            <span><span class="check">✓</span> <span data-i18n="home2.trust_no_card">Sem cartão até precisar</span></span>
+            <span><span class="check">✓</span> <span data-i18n="home2.trust_pt">Suporte em português</span></span>
           </div>
         </div>
-        <div class="hero-visual hero-visual--flagship hero-showcase">
-          <img src="/assets/education.webp" alt="" class="showcase-item showcase-item--main" />
-          <img src="/assets/scale.webp" alt="" class="showcase-item showcase-item--accent" />
-          <img src="/assets/responsive.webp" alt="" class="showcase-item showcase-item--back" />
-          <img src="/assets/colors.webp" alt="" class="showcase-item showcase-item--side" />
+
+        <div class="hero-v2__visual" aria-hidden="true">
+          <div class="hero-v2__mockup">
+            <div class="hero-v2__mockup-glow"></div>
+            <div class="hero-v2__mockup-chip">
+              <span class="hero-v2__mockup-chip-dot"></span>
+              <span data-i18n="home2.mockup_label">Daily · My Day</span>
+            </div>
+            <p class="hero-v2__mockup-title" data-i18n="home2.mockup_title">Seu dia mais inteligente começa aqui</p>
+            <div class="hero-v2__mockup-grid">
+              <span class="hero-v2__mockup-tag">📄 Scanner</span>
+              <span class="hero-v2__mockup-tag">📝 Summary</span>
+              <span class="hero-v2__mockup-tag">🔐 Vault</span>
+              <span class="hero-v2__mockup-tag">✍️ Writing</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -263,3 +289,248 @@ import { ROUTES } from "../data/routes";
   </main>
   <FlagshipFooter />
 </FlagshipLayout>
+
+<style>
+  /* ═══ HERO V2 — Premium Emotional ═══ */
+  .hero-v2 {
+    position: relative;
+    min-height: calc(100vh - 74px);
+    display: flex;
+    align-items: center;
+    padding: clamp(48px, 8vh, 96px) 0 clamp(40px, 6vh, 80px);
+    overflow: hidden;
+  }
+  .hero-v2__bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 50% 40%, rgba(20, 184, 166, 0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 90% 90%, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .hero-v2__inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  @media (min-width: 980px) {
+    .hero-v2__inner { grid-template-columns: 1.3fr 1fr; gap: 56px; }
+  }
+
+  .hero-v2__copy { max-width: 720px; }
+
+  .hero-v2__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 16px;
+    border-radius: 999px;
+    background: rgba(45, 212, 191, 0.08);
+    border: 1px solid rgba(45, 212, 191, 0.25);
+    margin-bottom: 24px;
+    font-size: .82rem;
+    font-weight: 600;
+    color: #5eead4;
+    letter-spacing: .02em;
+  }
+  .hero-v2__pill-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #2dd4bf;
+    box-shadow: 0 0 8px #2dd4bf;
+    animation: heroV2Pulse 2s ease-in-out infinite;
+  }
+  @keyframes heroV2Pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .4; transform: scale(.85); }
+  }
+
+  .hero-v2__title {
+    font-family: var(--display);
+    font-size: clamp(2.2rem, 6vw, 4.2rem);
+    font-weight: 700;
+    letter-spacing: -.035em;
+    line-height: 1.02;
+    margin: 0 0 24px;
+    color: #fff;
+  }
+  .hero-v2__title .gradient-text {
+    background: linear-gradient(135deg, #2dd4bf, #22d3ee, #3b82f6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    display: inline-block;
+  }
+
+  .hero-v2__desc {
+    font-size: clamp(1rem, 1.7vw, 1.18rem);
+    line-height: 1.65;
+    color: rgba(209, 215, 230, 0.78);
+    margin: 0 0 36px;
+    max-width: 54ch;
+  }
+
+  .hero-v2__actions {
+    display: flex;
+    gap: 14px;
+    flex-direction: column;
+  }
+  @media (min-width: 640px) {
+    .hero-v2__actions { flex-direction: row; }
+  }
+
+  .hero-v2__cta-main {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 36px;
+    border-radius: 999px;
+    background: #fff;
+    color: #09090b;
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 6px 16px rgba(45, 212, 191, 0.1);
+    transition: transform .2s ease, box-shadow .25s ease, background .2s;
+  }
+  .hero-v2__cta-main:hover {
+    transform: scale(1.03);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55), 0 10px 28px rgba(45, 212, 191, 0.25);
+  }
+  .hero-v2__cta-main:active { transform: scale(.97); }
+
+  .hero-v2__cta-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 34px;
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    transition: all .2s ease;
+  }
+  .hero-v2__cta-ghost:hover {
+    border-color: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .hero-v2__trust {
+    margin-top: 44px;
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    font-size: .88rem;
+    color: rgba(200, 205, 255, 0.48);
+  }
+  .hero-v2__trust span { display: inline-flex; align-items: center; gap: 6px; }
+  .hero-v2__trust .check { color: #2dd4bf; font-weight: 800; }
+
+  /* ── Visual mockup card ── */
+  .hero-v2__visual {
+    display: none;
+    justify-content: center;
+    align-items: center;
+  }
+  @media (min-width: 980px) {
+    .hero-v2__visual { display: flex; }
+  }
+  .hero-v2__mockup {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    aspect-ratio: 4 / 5;
+    border-radius: 32px;
+    background:
+      linear-gradient(180deg, rgba(24, 24, 27, 0.92), rgba(9, 9, 11, 0.98));
+    border: 1px solid rgba(244, 244, 245, 0.1);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow:
+      0 30px 80px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+  }
+  .hero-v2__mockup-glow {
+    position: absolute;
+    inset: -40%;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(45, 212, 191, 0.3), transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.2), transparent 50%);
+    pointer-events: none;
+    animation: heroV2Float 8s ease-in-out infinite;
+  }
+  @keyframes heroV2Float {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-10px, 10px); }
+  }
+  .hero-v2__mockup-chip {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(24, 24, 27, 0.8);
+    border: 1px solid rgba(45, 212, 191, 0.3);
+    color: #5eead4;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    align-self: flex-start;
+    backdrop-filter: blur(12px);
+  }
+  .hero-v2__mockup-chip-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #2dd4bf;
+    box-shadow: 0 0 6px #2dd4bf;
+  }
+  .hero-v2__mockup-title {
+    position: relative;
+    z-index: 2;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.25;
+    margin: 0;
+  }
+  .hero-v2__mockup-grid {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .hero-v2__mockup-tag {
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: rgba(244, 244, 245, 0.04);
+    border: 1px solid rgba(244, 244, 245, 0.08);
+    color: rgba(244, 244, 245, 0.85);
+    font-size: .82rem;
+    font-weight: 600;
+    backdrop-filter: blur(8px);
+  }
+
+  /* ── Mobile adjustments ── */
+  @media (max-width: 639px) {
+    .hero-v2__trust { gap: 16px; font-size: .8rem; }
+    .hero-v2__cta-main, .hero-v2__cta-ghost {
+      padding: 16px 28px;
+      font-size: 1rem;
+    }
+  }
+</style>
