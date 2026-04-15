@@ -218,6 +218,7 @@ export const sitePricing = {
   dailyPlans: [
     {
       id: 'daily_free',
+      image: '/assets/daily-icon.webp',
       name: { pt: 'Daily Free', en: 'Daily Free' },
       description: { pt: 'Todas as 6 ferramentas com limites diários. Armazenamento local.', en: 'All 6 tools with daily limits. Local storage.' },
       price: { GBP: '£0', EUR: '€0', BRL: 'R$0' },
@@ -230,6 +231,7 @@ export const sitePricing = {
     },
     {
       id: 'daily_pro',
+      image: '/assets/daily-icon.webp',
       badge: { pt: 'Mais popular', en: 'Most popular' },
       featured: true,
       name: { pt: 'Daily Pro', en: 'Daily Pro' },
@@ -244,6 +246,7 @@ export const sitePricing = {
     },
     {
       id: 'daily_diamond',
+      image: '/assets/daily-diamond.webp',
       name: { pt: 'Daily Diamond', en: 'Daily Diamond' },
       description: { pt: 'Uso ilimitado, acesso API, compartilhamento em equipe e analytics.', en: 'Unlimited usage, API access, team sharing and analytics.' },
       price: { GBP: '£29', EUR: '€34.90', BRL: 'R$199' },
