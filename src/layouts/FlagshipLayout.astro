@@ -41,28 +41,43 @@ const {
       }
     </script>
     <script is:inline>
-      // Early auth check — prevents flash of "Login" on page load
+      // Early auth check — avoid flash of "Login" before DOM is ready
       (function(){
         try {
           if (localStorage.getItem('volynx_access_token')) {
             document.documentElement.classList.add('vx-authed');
-            // Populate user badge with initials
-            var badge = document.getElementById('vxUserBadge');
-            if (badge) {
-              var name = '';
-              try {
-                var s = JSON.parse(localStorage.getItem('volynx_session') || '{}');
-                var m = (s && s.user && s.user.user_metadata) || {};
-                name = m.full_name || m.username || m.name || '';
-              } catch(e2){}
-              var email = localStorage.getItem('volynx_user_email') || '';
-              var label = name ? name.split(' ')[0] : (email ? email.split('@')[0] : '');
-              badge.textContent = label ? label.slice(0,2).toUpperCase() : '??';
-              badge.title = name || email || 'Profile';
-            }
           }
         } catch(e){}
       })();
+      // Populate the user badge AFTER DOM is parsed (badge lives in <body>)
+      function vxPopulateUserBadge() {
+        try {
+          if (!localStorage.getItem('volynx_access_token')) return;
+          var name = '';
+          try {
+            var s = JSON.parse(localStorage.getItem('volynx_session') || '{}');
+            var m = (s && s.user && s.user.user_metadata) || {};
+            name = m.full_name || m.username || m.name || '';
+          } catch(e) {}
+          var email = localStorage.getItem('volynx_user_email') || '';
+          var label = name ? name.split(' ')[0] : (email ? email.split('@')[0] : '');
+          var initials = label ? label.slice(0, 2).toUpperCase() : 'ME';
+          var title = name || email || 'Profile';
+          ['vxUserBadge', 'vxLoginBtn'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) {
+              el.textContent = initials;
+              el.setAttribute('title', title);
+              el.setAttribute('aria-label', title);
+            }
+          });
+        } catch (e) {}
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', vxPopulateUserBadge);
+      } else {
+        vxPopulateUserBadge();
+      }
     </script>
   </head>
   <body class={pageClass}>
