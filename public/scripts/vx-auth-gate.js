@@ -43,6 +43,7 @@
           token = sess.access_token;
           localStorage.setItem('volynx_access_token', sess.access_token);
           if (sess.refresh_token) localStorage.setItem('volynx_refresh_token', sess.refresh_token);
+          if (window.VxAuthBridge) window.VxAuthBridge.sync();
         }
       }
     }

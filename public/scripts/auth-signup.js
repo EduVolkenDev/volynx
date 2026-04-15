@@ -64,6 +64,8 @@ function persistSession(session, email) {
     expires_in: session.expires_in || null,
     user: session.user || null
   }));
+  // Mirror tokens to cross-subdomain cookies so daily.volynx.world / cvitae.volynx.world see the session
+  if (window.VxAuthBridge) window.VxAuthBridge.sync();
 }
 
 function showCheckEmail(email) {
