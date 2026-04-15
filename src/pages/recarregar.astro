@@ -1,0 +1,545 @@
+---
+import FlagshipLayout from "../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "../components/FlagshipHeader.astro";
+import FlagshipFooter from "../components/FlagshipFooter.astro";
+import { ROUTES } from "../data/routes";
+import { sitePricing } from "../data/pricing";
+
+const lang = Astro.url.searchParams.get('lang') === 'en' ? 'en' : 'pt';
+const currencyParam = Astro.url.searchParams.get('currency') || 'BRL';
+const currency = (['GBP', 'EUR', 'BRL'] as const).includes(currencyParam as any) ? (currencyParam as 'GBP'|'EUR'|'BRL') : 'BRL';
+
+// Enriched packages with bonus/emotional copy
+const packs = [
+  {
+    id: 'starter',
+    amount: 10,
+    price: { GBP: '£9.90', EUR: '€11.90', BRL: 'R$69' },
+    bonus: { pt: '', en: '' },
+    tagline: { pt: 'Primeiro passo', en: 'First step' },
+    desc: { pt: 'Para testar sem compromisso.', en: 'Try without committing.' }
+  },
+  {
+    id: 'core',
+    amount: 25,
+    priceOriginal: { GBP: '£24.90', EUR: '€29.90', BRL: 'R$169' },
+    price: { GBP: '£22.90', EUR: '€27.90', BRL: 'R$159' },
+    bonus: { pt: '+20% tokens extra', en: '+20% extra tokens' },
+    tagline: { pt: 'Mais popular', en: 'Most popular' },
+    desc: { pt: 'O sweet spot da plataforma.', en: 'The platform sweet spot.' },
+    featured: true
+  },
+  {
+    id: 'pro',
+    amount: 60,
+    priceOriginal: { GBP: '£65', EUR: '€78', BRL: 'R$459' },
+    price: { GBP: '£49.90', EUR: '€59.90', BRL: 'R$349' },
+    bonus: { pt: '+30% tokens + badge Power User', en: '+30% tokens + Power User badge' },
+    tagline: { pt: 'Melhor custo', en: 'Best value' },
+    desc: { pt: 'Para quem usa todos os dias.', en: 'For daily power users.' }
+  },
+  {
+    id: 'scale',
+    amount: 150,
+    price: { GBP: '£109', EUR: '€129', BRL: 'R$749' },
+    bonus: { pt: 'Diamond perks + prioridade', en: 'Diamond perks + priority' },
+    tagline: { pt: 'Whale', en: 'Whale tier' },
+    desc: { pt: 'Operação pesada sem fricção.', en: 'Heavy operation, zero friction.' }
+  }
+];
+
+const t = {
+  pt: {
+    pill: 'Recarregue com bônus',
+    title: 'Recarregue seus tokens',
+    titleAccent: 'e acelere',
+    subtitle: 'Quanto mais você usa, mais rápido você cresce. Cada pacote tem bônus exclusivo e Pix instantâneo.',
+    ofYourChoice: 'pacotes premium',
+    pixBadge: '⚡ Pix instantâneo',
+    stripeBadge: 'Cartão internacional',
+    tokens: 'tokens',
+    each: 'cada',
+    buyPix: 'Comprar com Pix',
+    buyCard: 'Comprar com cartão',
+    trustBilling: '✓ Cobrança segura',
+    trustInstant: '✓ Crédito instantâneo',
+    trustNoExpiry: '✓ Tokens nunca expiram',
+    footerNote: 'Todos os pacotes incluem Power User badge quando você acumula 100+ tokens. Um único saldo funciona em Builder, Daily, CVitae e PropertyFlow.',
+    from: 'Era',
+  },
+  en: {
+    pill: 'Recharge with bonus',
+    title: 'Recharge your tokens',
+    titleAccent: 'and scale',
+    subtitle: 'The more you use, the faster you grow. Every pack ships with an exclusive bonus and instant Pix.',
+    ofYourChoice: 'premium packs',
+    pixBadge: '⚡ Instant Pix',
+    stripeBadge: 'International card',
+    tokens: 'tokens',
+    each: 'each',
+    buyPix: 'Buy with Pix',
+    buyCard: 'Buy with card',
+    trustBilling: '✓ Secure billing',
+    trustInstant: '✓ Instant credit',
+    trustNoExpiry: '✓ Tokens never expire',
+    footerNote: 'Every pack includes a Power User badge when you reach 100+ tokens. Single balance works across Builder, Daily, CVitae and PropertyFlow.',
+    from: 'Was',
+  }
+};
+const L = t[lang];
+---
+<FlagshipLayout title="Recarregar tokens — VOLYNX" description="Recarregue seus tokens com Pix instantâneo ou cartão. Bônus exclusivos em cada pacote." pageClass="page-recarregar">
+  <FlagshipHeader current={ROUTES.pricing} ctaLabel={L.buyCard} />
+  <main>
+
+    <section class="rec-hero">
+      <div class="rec-bg" aria-hidden="true"></div>
+      <div class="shell rec-hero-inner">
+        <div class="rec-pill">
+          <span class="rec-pill-dot"></span>
+          <span>{L.pill}</span>
+        </div>
+        <h1 class="rec-title">
+          {L.title}<br />
+          <span class="gradient-text">{L.titleAccent}</span>
+        </h1>
+        <p class="rec-subtitle">{L.subtitle}</p>
+
+        <div class="rec-methods">
+          <span class="rec-method-pill rec-method-pill--pix">{L.pixBadge}</span>
+          <span class="rec-method-pill">{L.stripeBadge}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="shell rec-packs">
+      {packs.map((pack, i) => (
+        <article class={`rec-card${pack.featured ? ' rec-card--featured' : ''}`} data-pack-id={`tokens_${pack.id}`}>
+          {pack.featured && <span class="rec-card-ribbon">{L.ofYourChoice}</span>}
+          <div class="rec-card-top">
+            <div>
+              <span class="rec-card-tag">{pack.tagline[lang]}</span>
+              <h3 class="rec-card-amount">{pack.amount} <span class="rec-card-amount-unit">{L.tokens}</span></h3>
+              <p class="rec-card-desc">{pack.desc[lang]}</p>
+            </div>
+            <div class="rec-card-price">
+              {pack.priceOriginal && <span class="rec-card-price-original">{L.from} {pack.priceOriginal[currency]}</span>}
+              <div class="rec-card-price-current">{pack.price[currency]}</div>
+              {pack.bonus[lang] && <span class="rec-card-bonus">🎁 {pack.bonus[lang]}</span>}
+            </div>
+          </div>
+
+          <div class="rec-card-actions">
+            <button class="rec-btn rec-btn--pix" data-buy-pix={`tokens_${pack.id}_brl`} type="button">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M17.7 6.3c-1.2-1.2-2.8-1.8-4.5-1.8s-3.3.6-4.5 1.8L5.4 9.6l2.1 2.1 3.3-3.3c.6-.6 1.4-.9 2.4-.9s1.8.3 2.4.9l3.3 3.3 2.1-2.1-3.3-3.3z" fill="currentColor"/><path d="M6.3 17.7c1.2 1.2 2.8 1.8 4.5 1.8s3.3-.6 4.5-1.8l3.3-3.3-2.1-2.1-3.3 3.3c-.6.6-1.4.9-2.4.9s-1.8-.3-2.4-.9l-3.3-3.3-2.1 2.1 3.3 3.3z" fill="currentColor"/></svg>
+              {L.buyPix}
+            </button>
+            <button class="rec-btn rec-btn--card" data-buy-card={`tokens_${pack.id}_${currency.toLowerCase()}`} type="button">
+              {L.buyCard}
+            </button>
+          </div>
+        </article>
+      ))}
+    </section>
+
+    <section class="shell rec-trust">
+      <div class="rec-trust-item">
+        <div class="rec-trust-icon">🔒</div>
+        <div>
+          <strong>{L.trustBilling}</strong>
+          <p>{lang === 'pt' ? 'Stripe + Mercado Pago. Certificado PCI, criptografia end-to-end.' : 'Stripe + Mercado Pago. PCI certified, end-to-end encrypted.'}</p>
+        </div>
+      </div>
+      <div class="rec-trust-item">
+        <div class="rec-trust-icon">⚡</div>
+        <div>
+          <strong>{L.trustInstant}</strong>
+          <p>{lang === 'pt' ? 'Seus tokens aparecem no saldo em segundos via webhook.' : 'Tokens appear in your balance in seconds via webhook.'}</p>
+        </div>
+      </div>
+      <div class="rec-trust-item">
+        <div class="rec-trust-icon">♾️</div>
+        <div>
+          <strong>{L.trustNoExpiry}</strong>
+          <p>{lang === 'pt' ? 'Compre agora, use quando quiser. Saldo acumula sem validade.' : 'Buy now, use whenever. Balance never expires.'}</p>
+        </div>
+      </div>
+    </section>
+
+    <p class="shell rec-footer-note">{L.footerNote}</p>
+
+  </main>
+  <FlagshipFooter />
+
+  <!-- Pix checkout helper -->
+  <script is:inline src="/js/vx-pix.js"></script>
+
+  <script is:inline>
+    (function() {
+      var token = localStorage.getItem('volynx_access_token') || '';
+      var cfg = null;
+
+      // Load config
+      fetch('/config.json', { cache: 'no-store' }).then(function(r) { return r.json(); }).then(function(c) { cfg = c; }).catch(function(){});
+
+      // Pix buttons
+      document.querySelectorAll('[data-buy-pix]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (!token) { window.location.href = '/login/?next=/recarregar/'; return; }
+          var lookup = btn.getAttribute('data-buy-pix');
+          if (!lookup || !window.VxPix) return;
+          window.VxPix.checkout(lookup, {
+            onSuccess: function(data) {
+              // Confetti on successful purchase
+              if (window.VxGame && window.VxGame.triggerConfetti) {
+                window.VxGame.triggerConfetti();
+              }
+              setTimeout(function() { window.location.href = '/account/'; }, 2500);
+            }
+          });
+        });
+      });
+
+      // Card (Stripe) buttons
+      document.querySelectorAll('[data-buy-card]').forEach(function(btn) {
+        btn.addEventListener('click', async function(e) {
+          e.preventDefault();
+          if (!token) { window.location.href = '/login/?next=/recarregar/'; return; }
+          if (!cfg) cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r){return r.json();});
+          var apiBase = (cfg.functionsUrl || '').replace(/\/$/, '');
+          if (!apiBase) return;
+          var lookup = btn.getAttribute('data-buy-card');
+          btn.disabled = true;
+          var orig = btn.textContent;
+          btn.textContent = '...';
+          try {
+            var res = await fetch(apiBase + '/create-checkout-session', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+              body: JSON.stringify({
+                lookup_key: lookup,
+                success_url: window.location.origin + '/account/?recarga=sucesso',
+                cancel_url: window.location.href
+              })
+            });
+            var data = await res.json();
+            if (data.url) window.location.href = data.url;
+            else { alert(data.error || 'Checkout failed'); btn.textContent = orig; btn.disabled = false; }
+          } catch (err) { btn.textContent = orig; btn.disabled = false; }
+        });
+      });
+
+      // Confetti on successful return from Stripe
+      if (window.location.search.indexOf('recarga=sucesso') !== -1) {
+        setTimeout(function() {
+          if (window.VxGame) window.VxGame.triggerConfetti();
+        }, 500);
+      }
+    })();
+  </script>
+
+  <style>
+    .page-recarregar { background: #09090b; }
+
+    .rec-hero {
+      position: relative;
+      padding: clamp(60px, 10vh, 120px) 0 clamp(40px, 6vh, 80px);
+      overflow: hidden;
+      text-align: center;
+    }
+    .rec-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 50% 30%, rgba(45, 212, 191, 0.18), transparent 60%),
+        radial-gradient(ellipse 50% 40% at 80% 100%, rgba(59, 130, 246, 0.1), transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .rec-hero-inner {
+      position: relative;
+      z-index: 2;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .rec-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 16px;
+      border-radius: 999px;
+      background: rgba(45, 212, 191, 0.08);
+      border: 1px solid rgba(45, 212, 191, 0.28);
+      color: #5eead4;
+      font-size: .82rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+    .rec-pill-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #2dd4bf;
+      box-shadow: 0 0 8px #2dd4bf;
+      animation: recPulse 2s infinite;
+    }
+    @keyframes recPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .4; transform: scale(.85); }
+    }
+
+    .rec-title {
+      font-family: var(--display, 'Orbitron', sans-serif);
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 700;
+      letter-spacing: -.035em;
+      line-height: 1.05;
+      margin: 0 0 20px;
+      color: #fff;
+    }
+    .rec-title .gradient-text {
+      background: linear-gradient(135deg, #2dd4bf, #22d3ee, #3b82f6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+    }
+    .rec-subtitle {
+      font-size: clamp(1rem, 1.7vw, 1.14rem);
+      color: rgba(209, 215, 230, 0.72);
+      max-width: 54ch;
+      margin: 0 auto 24px;
+      line-height: 1.6;
+    }
+    .rec-methods {
+      display: inline-flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .rec-method-pill {
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: .82rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    .rec-method-pill--pix {
+      background: rgba(45, 212, 191, 0.1);
+      border-color: rgba(45, 212, 191, 0.35);
+      color: #5eead4;
+    }
+
+    /* ── Pack cards ── */
+    .rec-packs {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      padding: 40px 20px 60px;
+      max-width: 760px;
+    }
+    @media (min-width: 768px) {
+      .rec-packs { gap: 22px; padding: 60px 20px 80px; }
+    }
+
+    .rec-card {
+      position: relative;
+      background: linear-gradient(180deg, #18181b, #09090b);
+      border: 1px solid rgba(244, 244, 245, 0.08);
+      border-radius: 28px;
+      padding: 28px;
+      transition: border-color .25s, transform .25s, box-shadow .25s;
+    }
+    .rec-card:hover {
+      border-color: rgba(45, 212, 191, 0.35);
+      transform: translateY(-2px);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5), 0 0 40px rgba(45, 212, 191, 0.08);
+    }
+    .rec-card--featured {
+      border-color: rgba(45, 212, 191, 0.4);
+      box-shadow: 0 20px 60px rgba(45, 212, 191, 0.12), 0 0 0 1px rgba(45, 212, 191, 0.2);
+    }
+    .rec-card-ribbon {
+      position: absolute;
+      top: -12px;
+      left: 28px;
+      background: linear-gradient(135deg, #2dd4bf, #22d3ee);
+      color: #09090b;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      box-shadow: 0 6px 20px rgba(45, 212, 191, 0.3);
+    }
+
+    .rec-card-top {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+    @media (min-width: 540px) {
+      .rec-card-top { grid-template-columns: 1fr auto; align-items: flex-start; gap: 24px; }
+    }
+    .rec-card-tag {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #5eead4;
+      margin-bottom: 6px;
+    }
+    .rec-card-amount {
+      font-size: clamp(2.2rem, 5vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      color: #fff;
+      margin: 0 0 8px;
+      line-height: 1;
+    }
+    .rec-card-amount-unit {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.5);
+      letter-spacing: 0;
+      text-transform: lowercase;
+    }
+    .rec-card-desc {
+      font-size: .92rem;
+      color: rgba(209, 215, 230, 0.65);
+      margin: 0;
+      line-height: 1.5;
+    }
+    .rec-card-price {
+      text-align: right;
+    }
+    @media (max-width: 539px) {
+      .rec-card-price { text-align: left; }
+    }
+    .rec-card-price-original {
+      display: block;
+      font-size: .78rem;
+      color: rgba(255, 255, 255, 0.35);
+      text-decoration: line-through;
+      margin-bottom: 2px;
+    }
+    .rec-card-price-current {
+      font-family: var(--display, 'Orbitron', sans-serif);
+      font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -.02em;
+      color: #fff;
+      line-height: 1;
+    }
+    .rec-card-bonus {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(245, 197, 66, 0.1);
+      border: 1px solid rgba(245, 197, 66, 0.28);
+      color: #fbbf24;
+      font-size: .78rem;
+      font-weight: 700;
+    }
+
+    .rec-card-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 540px) {
+      .rec-card-actions { grid-template-columns: 1fr 1fr; }
+    }
+
+    .rec-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 20px;
+      border-radius: 999px;
+      font-size: .95rem;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      transition: all .15s;
+      font-family: inherit;
+    }
+    .rec-btn--pix {
+      background: linear-gradient(135deg, #2dd4bf, #22d3ee, #3b82f6);
+      color: #09090b;
+      box-shadow: 0 10px 30px rgba(45, 212, 191, 0.3);
+    }
+    .rec-btn--pix:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 40px rgba(45, 212, 191, 0.45);
+    }
+    .rec-btn--card {
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    .rec-btn--card:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.28);
+    }
+    .rec-btn:disabled { opacity: .6; cursor: not-allowed; }
+
+    /* ── Trust row ── */
+    .rec-trust {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      padding: 40px 20px;
+      border-top: 1px solid rgba(244, 244, 245, 0.06);
+      max-width: 960px;
+    }
+    @media (min-width: 768px) {
+      .rec-trust { grid-template-columns: repeat(3, 1fr); gap: 32px; }
+    }
+    .rec-trust-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .rec-trust-icon {
+      font-size: 1.8rem;
+      flex-shrink: 0;
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      background: rgba(45, 212, 191, 0.08);
+      border: 1px solid rgba(45, 212, 191, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .rec-trust-item strong {
+      display: block;
+      font-size: .95rem;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .rec-trust-item p {
+      font-size: .85rem;
+      color: rgba(209, 215, 230, 0.55);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* Footer note */
+    .rec-footer-note {
+      max-width: 720px;
+      padding: 0 20px 60px;
+      font-size: .82rem;
+      color: rgba(200, 205, 255, 0.4);
+      text-align: center;
+      line-height: 1.6;
+    }
+  </style>
+</FlagshipLayout>

@@ -23,6 +23,7 @@ export const ROUTES = {
   // ── Account ───────────────────────────
   account: "/account/",
   profile: "/profile/",
+  recarregar: "/recarregar/",
 
   // ── Products ──────────────────────────
   products: "/products/",

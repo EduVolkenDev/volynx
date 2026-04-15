@@ -305,8 +305,8 @@ window.VxTokens = (function () {
 
     // Determine base URL for pricing (cross-subdomain aware)
     var pricingHref = (window.location.hostname === 'volynx.world')
-      ? '/pricing/#tokens'
-      : 'https://volynx.world/pricing/#tokens';
+      ? '/recarregar/'
+      : 'https://volynx.world/recarregar/';
 
     var overlay = document.createElement('div');
     overlay.id = 'vxTokenModal';
