@@ -4,15 +4,15 @@ const currencies = ['GBP', 'EUR', 'BRL'] as const;
 ---
 <div class="addon-card" data-addon-id={addon.id}>
   <div class="addon-card__info">
-    <h3 class="addon-card__name">{addon.name[locale]}</h3>
-    <p class="addon-card__desc">{addon.description[locale]}</p>
+    <h3 class="addon-card__name"><span class="i18n-en">{addon.name.en}</span><span class="i18n-pt">{addon.name.pt}</span></h3>
+    <p class="addon-card__desc"><span class="i18n-en">{addon.description.en}</span><span class="i18n-pt">{addon.description.pt}</span></p>
   </div>
   <div class="addon-card__right">
     {currencies.map((c) => (
       <span class={`addon-card__price ${c !== currency ? 'vx-price--hidden' : ''}`} data-currency={c}>{addon.price[c]}</span>
     ))}
     <button type="button" class="addon-card__cta" data-addon-key={`addon_${addon.id}`}>
-      {locale === 'pt' ? 'Adicionar' : 'Add'}
+      <span class="i18n-en">Add</span><span class="i18n-pt">Adicionar</span>
     </button>
   </div>
 </div>

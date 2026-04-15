@@ -17,13 +17,15 @@ const classBorders: Record<string, string> = {
 const currencies = ['GBP', 'EUR', 'BRL'] as const;
 ---
 <div class="usage-card">
-  <h3 class="usage-card__label">{item.label[locale]}</h3>
+  <h3 class="usage-card__label"><span class="i18n-en">{item.label.en}</span><span class="i18n-pt">{item.label.pt}</span></h3>
   <span class="usage-card__tokens" style={`background:${classColors[item.tool_class || 'A']};border-color:${classBorders[item.tool_class || 'A']}`}>{item.tokens}</span>
   {currencies.map((c) => (
     <span class={`usage-card__price ${c !== currency ? 'vx-price--hidden' : ''}`} data-currency={c}>{item.price[c]}</span>
   ))}
   <ul class="usage-card__examples">
-    {item.examples[locale].map((ex: string) => <li>{ex}</li>)}
+    {item.examples.en.map((ex: string, i: number) => (
+      <li><span class="i18n-en">{ex}</span><span class="i18n-pt">{item.examples.pt[i] || ex}</span></li>
+    ))}
   </ul>
 </div>
 

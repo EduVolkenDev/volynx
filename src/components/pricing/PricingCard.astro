@@ -5,21 +5,23 @@ const currencies = ['GBP', 'EUR', 'BRL'] as const;
 <article class={`pricing-card ${plan.featured ? 'pricing-card--featured' : ''}`} data-plan={plan.id}>
   <div class="pricing-card__head">
     <div>
-      {plan.badge && <span class="pricing-pill">{plan.badge[locale]}</span>}
-      <h3 class="pricing-card__name">{plan.name[locale]}</h3>
-      <p class="pricing-card__desc">{plan.description[locale]}</p>
+      {plan.badge && <span class="pricing-pill"><span class="i18n-en">{plan.badge.en}</span><span class="i18n-pt">{plan.badge.pt}</span></span>}
+      <h3 class="pricing-card__name"><span class="i18n-en">{plan.name.en}</span><span class="i18n-pt">{plan.name.pt}</span></h3>
+      <p class="pricing-card__desc"><span class="i18n-en">{plan.description.en}</span><span class="i18n-pt">{plan.description.pt}</span></p>
     </div>
     <div class="pricing-card__price-block">
       {currencies.map((c) => (
         <span class={`pricing-card__price ${c !== currency ? 'pricing-card__price--hidden' : ''}`} data-currency={c}>{plan.price[c]}</span>
       ))}
-      <span class="pricing-card__billing">{plan.billing[locale]}</span>
+      <span class="pricing-card__billing"><span class="i18n-en">{plan.billing.en}</span><span class="i18n-pt">{plan.billing.pt}</span></span>
     </div>
   </div>
   <ul class="pricing-card__features">
-    {plan.features[locale].map((f: string) => <li>{f}</li>)}
+    {plan.features.en.map((f: string, i: number) => (
+      <li><span class="i18n-en">{f}</span><span class="i18n-pt">{plan.features.pt[i] || f}</span></li>
+    ))}
   </ul>
-  <button type="button" class={`pricing-card__cta ${plan.featured ? 'pricing-card__cta--primary' : ''}`}>{plan.cta[locale]}</button>
+  <button type="button" class={`pricing-card__cta ${plan.featured ? 'pricing-card__cta--primary' : ''}`}><span class="i18n-en">{plan.cta.en}</span><span class="i18n-pt">{plan.cta.pt}</span></button>
 </article>
 
 <style>

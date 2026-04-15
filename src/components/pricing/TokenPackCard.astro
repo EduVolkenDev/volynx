@@ -3,14 +3,14 @@ const { pack, locale, currency } = Astro.props;
 const currencies = ['GBP', 'EUR', 'BRL'] as const;
 ---
 <div class="token-card" data-pack-id={pack.id}>
-  {pack.badge && <span class="token-pill">{pack.badge[locale]}</span>}
+  {pack.badge && <span class="token-pill"><span class="i18n-en">{pack.badge.en}</span><span class="i18n-pt">{pack.badge.pt}</span></span>}
   <h3 class="token-card__amount">{pack.amount} tokens</h3>
   {currencies.map((c) => (
     <span class={`token-card__price ${c !== currency ? 'vx-price--hidden' : ''}`} data-currency={c}>{pack.price[c]}</span>
   ))}
-  <p class="token-card__desc">{locale === 'pt' ? 'Pacote avulso para uso flexível das ferramentas.' : 'One-time pack for flexible tool usage.'}</p>
+  <p class="token-card__desc"><span class="i18n-en">One-time pack for flexible tool usage.</span><span class="i18n-pt">Pacote avulso para uso flexível das ferramentas.</span></p>
   <div class="token-card__buttons">
-    <button type="button" class="token-card__cta">{locale === 'pt' ? 'Comprar' : 'Buy'}</button>
+    <button type="button" class="token-card__cta"><span class="i18n-en">Buy</span><span class="i18n-pt">Comprar</span></button>
     <button type="button" class="token-card__pix" data-pix-pack={`tokens_${pack.id}_brl`}>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:4px;">
         <path d="M17.7 6.3c-1.2-1.2-2.8-1.8-4.5-1.8s-3.3.6-4.5 1.8L5.4 9.6l2.1 2.1 3.3-3.3c.6-.6 1.4-.9 2.4-.9s1.8.3 2.4.9l3.3 3.3 2.1-2.1-3.3-3.3z" fill="currentColor"/>
