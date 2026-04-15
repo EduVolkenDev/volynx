@@ -115,7 +115,7 @@ import { ROUTES } from "../data/routes";
     <!-- ═══ LAB — Free Tools ═══ -->
     <section class="page-section" style="padding-bottom:0;">
       <div class="shell">
-        <article class="panel feature-card premium-frame" style="display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:center;padding:2rem;">
+        <article class="panel feature-card premium-frame lab-card">
           <div>
             <a href={ROUTES.lab} class="label label--free" data-i18n="home2.lab_label">Always free</a>
             <h3 style="margin:0.75rem 0 0.5rem;font-size:1.5rem;letter-spacing:-0.04em;" data-i18n="home2.lab_title">VOLYNX Lab — free tools that earn trust before asking for anything.</h3>
@@ -125,7 +125,7 @@ import { ROUTES } from "../data/routes";
               <a href={ROUTES.iconsStore} class="button button--ghost" data-i18n="home2.lab_btn_icons">Browse Icons Store</a>
             </div>
           </div>
-          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;max-width:200px;">
+          <div class="lab-card__icons">
             <img src="/assets/icons-store/icons-neon-premium/icon-neon-premium1.webp" alt="" style="width:56px;height:56px;border-radius:14px;" loading="lazy" />
             <img src="/assets/icons-store/darkglass-premium/darkglass-premium1.webp" alt="" style="width:56px;height:56px;border-radius:14px;" loading="lazy" />
             <img src="/assets/icons-store/icons-pink-abstract-free/icons-pink-sliced_03.webp" alt="" style="width:56px;height:56px;border-radius:14px;" loading="lazy" />
@@ -524,6 +524,29 @@ import { ROUTES } from "../data/routes";
     .hero-v2__mockup-tag img {
       max-width: 70px;
     }
+
+  /* ── Lab Card — responsive two-column layout ── */
+  .lab-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    align-items: start;
+    padding: 1.75rem;
+  }
+  .lab-card__icons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    max-width: 200px;
+  }
+  @media (min-width: 640px) {
+    .lab-card {
+      grid-template-columns: 1fr auto;
+      gap: 2rem;
+      align-items: center;
+      padding: 2rem;
+    }
+  }
 
   /* ── Mobile adjustments ── */
   @media (max-width: 639px) {
