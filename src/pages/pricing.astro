@@ -14,14 +14,14 @@ const currencyParam = Astro.url.searchParams.get('currency') || '';
 const currency = (['GBP', 'EUR', 'BRL'] as const).includes(currencyParam as any) ? currencyParam as 'GBP'|'EUR'|'BRL' : 'GBP';
 
 const faqs = [
-  { q: { en: "Is the Lab really free?", pt: "O Lab é realmente grátis?" }, a: { en: "Yes. Lab tools are always free. No account needed. Files are processed locally in your browser.", pt: "Sim. Ferramentas do Lab são sempre grátis. Sem necessidade de conta. Arquivos processados localmente no seu navegador." } },
-  { q: { en: "How do tokens work?", pt: "Como funcionam os tokens?" }, a: { en: "Tokens are the universal currency across the VOLYNX ecosystem. Use them for Builder exports, CVitae downloads, Daily overages, and more. Buy once, use anywhere. They never expire.", pt: "Tokens são a moeda universal do ecossistema VOLYNX. Use no Builder, CVitae, Daily e mais. Compre uma vez, use em qualquer lugar. Sem expiração." } },
-  { q: { en: "Can I use outputs commercially?", pt: "Posso usar comercialmente?" }, a: { en: "Yes. All paid plans include commercial usage rights for the outputs you create.", pt: "Sim. Todos os planos pagos incluem direitos de uso comercial para o que você criar." } },
-  { q: { en: "Can I switch plans anytime?", pt: "Posso trocar de plano?" }, a: { en: "Yes. Upgrade, downgrade or cancel at any time from your profile dashboard.", pt: "Sim. Faça upgrade, downgrade ou cancele a qualquer momento pelo seu painel." } },
-  { q: { en: "What's the difference between Builder and Daily plans?", pt: "Qual a diferença entre planos Builder e Daily?" }, a: { en: "Builder plans are for creating and publishing websites. Daily plans are for everyday tools: scanning, summarizing, writing, organizing, and deciding. They are separate subscriptions, or you can bundle them to save.", pt: "Planos Builder são para criar e publicar sites. Planos Daily são para ferramentas do dia a dia: escanear, resumir, escrever, organizar e decidir. São assinaturas separadas, ou você pode combinar em bundle e economizar." } },
-  { q: { en: "How do bundles work?", pt: "Como funcionam os bundles?" }, a: { en: "Bundles combine Builder and Daily subscriptions at a discount. One subscription, both products, shared token balance.", pt: "Bundles combinam assinaturas Builder e Daily com desconto. Uma assinatura, ambos os produtos, saldo de tokens compartilhado." } },
-  { q: { en: "Does CVitae require a subscription?", pt: "CVitae precisa de assinatura?" }, a: { en: "No. CVitae is free to build and preview. You only pay when you export — 2 tokens per clean PDF. No subscription needed for most users. A Business tier exists for professionals who need unlimited exports.", pt: "Não. CVitae é grátis para criar e visualizar. Você só paga ao exportar — 2 tokens por PDF limpo. Sem necessidade de assinatura para a maioria dos usuários. Um tier Business existe para profissionais que precisam de exports ilimitados." } },
-  { q: { en: "Can I use tokens across different products?", pt: "Posso usar tokens em produtos diferentes?" }, a: { en: "Yes. Your VOLYNX token balance works across Builder, Daily, CVitae, and all future products. One balance, one account.", pt: "Sim. Seu saldo de tokens VOLYNX funciona no Builder, Daily, CVitae e em todos os futuros produtos. Um saldo, uma conta." } },
+  { qKey: "price.faq_q1", aKey: "price.faq_a1", qFallback: "Is the Lab really free?", aFallback: "Yes. Lab tools are always free. No account needed. Files are processed locally in your browser." },
+  { qKey: "price.faq_q2", aKey: "price.faq_a2", qFallback: "How do tokens work?", aFallback: "Tokens are the universal currency across the VOLYNX ecosystem. Use them for Builder exports, CVitae downloads, Daily overages, and more. Buy once, use anywhere. They never expire." },
+  { qKey: "price.faq_q3", aKey: "price.faq_a3", qFallback: "Can I use outputs commercially?", aFallback: "Yes. All paid plans include commercial usage rights for the outputs you create." },
+  { qKey: "price.faq_q4", aKey: "price.faq_a4", qFallback: "Can I switch plans anytime?", aFallback: "Yes. Upgrade, downgrade or cancel at any time from your profile dashboard." },
+  { qKey: "price.faq_q5", aKey: "price.faq_a5", qFallback: "What's the difference between Builder and Daily plans?", aFallback: "Builder plans are for creating and publishing websites. Daily plans are for everyday tools: scanning, summarizing, writing, organizing, and deciding. They are separate subscriptions, or you can bundle them to save." },
+  { qKey: "price.faq_q6", aKey: "price.faq_a6", qFallback: "How do bundles work?", aFallback: "Bundles combine Builder and Daily subscriptions at a discount. One subscription, both products, shared token balance." },
+  { qKey: "price.faq_q7", aKey: "price.faq_a7", qFallback: "Does CVitae require a subscription?", aFallback: "No. CVitae is free to build and preview. You only pay when you export — 2 tokens per clean PDF. No subscription needed for most users. A Business tier exists for professionals who need unlimited exports." },
+  { qKey: "price.faq_q8", aKey: "price.faq_a8", qFallback: "Can I use tokens across different products?", aFallback: "Yes. Your VOLYNX token balance works across Builder, Daily, CVitae, and all future products. One balance, one account." },
 ];
 ---
 <FlagshipLayout title="Pricing — VOLYNX" pageClass="page-pricing">
@@ -56,7 +56,7 @@ const faqs = [
     <section class="page-section" style="padding-top:32px;">
       <div class="shell">
         <div class="currency-bar">
-          <span style="font-size:12px;font-weight:700;letter-spacing:.06em;color:rgba(255,255,255,.45);text-transform:uppercase;">Currency</span>
+          <span style="font-size:12px;font-weight:700;letter-spacing:.06em;color:rgba(255,255,255,.45);text-transform:uppercase;" data-i18n="price.currency">Currency</span>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             {['GBP', 'EUR', 'BRL'].map((c) => (
               <button type="button" class={`lcbar__pill ${c === currency ? 'lcbar__pill--active' : ''}`} data-switch-currency={c}>{c}</button>
@@ -211,7 +211,7 @@ const faqs = [
     <!-- ═══ ADD-ONS ═══ -->
     <section class="page-section">
       <div class="shell section-head">
-        <span class="eyebrow">Add-ons</span>
+        <span class="eyebrow" data-i18n="price.addons">Add-ons</span>
         <h2>{lang === 'pt' ? 'Extras para aumentar valor' : 'Extras to boost value'}</h2>
       </div>
       <div class="shell grid-3">
@@ -224,14 +224,14 @@ const faqs = [
     <!-- ═══ FAQ ═══ -->
     <section class="page-section page-section--last">
       <div class="shell section-head">
-        <span class="eyebrow">FAQ</span>
+        <span class="eyebrow" data-i18n="price.faq_heading">FAQ</span>
         <h2>{lang === 'pt' ? 'Perguntas frequentes' : 'Frequently asked questions'}</h2>
       </div>
       <div class="shell grid-2">
         {faqs.map((f) => (
           <details class="panel" style="cursor:pointer;">
-            <summary style="font-weight:700;font-size:15px;list-style:none;">{f.q[lang]}</summary>
-            <p style="margin:10px 0 0;color:var(--muted);line-height:1.7;">{f.a[lang]}</p>
+            <summary style="font-weight:700;font-size:15px;list-style:none;" data-i18n={f.qKey}>{f.qFallback}</summary>
+            <p style="margin:10px 0 0;color:var(--muted);line-height:1.7;" data-i18n={f.aKey}>{f.aFallback}</p>
           </details>
         ))}
       </div>

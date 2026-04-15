@@ -62,6 +62,10 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro" } = Astro.pr
     ))}
     <a href={ROUTES.login} class="button button--ghost" data-i18n="nav.login">Login</a>
     <a href={ctaHref} class="button button--gold" data-vx-hide-if-plan="pro">{ctaLabel}</a>
+    <a href={ROUTES.profile} class="mobile-profile-link" id="vxUserBadgeMobile" aria-label="Profile">
+      <span class="mobile-profile-avatar" id="vxUserBadgeMobileInitials"></span>
+      <span class="mobile-profile-label" data-i18n="nav.profile">Profile</span>
+    </a>
   </nav>
 </header>
 
@@ -156,6 +160,46 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro" } = Astro.pr
   /* Mobile nav: hide Login + Go Pro when authenticated */
   :global(.vx-authed) .mobile-nav .button--ghost { display: none !important; }
   :global(.vx-authed) .mobile-nav .button--gold { display: none !important; }
+
+  /* Mobile profile link: hidden by default, shown when authed */
+  .mobile-profile-link { display: none; }
+  :global(.vx-authed) .mobile-profile-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    margin-top: 8px;
+    border-radius: 12px;
+    background: rgba(139,250,240,.08);
+    border: 1px solid rgba(139,250,240,.2);
+    color: rgba(242,244,248,.95);
+    text-decoration: none;
+    font-weight: 700;
+    transition: all .15s;
+  }
+  :global(.vx-authed) .mobile-profile-link:hover {
+    background: rgba(139,250,240,.14);
+    border-color: rgba(139,250,240,.4);
+  }
+  .mobile-profile-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: rgba(139,250,240,.18);
+    border: 1px solid rgba(139,250,240,.35);
+    color: rgba(139,250,240,1);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .03em;
+    flex-shrink: 0;
+  }
+  .mobile-profile-label {
+    flex: 1;
+    font-size: 14px;
+  }
 
   .vx-lang-btn {
     position: relative;

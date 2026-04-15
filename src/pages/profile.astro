@@ -30,7 +30,7 @@ import { ROUTES } from "../data/routes";
 			{ href: ROUTES.studio, label: "Studio" },
 			{ href: ROUTES.pricing, label: "Pricing" },
 		]}>
-			<button slot="right" type="button" class="logout-btn" id="logoutBtn">Sign out</button>
+			<button slot="right" type="button" class="logout-btn" id="logoutBtn" data-i18n="profile.sign_out">Sign out</button>
 		</Topbar>
 
 		<!-- ═══ VIEW: loading ═══ -->
@@ -106,7 +106,7 @@ import { ROUTES } from "../data/routes";
 							</div>
 
 							<div class="avatar-panel__section" id="proAvatarSection" hidden>
-								<span class="avatar-panel__label">Pro <span class="avatar-pro-tag">PRO</span></span>
+								<span class="avatar-panel__label"><span data-i18n="profile.avatar_pro_label">Pro</span> <span class="avatar-pro-tag" data-i18n="profile.pro_badge">PRO</span></span>
 								<div class="avatar-panel__grid" id="proAvatarGrid"></div>
 							</div>
 
@@ -187,52 +187,52 @@ import { ROUTES } from "../data/routes";
 
 			<!-- ═══ SUBSCRIPTIONS (multi-product) ═══ -->
 			<section class="glass-section" id="subscriptionsSection">
-				<div class="section-label">Your Subscriptions</div>
+				<div class="section-label" data-i18n="profile.your_subscriptions">Your Subscriptions</div>
 				<div class="subs-grid" id="subsGrid">
 					<div class="sub-card">
 						<div class="sub-card__icon">&#9881;</div>
 						<div class="sub-card__label">VOLYNX Builder</div>
 						<div class="sub-card__plan" id="subBuilderPlan">Free</div>
-						<a href={ROUTES.pricing} class="sub-card__link" id="subBuilderCta">Upgrade</a>
+						<a href={ROUTES.pricing} class="sub-card__link" id="subBuilderCta" data-i18n="profile.sub_upgrade">Upgrade</a>
 					</div>
 					<div class="sub-card">
 						<div class="sub-card__icon">&#9728;</div>
 						<div class="sub-card__label">VOLYNX Daily</div>
 						<div class="sub-card__plan" id="subDailyPlan">Free</div>
-						<a href="https://daily.volynx.world/pricing/" class="sub-card__link" id="subDailyCta">Upgrade</a>
+						<a href="https://daily.volynx.world/pricing/" class="sub-card__link" id="subDailyCta" data-i18n="profile.sub_upgrade">Upgrade</a>
 					</div>
 					<div class="sub-card">
 						<div class="sub-card__icon">&#127912;</div>
-						<div class="sub-card__label">Tokens</div>
+						<div class="sub-card__label" data-i18n="profile.sub_tokens_label">Tokens</div>
 						<div class="sub-card__plan" id="subTokens">0</div>
-						<a href="/pricing/#tokens" class="sub-card__link">Buy tokens</a>
+						<a href="/pricing/#tokens" class="sub-card__link" data-i18n="profile.sub_buy_tokens">Buy tokens</a>
 					</div>
 				</div>
 			</section>
 
 			<!-- ═══ QUICK ACCESS ═══ -->
 			<section class="glass-section">
-				<div class="section-label">Quick Access</div>
+				<div class="section-label" data-i18n="profile.quick_access">Quick Access</div>
 				<div class="quick-grid">
 					<a href={ROUTES.builder} class="quick-card">
 						<span class="quick-card__icon">&#128187;</span>
-						<span class="quick-card__title">Builder</span>
-						<span class="quick-card__desc text-muted">Create & publish sites</span>
+						<span class="quick-card__title" data-i18n="profile.quick_builder_title">Builder</span>
+						<span class="quick-card__desc text-muted" data-i18n="profile.quick_builder_desc">Create & publish sites</span>
 					</a>
 					<a href={ROUTES.studio} class="quick-card">
 						<span class="quick-card__icon">&#127912;</span>
-						<span class="quick-card__title">Studio Pro</span>
-						<span class="quick-card__desc text-muted">Image tools & exports</span>
+						<span class="quick-card__title" data-i18n="profile.quick_studio_title">Studio Pro</span>
+						<span class="quick-card__desc text-muted" data-i18n="profile.quick_studio_desc">Image tools & exports</span>
 					</a>
 					<a href={ROUTES.iconsStore} class="quick-card">
 						<span class="quick-card__icon">&#11088;</span>
-						<span class="quick-card__title">Icons Store</span>
-						<span class="quick-card__desc text-muted">1,160+ premium icons</span>
+						<span class="quick-card__title" data-i18n="profile.quick_icons_title">Icons Store</span>
+						<span class="quick-card__desc text-muted" data-i18n="profile.quick_icons_desc">1,160+ premium icons</span>
 					</a>
 					<a href="https://daily.volynx.world/tools/my-day/" class="quick-card">
 						<span class="quick-card__icon">&#9728;</span>
-						<span class="quick-card__title">Daily OS</span>
-						<span class="quick-card__desc text-muted">Your daily dashboard</span>
+						<span class="quick-card__title" data-i18n="profile.quick_daily_title">Daily OS</span>
+						<span class="quick-card__desc text-muted" data-i18n="profile.quick_daily_desc">Your daily dashboard</span>
 					</a>
 				</div>
 			</section>
@@ -246,15 +246,15 @@ import { ROUTES } from "../data/routes";
 					<div class="section-label" data-i18n="profile.section_security">Security</div>
 					<div class="info-row"><span data-i18n="profile.security_password">Password</span><strong data-i18n="profile.security_set">Set</strong></div>
 					<div class="info-row" style="margin-top:8px;">
-						<button type="button" class="btn btn--sm" id="changePasswordBtn">Change password</button>
+						<button type="button" class="btn btn--sm" id="changePasswordBtn" data-i18n="profile.change_password">Change password</button>
 					</div>
 					<div id="passwordForm" hidden style="margin-top:12px;">
 						<div style="display:grid;gap:8px;">
-							<input id="newPassword" type="password" placeholder="New password (min 6 chars)" minlength="6" class="field-input" style="padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#fff;font-size:.9rem;" />
-							<input id="confirmPassword" type="password" placeholder="Confirm new password" class="field-input" style="padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#fff;font-size:.9rem;" />
+							<input id="newPassword" type="password" placeholder="New password (min 6 chars)" data-i18n-placeholder="profile.password_new_ph" minlength="6" class="field-input" style="padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#fff;font-size:.9rem;" />
+							<input id="confirmPassword" type="password" placeholder="Confirm new password" data-i18n-placeholder="profile.password_confirm_ph" class="field-input" style="padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#fff;font-size:.9rem;" />
 							<div style="display:flex;gap:8px;align-items:center;">
-								<button type="button" class="btn btn--sm" id="savePasswordBtn">Save password</button>
-								<button type="button" class="btn btn--sm btn--ghost" id="cancelPasswordBtn">Cancel</button>
+								<button type="button" class="btn btn--sm" id="savePasswordBtn" data-i18n="profile.password_save">Save password</button>
+								<button type="button" class="btn btn--sm btn--ghost" id="cancelPasswordBtn" data-i18n="profile.password_cancel">Cancel</button>
 								<span id="passwordMsg" style="font-size:.8rem;"></span>
 							</div>
 						</div>

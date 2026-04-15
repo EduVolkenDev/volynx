@@ -63,7 +63,7 @@ const {
           var label = name ? name.split(' ')[0] : (email ? email.split('@')[0] : '');
           var initials = label ? label.slice(0, 2).toUpperCase() : 'ME';
           var title = name || email || 'Profile';
-          ['vxUserBadge', 'vxLoginBtn'].forEach(function(id) {
+          ['vxUserBadge', 'vxLoginBtn', 'vxUserBadgeMobileInitials'].forEach(function(id) {
             var el = document.getElementById(id);
             if (el) {
               el.textContent = initials;
@@ -71,6 +71,11 @@ const {
               el.setAttribute('aria-label', title);
             }
           });
+          var mobileLink = document.getElementById('vxUserBadgeMobile');
+          if (mobileLink) {
+            mobileLink.setAttribute('title', title);
+            mobileLink.setAttribute('aria-label', title);
+          }
         } catch (e) {}
       }
       if (document.readyState === 'loading') {
