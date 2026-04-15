@@ -49,12 +49,12 @@ export const ROUTES = {
   labImageSuite: "/volynx-lab/image-suite/",
   labQrGen: "/volynx-lab/qr-gen/",
 
-  // ── Studio (Pro) ──────────────────────
-  studio: "/volynx-lab/studio/",
-  studioConverter: "/volynx-lab/studio/converter/",
-  studioImageScaler: "/volynx-lab/studio/image-scaler/",
-  studioImageSuite: "/volynx-lab/studio/image-suite/",
-  studioQrGen: "/volynx-lab/studio/qr-gen/",
+  // ── Studio (Pro) — unified into Lab; aliases kept for backwards-compat ──
+  studio: "/volynx-lab/",
+  studioConverter: "/volynx-lab/converter/",
+  studioImageScaler: "/volynx-lab/image-scaler/",
+  studioImageSuite: "/volynx-lab/image-suite/",
+  studioQrGen: "/volynx-lab/qr-gen/",
 
   // ── VIP / Vouchers ──────────────────
   activate: "/activate/",
