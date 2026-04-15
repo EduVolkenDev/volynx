@@ -2071,35 +2071,47 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     border-radius: 14px;
     border: 1px solid rgba(231, 238, 247, 0.08);
     background: rgba(231, 238, 247, 0.02);
-    color: var(--mut);
+    color: var(--fg);             /* TÍTULO SEMPRE BRANCO */
     cursor: pointer;
-    transition: border-color .2s, background .2s, color .2s, transform .15s;
+    transition: border-color .2s, background .2s, transform .15s, box-shadow .2s;
     text-align: left;
     font-family: inherit;
+    position: relative;
   }
   .archetype-card:hover {
     border-color: rgba(125, 211, 252, 0.28);
     background: rgba(125, 211, 252, 0.04);
-    color: var(--fg);
     transform: translateY(-1px);
   }
+  /* SELECIONADO — único estado com bg destacado e glow */
   .archetype-card--active {
-    border-color: rgba(125, 211, 252, 0.45);
-    background: linear-gradient(135deg, rgba(125, 211, 252, 0.09), rgba(99, 102, 241, 0.06));
-    color: var(--fg);
-    box-shadow: 0 0 20px rgba(125, 211, 252, 0.12), inset 0 1px 0 rgba(125, 211, 252, 0.18);
+    border-color: rgba(125, 211, 252, 0.5);
+    background: linear-gradient(135deg, rgba(125, 211, 252, 0.10), rgba(99, 102, 241, 0.06));
+    box-shadow: 0 0 20px rgba(125, 211, 252, 0.14), inset 0 1px 0 rgba(125, 211, 252, 0.2);
   }
-  /* Landing Express variant — accent via gradient, NOT washed-out white */
+  /* Landing Express — distinção SUTIL via pequeno indicador, NÃO bg destacado */
   .archetype-card--express {
-    border-color: rgba(125, 211, 252, 0.25);
-    background: linear-gradient(135deg, rgba(125, 211, 252, 0.08), rgba(99, 102, 241, 0.05));
+    /* mesma base que os outros — diferença é só o badge */
   }
-  .archetype-card--express:hover,
+  .archetype-card--express::after {
+    content: "QUICK START";
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(125, 211, 252, 0.12);
+    border: 1px solid rgba(125, 211, 252, 0.3);
+    color: #7DD3FC;
+  }
+  /* Quando express está selecionado, herda o look ativo padrão */
   .archetype-card--express.archetype-card--active {
-    border-color: rgba(125, 211, 252, 0.55);
-    background: linear-gradient(135deg, rgba(125, 211, 252, 0.14), rgba(99, 102, 241, 0.08));
-    box-shadow: 0 0 22px rgba(125, 211, 252, 0.18), inset 0 1px 0 rgba(125, 211, 252, 0.22);
-    color: var(--fg);
+    border-color: rgba(125, 211, 252, 0.5);
+    background: linear-gradient(135deg, rgba(125, 211, 252, 0.10), rgba(99, 102, 241, 0.06));
+    box-shadow: 0 0 20px rgba(125, 211, 252, 0.14), inset 0 1px 0 rgba(125, 211, 252, 0.2);
   }
   .archetype-icon {
     flex: 0 0 auto;
