@@ -147,7 +147,7 @@ const L = t[lang];
         <div class="rec-trust-icon">🔒</div>
         <div>
           <strong>{L.trustBilling}</strong>
-          <p>{lang === 'pt' ? 'Stripe + Mercado Pago. Certificado PCI, criptografia end-to-end.' : 'Stripe + Mercado Pago. PCI certified, end-to-end encrypted.'}</p>
+          <p>{lang === 'pt' ? 'Stripe Checkout com Pix. Certificado PCI, criptografia end-to-end.' : 'Stripe Checkout with Pix. PCI certified, end-to-end encrypted.'}</p>
         </div>
       </div>
       <div class="rec-trust-item">
@@ -190,13 +190,8 @@ const L = t[lang];
           var lookup = btn.getAttribute('data-buy-pix');
           if (!lookup || !window.VxPix) return;
           window.VxPix.checkout(lookup, {
-            onSuccess: function(data) {
-              // Confetti on successful purchase
-              if (window.VxGame && window.VxGame.triggerConfetti) {
-                window.VxGame.triggerConfetti();
-              }
-              setTimeout(function() { window.location.href = '/account/'; }, 2500);
-            }
+            successUrl: window.location.origin + '/account/?payment=pix_success',
+            cancelUrl: window.location.origin + '/recarregar/?payment=cancelled',
           });
         });
       });

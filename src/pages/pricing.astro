@@ -397,7 +397,10 @@ const faqs = [
         if (!token) { window.location.href = '/login/?next=/pricing/'; return; }
         const packLookup = btn.getAttribute('data-pix-pack');
         if (!packLookup || !window.VxPix) return;
-        window.VxPix.checkout(packLookup);
+        window.VxPix.checkout(packLookup, {
+          successUrl: window.location.origin + '/account/?payment=pix_success',
+          cancelUrl: window.location.origin + '/pricing/?payment=cancelled&currency=BRL',
+        });
       });
     });
 
