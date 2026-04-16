@@ -2,14 +2,10 @@
 import { ROUTES } from "../data/routes";
 
 const nav = [
-  { href: ROUTES.home, label: "Home", i18n: "nav.home" },
-  { href: ROUTES.builder, label: "Builder", i18n: "nav.builder" },
-  { href: ROUTES.products, label: "Products", i18n: "nav.products" },
-  { href: ROUTES.services, label: "Services", i18n: "nav.services" },
-  { href: ROUTES.lab, label: "Lab", i18n: "nav.lab" },
   { href: "https://daily.volynx.world", label: "Daily", i18n: "nav.daily" },
-  { href: ROUTES.pricing, label: "Pricing", i18n: "nav.pricing" },
-  { href: ROUTES.devHub, label: "Dev Hub", i18n: "nav.devhub" },
+  { href: ROUTES.builder, label: "Builder", i18n: "nav.builder" },
+  { href: "https://cvitae.volynx.world", label: "CVitae", i18n: "nav.cvitae" },
+  { href: "https://volynx.world/propertyflow/", label: "PropertyFlow", i18n: "nav.propertyflow" },
 ];
 
 interface Props {
@@ -20,265 +16,421 @@ interface Props {
 }
 const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "nav.go_pro" } = Astro.props;
 ---
-<header class="site-header">
-  <div class="shell header-shell">
-    <a href={ROUTES.home} class="brandmark" aria-label="VOLYNX home">
-      <img src="/assets/volynx-icon.webp" alt="VOLYNX" class="brandmark__icon" width="44" height="44" loading="eager" />
-      <img src="/assets/wordmark.webp" alt="VOLYNX" class="brandmark__wordmark" width="122" height="24" loading="eager" />
+<header class="vx-topbar" id="vxTopbar">
+  <div class="vx-topbar__inner">
+    <!-- LOGO -->
+    <a href={ROUTES.home} class="vx-brand" aria-label="VOLYNX Ecosystem home">
+      <span class="vx-brand__mark" aria-hidden="true">V</span>
+      <span class="vx-brand__text">
+        <span class="vx-brand__name">VOLYNX</span>
+        <span class="vx-brand__sub">ECOSYSTEM</span>
+      </span>
     </a>
 
-    <nav class="main-nav" aria-label="Primary navigation">
+    <!-- DESKTOP NAV -->
+    <nav class="vx-nav" aria-label="Primary">
       {nav.map((item) => (
-        <a href={item.href} class:list={{ active: current === item.href }} data-i18n={item.i18n}>{item.label}</a>
+        <a href={item.href} class:list={{ "is-active": current === item.href }} data-i18n={item.i18n}>{item.label}</a>
       ))}
     </nav>
 
-    <div class="header-actions">
-      <!-- Token balance pill — only visible when authed -->
-      <a href={ROUTES.account} class="vx-token-pill" id="vxTokenPill" aria-label="Token balance" title="View your tokens">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v10M8 10h8M8 14h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <!-- RIGHT ACTIONS -->
+    <div class="vx-actions">
+      <!-- Token pill (authed only) -->
+      <a href={ROUTES.account} class="vx-token-pill" id="vxTokenPill" aria-label="Token balance">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v10M8 10h8M8 14h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <span class="vx-token-count" id="vxTokenCount">—</span>
         <span class="vx-token-label" data-i18n="widget.tokens">tokens</span>
       </a>
 
-      <!-- Recharge CTA — only visible when authed -->
-      <a href={ROUTES.recarregar} class="vx-recharge-btn" data-i18n="widget.recharge">Recarregar</a>
+      <!-- Recharge (authed only) -->
+      <a href={ROUTES.recarregar} class="vx-recharge" data-i18n="widget.recharge">Recarregar</a>
 
-      <button id="vxLangToggle" class="vx-widget vx-lang-btn" aria-label="Toggle language" title="Switch language / Mudar idioma">
-        <span class="vx-lang-label" data-i18n="widget.lang">EN</span>
+      <!-- Lang toggle -->
+      <button id="vxLangToggle" class="vx-lang" aria-label="Toggle language" title="Switch language / Mudar idioma">
+        <span data-i18n="widget.lang">EN</span>
       </button>
-      <a href={ROUTES.login} class="header-link vx-login-link" data-i18n="nav.login">Login</a>
-      <a href={ROUTES.profile} class="vx-user-badge" id="vxUserBadge" aria-label="Profile"></a>
-      <a href={ctaHref} class="button button--gold" data-vx-hide-if-plan="pro" data-i18n={ctaI18n}>{ctaLabel}</a>
-      <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Open menu" aria-expanded="false">
-        <span></span><span></span><span></span>
+
+      <!-- Signed-out: login + CTA -->
+      <a href={ROUTES.login} class="vx-login" data-i18n="nav.login">Login</a>
+      <a href={ctaHref} class="vx-cta" data-vx-hide-if-plan="pro" data-i18n={ctaI18n}>{ctaLabel}</a>
+
+      <!-- Avatar (authed only) -->
+      <a href={ROUTES.profile} class="vx-avatar" id="vxUserBadge" aria-label="Profile">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+
+      <!-- Mobile menu btn -->
+      <button class="vx-burger" id="mobileMenuBtn" type="button" aria-label="Open menu" aria-expanded="false">
+        <svg class="vx-burger__open"  width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="6"  x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <svg class="vx-burger__close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
   </div>
 
-  <!-- Mobile navigation -->
-  <nav class="mobile-nav" id="mobileNav" aria-label="Mobile navigation">
+  <!-- MOBILE MENU -->
+  <nav class="vx-mobile" id="mobileNav" aria-label="Mobile">
     {nav.map((item) => (
-      <a href={item.href} class:list={{ active: current === item.href }} data-i18n={item.i18n}>{item.label}</a>
+      <a href={item.href} class:list={{ "is-active": current === item.href }} data-i18n={item.i18n}>{item.label}</a>
     ))}
-    <a href={ROUTES.login} class="button button--ghost" data-i18n="nav.login">Login</a>
-    <a href={ctaHref} class="button button--gold" data-vx-hide-if-plan="pro">{ctaLabel}</a>
-    <a href={ROUTES.profile} class="mobile-profile-link" id="vxUserBadgeMobile" aria-label="Profile">
-      <span class="mobile-profile-avatar" id="vxUserBadgeMobileInitials"></span>
-      <span class="mobile-profile-label" data-i18n="nav.profile">Profile</span>
+    <a href={ROUTES.pricing} class="vx-mobile__link" data-i18n="nav.pricing">Pricing</a>
+    <hr class="vx-mobile__hr" />
+    <a href={ROUTES.login} class="vx-mobile__link" data-auth="out" data-i18n="nav.login">Login</a>
+    <a href={ctaHref} class="vx-mobile__cta" data-auth="out" data-i18n={ctaI18n}>{ctaLabel}</a>
+    <a href={ROUTES.profile} class="vx-mobile__profile" data-auth="in">
+      <span class="vx-mobile__avatar" id="vxUserBadgeMobileInitials"></span>
+      <span data-i18n="nav.profile">Profile</span>
     </a>
   </nav>
 </header>
 
 <style>
-  /* Token pill + recharge: hidden by default, shown when authed */
-  .vx-token-pill, .vx-recharge-btn { display: none; }
+  :root {
+    --topbar-h: 64px;
+    --topbar-bg: rgba(9, 9, 11, 0.92);
+    --topbar-border: rgba(39, 39, 42, 0.8);
+    --topbar-text: #fafafa;
+    --topbar-muted: #d4d4d8;
+    --topbar-soft: #71717a;
+    --topbar-accent: #2dd4bf;
+  }
+
+  /* ── SHELL ───────────────────────────────────────── */
+  .vx-topbar {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: var(--topbar-bg);
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    border-bottom: 1px solid var(--topbar-border);
+  }
+  .vx-topbar__inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 16px;
+    min-height: var(--topbar-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  @media (min-width: 768px) {
+    .vx-topbar__inner { padding: 0 32px; }
+  }
+
+  /* ── BRAND ───────────────────────────────────────── */
+  .vx-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    flex-shrink: 0;
+    transition: opacity .15s;
+  }
+  .vx-brand:hover { opacity: .9; }
+  .vx-brand__mark {
+    width: 40px;
+    height: 40px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #2dd4bf 0%, #22d3ee 50%, #3b82f6 100%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 900;
+    font-size: 28px;
+    letter-spacing: -0.06em;
+    line-height: 1;
+    box-shadow: 0 10px 28px rgba(45, 212, 191, 0.35);
+    transition: transform .2s;
+  }
+  .vx-brand:hover .vx-brand__mark { transform: scale(1.08); }
+  .vx-brand__text { display: flex; flex-direction: column; line-height: 1; }
+  .vx-brand__name {
+    font-weight: 700;
+    font-size: 26px;
+    letter-spacing: -0.07em;
+    color: var(--topbar-text);
+  }
+  .vx-brand__sub {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--topbar-soft);
+    margin-top: 2px;
+  }
+  @media (max-width: 520px) {
+    .vx-brand__text { display: none; }
+  }
+
+  /* ── DESKTOP NAV ─────────────────────────────────── */
+  .vx-nav { display: none; }
+  @media (min-width: 980px) {
+    .vx-nav {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .vx-nav a {
+      color: var(--topbar-muted);
+      text-decoration: none;
+      transition: color .15s;
+      white-space: nowrap;
+    }
+    .vx-nav a:hover, .vx-nav a.is-active { color: #fff; }
+  }
+
+  /* ── ACTIONS ─────────────────────────────────────── */
+  .vx-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  /* Token pill */
+  .vx-token-pill { display: none; }
   :global(.vx-authed) .vx-token-pill {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 12px;
+    padding: 8px 14px;
     border-radius: 999px;
-    background: rgba(255,255,255,.04);
-    border: 1px solid rgba(139,250,240,.2);
-    color: rgba(242,244,248,.9);
-    font-size: 12px;
-    font-weight: 700;
+    background: #18181b;
+    border: 1px solid #3f3f46;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
     text-decoration: none;
     transition: all .15s;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
   :global(.vx-authed) .vx-token-pill:hover {
-    background: rgba(139,250,240,.08);
-    border-color: rgba(139,250,240,.4);
+    background: #27272a;
+    border-color: var(--topbar-accent);
   }
-  .vx-token-pill svg { color: #8bfaf0; flex-shrink: 0; }
-  .vx-token-pill .vx-token-count { color: #fff; font-size: 13px; }
-  .vx-token-pill .vx-token-label { color: rgba(242,244,248,.45); font-size: 10px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+  .vx-token-pill svg { color: var(--topbar-accent); flex-shrink: 0; }
+  .vx-token-pill .vx-token-label {
+    color: var(--topbar-soft);
+    font-size: 12px;
+    font-weight: 500;
+  }
 
-  :global(.vx-authed) .vx-recharge-btn {
+  /* Recharge CTA */
+  .vx-recharge { display: none; }
+  :global(.vx-authed) .vx-recharge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 18px;
+    padding: 10px 22px;
     border-radius: 999px;
-    background: #fff;
-    color: #0c0e16;
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: .01em;
+    background: #fafafa;
+    color: #09090b;
+    font-size: 14px;
+    font-weight: 600;
     text-decoration: none;
     transition: all .15s;
-    box-shadow: 0 4px 16px rgba(255,255,255,.12);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     white-space: nowrap;
   }
-  :global(.vx-authed) .vx-recharge-btn:hover {
-    background: #f0f4f8;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(255,255,255,.2);
-  }
-  :global(.vx-authed) .vx-recharge-btn:active {
-    transform: translateY(0) scale(.97);
-  }
+  :global(.vx-authed) .vx-recharge:hover { background: #f4f4f5; }
+  :global(.vx-authed) .vx-recharge:active { transform: scale(.96); }
 
-  /* Responsive progressive disclosure */
-  @media (max-width: 767px) {
-    .vx-token-pill .vx-token-label { display: none; }
-    .vx-token-pill { padding: 6px 10px; font-size: 11px; }
-    .vx-recharge-btn { padding: 7px 14px; font-size: 11px; }
-  }
-  @media (max-width: 520px) {
-    :global(.vx-authed) .vx-token-pill { display: none !important; }
-  }
-  @media (max-width: 380px) {
-    :global(.vx-authed) .vx-recharge-btn { padding: 6px 12px; font-size: 10.5px; }
-  }
-
-  /* Auth flash prevention — hide login, show badge instantly when authed */
-  .vx-user-badge { display: none; }
-  :global(.vx-authed) .vx-login-link { display: none !important; }
-  :global(.vx-authed) .vx-user-badge {
+  /* Lang */
+  .vx-lang {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 6px 14px;
+    min-width: 42px;
+    height: 36px;
+    padding: 0 12px;
     border-radius: 999px;
-    background: rgba(139,250,240,.08);
-    border: 1px solid rgba(139,250,240,.2);
-    color: rgba(139,250,240,.9);
-    font-size: 11px;
-    font-weight: 700;
-    text-decoration: none;
-    letter-spacing: .03em;
-    white-space: nowrap;
-  }
-  :global(.vx-authed) .vx-user-badge:hover {
-    background: rgba(139,250,240,.14);
-    border-color: rgba(139,250,240,.35);
-  }
-
-  /* Mobile nav: hide Login + Go Pro when authenticated */
-  :global(.vx-authed) .mobile-nav .button--ghost { display: none !important; }
-  :global(.vx-authed) .mobile-nav .button--gold { display: none !important; }
-
-  /* Mobile profile link: hidden by default, shown when authed */
-  .mobile-profile-link { display: none; }
-  :global(.vx-authed) .mobile-profile-link {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    margin-top: 8px;
-    border-radius: 12px;
-    background: rgba(139,250,240,.08);
-    border: 1px solid rgba(139,250,240,.2);
-    color: rgba(242,244,248,.95);
-    text-decoration: none;
-    font-weight: 700;
-    transition: all .15s;
-  }
-  :global(.vx-authed) .mobile-profile-link:hover {
-    background: rgba(139,250,240,.14);
-    border-color: rgba(139,250,240,.4);
-  }
-  .mobile-profile-avatar {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 999px;
-    background: rgba(139,250,240,.18);
-    border: 1px solid rgba(139,250,240,.35);
-    color: rgba(139,250,240,1);
+    background: #18181b;
+    border: 1px solid #3f3f46;
+    color: var(--topbar-muted);
     font-size: 12px;
-    font-weight: 800;
-    letter-spacing: .03em;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all .15s;
     flex-shrink: 0;
   }
-  .mobile-profile-label {
-    flex: 1;
+  .vx-lang:hover { background: #27272a; color: #fff; border-color: var(--topbar-accent); }
+
+  /* Login link (signed-out) */
+  .vx-login {
+    color: var(--topbar-muted);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 6px 12px;
+    white-space: nowrap;
+    transition: color .15s;
+  }
+  .vx-login:hover { color: #fff; }
+  :global(.vx-authed) .vx-login { display: none !important; }
+
+  /* Gold CTA (Go Pro) */
+  .vx-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 20px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #d4af37 0%, #f1c40f 100%);
+    color: #09090b;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(212, 175, 55, 0.25);
+    transition: all .15s;
+  }
+  .vx-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4); }
+  :global(.vx-authed) .vx-cta[data-vx-hide-if-plan="pro"] { display: none !important; }
+
+  /* Avatar */
+  .vx-avatar { display: none; }
+  :global(.vx-authed) .vx-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #3f3f46, #52525b);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    cursor: pointer;
+    transition: all .15s;
+    flex-shrink: 0;
+    border: 1px solid transparent;
+  }
+  :global(.vx-authed) .vx-avatar:hover {
+    border-color: rgba(45, 212, 191, 0.5);
+    box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.15);
+  }
+
+  /* Burger */
+  .vx-burger {
+    display: none;
+    background: transparent;
+    border: 0;
+    padding: 8px;
+    margin-right: -8px;
+    color: var(--topbar-muted);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .vx-burger__close { display: none; }
+  .vx-burger.is-open .vx-burger__open { display: none; }
+  .vx-burger.is-open .vx-burger__close { display: inline; }
+
+  /* ── MOBILE MENU ─────────────────────────────────── */
+  .vx-mobile {
+    display: none;
+    background: #09090b;
+    border-top: 1px solid #27272a;
+    padding: 32px 24px;
+    gap: 8px;
+    flex-direction: column;
+  }
+  .vx-mobile.is-open { display: flex; }
+  .vx-mobile a, .vx-mobile__profile {
+    display: block;
+    padding: 14px 4px;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .vx-mobile a.is-active { color: var(--topbar-accent); }
+  .vx-mobile__hr { border: 0; border-top: 1px solid #27272a; margin: 12px 0; }
+  .vx-mobile__cta {
+    margin-top: 8px;
+    padding: 14px !important;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #d4af37 0%, #f1c40f 100%);
+    color: #09090b !important;
+    text-align: center;
+    font-weight: 700 !important;
+  }
+  .vx-mobile__profile { display: none !important; align-items: center; gap: 12px; }
+  :global(.vx-authed) .vx-mobile__profile { display: flex !important; }
+  :global(.vx-authed) .vx-mobile [data-auth="out"] { display: none !important; }
+  .vx-mobile__avatar {
+    width: 36px; height: 36px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #3f3f46, #52525b);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
     font-size: 14px;
   }
 
-  .vx-lang-btn {
-    position: relative;
-    top: unset; right: unset;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 40px;
-    padding: 6px 10px;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: .09em;
-    line-height: 1;
-    background: rgba(255,255,255,.04);
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 999px;
-    color: rgba(255,255,255,.82);
-    cursor: pointer;
-    user-select: none;
-    transition: background 160ms, border-color 160ms, color 160ms;
+  /* ── RESPONSIVE ──────────────────────────────────── */
+  @media (max-width: 979px) {
+    .vx-login, .vx-cta, .vx-lang { display: none !important; }
+    :global(.vx-authed) .vx-cta { display: none !important; }
+    .vx-burger { display: inline-flex; }
   }
-  .vx-lang-btn:hover {
-    background: rgba(130,220,255,.13);
-    border-color: rgba(130,220,255,.36);
-    color: #fff;
+  @media (max-width: 767px) {
+    .vx-token-pill .vx-token-label { display: none; }
+    .vx-token-pill { padding: 8px 12px; }
   }
-
-  /* Tablet and smaller: compact header */
-  @media (max-width: 640px) {
-    .header-actions .button--gold { display: none; }
-    .header-actions { gap: 6px; }
-    .brandmark__wordmark { width: 90px; }
+  @media (max-width: 520px) {
+    :global(.vx-authed) .vx-token-pill { display: none !important; }
+    :global(.vx-authed) .vx-recharge { padding: 8px 14px; font-size: 12px; }
+    .vx-actions { gap: 8px; }
+    .vx-brand__mark { width: 36px; height: 36px; font-size: 24px; border-radius: 14px; }
   }
-  /* Narrow phones: hide wordmark entirely */
   @media (max-width: 380px) {
-    .brandmark__wordmark { display: none; }
-    .vx-lang-btn { min-width: 36px; padding: 5px 8px; font-size: 10px; }
+    :global(.vx-authed) .vx-recharge { padding: 7px 12px; font-size: 11px; }
   }
 </style>
 
 <script>
+  // Burger
   const btn = document.getElementById("mobileMenuBtn");
   const nav = document.getElementById("mobileNav");
   if (btn && nav) {
     btn.addEventListener("click", () => {
       const open = nav.classList.toggle("is-open");
+      btn.classList.toggle("is-open", open);
       btn.setAttribute("aria-expanded", String(open));
     });
   }
 
-  // Wire up token balance pill (uses VxTokens)
+  // Token pill live balance
   (function wireTokenPill() {
     const countEl = document.getElementById("vxTokenCount");
     if (!countEl) return;
-
     function setCount(n: number | string | null | undefined) {
       if (n === null || n === undefined) { countEl.textContent = "—"; return; }
       const num = typeof n === "number" ? n : parseFloat(String(n));
       if (isNaN(num)) { countEl.textContent = "—"; return; }
       countEl.textContent = num.toLocaleString();
     }
-
-    // @ts-ignore — VxTokens is a global loaded via /js/vx-tokens.js
+    // @ts-ignore global
     const VxTokens = (window as any).VxTokens;
     if (VxTokens) {
       const cached = VxTokens.getCachedBalance();
       if (cached !== null) setCount(cached);
       VxTokens.getBalance?.().then((b: number) => setCount(b)).catch(() => {});
     }
-
-    // Listen for realtime / local balance changes
     window.addEventListener("vx:balance-changed", (e: any) => {
       if (e.detail && typeof e.detail.balance === "number") {
         setCount(e.detail.balance);
-        // Flash animation on change
         const pill = document.getElementById("vxTokenPill");
         if (pill) {
-          pill.style.borderColor = "rgba(139,250,240,.6)";
+          pill.style.borderColor = "rgba(45, 212, 191, 0.6)";
           setTimeout(() => { pill.style.borderColor = ""; }, 800);
         }
       }
