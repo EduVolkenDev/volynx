@@ -52,6 +52,9 @@ FUNCTIONS=(
   "claim-black-diamond"
   "ai-builder"
   "ai-tools"
+  "create-pix-checkout"
+  "check-pix-status"
+  "pix-webhook"
 )
 
 for fn in "${FUNCTIONS[@]}"; do
@@ -74,6 +77,14 @@ echo "Enable Pix for Checkout in live mode."
 echo ""
 echo "Webhook stays on Stripe:"
 echo "  https://zdmpzrderifgqmqivjoy.supabase.co/functions/v1/stripe-webhook"
+echo "Required Stripe events:"
+echo "  checkout.session.completed"
+echo "  checkout.session.async_payment_succeeded"
+echo "  checkout.session.async_payment_failed"
+echo "  customer.subscription.updated"
+echo "  customer.subscription.deleted"
+echo "  invoice.payment_succeeded"
+echo "  invoice.payment_failed"
 echo ""
 read -p "Press Enter after Stripe Pix is enabled..."
 

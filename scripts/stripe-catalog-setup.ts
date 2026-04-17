@@ -241,7 +241,7 @@ const TOKEN_PACKS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 10900, eur: 12900, brl: 74900 } },
+    prices: { amounts: { gbp: 7900, eur: 9900, brl: 57900 } },
   },
 ];
 

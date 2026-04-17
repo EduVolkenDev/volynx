@@ -4,8 +4,8 @@ import PageWidgets from "../../../components/PageWidgets.astro";
 import { ROUTES } from "../../../data/routes";
 // PageWidgets provides floating lang/login — hide its util bar since icons store has its own nav auth
 
-const pageTitle = "VOLYNX Icons Store - Premium SVG Icons & Design Assets";
-const pageDescription = "Premium SVG icons and design assets for developers. Build faster, design better.";
+const pageTitle = "VOLYNX Icon Vault - Opening Soon";
+const pageDescription = "The VOLYNX premium icon vault is being curated, converted, and quality-checked before public release.";
 ---
 
 <!DOCTYPE html>
@@ -31,6 +31,58 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
   <meta name="apple-mobile-web-app-title" content="VOLYNX" />
   <link rel="manifest" href="/site.webmanifest" />
+  <style>
+    .filters,
+    .collections-preview,
+    .cta-section {
+      display: none !important;
+    }
+
+    .soon-panel {
+      grid-column: 1 / -1;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 32px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
+      text-align: center;
+    }
+
+    .soon-kicker {
+      margin: 0 0 10px;
+      color: rgba(0,240,255,.86);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .soon-panel h3 {
+      margin: 0 0 12px;
+      color: #fff;
+      font-size: clamp(1.35rem, 3vw, 2rem);
+    }
+
+    .soon-panel p:not(.soon-kicker) {
+      margin: 0 auto 18px;
+      max-width: 620px;
+      color: rgba(255,255,255,.66);
+      line-height: 1.7;
+    }
+
+    .soon-panel a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border-radius: 8px;
+      background: linear-gradient(135deg,#00f0ff,#0066ff);
+      color: #020817;
+      font-weight: 800;
+      text-decoration: none;
+    }
+  </style>
 </head>
 
 <body class="fx-grid">
@@ -48,8 +100,8 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
 
       <!-- Desktop Navigation -->
       <div class="nav-links desktop-nav">
-        <a href={ROUTES.iconsStore} class="nav-link active">Gallery</a>
-        <a href="#collections" class="nav-link" id="collectionsBtn">Collections</a>
+        <a href={ROUTES.iconsStore} class="nav-link active">Vault</a>
+        <a href={ROUTES.products} class="nav-link" id="collectionsBtn">Products</a>
         <a href={`${ROUTES.login}?return=${ROUTES.iconsStore}`} class="nav-link" id="favoritesBtn" style="display:none;">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
@@ -118,8 +170,8 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
 
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
-      <a href={ROUTES.iconsStore} class="mobile-menu-item active">Gallery</a>
-      <a href="#collections" class="mobile-menu-item" id="mobileCollectionsBtn">Collections</a>
+      <a href={ROUTES.iconsStore} class="mobile-menu-item active">Vault</a>
+      <a href={ROUTES.products} class="mobile-menu-item" id="mobileCollectionsBtn">Products</a>
       <a href={`${ROUTES.login}?return=${ROUTES.iconsStore}`} class="mobile-menu-item" id="mobileFavoritesBtn" style="display:none;">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
@@ -139,29 +191,29 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
           <img src="/assets/long-logo-icons.webp" class="hero-long-logo" alt="Volynx Icons Store" />
         </div>
         <h1 class="hero-title" data-i18n="icons.hero_title">
-          Premium Design Assets
-          <span class="gradient-text">For Modern Developers</span>
+          VOLYNX Icon Vault
+          <span class="gradient-text">Opening Soon</span>
         </h1>
         <p class="hero-description" data-i18n="icons.hero_desc">
-          Thousands of premium SVG icons, UI kits, and design assets.
-          Download instantly and build beautiful products faster.
+          The icon library is being curated, cleaned, and converted into a sharper SVG-first release.
+          The vault stays closed until every collection feels worthy of the VOLYNX name.
         </p>
         <div class="hero-actions">
-          <a href="#gallery" class="btn btn-primary btn-lg" data-i18n="icons.btn_browse">Browse Gallery</a>
-          <a href={ROUTES.pricing} class="btn btn-secondary btn-lg" id="pricingBtn" data-i18n="icons.btn_pricing">View Pricing</a>
+          <a href={ROUTES.products} class="btn btn-primary btn-lg" data-i18n="icons.btn_browse">Explore VOLYNX Products</a>
+          <a href={ROUTES.contact} class="btn btn-secondary btn-lg" id="pricingBtn" data-i18n="icons.btn_pricing">Request Early Access</a>
         </div>
         <div class="hero-stats">
           <div class="stat">
-            <span class="stat-number" id="heroIconCount">1,160+</span>
-            <span class="stat-label">Icons</span>
+            <span class="stat-number" id="heroIconCount">Curated</span>
+            <span class="stat-label">Library</span>
           </div>
           <div class="stat">
-            <span class="stat-number">27</span>
-            <span class="stat-label">Collections</span>
+            <span class="stat-number">SVG-first</span>
+            <span class="stat-label">Release</span>
           </div>
           <div class="stat">
-            <span class="stat-number">SVG & WebP</span>
-            <span class="stat-label">Formats</span>
+            <span class="stat-number">Premium</span>
+            <span class="stat-label">Quality Gate</span>
           </div>
         </div>
       </div>
@@ -171,7 +223,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
     <section class="gallery-section" id="gallery">
       <div class="container">
         <div class="section-header">
-          <h2 class="section-title" data-i18n="icons.gallery_title">Featured Icons</h2>
+          <h2 class="section-title" data-i18n="icons.gallery_title">Vault Calibration</h2>
           <div class="filters">
             <button class="filter-btn active" data-filter="all">All</button>
             <button class="filter-btn" data-filter="pink">Pink</button>
@@ -187,7 +239,12 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
         </div>
 
         <div class="gallery-grid" id="galleryGrid">
-          <!-- icons generated by JS -->
+          <article class="soon-panel">
+            <p class="soon-kicker">Coming soon</p>
+            <h3>Premium icon collections are under final review.</h3>
+            <p>Broken sources, missing previews, and raster-only packs are being removed before the vault opens. For launch today, VOLYNX stays focused on Builder, Lab tools, VX packs, services, and product kits.</p>
+            <a href={ROUTES.pricing}>View live offers</a>
+          </article>
         </div>
 
         <div class="load-more-container">
@@ -243,15 +300,15 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
             <span class="brand-name-footer">Volynx Icons Store</span>
           </div>
           <p class="footer-description">
-            Premium SVG icons and design assets for developers. Build faster, design better.
+            Premium icon collections are being prepared for a cleaner SVG-first release.
           </p>
         </div>
 
         <div class="footer-col">
           <h4 class="footer-title">Product</h4>
           <ul class="footer-links">
-            <li><a href={ROUTES.iconsStore}>Gallery</a></li>
-            <li><a href="#collections" id="collectionsFooterBtn">Collections</a></li>
+            <li><a href={ROUTES.iconsStore}>Vault</a></li>
+            <li><a href={ROUTES.products} id="collectionsFooterBtn">Products</a></li>
             <li><a href={ROUTES.pricing}>Pricing</a></li>
           </ul>
         </div>
@@ -305,7 +362,7 @@ const pageDescription = "Premium SVG icons and design assets for developers. Bui
       const y = document.getElementById("y");
       if (y) y.textContent = String(new Date().getFullYear());
 
-      await loadCatalog();
+      // Public store is intentionally paused until the icon catalog is fully cleaned.
     });
 
     // ===== NAVIGATION =====

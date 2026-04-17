@@ -178,14 +178,6 @@ DECLARE
   v_purchases    INT;
   v_products_today INT;
   v_unlocked     TEXT[] := ARRAY[]::TEXT[];
-
-  FUNCTION _unlock(p_badge TEXT) RETURNS VOID AS $inner$
-  BEGIN
-    INSERT INTO public.user_badges (user_id, badge_id)
-    VALUES (p_user_id, p_badge)
-    ON CONFLICT (user_id, badge_id) DO NOTHING;
-  END;
-  $inner$ LANGUAGE plpgsql;
 BEGIN
   -- First purchase
   SELECT COUNT(*) INTO v_purchases FROM public.purchase_events WHERE user_id = p_user_id AND status = 'completed';

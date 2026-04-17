@@ -1,4 +1,4 @@
-const DEFAULT_REDIRECT = "/volynx-lab/studio/";
+const DEFAULT_REDIRECT = "/volynx-lab/";
 
 function t(key, fallback) {
   var lang = localStorage.getItem("volynx_lang") || "en";

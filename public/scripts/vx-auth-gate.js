@@ -161,7 +161,7 @@
       + '</div>'
       + '<div class="studio-pro-bar__right">'
       + '  <span class="studio-pro-bar__usage" id="proBarUsage">Loading...</span>'
-      + '  <a class="studio-pro-bar__dash" href="/volynx-lab/studio/">Dashboard</a>'
+      + '  <a class="studio-pro-bar__dash" href="/volynx-lab/">Dashboard</a>'
       + '</div>';
 
     // Insert after header or at top of body

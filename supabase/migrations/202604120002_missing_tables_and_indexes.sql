@@ -35,3 +35,6 @@ CREATE INDEX IF NOT EXISTS idx_profiles_plan ON public.profiles(plan);
 CREATE INDEX IF NOT EXISTS idx_profiles_builder_plan ON public.profiles(builder_plan);
 CREATE INDEX IF NOT EXISTS idx_profiles_daily_plan ON public.profiles(daily_plan);
 CREATE INDEX IF NOT EXISTS idx_subscriptions_status ON public.subscriptions(status) WHERE status = 'active';
+CREATE UNIQUE INDEX IF NOT EXISTS idx_purchase_events_stripe_session_unique
+  ON public.purchase_events(stripe_session_id)
+  WHERE stripe_session_id IS NOT NULL;

@@ -11,9 +11,12 @@
  *
  * Handles:
  *   checkout.session.completed       — activate plan or credit tokens
+ *   checkout.session.async_payment_succeeded — credit delayed one-time payments
+ *   checkout.session.async_payment_failed    — mark delayed one-time payments failed
  *   customer.subscription.updated    — sync plan changes
  *   customer.subscription.deleted    — downgrade to free
  *   invoice.payment_succeeded        — update period end
+ *   invoice.payment_failed           — mark subscription past_due
  */
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
@@ -122,6 +125,22 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const userId = session.metadata?.user_id;
   if (!userId) {
     console.error("checkout.session.completed: no user_id in metadata");
+    return;
+  }
+
+  if (session.mode === "payment" && session.payment_status && session.payment_status !== "paid") {
+    console.log(`Payment session ${session.id} is ${session.payment_status}; waiting for async success before fulfillment`);
+    return;
+  }
+
+  const { data: existingPurchase } = await supabase
+    .from("purchase_events")
+    .select("id,status")
+    .eq("stripe_session_id", session.id)
+    .maybeSingle();
+
+  if (existingPurchase?.status === "completed") {
+    console.log(`Session ${session.id} already fulfilled; skipping duplicate webhook`);
     return;
   }
 
@@ -458,6 +477,44 @@ async function handleInvoiceSucceeded(invoice: Stripe.Invoice) {
   console.log(`Invoice paid, subscription ${subId} renewed`);
 }
 
+async function handleInvoiceFailed(invoice: Stripe.Invoice) {
+  if (!invoice.subscription) return;
+
+  const subId = typeof invoice.subscription === "string"
+    ? invoice.subscription
+    : invoice.subscription.id;
+
+  await supabase
+    .from("subscriptions")
+    .update({ status: "past_due" })
+    .eq("stripe_subscription_id", subId);
+
+  const { data: subRecord } = await supabase
+    .from("subscriptions")
+    .select("user_id, plan_key")
+    .eq("stripe_subscription_id", subId)
+    .single();
+
+  if (subRecord?.user_id) {
+    const downgrades = PLAN_DOWNGRADE_MAP[subRecord.plan_key || ""] || {};
+    if (Object.keys(downgrades).length > 0) {
+      await supabase.from("profiles").update(downgrades).eq("id", subRecord.user_id);
+    }
+    await supabase.rpc("sync_plan_to_app_metadata", { p_user_id: subRecord.user_id });
+  }
+
+  console.log(`Invoice failed, subscription ${subId} marked past_due`);
+}
+
+async function handleAsyncPaymentFailed(session: Stripe.Checkout.Session) {
+  await supabase
+    .from("purchase_events")
+    .update({ status: "failed" })
+    .eq("stripe_session_id", session.id);
+
+  console.log(`Async payment failed for session ${session.id}`);
+}
+
 // ── HTTP Handler ────────────────────────────────────────────
 
 serve(async (req: Request) => {
@@ -498,6 +555,14 @@ serve(async (req: Request) => {
         await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
         break;
 
+      case "checkout.session.async_payment_succeeded":
+        await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
+        break;
+
+      case "checkout.session.async_payment_failed":
+        await handleAsyncPaymentFailed(event.data.object as Stripe.Checkout.Session);
+        break;
+
       case "customer.subscription.updated":
         await handleSubscriptionUpdated(event.data.object as Stripe.Subscription);
         break;
@@ -508,6 +573,10 @@ serve(async (req: Request) => {
 
       case "invoice.payment_succeeded":
         await handleInvoiceSucceeded(event.data.object as Stripe.Invoice);
+        break;
+
+      case "invoice.payment_failed":
+        await handleInvoiceFailed(event.data.object as Stripe.Invoice);
         break;
 
       default:

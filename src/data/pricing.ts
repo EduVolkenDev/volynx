@@ -325,12 +325,6 @@ export const sitePricing = {
       name: { pt: 'Bilingual pack', en: 'Bilingual pack' },
       description: { pt: 'Suporte a versão em dois idiomas no publish.', en: 'Two-language support in published projects.' },
       price: { GBP: '£7', EUR: '€8.90', BRL: 'R$49' }
-    },
-    {
-      id: 'icons-addon',
-      name: { pt: 'Icon Collection Pack (5 premium)', en: 'Icon Collection Pack (5 premium)' },
-      description: { pt: '5 coleções premium permanentes: 3D Icons, Futuristic, Neon, Metal Blue e Nature. Sem expiração.', en: '5 permanent premium collections: 3D Icons, Futuristic, Neon, Metal Blue and Nature. No expiry.' },
-      price: { GBP: '£9', EUR: '€10.90', BRL: 'R$59' }
     }
   ] satisfies BuilderAddon[],
   labels: {

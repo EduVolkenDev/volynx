@@ -3,6 +3,15 @@
 -- Safe to re-run: all operations are idempotent
 -- ============================================================
 
+-- ── 0. Ensure base table exists for fresh local databases ────
+-- Local Supabase applies migrations from an empty database. Later migrations
+-- also extend this table, but this first migration must be able to run alone.
+CREATE TABLE IF NOT EXISTS public.profiles (
+  id         uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  email      text,
+  created_at timestamptz DEFAULT now()
+);
+
 -- ── 1. Add canonical columns ─────────────────────────────────
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS full_name   text;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS username    text;
@@ -14,10 +23,21 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS updated_at  timestamptz DEF
 
 -- ── 2. Migrate legacy data before dropping columns ───────────
 -- Preserve user_name values into full_name (only where full_name is empty)
-UPDATE public.profiles
-  SET full_name = user_name
-  WHERE full_name IS NULL
-    AND user_name IS NOT NULL;
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'profiles'
+      AND column_name = 'user_name'
+  ) THEN
+    UPDATE public.profiles
+      SET full_name = user_name
+      WHERE full_name IS NULL
+        AND user_name IS NOT NULL;
+  END IF;
+END $$;
 
 -- ── 3. Drop legacy / redundant columns ───────────────────────
 -- user_name: replaced by full_name + username (data migrated above)
