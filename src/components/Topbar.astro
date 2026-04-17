@@ -28,8 +28,9 @@ const {
     ))}
     <slot name="left" />
   </div>
-  <a href={ROUTES.home} class="vx-topbar-brand">
-    <img src="/assets/volynx-icon.webp" alt="VOLYNX" class="vx-topbar-icon" />
+  <a href={ROUTES.home} class="vx-topbar-brand" aria-label="VOLYNX home">
+    <img src="/assets/V.webp" alt="" class="vx-topbar-icon" width="44" height="44" aria-hidden="true" loading="eager" decoding="async" />
+    <img src="/assets/wordmark.webp" alt="VOLYNX" class="vx-topbar-wordmark" width="132" height="72" loading="eager" decoding="async" />
   </a>
   <div class="vx-topbar-right">
     {rightLinks.map(link => (
@@ -72,16 +73,25 @@ const {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 10px;
     min-width: 44px;
     min-height: 44px;
     justify-self: center;
     text-decoration: none;
   }
   .vx-topbar-icon {
-    width: 70px;
-  height: 60px;
-  object-fit: cover;
-  display: block;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    object-fit: contain;
+    display: block;
+  }
+  .vx-topbar-wordmark {
+    width: 132px;
+    max-height: 38px;
+    object-fit: contain;
+    object-position: left center;
+    display: block;
   }
 
   .vx-topbar-right {
@@ -141,6 +151,7 @@ const {
       justify-content: center;
       flex-wrap: wrap;
     }
+    .vx-topbar-wordmark { width: 116px; }
   }
 </style>
 
