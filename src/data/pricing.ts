@@ -29,6 +29,7 @@ type TokenPack = {
   amount: number;
   price: MoneyMap;
   badge?: Record<Locale, string>;
+  description?: Record<Locale, string>;
 };
 
 type BuilderAddon = {
@@ -56,27 +57,43 @@ export const sitePricing = {
   tokenPacks: [
     {
       id: 'starter',
-      amount: 10,
+      amount: 12,
       price: { GBP: '£9.90', EUR: '€11.90', BRL: 'R$69' },
-      badge: { pt: 'Entrada', en: 'Entry' }
+      badge: { pt: 'Starter', en: 'Starter' },
+      description: {
+        pt: 'Ideal para uso leve e ações pontuais.',
+        en: 'Ideal for light usage and one-off premium actions.'
+      }
     },
     {
       id: 'core',
-      amount: 25,
-      price: { GBP: '£22.90', EUR: '€27.90', BRL: 'R$159' },
-      badge: { pt: 'Mais popular', en: 'Most popular' }
+      amount: 32,
+      price: { GBP: '£19.90', EUR: '€24.90', BRL: 'R$149' },
+      badge: { pt: 'Core · Mais popular', en: 'Core · Most popular' },
+      description: {
+        pt: 'O melhor equilíbrio entre valor e capacidade.',
+        en: 'The best balance between value and premium capacity.'
+      }
     },
     {
       id: 'pro',
-      amount: 60,
-      price: { GBP: '£49.90', EUR: '€59.90', BRL: 'R$349' },
-      badge: { pt: 'Melhor custo', en: 'Best value' }
+      amount: 80,
+      price: { GBP: '£39.90', EUR: '€49.90', BRL: 'R$289' },
+      badge: { pt: 'Pro · Melhor custo', en: 'Pro · Best value' },
+      description: {
+        pt: 'Para usuários frequentes e fluxos mais exigentes.',
+        en: 'For frequent users and more demanding workflows.'
+      }
     },
     {
       id: 'scale',
-      amount: 150,
-      price: { GBP: '£109', EUR: '€129', BRL: 'R$749' },
-      badge: { pt: 'Heavy use', en: 'Heavy use' }
+      amount: 200,
+      price: { GBP: '£79', EUR: '€99', BRL: 'R$579' },
+      badge: { pt: 'Elite', en: 'Elite' },
+      description: {
+        pt: 'Capacidade máxima para uso intensivo e operações maiores.',
+        en: 'Maximum capacity for heavy usage and larger operations.'
+      }
     }
   ] satisfies TokenPack[],
   toolUsage: [
@@ -137,8 +154,8 @@ export const sitePricing = {
       image: '/assets/builderfree.webp',
       name: { pt: 'Builder Free', en: 'Builder Free' },
       description: {
-        pt: 'Para testar o fluxo, criar rascunhos e sentir a experiência Volynx.',
-        en: 'For testing the flow, creating drafts, and experiencing Volynx.'
+        pt: 'Para testar o fluxo, montar drafts e começar sem fricção.',
+        en: 'For testing the flow, creating drafts, and starting without friction.'
       },
       price: { GBP: '£0', EUR: '€0', BRL: 'R$0' },
       billing: { pt: 'sem custo', en: 'no cost' },
@@ -153,8 +170,8 @@ export const sitePricing = {
       image: '/assets/builderlaunch.webp',
       name: { pt: 'Builder Launch', en: 'Builder Launch' },
       description: {
-        pt: 'Plano de entrada para lançar páginas enxutas com velocidade.',
-        en: 'Entry plan to launch lean pages quickly.'
+        pt: 'Para lançar páginas enxutas com velocidade e presença profissional.',
+        en: 'For launching lean pages with speed and professional presence.'
       },
       price: { GBP: '£9', EUR: '€10.90', BRL: 'R$59' },
       billing: { pt: '/mês', en: '/month' },
@@ -171,8 +188,8 @@ export const sitePricing = {
       featured: true,
       name: { pt: 'Builder Pro', en: 'Builder Pro' },
       description: {
-        pt: 'O melhor equilíbrio entre publish, domínio próprio e visual premium.',
-        en: 'Best balance of publish, custom domain, and premium presentation.'
+        pt: 'Para quem precisa publicar com domínio próprio, remover branding e operar com mais credibilidade.',
+        en: 'For users who need custom domains, no branding, and more credibility in production.'
       },
       price: { GBP: '£19', EUR: '€22.90', BRL: 'R$129' },
       billing: { pt: '/mês', en: '/month' },
@@ -187,8 +204,8 @@ export const sitePricing = {
       image: '/assets/builderstudio.webp',
       name: { pt: 'Builder Studio', en: 'Builder Studio' },
       description: {
-        pt: 'Para creators, freelancers e estúdios pequenos que publicam com frequência.',
-        en: 'For creators, freelancers, and small studios publishing frequently.'
+        pt: 'Para creators, freelancers e pequenos estúdios que publicam com frequência e precisam de kits completos.',
+        en: 'For creators, freelancers, and small studios publishing frequently with full premium kits.'
       },
       price: { GBP: '£39', EUR: '€45.90', BRL: 'R$249' },
       billing: { pt: '/mês', en: '/month' },
@@ -203,8 +220,8 @@ export const sitePricing = {
       image: '/assets/builderteams.webp',
       name: { pt: 'Builder Teams', en: 'Builder Teams' },
       description: {
-        pt: 'Workspace para operação em equipe com billing central e shared assets.',
-        en: 'Workspace for team operations with central billing and shared assets.'
+        pt: 'Para operações em equipe com billing central, ativos compartilhados e escala real.',
+        en: 'For team operations with central billing, shared assets, and real scale.'
       },
       price: { GBP: '£79', EUR: '€89.90', BRL: 'R$499' },
       billing: { pt: '/mês', en: '/month' },
@@ -219,7 +236,7 @@ export const sitePricing = {
     {
       id: 'daily_free',
       name: { pt: 'Daily Free', en: 'Daily Free' },
-      description: { pt: 'Todas as 6 ferramentas com limites diários. Armazenamento local.', en: 'All 6 tools with daily limits. Local storage.' },
+      description: { pt: 'As ferramentas essenciais para começar com limites diários e simplicidade local.', en: 'Essential tools to start with daily limits and local simplicity.' },
       price: { GBP: '£0', EUR: '€0', BRL: 'R$0' },
       billing: { pt: 'sem custo', en: 'no cost' },
       cta: { pt: 'Começar grátis', en: 'Start free' },
@@ -233,7 +250,7 @@ export const sitePricing = {
       badge: { pt: 'Mais popular', en: 'Most popular' },
       featured: true,
       name: { pt: 'Daily Pro', en: 'Daily Pro' },
-      description: { pt: 'Quotas maiores, sync na nuvem, exportação e processamento avançado.', en: 'Higher quotas, cloud sync, export and smart processing.' },
+      description: { pt: 'Mais capacidade, sync na nuvem, exportação e processamento mais inteligente.', en: 'More capacity, cloud sync, exports, and smarter processing.' },
       price: { GBP: '£12', EUR: '€14.90', BRL: 'R$89' },
       billing: { pt: '/mês', en: '/month' },
       cta: { pt: 'Ir de Pro', en: 'Go Pro' },
@@ -245,7 +262,7 @@ export const sitePricing = {
     {
       id: 'daily_diamond',
       name: { pt: 'Daily Diamond', en: 'Daily Diamond' },
-      description: { pt: 'Uso ilimitado, acesso API, compartilhamento em equipe e analytics.', en: 'Unlimited usage, API access, team sharing and analytics.' },
+      description: { pt: 'Uso intensivo, analytics, acesso expandido e prioridade operacional.', en: 'Heavy usage, analytics, expanded access, and operational priority.' },
       price: { GBP: '£29', EUR: '€34.90', BRL: 'R$199' },
       billing: { pt: '/mês', en: '/month' },
       cta: { pt: 'Ir de Diamond', en: 'Go Diamond' },
@@ -260,7 +277,7 @@ export const sitePricing = {
       id: 'bundle_essential',
       name: { pt: 'VOLYNX Essential', en: 'VOLYNX Essential' },
       includes: { pt: 'Builder Pro + Daily Pro', en: 'Builder Pro + Daily Pro' },
-      description: { pt: 'Para criadores solo que constroem sites e usam ferramentas diárias.', en: 'For solo creators who build sites and use daily tools.' },
+      description: { pt: 'Para criadores solo que constroem sites e dependem de ferramentas diárias.', en: 'For solo creators building sites and relying on daily tools.' },
       price: { GBP: '£29', EUR: '€34.90', BRL: 'R$199' },
       billing: { pt: '/mês', en: '/month' },
       savings: { pt: 'Economize vs. separado', en: 'Save vs. separate' },
@@ -271,7 +288,7 @@ export const sitePricing = {
       badge: { pt: 'Melhor valor', en: 'Best value' },
       name: { pt: 'VOLYNX Complete', en: 'VOLYNX Complete' },
       includes: { pt: 'Builder Studio + Daily Diamond', en: 'Builder Studio + Daily Diamond' },
-      description: { pt: 'Para agências e power users que precisam de tudo.', en: 'For agencies and power users who need everything.' },
+      description: { pt: 'Para power users, estúdios e operações que precisam do melhor conjunto completo.', en: 'For power users, studios, and operations that need the strongest complete setup.' },
       price: { GBP: '£59', EUR: '€69.90', BRL: 'R$399' },
       billing: { pt: '/mês', en: '/month' },
       savings: { pt: 'Economize 13% vs. separado', en: 'Save 13% vs. separate' },

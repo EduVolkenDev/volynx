@@ -41,20 +41,20 @@ import { ROUTES } from "../data/routes";
           </div>
         </div>
 
-        <div class="hero-v2__visual" aria-hidden="true">
+        <div class="hero-v2__visual">
           <div class="hero-v2__mockup">
-            <div class="hero-v2__mockup-glow"></div>
-            <div class="hero-v2__mockup-chip">
-              <span><img src="/assets/volynx-daily.webp" alt="daily logo"></span>
-            </div>
+            <div class="hero-v2__mockup-glow" aria-hidden="true"></div>
+            <a href="https://daily.volynx.world/" class="hero-v2__mockup-chip" aria-label="Open VOLYNX Daily">
+              <img src="/assets/volynx-daily.webp" alt="VOLYNX Daily" />
+            </a>
             <p class="hero-v2__mockup-title" data-i18n="home2.mockup_title">Seu dia mais inteligente e organizado começa aqui</p>
             <div class="hero-v2__mockup-grid">
-              <span class="hero-v2__mockup-tag"><img src="/assets/myday.webp" alt="My Day">My Day</span>
-              <span class="hero-v2__mockup-tag"><img src="/assets/scanner.webp" alt="Scanner">Smart Scanner</span>
-              <span class="hero-v2__mockup-tag"><img src="/assets/summary.webp" alt="Summary">Universal Summary</span>
-              <span class="hero-v2__mockup-tag"><img src="/assets/vault.webp" alt="Vault">Smart Vault</span>
-              <span class="hero-v2__mockup-tag"><img src="/assets/writing.webp" alt="Writing">Writing Studio</span>
-              <span class="hero-v2__mockup-tag"><img src="/assets/decision.webp" alt="Decision">Decision Desk</span>
+              <a href="https://daily.volynx.world/tools/my-day/"   class="hero-v2__mockup-tag"><img src="/assets/myday.webp"    alt="">My Day</a>
+              <a href="https://daily.volynx.world/tools/scanner/"  class="hero-v2__mockup-tag"><img src="/assets/scanner.webp"  alt="">Smart Scanner</a>
+              <a href="https://daily.volynx.world/tools/summary/"  class="hero-v2__mockup-tag"><img src="/assets/summary.webp"  alt="">Universal Summary</a>
+              <a href="https://daily.volynx.world/tools/vault/"    class="hero-v2__mockup-tag"><img src="/assets/vault.webp"    alt="">Smart Vault</a>
+              <a href="https://daily.volynx.world/tools/writing/"  class="hero-v2__mockup-tag"><img src="/assets/writing.webp"  alt="">Writing Studio</a>
+              <a href="https://daily.volynx.world/tools/decision/" class="hero-v2__mockup-tag"><img src="/assets/decision.webp" alt="">Decision Desk</a>
             </div>
           </div>
         </div>
@@ -63,7 +63,7 @@ import { ROUTES } from "../data/routes";
 
     <!-- floating: Ecosystem -->
     <div class="section-float section-float--right" aria-hidden="true">
-      <img src="/assets/float-ecosystem.webp" alt="" loading="lazy" />
+      <img src="/assets/ecosystem.webp" alt="" loading="lazy" />
     </div>
 
     <!-- ═══ ECOSYSTEM ═══ -->
@@ -472,12 +472,23 @@ import { ROUTES } from "../data/routes";
     50% { transform: translate(-10px, 10px); }
   }
   .hero-v2__mockup-chip {
-  max-width: 100%;
-  display: block;
-  width: 400px;
-  height: auto;
-  margin: 0 auto;
-  padding: 0;
+    max-width: 100%;
+    display: block;
+    width: 400px;
+    height: auto;
+    margin: 0 auto;
+    padding: 0;
+    text-decoration: none;
+    transition: transform .25s ease, filter .25s ease;
+  }
+  .hero-v2__mockup-chip img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+  .hero-v2__mockup-chip:hover {
+    transform: translateY(-2px) scale(1.02);
+    filter: drop-shadow(0 8px 24px rgba(4, 255, 231, 0.25));
   }
 
  
@@ -500,21 +511,35 @@ import { ROUTES } from "../data/routes";
   }
   .hero-v2__mockup-tag {
     padding: 15px 30px;
-  border-radius: 14px;
-  background: rgba(244,244,245,0.04);
-  border: 1px solid rgba(244,244,245,0.08);
-  color: rgba(244,244,245,0.85);
-  font-size: 1.1rem;
-  font-weight: 800;
-  backdrop-filter: blur(10px);
-  display: inline-flex;
-  position: relative;
-  align-items: center;
+    border-radius: 14px;
+    background: rgba(244,244,245,0.04);
+    border: 1px solid rgba(244,244,245,0.08);
+    color: rgba(244,244,245,0.85);
+    font-size: 1.1rem;
+    font-weight: 800;
+    backdrop-filter: blur(10px);
+    display: inline-flex;
+    position: relative;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform .2s ease, background .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
   }
-
-    .hero-v2__mockup-tag img {
-      max-width: 70px;
-    }
+  .hero-v2__mockup-tag:hover {
+    transform: translateY(-2px);
+    background: rgba(4, 255, 231, 0.08);
+    border-color: rgba(4, 255, 231, 0.35);
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(4, 255, 231, 0.14);
+  }
+  .hero-v2__mockup-tag:focus-visible {
+    outline: 2px solid #04ffe7;
+    outline-offset: 2px;
+  }
+  .hero-v2__mockup-tag img {
+    max-width: 70px;
+  }
 
   /* ── Lab Card — responsive two-column layout ── */
   .lab-card {

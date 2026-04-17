@@ -5,7 +5,10 @@ const nav = [
   { href: "https://daily.volynx.world", label: "Daily", i18n: "nav.daily" },
   { href: ROUTES.builder, label: "Builder", i18n: "nav.builder" },
   { href: "https://cvitae.volynx.world", label: "CVitae", i18n: "nav.cvitae" },
-  { href: "https://volynx.world/propertyflow/", label: "PropertyFlow", i18n: "nav.propertyflow" },
+  { href: ROUTES.propertyflow, label: "PropertyFlow", i18n: "nav.propertyflow" },
+  { href: ROUTES.lab, label: "Lab", i18n: "nav.lab" },
+  { href: ROUTES.products, label: "Products", i18n: "nav.products" },
+  { href: ROUTES.pricing, label: "Pricing", i18n: "nav.pricing" },
 ];
 
 interface Props {
@@ -36,14 +39,14 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
     <!-- RIGHT ACTIONS -->
     <div class="vx-actions">
       <!-- Token pill (authed only) -->
-      <a href={ROUTES.account} class="vx-token-pill" id="vxTokenPill" aria-label="Token balance">
+      <a href={ROUTES.account} class="vx-token-pill" id="vxTokenPill" aria-label="VX balance">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v10M8 10h8M8 14h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <span class="vx-token-count" id="vxTokenCount">—</span>
-        <span class="vx-token-label" data-i18n="widget.tokens">tokens</span>
+        <span class="vx-token-label" data-i18n="widget.tokens">VX</span>
       </a>
 
-      <!-- Recharge (authed only) -->
-      <a href={ROUTES.recarregar} class="vx-recharge" data-i18n="widget.recharge">Recarregar</a>
+      <!-- Get VX (authed only) -->
+      <a href={ROUTES.recarregar} class="vx-recharge" data-i18n="widget.recharge">Get VX</a>
 
       <!-- Lang toggle -->
       <button id="vxLangToggle" class="vx-lang" aria-label="Toggle language" title="Switch language / Mudar idioma">
@@ -170,10 +173,17 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
     .vx-nav a {
       color: var(--topbar-muted);
       text-decoration: none;
-      transition: color .15s;
+      transition: color .25s ease, text-shadow .25s ease, transform .25s ease;
       white-space: nowrap;
+      display: inline-block;
+      will-change: transform;
     }
-    .vx-nav a:hover, .vx-nav a.is-active { color: #fff; }
+    .vx-nav a:hover {
+      color: #fff;
+      text-shadow: 0 0 10px #fff;
+      transform: translateY(-2px);
+    }
+    .vx-nav a.is-active { color: #fff; }
   }
 
   /* ── ACTIONS ─────────────────────────────────────── */
@@ -403,7 +413,7 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
     });
   }
 
-  // Token pill live balance
+  // Token pill — resilient: cache → VxTokens (polled) → direct fetch fallback
   (function wireTokenPill() {
     const countEl = document.getElementById("vxTokenCount");
     if (!countEl) return;
@@ -413,13 +423,64 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
       if (isNaN(num)) { countEl.textContent = "—"; return; }
       countEl.textContent = num.toLocaleString();
     }
-    // @ts-ignore global
-    const VxTokens = (window as any).VxTokens;
-    if (VxTokens) {
+    function persistBalance(n: number) {
+      try {
+        localStorage.setItem("volynx_token_balance", String(n));
+        localStorage.setItem("volynx_token_balance_ts", String(Date.now()));
+      } catch (_) {}
+    }
+
+    // 1. Show cached balance immediately from localStorage
+    try {
+      const rawCached = localStorage.getItem("volynx_token_balance");
+      if (rawCached !== null) {
+        const n = parseInt(rawCached, 10);
+        if (!isNaN(n)) setCount(n);
+      }
+    } catch (_) {}
+
+    // 2. Direct fetch — independent of VxTokens (used as fallback)
+    async function directFetch() {
+      try {
+        const jwt = localStorage.getItem("volynx_access_token");
+        if (!jwt) return;
+        const cfg = await fetch("/config.json", { cache: "no-store" }).then(r => r.json());
+        const apiBase = ((cfg && (cfg.functionsUrl || cfg.apiBaseUrl)) || "").replace(/\/$/, "");
+        if (!apiBase) return;
+        const res = await fetch(apiBase + "/get-balance", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + jwt },
+          body: JSON.stringify({}),
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const bal = (data && typeof data.balance === "number") ? data.balance : null;
+        if (bal !== null) { setCount(bal); persistBalance(bal); }
+      } catch (_) {}
+    }
+
+    // 3. Prefer VxTokens when it loads (keeps cache warm across products)
+    let tries = 0;
+    function tryVxTokens() {
+      // @ts-ignore global
+      const VxTokens = (window as any).VxTokens;
+      if (!VxTokens) {
+        if (++tries > 40) { directFetch(); return; }
+        setTimeout(tryVxTokens, 100);
+        return;
+      }
       const cached = VxTokens.getCachedBalance();
       if (cached !== null) setCount(cached);
-      VxTokens.getBalance?.().then((b: number) => setCount(b)).catch(() => {});
+      if (VxTokens.getBalance) {
+        VxTokens.getBalance()
+          .then((b: number) => { if (typeof b === "number") { setCount(b); persistBalance(b); } })
+          .catch(() => { directFetch(); });
+      } else {
+        directFetch();
+      }
     }
+    tryVxTokens();
+
     window.addEventListener("vx:balance-changed", (e: any) => {
       if (e.detail && typeof e.detail.balance === "number") {
         setCount(e.detail.balance);

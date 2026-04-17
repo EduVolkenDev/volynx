@@ -5,13 +5,19 @@ import PageWidgets from "../components/PageWidgets.astro";
 interface Props {
   title?: string;
   description?: string;
+  ogImage?: string;
+  ogType?: string;
   pageClass?: string;
 }
 const {
   title = "VOLYNX — Building a Smarter Future",
   description = "Premium tools, kits and systems for the modern web.",
+  ogImage = "/assets/volynx-icon.webp",
+  ogType = "website",
   pageClass = "",
 } = Astro.props;
+
+const canonicalUrl = `https://volynx.world${Astro.url.pathname}`;
 ---
 <!doctype html>
 <html lang="en">
@@ -21,6 +27,17 @@ const {
     <meta name="format-detection" content="telephone=no,date=no,address=no,email=no" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={`https://volynx.world${ogImage}`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`https://volynx.world${ogImage}`} />
 
     <link rel="preload" as="image" href="/assets/V.webp" />
     <link rel="preload" as="image" href="/assets/wordmark.webp" />
@@ -112,5 +129,6 @@ const {
     <slot />
 
     <PageWidgets hideUtilBar />
+    <script is:inline src="/js/vx-clickable-cards.js"></script>
   </body>
 </html>

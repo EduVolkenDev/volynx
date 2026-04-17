@@ -472,7 +472,7 @@ import { ROUTES } from "../../../data/routes";
         </div>
         <div class="pillar">
           <span class="pillar-icon">◈</span>
-          <div class="pillar-title" data-i="p3_title">60 Activation Tokens</div>
+          <div class="pillar-title" data-i="p3_title">60 Activation VX</div>
           <div class="pillar-desc"  data-i="p3_desc">Spend across current and future Volynx products.</div>
         </div>
         <div class="pillar">
@@ -521,12 +521,12 @@ import { ROUTES } from "../../../data/routes";
           row_tier:       'Access Tier',
           row_transfer:   'Transferability',
           nontransfer_val:'Non-transferable',
-          body:           'Black Diamond is a private Volynx founding invitation, individually issued to a limited number of early members. It grants permanent recognition, locked founding pricing, activation tokens, and priority access to what comes next.',
+          body:           'Black Diamond is a private Volynx founding invitation, individually issued to a limited number of early members. It grants permanent recognition, locked founding pricing, activation VX, and priority access to what comes next.',
           p1_title: 'Permanent Founding Badge',
           p1_desc:  'A lasting Black Diamond identity across the Volynx ecosystem.',
           p2_title: 'Locked Pricing for Life',
           p2_desc:  'Your founding pricing remains protected as Volynx evolves.',
-          p3_title: '60 Activation Tokens',
+          p3_title: '60 Activation VX',
           p3_desc:  'Spend across current and future Volynx products.',
           p4_title: 'Priority Access',
           p4_desc:  'Early releases and a direct channel to the founder.',
@@ -537,7 +537,7 @@ import { ROUTES } from "../../../data/routes";
           fine3: 'Permanent once activated',
           footer_txt: 'Issued by Volynx · Private Founding Access',
           sign_in_cta: 'Sign in to activate',
-          activated_msg: '◆ Activated. <strong>{n} tokens</strong> have been credited to your account. Welcome to the founding circle.',
+          activated_msg: '◆ Activated. <strong>{n} VX</strong> have been credited to your account. Welcome to the founding circle.',
           already_msg:   '◆ Black Diamond is already active on your account. Welcome back, founding member.',
           error_msg:     'Something went wrong: ',
           goto_profile:  'Go to your profile →',
@@ -557,12 +557,12 @@ import { ROUTES } from "../../../data/routes";
           row_tier:       'Nível de Acesso',
           row_transfer:   'Transferibilidade',
           nontransfer_val:'Intransferível',
-          body:           'Black Diamond é um convite fundador privado da Volynx, emitido individualmente para um número limitado de membros iniciais. Concede reconhecimento permanente, preço fundador travado, tokens de ativação e acesso prioritário ao que vem a seguir.',
+          body:           'Black Diamond é um convite fundador privado da Volynx, emitido individualmente para um número limitado de membros iniciais. Concede reconhecimento permanente, preço fundador travado, VX de ativação e acesso prioritário ao que vem a seguir.',
           p1_title: 'Badge Permanente de Fundador',
           p1_desc:  'Uma identidade Black Diamond permanente em todo o ecossistema Volynx.',
           p2_title: 'Preço Travado para Sempre',
           p2_desc:  'Seu preço de fundador permanece protegido à medida que a Volynx evolui.',
-          p3_title: '60 Tokens de Ativação',
+          p3_title: '60 VX de Ativação',
           p3_desc:  'Disponíveis para uso nas experiências atuais e futuras da Volynx.',
           p4_title: 'Acesso Prioritário',
           p4_desc:  'Lançamentos antecipados e canal direto com o fundador.',
@@ -573,7 +573,7 @@ import { ROUTES } from "../../../data/routes";
           fine3: 'Permanente após ativação',
           footer_txt: 'Emitido por Volynx · Acesso Fundador Privado',
           sign_in_cta: 'Entrar para ativar',
-          activated_msg: '◆ Ativado. <strong>{n} tokens</strong> foram creditados na sua conta. Bem-vindo ao círculo fundador.',
+          activated_msg: '◆ Ativado. <strong>{n} VX</strong> foram creditados na sua conta. Bem-vindo ao círculo fundador.',
           already_msg:   '◆ Black Diamond já está ativo na sua conta. Bem-vindo de volta, membro fundador.',
           error_msg:     'Algo correu mal: ',
           goto_profile:  'Ir para o seu perfil →',
@@ -639,14 +639,34 @@ import { ROUTES } from "../../../data/routes";
       var codeCopy = document.getElementById('codeCopy');
       if (codeCopy) {
         codeCopy.addEventListener('click', function() {
-          navigator.clipboard.writeText(code).then(function() {
+          function markCopied() {
             codeCopy.textContent = STRINGS[lang].copy_done;
             codeCopy.classList.add('copied');
             setTimeout(function() {
               codeCopy.textContent = STRINGS[lang].code_copy;
               codeCopy.classList.remove('copied');
             }, 2000);
-          }).catch(function() {});
+          }
+          function fallbackCopy() {
+            try {
+              var ta = document.createElement('textarea');
+              ta.value = code;
+              ta.setAttribute('readonly', '');
+              ta.style.position = 'fixed';
+              ta.style.left = '-9999px';
+              document.body.appendChild(ta);
+              ta.select();
+              var ok = document.execCommand('copy');
+              document.body.removeChild(ta);
+              if (ok) { markCopied(); return; }
+            } catch(_) {}
+            codeCopy.textContent = lang === 'pt' ? 'Falha — copie manualmente' : 'Copy failed — copy manually';
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(code).then(markCopied).catch(fallbackCopy);
+          } else {
+            fallbackCopy();
+          }
         });
       }
 

@@ -4,11 +4,14 @@ const currencies = ['GBP', 'EUR', 'BRL'] as const;
 ---
 <div class="token-card" data-pack-id={pack.id}>
   {pack.badge && <span class="token-pill"><span class="i18n-en">{pack.badge.en}</span><span class="i18n-pt">{pack.badge.pt}</span></span>}
-  <h3 class="token-card__amount">{pack.amount} tokens</h3>
+  <h3 class="token-card__amount">{pack.amount} VX</h3>
   {currencies.map((c) => (
     <span class={`token-card__price ${c !== currency ? 'vx-price--hidden' : ''}`} data-currency={c}>{pack.price[c]}</span>
   ))}
-  <p class="token-card__desc"><span class="i18n-en">One-time pack for flexible tool usage.</span><span class="i18n-pt">Pacote avulso para uso flexível das ferramentas.</span></p>
+  {pack.description
+    ? <p class="token-card__desc"><span class="i18n-en">{pack.description.en}</span><span class="i18n-pt">{pack.description.pt}</span></p>
+    : <p class="token-card__desc"><span class="i18n-en">One-time pack. Flexible capacity across the ecosystem.</span><span class="i18n-pt">Pacote avulso. Capacidade flexível em todo o ecossistema.</span></p>
+  }
   <div class="token-card__buttons">
     <button type="button" class="token-card__cta"><span class="i18n-en">Buy</span><span class="i18n-pt">Comprar</span></button>
     <button type="button" class="token-card__pix" data-pix-pack={`tokens_${pack.id}_brl`}>

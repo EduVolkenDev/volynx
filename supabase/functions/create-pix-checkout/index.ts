@@ -40,10 +40,10 @@ const TOKEN_PACKS: Record<
   string,
   { tokens: number; amount: number; label: string }
 > = {
-  tokens_starter: { tokens: 10, amount: 69.0, label: "Starter — 10 tokens" },
-  tokens_core: { tokens: 25, amount: 159.0, label: "Core — 25 tokens" },
-  tokens_pro: { tokens: 60, amount: 349.0, label: "Pro — 60 tokens" },
-  tokens_scale: { tokens: 150, amount: 749.0, label: "Scale — 150 tokens" },
+  tokens_starter: { tokens: 12, amount: 69.0, label: "Starter — 12 VX" },
+  tokens_core: { tokens: 32, amount: 149.0, label: "Core — 32 VX" },
+  tokens_pro: { tokens: 80, amount: 289.0, label: "Pro — 80 VX" },
+  tokens_scale: { tokens: 200, amount: 579.0, label: "Elite — 200 VX" },
 };
 
 // Strip currency suffix from lookup_key
