@@ -234,7 +234,7 @@ export const sitePricing = {
       featured: true,
       name: { pt: 'Daily Pro', en: 'Daily Pro' },
       description: { pt: 'Quotas maiores, sync na nuvem, exportação e processamento avançado.', en: 'Higher quotas, cloud sync, export and smart processing.' },
-      price: { GBP: '£12', EUR: '€14.90', BRL: 'R$79' },
+      price: { GBP: '£12', EUR: '€14.90', BRL: 'R$89' },
       billing: { pt: '/mês', en: '/month' },
       cta: { pt: 'Ir de Pro', en: 'Go Pro' },
       features: {

@@ -23,6 +23,11 @@ const faqs = [
   { qKey: "price.faq_q7", aKey: "price.faq_a7", qFallback: "Does CVitae require a subscription?", aFallback: "No. CVitae is free to build and preview. You only pay when you export — 2 tokens per clean PDF. No subscription needed for most users. A Business tier exists for professionals who need unlimited exports." },
   { qKey: "price.faq_q8", aKey: "price.faq_a8", qFallback: "Can I use tokens across different products?", aFallback: "Yes. Your VOLYNX token balance works across Builder, Daily, CVitae, and all future products. One balance, one account." },
 ];
+
+const bundleLookupById = {
+  bundle_essential: 'bundle_volynx_daily_pro',
+  bundle_complete: 'bundle_volynx_daily_studio',
+} as Record<string, string>;
 ---
 <FlagshipLayout title="Pricing — VOLYNX" pageClass="page-pricing">
   <FlagshipHeader current={ROUTES.pricing} ctaLabel="Go Pro" ctaI18n="nav.go_pro" />
@@ -176,6 +181,9 @@ const faqs = [
             </div>
             <p style="margin:0 0 12px;color:var(--muted);font-size:12px;"><span class="i18n-en">{b.savings.en}</span><span class="i18n-pt">{b.savings.pt}</span></p>
             <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.5;"><span class="i18n-en">{b.description.en}</span><span class="i18n-pt">{b.description.pt}</span></p>
+            <button type="button" class="bundle-card__cta" data-bundle-key={bundleLookupById[b.id]}>
+              <span class="i18n-en">{b.cta.en}</span><span class="i18n-pt">{b.cta.pt}</span>
+            </button>
           </div>
         ))}
       </div>
@@ -271,6 +279,8 @@ const faqs = [
     .lcbar__pill { padding:6px 14px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:.06em; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03); color:rgba(255,255,255,.45); cursor:pointer; transition:all .15s; }
     .lcbar__pill:hover { border-color:rgba(255,255,255,.15); color:rgba(255,255,255,.7); }
     .lcbar__pill--active { background:rgba(109,94,252,.12); border-color:rgba(109,94,252,.35); color:#C4B5FD; }
+    .bundle-card__cta { display:flex; align-items:center; justify-content:center; width:100%; min-height:44px; margin-top:16px; padding:12px; border-radius:8px; border:1px solid rgba(196,181,253,.28); background:rgba(196,181,253,.1); color:#C4B5FD; font-weight:700; font-size:14px; cursor:pointer; transition:all .2s; }
+    .bundle-card__cta:hover { background:rgba(196,181,253,.18); border-color:rgba(196,181,253,.42); color:#fff; }
     .vx-price--hidden, .pricing-card__price--hidden { display:none !important; }
   </style>
 
@@ -301,7 +311,14 @@ const faqs = [
 
   <!-- Checkout + Plan detection -->
   <script is:inline type="module">
-    const PLAN_KEYS = ['free', 'launch', 'pro', 'studio', 'teams'];
+    const PLAN_LOOKUP_PREFIX = {
+      launch: 'builder_launch',
+      pro: 'builder_pro',
+      studio: 'builder_studio',
+      teams: 'builder_teams',
+      daily_pro: 'daily_pro',
+      daily_diamond: 'daily_diamond',
+    };
     const urlParams = new URLSearchParams(window.location.search);
 
     // Show cancelled banner if redirected from Stripe
@@ -337,14 +354,16 @@ const faqs = [
       } catch {}
     }
 
-    document.querySelectorAll('.pricing-card__cta').forEach((btn, idx) => {
-      const planKey = PLAN_KEYS[idx];
-      if (planKey === 'free') return;
+    document.querySelectorAll('.pricing-card__cta').forEach((btn) => {
+      const card = btn.closest('.pricing-card');
+      const planId = card?.getAttribute('data-plan') || '';
+      const lookupPrefix = PLAN_LOOKUP_PREFIX[planId];
+      if (!lookupPrefix) return;
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
         if (!token) { window.location.href = '/login/?next=/pricing/'; return; }
         if (!apiBase) { alert('Checkout not configured.'); return; }
-        const lookupKey = planKey === 'teams' ? 'builder_teams_' + currency : 'builder_' + planKey + '_' + currency;
+        const lookupKey = lookupPrefix + '_' + currency;
         btn.textContent = 'Redirecting...';
         btn.style.pointerEvents = 'none';
         try {
@@ -352,6 +371,29 @@ const faqs = [
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
             body: JSON.stringify({ lookup_key: lookupKey, success_url: window.location.origin + '/profile/?payment=success', cancel_url: window.location.origin + '/pricing/?payment=cancelled' }),
+          });
+          const data = await res.json();
+          if (data.url) window.location.href = data.url;
+          else { alert(data.error || data.msg || data.message || 'Checkout failed. Please try again.'); btn.textContent = 'Try again'; btn.style.pointerEvents = ''; }
+        } catch { alert('Connection error. Please check your network and try again.'); btn.textContent = 'Try again'; btn.style.pointerEvents = ''; }
+      });
+    });
+
+    // ── Bundles: checkout via Stripe ──
+    document.querySelectorAll('.bundle-card__cta').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (!token) { window.location.href = '/login/?next=/pricing/'; return; }
+        if (!apiBase) { alert('Checkout not configured.'); return; }
+        const bundleKey = btn.getAttribute('data-bundle-key');
+        if (!bundleKey) return;
+        btn.textContent = 'Redirecting...';
+        btn.style.pointerEvents = 'none';
+        try {
+          const res = await fetch(apiBase + '/create-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+            body: JSON.stringify({ lookup_key: bundleKey + '_' + currency, success_url: window.location.origin + '/profile/?payment=success', cancel_url: window.location.origin + '/pricing/?payment=cancelled' }),
           });
           const data = await res.json();
           if (data.url) window.location.href = data.url;
@@ -447,17 +489,23 @@ const faqs = [
         });
         if (res.ok) {
           const perm = await res.json();
-          const plan = perm.effective_tier || perm.builder_plan || perm.builderPlan || perm.plan || 'free';
           if (!perm.useLocalStorage) {
-            const cards = document.querySelectorAll('.pricing-card');
-            const idx = PLAN_KEYS.indexOf(plan);
-            if (idx >= 0 && cards[idx]) {
-              cards[idx].style.borderColor = 'rgba(52,211,153,.35)';
-              cards[idx].style.boxShadow = '0 0 24px rgba(52,211,153,.08)';
-              const name = cards[idx].querySelector('.pricing-card__name');
+            const currentPlanIds = new Set();
+            const builderPlan = (perm.builder_plan || perm.builderPlan || perm.plan || 'free').toLowerCase();
+            const dailyPlan = (perm.daily_plan || perm.dailyPlan || 'free').toLowerCase();
+            currentPlanIds.add(builderPlan === 'free' ? 'free' : builderPlan);
+            if (dailyPlan !== 'free') currentPlanIds.add('daily_' + dailyPlan);
+
+            document.querySelectorAll('.pricing-card').forEach((card) => {
+              const planId = card.getAttribute('data-plan') || '';
+              if (!currentPlanIds.has(planId)) return;
+
+              card.style.borderColor = 'rgba(52,211,153,.35)';
+              card.style.boxShadow = '0 0 24px rgba(52,211,153,.08)';
+              const name = card.querySelector('.pricing-card__name');
               if (name) { const b = document.createElement('span'); b.textContent = ' ✓ Your plan'; b.style.cssText = 'font-size:12px;color:#34D399;font-weight:700;'; name.appendChild(b); }
-              const cta = cards[idx].querySelector('.pricing-card__cta');
-              if (cta && plan !== 'free') {
+              const cta = card.querySelector('.pricing-card__cta');
+              if (cta && planId !== 'free' && planId !== 'daily_free') {
                 cta.textContent = 'Current plan ✓';
                 cta.style.cssText = 'background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.25);color:#34D399;pointer-events:none;display:flex;justify-content:center;padding:12px;border-radius:14px;text-decoration:none;font-weight:600;font-size:14px;';
 
@@ -483,10 +531,8 @@ const faqs = [
                   } catch { alert('Connection error.'); manageBtn.textContent = 'Manage subscription'; manageBtn.style.pointerEvents = ''; }
                 });
                 cta.parentElement.appendChild(manageBtn);
-              } else if (cta && plan === 'free') {
-                // Free plan - no change needed
               }
-            }
+            });
           }
         }
       } catch {}

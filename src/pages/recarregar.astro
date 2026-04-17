@@ -8,22 +8,21 @@ import { sitePricing } from "../data/pricing";
 const lang = Astro.url.searchParams.get('lang') === 'en' ? 'en' : 'pt';
 const currencyParam = Astro.url.searchParams.get('currency') || 'BRL';
 const currency = (['GBP', 'EUR', 'BRL'] as const).includes(currencyParam as any) ? (currencyParam as 'GBP'|'EUR'|'BRL') : 'BRL';
+const tokenPackById = Object.fromEntries(sitePricing.tokenPacks.map((pack) => [pack.id, pack]));
+const getPackAmount = (id: string) => tokenPackById[id]?.amount || 0;
+const getPackPrice = (id: string) => tokenPackById[id]?.price[currency] || '';
 
 // Enriched packages with bonus/emotional copy
 const packs = [
   {
     id: 'starter',
-    amount: 10,
-    price: { GBP: '£9.90', EUR: '€11.90', BRL: 'R$69' },
     bonus: { pt: '', en: '' },
     tagline: { pt: 'Primeiro passo', en: 'First step' },
     desc: { pt: 'Para testar sem compromisso.', en: 'Try without committing.' }
   },
   {
     id: 'core',
-    amount: 25,
     priceOriginal: { GBP: '£24.90', EUR: '€29.90', BRL: 'R$169' },
-    price: { GBP: '£22.90', EUR: '€27.90', BRL: 'R$159' },
     bonus: { pt: '+20% tokens extra', en: '+20% extra tokens' },
     tagline: { pt: 'Mais popular', en: 'Most popular' },
     desc: { pt: 'O sweet spot da plataforma.', en: 'The platform sweet spot.' },
@@ -31,17 +30,13 @@ const packs = [
   },
   {
     id: 'pro',
-    amount: 60,
     priceOriginal: { GBP: '£65', EUR: '€78', BRL: 'R$459' },
-    price: { GBP: '£49.90', EUR: '€59.90', BRL: 'R$349' },
     bonus: { pt: '+30% tokens + badge Power User', en: '+30% tokens + Power User badge' },
     tagline: { pt: 'Melhor custo', en: 'Best value' },
     desc: { pt: 'Para quem usa todos os dias.', en: 'For daily power users.' }
   },
   {
     id: 'scale',
-    amount: 150,
-    price: { GBP: '£109', EUR: '€129', BRL: 'R$749' },
     bonus: { pt: 'Diamond perks + prioridade', en: 'Diamond perks + priority' },
     tagline: { pt: 'Whale', en: 'Whale tier' },
     desc: { pt: 'Operação pesada sem fricção.', en: 'Heavy operation, zero friction.' }
@@ -119,12 +114,12 @@ const L = t[lang];
           <div class="rec-card-top">
             <div>
               <span class="rec-card-tag">{pack.tagline[lang]}</span>
-              <h3 class="rec-card-amount">{pack.amount} <span class="rec-card-amount-unit">{L.tokens}</span></h3>
+              <h3 class="rec-card-amount">{getPackAmount(pack.id)} <span class="rec-card-amount-unit">{L.tokens}</span></h3>
               <p class="rec-card-desc">{pack.desc[lang]}</p>
             </div>
             <div class="rec-card-price">
               {pack.priceOriginal && <span class="rec-card-price-original">{L.from} {pack.priceOriginal[currency]}</span>}
-              <div class="rec-card-price-current">{pack.price[currency]}</div>
+              <div class="rec-card-price-current">{getPackPrice(pack.id)}</div>
               {pack.bonus[lang] && <span class="rec-card-bonus">🎁 {pack.bonus[lang]}</span>}
             </div>
           </div>

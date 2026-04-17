@@ -1,6 +1,14 @@
 ---
 const { addon, locale, currency } = Astro.props;
 const currencies = ['GBP', 'EUR', 'BRL'] as const;
+const addonLookupKey = ({
+  'domain-setup': 'addon_domain_setup',
+  'template-pack': 'addon_template_pack',
+  'html-export': 'addon_html_export',
+  'extra-slot': 'addon_extra_slot',
+  'bilingual': 'addon_bilingual',
+  'icons-addon': 'addon_icons',
+} as Record<string, string>)[addon.id] || `addon_${String(addon.id).replace(/-/g, '_')}`;
 ---
 <div class="addon-card" data-addon-id={addon.id}>
   <div class="addon-card__info">
@@ -11,7 +19,7 @@ const currencies = ['GBP', 'EUR', 'BRL'] as const;
     {currencies.map((c) => (
       <span class={`addon-card__price ${c !== currency ? 'vx-price--hidden' : ''}`} data-currency={c}>{addon.price[c]}</span>
     ))}
-    <button type="button" class="addon-card__cta" data-addon-key={`addon_${addon.id}`}>
+    <button type="button" class="addon-card__cta" data-addon-key={addonLookupKey}>
       <span class="i18n-en">Add</span><span class="i18n-pt">Adicionar</span>
     </button>
   </div>
