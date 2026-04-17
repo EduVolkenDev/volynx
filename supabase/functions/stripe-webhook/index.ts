@@ -94,10 +94,10 @@ function detectProductKey(prefix: string): string {
 
 // Token pack credits (lookup_key prefix → tokens to add)
 const TOKEN_CREDITS: Record<string, number> = {
-  tokens_starter: 10,
-  tokens_core: 25,
-  tokens_pro: 60,
-  tokens_scale: 150,
+  tokens_starter: 12,
+  tokens_core: 32,
+  tokens_pro: 80,
+  tokens_scale: 200,
 };
 
 // ── Helpers ─────────────────────────────────────────────────
