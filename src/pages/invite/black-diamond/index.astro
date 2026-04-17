@@ -539,7 +539,14 @@ import { ROUTES } from "../../../data/routes";
           sign_in_cta: 'Sign in to activate',
           activated_msg: '◆ Activated. <strong>{n} VX</strong> have been credited to your account. Welcome to the founding circle.',
           already_msg:   '◆ Black Diamond is already active on your account. Welcome back, founding member.',
+          missing_code_msg: 'This private invitation requires a valid invitation code. Please use the full link you received or paste your code on the activation page.',
+          invalid_code:   'This invitation code could not be validated. Please check the link or contact Volynx support.',
+          expired:        'This invitation code has expired.',
+          max_uses_reached: 'This invitation code has already been fully redeemed.',
+          wrong_recipient: 'This invitation was issued to a different recipient and is non-transferable.',
+          already_redeemed: 'This invitation code has already been redeemed.',
           error_msg:     'Something went wrong: ',
+          enter_code:     'Enter invitation code',
           goto_profile:  'Go to your profile →',
           try_again:     'Try again',
           activating:    'Activating…',
@@ -575,7 +582,14 @@ import { ROUTES } from "../../../data/routes";
           sign_in_cta: 'Entrar para ativar',
           activated_msg: '◆ Ativado. <strong>{n} VX</strong> foram creditados na sua conta. Bem-vindo ao círculo fundador.',
           already_msg:   '◆ Black Diamond já está ativo na sua conta. Bem-vindo de volta, membro fundador.',
+          missing_code_msg: 'Este convite privado exige um código de convite válido. Use o link completo recebido ou cole o código na página de ativação.',
+          invalid_code:   'Não foi possível validar este código de convite. Verifique o link ou fale com o suporte da Volynx.',
+          expired:        'Este código de convite expirou.',
+          max_uses_reached: 'Este código de convite já foi totalmente resgatado.',
+          wrong_recipient: 'Este convite foi emitido para outro destinatário e é intransferível.',
+          already_redeemed: 'Este código de convite já foi resgatado.',
           error_msg:     'Algo correu mal: ',
+          enter_code:     'Inserir código do convite',
           goto_profile:  'Ir para o seu perfil →',
           try_again:     'Tentar novamente',
           activating:    'A ativar…',
@@ -595,8 +609,17 @@ import { ROUTES } from "../../../data/routes";
         document.querySelectorAll('[data-i]').forEach(function(el) {
           var key = el.getAttribute('data-i');
           if (key && s[key] !== undefined) {
-            // don't overwrite cta_activate if already in claim state
-            if (key === 'cta_activate' && acceptBtn && acceptBtn._claimed) return;
+            // Keep the CTA aligned with the current auth/claim state when language changes.
+            if (key === 'cta_activate' && acceptBtn && acceptBtn._mode) {
+              var modeText = {
+                signin: s.sign_in_cta,
+                enter_code: s.enter_code,
+                activating: s.activating,
+                profile: s.goto_profile,
+                retry: s.try_again,
+              }[acceptBtn._mode];
+              if (modeText) { el.textContent = modeText; return; }
+            }
             el.textContent = s[key];
           }
         });
@@ -677,6 +700,19 @@ import { ROUTES } from "../../../data/routes";
       var acceptBtn = document.getElementById('acceptBtn');
       var claimMsg  = document.getElementById('claimMsg');
 
+      function setButtonMode(mode) {
+        acceptBtn._mode = mode;
+        var s = STRINGS[lang];
+        var text = {
+          signin: s.sign_in_cta,
+          enter_code: s.enter_code,
+          activating: s.activating,
+          profile: s.goto_profile,
+          retry: s.try_again,
+        }[mode] || s.cta_activate;
+        acceptBtn.textContent = text;
+      }
+
       function showMsg(html, ok) {
         claimMsg.style.display    = 'block';
         claimMsg.style.background = ok ? 'rgba(34,197,94,.07)'           : 'rgba(239,68,68,.07)';
@@ -685,18 +721,30 @@ import { ROUTES } from "../../../data/routes";
         claimMsg.innerHTML        = html;
       }
 
+      function voucherErrorMessage(error) {
+        var s = STRINGS[lang];
+        return s[error] || s.error_msg + (error || 'unknown error');
+      }
+
       var token = localStorage.getItem('volynx_access_token');
 
       if (!token) {
         var next = encodeURIComponent(window.location.pathname + window.location.search);
         acceptBtn.href        = '/login/?next=' + next;
-        acceptBtn.textContent = STRINGS[lang].sign_in_cta;
+        setButtonMode('signin');
+        return;
+      }
+
+      if (!code) {
+        showMsg(STRINGS[lang].missing_code_msg, false);
+        acceptBtn.href = '/activate/';
+        setButtonMode('enter_code');
         return;
       }
 
       acceptBtn.addEventListener('click', async function(e) {
         e.preventDefault();
-        acceptBtn.textContent         = STRINGS[lang].activating;
+        setButtonMode('activating');
         acceptBtn.style.opacity       = '0.65';
         acceptBtn.style.pointerEvents = 'none';
 
@@ -707,36 +755,25 @@ import { ROUTES } from "../../../data/routes";
 
           var data;
 
-          // If a voucher code is present, try the new voucher system first
-          if (code) {
-            var vRes = await fetch(base + '/redeem-voucher', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-              body: JSON.stringify({ code: code }),
-            });
-            var vData = await vRes.json();
+          var vRes = await fetch(base + '/redeem-voucher', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify({ code: code }),
+          });
+          var vData = await vRes.json();
 
-            if (vData.ok) {
-              // Voucher redeemed successfully
-              data = { ok: true, already_claimed: false, tokens_granted: (vData.grants_applied && vData.grants_applied.tokens) || 0 };
-            } else if (vData.error === 'already_redeemed') {
-              data = { ok: true, already_claimed: true, tokens_granted: 0 };
-            } else if (vData.error === 'invalid_code') {
-              // Code not in voucher system — fall back to legacy claim
-              data = null;
-            } else {
-              // Other voucher error
-              data = { ok: false, error: vData.error };
-            }
-          }
-
-          // Fall back to legacy claim-black-diamond if no code or voucher not found
-          if (!data) {
-            var res = await fetch(base + '/claim-black-diamond', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-            });
-            data = await res.json();
+          if (vData.ok) {
+            var grants = vData.grants_applied || {};
+            var isBlackDiamondVoucher = vData.voucher_type === 'black_diamond' || grants.badge === 'black_diamond';
+            data = isBlackDiamondVoucher
+              ? { ok: true, already_claimed: false, tokens_granted: grants.tokens || 0 }
+              : { ok: false, error: 'invalid_code' };
+          } else if (vData.error === 'already_black_diamond') {
+            data = { ok: true, already_claimed: true, tokens_granted: 0 };
+          } else if (vData.error === 'already_redeemed') {
+            data = { ok: false, error: vData.error };
+          } else {
+            data = { ok: false, error: vData.error };
           }
 
           var s = STRINGS[lang];
@@ -746,7 +783,7 @@ import { ROUTES } from "../../../data/routes";
             acceptBtn.style.display = 'none';
           } else if (data.ok) {
             showMsg(s.activated_msg.replace('{n}', data.tokens_granted), true);
-            acceptBtn._claimed        = true;
+            setButtonMode('profile');
             acceptBtn.textContent     = s.goto_profile;
             acceptBtn.href            = '/profile/';
             acceptBtn.style.opacity       = '1';
@@ -754,15 +791,15 @@ import { ROUTES } from "../../../data/routes";
             // Clear plan cache so profile shows updated state
             if (window.VxPlan) window.VxPlan.clearCache();
           } else {
-            showMsg(s.error_msg + (data.error || 'unknown error'), false);
-            acceptBtn.textContent         = s.try_again;
+            showMsg(voucherErrorMessage(data.error), false);
+            setButtonMode('retry');
             acceptBtn.style.opacity       = '1';
             acceptBtn.style.pointerEvents = 'auto';
           }
         } catch(_) {
           var s2 = STRINGS[lang];
           showMsg(s2.network_error, false);
-          acceptBtn.textContent         = s2.try_again;
+          setButtonMode('retry');
           acceptBtn.style.opacity       = '1';
           acceptBtn.style.pointerEvents = 'auto';
         }

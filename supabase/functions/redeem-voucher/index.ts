@@ -87,6 +87,10 @@ Deno.serve(async (req: Request) => {
       }
     }
 
+    // ── Prepare grants ─────────────────────────────────────────
+    const grants = voucher.grants || {};
+    const isBlackDiamondGrant = grants.badge === "black_diamond";
+
     // ── Check if already redeemed by this user ────────────────
     const { data: existing } = await supabase
       .from("voucher_redemptions")
@@ -96,13 +100,29 @@ Deno.serve(async (req: Request) => {
       .maybeSingle();
 
     if (existing) {
-      return json({ ok: false, error: "already_redeemed" }, 400);
+      return json({ ok: false, error: isBlackDiamondGrant ? "already_black_diamond" : "already_redeemed" }, 400);
     }
 
     // ── Apply grants ──────────────────────────────────────────
-    const grants = voucher.grants || {};
     const profileUpdates: Record<string, unknown> = {};
     let tokensGranted = 0;
+
+    if (isBlackDiamondGrant) {
+      const { data: profile, error: profileErr } = await supabase
+        .from("profiles")
+        .select("is_black_diamond")
+        .eq("id", userId)
+        .single();
+
+      if (profileErr || !profile) {
+        console.error("[redeem-voucher] profile lookup error:", profileErr?.message);
+        return json({ ok: false, error: "grant_failed" }, 500);
+      }
+
+      if (profile.is_black_diamond) {
+        return json({ ok: false, error: "already_black_diamond" }, 400);
+      }
+    }
 
     // Plan upgrades
     if (grants.builder_plan) profileUpdates.builder_plan = grants.builder_plan;
@@ -110,7 +130,7 @@ Deno.serve(async (req: Request) => {
     if (grants.plan) profileUpdates.plan = grants.plan;
 
     // Badge grants
-    if (grants.badge === "black_diamond") {
+    if (isBlackDiamondGrant) {
       profileUpdates.is_black_diamond = true;
       profileUpdates.black_diamond_claimed_at = new Date().toISOString();
     }
