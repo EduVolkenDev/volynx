@@ -298,10 +298,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         kit_landing_express: "saas",
         kit_portfolio_personal: "portfolio",
         kit_portfolio_commercial: "portfolio",
+        kit_portfolio_studio: "portfolio",
         kit_agency_personal: "agency",
         kit_agency_commercial: "agency",
+        kit_agency_studio: "agency",
         kit_saas_personal: "saas",
         kit_saas_commercial: "saas",
+        kit_saas_studio: "saas",
       };
 
       const presetId = presetMap[prefix];

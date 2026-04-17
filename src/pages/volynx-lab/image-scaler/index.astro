@@ -49,8 +49,8 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
       <div class="card">
         <div class="cardHead">
           <h2 data-i18n="scaler.card_upload">Upload &amp; Settings</h2>
-          <button id="pickBtn" class="btn secondary" type="button" data-i18n="scaler.btn_select">Select</button>
-          <input id="file" type="file" accept="image/*" multiple hidden aria-label="Select images" />
+          <label id="pickBtn" for="file" class="btn secondary" role="button" tabindex="0" data-i18n="scaler.btn_select" style="cursor:pointer;display:inline-flex;align-items:center;justify-content:center;">Select</label>
+          <input id="file" type="file" accept="image/*" multiple aria-label="Select images" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;overflow:hidden;" />
         </div>
 
         <div class="cardBody">
@@ -260,7 +260,11 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
       return { baseName, originalFile: file, blob, width: canvas.width, height: canvas.height };
     }
 
-    pickBtn.addEventListener("click", () => fileEl.click());
+    // pickBtn is now a <label for="file"> — native HTML triggers file input, no JS needed.
+    // Keep keyboard support for the label (Enter/Space).
+    pickBtn.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileEl.click(); }
+    });
     dropEl.addEventListener("click", () => fileEl.click());
     dropEl.addEventListener("keydown", e => {
       if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileEl.click(); }
