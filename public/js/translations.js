@@ -170,7 +170,7 @@ window.VX_TRANS = {
 
     /* === COOKIE BANNER === */
     "cookie.title":          "Cookies & Privacy",
-    "cookie.msg":            "We use essential cookies for the platform to work. With your permission, we use analytics cookies to improve the experience and track impact responsibly. You are in control.",
+    "cookie.msg":            "We use essential cookies to keep VOLYNX working. Analytics are optional and stay in your control.",
     "cookie.prefs_btn":      "Preferences",
     "cookie.reject_btn":     "Reject",
     "cookie.accept_btn":     "Accept all",
@@ -2247,7 +2247,7 @@ window.VX_TRANS = {
 
     /* === COOKIE BANNER === */
     "cookie.title":          "Cookies & Privacidade",
-    "cookie.msg":            "Usamos cookies essenciais para o funcionamento da plataforma. Com sua permissão, usamos cookies de análise para melhorar a experiência e medir impacto com responsabilidade. Você está no controle.",
+    "cookie.msg":            "Usamos cookies essenciais para manter a VOLYNX funcionando. Analytics são opcionais e ficam sob seu controle.",
     "cookie.prefs_btn":      "Preferências",
     "cookie.reject_btn":     "Rejeitar",
     "cookie.accept_btn":     "Aceitar tudo",

@@ -1820,7 +1820,7 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     --accent: #7DD3FC;
     --card-bg: rgba(231, 238, 247, .04);
     --card-border: rgba(231, 238, 247, .10);
-    --r: 20px;
+    --r: 8px;
   }
 
   *, *::before, *::after { box-sizing: border-box; }
@@ -1840,6 +1840,14 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     overflow-x: hidden;
   }
 
+  button, [role="button"], input[type="button"], input[type="submit"], input[type="reset"] {
+    min-height: 44px;
+  }
+
+  a, button {
+    touch-action: manipulation;
+  }
+
   /* HERO */
   .hero {
     text-align: center;
@@ -1853,12 +1861,12 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     align-items: center;
     gap: 8px;
     padding: 6px 14px;
-    border-radius: 999px;
+    border-radius: 8px;
     border: 1px solid rgba(125, 211, 252, .22);
     background: rgba(125, 211, 252, .06);
     font-size: 12px;
     font-weight: 700;
-    letter-spacing: .1em;
+    letter-spacing: 0;
     text-transform: uppercase;
     color: var(--accent);
     margin-bottom: 24px;
@@ -1880,10 +1888,11 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
 
   .hero__title {
     margin: 0 0 14px;
-    font-size: clamp(32px, 6vw, 56px);
+    font-size: 48px;
     font-weight: 800;
-    letter-spacing: -.03em;
+    letter-spacing: 0;
     line-height: 1.05;
+    overflow-wrap: anywhere;
   }
 
   .accent {
@@ -2436,15 +2445,16 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    min-height: 44px;
     padding: 11px 20px;
-    border-radius: 12px;
+    border-radius: 8px;
     font-family: inherit;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
     border: none;
     transition: background .15s, transform .1s, opacity .15s;
-    letter-spacing: .02em;
+    letter-spacing: 0;
   }
 
   .btn--primary {
@@ -2470,9 +2480,9 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
   }
 
   .btn--sm {
-    padding: 7px 14px;
+    padding: 8px 14px;
     font-size: 12px;
-    border-radius: 10px;
+    border-radius: 8px;
   }
 
   .btn[disabled] {
@@ -2520,6 +2530,7 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
   /* Mobile */
   @media (max-width: 680px) {
     .hero { padding: 40px 16px 28px; }
+    .hero__title { font-size: 34px; }
     .panel { padding: 28px 20px; }
     .card { padding: 16px; }
     .json-editor { min-height: 220px; }

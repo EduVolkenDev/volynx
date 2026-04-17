@@ -14,8 +14,7 @@ import { ROUTES } from "../data/routes";
       <div class="vx-cookie__title" data-i18n="cookie.title">Cookies &amp; Privacy</div>
     </div>
     <p class="vx-cookie__text" data-i18n="cookie.msg">
-      We use essential cookies for the platform to work. With your permission, we use analytics cookies to
-      improve the experience and track impact responsibly. You are in control.
+      We use essential cookies to keep VOLYNX working. Analytics are optional and stay in your control.
     </p>
     <div class="vx-cookie__actions">
       <button class="vx-cbtn vx-cbtn--ghost" id="vxCookiePrefs" type="button" data-i18n="cookie.prefs_btn">Preferences</button>
@@ -46,7 +45,7 @@ import { ROUTES } from "../data/routes";
   /* Hidden by default — JS adds .vx-cookie--show to reveal */
   .vx-cookie {
     position: fixed;
-    inset: auto 18px 18px 18px;
+    inset: auto 16px 16px 16px;
     z-index: 9999;
     display: flex;
     justify-content: center;
@@ -65,18 +64,20 @@ import { ROUTES } from "../data/routes";
   .vx-cookie__card {
     position: relative;
     width: min(560px, 100%);
-    border-radius: 18px;
+    max-height: min(440px, calc(100svh - 96px));
+    border-radius: 8px;
     background: rgba(4, 6, 13, 0.94);
     border: 1px solid rgba(160, 130, 255, 0.2);
     box-shadow: 0 24px 64px rgba(0, 0, 0, 0.72), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
-    overflow: hidden;
+    overflow: hidden auto;
+    overscroll-behavior: contain;
   }
 
   .vx-cookie__glow {
     position: absolute;
-    inset: -40%;
+    inset: 0;
     background:
       radial-gradient(circle at 20% 20%, rgba(4, 229, 255, 0.18), transparent 45%),
       radial-gradient(circle at 80% 70%, rgba(167, 139, 250, 0.18), transparent 45%);
@@ -106,7 +107,7 @@ import { ROUTES } from "../data/routes";
   .vx-cookie__title {
     font-weight: 800;
     color: #fff;
-    letter-spacing: 0.08em;
+    letter-spacing: 0;
   }
   .vx-cookie__text {
     padding: 10px 14px 0;
@@ -127,11 +128,11 @@ import { ROUTES } from "../data/routes";
   /* Buttons — prefixed vx-cbtn to avoid collision */
   .vx-cbtn {
     font-weight: 800;
-    letter-spacing: 0.14em;
+    letter-spacing: 0;
     text-transform: uppercase;
     font-size: 11px;
     padding: 10px 14px;
-    border-radius: 999px;
+    border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.18);
     background: rgba(10, 8, 24, 0.60);
     color: #fff;
@@ -159,6 +160,7 @@ import { ROUTES } from "../data/routes";
   .vx-cookie__link {
     display: inline-block;
     padding: 0 14px 14px;
+    min-height: 44px;
     font-size: 12px;
     color: rgba(200, 245, 255, 0.85);
     text-decoration: underline;
@@ -229,8 +231,46 @@ import { ROUTES } from "../data/routes";
   }
 
   @media (max-width: 480px) {
-    .vx-cookie { inset: auto 10px 10px 10px; }
-    .vx-cookie__actions { gap: 8px; }
+    .vx-cookie { inset: auto 8px 8px 8px; }
+    .vx-cookie__card {
+      width: 100%;
+      max-height: min(260px, calc(100svh - 88px));
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.68), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    }
+    .vx-cookie__head {
+      gap: 8px;
+      padding: 12px 12px 0;
+    }
+    .vx-cookie__badge {
+      padding: 7px 9px;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      border-radius: 8px;
+    }
+    .vx-cookie__title {
+      font-size: 14px;
+    }
+    .vx-cookie__text {
+      padding: 8px 12px 0;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .vx-cookie__actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 10px 12px 12px;
+    }
+    .vx-cbtn {
+      width: 100%;
+      padding: 9px 10px;
+    }
+    .vx-cbtn--primary {
+      grid-column: 1 / -1;
+    }
+    .vx-cookie__link {
+      padding: 0 12px 12px;
+    }
   }
 </style>
 

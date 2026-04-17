@@ -28,7 +28,7 @@ const currencies = ['GBP', 'EUR', 'BRL'] as const;
 <style>
   .pricing-card {
     padding: 24px;
-    border-radius: 20px;
+    border-radius: 8px;
     border: 1px solid rgba(255,255,255,.06);
     background: rgba(255,255,255,.03);
     backdrop-filter: blur(12px);
@@ -45,9 +45,9 @@ const currencies = ['GBP', 'EUR', 'BRL'] as const;
   /* Floating plan icon — top-right, matches home card-asset pattern but scaled for pricing cards */
   .pricing-card > .card-asset {
     position: absolute;
-    top: -18px;
-    right: -18px;
-    width: 110px;
+    top: 8px;
+    right: 8px;
+    width: min(96px, 30%);
     height: auto;
     opacity: 0.55;
     pointer-events: none;
@@ -62,7 +62,7 @@ const currencies = ['GBP', 'EUR', 'BRL'] as const;
   }
   .pricing-card > *:not(.card-asset) { position: relative; z-index: 1; }
   @media (min-width: 768px) {
-    .pricing-card > .card-asset { width: 130px; top: -22px; right: -22px; }
+    .pricing-card > .card-asset { width: 130px; top: -8px; right: -8px; }
   }
   .pricing-card:hover {
     border-color: rgba(255,255,255,.12);
@@ -88,10 +88,10 @@ const currencies = ['GBP', 'EUR', 'BRL'] as const;
   .pricing-pill {
     display: inline-block;
     padding: 4px 12px;
-    border-radius: 999px;
+    border-radius: 8px;
     font-size: 12px;
     font-weight: 700;
-    letter-spacing: .08em;
+    letter-spacing: 0;
     text-transform: uppercase;
     background: rgba(109,94,252,.12);
     border: 1px solid rgba(109,94,252,.3);
@@ -101,7 +101,7 @@ const currencies = ['GBP', 'EUR', 'BRL'] as const;
   .pricing-card__name {
     font-size: 22px;
     font-weight: 800;
-    letter-spacing: -.02em;
+    letter-spacing: 0;
     margin: 0 0 6px;
   }
   .pricing-card__desc {
@@ -118,9 +118,9 @@ const currencies = ['GBP', 'EUR', 'BRL'] as const;
   }
   .pricing-card__price {
     display: block;
-    font-size: clamp(22px, 5vw, 32px);
+    font-size: 28px;
     font-weight: 800;
-    letter-spacing: -.04em;
+    letter-spacing: 0;
     word-break: break-word;
   }
   @media (max-width: 400px) {
@@ -163,7 +163,7 @@ const currencies = ['GBP', 'EUR', 'BRL'] as const;
     justify-content: center;
     padding: 12px;
     min-height: 44px;
-    border-radius: 14px;
+    border-radius: 8px;
     border: 1px solid rgba(255,255,255,.1);
     background: rgba(255,255,255,.04);
     color: rgba(255,255,255,.7);

@@ -57,6 +57,9 @@ const {
     gap: 14px;
   }
   .vx-topbar-left a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     color: rgba(255,255,255,.45);
     font-size: .88rem;
     font-weight: 500;
@@ -68,6 +71,9 @@ const {
   .vx-topbar-brand {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
     justify-self: center;
     text-decoration: none;
   }
@@ -85,6 +91,9 @@ const {
     gap: 14px;
   }
   .vx-topbar-right a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     color: rgba(255,255,255,.45);
     font-size: .88rem;
     font-weight: 500;
@@ -100,11 +109,13 @@ const {
     color: rgba(255,255,255,.45);
     font-size: .78rem;
     font-weight: 700;
-    padding: 5px 10px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 8px 10px;
     cursor: pointer;
     transition: color .15s, border-color .15s;
     text-transform: uppercase;
-    letter-spacing: .06em;
+    letter-spacing: 0;
   }
   .vx-topbar-lang:hover {
     color: #02fdce;
@@ -113,8 +124,10 @@ const {
 
   @media (max-width: 640px) {
     .vx-topbar {
-      grid-template-columns: 1fr 1fr;
+      width: min(var(--content-max, 1100px), 100% - 24px);
+      grid-template-columns: 1fr;
       padding-top: 18px;
+      gap: 8px;
     }
     .vx-topbar-brand {
       grid-column: 1 / -1;
@@ -123,6 +136,11 @@ const {
       margin-bottom: 8px;
     }
     .vx-topbar-left { flex-wrap: wrap; gap: 10px; }
+    .vx-topbar-left,
+    .vx-topbar-right {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
   }
 </style>
 
