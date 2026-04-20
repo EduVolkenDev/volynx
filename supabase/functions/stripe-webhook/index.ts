@@ -296,6 +296,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       // Auto-create a Builder project with the kit's preset
       const presetMap: Record<string, string> = {
         kit_landing_express: "saas",
+        kit_landing_express_personal: "saas",
+        kit_landing_express_commercial: "saas",
+        kit_landing_express_studio: "saas",
         kit_portfolio_personal: "portfolio",
         kit_portfolio_commercial: "portfolio",
         kit_portfolio_studio: "portfolio",

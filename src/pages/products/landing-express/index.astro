@@ -1,0 +1,625 @@
+---
+import PageWidgets from "../../../components/PageWidgets.astro";
+import SiteFooter from "../../../components/SiteFooter.astro";
+import { ROUTES } from "../../../data/routes";
+const pageTitle = "VOLYNX — Landing Express";
+const pageDescription = "Premium conversion-focused landing page, delivered as a live Builder project. Instant Stripe checkout, premium structure, mobile-first.";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,date=no,address=no,email=no" />
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDescription} />
+  <meta property="og:title" content={pageTitle} />
+  <meta property="og:description" content={pageDescription} />
+  <meta property="og:type" content="product" />
+  <meta property="og:url" content="https://volynx.world/products/landing-express/" />
+  <link rel="canonical" href="https://volynx.world/products/landing-express/" />
+
+  <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="shortcut icon" href="/assets/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Volynx" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <style>
+    :root {
+      --bg-primary: #0a0a0f; --bg-secondary: #131318; --bg-card: rgba(19, 19, 24, 0.6);
+      --neon-cyan: #00f3ff; --neon-purple: #b400ff; --neon-pink: #ff00ff;
+      --neon-blue: #0066ff; --neon-green: #00ff88; --neon-orange: #ff6b00;
+      --text-primary: #ffffff; --text-secondary: rgba(255,255,255,0.75); --text-muted: rgba(255,255,255,0.5);
+      --border-color: rgba(0,243,255,0.2); --border-glow: rgba(0,243,255,0.5);
+      --space-xs: 8px; --space-sm: 12px; --space-md: 16px; --space-lg: 24px;
+      --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px; --space-4xl: 96px;
+      --font-base: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      --glow-sm: 0 0 10px currentColor; --glow-md: 0 0 20px currentColor; --glow-lg: 0 0 40px currentColor;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { overflow-x: hidden; scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-base); background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; min-height: 100vh; }
+
+    .cyber-grid { position: fixed; inset: 0; z-index: 0; pointer-events: none; background-image: linear-gradient(rgba(0,243,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,243,255,0.05) 1px, transparent 1px); background-size: 40px 40px; animation: gridPulse 3s ease-in-out infinite; }
+    @keyframes gridPulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
+
+    .neon-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.3; animation: float 20s ease-in-out infinite; }
+    .orb-1 { width: 400px; height: 400px; background: radial-gradient(circle, var(--neon-cyan), transparent); top: 10%; left: 10%; }
+    .orb-2 { width: 500px; height: 500px; background: radial-gradient(circle, var(--neon-purple), transparent); top: 50%; right: 10%; animation-delay: 7s; }
+    .orb-3 { width: 350px; height: 350px; background: radial-gradient(circle, var(--neon-pink), transparent); bottom: 10%; left: 50%; animation-delay: 14s; }
+    @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; } 33% { transform: translate(50px, -30px) scale(1.1); opacity: 0.4; } 66% { transform: translate(-30px, 40px) scale(0.9); opacity: 0.35; } }
+
+    .top-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(10,10,15,0.85); backdrop-filter: blur(24px); border-bottom: 1px solid var(--border-color); box-shadow: 0 4px 32px rgba(0,243,255,0.15); }
+    .nav-container { max-width: 1400px; margin: 0 auto; padding: var(--space-md) var(--space-lg); display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); }
+    .nav-logo { display: flex; align-items: center; gap: var(--space-sm); z-index: 1001; }
+    .logo-icon { width: 32px; height: 32px; color: var(--neon-cyan); filter: drop-shadow(0 0 8px var(--neon-cyan)); }
+    .logo-text { font-size: 18px; font-weight: 900; letter-spacing: 2px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .mobile-menu-btn { display: flex; flex-direction: column; gap: 5px; background: transparent; border: none; cursor: pointer; padding: var(--space-xs); z-index: 1001; }
+    .menu-bar { width: 24px; height: 2px; background: var(--neon-cyan); border-radius: 2px; transition: var(--transition); box-shadow: 0 0 10px currentColor; }
+    .mobile-menu-btn.active .menu-bar:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .mobile-menu-btn.active .menu-bar:nth-child(2) { opacity: 0; }
+    .mobile-menu-btn.active .menu-bar:nth-child(3) { transform: rotate(-45deg) translate(7px, -7px); }
+    .nav-links { position: fixed; top: 70px; left: 0; right: 0; background: rgba(10,10,15,0.98); backdrop-filter: blur(24px); border-bottom: 1px solid var(--border-color); padding: var(--space-lg); display: flex; flex-direction: column; gap: var(--space-sm); transform: translateY(-100%); opacity: 0; transition: var(--transition); pointer-events: none; }
+    .nav-links.active { transform: translateY(0); opacity: 1; pointer-events: all; }
+    .nav-link { display: flex; align-items: center; justify-content: space-between; padding: var(--space-md); background: rgba(255,255,255,0.02); border: 1px solid rgba(0,243,255,0.15); border-radius: 12px; color: var(--text-primary); text-decoration: none; font-size: 16px; font-weight: 500; transition: var(--transition); }
+    .nav-link:hover { background: rgba(0,243,255,0.08); border-color: var(--neon-cyan); box-shadow: 0 0 24px rgba(0,243,255,0.25); }
+    .nav-arrow { color: var(--neon-cyan); font-size: 20px; transition: var(--transition); }
+    .nav-link:hover .nav-arrow { transform: translateX(4px); }
+
+    .main-content { position: relative; z-index: 10; padding-top: 70px; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 0 var(--space-lg); }
+
+    .hero-section { position: relative; padding: var(--space-4xl) 0 var(--space-3xl); overflow: hidden; }
+    .hero-glow { position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 400px; height: 400px; background: radial-gradient(circle, rgba(0,243,255,0.85) 30%, transparent 100%); filter: blur(100px); pointer-events: none; animation: glowPulse 5s ease-in-out infinite; }
+    @keyframes glowPulse { 0%, 100% { opacity: 0.3; transform: translateX(-50%) scale(1); } 50% { opacity: 0.5; transform: translateX(-50%) scale(1.2); } }
+
+    .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: 14px; color: var(--text-muted); margin-bottom: var(--space-lg); }
+    .breadcrumb a { color: var(--neon-cyan); text-decoration: none; transition: var(--transition); }
+    .breadcrumb a:hover { color: var(--text-primary); text-shadow: 0 0 10px currentColor; }
+    .breadcrumb-sep { color: var(--text-muted); }
+
+    .product-badge { display: inline-flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); background: rgba(0,243,255,0.08); border: 2px solid rgba(0,243,255,0.3); border-radius: 100px; font-size: 13px; font-weight: 700; letter-spacing: 2px; color: var(--neon-cyan); margin-bottom: var(--space-xl); box-shadow: 0 0 30px rgba(0,243,255,0.3); }
+    .badge-icon { width: 20px; height: 20px; color: var(--neon-cyan); animation: spin 8s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    .hero-title { font-size: clamp(40px, 10vw, 80px); font-weight: 900; line-height: 1.1; margin-bottom: var(--space-lg); display: flex; flex-direction: column; gap: var(--space-xs); }
+    .title-main { color: var(--text-primary); text-shadow: 0 0 20px rgba(255,255,255,0.3); }
+    .title-gradient { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; filter: drop-shadow(0 0 40px var(--neon-cyan)); animation: gradientShift 5s ease infinite; }
+    @keyframes gradientShift { 0%, 100% { filter: drop-shadow(0 0 40px var(--neon-cyan)); } 50% { filter: drop-shadow(0 0 40px var(--neon-purple)); } }
+
+    .hero-description { font-size: clamp(16px, 3vw, 22px); color: var(--text-secondary); max-width: 700px; margin-bottom: var(--space-xl); line-height: 1.7; }
+
+    .feature-pills { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-bottom: var(--space-xl); }
+    .pill { display: inline-flex; align-items: center; gap: var(--space-xs); padding: var(--space-sm) var(--space-md); background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2); border-radius: 100px; font-size: 13px; font-weight: 500; color: var(--text-secondary); transition: var(--transition); }
+    .pill:hover { background: rgba(0,243,255,0.1); border-color: var(--neon-cyan); color: var(--neon-cyan); box-shadow: 0 0 20px rgba(0,243,255,0.3); transform: translateY(-2px); }
+    .pill-icon { width: 14px; height: 14px; color: var(--neon-cyan); }
+
+    .hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-md); margin-bottom: var(--space-2xl); }
+
+    .btn { display: inline-flex; align-items: center; gap: var(--space-sm); padding: var(--space-md) var(--space-xl); border-radius: 12px; font-size: 16px; font-weight: 700; text-decoration: none; transition: var(--transition); cursor: pointer; border: 2px solid transparent; position: relative; overflow: hidden; }
+    .btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); transform: translateX(-100%); transition: transform 0.6s; }
+    .btn:hover::before { transform: translateX(100%); }
+    .btn-primary { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue)); color: #000; box-shadow: 0 4px 32px rgba(0,243,255,0.5); }
+    .btn-primary:hover { box-shadow: 0 8px 48px rgba(0,243,255,0.7); transform: translateY(-3px); }
+    .btn-secondary { background: transparent; border-color: var(--border-color); color: var(--text-primary); }
+    .btn-secondary:hover { border-color: var(--neon-cyan); background: rgba(0,243,255,0.1); box-shadow: 0 0 24px rgba(0,243,255,0.3); }
+    .btn-icon { width: 16px; height: 16px; transition: var(--transition); }
+    .btn:hover .btn-icon { transform: translateX(4px); }
+
+    .highlights-section, .problem-section, .solution-section, .scope-section, .proof-section, .licenses-section, .faq-section { padding: var(--space-4xl) 0; position: relative; }
+    .section-header { text-align: center; margin-bottom: var(--space-3xl); }
+    .section-title { font-size: clamp(32px, 6vw, 56px); font-weight: 900; margin-bottom: var(--space-md); position: relative; display: inline-block; }
+    .title-line { position: absolute; bottom: -8px; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent); box-shadow: 0 0 10px var(--neon-cyan); }
+    .section-subtitle { font-size: clamp(16px, 3vw, 18px); color: var(--text-secondary); max-width: 700px; margin: 0 auto; line-height: 1.7; }
+
+    .highlights-grid, .problem-grid, .solution-grid, .proof-grid { display: grid; grid-template-columns: 1fr; gap: var(--space-xl); }
+    .scope-grid { display: grid; grid-template-columns: 1fr; gap: var(--space-xl); }
+
+    .highlight-card, .problem-card, .solution-card, .proof-card, .scope-card { position: relative; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(0,243,255,0.2); border-radius: 24px; padding: var(--space-2xl); transition: var(--transition); overflow: hidden; }
+    .card-glow { position: absolute; inset: -100%; background: radial-gradient(circle at center, rgba(0,243,255,0.15) 0%, transparent 60%); opacity: 0; transition: opacity 0.6s; pointer-events: none; }
+    .highlight-card:hover .card-glow, .problem-card:hover .card-glow, .solution-card:hover .card-glow, .proof-card:hover .card-glow, .scope-card:hover .card-glow { opacity: 1; }
+    .highlight-card:hover, .problem-card:hover, .solution-card:hover, .proof-card:hover, .scope-card:hover { border-color: var(--neon-cyan); box-shadow: 0 0 40px rgba(0,243,255,0.3), inset 0 0 80px rgba(0,243,255,0.05); transform: translateY(-6px); }
+
+    .card-icon-wrapper { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background: rgba(0,243,255,0.1); border: 2px solid rgba(0,243,255,0.3); border-radius: 16px; margin-bottom: var(--space-lg); transition: var(--transition); }
+    .card-icon { width: 32px; height: 32px; color: var(--neon-cyan); transition: var(--transition); }
+    .highlight-card:hover .card-icon-wrapper, .problem-card:hover .card-icon-wrapper, .solution-card:hover .card-icon-wrapper, .scope-card:hover .card-icon-wrapper { background: rgba(0,243,255,0.15); border-color: var(--neon-cyan); box-shadow: 0 0 30px rgba(0,243,255,0.4); }
+    .highlight-card:hover .card-icon, .problem-card:hover .card-icon, .solution-card:hover .card-icon, .scope-card:hover .card-icon { transform: scale(1.1) rotate(5deg); filter: drop-shadow(0 0 10px currentColor); }
+
+    .card-title { font-size: clamp(22px, 4vw, 28px); font-weight: 800; margin-bottom: var(--space-md); }
+    .card-description { color: var(--text-secondary); font-size: clamp(15px, 2.5vw, 17px); line-height: 1.6; }
+    .card-list { list-style: none; display: flex; flex-direction: column; gap: var(--space-md); }
+    .card-list li { display: flex; align-items: flex-start; gap: var(--space-sm); color: var(--text-secondary); font-size: clamp(15px, 2.5vw, 17px); line-height: 1.6; }
+    .check-icon { width: 20px; height: 20px; color: var(--neon-green); flex-shrink: 0; margin-top: 2px; filter: drop-shadow(0 0 8px var(--neon-green)); }
+
+    .proof-metric { font-size: clamp(36px, 7vw, 56px); font-weight: 900; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; margin-bottom: var(--space-md); }
+    .proof-logo-row { margin-top: var(--space-2xl); display: flex; justify-content: center; }
+    .proof-logo-pill { display: inline-flex; align-items: center; gap: var(--space-sm); padding: var(--space-md) var(--space-xl); background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2); border-radius: 100px; color: var(--text-primary); text-decoration: none; font-weight: 600; transition: var(--transition); }
+    .proof-logo-pill:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); background: rgba(0,243,255,0.05); box-shadow: 0 0 24px rgba(0,243,255,0.3); }
+
+    .licenses-grid { display: grid; grid-template-columns: 1fr; gap: var(--space-xl); }
+    .license-card { position: relative; background: var(--bg-card); backdrop-filter: blur(10px); border: 2px solid rgba(0,243,255,0.2); border-radius: 24px; padding: var(--space-2xl); transition: var(--transition); overflow: hidden; display: flex; flex-direction: column; }
+    .license-card:hover { border-color: var(--neon-cyan); box-shadow: 0 0 50px rgba(0,243,255,0.4), inset 0 0 100px rgba(0,243,255,0.05); transform: translateY(-8px); }
+    .license-featured { border-color: var(--neon-purple); background: linear-gradient(135deg, rgba(180,0,255,0.05), rgba(255,0,255,0.03)); }
+    .license-featured:hover { border-color: var(--neon-pink); box-shadow: 0 0 60px rgba(255,0,255,0.5), inset 0 0 120px rgba(255,0,255,0.08); }
+    .popular-badge { position: absolute; top: var(--space-lg); right: var(--space-lg); display: flex; align-items: center; gap: var(--space-xs); padding: var(--space-xs) var(--space-md); background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink)); border-radius: 100px; font-size: 11px; font-weight: 800; letter-spacing: 1px; box-shadow: 0 0 30px rgba(255,0,255,0.6); animation: badgePulse 2s ease-in-out infinite; }
+    @keyframes badgePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    .popular-badge svg { width: 14px; height: 14px; }
+    .license-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-lg); }
+    .license-badge { padding: var(--space-xs) var(--space-md); background: rgba(0,243,255,0.1); border: 1px solid rgba(0,243,255,0.3); border-radius: 100px; font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: var(--neon-cyan); }
+    .license-price { display: flex; align-items: baseline; gap: 4px; }
+    .amount { font-size: clamp(32px, 5vw, 42px); font-weight: 900; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .license-name { font-size: clamp(24px, 4vw, 32px); font-weight: 800; margin-bottom: var(--space-lg); }
+    .license-features { list-style: none; display: flex; flex-direction: column; gap: var(--space-md); margin-bottom: var(--space-xl); flex: 1; }
+    .license-features li { display: flex; align-items: flex-start; gap: var(--space-sm); color: var(--text-secondary); font-size: clamp(15px, 2.5vw, 17px); line-height: 1.6; }
+    .btn-license { width: 100%; justify-content: center; padding: var(--space-lg) var(--space-xl); background: rgba(0,243,255,0.1); border: 2px solid var(--neon-cyan); color: var(--neon-cyan); }
+    .btn-license:hover { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue)); color: #000; box-shadow: 0 8px 48px rgba(0,243,255,0.6); }
+    .btn-featured { background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink)); border-color: var(--neon-pink); color: #000; box-shadow: 0 4px 32px rgba(255,0,255,0.4); }
+    .btn-featured:hover { box-shadow: 0 8px 56px rgba(255,0,255,0.7); }
+
+    .faq-grid { display: grid; grid-template-columns: 1fr; gap: var(--space-lg); max-width: 900px; margin: 0 auto; }
+    .faq-item { display: flex; gap: var(--space-lg); padding: var(--space-xl); background: rgba(255,255,255,0.02); border: 1px solid rgba(0,243,255,0.15); border-radius: 20px; transition: var(--transition); }
+    .faq-item:hover { background: rgba(0,243,255,0.05); border-color: var(--neon-cyan); box-shadow: 0 0 30px rgba(0,243,255,0.2); transform: translateX(4px); }
+    .faq-icon { width: 40px; height: 40px; color: var(--neon-cyan); flex-shrink: 0; filter: drop-shadow(0 0 10px currentColor); }
+    .faq-content { flex: 1; }
+    .faq-question { font-size: clamp(17px, 3vw, 20px); font-weight: 700; margin-bottom: var(--space-sm); }
+    .faq-answer { color: var(--text-secondary); font-size: clamp(15px, 2.5vw, 17px); line-height: 1.6; margin: 0; }
+
+    .cta-section { padding: var(--space-4xl) 0; position: relative; overflow: hidden; }
+    .cta-content { position: relative; text-align: center; padding: var(--space-4xl) var(--space-xl); background: linear-gradient(135deg, rgba(0,243,255,0.08), rgba(180,0,255,0.05)); border: 2px solid rgba(0,243,255,0.3); border-radius: 32px; backdrop-filter: blur(10px); overflow: hidden; }
+    .cta-glow { position: absolute; top: -50%; left: 50%; transform: translateX(-50%); width: 500px; height: 500px; background: radial-gradient(circle, rgba(0,243,255,0.3) 0%, transparent 70%); filter: blur(80px); pointer-events: none; animation: ctaGlow 5s ease-in-out infinite; }
+    @keyframes ctaGlow { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.7; } }
+    .cta-title { font-size: clamp(32px, 7vw, 56px); font-weight: 900; margin-bottom: var(--space-md); background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .cta-description { font-size: clamp(16px, 3vw, 20px); color: var(--text-secondary); max-width: 600px; margin: 0 auto var(--space-xl); line-height: 1.7; }
+    .btn-cta { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue)); color: #000; font-size: 18px; padding: var(--space-lg) var(--space-2xl); box-shadow: 0 8px 48px rgba(0,243,255,0.5); }
+    .btn-cta:hover { box-shadow: 0 12px 64px rgba(0,243,255,0.8); transform: translateY(-4px) scale(1.05); }
+
+    @media (min-width: 768px) {
+      .mobile-menu-btn { display: none; }
+      .nav-links { position: static; flex-direction: row; gap: var(--space-sm); transform: none; opacity: 1; pointer-events: all; padding: 0; background: transparent; border: none; }
+      .nav-link { padding: var(--space-sm) var(--space-md); font-size: 14px; }
+      .highlights-grid { grid-template-columns: repeat(2, 1fr); }
+      .problem-grid, .solution-grid, .proof-grid { grid-template-columns: repeat(3, 1fr); }
+      .scope-grid { grid-template-columns: repeat(2, 1fr); }
+      .faq-grid { grid-template-columns: repeat(2, 1fr); }
+      .licenses-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1024px) {
+      .hero-section { padding: 120px 0 var(--space-4xl); }
+      .licenses-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
+    *:focus-visible { outline: 2px solid var(--neon-cyan); outline-offset: 4px; border-radius: 4px; }
+  </style>
+</head>
+
+<body>
+  <div class="cyber-grid" aria-hidden="true"></div>
+  <div class="neon-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <header class="top-nav" aria-label="VOLYNX menu">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M12 2L2 7L12 12L22 7L12 2Z" /><path d="M2 17L12 22L22 17" /><path d="M2 12L12 17L22 12" />
+        </svg>
+        <span class="logo-text">VOLYNX</span>
+      </div>
+      <button class="mobile-menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false">
+        <span class="menu-bar"></span><span class="menu-bar"></span><span class="menu-bar"></span>
+      </button>
+      <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
+        <a href={ROUTES.lab} class="nav-link"><span>Volynx.Lab</span><span class="nav-arrow" aria-hidden="true">→</span></a>
+        <a href={ROUTES.products} class="nav-link"><span>Products</span><span class="nav-arrow" aria-hidden="true">→</span></a>
+        <a href={ROUTES.home} class="nav-link"><span>Home</span><span class="nav-arrow" aria-hidden="true">→</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <section class="hero-section">
+      <div class="hero-glow"></div>
+      <div class="container">
+        <div class="breadcrumb">
+          <a href={ROUTES.products}>Products</a>
+          <span class="breadcrumb-sep">→</span>
+          <span data-i18n="le.breadcrumb">Landing Express</span>
+        </div>
+        <div class="product-badge">
+          <span class="badge-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+            </svg>
+          </span>
+          <span data-i18n="le.badge">LANDING EXPRESS</span>
+        </div>
+        <h1 class="hero-title">
+          <span class="title-main" data-i18n="le.title_main">Landing</span>
+          <span class="title-gradient" data-i18n="le.title_gradient">Express</span>
+        </h1>
+        <p class="hero-description" data-i18n="le.desc">Premium conversion-focused landing page, delivered as a live Builder project. Clean sections, Stripe-ready structure, mobile-first — shipped to your dashboard the moment checkout clears.</p>
+        <div class="feature-pills">
+          <span class="pill" data-i18n="le.pill_premium"><svg class="pill-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2L4 6L8 10L12 6L8 2Z" /></svg>Premium</span>
+          <span class="pill" data-i18n="le.pill_conversion"><svg class="pill-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2L4 6L8 10L12 6L8 2Z" /></svg>Conversion-first</span>
+          <span class="pill" data-i18n="le.pill_instant"><svg class="pill-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2L4 6L8 10L12 6L8 2Z" /></svg>Instant Builder delivery</span>
+        </div>
+        <div class="hero-actions">
+          <a href="#licenses" class="btn btn-primary">
+            <span data-i18n="le.btn_buy">Buy Landing Express</span>
+            <svg class="btn-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M6 3L11 8L6 13" /></svg>
+          </a>
+          <a href={ROUTES.products} class="btn btn-secondary"><span data-i18n="le.btn_back">← Back to Products</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="highlights-section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title" data-i18n="le.highlights_title"><span class="title-line"></span>Highlights</h2>
+        </div>
+        <div class="highlights-grid">
+          <div class="highlight-card">
+            <div class="card-glow"></div>
+            <div class="card-icon-wrapper">
+              <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+              </svg>
+            </div>
+            <h3 class="card-title" data-i18n="le.get_title">What You Get</h3>
+            <ul class="card-list">
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.get_i1">1 conversion-focused landing page (all core sections)</span></li>
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.get_i2">Live Builder project auto-created at purchase</span></li>
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.get_i3">Mobile-first, performance-optimised structure</span></li>
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.get_i4">Basic SEO (title, description, heading hierarchy)</span></li>
+            </ul>
+          </div>
+          <div class="highlight-card">
+            <div class="card-glow"></div>
+            <div class="card-icon-wrapper">
+              <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18M9 3v18" />
+              </svg>
+            </div>
+            <h3 class="card-title" data-i18n="le.inside_title">What's Inside</h3>
+            <ul class="card-list">
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.inside_i1">Hero, proof, features, pricing, FAQ and CTA sections</span></li>
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.inside_i2">Copy framework ready to fill in</span></li>
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.inside_i3">Stripe CTA slots and Formspree contact hook</span></li>
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.inside_i4">Smooth anchors and scannable navigation</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="problem-section" id="problem">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title" data-i18n="le.pain_title"><span class="title-line"></span>The problem isn't your traffic. It's the leak.</h2>
+          <p class="section-subtitle" data-i18n="le.pain_desc">When a visitor lands and doesn't instantly understand the value, the page becomes a leaky funnel — one that burns budget and time.</p>
+        </div>
+        <div class="problem-grid">
+          <div class="problem-card">
+            <div class="card-glow"></div>
+            <div class="card-icon-wrapper">
+              <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" /></svg>
+            </div>
+            <h3 class="card-title" data-i18n="le.pain_card1_title">No hierarchy</h3>
+            <p class="card-description" data-i18n="le.pain_card1_desc">Good-looking design with no direction. The visitor doesn't know where to click or why.</p>
+          </div>
+          <div class="problem-card">
+            <div class="card-glow"></div>
+            <div class="card-icon-wrapper">
+              <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" /><line x1="12" y1="18" x2="12.01" y2="18" /></svg>
+            </div>
+            <h3 class="card-title" data-i18n="le.pain_card2_title">Mobile is broken</h3>
+            <p class="card-description" data-i18n="le.pain_card2_desc">Most decisions happen on mobile. If the experience is poor there, conversion dies there.</p>
+          </div>
+          <div class="problem-card">
+            <div class="card-glow"></div>
+            <div class="card-icon-wrapper">
+              <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg>
+            </div>
+            <h3 class="card-title" data-i18n="le.pain_card3_title">Friction everywhere</h3>
+            <p class="card-description" data-i18n="le.pain_card3_desc">Weak CTA, slow load, confusing layout. Doubt wins over the click.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="solution-section" id="solution">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title" data-i18n="le.sol_title"><span class="title-line"></span>Premium design + conversion engineering.</h2>
+          <p class="section-subtitle" data-i18n="le.sol_desc">Straight-line structure: clear promise, proof, scope, strong CTA. No maze, no ten options. One path.</p>
+        </div>
+        <div class="solution-grid">
+          <div class="solution-card">
+            <div class="card-glow"></div>
+            <div class="card-icon-wrapper">
+              <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>
+            </div>
+            <h3 class="card-title" data-i18n="le.sol_card1_title">Conversion</h3>
+            <p class="card-description" data-i18n="le.sol_card1_desc">Copy and layout designed to drive the click — reducing hesitation at every step.</p>
+          </div>
+          <div class="solution-card">
+            <div class="card-glow"></div>
+            <div class="card-icon-wrapper">
+              <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
+            </div>
+            <h3 class="card-title" data-i18n="le.sol_card2_title">Performance</h3>
+            <p class="card-description" data-i18n="le.sol_card2_desc">Fast and lean so load time never kills the buying impulse.</p>
+          </div>
+          <div class="solution-card">
+            <div class="card-glow"></div>
+            <div class="card-icon-wrapper">
+              <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" /><line x1="12" y1="18" x2="12.01" y2="18" /></svg>
+            </div>
+            <h3 class="card-title" data-i18n="le.sol_card3_title">Mobile-first</h3>
+            <p class="card-description" data-i18n="le.sol_card3_desc">Readable, breathable, with CTA always in reach — no broken layouts on small screens.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="scope-section" id="scope">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title" data-i18n="le.scope_title"><span class="title-line"></span>What's included</h2>
+          <p class="section-subtitle" data-i18n="le.scope_desc">A clear, objective scope to launch fast at a premium standard.</p>
+        </div>
+        <div class="scope-grid">
+          <div class="scope-card">
+            <div class="card-glow"></div>
+            <div class="card-icon-wrapper">
+              <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+            </div>
+            <h3 class="card-title" data-i18n="le.scope_delivery_title">Delivery</h3>
+            <ul class="card-list">
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.scope_d1">1 landing page with full conversion structure</span></li>
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.scope_d2">Full responsiveness (mobile, tablet, desktop)</span></li>
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.scope_d3">Performance baseline (assets, loading, core web vitals)</span></li>
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.scope_d4">Basic SEO (title, description, heading hierarchy)</span></li>
+            </ul>
+          </div>
+          <div class="scope-card">
+            <div class="card-glow"></div>
+            <div class="card-icon-wrapper">
+              <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>
+            </div>
+            <h3 class="card-title" data-i18n="le.scope_ops_title">Operations</h3>
+            <ul class="card-list">
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.scope_o1">CTA with Stripe (Payment Link or Buy Button)</span></li>
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.scope_o2">Contact form via Formspree (no broken mailto)</span></li>
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.scope_o3">Social proof blocks (cases, logos, numbers)</span></li>
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.scope_o4">Smooth anchors and page navigation</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="proof-section" id="proof">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title" data-i18n="le.proof_title"><span class="title-line"></span>Premium landings in the wild</h2>
+          <p class="section-subtitle" data-i18n="le.proof_desc">Real project. Studios Valcarce — luxury residential complex landing with bilingual content, custom VOLYNX icons, appointment scheduling and AI chat.</p>
+        </div>
+        <div class="proof-grid">
+          <div class="proof-card">
+            <div class="card-glow"></div>
+            <div class="proof-metric" data-i18n="le.proof_m1_val">Instant</div>
+            <p class="card-description" data-i18n="le.proof_m1_desc">Builder project ships to your dashboard the second payment clears — no human handoff.</p>
+          </div>
+          <div class="proof-card">
+            <div class="card-glow"></div>
+            <div class="proof-metric" data-i18n="le.proof_m2_val">Bilingual</div>
+            <p class="card-description" data-i18n="le.proof_m2_desc">Studios Valcarce shipped EN + ES. Designed to convert international buyers from day one.</p>
+          </div>
+          <div class="proof-card">
+            <div class="card-glow"></div>
+            <div class="proof-metric" data-i18n="le.proof_m3_val">Custom</div>
+            <p class="card-description" data-i18n="le.proof_m3_desc">VOLYNX Icons, on-brand palette, AI chat widget. Every section designed to close.</p>
+          </div>
+        </div>
+        <div class="proof-logo-row">
+          <a class="proof-logo-pill" href="https://eduvolkendev.github.io/Valcarce/" target="_blank" rel="noopener noreferrer">
+            <span data-i18n="le.proof_case">Studios Valcarce</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M6 3L11 8L6 13" /></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="licenses-section" id="licenses">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title" data-i18n="le.licenses_title"><span class="title-line"></span>Choose Your License</h2>
+          <p class="section-subtitle" data-i18n="le.licenses_subtitle">Choose your usage level. Simple. No fine print.</p>
+          <div class="vx-currency-bar" style="margin-top:12px;justify-content:center;"></div>
+        </div>
+        <div class="licenses-grid">
+          <div class="license-card">
+            <div class="card-glow"></div>
+            <div class="license-header">
+              <span class="license-badge">STARTER</span>
+              <div class="license-price"><span class="amount" data-price-gbp="£29" data-price-eur="€35" data-price-brl="R$199">£29</span></div>
+            </div>
+            <h3 class="license-name" data-i18n="le.license_personal_name">Personal</h3>
+            <ul class="license-features">
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.license_personal_f1">1 project</span></li>
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.license_personal_f2">1 user</span></li>
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.license_personal_f3">No redistribution</span></li>
+            </ul>
+            <a class="btn btn-license vx-checkout-btn" href="#" data-lookup="kit_landing_express_personal" data-label="Buy Personal License" data-i18n="le.license_personal_cta">Buy Personal License</a>
+          </div>
+          <div class="license-card license-featured">
+            <div class="card-glow"></div>
+            <div class="popular-badge">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1L10 6L15 6L11 9L13 14L8 11L3 14L5 9L1 6L6 6L8 1Z" /></svg>
+              <span data-i18n="le.license_popular">MOST POPULAR</span>
+            </div>
+            <div class="license-header">
+              <span class="license-badge">PRO</span>
+              <div class="license-price"><span class="amount" data-price-gbp="£49" data-price-eur="€59" data-price-brl="R$349">£49</span></div>
+            </div>
+            <h3 class="license-name" data-i18n="le.license_commercial_name">Commercial</h3>
+            <ul class="license-features">
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.license_commercial_f1">Client delivery allowed</span></li>
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.license_commercial_f2">Final delivery included</span></li>
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.license_commercial_f3">No resale as template</span></li>
+            </ul>
+            <a class="btn btn-license btn-featured vx-checkout-btn" href="#" data-lookup="kit_landing_express_commercial" data-label="Buy Commercial License" data-i18n="le.license_commercial_cta">Buy Commercial License</a>
+          </div>
+          <div class="license-card">
+            <div class="card-glow"></div>
+            <div class="license-header">
+              <span class="license-badge">ENTERPRISE</span>
+              <div class="license-price"><span class="amount" data-price-gbp="£89" data-price-eur="€109" data-price-brl="R$649">£89</span></div>
+            </div>
+            <h3 class="license-name" data-i18n="le.license_studio_name">Studio</h3>
+            <ul class="license-features">
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.license_studio_f1">Multi-seat</span></li>
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.license_studio_f2">Recurring internal use</span></li>
+              <li><svg class="check-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 4L6 11L3 8" /></svg><span data-i18n="le.license_studio_f3">Priority updates</span></li>
+            </ul>
+            <a class="btn btn-license vx-checkout-btn" href="#" data-lookup="kit_landing_express_studio" data-label="Buy Studio License" data-i18n="le.license_studio_cta">Buy Studio License</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq-section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title" data-i18n="le.faq_title"><span class="title-line"></span>FAQ</h2>
+        </div>
+        <div class="faq-grid">
+          <div class="faq-item">
+            <div class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg></div>
+            <div class="faq-content"><h3 class="faq-question" data-i18n="le.faq1_q">How fast does my project arrive?</h3><p class="faq-answer" data-i18n="le.faq1_a">Instantly. Once checkout clears, a Builder project is auto-created in your dashboard with the Landing Express preset loaded.</p></div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg></div>
+            <div class="faq-content"><h3 class="faq-question" data-i18n="le.faq2_q">Can I publish on Cloudflare Pages?</h3><p class="faq-answer" data-i18n="le.faq2_a">Yes. The Builder export is static HTML/CSS — drop it on any static host.</p></div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg></div>
+            <div class="faq-content"><h3 class="faq-question" data-i18n="le.faq3_q">Can I change colors and typography?</h3><p class="faq-answer" data-i18n="le.faq3_a">Yes. Builder exposes tokens for palette, spacing and type. Everything is editable before export.</p></div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg></div>
+            <div class="faq-content"><h3 class="faq-question" data-i18n="le.faq4_q">What if I need something bigger?</h3><p class="faq-answer" data-i18n="le.faq4_a">Upgrade to the Studio license or pair Landing Express with a VOLYNX service plan — full scope, custom design, priority pipeline.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="container">
+        <div class="cta-content">
+          <div class="cta-glow"></div>
+          <h2 class="cta-title" data-i18n="le.cta_title">Ready to Launch?</h2>
+          <p class="cta-description" data-i18n="le.cta_desc">Pick your license and your Builder project lands in your dashboard instantly.</p>
+          <a href="#licenses" class="btn btn-cta">
+            <span data-i18n="le.cta_btn">Choose License</span>
+            <svg class="btn-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M3 8L8 3L13 8M8 3V13" /></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const menuBtn = document.getElementById('menuBtn');
+    const navLinks = document.getElementById('navLinks');
+
+    menuBtn?.addEventListener('click', () => {
+      const isOpen = navLinks?.classList.toggle('active');
+      menuBtn?.classList.toggle('active');
+      menuBtn?.setAttribute('aria-expanded', String(!!isOpen));
+    });
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.querySelector(anchor.getAttribute('href') ?? '');
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          navLinks?.classList.remove('active');
+          menuBtn?.classList.remove('active');
+          menuBtn?.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+  </script>
+
+  <script is:inline>
+(function() {
+  document.querySelectorAll('.vx-checkout-btn').forEach(function(btn) {
+    btn.addEventListener('click', async function(e) {
+      e.preventDefault();
+      var lookupBase = btn.dataset.lookup;
+      if (!lookupBase) return;
+
+      var token = localStorage.getItem('volynx_access_token');
+      if (!token) {
+        window.location.href = '/login/?next=' + encodeURIComponent(window.location.pathname);
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
+
+      try {
+        var cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r) { return r.json(); });
+        var apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
+
+        var currency = (localStorage.getItem('volynx_currency') || 'gbp').toLowerCase();
+        var lookupKey = lookupBase + '_' + currency;
+
+        var res = await fetch(apiBase + '/create-checkout-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+          body: JSON.stringify({
+            lookup_key: lookupKey,
+            success_url: window.location.origin + '/profile/?payment=success',
+            cancel_url: window.location.href + '?payment=cancelled'
+          })
+        });
+
+        var data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          alert(data.error || 'Checkout failed. Please try again.');
+          btn.disabled = false;
+          btn.textContent = btn.dataset.label || 'Buy now';
+        }
+      } catch (err) {
+        alert('Connection error. Please try again.');
+        btn.disabled = false;
+        btn.textContent = btn.dataset.label || 'Buy now';
+      }
+    });
+  });
+})();
+  </script>
+
+  <SiteFooter />
+  <PageWidgets />
+  <script is:inline src="/js/vx-currency.js"></script>
+  <script is:inline src="/scripts/kit-checkout.js" defer></script>
+</body>
+</html>
