@@ -33,7 +33,7 @@ export const ROUTES = {
   saasSystem: "/products/saas-landing-system/",
   propertyflow: "/products/propertyflow/",
   iconsStore: "/products/volynx-icons-store/",
-  landingExpress: "/products/landing-express/",
+  landingExpress: "/products/saas-landing-system/",
 
   // ── Services ──────────────────────────
   services: "/services/",

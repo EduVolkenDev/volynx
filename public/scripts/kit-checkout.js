@@ -4,7 +4,7 @@
  * to the lookup_key, and calls /create-checkout-session.
  *
  * Usage:
- *   <a class="btn vx-checkout-btn" data-lookup="kit_portfolio_personal" data-label="Buy Personal License">Buy Personal — £39</a>
+ *   <a class="btn vx-checkout-btn" data-lookup="kit_portfolio_personal" data-label="Buy Starter">Buy Starter — £39</a>
  *
  * Requirements:
  *   - /config.json must expose functionsUrl (or apiBaseUrl)
