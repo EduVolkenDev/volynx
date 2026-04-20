@@ -61,7 +61,14 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     .featured-title { font-size: clamp(24px,4vw,32px); font-weight: 900; background: linear-gradient(135deg, #fff 0%, #4fc3f7 50%, #7c4dff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 0; }
     .featured-subtitle { font-size: 12px; color: #546e7a; letter-spacing: 2px; text-transform: uppercase; margin: 0; }
 
-    .featured-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 14px; max-width: 1100px; margin: 0 auto; padding: 0 clamp(12px,3vw,24px); }
+    .featured-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 14px; max-width: 1100px; margin: 0 auto; padding: 0 clamp(12px,3vw,24px); position: relative; }
+    /* Collapsed state: hide cards beyond the first 12, fade-mask the bottom of the visible set */
+    .featured-grid[data-expanded="false"] .featured-card:nth-child(n+13) { display: none; }
+    .featured-toggle-row { display: flex; justify-content: center; margin-top: clamp(18px,3vw,28px); }
+    .featured-toggle { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 999px; background: rgba(79,195,247,0.08); border: 1px solid rgba(79,195,247,0.25); color: #4fc3f7; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease; font-family: inherit; }
+    .featured-toggle:hover { background: rgba(79,195,247,0.14); border-color: rgba(79,195,247,0.5); box-shadow: 0 0 24px rgba(79,195,247,0.2); }
+    .featured-toggle-icon { transition: transform 0.25s ease; }
+    .featured-grid[data-expanded="true"] + .featured-toggle-row .featured-toggle-icon { transform: rotate(180deg); }
     .featured-card {
       position: relative;
       background: linear-gradient(145deg, #0d1117 0%, #111827 100%);
@@ -248,7 +255,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         <h2 class="featured-title" data-i18n="icons.featured_title">Featured icons</h2>
         <p class="featured-subtitle" data-i18n="icons.featured_subtitle">Premium · Textured · Futuristic</p>
       </div>
-      <div class="featured-grid">
+      <div class="featured-grid" id="featuredGrid" data-expanded="false">
         <button type="button" class="featured-card" data-featured-filter="futuristic">
           <span class="featured-badge new">NEW</span>
           <div class="featured-svg-wrap">
@@ -998,6 +1005,12 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
           <span class="featured-label">Atom</span>
         </button>
       </div>
+      <div class="featured-toggle-row">
+        <button type="button" id="featuredToggleBtn" class="featured-toggle" aria-expanded="false" aria-controls="featuredGrid">
+          <span class="featured-toggle-label" data-i18n="icons.featured_show_more">Show all featured icons</span>
+          <svg class="featured-toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
     </section>
 
     <!-- Gallery Section -->
@@ -1629,6 +1642,33 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
           }
         });
       });
+
+      // Featured Icons toggle (show 12 initially, expand to all 40)
+      const featuredGrid = document.getElementById("featuredGrid");
+      const featuredToggleBtn = document.getElementById("featuredToggleBtn");
+      if (featuredGrid && featuredToggleBtn) {
+        const labelEl = featuredToggleBtn.querySelector(".featured-toggle-label") as HTMLElement | null;
+        const LABELS = {
+          en: { show: "Show all featured icons", hide: "Show fewer" },
+          pt: { show: "Ver todos os ícones em destaque", hide: "Ver menos" },
+        };
+        function lang(): "en" | "pt" {
+          return localStorage.getItem("volynx_lang") === "pt" ? "pt" : "en";
+        }
+        function syncLabel() {
+          if (!labelEl) return;
+          const expanded = featuredGrid!.dataset.expanded === "true";
+          labelEl.textContent = expanded ? LABELS[lang()].hide : LABELS[lang()].show;
+        }
+        syncLabel();
+        featuredToggleBtn.addEventListener("click", () => {
+          const expanded = featuredGrid.dataset.expanded === "true";
+          featuredGrid.dataset.expanded = expanded ? "false" : "true";
+          featuredToggleBtn.setAttribute("aria-expanded", String(!expanded));
+          syncLabel();
+        });
+        window.addEventListener("vx:lang-changed", syncLabel);
+      }
     }
 
     // ===== MODAL =====
