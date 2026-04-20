@@ -55,14 +55,84 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     .soon-panel p:not(.soon-kicker) { margin: 0 auto 18px; max-width: 620px; color: rgba(255,255,255,.66); line-height: 1.7; }
 
     /* ── Featured Icons showcase (neon premium cards) ── */
-    .featured-section { padding: clamp(40px,6vw,64px) 0 clamp(24px,4vw,40px); position: relative; }
-    .featured-section .section-header { display: flex; flex-direction: column; gap: 8px; align-items: center; text-align: center; margin-bottom: clamp(24px,4vw,40px); }
+    .featured-section {
+      padding: clamp(48px,6vw,72px) 0 clamp(28px,4vw,44px);
+      position: relative;
+    }
+    .featured-section::before {
+      content: "";
+      position: absolute;
+      inset: 10% 5% auto;
+      height: 70%;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 12% 20%, rgba(124,77,255,.18), transparent 28%),
+        radial-gradient(circle at 85% 12%, rgba(79,195,247,.18), transparent 24%),
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border: 1px solid rgba(255,255,255,.06);
+      pointer-events: none;
+    }
+    .featured-shell {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+      gap: clamp(24px, 4vw, 40px);
+      align-items: start;
+    }
+    .featured-intro {
+      position: sticky;
+      top: 104px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: clamp(20px, 2.5vw, 28px);
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(11,14,28,.92), rgba(9,11,22,.82));
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 22px 46px rgba(0,0,0,.22);
+    }
     .featured-brand { font-size: 11px; font-weight: 700; letter-spacing: 8px; color: #4fc3f7; text-transform: uppercase; opacity: 0.8; margin: 0; }
-    .featured-title { font-size: clamp(24px,4vw,32px); font-weight: 900; background: linear-gradient(135deg, #fff 0%, #4fc3f7 50%, #7c4dff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 0; }
-    .featured-subtitle { font-size: 12px; color: #546e7a; letter-spacing: 2px; text-transform: uppercase; margin: 0; }
-
-    .featured-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 14px; max-width: 1100px; margin: 0 auto; padding: 0 clamp(12px,3vw,24px); position: relative; }
-    /* Collapsed state: hide cards beyond the first 12, fade-mask the bottom of the visible set */
+    .featured-title { font-size: clamp(28px,4vw,38px); line-height: 1.05; font-weight: 900; background: linear-gradient(135deg, #fff 0%, #4fc3f7 42%, #7c4dff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 0; }
+    .featured-subtitle { font-size: 12px; color: #8e99b7; letter-spacing: 1.4px; text-transform: uppercase; margin: 0; }
+    .featured-deck { margin: 0; color: rgba(255,255,255,.72); line-height: 1.75; }
+    .featured-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .featured-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      color: rgba(255,255,255,.72);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1;
+    }
+    .featured-actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 4px; }
+    .featured-stage {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0;
+    }
+    .featured-stage-note {
+      margin: 0;
+      padding: 0 6px;
+      color: rgba(255,255,255,.6);
+      font-size: .94rem;
+      line-height: 1.6;
+    }
+    .featured-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(136px, 1fr));
+      gap: 14px;
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 0;
+      position: relative;
+    }
+    /* Collapsed state: hide cards beyond the first 12 */
     .featured-grid[data-expanded="false"] .featured-card:nth-child(n+13) { display: none; }
     .featured-toggle-row { display: flex; justify-content: center; margin-top: clamp(18px,3vw,28px); }
     .featured-toggle { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 999px; background: rgba(79,195,247,0.08); border: 1px solid rgba(79,195,247,0.25); color: #4fc3f7; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease; font-family: inherit; }
@@ -71,24 +141,32 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     .featured-grid[data-expanded="true"] + .featured-toggle-row .featured-toggle-icon { transform: rotate(180deg); }
     .featured-card {
       position: relative;
-      background: linear-gradient(145deg, #0d1117 0%, #111827 100%);
-      border: 1px solid #1a2744;
-      border-radius: 16px;
-      padding: 22px 12px 16px;
+      background:
+        radial-gradient(circle at 16% 14%, rgba(124,77,255,.18), transparent 28%),
+        radial-gradient(circle at 84% 18%, rgba(79,195,247,.18), transparent 25%),
+        linear-gradient(145deg, #0d1117 0%, #111827 100%);
+      border: 1px solid rgba(111,133,170,.24);
+      border-radius: 20px;
+      padding: 24px 12px 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 10px;
       cursor: pointer;
       overflow: hidden;
+      min-height: 138px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .featured-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(79,195,247,0.4), transparent); }
     .featured-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(79, 195, 247, 0.4);
-      background: linear-gradient(145deg, #0d1117 0%, #152035 100%);
-      box-shadow: 0 8px 32px rgba(79, 195, 247, 0.12), 0 0 0 1px rgba(79,195,247,0.15);
+      transform: translateY(-6px);
+      border-color: rgba(79, 195, 247, 0.42);
+      background:
+        radial-gradient(circle at 16% 14%, rgba(124,77,255,.24), transparent 28%),
+        radial-gradient(circle at 84% 18%, rgba(79,195,247,.22), transparent 25%),
+        linear-gradient(145deg, #0d1117 0%, #152035 100%);
+      box-shadow: 0 14px 36px rgba(79, 195, 247, 0.13), 0 0 0 1px rgba(79,195,247,0.15);
     }
     .featured-card.purple::before { background: linear-gradient(90deg, transparent, rgba(124,77,255,0.45), transparent); }
     .featured-card.purple:hover { border-color: rgba(124,77,255,0.4); box-shadow: 0 8px 32px rgba(124,77,255,0.15); }
@@ -99,9 +177,28 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     .featured-card.coral::before { background: linear-gradient(90deg, transparent, rgba(255,112,67,0.45), transparent); }
     .featured-card.coral:hover { border-color: rgba(255,112,67,0.4); box-shadow: 0 8px 32px rgba(255,112,67,0.15); }
 
-    .featured-svg-wrap { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: 18px; position: relative; }
-    .featured-svg-wrap svg { display: block; }
-    .featured-label { font-size: 11px; color: #546e7a; letter-spacing: 0.5px; text-align: center; line-height: 1.3; font-weight: 500; transition: color 0.25s; }
+    .featured-svg-wrap {
+      width: 78px;
+      height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 22px;
+      position: relative;
+      background:
+        radial-gradient(circle at 24% 22%, rgba(124,77,255,.35), transparent 34%),
+        radial-gradient(circle at 76% 24%, rgba(79,195,247,.34), transparent 34%),
+        linear-gradient(180deg, rgba(13,17,31,.92), rgba(8,10,20,.98));
+      border: 1px solid rgba(255,255,255,.06);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 12px 24px rgba(0,0,0,.16);
+    }
+    .featured-svg-wrap svg {
+      display: block;
+      width: 66px;
+      height: 66px;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.22));
+    }
+    .featured-label { font-size: 11px; color: #7c87a5; letter-spacing: 0.5px; text-align: center; line-height: 1.35; font-weight: 600; transition: color 0.25s; }
     .featured-card:hover .featured-label { color: #4fc3f7; }
     .featured-card.purple:hover .featured-label { color: #b39ddb; }
     .featured-card.amber:hover .featured-label { color: #ffb74d; }
@@ -112,6 +209,12 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     .featured-badge.new { background: rgba(79,195,247,0.15); color: #4fc3f7; border: 1px solid rgba(79,195,247,0.3); }
     .featured-badge.hot { background: rgba(255,112,67,0.15); color: #ff7043; border: 1px solid rgba(255,112,67,0.3); }
     .featured-badge.pro { background: rgba(255,183,77,0.15); color: #ffb74d; border: 1px solid rgba(255,183,77,0.3); }
+
+    @media (max-width: 960px) {
+      .featured-shell { grid-template-columns: 1fr; }
+      .featured-intro { position: static; }
+      .featured-stage-note { padding: 0; }
+    }
   </style>
 </head>
 
@@ -216,46 +319,111 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
   <main class="main-content">
     <!-- Hero Section -->
     <section class="hero">
+      <div class="container hero-shell">
+        <div class="hero-copy">
+          <p class="hero-kicker" data-i18n="icons.hero_kicker">Premium Design Assets</p>
+          <div class="hero-brand">
+            <img src="/assets/long-logo-icons.webp" class="hero-long-logo" alt="Volynx Icons Store" />
+          </div>
+          <h1 class="hero-title">
+            <span data-i18n="icons.hero_title_lead">VOLYNX</span>
+            <span class="gradient-text" data-i18n="icons.hero_title_accent">Icon Vault</span>
+          </h1>
+          <p class="hero-description" data-i18n="icons.hero_desc">
+            Premium icon packs, standout neon singles, and full collection previews in one storefront.
+          </p>
+          <div class="hero-actions">
+            <a href="#collections" class="btn btn-primary btn-lg" data-i18n="icons.btn_browse">Browse Icon Packs</a>
+            <a href="#featured" class="btn btn-secondary btn-lg" data-i18n="icons.btn_gallery">View Neon Singles</a>
+          </div>
+          <div class="hero-proof-list">
+            <span class="hero-proof" data-i18n="icons.hero_proof_1">Open packs without leaving the vault</span>
+            <span class="hero-proof" data-i18n="icons.hero_proof_2">Request standout neon icons individually</span>
+            <span class="hero-proof" data-i18n="icons.hero_proof_3">Preview every collection before checkout</span>
+          </div>
+          <div class="hero-stats">
+            <div class="stat">
+              <span class="stat-number" id="heroIconCount">0</span>
+              <span class="stat-label" data-i18n="icons.hero_stat_library">Icons</span>
+            </div>
+            <div class="stat">
+              <span class="stat-number">0</span>
+              <span class="stat-label" data-i18n="icons.hero_stat_packs">Packs</span>
+            </div>
+            <div class="stat">
+              <span class="stat-number" data-i18n="icons.hero_stat_single_value">Neon</span>
+              <span class="stat-label" data-i18n="icons.hero_stat_single_label">Singles</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-scene" aria-hidden="true">
+          <div class="hero-scene-card hero-scene-card--center">
+            <img src="/assets/icons-store/Abstract-Free/icon-neon-premium8.webp" alt="" loading="eager" />
+          </div>
+          <div class="hero-scene-card hero-scene-card--top">
+            <img src="/assets/icons-store/Hyper-Icons-Premium/launch.png" alt="" loading="eager" />
+          </div>
+          <div class="hero-scene-card hero-scene-card--left">
+            <img src="/assets/icons-store/Icons-Glass-Premium/glass-premium14.webp" alt="" loading="eager" />
+          </div>
+          <div class="hero-scene-card hero-scene-card--right">
+            <img src="/assets/icons-store/green-neon-premium/green-neon-premium16.webp" alt="" loading="eager" />
+          </div>
+          <div class="hero-scene-caption">
+            <span data-i18n="icons.hero_scene_label">Neon Singles + Full Packs</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="asset-showcase" id="asset-showcase">
       <div class="container">
-        <div class="hero-brand">
-          <img src="/assets/long-logo-icons.webp" class="hero-long-logo" alt="Volynx Icons Store" />
+        <div class="asset-showcase-head">
+          <div class="asset-showcase-copy">
+            <p class="asset-showcase-kicker" data-i18n="icons.asset_kicker">Latest Assets</p>
+            <h2 class="asset-showcase-title" data-i18n="icons.asset_title">Metal + glass essentials</h2>
+            <p class="asset-showcase-desc" data-i18n="icons.asset_desc">
+              Loaded directly from the new HTML source inside the assets folder, so the storefront reflects the latest icon batch instead of leaving it hidden.
+            </p>
+          </div>
+          <a href="/assets/icons-store/volynx-icons-gallery.html" class="btn btn-secondary asset-showcase-link" data-i18n="icons.asset_link">Open source gallery</a>
         </div>
-        <h1 class="hero-title">
-          <span data-i18n="icons.hero_title_lead">VOLYNX</span>
-          <span class="gradient-text" data-i18n="icons.hero_title_accent">Icon Vault</span>
-        </h1>
-        <p class="hero-description" data-i18n="icons.hero_desc">
-          Browse curated icon packs, preview each collection, and open the full pack without leaving the store.
-        </p>
-        <div class="hero-actions">
-          <a href="#collections" class="btn btn-primary btn-lg" data-i18n="icons.btn_browse">Browse Icon Packs</a>
-          <a href="#gallery" class="btn btn-secondary btn-lg" data-i18n="icons.btn_gallery">View all icons</a>
-        </div>
-        <div class="hero-stats">
-          <div class="stat">
-            <span class="stat-number" id="heroIconCount">Curated</span>
-            <span class="stat-label">Library</span>
-          </div>
-          <div class="stat">
-            <span class="stat-number">SVG-first</span>
-            <span class="stat-label">Packs</span>
-          </div>
-          <div class="stat">
-            <span class="stat-number">Premium</span>
-            <span class="stat-label">Access</span>
-          </div>
+        <div class="asset-showcase-grid" id="assetShowcaseGrid">
+          <article class="soon-panel">
+            <p class="soon-kicker">Loading latest assets</p>
+            <h3>Preparing the new glass showcase.</h3>
+            <p>The new icons from the asset HTML will appear here.</p>
+          </article>
         </div>
       </div>
     </section>
 
     <!-- Featured Icons (inline SVG neon cards — premium showcase) -->
     <section class="featured-section" id="featured">
-      <div class="section-header">
-        <p class="featured-brand" data-i18n="icons.featured_brand">Volynx Studio</p>
-        <h2 class="featured-title" data-i18n="icons.featured_title">Featured icons</h2>
-        <p class="featured-subtitle" data-i18n="icons.featured_subtitle">Premium · Textured · Futuristic</p>
-      </div>
-      <div class="featured-grid" id="featuredGrid" data-expanded="false">
+      <div class="container">
+        <div class="featured-shell">
+          <div class="featured-intro">
+            <p class="featured-brand" data-i18n="icons.featured_brand">Neon Singles</p>
+            <h2 class="featured-title" data-i18n="icons.featured_title">Standalone premium icons</h2>
+            <p class="featured-subtitle" data-i18n="icons.featured_subtitle">Purple and blue gradients, SVG showcase art, and one-off icon requests.</p>
+            <p class="featured-deck" data-i18n="icons.featured_desc">
+              This section brings back the neon showcase cards as their own storefront lane. Use them for standout hero assets, campaign pieces, or single-icon licensing before you open the full pack.
+            </p>
+            <div class="featured-pills">
+              <span class="featured-pill" data-i18n="icons.featured_pill_1">Single icon requests</span>
+              <span class="featured-pill" data-i18n="icons.featured_pill_2">Gradient neon backgrounds</span>
+              <span class="featured-pill" data-i18n="icons.featured_pill_3">Related packs below</span>
+            </div>
+            <div class="featured-actions">
+              <a href={`${ROUTES.contact}?product=volynx-icons-store&intent=single-icon`} class="btn btn-primary" data-i18n="icons.featured_cta_primary">Request Single Icon</a>
+              <a href="#collections" class="btn btn-secondary" data-i18n="icons.featured_cta_secondary">Open Full Packs</a>
+            </div>
+          </div>
+
+          <div class="featured-stage">
+            <p class="featured-stage-note" data-i18n="icons.featured_stage_note">Tap any neon card to request it individually or jump to the related pack.</p>
+            <div class="featured-grid" id="featuredGrid" data-expanded="false">
         <button type="button" class="featured-card" data-featured-filter="futuristic">
           <span class="featured-badge new">NEW</span>
           <div class="featured-svg-wrap">
@@ -1004,12 +1172,15 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
           </div>
           <span class="featured-label">Atom</span>
         </button>
-      </div>
-      <div class="featured-toggle-row">
-        <button type="button" id="featuredToggleBtn" class="featured-toggle" aria-expanded="false" aria-controls="featuredGrid">
-          <span class="featured-toggle-label" data-i18n="icons.featured_show_more">Show all featured icons</span>
-          <svg class="featured-toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
+            </div>
+            <div class="featured-toggle-row">
+              <button type="button" id="featuredToggleBtn" class="featured-toggle" aria-expanded="false" aria-controls="featuredGrid">
+                <span class="featured-toggle-label" data-i18n="icons.featured_show_more">Show all featured icons</span>
+                <svg class="featured-toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -1135,6 +1306,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
 
     let allIcons: any[] = [];
     let visibleCount = 48;
+    const DUPLICATE_COLLECTIONS = new Set(["Glass Icons II"]);
 
     const STORE_TEXT = {
       en: {
@@ -1176,6 +1348,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       initFilters();
       checkAuth();
       await loadCatalog();
+      await loadAssetShowcase();
 
       const y = document.getElementById("y");
       if (y) y.textContent = String(new Date().getFullYear());
@@ -1249,6 +1422,66 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       });
     }
 
+    async function loadAssetShowcase() {
+      const mount = document.getElementById("assetShowcaseGrid");
+      if (!mount) return;
+
+      try {
+        const res = await fetch("/assets/icons-store/volynx-icons-gallery.html", { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status} fetching volynx-icons-gallery.html`);
+
+        const html = await res.text();
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const defsSvg = doc.querySelector('svg[width="0"][height="0"]');
+        const categories = Array.from(doc.querySelectorAll(".category")).map((section, index) => {
+          const title = section.querySelector(".category-name")?.textContent?.trim() || `Category ${index + 1}`;
+          const count = section.querySelector(".category-count")?.textContent?.trim() || "";
+          const cards = Array.from(section.querySelectorAll(".card")).map((card) => ({
+            label: card.querySelector(".card-label")?.textContent?.trim() || "Icon",
+            number: card.querySelector(".card-num")?.textContent?.trim() || "",
+            svg: card.querySelector(".icon-wrap svg")?.outerHTML || "",
+          })).filter((card) => card.svg);
+          return { title, count, cards };
+        }).filter((category) => category.cards.length);
+
+        if (!categories.length) throw new Error("No categories found in source gallery HTML");
+
+        mount.innerHTML = `
+          ${defsSvg ? `<div class="asset-showcase-defs" aria-hidden="true">${defsSvg.outerHTML}</div>` : ""}
+          ${categories.map((category) => `
+            <section class="asset-category" data-category="${escHtml(category.title)}">
+              <div class="asset-category-head">
+                <h3 class="asset-category-title">${escHtml(category.title)}</h3>
+                <span class="asset-category-count">${escHtml(category.count)}</span>
+              </div>
+              <div class="asset-category-grid">
+                ${category.cards.map((card) => `
+                  <button type="button" class="asset-card" data-label="${escHtml(card.label)}" data-number="${escHtml(card.number)}">
+                    <span class="asset-card-icon">${card.svg}</span>
+                    <span class="asset-card-label">${escHtml(card.label)}</span>
+                    <span class="asset-card-number">${escHtml(card.number)}</span>
+                  </button>
+                `).join("")}
+              </div>
+            </section>
+          `).join("")}
+        `;
+
+        mount.querySelectorAll<HTMLButtonElement>(".asset-card").forEach((card) => {
+          card.addEventListener("click", () => showAssetPreviewModal(card));
+        });
+      } catch (e) {
+        console.error("[icons-store] asset showcase load failed:", e);
+        mount.innerHTML = `
+          <article class="soon-panel">
+            <p class="soon-kicker">Asset showcase unavailable</p>
+            <h3>The new asset HTML could not be loaded.</h3>
+            <p>${e instanceof Error ? e.message : "Unknown error."}</p>
+          </article>
+        `;
+      }
+    }
+
     // ===== CATALOG =====
     async function loadCatalog() {
       try {
@@ -1256,8 +1489,9 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         if (!res.ok) throw new Error(`HTTP ${res.status} fetching catalog.json`);
         const parsed = await res.json();
         if (!Array.isArray(parsed)) throw new Error("catalog.json is not an array");
-        allIcons = parsed;
-        console.info(`[icons-store] catalog loaded: ${allIcons.length} icons across ${new Set(allIcons.map(i => i.collection)).size} packs`);
+        const duplicateCount = parsed.filter((icon) => DUPLICATE_COLLECTIONS.has(icon.collection)).length;
+        allIcons = parsed.filter((icon) => !DUPLICATE_COLLECTIONS.has(icon.collection));
+        console.info(`[icons-store] catalog loaded: ${allIcons.length} icons across ${new Set(allIcons.map(i => i.collection)).size} packs${duplicateCount ? ` (${duplicateCount} duplicate Glass Icons II entries hidden)` : ""}`);
         updateGalleryHeading();
         renderGallery();
         updateStats();
@@ -1569,23 +1803,30 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
 
       const L = storeLang();
       const explainCopy = L === "pt"
-        ? "Ícone inline SVG da edição showcase. As coleções completas ficam nos packs abaixo — clique em \"Abrir pack\" pra ver ícones relacionados."
-        : "Inline SVG icon from the showcase edition. The full collections live in the packs below — click \"Open pack\" to see related icons.";
+        ? "Este card pertence à linha Neon Singles. Você pode pedir este ícone individualmente ou abrir o pack relacionado para ver o restante da coleção."
+        : "This card belongs to the Neon Singles lane. You can request this icon individually or open the related pack to browse the rest of the collection.";
       const openPackLabel = L === "pt" ? "Abrir pack relacionado" : "Open related pack";
+      const requestLabel = L === "pt" ? "Pedir este ícone" : "Request this icon";
       const closeLabel = L === "pt" ? "Fechar" : "Close";
+      const requestHref = `${ROUTES.contact}?product=volynx-icons-store&intent=single-icon&icon=${encodeURIComponent(label)}`;
 
       openModal(`
-        <div style="display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#0d1117,#152035);border-radius:16px;padding:32px;margin-bottom:1rem;min-height:220px;">
+        <div style="display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 20% 20%,rgba(124,77,255,.45),transparent 35%),radial-gradient(circle at 80% 25%,rgba(79,195,247,.35),transparent 32%),linear-gradient(145deg,#0d1117,#152035);border:1px solid rgba(124,77,255,.22);border-radius:18px;padding:32px;margin-bottom:1rem;min-height:220px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 18px 40px rgba(0,0,0,.28);">
           ${svgMarkup}
         </div>
         <h3 style="margin:0 0 .5rem;color:#fff;font-size:1.25rem;font-weight:700;">${label}${badge ? ` <span style="margin-left:.5rem;font-size:.7rem;padding:2px 8px;border-radius:999px;background:rgba(79,195,247,.15);color:#4fc3f7;border:1px solid rgba(79,195,247,.3);vertical-align:middle;">${badge}</span>` : ""}</h3>
         <p style="color:rgba(255,255,255,.5);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin:0 0 1rem;">${catLabel}</p>
         <p style="color:rgba(255,255,255,.7);font-size:.85rem;line-height:1.6;margin:0 0 1.5rem;">${explainCopy}</p>
         <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
+          <button id="featuredRequestBtn" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#7c4dff,#00f0ff);color:#05070f;font-weight:800;border-radius:10px;border:none;font-size:.9rem;cursor:pointer;">${requestLabel}</button>
           <button id="featuredGoPackBtn" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#00f0ff,#0066ff);color:#000;font-weight:700;border-radius:10px;border:none;font-size:.9rem;cursor:pointer;">${openPackLabel}</button>
           <button id="featuredCancelBtn" style="padding:.75rem 1.25rem;background:transparent;color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.15);border-radius:10px;font-size:.9rem;cursor:pointer;">${closeLabel}</button>
         </div>
       `);
+      document.getElementById("featuredRequestBtn")?.addEventListener("click", () => {
+        closeModal();
+        window.location.href = requestHref;
+      });
       document.getElementById("featuredGoPackBtn")?.addEventListener("click", () => {
         closeModal();
         const match = document.querySelector<HTMLButtonElement>(`.filter-btn[data-filter="${filterKey}"]`);
@@ -1597,11 +1838,46 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       document.getElementById("featuredCancelBtn")?.addEventListener("click", closeModal);
     }
 
+    function showAssetPreviewModal(card: HTMLButtonElement) {
+      const svgEl = card.querySelector(".asset-card-icon svg");
+      const label = card.dataset.label || "Icon";
+      const number = card.dataset.number || "";
+      const category = card.closest(".asset-category")?.getAttribute("data-category") || "Latest Assets";
+      const svgMarkup = svgEl ? svgEl.outerHTML.replace("<svg ", '<svg style="width:180px;height:180px;" ') : "";
+      const L = storeLang();
+      const requestLabel = L === "pt" ? "Pedir este ícone" : "Request this icon";
+      const sourceLabel = L === "pt" ? "Abrir galeria-fonte" : "Open source gallery";
+      const closeLabel = L === "pt" ? "Fechar" : "Close";
+      const description = L === "pt"
+        ? "Ícone novo carregado direto do HTML de assets da Icons Store."
+        : "New icon loaded directly from the Icons Store asset HTML.";
+      const requestHref = `${ROUTES.contact}?product=volynx-icons-store&intent=single-icon&source=asset-html&icon=${encodeURIComponent(label)}`;
+
+      openModal(`
+        <div style="display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 20% 20%,rgba(120,220,255,.18),transparent 34%),radial-gradient(circle at 80% 20%,rgba(176,132,255,.18),transparent 30%),linear-gradient(145deg,#10131f,#090b14);border:1px solid rgba(120,220,255,.16);border-radius:18px;padding:32px;margin-bottom:1rem;min-height:220px;">
+          ${svgMarkup}
+        </div>
+        <h3 style="margin:0 0 .35rem;color:#fff;font-size:1.2rem;font-weight:700;">${label}</h3>
+        <p style="margin:0 0 .35rem;color:rgba(255,255,255,.55);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;">${category}${number ? ` · ${number}` : ""}</p>
+        <p style="margin:0 0 1.4rem;color:rgba(255,255,255,.74);font-size:.9rem;line-height:1.65;">${description}</p>
+        <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
+          <button id="assetRequestBtn" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#7c4dff,#00f0ff);color:#05070f;font-weight:800;border-radius:10px;border:none;font-size:.9rem;cursor:pointer;">${requestLabel}</button>
+          <a id="assetSourceBtn" href="/assets/icons-store/volynx-icons-gallery.html" style="padding:.75rem 1.25rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;border:1px solid rgba(255,255,255,.18);">${sourceLabel}</a>
+          <button id="assetCancelBtn" style="padding:.75rem 1.25rem;background:transparent;color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.15);border-radius:10px;font-size:.9rem;cursor:pointer;">${closeLabel}</button>
+        </div>
+      `);
+      document.getElementById("assetRequestBtn")?.addEventListener("click", () => {
+        closeModal();
+        window.location.href = requestHref;
+      });
+      document.getElementById("assetCancelBtn")?.addEventListener("click", closeModal);
+    }
+
     // ===== PREVIEW MODAL =====
     function showPreviewModal(icon: any) {
       const isPremium = icon.plan === "premium" || icon.plan === "paid";
       openModal(`
-        <div style="display:flex;align-items:center;justify-content:center;background:#fff;border-radius:16px;padding:24px;margin-bottom:1.25rem;min-height:180px;">
+        <div style="display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 15% 15%,rgba(124,77,255,.18),transparent 30%),radial-gradient(circle at 85% 15%,rgba(79,195,247,.2),transparent 28%),linear-gradient(145deg,rgba(255,255,255,.98),rgba(243,247,255,.94));border:1px solid rgba(124,77,255,.12);border-radius:18px;padding:24px;margin-bottom:1.25rem;min-height:180px;box-shadow:inset 0 1px 0 rgba(255,255,255,.8);">
           <img src="${icon.path}" alt="" style="width:160px;height:160px;object-fit:contain;display:block;" />
         </div>
         <p style="color:rgba(255,255,255,.5);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1.25rem;">${icon.category}</p>
