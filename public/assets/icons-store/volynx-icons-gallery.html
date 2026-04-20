@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Volynx Icons — Essentials Pack</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #06060a;
+    --bg-deep: #030305;
+    --surface: rgba(18, 18, 26, 0.6);
+    --surface-hover: rgba(28, 28, 40, 0.75);
+    --border: rgba(255, 255, 255, 0.06);
+    --border-hover: rgba(120, 220, 255, 0.35);
+    --text: #f4f4f6;
+    --text-muted: #8b8b96;
+    --text-dim: #5a5a65;
+    --accent: #78dcff;
+    --accent-violet: #b084ff;
+    --glow: 0 0 40px rgba(120, 220, 255, 0.15);
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, 'SF Pro Display', 'Inter', system-ui, sans-serif;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 220, 255, 0.12), transparent),
+      radial-gradient(ellipse 60% 40% at 80% 60%, rgba(176, 132, 255, 0.08), transparent),
+      radial-gradient(ellipse 50% 30% at 20% 80%, rgba(255, 180, 220, 0.05), transparent);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 80px 48px 120px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    margin-bottom: 96px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 36px;
+  }
+
+  .brand-mark {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #1a1a28 0%, #0a0a14 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .brand-mark::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(120, 220, 255, 0.3), transparent 50%);
+    opacity: 0.4;
+  }
+  .brand-mark svg {
+    position: relative;
+    z-index: 1;
+  }
+
+  .brand-text {
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+  .brand-text strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    padding: 6px 14px;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(120, 220, 255, 0.08);
+    border: 1px solid rgba(120, 220, 255, 0.2);
+    border-radius: 100px;
+    margin-bottom: 24px;
+  }
+
+  h1 {
+    font-size: 64px;
+    line-height: 1;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    margin-bottom: 20px;
+    max-width: 820px;
+  }
+  h1 .accent {
+    background: linear-gradient(120deg, var(--accent) 0%, var(--accent-violet) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .lede {
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    max-width: 600px;
+    font-weight: 400;
+  }
+
+  .meta {
+    display: flex;
+    gap: 48px;
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .meta-label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+  .meta-value {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+
+  /* Category */
+  .category {
+    margin-bottom: 80px;
+  }
+
+  .category-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .category-title {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+  .category-num {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+  .category-name {
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+  .category-count {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 400;
+    letter-spacing: -0.005em;
+  }
+
+  /* Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 16px;
+  }
+
+  .card {
+    position: relative;
+    aspect-ratio: 1 / 1.05;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    padding: 1px;
+    background: linear-gradient(135deg, transparent 30%, rgba(120, 220, 255, 0.25) 50%, transparent 70%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+  }
+
+  .card::after {
+    content: '';
+    position: absolute;
+    top: -1px; left: -1px; right: -1px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  }
+
+  .card:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-hover);
+    transform: translateY(-3px);
+    box-shadow: var(--glow);
+  }
+  .card:hover::before { opacity: 1; }
+  .card:hover .icon-wrap { transform: scale(1.08); }
+  .card:hover .copy-btn { opacity: 1; transform: translateY(0); }
+
+  .icon-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    margin-bottom: 12px;
+  }
+  .icon-wrap svg {
+    width: 56px;
+    height: 56px;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+  }
+
+  .card-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.005em;
+    margin-bottom: 2px;
+  }
+  .card-num {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(120, 220, 255, 0.12);
+    border: 1px solid rgba(120, 220, 255, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    font-size: 12px;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: all 0.3s;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 120px;
+    padding-top: 48px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-dim);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+  footer a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  footer a:hover { color: var(--accent); }
+
+  @media (max-width: 768px) {
+    .wrap { padding: 48px 24px 80px; }
+    h1 { font-size: 40px; }
+    .lede { font-size: 16px; }
+    .meta { flex-wrap: wrap; gap: 28px; }
+    .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    .card { padding: 18px; border-radius: 14px; }
+    .icon-wrap svg { width: 48px; height: 48px; }
+    footer { flex-direction: column; gap: 16px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SHARED SVG DEFS — keeps gradient refs working across all icons -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="glass2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.5)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#78dcff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 22 12 12 22 2 12" fill="rgba(120,220,255,0.15)"/>
+          <polyline points="7 10 12 15 17 10"/>
+        </svg>
+      </div>
+      <div class="brand-text"><strong>VOLYNX</strong> · ICONS</div>
+    </div>
+
+    <div class="eyebrow">Essentials Pack · 24 icons</div>
+    <h1>Crafted icons that feel like <span class="accent">product.</span></h1>
+    <p class="lede">Twenty-four foundational icons in premium metal and glass — built for interfaces that don't settle for default. Every stroke aligned to a 24px grid, every gradient hand-tuned.</p>
+
+    <div class="meta">
+      <div class="meta-item">
+        <div class="meta-label">Format</div>
+        <div class="meta-value">SVG</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Grid</div>
+        <div class="meta-value">24 × 24</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Style</div>
+        <div class="meta-value">Metal · Glass</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">License</div>
+        <div class="meta-value">Commercial</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CATEGORY 1 -->
+  <section class="category">
+    <div class="category-head">
+      <div class="category-title">
+        <span class="category-num">01</span>
+        <span class="category-name">Communication</span>
+      </div>
+      <span class="category-count">6 icons</span>
+    </div>
+
+    <div class="grid">
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs>
+              <linearGradient id="metal1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#e0e0e0"/><stop offset="50%" stop-color="#b0b0b0"/><stop offset="100%" stop-color="#808080"/>
+              </linearGradient>
+              <linearGradient id="glass1" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.6)"/><stop offset="100%" stop-color="rgba(255,255,255,0.1)"/>
+              </linearGradient>
+              <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="#00000030"/></filter>
+            </defs>
+            <rect x="2" y="3" width="20" height="16" rx="3" fill="url(#metal1)" filter="url(#shadow)"/>
+            <rect x="2" y="3" width="20" height="16" rx="3" fill="url(#glass1)"/>
+            <polyline points="2,7 12,13 22,7" fill="none" stroke="#2c2c2c" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-label">Message</div>
+        <div class="card-num">VX / 01</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs>
+              <linearGradient id="metal2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#d4d4d4"/><stop offset="100%" stop-color="#8a8a8a"/></linearGradient>
+            </defs>
+            <rect x="2" y="4" width="20" height="16" rx="2" fill="url(#metal2)"/>
+            <rect x="2" y="4" width="20" height="16" rx="2" fill="url(#glass2)"/>
+            <polyline points="2,8 12,14 22,8" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M22 18L15 12M2 18L9 12" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-label">Envelope</div>
+        <div class="card-num">VX / 02</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ececec"/><stop offset="100%" stop-color="#9a9a9a"/></linearGradient></defs>
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" fill="url(#metal3)" stroke="#333" stroke-width="1.2"/>
+          </svg>
+        </div>
+        <div class="card-label">Phone</div>
+        <div class="card-num">VX / 03</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#c0c0c0"/><stop offset="100%" stop-color="#707070"/></linearGradient></defs>
+            <rect x="2" y="6" width="16" height="12" rx="2" fill="url(#metal4)"/>
+            <rect x="2" y="6" width="16" height="12" rx="2" fill="url(#glass2)"/>
+            <path d="M22 7L18 10v4l4 3z" fill="url(#metal4)" stroke="#333" stroke-width="1"/>
+            <circle cx="10" cy="12" r="3" fill="none" stroke="#222" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="card-label">Video Call</div>
+        <div class="card-num">VX / 04</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal5" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#dbdbdb"/><stop offset="100%" stop-color="#8f8f8f"/></linearGradient></defs>
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" fill="none" stroke="url(#metal5)" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="9" cy="7" r="4" fill="none" stroke="url(#metal5)" stroke-width="2"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" fill="none" stroke="url(#metal5)" stroke-width="2" stroke-linecap="round"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" fill="none" stroke="url(#metal5)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-label">Group</div>
+        <div class="card-num">VX / 05</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal6" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e8e8e8"/><stop offset="100%" stop-color="#999"/></linearGradient></defs>
+            <circle cx="18" cy="5" r="3" fill="url(#metal6)" stroke="#444" stroke-width="1"/>
+            <circle cx="6" cy="12" r="3" fill="url(#metal6)" stroke="#444" stroke-width="1"/>
+            <circle cx="18" cy="19" r="3" fill="url(#metal6)" stroke="#444" stroke-width="1"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" stroke="#555" stroke-width="1.5"/>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" stroke="#555" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="card-label">Share</div>
+        <div class="card-num">VX / 06</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CATEGORY 2 -->
+  <section class="category">
+    <div class="category-head">
+      <div class="category-title">
+        <span class="category-num">02</span>
+        <span class="category-name">Files &amp; Documents</span>
+      </div>
+      <span class="category-count">5 icons</span>
+    </div>
+
+    <div class="grid">
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal7" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e2e2e2"/><stop offset="100%" stop-color="#a0a0a0"/></linearGradient></defs>
+            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" fill="url(#metal7)"/>
+            <polyline points="13 2 13 9 20 9" fill="none" stroke="#444" stroke-width="1.5"/>
+            <line x1="8" y1="13" x2="16" y2="13" stroke="#444" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="8" y1="17" x2="16" y2="17" stroke="#444" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-label">Document</div>
+        <div class="card-num">VX / 07</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal8" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#cdcdcd"/><stop offset="100%" stop-color="#7a7a7a"/></linearGradient></defs>
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" fill="url(#metal8)"/>
+          </svg>
+        </div>
+        <div class="card-label">Folder</div>
+        <div class="card-num">VX / 08</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal9" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f0f0f0"/><stop offset="100%" stop-color="#aaa"/></linearGradient></defs>
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" fill="none" stroke="url(#metal9)" stroke-width="2" stroke-linecap="round"/>
+            <polyline points="7 10 12 15 17 10" fill="none" stroke="url(#metal9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="12" y1="15" x2="12" y2="3" stroke="url(#metal9)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-label">Download</div>
+        <div class="card-num">VX / 09</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal10" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#d8d8d8"/><stop offset="100%" stop-color="#868686"/></linearGradient></defs>
+            <path d="M17.5 19H9a3.5 3.5 0 0 1 0-7h.5A5.5 5.5 0 0 1 17 8.5a4.5 4.5 0 0 1 2 8.5" fill="url(#metal10)"/>
+            <polyline points="12 11 12 17 9 14" fill="none" stroke="#222" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="12" y1="17" x2="15" y2="14" stroke="#222" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-label">Cloud</div>
+        <div class="card-num">VX / 10</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal11" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#c8c8c8"/><stop offset="100%" stop-color="#6e6e6e"/></linearGradient></defs>
+            <polyline points="3 6 5 6 21 6" fill="none" stroke="url(#metal11)" stroke-width="2" stroke-linecap="round"/>
+            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" fill="none" stroke="url(#metal11)" stroke-width="2"/>
+            <rect x="7" y="10" width="10" height="11" rx="1" fill="url(#metal11)"/>
+          </svg>
+        </div>
+        <div class="card-label">Trash</div>
+        <div class="card-num">VX / 11</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CATEGORY 3 -->
+  <section class="category">
+    <div class="category-head">
+      <div class="category-title">
+        <span class="category-num">03</span>
+        <span class="category-name">Productivity &amp; Tools</span>
+      </div>
+      <span class="category-count">7 icons</span>
+    </div>
+
+    <div class="grid">
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal12" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#eee"/><stop offset="100%" stop-color="#999"/></linearGradient></defs>
+            <circle cx="11" cy="11" r="8" fill="none" stroke="url(#metal12)" stroke-width="2"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="url(#metal12)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-label">Search</div>
+        <div class="card-num">VX / 12</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal13" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ddd"/><stop offset="100%" stop-color="#8c8c8c"/></linearGradient></defs>
+            <circle cx="12" cy="12" r="3" fill="url(#metal13)" stroke="#444" stroke-width="1"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" fill="none" stroke="url(#metal13)" stroke-width="1.8"/>
+          </svg>
+        </div>
+        <div class="card-label">Settings</div>
+        <div class="card-num">VX / 13</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal14" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ebebeb"/><stop offset="100%" stop-color="#a5a5a5"/></linearGradient></defs>
+            <rect x="3" y="4" width="18" height="18" rx="2" fill="url(#metal14)"/>
+            <line x1="8" y1="2" x2="8" y2="6" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="16" y1="2" x2="16" y2="6" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="3" y1="10" x2="21" y2="10" stroke="#444" stroke-width="1.5"/>
+            <circle cx="12" cy="15" r="1" fill="#333"/>
+            <circle cx="16" cy="15" r="1" fill="#333"/>
+            <circle cx="8" cy="15" r="1" fill="#333"/>
+          </svg>
+        </div>
+        <div class="card-label">Calendar</div>
+        <div class="card-num">VX / 14</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal15" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e5e5e5"/><stop offset="100%" stop-color="#959595"/></linearGradient></defs>
+            <circle cx="12" cy="12" r="10" fill="url(#metal15)"/>
+            <polyline points="12 6 12 12 16 14" fill="none" stroke="#222" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="card-label">Clock</div>
+        <div class="card-num">VX / 15</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal16" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#d0d0d0"/><stop offset="100%" stop-color="#7c7c7c"/></linearGradient></defs>
+            <rect x="5" y="11" width="14" height="11" rx="2" fill="url(#metal16)"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="url(#metal16)" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="12" cy="16" r="2" fill="#2a2a2a"/>
+          </svg>
+        </div>
+        <div class="card-label">Lock</div>
+        <div class="card-num">VX / 16</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal17" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f2f2f2"/><stop offset="100%" stop-color="#b3b3b3"/></linearGradient></defs>
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="url(#metal17)" stroke="#444" stroke-width="1"/>
+          </svg>
+        </div>
+        <div class="card-label">Heart</div>
+        <div class="card-num">VX / 17</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal18" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fafafa"/><stop offset="100%" stop-color="#bcbcbc"/></linearGradient></defs>
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="url(#metal18)" stroke="#555" stroke-width="1"/>
+          </svg>
+        </div>
+        <div class="card-label">Star</div>
+        <div class="card-num">VX / 18</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CATEGORY 4 -->
+  <section class="category">
+    <div class="category-head">
+      <div class="category-title">
+        <span class="category-num">04</span>
+        <span class="category-name">Web &amp; Navigation</span>
+      </div>
+      <span class="category-count">6 icons</span>
+    </div>
+
+    <div class="grid">
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal19" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e1e1e1"/><stop offset="100%" stop-color="#919191"/></linearGradient></defs>
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="url(#metal19)"/>
+            <polyline points="9 22 9 12 15 12 15 22" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-label">Home</div>
+        <div class="card-num">VX / 19</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal20" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ececec"/><stop offset="100%" stop-color="#9e9e9e"/></linearGradient></defs>
+            <circle cx="9" cy="21" r="1" fill="#333"/>
+            <circle cx="20" cy="21" r="1" fill="#333"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" fill="none" stroke="url(#metal20)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-label">Cart</div>
+        <div class="card-num">VX / 20</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal21" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#dbdbdb"/><stop offset="100%" stop-color="#8f8f8f"/></linearGradient></defs>
+            <rect x="2" y="6" width="20" height="14" rx="2" fill="url(#metal21)"/>
+            <circle cx="12" cy="13" r="4" fill="none" stroke="#333" stroke-width="1.5"/>
+            <line x1="19" y1="8" x2="20" y2="8" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-label">Camera</div>
+        <div class="card-num">VX / 21</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal22" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e8e8e8"/><stop offset="100%" stop-color="#a3a3a3"/></linearGradient></defs>
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" fill="url(#metal22)" stroke="#555" stroke-width="1.2"/>
+            <circle cx="12" cy="10" r="3" fill="#4a4a4a"/>
+          </svg>
+        </div>
+        <div class="card-label">Location</div>
+        <div class="card-num">VX / 22</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal23" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f5f5f5"/><stop offset="100%" stop-color="#adadad"/></linearGradient></defs>
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" fill="none" stroke="url(#metal23)" stroke-width="2" stroke-linecap="round"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" fill="none" stroke="url(#metal23)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-label">Link</div>
+        <div class="card-num">VX / 23</div>
+      </div>
+
+      <div class="card">
+        <div class="copy-btn">+</div>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <defs><linearGradient id="metal24" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#dddddd"/><stop offset="100%" stop-color="#888888"/></linearGradient></defs>
+            <path d="M23 4v6h-6" fill="none" stroke="url(#metal24)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M1 20v-6h6" fill="none" stroke="url(#metal24)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" fill="none" stroke="url(#metal24)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-label">Refresh</div>
+        <div class="card-num">VX / 24</div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <div>© 2026 VOLYNX · Icons Store</div>
+    <div><a href="#">License</a> &nbsp; <a href="#">Usage</a> &nbsp; <a href="#">Support</a></div>
+  </footer>
+
+</div>
+
+</body>
+</html>
