@@ -1252,20 +1252,24 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     // ===== CATALOG =====
     async function loadCatalog() {
       try {
-        const res = await fetch("/assets/icons-store/catalog.json");
-        allIcons = await res.json();
+        const res = await fetch("/assets/icons-store/catalog.json", { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status} fetching catalog.json`);
+        const parsed = await res.json();
+        if (!Array.isArray(parsed)) throw new Error("catalog.json is not an array");
+        allIcons = parsed;
+        console.info(`[icons-store] catalog loaded: ${allIcons.length} icons across ${new Set(allIcons.map(i => i.collection)).size} packs`);
         updateGalleryHeading();
         renderGallery();
         updateStats();
       } catch (e) {
-        console.error("Error loading catalog:", e);
+        console.error("[icons-store] catalog load failed:", e);
         const grid = document.getElementById("galleryGrid");
         if (grid) {
           grid.innerHTML = `
             <article class="soon-panel">
               <p class="soon-kicker">Vault unavailable</p>
               <h3>Icon packs could not load.</h3>
-              <p>Please refresh the page or try again in a moment.</p>
+              <p>Check browser console for details. ${e instanceof Error ? e.message : ""}</p>
             </article>
           `;
         }
@@ -1554,6 +1558,45 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       }
     }
 
+    // ===== FEATURED SVG PREVIEW MODAL =====
+    function showFeaturedPreviewModal(card: HTMLElement) {
+      const svgEl = card.querySelector(".featured-svg-wrap svg");
+      const label = card.querySelector(".featured-label")?.textContent?.trim() || "Icon";
+      const badge = card.querySelector(".featured-badge")?.textContent?.trim() || "";
+      const filterKey = card.dataset.featuredFilter ?? "";
+      const catLabel = CATEGORY_CONFIG.find(c => c.key === filterKey)?.label || filterKey;
+      const svgMarkup = svgEl ? svgEl.outerHTML.replace(/width="54"/g, 'width="180"').replace(/height="54"/g, 'height="180"') : "";
+
+      const L = storeLang();
+      const explainCopy = L === "pt"
+        ? "Ícone inline SVG da edição showcase. As coleções completas ficam nos packs abaixo — clique em \"Abrir pack\" pra ver ícones relacionados."
+        : "Inline SVG icon from the showcase edition. The full collections live in the packs below — click \"Open pack\" to see related icons.";
+      const openPackLabel = L === "pt" ? "Abrir pack relacionado" : "Open related pack";
+      const closeLabel = L === "pt" ? "Fechar" : "Close";
+
+      openModal(`
+        <div style="display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#0d1117,#152035);border-radius:16px;padding:32px;margin-bottom:1rem;min-height:220px;">
+          ${svgMarkup}
+        </div>
+        <h3 style="margin:0 0 .5rem;color:#fff;font-size:1.25rem;font-weight:700;">${label}${badge ? ` <span style="margin-left:.5rem;font-size:.7rem;padding:2px 8px;border-radius:999px;background:rgba(79,195,247,.15);color:#4fc3f7;border:1px solid rgba(79,195,247,.3);vertical-align:middle;">${badge}</span>` : ""}</h3>
+        <p style="color:rgba(255,255,255,.5);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin:0 0 1rem;">${catLabel}</p>
+        <p style="color:rgba(255,255,255,.7);font-size:.85rem;line-height:1.6;margin:0 0 1.5rem;">${explainCopy}</p>
+        <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
+          <button id="featuredGoPackBtn" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#00f0ff,#0066ff);color:#000;font-weight:700;border-radius:10px;border:none;font-size:.9rem;cursor:pointer;">${openPackLabel}</button>
+          <button id="featuredCancelBtn" style="padding:.75rem 1.25rem;background:transparent;color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.15);border-radius:10px;font-size:.9rem;cursor:pointer;">${closeLabel}</button>
+        </div>
+      `);
+      document.getElementById("featuredGoPackBtn")?.addEventListener("click", () => {
+        closeModal();
+        const match = document.querySelector<HTMLButtonElement>(`.filter-btn[data-filter="${filterKey}"]`);
+        if (match) {
+          match.click();
+          document.getElementById("gallery")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+      document.getElementById("featuredCancelBtn")?.addEventListener("click", closeModal);
+    }
+
     // ===== PREVIEW MODAL =====
     function showPreviewModal(icon: any) {
       const isPremium = icon.plan === "premium" || icon.plan === "paid";
@@ -1631,15 +1674,12 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         });
       });
 
-      // Featured Icons → scroll to gallery filtered by category
+      // Featured Icons → open inline-SVG preview modal (NOT scroll to gallery)
       document.querySelectorAll<HTMLButtonElement>(".featured-card[data-featured-filter]").forEach(card => {
-        card.addEventListener("click", () => {
-          const target = card.dataset.featuredFilter ?? "all";
-          const match = document.querySelector<HTMLButtonElement>(`.filter-btn[data-filter="${target}"]`);
-          if (match) {
-            match.click();
-            document.getElementById("gallery")?.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
+        card.addEventListener("click", (e) => {
+          // Ignore clicks that originated from the "show more" button or toggle
+          if ((e.target as HTMLElement).closest(".featured-toggle")) return;
+          showFeaturedPreviewModal(card);
         });
       });
 
