@@ -1383,13 +1383,18 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
 
     function updateStats() {
       const total = allIcons.length;
-      const collections = new Set(allIcons.map(i => i.collection)).size;
+      const packs = new Set(allIcons.map(packFolder)).size;
       const heroCount = document.getElementById('heroIconCount');
       if (heroCount) heroCount.textContent = total.toLocaleString() + '+';
       const statEls = document.querySelectorAll<HTMLElement>(".stat-number");
       if (statEls[0]) statEls[0].textContent = total.toLocaleString() + '+';
-      if (statEls[1]) statEls[1].textContent = String(collections);
+      if (statEls[1]) statEls[1].textContent = String(packs);
       renderCollections();
+    }
+
+    function packFolder(icon: any) {
+      const match = String(icon?.path || "").match(/^\/assets\/icons-store\/([^/]+)\//);
+      return match?.[1] || icon?.collection || icon?.category || "unknown";
     }
 
     // ===== FEATURED COLLECTIONS =====

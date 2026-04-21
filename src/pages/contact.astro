@@ -59,6 +59,7 @@ const title = "Contact — VOLYNX";
         <p data-i18n="contact.sales_desc">Tell us what you're building. We'll come back with a clear path and what it takes.</p>
 
         <form class="lead-form" id="contactForm">
+          <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="lead-form__website" />
           <div class="field-row">
             <div class="field">
               <label for="name" data-i18n="contact.name">Name</label>
@@ -273,6 +274,7 @@ const title = "Contact — VOLYNX";
 
   /* Sales form */
   .lead-form { display: flex; flex-direction: column; gap: 14px; }
+  .lead-form__website { position: absolute; left: -10000px; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 
   .field-row {
     display: grid;
@@ -461,6 +463,10 @@ const title = "Contact — VOLYNX";
         budget: form.budget.value,
         timeline: form.timeline.value,
         brief: form.brief.value.trim(),
+        website: form.website ? form.website.value.trim() : '',
+        source_path: window.location.pathname + window.location.search,
+        referrer: document.referrer || '',
+        locale: localStorage.getItem('volynx_lang') || (navigator.language && navigator.language.startsWith('pt') ? 'pt' : 'en'),
       };
 
       if (!data.name || !data.email || !data.brief) return;
@@ -496,7 +502,7 @@ const title = "Contact — VOLYNX";
         }
 
         // Success — replace form with confirmation
-        form.innerHTML = '<div class="form-success">Thanks, ' + escapeHtml(data.name) + '! Your brief has been received.<br>I\'ll review it and get back to you within 24–48h on business days.</div>';
+        form.innerHTML = '<div class="form-success">Thanks, ' + escapeHtml(data.name) + '! Your brief has been received.<br>I will review it and get back to you within 24–48h on business days.</div>';
       } catch (err) {
         // Restore button
         submitBtn.disabled = false;
