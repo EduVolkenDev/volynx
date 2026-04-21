@@ -1,319 +1,21 @@
 ---
 import "../../../styles/icons-store.css";
-import PageWidgets from "../../../components/PageWidgets.astro";
+import FlagshipLayout from "../../../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "../../../components/FlagshipHeader.astro";
+import FlagshipFooter from "../../../components/FlagshipFooter.astro";
 import { ROUTES } from "../../../data/routes";
-// PageWidgets provides floating lang/login — hide its util bar since icons store has its own nav auth
 
 const pageTitle = "VOLYNX Icon Vault";
 const pageDescription = "Browse curated VOLYNX icon packs, preview every collection, and open each pack without leaving the store.";
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{pageTitle}</title>
-  <meta name="description" content={pageDescription} />
-  <meta property="og:title" content={pageTitle} />
-  <meta property="og:description" content={pageDescription} />
-  <meta property="og:image" content="/assets/volynx-icon.webp" />
-  <meta property="og:url" content="https://volynx.world/products/volynx-icons-store/" />
-  <meta name="twitter:card" content="summary_large_image" />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
-  <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
-  <link rel="shortcut icon" href="/assets/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-  <meta name="apple-mobile-web-app-title" content="VOLYNX" />
-  <link rel="manifest" href="/site.webmanifest" />
-  <style>
-    /* ── Loading / empty state panel ── */
-    .soon-panel {
-      grid-column: 1 / -1;
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 32px;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 8px;
-      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
-      text-align: center;
-    }
-    .soon-kicker {
-      margin: 0 0 10px;
-      color: rgba(0,240,255,.86);
-      font-size: .78rem;
-      font-weight: 800;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-    }
-    .soon-panel h3 { margin: 0 0 12px; color: #fff; font-size: clamp(1.35rem, 3vw, 2rem); }
-    .soon-panel p:not(.soon-kicker) { margin: 0 auto 18px; max-width: 620px; color: rgba(255,255,255,.66); line-height: 1.7; }
-
-    /* ── Featured Icons showcase (neon premium cards) ── */
-    .featured-section {
-      padding: clamp(48px,6vw,72px) 0 clamp(28px,4vw,44px);
-      position: relative;
-    }
-    .featured-section::before {
-      content: "";
-      position: absolute;
-      inset: 10% 5% auto;
-      height: 70%;
-      border-radius: 28px;
-      background:
-        radial-gradient(circle at 12% 20%, rgba(124,77,255,.18), transparent 28%),
-        radial-gradient(circle at 85% 12%, rgba(79,195,247,.18), transparent 24%),
-        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
-      border: 1px solid rgba(255,255,255,.06);
-      pointer-events: none;
-    }
-    .featured-shell {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
-      gap: clamp(24px, 4vw, 40px);
-      align-items: start;
-    }
-    .featured-intro {
-      position: sticky;
-      top: 104px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      padding: clamp(20px, 2.5vw, 28px);
-      border-radius: 24px;
-      background: linear-gradient(180deg, rgba(11,14,28,.92), rgba(9,11,22,.82));
-      border: 1px solid rgba(255,255,255,.08);
-      box-shadow: 0 22px 46px rgba(0,0,0,.22);
-    }
-    .featured-brand { font-size: 11px; font-weight: 700; letter-spacing: 8px; color: #4fc3f7; text-transform: uppercase; opacity: 0.8; margin: 0; }
-    .featured-title { font-size: clamp(28px,4vw,38px); line-height: 1.05; font-weight: 900; background: linear-gradient(135deg, #fff 0%, #4fc3f7 42%, #7c4dff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 0; }
-    .featured-subtitle { font-size: 12px; color: #8e99b7; letter-spacing: 1.4px; text-transform: uppercase; margin: 0; }
-    .featured-deck { margin: 0; color: rgba(255,255,255,.72); line-height: 1.75; }
-    .featured-pills { display: flex; flex-wrap: wrap; gap: 8px; }
-    .featured-pill {
-      display: inline-flex;
-      align-items: center;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.08);
-      color: rgba(255,255,255,.72);
-      font-size: 12px;
-      font-weight: 600;
-      line-height: 1;
-    }
-    .featured-actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 4px; }
-    .featured-stage {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      min-width: 0;
-    }
-    .featured-stage-note {
-      margin: 0;
-      padding: 0 6px;
-      color: rgba(255,255,255,.6);
-      font-size: .94rem;
-      line-height: 1.6;
-    }
-    .featured-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(136px, 1fr));
-      gap: 14px;
-      max-width: 100%;
-      margin: 0 auto;
-      padding: 0;
-      position: relative;
-    }
-    /* Collapsed state: hide cards beyond the first 12 */
-    .featured-grid[data-expanded="false"] .featured-card:nth-child(n+13) { display: none; }
-    .featured-toggle-row { display: flex; justify-content: center; margin-top: clamp(18px,3vw,28px); }
-    .featured-toggle { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 999px; background: rgba(79,195,247,0.08); border: 1px solid rgba(79,195,247,0.25); color: #4fc3f7; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease; font-family: inherit; }
-    .featured-toggle:hover { background: rgba(79,195,247,0.14); border-color: rgba(79,195,247,0.5); box-shadow: 0 0 24px rgba(79,195,247,0.2); }
-    .featured-toggle-icon { transition: transform 0.25s ease; }
-    .featured-grid[data-expanded="true"] + .featured-toggle-row .featured-toggle-icon { transform: rotate(180deg); }
-    .featured-card {
-      position: relative;
-      background:
-        radial-gradient(circle at 16% 14%, rgba(124,77,255,.18), transparent 28%),
-        radial-gradient(circle at 84% 18%, rgba(79,195,247,.18), transparent 25%),
-        linear-gradient(145deg, #0d1117 0%, #111827 100%);
-      border: 1px solid rgba(111,133,170,.24);
-      border-radius: 20px;
-      padding: 24px 12px 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      overflow: hidden;
-      min-height: 138px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .featured-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(79,195,247,0.4), transparent); }
-    .featured-card:hover {
-      transform: translateY(-6px);
-      border-color: rgba(79, 195, 247, 0.42);
-      background:
-        radial-gradient(circle at 16% 14%, rgba(124,77,255,.24), transparent 28%),
-        radial-gradient(circle at 84% 18%, rgba(79,195,247,.22), transparent 25%),
-        linear-gradient(145deg, #0d1117 0%, #152035 100%);
-      box-shadow: 0 14px 36px rgba(79, 195, 247, 0.13), 0 0 0 1px rgba(79,195,247,0.15);
-    }
-    .featured-card.purple::before { background: linear-gradient(90deg, transparent, rgba(124,77,255,0.45), transparent); }
-    .featured-card.purple:hover { border-color: rgba(124,77,255,0.4); box-shadow: 0 8px 32px rgba(124,77,255,0.15); }
-    .featured-card.amber::before { background: linear-gradient(90deg, transparent, rgba(255,183,77,0.45), transparent); }
-    .featured-card.amber:hover { border-color: rgba(255,183,77,0.4); box-shadow: 0 8px 32px rgba(255,183,77,0.15); }
-    .featured-card.green::before { background: linear-gradient(90deg, transparent, rgba(102,187,106,0.45), transparent); }
-    .featured-card.green:hover { border-color: rgba(102,187,106,0.4); box-shadow: 0 8px 32px rgba(102,187,106,0.15); }
-    .featured-card.coral::before { background: linear-gradient(90deg, transparent, rgba(255,112,67,0.45), transparent); }
-    .featured-card.coral:hover { border-color: rgba(255,112,67,0.4); box-shadow: 0 8px 32px rgba(255,112,67,0.15); }
-
-    .featured-svg-wrap {
-      width: 78px;
-      height: 78px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 22px;
-      position: relative;
-      background:
-        radial-gradient(circle at 24% 22%, rgba(124,77,255,.35), transparent 34%),
-        radial-gradient(circle at 76% 24%, rgba(79,195,247,.34), transparent 34%),
-        linear-gradient(180deg, rgba(13,17,31,.92), rgba(8,10,20,.98));
-      border: 1px solid rgba(255,255,255,.06);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 12px 24px rgba(0,0,0,.16);
-    }
-    .featured-svg-wrap svg {
-      display: block;
-      width: 66px;
-      height: 66px;
-      filter: drop-shadow(0 10px 18px rgba(0,0,0,.22));
-    }
-    .featured-label { font-size: 11px; color: #7c87a5; letter-spacing: 0.5px; text-align: center; line-height: 1.35; font-weight: 600; transition: color 0.25s; }
-    .featured-card:hover .featured-label { color: #4fc3f7; }
-    .featured-card.purple:hover .featured-label { color: #b39ddb; }
-    .featured-card.amber:hover .featured-label { color: #ffb74d; }
-    .featured-card.green:hover .featured-label { color: #66bb6a; }
-    .featured-card.coral:hover .featured-label { color: #ff8a65; }
-
-    .featured-badge { position: absolute; top: 8px; right: 8px; font-size: 8px; font-weight: 800; letter-spacing: 0.5px; padding: 2px 6px; border-radius: 4px; }
-    .featured-badge.new { background: rgba(79,195,247,0.15); color: #4fc3f7; border: 1px solid rgba(79,195,247,0.3); }
-    .featured-badge.hot { background: rgba(255,112,67,0.15); color: #ff7043; border: 1px solid rgba(255,112,67,0.3); }
-    .featured-badge.pro { background: rgba(255,183,77,0.15); color: #ffb74d; border: 1px solid rgba(255,183,77,0.3); }
-
-    @media (max-width: 960px) {
-      .featured-shell { grid-template-columns: 1fr; }
-      .featured-intro { position: static; }
-      .featured-stage-note { padding: 0; }
-    }
-  </style>
-</head>
-
-<body class="fx-grid">
-  <nav class="nav-header">
-    <div class="nav-container">
-      <!-- Logo -->
-      <div class="brand">
-        <div class="brand-icon">
-          <img src="/assets/volynx-icon.webp" alt="VOLYNX Icon" aria-hidden="true" />
-        </div>
-        <div class="brand-name">
-          <img src="/assets/wordmark.webp" alt="VOLYNX Wordmark" aria-hidden="true" />
-        </div>
-      </div>
-
-      <!-- Desktop Navigation -->
-      <div class="nav-links desktop-nav">
-        <a href={ROUTES.iconsStore} class="nav-link active">Vault</a>
-        <a href={ROUTES.products} class="nav-link" id="collectionsBtn">Products</a>
-        <a href={`${ROUTES.login}?return=${ROUTES.iconsStore}`} class="nav-link" id="favoritesBtn" style="display:none;">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-          </svg>
-          Favorites
-        </a>
-        <a href={ROUTES.pricing} class="btn-upgrade" id="upgradeBtn" style="display:none;">Upgrade</a>
-      </div>
-
-      <!-- Auth Buttons -->
-      <div class="nav-actions">
-        <a class="btn btn-primary" id="signInBtn" href={`${ROUTES.login}?return=${ROUTES.iconsStore}`} data-i18n="icons.signin">Sign In</a>
-
-        <!-- User Menu (hidden by default) -->
-        <div class="user-menu" id="userMenu" style="display: none;">
-          <button class="user-btn" id="userMenuBtn">
-            <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
-            <span id="userName">User</span>
-          </button>
-
-          <div class="dropdown-menu" id="dropdownMenu">
-            <div class="dropdown-item user-info">
-              <div class="user-details">
-                <span class="user-name-full" id="userNameFull"></span>
-                <span class="user-email" id="userEmail"></span>
-              </div>
-            </div>
-            <div class="dropdown-divider"></div>
-            <a href="#favorites" class="dropdown-item" id="dropdownFavoritesBtn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-              </svg>
-              My Favorites
-            </a>
-            <a href={ROUTES.pricing} class="dropdown-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <path d="M16 10a4 4 0 0 1-8 0" />
-              </svg>
-              Upgrade Plan
-            </a>
-            <div class="dropdown-divider"></div>
-            <button class="dropdown-item logout-btn" id="logoutBtn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16 17 21 12 16 7" />
-                <line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
-              Logout
-            </button>
-          </div>
-        </div>
-
-        <!-- Mobile Menu Button -->
-        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
-          <span class="menu-bar"></span>
-          <span class="menu-bar"></span>
-          <span class="menu-bar"></span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Mobile Menu -->
-    <div class="mobile-menu" id="mobileMenu">
-      <a href={ROUTES.iconsStore} class="mobile-menu-item active">Vault</a>
-      <a href={ROUTES.products} class="mobile-menu-item" id="mobileCollectionsBtn">Products</a>
-      <a href={`${ROUTES.login}?return=${ROUTES.iconsStore}`} class="mobile-menu-item" id="mobileFavoritesBtn" style="display:none;">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-        </svg>
-        Favorites
-      </a>
-      <a href={ROUTES.pricing} class="mobile-menu-item upgrade" id="mobileUpgradeBtn" style="display:none;">Upgrade to Pro</a>
-    </div>
-  </nav>
+<FlagshipLayout
+  title={pageTitle}
+  description={pageDescription}
+  ogImage="/assets/volynx-icon.webp"
+  pageClass="page-icons-store fx-grid"
+>
+  <FlagshipHeader current={ROUTES.iconsStore} ctaLabel="Go Pro" ctaHref={ROUTES.pricing} ctaI18n="nav.go_pro" />
 
   <!-- Main Content -->
   <main class="main-content">
@@ -2406,6 +2108,191 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     });
   </script>
 
-  <PageWidgets hideUtilBar={true} />
-</body>
-</html>
+  <FlagshipFooter />
+</FlagshipLayout>
+
+<style>
+    /* ── Loading / empty state panel ── */
+    .soon-panel {
+      grid-column: 1 / -1;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 32px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
+      text-align: center;
+    }
+    .soon-kicker {
+      margin: 0 0 10px;
+      color: rgba(0,240,255,.86);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .soon-panel h3 { margin: 0 0 12px; color: #fff; font-size: clamp(1.35rem, 3vw, 2rem); }
+    .soon-panel p:not(.soon-kicker) { margin: 0 auto 18px; max-width: 620px; color: rgba(255,255,255,.66); line-height: 1.7; }
+
+    /* ── Featured Icons showcase (neon premium cards) ── */
+    .featured-section {
+      padding: clamp(48px,6vw,72px) 0 clamp(28px,4vw,44px);
+      position: relative;
+    }
+    .featured-section::before {
+      content: "";
+      position: absolute;
+      inset: 10% 5% auto;
+      height: 70%;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 12% 20%, rgba(124,77,255,.18), transparent 28%),
+        radial-gradient(circle at 85% 12%, rgba(79,195,247,.18), transparent 24%),
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border: 1px solid rgba(255,255,255,.06);
+      pointer-events: none;
+    }
+    .featured-shell {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+      gap: clamp(24px, 4vw, 40px);
+      align-items: start;
+    }
+    .featured-intro {
+      position: sticky;
+      top: 104px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: clamp(20px, 2.5vw, 28px);
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(11,14,28,.92), rgba(9,11,22,.82));
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 22px 46px rgba(0,0,0,.22);
+    }
+    .featured-brand { font-size: 11px; font-weight: 700; letter-spacing: 8px; color: #4fc3f7; text-transform: uppercase; opacity: 0.8; margin: 0; }
+    .featured-title { font-size: clamp(28px,4vw,38px); line-height: 1.05; font-weight: 900; background: linear-gradient(135deg, #fff 0%, #4fc3f7 42%, #7c4dff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 0; }
+    .featured-subtitle { font-size: 12px; color: #8e99b7; letter-spacing: 1.4px; text-transform: uppercase; margin: 0; }
+    .featured-deck { margin: 0; color: rgba(255,255,255,.72); line-height: 1.75; }
+    .featured-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .featured-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      color: rgba(255,255,255,.72);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1;
+    }
+    .featured-actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 4px; }
+    .featured-stage {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0;
+    }
+    .featured-stage-note {
+      margin: 0;
+      padding: 0 6px;
+      color: rgba(255,255,255,.6);
+      font-size: .94rem;
+      line-height: 1.6;
+    }
+    .featured-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(136px, 1fr));
+      gap: 14px;
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 0;
+      position: relative;
+    }
+    /* Collapsed state: hide cards beyond the first 12 */
+    .featured-grid[data-expanded="false"] .featured-card:nth-child(n+13) { display: none; }
+    .featured-toggle-row { display: flex; justify-content: center; margin-top: clamp(18px,3vw,28px); }
+    .featured-toggle { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 999px; background: rgba(79,195,247,0.08); border: 1px solid rgba(79,195,247,0.25); color: #4fc3f7; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease; font-family: inherit; }
+    .featured-toggle:hover { background: rgba(79,195,247,0.14); border-color: rgba(79,195,247,0.5); box-shadow: 0 0 24px rgba(79,195,247,0.2); }
+    .featured-toggle-icon { transition: transform 0.25s ease; }
+    .featured-grid[data-expanded="true"] + .featured-toggle-row .featured-toggle-icon { transform: rotate(180deg); }
+    .featured-card {
+      position: relative;
+      background:
+        radial-gradient(circle at 16% 14%, rgba(124,77,255,.18), transparent 28%),
+        radial-gradient(circle at 84% 18%, rgba(79,195,247,.18), transparent 25%),
+        linear-gradient(145deg, #0d1117 0%, #111827 100%);
+      border: 1px solid rgba(111,133,170,.24);
+      border-radius: 20px;
+      padding: 24px 12px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      overflow: hidden;
+      min-height: 138px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .featured-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(79,195,247,0.4), transparent); }
+    .featured-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(79, 195, 247, 0.42);
+      background:
+        radial-gradient(circle at 16% 14%, rgba(124,77,255,.24), transparent 28%),
+        radial-gradient(circle at 84% 18%, rgba(79,195,247,.22), transparent 25%),
+        linear-gradient(145deg, #0d1117 0%, #152035 100%);
+      box-shadow: 0 14px 36px rgba(79, 195, 247, 0.13), 0 0 0 1px rgba(79,195,247,0.15);
+    }
+    .featured-card.purple::before { background: linear-gradient(90deg, transparent, rgba(124,77,255,0.45), transparent); }
+    .featured-card.purple:hover { border-color: rgba(124,77,255,0.4); box-shadow: 0 8px 32px rgba(124,77,255,0.15); }
+    .featured-card.amber::before { background: linear-gradient(90deg, transparent, rgba(255,183,77,0.45), transparent); }
+    .featured-card.amber:hover { border-color: rgba(255,183,77,0.4); box-shadow: 0 8px 32px rgba(255,183,77,0.15); }
+    .featured-card.green::before { background: linear-gradient(90deg, transparent, rgba(102,187,106,0.45), transparent); }
+    .featured-card.green:hover { border-color: rgba(102,187,106,0.4); box-shadow: 0 8px 32px rgba(102,187,106,0.15); }
+    .featured-card.coral::before { background: linear-gradient(90deg, transparent, rgba(255,112,67,0.45), transparent); }
+    .featured-card.coral:hover { border-color: rgba(255,112,67,0.4); box-shadow: 0 8px 32px rgba(255,112,67,0.15); }
+
+    .featured-svg-wrap {
+      width: 78px;
+      height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 22px;
+      position: relative;
+      background:
+        radial-gradient(circle at 24% 22%, rgba(124,77,255,.35), transparent 34%),
+        radial-gradient(circle at 76% 24%, rgba(79,195,247,.34), transparent 34%),
+        linear-gradient(180deg, rgba(13,17,31,.92), rgba(8,10,20,.98));
+      border: 1px solid rgba(255,255,255,.06);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 12px 24px rgba(0,0,0,.16);
+    }
+    .featured-svg-wrap svg {
+      display: block;
+      width: 66px;
+      height: 66px;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.22));
+    }
+    .featured-label { font-size: 11px; color: #7c87a5; letter-spacing: 0.5px; text-align: center; line-height: 1.35; font-weight: 600; transition: color 0.25s; }
+    .featured-card:hover .featured-label { color: #4fc3f7; }
+    .featured-card.purple:hover .featured-label { color: #b39ddb; }
+    .featured-card.amber:hover .featured-label { color: #ffb74d; }
+    .featured-card.green:hover .featured-label { color: #66bb6a; }
+    .featured-card.coral:hover .featured-label { color: #ff8a65; }
+
+    .featured-badge { position: absolute; top: 8px; right: 8px; font-size: 8px; font-weight: 800; letter-spacing: 0.5px; padding: 2px 6px; border-radius: 4px; }
+    .featured-badge.new { background: rgba(79,195,247,0.15); color: #4fc3f7; border: 1px solid rgba(79,195,247,0.3); }
+    .featured-badge.hot { background: rgba(255,112,67,0.15); color: #ff7043; border: 1px solid rgba(255,112,67,0.3); }
+    .featured-badge.pro { background: rgba(255,183,77,0.15); color: #ffb74d; border: 1px solid rgba(255,183,77,0.3); }
+
+    @media (max-width: 960px) {
+      .featured-shell { grid-template-columns: 1fr; }
+      .featured-intro { position: static; }
+      .featured-stage-note { padding: 0; }
+    }
+  </style>
