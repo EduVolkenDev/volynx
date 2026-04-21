@@ -42,6 +42,7 @@ const FOLDER_MANIFEST = {
   "Icons-Glass-Premium-2": { name: "Glass Icons",      category: "futuristic", plan: "premium" },
   "Iridescent-Premium":    { name: "Iridescent",       category: "futuristic", plan: "premium" },
   "Metal-Premium":         { name: "Metal",            category: "metal",      plan: "premium" },
+  "metal-chrome-premium":  { name: "Metal Chrome",     category: "metal",      plan: "premium" },
   // "Nature-Premium":     REMOVED — icons render broken (1, 24, 48… all); needs redo
   "Neon-Icons-Free":       { name: "Neon Icons",       category: "futuristic", plan: "free" },
   "Neon-Icons-Free3":      { name: "Neon Icons",       category: "futuristic", plan: "free" },
