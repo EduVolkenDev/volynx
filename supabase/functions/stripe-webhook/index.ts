@@ -26,7 +26,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 // ── Config ──────────────────────────────────────────────────
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
-  apiVersion: "2023-10-16",
+  apiVersion: "2026-02-25.clover" as any,
   httpClient: Stripe.createFetchHttpClient(),
 });
 
@@ -90,6 +90,7 @@ function detectProductKey(prefix: string): string {
   if (prefix.startsWith("studio_")) return "volynxlab";
   if (prefix.startsWith("tokens_")) return "tokens";
   if (prefix.startsWith("addon_")) return "addons";
+  if (prefix.startsWith("icons_")) return "icons_store";
   if (prefix.startsWith("kit_")) return "kits";
   if (prefix.startsWith("pf_")) return "propertyflow";
   return "volynx";

@@ -7,7 +7,7 @@
  *   1. Include this script on the page.
  *   2. Add a container with class "vx-currency-bar" — buttons auto-generated.
  *      OR add buttons manually: <button class="vx-cur-btn" data-cur="GBP">£ GBP</button>
- *   3. Mark price elements: <span data-price-gbp="£149" data-price-eur="€179" data-price-brl="R$1.049">£149</span>
+ *   3. Mark price elements: <span data-price-gbp="£187" data-price-eur="€219" data-price-brl="R$1.290">£187</span>
  *
  * The active currency is stored in localStorage as volynx_currency.
  * Default: GBP.

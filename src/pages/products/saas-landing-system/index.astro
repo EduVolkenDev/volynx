@@ -297,7 +297,7 @@ const pageDescription = "Conversion-focused landing kit with clean sections, SEO
             <div class="card-glow"></div>
             <div class="license-header">
               <span class="license-badge">STARTER</span>
-              <div class="license-price"><span data-price-gbp="£65" data-price-eur="€75" data-price-brl="R$459">£65</span></div>
+              <div class="license-price"><span class="amount" data-price-gbp="£77" data-price-eur="€89" data-price-brl="R$539">£77</span></div>
             </div>
             <h3 class="license-name">Launch</h3>
             <ul class="license-features">
@@ -315,7 +315,7 @@ const pageDescription = "Conversion-focused landing kit with clean sections, SEO
             </div>
             <div class="license-header">
               <span class="license-badge">PRO</span>
-              <div class="license-price"><span data-price-gbp="£135" data-price-eur="€159" data-price-brl="R$979">£135</span></div>
+              <div class="license-price"><span class="amount" data-price-gbp="£177" data-price-eur="€205" data-price-brl="R$1.240">£177</span></div>
             </div>
             <h3 class="license-name">Growth</h3>
             <ul class="license-features">
@@ -329,7 +329,7 @@ const pageDescription = "Conversion-focused landing kit with clean sections, SEO
             <div class="card-glow"></div>
             <div class="license-header">
               <span class="license-badge">ENTERPRISE</span>
-              <div class="license-price"><span data-price-gbp="£259" data-price-eur="€309" data-price-brl="R$1.909">£259</span></div>
+              <div class="license-price"><span class="amount" data-price-gbp="£327" data-price-eur="€379" data-price-brl="R$2.290">£327</span></div>
             </div>
             <h3 class="license-name">Scale</h3>
             <ul class="license-features">
@@ -404,57 +404,6 @@ const pageDescription = "Conversion-focused landing kit with clean sections, SEO
     });
   </script>
 
-  <script is:inline>
-(function() {
-  document.querySelectorAll('.vx-checkout-btn').forEach(function(btn) {
-    btn.addEventListener('click', async function(e) {
-      e.preventDefault();
-      var lookupBase = btn.dataset.lookup;
-      if (!lookupBase) return;
-
-      var token = localStorage.getItem('volynx_access_token');
-      if (!token) {
-        window.location.href = '/login/?next=' + encodeURIComponent(window.location.pathname);
-        return;
-      }
-
-      btn.disabled = true;
-      btn.textContent = 'Processing...';
-
-      try {
-        var cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r) { return r.json(); });
-        var apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
-
-        var currency = (localStorage.getItem('volynx_currency') || 'gbp').toLowerCase();
-        var lookupKey = lookupBase + '_' + currency;
-
-        var res = await fetch(apiBase + '/create-checkout-session', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-          body: JSON.stringify({
-            lookup_key: lookupKey,
-            success_url: window.location.origin + '/profile/?payment=success',
-            cancel_url: window.location.href + '?payment=cancelled'
-          })
-        });
-
-        var data = await res.json();
-        if (data.url) {
-          window.location.href = data.url;
-        } else {
-          alert(data.error || 'Checkout failed. Please try again.');
-          btn.disabled = false;
-          btn.textContent = btn.dataset.label || 'Buy now';
-        }
-      } catch (err) {
-        alert('Connection error. Please try again.');
-        btn.disabled = false;
-        btn.textContent = btn.dataset.label || 'Buy now';
-      }
-    });
-  });
-})();
-  </script>
 
   <SiteFooter />
   <PageWidgets />

@@ -84,7 +84,7 @@ import { ROUTES } from "../../data/routes";
      */
     function addonLabel(addonId) {
       if (!addonId) return 'Unknown Product';
-      const id = addonId.toLowerCase();
+      const id = addonId.toLowerCase().replace(/_/g, '-');
       if (id.startsWith('kit-portfolio')) {
         const variant = id.replace('kit-portfolio-', '');
         return 'Portfolio Pro Kit' + (variant ? ' \u2014 ' + titleCase(variant) : '');
@@ -97,11 +97,18 @@ import { ROUTES } from "../../data/routes";
         const variant = id.replace('kit-saas-', '');
         return 'SaaS Landing System' + (variant ? ' \u2014 ' + titleCase(variant) : '');
       }
+      if (id.startsWith('pf-')) {
+        const variant = id.replace('pf-', '');
+        return 'PropertyFlow' + (variant ? ' \u2014 ' + titleCase(variant) : '');
+      }
+      if (id.startsWith('icons-')) {
+        return 'VOLYNX Icon Vault';
+      }
       if (id === 'kit-landing-express' || id.startsWith('kit-landing')) {
         return 'Landing Express';
       }
       // Fallback: humanise the raw id
-      return addonId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      return addonId.replace(/[_-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
     }
 
     function titleCase(str) {
@@ -111,12 +118,29 @@ import { ROUTES } from "../../data/routes";
     /** Map addon_id to a Builder preset slug. */
     function addonToPreset(addonId) {
       if (!addonId) return null;
-      const id = addonId.toLowerCase();
+      const id = addonId.toLowerCase().replace(/_/g, '-');
       if (id.startsWith('kit-portfolio')) return 'portfolio';
       if (id.startsWith('kit-agency'))    return 'agency';
       if (id.startsWith('kit-saas'))      return 'saas';
       if (id === 'kit-landing-express' || id.startsWith('kit-landing')) return 'landing_express';
       return null;
+    }
+
+    function productHref(addonId) {
+      if (!addonId) return '/builder/';
+      const id = addonId.toLowerCase().replace(/_/g, '-');
+      const preset = addonToPreset(addonId);
+      if (preset) return '/builder/?preset=' + encodeURIComponent(preset);
+      if (id.startsWith('pf-')) return '/products/propertyflow/';
+      if (id.startsWith('icons-')) return '/products/volynx-icons-store/';
+      return '/builder/';
+    }
+
+    function productCta(addonId) {
+      const id = (addonId || '').toLowerCase().replace(/_/g, '-');
+      if (id.startsWith('pf-')) return 'Open PropertyFlow';
+      if (id.startsWith('icons-')) return 'Open Icon Vault';
+      return 'Open in Builder';
     }
 
     function formatDate(iso) {
@@ -140,17 +164,16 @@ import { ROUTES } from "../../data/routes";
 
     function buildCard(item) {
       const label   = addonLabel(item.addon_id || item.product_id || '');
-      const preset  = addonToPreset(item.addon_id || item.product_id || '');
       const date    = formatDate(item.created_at);
       const price   = formatPrice(item.amount_paid ?? item.amount ?? item.price, item.currency);
-      const builderHref = preset
-        ? '/builder/?preset=' + encodeURIComponent(preset)
-        : '/builder/';
+      const productId = item.addon_id || item.product_id || item.lookup_key || '';
+      const builderHref = productHref(productId);
+      const cta = productCta(productId);
 
       return `
         <article class="panel delivery-card">
           <div class="delivery-card__body">
-            <span class="eyebrow delivery-card__eyebrow">Kit</span>
+            <span class="eyebrow delivery-card__eyebrow">Product</span>
             <h3 class="delivery-card__name">${label}</h3>
             <dl class="delivery-card__meta">
               ${date  ? `<div><dt>Purchased</dt><dd>${date}</dd></div>` : ''}
@@ -158,7 +181,7 @@ import { ROUTES } from "../../data/routes";
             </dl>
           </div>
           <div class="delivery-card__actions">
-            <a href="${builderHref}" class="button button--gold delivery-card__cta">Open in Builder</a>
+            <a href="${builderHref}" class="button button--gold delivery-card__cta">${cta}</a>
           </div>
         </article>`;
     }

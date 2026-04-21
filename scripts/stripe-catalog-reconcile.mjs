@@ -60,7 +60,7 @@ const catalog = [
     family: "builder",
     tier: "launch",
     recurring: "month",
-    amounts: { gbp: 900, eur: 1090, brl: 5900 },
+    amounts: { gbp: 1100, eur: 1300, brl: 6900 },
   },
   {
     name: "Builder Pro",
@@ -69,7 +69,7 @@ const catalog = [
     family: "builder",
     tier: "pro",
     recurring: "month",
-    amounts: { gbp: 1900, eur: 2290, brl: 12900 },
+    amounts: { gbp: 2400, eur: 2800, brl: 14900 },
   },
   {
     name: "Builder Studio",
@@ -78,7 +78,7 @@ const catalog = [
     family: "builder",
     tier: "studio",
     recurring: "month",
-    amounts: { gbp: 3900, eur: 4590, brl: 24900 },
+    amounts: { gbp: 5400, eur: 6300, brl: 34900 },
   },
   {
     name: "Builder Teams",
@@ -87,7 +87,7 @@ const catalog = [
     family: "builder",
     tier: "teams",
     recurring: "month",
-    amounts: { gbp: 7900, eur: 8990, brl: 49900 },
+    amounts: { gbp: 11800, eur: 13800, brl: 74900 },
   },
   {
     name: "Studio Pro",
@@ -96,7 +96,7 @@ const catalog = [
     family: "studio",
     tier: "pro",
     recurring: "month",
-    amounts: { gbp: 1900, eur: 2290, brl: 12900 },
+    amounts: { gbp: 1800, eur: 2100, brl: 11900 },
   },
   {
     name: "Daily Pro",
@@ -105,7 +105,7 @@ const catalog = [
     family: "daily",
     tier: "pro",
     recurring: "month",
-    amounts: { gbp: 1200, eur: 1490, brl: 8900 },
+    amounts: { gbp: 1400, eur: 1600, brl: 8900 },
   },
   {
     name: "Daily Diamond",
@@ -114,7 +114,7 @@ const catalog = [
     family: "daily",
     tier: "diamond",
     recurring: "month",
-    amounts: { gbp: 2900, eur: 3490, brl: 19900 },
+    amounts: { gbp: 3400, eur: 3900, brl: 21900 },
   },
   {
     name: "VOLYNX + Daily Pro Bundle",
@@ -123,7 +123,7 @@ const catalog = [
     family: "bundle",
     tier: "pro",
     recurring: "month",
-    amounts: { gbp: 2900, eur: 3490, brl: 19900 },
+    amounts: { gbp: 3500, eur: 4100, brl: 22900 },
   },
   {
     name: "VOLYNX Studio + Daily Diamond Bundle",
@@ -132,7 +132,7 @@ const catalog = [
     family: "bundle",
     tier: "studio",
     recurring: "month",
-    amounts: { gbp: 5900, eur: 6990, brl: 39900 },
+    amounts: { gbp: 8200, eur: 9600, brl: 54900 },
   },
   {
     name: "VX Pack - Starter (12)",
@@ -141,7 +141,7 @@ const catalog = [
     family: "tokens",
     tier: "starter",
     includesTokens: "12",
-    amounts: { gbp: 990, eur: 1190, brl: 6900 },
+    amounts: { gbp: 840, eur: 980, brl: 5400 },
   },
   {
     name: "VX Pack - Core (32)",
@@ -150,7 +150,7 @@ const catalog = [
     family: "tokens",
     tier: "core",
     includesTokens: "32",
-    amounts: { gbp: 1990, eur: 2490, brl: 14900 },
+    amounts: { gbp: 1800, eur: 2100, brl: 11900 },
   },
   {
     name: "VX Pack - Pro (80)",
@@ -159,7 +159,7 @@ const catalog = [
     family: "tokens",
     tier: "pro",
     includesTokens: "80",
-    amounts: { gbp: 3990, eur: 4990, brl: 28900 },
+    amounts: { gbp: 4200, eur: 4900, brl: 27900 },
   },
   {
     name: "VX Pack - Elite (200)",
@@ -168,7 +168,7 @@ const catalog = [
     family: "tokens",
     tier: "scale",
     includesTokens: "200",
-    amounts: { gbp: 7900, eur: 9900, brl: 57900 },
+    amounts: { gbp: 8800, eur: 10200, brl: 58900 },
   },
   {
     name: "Assisted Domain Setup",
@@ -176,7 +176,7 @@ const catalog = [
     lookupPrefix: "addon_domain_setup",
     family: "addons",
     tier: "addon",
-    amounts: { gbp: 900, eur: 1090, brl: 5900 },
+    amounts: { gbp: 1500, eur: 1700, brl: 9900 },
   },
   {
     name: "Premium Template / Kit",
@@ -184,7 +184,7 @@ const catalog = [
     lookupPrefix: "addon_template_pack",
     family: "addons",
     tier: "addon",
-    amounts: { gbp: 1200, eur: 1490, brl: 7900 },
+    amounts: { gbp: 2800, eur: 3200, brl: 17900 },
   },
   {
     name: "HTML Export",
@@ -192,7 +192,7 @@ const catalog = [
     lookupPrefix: "addon_html_export",
     family: "addons",
     tier: "addon",
-    amounts: { gbp: 2900, eur: 3490, brl: 19900 },
+    amounts: { gbp: 4400, eur: 5100, brl: 29900 },
   },
   {
     name: "Extra Site Slot",
@@ -201,7 +201,7 @@ const catalog = [
     family: "addons",
     tier: "addon",
     recurring: "month",
-    amounts: { gbp: 500, eur: 590, brl: 3900 },
+    amounts: { gbp: 700, eur: 800, brl: 4900 },
   },
   {
     name: "Bilingual Pack",
@@ -209,7 +209,7 @@ const catalog = [
     lookupPrefix: "addon_bilingual",
     family: "addons",
     tier: "addon",
-    amounts: { gbp: 700, eur: 890, brl: 4900 },
+    amounts: { gbp: 1900, eur: 2200, brl: 12900 },
   },
   {
     name: "Icon Collection Pack (5 Premium)",
@@ -217,7 +217,7 @@ const catalog = [
     lookupPrefix: "addon_icons",
     family: "addons",
     tier: "addon",
-    amounts: { gbp: 900, eur: 1090, brl: 5900 },
+    amounts: { gbp: 1800, eur: 2100, brl: 11900 },
   },
   {
     name: "Icons Store Single - Budget",
@@ -225,7 +225,7 @@ const catalog = [
     lookupPrefix: "icons_single_budget",
     family: "icons_store",
     tier: "single_budget",
-    amounts: { gbp: 90, eur: 110, brl: 690 },
+    amounts: { gbp: 80, eur: 95, brl: 550 },
   },
   {
     name: "Icons Store Single - Standard",
@@ -233,7 +233,7 @@ const catalog = [
     lookupPrefix: "icons_single_standard",
     family: "icons_store",
     tier: "single_standard",
-    amounts: { gbp: 190, eur: 230, brl: 1390 },
+    amounts: { gbp: 170, eur: 195, brl: 1190 },
   },
   {
     name: "Icons Store Single - Premium",
@@ -241,7 +241,7 @@ const catalog = [
     lookupPrefix: "icons_single_premium",
     family: "icons_store",
     tier: "single_premium",
-    amounts: { gbp: 290, eur: 350, brl: 1990 },
+    amounts: { gbp: 290, eur: 340, brl: 1890 },
   },
   {
     name: "Icons Store Single - Hyper 5000px",
@@ -249,7 +249,7 @@ const catalog = [
     lookupPrefix: "icons_single_hyper",
     family: "icons_store",
     tier: "single_hyper",
-    amounts: { gbp: 590, eur: 690, brl: 3990 },
+    amounts: { gbp: 750, eur: 870, brl: 4900 },
   },
   {
     name: "Icons Store Pack - Mixed",
@@ -257,7 +257,7 @@ const catalog = [
     lookupPrefix: "icons_pack_mixed",
     family: "icons_store",
     tier: "pack_mixed",
-    amounts: { gbp: 490, eur: 590, brl: 3490 },
+    amounts: { gbp: 640, eur: 750, brl: 4200 },
   },
   {
     name: "Icons Store Pack - Premium",
@@ -265,7 +265,7 @@ const catalog = [
     lookupPrefix: "icons_pack_premium",
     family: "icons_store",
     tier: "pack_premium",
-    amounts: { gbp: 990, eur: 1190, brl: 6900 },
+    amounts: { gbp: 1400, eur: 1600, brl: 9200 },
   },
   {
     name: "Icons Store Pack - Hyper 5000px",
@@ -273,7 +273,79 @@ const catalog = [
     lookupPrefix: "icons_pack_hyper",
     family: "icons_store",
     tier: "pack_hyper",
-    amounts: { gbp: 1990, eur: 2390, brl: 13900 },
+    amounts: { gbp: 4800, eur: 5600, brl: 32000 },
+  },
+  {
+    name: "Portfolio Pro Kit - Personal",
+    description: "Personal-license portfolio kit with Builder preset, premium section system, motion direction and launch checklist.",
+    lookupPrefix: "kit_portfolio_personal",
+    family: "kits",
+    tier: "portfolio_personal",
+    amounts: { gbp: 4700, eur: 5400, brl: 32900 },
+  },
+  {
+    name: "Portfolio Pro Kit - Commercial",
+    description: "Commercial portfolio kit for client-facing work: Builder preset, SEO structure, section variants and handoff checklist.",
+    lookupPrefix: "kit_portfolio_commercial",
+    family: "kits",
+    tier: "portfolio_commercial",
+    amounts: { gbp: 11700, eur: 13600, brl: 81900 },
+  },
+  {
+    name: "Portfolio Pro Kit - Studio",
+    description: "Studio portfolio kit license with extended commercial usage, Builder preset and reusable delivery system.",
+    lookupPrefix: "kit_portfolio_studio",
+    family: "kits",
+    tier: "portfolio_studio",
+    amounts: { gbp: 24700, eur: 28700, brl: 172000 },
+  },
+  {
+    name: "Agency Launch Kit - Starter",
+    description: "Agency starter kit with Builder preset, positioning structure, proposal logic and launch-ready agency page system.",
+    lookupPrefix: "kit_agency_personal",
+    family: "kits",
+    tier: "agency_personal",
+    amounts: { gbp: 8700, eur: 10100, brl: 60900 },
+  },
+  {
+    name: "Agency Launch Kit - Commercial",
+    description: "Agency commercial kit for client delivery: Builder preset, proposal/SOW assets and premium conversion sections.",
+    lookupPrefix: "kit_agency_commercial",
+    family: "kits",
+    tier: "agency_commercial",
+    amounts: { gbp: 18700, eur: 21700, brl: 129000 },
+  },
+  {
+    name: "Agency Launch Kit - Studio",
+    description: "Agency studio license with reusable delivery system, Builder preset, client-ready structure and operations checklist.",
+    lookupPrefix: "kit_agency_studio",
+    family: "kits",
+    tier: "agency_studio",
+    amounts: { gbp: 34700, eur: 39900, brl: 239000 },
+  },
+  {
+    name: "SaaS Landing System - Launch",
+    description: "SaaS launch kit with Builder preset, conversion-first landing blocks, pricing/FAQ sections and launch checklist.",
+    lookupPrefix: "kit_saas_personal",
+    family: "kits",
+    tier: "saas_personal",
+    amounts: { gbp: 7700, eur: 8900, brl: 53900 },
+  },
+  {
+    name: "SaaS Landing System - Growth",
+    description: "Commercial SaaS landing system with Builder preset, variant logic, conversion sections and client-ready delivery scope.",
+    lookupPrefix: "kit_saas_commercial",
+    family: "kits",
+    tier: "saas_commercial",
+    amounts: { gbp: 17700, eur: 20500, brl: 124000 },
+  },
+  {
+    name: "SaaS Landing System - Scale",
+    description: "Studio SaaS landing system with advanced variant structure, Builder preset and reusable launch framework.",
+    lookupPrefix: "kit_saas_studio",
+    family: "kits",
+    tier: "saas_studio",
+    amounts: { gbp: 32700, eur: 37900, brl: 229000 },
   },
   {
     name: "PropertyFlow Starter (3 templates)",
@@ -281,7 +353,7 @@ const catalog = [
     lookupPrefix: "pf_starter",
     family: "propertyflow",
     tier: "starter",
-    amounts: { gbp: 14900, eur: 17900, brl: 104900 },
+    amounts: { gbp: 18700, eur: 21900, brl: 129000 },
   },
   {
     name: "PropertyFlow Professional (6 templates)",
@@ -289,7 +361,7 @@ const catalog = [
     lookupPrefix: "pf_professional",
     family: "propertyflow",
     tier: "professional",
-    amounts: { gbp: 34900, eur: 41900, brl: 244900 },
+    amounts: { gbp: 44700, eur: 51900, brl: 309000 },
   },
   {
     name: "PropertyFlow Enterprise (15 templates)",
@@ -297,7 +369,7 @@ const catalog = [
     lookupPrefix: "pf_enterprise",
     family: "propertyflow",
     tier: "enterprise",
-    amounts: { gbp: 59900, eur: 69900, brl: 419900 },
+    amounts: { gbp: 89700, eur: 103900, brl: 619000 },
   },
 ];
 

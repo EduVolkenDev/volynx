@@ -57,11 +57,24 @@ FUNCTIONS=(
   "pix-webhook"
 )
 
+NO_VERIFY_JWT=(
+  "deduct-tokens"
+  "get-balance"
+  "check-permission"
+  "create-checkout-session"
+  "create-portal-session"
+  "redeem-voucher"
+  "log-usage"
+  "create-pix-checkout"
+  "check-pix-status"
+  "stripe-webhook"
+  "pix-webhook"
+)
+
 for fn in "${FUNCTIONS[@]}"; do
   if [ -d "supabase/functions/$fn" ]; then
     echo "  Deploying: $fn"
-    # pix-webhook and stripe-webhook need --no-verify-jwt
-    if [[ "$fn" == *"webhook"* ]]; then
+    if [[ " ${NO_VERIFY_JWT[*]} " == *" $fn "* ]]; then
       supabase functions deploy "$fn" --no-verify-jwt || echo "  ⚠ Failed: $fn"
     else
       supabase functions deploy "$fn" || echo "  ⚠ Failed: $fn"

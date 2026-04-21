@@ -50,15 +50,15 @@ export const sitePricing = {
     en: 'Commercial fixed prices for a stable PT/EN experience. Do not use spot FX conversion on the front-end.'
   },
   tokenUnitPrice: {
-    GBP: '£0.99',
-    EUR: '€1.19',
-    BRL: 'R$6.90'
+    GBP: 'from £0.44',
+    EUR: 'from €0.51',
+    BRL: 'from R$2.95'
   },
   tokenPacks: [
     {
       id: 'starter',
       amount: 12,
-      price: { GBP: '£9.90', EUR: '€11.90', BRL: 'R$69' },
+      price: { GBP: '£8.40', EUR: '€9.80', BRL: 'R$54' },
       badge: { pt: 'Starter', en: 'Starter' },
       description: {
         pt: 'Ideal para uso leve e ações pontuais.',
@@ -68,7 +68,7 @@ export const sitePricing = {
     {
       id: 'core',
       amount: 32,
-      price: { GBP: '£19.90', EUR: '€24.90', BRL: 'R$149' },
+      price: { GBP: '£18', EUR: '€21', BRL: 'R$119' },
       badge: { pt: 'Core · Mais popular', en: 'Core · Most popular' },
       description: {
         pt: 'O melhor equilíbrio entre valor e capacidade.',
@@ -78,7 +78,7 @@ export const sitePricing = {
     {
       id: 'pro',
       amount: 80,
-      price: { GBP: '£39.90', EUR: '€49.90', BRL: 'R$289' },
+      price: { GBP: '£42', EUR: '€49', BRL: 'R$279' },
       badge: { pt: 'Pro · Melhor custo', en: 'Pro · Best value' },
       description: {
         pt: 'Para usuários frequentes e fluxos mais exigentes.',
@@ -88,7 +88,7 @@ export const sitePricing = {
     {
       id: 'scale',
       amount: 200,
-      price: { GBP: '£79', EUR: '€99', BRL: 'R$579' },
+      price: { GBP: '£88', EUR: '€102', BRL: 'R$589' },
       badge: { pt: 'Elite', en: 'Elite' },
       description: {
         pt: 'Capacidade máxima para uso intensivo e operações maiores.',
@@ -101,7 +101,7 @@ export const sitePricing = {
       id: 'light',
       label: { pt: 'Classe A — ação leve', en: 'Class A — light action' },
       tokens: '1 token',
-      price: { GBP: '£0.99', EUR: '€1.19', BRL: 'R$6.90' },
+      price: { GBP: 'from £0.44', EUR: 'from €0.51', BRL: 'from R$2.95' },
       examples: {
         pt: ['converter 1 arquivo', 'resize simples', 'QR básico com download padrão'],
         en: ['convert 1 file', 'simple resize', 'basic QR with standard download']
@@ -111,7 +111,7 @@ export const sitePricing = {
       id: 'medium',
       label: { pt: 'Classe B — ação média', en: 'Class B — medium action' },
       tokens: '2 tokens',
-      price: { GBP: '£1.98', EUR: '€2.38', BRL: 'R$13.80' },
+      price: { GBP: 'from £0.88', EUR: 'from €1.02', BRL: 'from R$5.90' },
       examples: {
         pt: ['upscale simples', 'QR com branding', 'lote pequeno'],
         en: ['simple upscale', 'branded QR', 'small batch']
@@ -121,7 +121,7 @@ export const sitePricing = {
       id: 'pro',
       label: { pt: 'Classe C — ação pro', en: 'Class C — pro action' },
       tokens: '4 tokens',
-      price: { GBP: '£3.96', EUR: '€4.76', BRL: 'R$27.60' },
+      price: { GBP: 'from £1.76', EUR: 'from €2.04', BRL: 'from R$11.80' },
       examples: {
         pt: ['image suite completa', 'upscale melhor', 'lote médio'],
         en: ['full image suite', 'better upscale', 'mid-size batch']
@@ -131,7 +131,7 @@ export const sitePricing = {
       id: 'batch',
       label: { pt: 'Classe D — batch / valor comercial', en: 'Class D — batch / commercial value' },
       tokens: '8 tokens',
-      price: { GBP: '£7.92', EUR: '€9.52', BRL: 'R$55.20' },
+      price: { GBP: 'from £3.52', EUR: 'from €4.08', BRL: 'from R$23.60' },
       examples: {
         pt: ['batch grande', 'export premium', 'ação com impacto comercial'],
         en: ['large batch', 'premium export', 'commercial-impact action']
@@ -141,7 +141,7 @@ export const sitePricing = {
       id: 'premium',
       label: { pt: 'Classe E — premium / business action', en: 'Class E — premium / business action' },
       tokens: '12–20 tokens',
-      price: { GBP: '£11.88–£19.80', EUR: '€14.28–€23.80', BRL: 'R$82.80–R$138' },
+      price: { GBP: 'from £5.28–£8.80', EUR: 'from €6.12–€10.20', BRL: 'from R$35.40–R$59' },
       examples: {
         pt: ['HTML export', 'custom domain setup premium', 'template premium'],
         en: ['HTML export', 'premium custom domain setup', 'premium template']
@@ -173,7 +173,7 @@ export const sitePricing = {
         pt: 'Para lançar páginas enxutas com velocidade e presença profissional.',
         en: 'For launching lean pages with speed and professional presence.'
       },
-      price: { GBP: '£9', EUR: '€10.90', BRL: 'R$59' },
+      price: { GBP: '£11', EUR: '€13', BRL: 'R$69' },
       billing: { pt: '/mês', en: '/month' },
       cta: { pt: 'Assinar Launch', en: 'Get Launch' },
       features: {
@@ -191,7 +191,7 @@ export const sitePricing = {
         pt: 'Para quem precisa publicar com domínio próprio, remover branding e operar com mais credibilidade.',
         en: 'For users who need custom domains, no branding, and more credibility in production.'
       },
-      price: { GBP: '£19', EUR: '€22.90', BRL: 'R$129' },
+      price: { GBP: '£24', EUR: '€28', BRL: 'R$149' },
       billing: { pt: '/mês', en: '/month' },
       cta: { pt: 'Ir de Pro', en: 'Go Pro' },
       features: {
@@ -207,7 +207,7 @@ export const sitePricing = {
         pt: 'Para creators, freelancers e pequenos estúdios que publicam com frequência e precisam de kits completos.',
         en: 'For creators, freelancers, and small studios publishing frequently with full premium kits.'
       },
-      price: { GBP: '£39', EUR: '€45.90', BRL: 'R$249' },
+      price: { GBP: '£54', EUR: '€63', BRL: 'R$349' },
       billing: { pt: '/mês', en: '/month' },
       cta: { pt: 'Assinar Studio', en: 'Get Studio' },
       features: {
@@ -223,7 +223,7 @@ export const sitePricing = {
         pt: 'Para operações em equipe com billing central, ativos compartilhados e escala real.',
         en: 'For team operations with central billing, shared assets, and real scale.'
       },
-      price: { GBP: '£79', EUR: '€89.90', BRL: 'R$499' },
+      price: { GBP: '£118', EUR: '€138', BRL: 'R$749' },
       billing: { pt: '/mês', en: '/month' },
       cta: { pt: 'Falar com a Volynx', en: 'Talk to Volynx' },
       features: {
@@ -251,7 +251,7 @@ export const sitePricing = {
       featured: true,
       name: { pt: 'Daily Pro', en: 'Daily Pro' },
       description: { pt: 'Mais capacidade, sync na nuvem, exportação e processamento mais inteligente.', en: 'More capacity, cloud sync, exports, and smarter processing.' },
-      price: { GBP: '£12', EUR: '€14.90', BRL: 'R$89' },
+      price: { GBP: '£14', EUR: '€16', BRL: 'R$89' },
       billing: { pt: '/mês', en: '/month' },
       cta: { pt: 'Ir de Pro', en: 'Go Pro' },
       features: {
@@ -263,7 +263,7 @@ export const sitePricing = {
       id: 'daily_diamond',
       name: { pt: 'Daily Diamond', en: 'Daily Diamond' },
       description: { pt: 'Uso intensivo, analytics, acesso expandido e prioridade operacional.', en: 'Heavy usage, analytics, expanded access, and operational priority.' },
-      price: { GBP: '£29', EUR: '€34.90', BRL: 'R$199' },
+      price: { GBP: '£34', EUR: '€39', BRL: 'R$219' },
       billing: { pt: '/mês', en: '/month' },
       cta: { pt: 'Ir de Diamond', en: 'Go Diamond' },
       features: {
@@ -278,7 +278,7 @@ export const sitePricing = {
       name: { pt: 'VOLYNX Essential', en: 'VOLYNX Essential' },
       includes: { pt: 'Builder Pro + Daily Pro', en: 'Builder Pro + Daily Pro' },
       description: { pt: 'Para criadores solo que constroem sites e dependem de ferramentas diárias.', en: 'For solo creators building sites and relying on daily tools.' },
-      price: { GBP: '£29', EUR: '€34.90', BRL: 'R$199' },
+      price: { GBP: '£35', EUR: '€41', BRL: 'R$229' },
       billing: { pt: '/mês', en: '/month' },
       savings: { pt: 'Economize vs. separado', en: 'Save vs. separate' },
       cta: { pt: 'Assinar Essential', en: 'Get Essential' }
@@ -289,7 +289,7 @@ export const sitePricing = {
       name: { pt: 'VOLYNX Complete', en: 'VOLYNX Complete' },
       includes: { pt: 'Builder Studio + Daily Diamond', en: 'Builder Studio + Daily Diamond' },
       description: { pt: 'Para power users, estúdios e operações que precisam do melhor conjunto completo.', en: 'For power users, studios, and operations that need the strongest complete setup.' },
-      price: { GBP: '£59', EUR: '€69.90', BRL: 'R$399' },
+      price: { GBP: '£82', EUR: '€96', BRL: 'R$549' },
       billing: { pt: '/mês', en: '/month' },
       savings: { pt: 'Economize 13% vs. separado', en: 'Save 13% vs. separate' },
       cta: { pt: 'Assinar Complete', en: 'Get Complete' }
@@ -300,31 +300,37 @@ export const sitePricing = {
       id: 'domain-setup',
       name: { pt: 'Configuração assistida de domínio', en: 'Assisted domain setup' },
       description: { pt: 'Ativação rápida do domínio com menos fricção.', en: 'Faster domain activation with less friction.' },
-      price: { GBP: '£9', EUR: '€10.90', BRL: 'R$59' }
+      price: { GBP: '£15', EUR: '€17', BRL: 'R$99' }
     },
     {
       id: 'template-pack',
       name: { pt: 'Template / kit premium', en: 'Premium template / kit' },
       description: { pt: 'Kits prontos para páginas premium de conversão.', en: 'Ready-made kits for premium conversion pages.' },
-      price: { GBP: '£12', EUR: '€14.90', BRL: 'R$79' }
+      price: { GBP: '£28', EUR: '€32', BRL: 'R$179' }
     },
     {
       id: 'html-export',
       name: { pt: 'HTML export', en: 'HTML export' },
       description: { pt: 'Pacote exportável para uso fora da plataforma.', en: 'Exportable package for use outside the platform.' },
-      price: { GBP: '£29', EUR: '€34.90', BRL: 'R$199' }
+      price: { GBP: '£44', EUR: '€51', BRL: 'R$299' }
     },
     {
       id: 'extra-slot',
       name: { pt: 'Site slot extra', en: 'Extra site slot' },
       description: { pt: 'Mais capacidade sem troca imediata de plano.', en: 'More capacity without an immediate plan upgrade.' },
-      price: { GBP: '£5/mo', EUR: '€5.90/mo', BRL: 'R$39/mês' }
+      price: { GBP: '£7/mo', EUR: '€8/mo', BRL: 'R$49/mês' }
     },
     {
       id: 'bilingual',
       name: { pt: 'Bilingual pack', en: 'Bilingual pack' },
       description: { pt: 'Suporte a versão em dois idiomas no publish.', en: 'Two-language support in published projects.' },
-      price: { GBP: '£7', EUR: '€8.90', BRL: 'R$49' }
+      price: { GBP: '£19', EUR: '€22', BRL: 'R$129' }
+    },
+    {
+      id: 'icons-addon',
+      name: { pt: 'Icon collection pack', en: 'Icon collection pack' },
+      description: { pt: 'Coleções premium permanentes para usar nos seus projetos.', en: 'Permanent premium collections for your own projects.' },
+      price: { GBP: '£18', EUR: '€21', BRL: 'R$119' }
     }
   ] satisfies BuilderAddon[],
   labels: {

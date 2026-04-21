@@ -176,9 +176,9 @@ const bundleLookupById = {
         <div class="panel" style="padding:24px;">
           <strong><span class="i18n-en">CVitae Business</span><span class="i18n-pt">CVitae Business</span></strong>
           <div style="font-size:1.1rem;font-weight:700;margin:8px 0;color:var(--muted);">
-            <span class="vx-price" data-currency="GBP">£15</span>
-            <span class="vx-price vx-price--hidden" data-currency="EUR">€17.90</span>
-            <span class="vx-price vx-price--hidden" data-currency="BRL">R$99</span>
+            <span class="vx-price" data-currency="GBP">£18</span>
+            <span class="vx-price vx-price--hidden" data-currency="EUR">€21</span>
+            <span class="vx-price vx-price--hidden" data-currency="BRL">R$119</span>
             <span style="font-size:13px;font-weight:400;"><span class="i18n-en">/month</span><span class="i18n-pt">/mês</span></span>
           </div>
           <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.6;"><span class="i18n-en">For professionals who need unlimited exports, premium templates, and multi-CV management.</span><span class="i18n-pt">Para profissionais que precisam de exports ilimitados, templates premium e gestão de múltiplos CVs.</span></p>
@@ -366,9 +366,13 @@ const bundleLookupById = {
           el.classList.toggle('vx-price--hidden', curr !== target);
           el.classList.toggle('pricing-card__price--hidden', curr !== target);
         });
+        document.querySelectorAll('.token-card__pix').forEach(function(el) {
+          el.style.display = target === 'BRL' ? 'flex' : 'none';
+        });
         var url = new URL(window.location.href);
         url.searchParams.set('currency', target);
         history.replaceState(null, '', url.toString());
+        try { localStorage.setItem('volynx_currency', target); } catch {}
       });
     });
   </script>
@@ -396,7 +400,15 @@ const bundleLookupById = {
       if (cb) cb.style.display = '';
       history.replaceState({}, '', '/pricing/');
     }
-    const currency = (urlParams.get('currency') || 'GBP').toLowerCase();
+    function normalizeCurrency(value) {
+      const code = String(value || 'GBP').toLowerCase();
+      return ['gbp', 'eur', 'brl'].includes(code) ? code : 'gbp';
+    }
+
+    function getCheckoutCurrency() {
+      const active = document.querySelector('[data-switch-currency].lcbar__pill--active')?.dataset.switchCurrency;
+      return normalizeCurrency(active || new URLSearchParams(window.location.search).get('currency') || localStorage.getItem('volynx_currency') || 'GBP');
+    }
 
     let cfg = null;
     let token = localStorage.getItem('volynx_access_token') || '';
@@ -432,7 +444,7 @@ const bundleLookupById = {
         e.preventDefault();
         if (!token) { window.location.href = '/login/?next=/pricing/'; return; }
         if (!apiBase) { alert('Checkout not configured.'); return; }
-        const lookupKey = lookupPrefix + '_' + currency;
+        const lookupKey = lookupPrefix + '_' + getCheckoutCurrency();
         btn.textContent = 'Redirecting...';
         btn.style.pointerEvents = 'none';
         try {
@@ -462,7 +474,7 @@ const bundleLookupById = {
           const res = await fetch(apiBase + '/create-checkout-session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-            body: JSON.stringify({ lookup_key: bundleKey + '_' + currency, success_url: window.location.origin + '/profile/?payment=success', cancel_url: window.location.origin + '/pricing/?payment=cancelled' }),
+            body: JSON.stringify({ lookup_key: bundleKey + '_' + getCheckoutCurrency(), success_url: window.location.origin + '/profile/?payment=success', cancel_url: window.location.origin + '/pricing/?payment=cancelled' }),
           });
           const data = await res.json();
           if (data.url) window.location.href = data.url;
@@ -485,7 +497,7 @@ const bundleLookupById = {
           const res = await fetch(apiBase + '/create-checkout-session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-            body: JSON.stringify({ lookup_key: packKey + '_' + currency }),
+            body: JSON.stringify({ lookup_key: packKey + '_' + getCheckoutCurrency() }),
           });
           const data = await res.json();
           if (data.url) window.location.href = data.url;
@@ -496,7 +508,7 @@ const bundleLookupById = {
 
     // ── Token pack: Pix checkout (BRL only) ──
     // Show Pix buttons when currency is BRL
-    if (currency === 'brl') {
+    if (getCheckoutCurrency() === 'brl') {
       document.querySelectorAll('.token-card__pix').forEach(btn => {
         btn.style.display = 'flex';
       });
@@ -524,7 +536,7 @@ const bundleLookupById = {
         if (!apiBase) return;
         const addonKey = btn.getAttribute('data-addon-key');
         if (!addonKey) return;
-        const lookupKey = addonKey + '_' + currency;
+        const lookupKey = addonKey + '_' + getCheckoutCurrency();
         btn.textContent = '...';
         btn.style.pointerEvents = 'none';
         try {

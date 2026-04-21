@@ -3,7 +3,7 @@
  * VOLYNX Icons Store — catalog regenerator
  *
  * Scans public/assets/icons-store/ and builds catalog.json from ONLY the
- * top-level folders tagged GREEN in Finder (macOS color label).
+ * top-level folders tagged GREEN or PURPLE in Finder (macOS color label).
  *
  * - Does NOT recurse into sub-folders of Regenerate/, Repairable/, etc.
  * - Skips folders tagged Orange (needs regenerate), Yellow (needs repair),
@@ -29,7 +29,7 @@ const DRY_RUN = process.argv.includes("--dry-run");
 const IMAGE_EXT = new Set([".png", ".webp", ".jpg", ".jpeg", ".svg"]);
 
 // ── Explicit folder → friendly-name + category + plan mapping ──────────────
-// Only folders listed here will ship, AND the folder must be GREEN-tagged.
+// Only folders listed here will ship, AND the folder must be tagged GREEN or PURPLE.
 const FOLDER_MANIFEST = {
   "Abstract-Free":         { name: "Abstract",         category: "futuristic", plan: "free" },
   // "BigIcons-Free":      REMOVED — icons render broken; needs redo (re-enable after fix)
@@ -37,6 +37,7 @@ const FOLDER_MANIFEST = {
   "Day-By-Day-free":       { name: "Day by Day",       category: "simple",     plan: "free" },
   // "Free-Greens":        REMOVED — icons render broken; needs redo
   // "Free-Purples":       REMOVED — icons render broken; needs redo
+  "glow-premium":          { name: "Glow",             category: "futuristic", plan: "premium" },
   "Hyper-Icons-Premium":   { name: "Hyper Icons",      category: "futuristic", plan: "premium" },
   "Icons-Glass-Premium":   { name: "Glass Icons",      category: "futuristic", plan: "premium" },
   "Icons-Glass-Premium-2": { name: "Glass Icons",      category: "futuristic", plan: "premium" },
@@ -49,21 +50,30 @@ const FOLDER_MANIFEST = {
   // "Pink-Abstract-Free": REMOVED — icons render broken; needs redo
   "Poligon-Premium":       { name: "Polygon",          category: "futuristic", plan: "premium" },
   "purple-icons-premium":  { name: "Purple Icons",     category: "purple",     plan: "premium" },
+  "soft-blue":             { name: "Soft Blue",        category: "blue",       plan: "premium" },
+  "soft-dark-blue":        { name: "Soft Dark Blue",   category: "blue",       plan: "premium" },
+  "soft-green":            { name: "Soft Green",       category: "green",      plan: "premium" },
+  "soft-orange":           { name: "Soft Orange",      category: "draw",       plan: "premium" },
+  "soft-red":              { name: "Soft Red",         category: "pink",       plan: "premium" },
+  "vintage-premium":       { name: "Vintage",          category: "futuristic", plan: "premium" },
 };
 
 // ── Read Finder tag for a folder via mdls ──────────────────────────────────
-function getTag(absPath) {
+function getTags(absPath) {
   try {
     const out = execSync(
       `mdls -raw -name kMDItemUserTags ${JSON.stringify(absPath)}`,
       { encoding: "utf8" }
     );
-    // Format: "(\n    Green\n)" or "(null)" or "(\n    Orange\n)"
-    const match = out.match(/\b(Red|Orange|Yellow|Green|Blue|Purple|Gr[ae]y)\b/i);
-    return match ? match[1].charAt(0).toUpperCase() + match[1].slice(1).toLowerCase() : null;
+    return [...out.matchAll(/\b(Red|Orange|Yellow|Green|Blue|Purple|Gr[ae]y)\b/gi)]
+      .map(m => m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase());
   } catch {
-    return null;
+    return [];
   }
+}
+
+function isShippingTagged(tags) {
+  return tags.includes("Green") || tags.includes("Purple");
 }
 
 // ── Walk files in a single folder (no recursion) ──────────────────────────
@@ -103,15 +113,16 @@ function main() {
 
   for (const folderName of entries.sort()) {
     const abs = path.join(iconsRoot, folderName);
-    const tag = getTag(abs);
+    const tags = getTags(abs);
+    const tagLabel = tags.length ? tags.join(", ") : "(untagged)";
     const manifestEntry = FOLDER_MANIFEST[folderName];
 
-    if (tag !== "Green") {
-      report.skipped_not_green.push({ folder: folderName, tag: tag || "(untagged)" });
+    if (!isShippingTagged(tags)) {
+      report.skipped_not_green.push({ folder: folderName, tag: tagLabel });
       continue;
     }
     if (!manifestEntry) {
-      report.missing_manifest.push({ folder: folderName, tag });
+      report.missing_manifest.push({ folder: folderName, tag: tagLabel });
       continue;
     }
 
@@ -147,18 +158,18 @@ function main() {
   console.log("Icons Store catalog regenerator");
   console.log("═══════════════════════════════════════════════════════════════════════\n");
 
-  console.log(`Included (green-tagged + in manifest):`);
+  console.log(`Included (green/purple-tagged + in manifest):`);
   for (const r of report.included) {
     console.log(`  ✓ ${r.folder.padEnd(28)} → "${r.name}" · ${r.count} icons · ${r.plan}`);
   }
 
   if (report.skipped_not_green.length) {
-    console.log(`\nSkipped (not green-tagged):`);
+    console.log(`\nSkipped (not green/purple-tagged):`);
     for (const r of report.skipped_not_green) console.log(`  ✗ ${r.folder.padEnd(28)} tag=${r.tag}`);
   }
 
   if (report.missing_manifest.length) {
-    console.log(`\nNeeds manifest entry (green but unmapped):`);
+    console.log(`\nNeeds manifest entry (green/purple but unmapped):`);
     for (const r of report.missing_manifest) console.log(`  ⚠ ${r.folder.padEnd(28)} tag=${r.tag}  — add to FOLDER_MANIFEST`);
   }
 

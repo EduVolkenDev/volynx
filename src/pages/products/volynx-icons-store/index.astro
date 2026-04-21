@@ -1073,17 +1073,17 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
 
     const ICON_PRICE_TIERS = {
       free: { vx: "0 VX", money: "", lookup: "", label: "Free" },
-      budget: { vx: "19 VX", money: "£0.90", lookup: "icons_single_budget", label: "Budget single" },
-      standard: { vx: "29 VX", money: "£1.90", lookup: "icons_single_standard", label: "Standard single" },
+      budget: { vx: "9 VX", money: "£0.80", lookup: "icons_single_budget", label: "Budget single" },
+      standard: { vx: "24 VX", money: "£1.70", lookup: "icons_single_standard", label: "Standard single" },
       premium: { vx: "45 VX", money: "£2.90", lookup: "icons_single_premium", label: "Premium single" },
-      hyper: { vx: "95 VX", money: "£5.90", lookup: "icons_single_hyper", label: "Hyper 5000px single" },
+      hyper: { vx: "120 VX", money: "£7.50", lookup: "icons_single_hyper", label: "Hyper 5000px single" },
     } as const;
 
     const ICON_PACK_PRICES = {
       free: { label: "Free with signup", lookup: "", display: "" },
-      mixed: { label: "From 120 VX · £4.90", lookup: "icons_pack_mixed", display: "120 VX · £4.90" },
-      premium: { label: "From 240 VX · £9.90", lookup: "icons_pack_premium", display: "240 VX · £9.90" },
-      hyper: { label: "5000px Hyper pack · £19.90", lookup: "icons_pack_hyper", display: "490 VX · £19.90" },
+      mixed: { label: "90 VX · £6.40", lookup: "icons_pack_mixed", display: "90 VX · £6.40" },
+      premium: { label: "260 VX · £14", lookup: "icons_pack_premium", display: "260 VX · £14" },
+      hyper: { label: "5000px Hyper pack · £48", lookup: "icons_pack_hyper", display: "820 VX · £48" },
     } as const;
 
     function storeLang() {
@@ -1952,8 +1952,8 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       const closeCopy = L === "pt" ? "Continuar olhando" : "Keep browsing";
       const format = item.type === "svg" ? "SVG" : "PNG";
       const bodyCopy = L === "pt"
-        ? "Licencie este ícone sozinho em VX ou peça a compra em dinheiro. Se ele fizer parte de um pack, você também pode abrir a coleção completa sem sair da página."
-        : "License this icon by itself with VX or request a cash purchase. If it belongs to a pack, you can also open the full collection without leaving this page.";
+        ? "Licencie este ícone sozinho com VX ou checkout Stripe. Se ele fizer parte de um pack, você também pode abrir a coleção completa sem sair da página."
+        : "License this icon by itself with VX or Stripe checkout. If it belongs to a pack, you can also open the full collection without leaving this page.";
 
       openModal(`
         <div class="single-modal-shell">
@@ -1963,7 +1963,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
             <h3 class="single-modal-title">${escHtml(label)}</h3>
             <p class="single-modal-text">${bodyCopy}</p>
             <div class="single-modal-price-row">
-              <span class="single-modal-price"><strong>${escHtml(item.priceVX || "29 VX")}</strong><small>VX</small></span>
+              <span class="single-modal-price"><strong>${escHtml(item.priceVX || "24 VX")}</strong><small>VX</small></span>
               ${item.money ? `<span class="single-modal-price single-modal-price--cash"><strong>${escHtml(item.money)}</strong><small>${L === "pt" ? "dinheiro" : "cash"}</small></span>` : ""}
             </div>
             <div class="single-modal-actions">
@@ -2207,7 +2207,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     }
 
     function showPremiumModal(icon: any) {
-      const colPrice = (icon as any).collectionPrice || "£4.99";
+      const colPrice = (icon as any).collectionPrice || "£14";
       openModal(`
         <img src="${icon.path}" alt="" style="width:80px;height:80px;object-fit:contain;background:#fff;border-radius:12px;padding:8px;margin:0 auto 1rem;display:block;" />
         <p style="color:rgba(200,150,255,.9);font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem;">Premium Collection</p>
@@ -2220,16 +2220,23 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
           </div>
           <div style="background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(255,0,110,.15));border:1px solid rgba(139,92,246,.4);border-radius:12px;padding:1rem;text-align:center;">
             <div style="color:rgba(200,150,255,.8);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.25rem;">Full combo</div>
-            <div style="color:#fff;font-size:1.5rem;font-weight:900;">£19.99</div>
+            <div style="color:#fff;font-size:1.5rem;font-weight:900;">£48</div>
             <div style="color:rgba(200,150,255,.7);font-size:.65rem;margin-top:.15rem;">All premium collections</div>
           </div>
         </div>
 
         <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
-          <a href="/contact/?product=volynx-icons-store&intent=collection-access" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#8b5cf6,#ff006e);color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.875rem;">Request collection access</a>
+          <button id="premiumCollectionCheckoutBtn" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#8b5cf6,#ff006e);color:#fff;font-weight:700;border-radius:10px;border:none;font-size:.875rem;cursor:pointer;">Checkout collection</button>
+          <button id="premiumComboCheckoutBtn" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#00f0ff,#8b5cf6);color:#020617;font-weight:800;border-radius:10px;border:none;font-size:.875rem;cursor:pointer;">Checkout full combo</button>
           <a href="/products/volynx-icons-store/" style="padding:.75rem 1.5rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.875rem;border:1px solid rgba(255,255,255,.2);">Back to vault</a>
         </div>
       `);
+      document.getElementById("premiumCollectionCheckoutBtn")?.addEventListener("click", () => {
+        startIconCheckout(ICON_PACK_PRICES.premium.lookup, document.getElementById("premiumCollectionCheckoutBtn"));
+      });
+      document.getElementById("premiumComboCheckoutBtn")?.addEventListener("click", () => {
+        startIconCheckout(ICON_PACK_PRICES.hyper.lookup, document.getElementById("premiumComboCheckoutBtn"));
+      });
     }
 
     // ===== NOTIFICATIONS =====

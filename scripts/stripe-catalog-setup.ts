@@ -37,7 +37,9 @@ if (!STRIPE_KEY || (!STRIPE_KEY.startsWith("sk_test_") && !STRIPE_KEY.startsWith
 const mode = STRIPE_KEY.startsWith("sk_test_") ? "test" : "live";
 console.log(`\n  Mode: ${mode.toUpperCase()} (key loaded from env)\n`);
 
-const stripe = new Stripe(STRIPE_KEY);
+const stripe = new Stripe(STRIPE_KEY, {
+  apiVersion: "2026-02-25.clover" as any,
+});
 
 // ── Types ─────────────────────────────────────────────────
 type Cur = "gbp" | "eur" | "brl";
@@ -79,7 +81,7 @@ const BUILDER_SUBS: ProductDef[] = [
       builder_sites_limit: "1",
       is_addon: "false",
     },
-    prices: { recurring: { interval: "month" }, amounts: { gbp: 900, eur: 1090, brl: 5900 } },
+    prices: { recurring: { interval: "month" }, amounts: { gbp: 1100, eur: 1300, brl: 6900 } },
   },
   {
     name: "Builder Pro",
@@ -103,7 +105,7 @@ const BUILDER_SUBS: ProductDef[] = [
       builder_sites_limit: "3",
       is_addon: "false",
     },
-    prices: { recurring: { interval: "month" }, amounts: { gbp: 1900, eur: 2290, brl: 12900 } },
+    prices: { recurring: { interval: "month" }, amounts: { gbp: 2400, eur: 2800, brl: 14900 } },
   },
   {
     name: "Builder Studio",
@@ -127,7 +129,7 @@ const BUILDER_SUBS: ProductDef[] = [
       builder_sites_limit: "10",
       is_addon: "false",
     },
-    prices: { recurring: { interval: "month" }, amounts: { gbp: 3900, eur: 4590, brl: 24900 } },
+    prices: { recurring: { interval: "month" }, amounts: { gbp: 5400, eur: 6300, brl: 34900 } },
   },
   {
     name: "Builder Teams",
@@ -150,7 +152,7 @@ const BUILDER_SUBS: ProductDef[] = [
       builder_sites_limit: "25",
       is_addon: "false",
     },
-    prices: { recurring: { interval: "month" }, amounts: { gbp: 7900, eur: 8990, brl: 49900 } },
+    prices: { recurring: { interval: "month" }, amounts: { gbp: 11800, eur: 13800, brl: 74900 } },
   },
 ];
 
@@ -175,7 +177,7 @@ const STUDIO_PRO: ProductDef = {
     builder_sites_limit: "0",
     is_addon: "false",
   },
-  prices: { recurring: { interval: "month" }, amounts: { gbp: 1900, eur: 2290, brl: 12900 } },
+  prices: { recurring: { interval: "month" }, amounts: { gbp: 1800, eur: 2100, brl: 11900 } },
 };
 
 const TOKEN_PACKS: ProductDef[] = [
@@ -193,7 +195,7 @@ const TOKEN_PACKS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 990, eur: 1190, brl: 6900 } },
+    prices: { amounts: { gbp: 840, eur: 980, brl: 5400 } },
   },
   {
     name: "VX Pack — Core (32)",
@@ -209,7 +211,7 @@ const TOKEN_PACKS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 1990, eur: 2490, brl: 14900 } },
+    prices: { amounts: { gbp: 1800, eur: 2100, brl: 11900 } },
   },
   {
     name: "VX Pack — Pro (80)",
@@ -225,7 +227,7 @@ const TOKEN_PACKS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 3990, eur: 4990, brl: 28900 } },
+    prices: { amounts: { gbp: 4200, eur: 4900, brl: 27900 } },
   },
   {
     name: "VX Pack — Elite (200)",
@@ -241,7 +243,7 @@ const TOKEN_PACKS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 7900, eur: 9900, brl: 57900 } },
+    prices: { amounts: { gbp: 8800, eur: 10200, brl: 58900 } },
   },
 ];
 
@@ -260,7 +262,7 @@ const ADDONS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "true",
     },
-    prices: { amounts: { gbp: 900, eur: 1090, brl: 5900 } },
+    prices: { amounts: { gbp: 1500, eur: 1700, brl: 9900 } },
   },
   {
     name: "Premium Template / Kit",
@@ -276,7 +278,7 @@ const ADDONS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "true",
     },
-    prices: { amounts: { gbp: 1200, eur: 1490, brl: 7900 } },
+    prices: { amounts: { gbp: 2800, eur: 3200, brl: 17900 } },
   },
   {
     name: "HTML Export",
@@ -292,7 +294,7 @@ const ADDONS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "true",
     },
-    prices: { amounts: { gbp: 2900, eur: 3490, brl: 19900 } },
+    prices: { amounts: { gbp: 4400, eur: 5100, brl: 29900 } },
   },
   {
     name: "Extra Site Slot",
@@ -308,7 +310,7 @@ const ADDONS: ProductDef[] = [
       builder_sites_limit: "+1",
       is_addon: "true",
     },
-    prices: { recurring: { interval: "month" }, amounts: { gbp: 500, eur: 590, brl: 3900 } },
+    prices: { recurring: { interval: "month" }, amounts: { gbp: 700, eur: 800, brl: 4900 } },
   },
   {
     name: "Bilingual Pack",
@@ -324,7 +326,7 @@ const ADDONS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "true",
     },
-    prices: { amounts: { gbp: 700, eur: 890, brl: 4900 } },
+    prices: { amounts: { gbp: 1900, eur: 2200, brl: 12900 } },
   },
   {
     name: "Icon Collection Pack (5 Premium)",
@@ -340,7 +342,7 @@ const ADDONS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "true",
     },
-    prices: { amounts: { gbp: 900, eur: 1090, brl: 5900 } },
+    prices: { amounts: { gbp: 1800, eur: 2100, brl: 11900 } },
   },
   {
     name: "Icons Store Single - Budget",
@@ -356,7 +358,7 @@ const ADDONS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 90, eur: 110, brl: 690 } },
+    prices: { amounts: { gbp: 80, eur: 95, brl: 550 } },
   },
   {
     name: "Icons Store Single - Standard",
@@ -372,7 +374,7 @@ const ADDONS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 190, eur: 230, brl: 1390 } },
+    prices: { amounts: { gbp: 170, eur: 195, brl: 1190 } },
   },
   {
     name: "Icons Store Single - Premium",
@@ -388,7 +390,7 @@ const ADDONS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 290, eur: 350, brl: 1990 } },
+    prices: { amounts: { gbp: 290, eur: 340, brl: 1890 } },
   },
   {
     name: "Icons Store Single - Hyper 5000px",
@@ -404,7 +406,7 @@ const ADDONS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 590, eur: 690, brl: 3990 } },
+    prices: { amounts: { gbp: 750, eur: 870, brl: 4900 } },
   },
   {
     name: "Icons Store Pack - Mixed",
@@ -420,7 +422,7 @@ const ADDONS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 490, eur: 590, brl: 3490 } },
+    prices: { amounts: { gbp: 640, eur: 750, brl: 4200 } },
   },
   {
     name: "Icons Store Pack - Premium",
@@ -436,7 +438,7 @@ const ADDONS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 990, eur: 1190, brl: 6900 } },
+    prices: { amounts: { gbp: 1400, eur: 1600, brl: 9200 } },
   },
   {
     name: "Icons Store Pack - Hyper 5000px",
@@ -452,7 +454,7 @@ const ADDONS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 1990, eur: 2390, brl: 13900 } },
+    prices: { amounts: { gbp: 4800, eur: 5600, brl: 32000 } },
   },
 ];
 
@@ -480,7 +482,7 @@ const DAILY_SUBS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { recurring: { interval: "month" }, amounts: { gbp: 1200, eur: 1490, brl: 8900 } },
+    prices: { recurring: { interval: "month" }, amounts: { gbp: 1400, eur: 1600, brl: 8900 } },
   },
   {
     name: "Daily Diamond",
@@ -503,7 +505,7 @@ const DAILY_SUBS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { recurring: { interval: "month" }, amounts: { gbp: 2900, eur: 3490, brl: 19900 } },
+    prices: { recurring: { interval: "month" }, amounts: { gbp: 3400, eur: 3900, brl: 21900 } },
   },
 ];
 
@@ -530,7 +532,7 @@ const BUNDLE_SUBS: ProductDef[] = [
       builder_sites_limit: "3",
       is_addon: "false",
     },
-    prices: { recurring: { interval: "month" }, amounts: { gbp: 2900, eur: 3490, brl: 19900 } },
+    prices: { recurring: { interval: "month" }, amounts: { gbp: 3500, eur: 4100, brl: 22900 } },
   },
   {
     name: "VOLYNX Studio + Daily Diamond Bundle",
@@ -552,8 +554,41 @@ const BUNDLE_SUBS: ProductDef[] = [
       builder_sites_limit: "10",
       is_addon: "false",
     },
-    prices: { recurring: { interval: "month" }, amounts: { gbp: 5900, eur: 6990, brl: 39900 } },
+    prices: { recurring: { interval: "month" }, amounts: { gbp: 8200, eur: 9600, brl: 54900 } },
   },
+];
+
+// ── Launch Kit Products ─────────────────────────────────
+
+function kitProduct(name: string, description: string, lookupPrefix: string, tier: string, amounts: Amounts): ProductDef {
+  return {
+    name,
+    description,
+    lookupPrefix,
+    metadata: {
+      product_family: "kits",
+      plan_tier: tier,
+      billing_type: "one_time",
+      currency_scope: "multi",
+      includes_tokens: "0",
+      includes_icons: "false",
+      builder_sites_limit: "0",
+      is_addon: "false",
+    },
+    prices: { amounts },
+  };
+}
+
+const KIT_PRODUCTS: ProductDef[] = [
+  kitProduct("Portfolio Pro Kit - Personal", "Personal-license portfolio kit with Builder preset, premium section system, motion direction and launch checklist.", "kit_portfolio_personal", "portfolio_personal", { gbp: 4700, eur: 5400, brl: 32900 }),
+  kitProduct("Portfolio Pro Kit - Commercial", "Commercial portfolio kit for client-facing work: Builder preset, SEO structure, section variants and handoff checklist.", "kit_portfolio_commercial", "portfolio_commercial", { gbp: 11700, eur: 13600, brl: 81900 }),
+  kitProduct("Portfolio Pro Kit - Studio", "Studio portfolio kit license with extended commercial usage, Builder preset and reusable delivery system.", "kit_portfolio_studio", "portfolio_studio", { gbp: 24700, eur: 28700, brl: 172000 }),
+  kitProduct("Agency Launch Kit - Starter", "Agency starter kit with Builder preset, positioning structure, proposal logic and launch-ready agency page system.", "kit_agency_personal", "agency_personal", { gbp: 8700, eur: 10100, brl: 60900 }),
+  kitProduct("Agency Launch Kit - Commercial", "Agency commercial kit for client delivery: Builder preset, proposal/SOW assets and premium conversion sections.", "kit_agency_commercial", "agency_commercial", { gbp: 18700, eur: 21700, brl: 129000 }),
+  kitProduct("Agency Launch Kit - Studio", "Agency studio license with reusable delivery system, Builder preset, client-ready structure and operations checklist.", "kit_agency_studio", "agency_studio", { gbp: 34700, eur: 39900, brl: 239000 }),
+  kitProduct("SaaS Landing System - Launch", "SaaS launch kit with Builder preset, conversion-first landing blocks, pricing/FAQ sections and launch checklist.", "kit_saas_personal", "saas_personal", { gbp: 7700, eur: 8900, brl: 53900 }),
+  kitProduct("SaaS Landing System - Growth", "Commercial SaaS landing system with Builder preset, variant logic, conversion sections and client-ready delivery scope.", "kit_saas_commercial", "saas_commercial", { gbp: 17700, eur: 20500, brl: 124000 }),
+  kitProduct("SaaS Landing System - Scale", "Studio SaaS landing system with advanced variant structure, Builder preset and reusable launch framework.", "kit_saas_studio", "saas_studio", { gbp: 32700, eur: 37900, brl: 229000 }),
 ];
 
 // ── PropertyFlow Products ─────────────────────────────────
@@ -580,7 +615,7 @@ const PROPERTYFLOW: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 14900, eur: 17900, brl: 104900 } },
+    prices: { amounts: { gbp: 18700, eur: 21900, brl: 129000 } },
   },
   {
     name: "PropertyFlow Professional (6 templates)",
@@ -604,7 +639,7 @@ const PROPERTYFLOW: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 34900, eur: 41900, brl: 244900 } },
+    prices: { amounts: { gbp: 44700, eur: 51900, brl: 309000 } },
   },
   {
     name: "PropertyFlow Enterprise (15 templates)",
@@ -627,7 +662,7 @@ const PROPERTYFLOW: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 59900, eur: 69900, brl: 419900 } },
+    prices: { amounts: { gbp: 89700, eur: 103900, brl: 619000 } },
   },
 ];
 
@@ -762,6 +797,9 @@ async function main() {
 
   console.log("── Add-ons ──\n");
   for (const def of ADDONS) await createProductWithPrices(def);
+
+  console.log("── Launch Kits ──\n");
+  for (const def of KIT_PRODUCTS) await createProductWithPrices(def);
 
   console.log("── PropertyFlow ──\n");
   for (const def of PROPERTYFLOW) await createProductWithPrices(def);

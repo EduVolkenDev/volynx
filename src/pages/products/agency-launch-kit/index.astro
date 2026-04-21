@@ -292,7 +292,7 @@ const pageDescription = "Website + proposal/SOW/onboarding pack to close faster 
         <div class="grid grid-3">
           <div class="price-card">
             <div class="price-tag">STARTER</div>
-            <div class="price-value"><span data-price-gbp="£59" data-price-eur="€65" data-price-brl="R$399">£59</span></div>
+            <div class="price-value"><span data-price-gbp="£87" data-price-eur="€101" data-price-brl="R$609">£87</span></div>
             <h3 class="price-name">Starter</h3>
             <ul class="price-features">
               <li>6 sections</li>
@@ -307,7 +307,7 @@ const pageDescription = "Website + proposal/SOW/onboarding pack to close faster 
               POPULAR
             </div>
             <div class="price-tag">PRO</div>
-            <div class="price-value"><span data-price-gbp="£119" data-price-eur="€139" data-price-brl="R$869">£119</span></div>
+            <div class="price-value"><span data-price-gbp="£187" data-price-eur="€217" data-price-brl="R$1.290">£187</span></div>
             <h3 class="price-name">Agency Pro</h3>
             <ul class="price-features">
               <li>10 sections</li>
@@ -318,7 +318,7 @@ const pageDescription = "Website + proposal/SOW/onboarding pack to close faster 
           </div>
           <div class="price-card">
             <div class="price-tag">ENTERPRISE</div>
-            <div class="price-value"><span data-price-gbp="£229" data-price-eur="€269" data-price-brl="R$1.679">£229</span></div>
+            <div class="price-value"><span data-price-gbp="£347" data-price-eur="€399" data-price-brl="R$2.390">£347</span></div>
             <h3 class="price-name">Studio</h3>
             <ul class="price-features">
               <li>13+ sections</li>
@@ -400,57 +400,6 @@ const pageDescription = "Website + proposal/SOW/onboarding pack to close faster 
     });
   </script>
 
-  <script is:inline>
-(function() {
-  document.querySelectorAll('.vx-checkout-btn').forEach(function(btn) {
-    btn.addEventListener('click', async function(e) {
-      e.preventDefault();
-      var lookupBase = btn.dataset.lookup;
-      if (!lookupBase) return;
-
-      var token = localStorage.getItem('volynx_access_token');
-      if (!token) {
-        window.location.href = '/login/?next=' + encodeURIComponent(window.location.pathname);
-        return;
-      }
-
-      btn.disabled = true;
-      btn.textContent = 'Processing...';
-
-      try {
-        var cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r) { return r.json(); });
-        var apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
-
-        var currency = (localStorage.getItem('volynx_currency') || 'gbp').toLowerCase();
-        var lookupKey = lookupBase + '_' + currency;
-
-        var res = await fetch(apiBase + '/create-checkout-session', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-          body: JSON.stringify({
-            lookup_key: lookupKey,
-            success_url: window.location.origin + '/profile/?payment=success',
-            cancel_url: window.location.href + '?payment=cancelled'
-          })
-        });
-
-        var data = await res.json();
-        if (data.url) {
-          window.location.href = data.url;
-        } else {
-          alert(data.error || 'Checkout failed. Please try again.');
-          btn.disabled = false;
-          btn.textContent = btn.dataset.label || 'Buy now';
-        }
-      } catch (err) {
-        alert('Connection error. Please try again.');
-        btn.disabled = false;
-        btn.textContent = btn.dataset.label || 'Buy now';
-      }
-    });
-  });
-})();
-  </script>
 
   <SiteFooter />
   <PageWidgets />
