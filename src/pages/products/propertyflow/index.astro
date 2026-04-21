@@ -417,12 +417,12 @@ const pageDescription = "Premium property management platform for real estate ag
         <p class="sub" data-i18n="pf.templates_desc">Each template is a different property grid layout — optimized for different listing styles, screen sizes, and use cases. Pick your package, pay once, plug it in.</p>
       </div>
       <div class="template-preview-grid">
-        <div class="tpl-card"><div class="tpl-thumb tpl-thumb--1"></div><span>Classic Grid</span></div>
-        <div class="tpl-card"><div class="tpl-thumb tpl-thumb--2"></div><span>Magazine</span></div>
-        <div class="tpl-card"><div class="tpl-thumb tpl-thumb--3"></div><span>Compact List</span></div>
-        <div class="tpl-card tpl-card--pro"><div class="tpl-thumb tpl-thumb--4"></div><span>Gallery Hero</span><span class="tpl-pro-tag">Pro+</span></div>
-        <div class="tpl-card tpl-card--pro"><div class="tpl-thumb tpl-thumb--5"></div><span>Split View</span><span class="tpl-pro-tag">Pro+</span></div>
-        <div class="tpl-card tpl-card--pro"><div class="tpl-thumb tpl-thumb--6"></div><span>Masonry</span><span class="tpl-pro-tag">Pro+</span></div>
+        <div class="tpl-card"><div class="tpl-thumb tpl-thumb--1"></div><span data-i18n="pf.tpl_classic">Classic Grid</span></div>
+        <div class="tpl-card"><div class="tpl-thumb tpl-thumb--2"></div><span data-i18n="pf.tpl_magazine">Magazine</span></div>
+        <div class="tpl-card"><div class="tpl-thumb tpl-thumb--3"></div><span data-i18n="pf.tpl_compact">Compact List</span></div>
+        <div class="tpl-card tpl-card--pro"><div class="tpl-thumb tpl-thumb--4"></div><span data-i18n="pf.tpl_gallery">Gallery Hero</span><span class="tpl-pro-tag">Pro+</span></div>
+        <div class="tpl-card tpl-card--pro"><div class="tpl-thumb tpl-thumb--5"></div><span data-i18n="pf.tpl_split">Split View</span><span class="tpl-pro-tag">Pro+</span></div>
+        <div class="tpl-card tpl-card--pro"><div class="tpl-thumb tpl-thumb--6"></div><span data-i18n="pf.tpl_masonry">Masonry</span><span class="tpl-pro-tag">Pro+</span></div>
       </div>
       <p class="sub" style="margin-top:16px;font-size:.85rem;opacity:.5;" data-i18n="pf.templates_note">Enterprise includes 15 templates with all variations. Preview all templates after purchase.</p>
     </section>
@@ -448,7 +448,7 @@ const pageDescription = "Premium property management platform for real estate ag
             <li data-i18n="pf.plan1_f5">Responsive design</li>
             <li data-i18n="pf.plan1_f6">Static data mode</li>
           </ul>
-          <button type="button" class="btn btn--ghost price-card__cta pf-checkout" data-lookup="pf_starter" data-i18n="pf.plan1_cta">Buy Starter — £149</button>
+          <button type="button" class="btn btn--ghost price-card__cta vx-checkout-btn" data-lookup="pf_starter" data-i18n="pf.plan1_cta">Buy Starter — £149</button>
         </div>
         <div class="price-card price-card--featured">
           <span class="price-card__name" data-i18n="pf.plan2_name">Professional</span>
@@ -464,7 +464,7 @@ const pageDescription = "Premium property management platform for real estate ag
             <li data-i18n="pf.plan2_f6">Enquiry capture system</li>
             <li data-i18n="pf.plan2_f7">Deployment guide</li>
           </ul>
-          <button type="button" class="btn btn--primary price-card__cta pf-checkout" data-lookup="pf_professional" data-i18n="pf.plan2_cta">Buy Professional — £349</button>
+          <button type="button" class="btn btn--primary price-card__cta vx-checkout-btn" data-lookup="pf_professional" data-i18n="pf.plan2_cta">Buy Professional — £349</button>
         </div>
         <div class="price-card">
           <span class="price-card__name" data-i18n="pf.plan3_name">Enterprise</span>
@@ -478,7 +478,7 @@ const pageDescription = "Premium property management platform for real estate ag
             <li data-i18n="pf.plan3_f5">Data migration support</li>
             <li data-i18n="pf.plan3_f6">Dedicated support channel</li>
           </ul>
-          <button type="button" class="btn btn--primary price-card__cta pf-checkout" data-lookup="pf_enterprise" data-i18n="pf.plan3_cta">Buy Enterprise — £599</button>
+          <button type="button" class="btn btn--primary price-card__cta vx-checkout-btn" data-lookup="pf_enterprise" data-i18n="pf.plan3_cta">Buy Enterprise — £599</button>
         </div>
       </div>
       <p class="sub" style="margin-top:20px;font-size:.85rem;text-align:center;opacity:.5;" data-i18n="pf.pricing_note">All packages are one-time purchases. No free updates included. Template updates available at a fixed price — we'll contact you when new layouts are ready.</p>
@@ -506,7 +506,7 @@ const pageDescription = "Premium property management platform for real estate ag
   <!-- Checkout handler -->
   <script is:inline>
   (function() {
-    document.querySelectorAll('.pf-checkout').forEach(function(btn) {
+    document.querySelectorAll('.vx-checkout-btn').forEach(function(btn) {
       btn.addEventListener('click', async function() {
         var lookup = btn.getAttribute('data-lookup');
         var token = localStorage.getItem('volynx_access_token');
