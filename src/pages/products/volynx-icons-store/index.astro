@@ -1331,7 +1331,9 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     let assetSingles: any[] = [];
     let singleFormatFilter = "all";
     let visibleCount = 48;
-    const DUPLICATE_COLLECTIONS = new Set(["Glass Icons II", "Neon Icons III"]);
+    // Catalog is deduped at generation time (see scripts/regenerate-icons-catalog.mjs).
+    // Two disk folders can map to the same collection name — totals merge in the catalog.
+    const DUPLICATE_COLLECTIONS = new Set();
 
     const STORE_TEXT = {
       en: {
@@ -1538,9 +1540,8 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         if (!res.ok) throw new Error(`HTTP ${res.status} fetching catalog.json`);
         const parsed = await res.json();
         if (!Array.isArray(parsed)) throw new Error("catalog.json is not an array");
-        const duplicateCount = parsed.filter((icon) => DUPLICATE_COLLECTIONS.has(icon.collection)).length;
-        allIcons = parsed.filter((icon) => !DUPLICATE_COLLECTIONS.has(icon.collection));
-        console.info(`[icons-store] catalog loaded: ${allIcons.length} icons across ${new Set(allIcons.map(i => i.collection)).size} packs${duplicateCount ? ` (${duplicateCount} duplicate pack entries hidden)` : ""}`);
+        allIcons = parsed;
+        console.info(`[icons-store] catalog loaded: ${allIcons.length} icons across ${new Set(allIcons.map(i => i.collection)).size} packs`);
         updateGalleryHeading();
         renderGallery();
         updateStats();
