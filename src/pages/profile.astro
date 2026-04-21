@@ -179,19 +179,19 @@ import { ROUTES } from "../data/routes";
 				<div class="section-label" data-i18n="profile.your_subscriptions">Your Subscriptions</div>
 				<div class="subs-grid" id="subsGrid">
 					<div class="sub-card">
-						<div class="sub-card__icon"><img src="/assets/new-builder.webp" alt="builder icon"></div>
+						<div class="sub-card__icon"><img src="/assets/new-builder.webp" alt="" loading="lazy" /></div>
 						<div class="sub-card__label">VOLYNX Builder</div>
 						<div class="sub-card__plan" id="subBuilderPlan">Free</div>
 						<a href={ROUTES.pricing} class="sub-card__link" id="subBuilderCta" data-i18n="profile.sub_upgrade">Upgrade</a>
 					</div>
 					<div class="sub-card">
-						<div class="sub-card__icon">&#9728;</div>
+						<div class="sub-card__icon"><img src="/assets/daily-icon.webp" alt="" loading="lazy" /></div>
 						<div class="sub-card__label">VOLYNX Daily</div>
 						<div class="sub-card__plan" id="subDailyPlan">Free</div>
 						<a href="https://daily.volynx.world/pricing/" class="sub-card__link" id="subDailyCta" data-i18n="profile.sub_upgrade">Upgrade</a>
 					</div>
 					<div class="sub-card">
-						<div class="sub-card__icon">&#127912;</div>
+						<div class="sub-card__icon"><img src="/assets/V.webp" alt="" loading="lazy" /></div>
 						<div class="sub-card__label" data-i18n="profile.sub_tokens_label">VX</div>
 						<div class="sub-card__plan" id="subTokens">0</div>
 						<a href={ROUTES.recarregar} class="sub-card__link" data-i18n="profile.sub_buy_tokens">Get VX</a>
@@ -204,22 +204,22 @@ import { ROUTES } from "../data/routes";
 				<div class="section-label" data-i18n="profile.quick_access">Quick Access</div>
 				<div class="quick-grid">
 					<a href={ROUTES.builder} class="quick-card">
-						<span class="quick-card__icon">&#128187;</span>
+						<span class="quick-card__icon"><img src="/assets/new-builder.webp" alt="" loading="lazy" /></span>
 						<span class="quick-card__title" data-i18n="profile.quick_builder_title">Builder</span>
 						<span class="quick-card__desc text-muted" data-i18n="profile.quick_builder_desc">Create & publish sites</span>
 					</a>
 					<a href={ROUTES.studio} class="quick-card">
-						<span class="quick-card__icon">&#127912;</span>
+						<span class="quick-card__icon"><img src="/assets/imagestudio.webp" alt="" loading="lazy" /></span>
 						<span class="quick-card__title" data-i18n="profile.quick_studio_title">Studio Pro</span>
 						<span class="quick-card__desc text-muted" data-i18n="profile.quick_studio_desc">Image tools & exports</span>
 					</a>
 					<a href={ROUTES.iconsStore} class="quick-card">
-						<span class="quick-card__icon">&#11088;</span>
+						<span class="quick-card__icon"><img src="/assets/icons-store-logo2.webp" alt="" loading="lazy" /></span>
 						<span class="quick-card__title" data-i18n="profile.quick_icons_title">Icon Vault</span>
 						<span class="quick-card__desc text-muted" data-i18n="profile.quick_icons_desc">Browse packs</span>
 					</a>
 					<a href="https://daily.volynx.world/tools/my-day/" class="quick-card">
-						<span class="quick-card__icon">&#9728;</span>
+						<span class="quick-card__icon"><img src="/assets/daily-icon.webp" alt="" loading="lazy" /></span>
 						<span class="quick-card__title" data-i18n="profile.quick_daily_title">Daily OS</span>
 						<span class="quick-card__desc text-muted" data-i18n="profile.quick_daily_desc">Your daily dashboard</span>
 					</a>
@@ -1192,9 +1192,10 @@ import { ROUTES } from "../data/routes";
 	.form-status { margin: 0; font-size: .85rem; color: var(--muted); }
 
 	/* Subscription cards */
-	.subs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+	.subs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 	.sub-card { padding: 18px; border-radius: 16px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); text-align: center; }
-	.sub-card__icon { font-size: 1.5rem; margin-bottom: 6px; }
+	.sub-card__icon { font-size: 1.5rem; margin-bottom: 10px; display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.05); }
+	.sub-card__icon img { width: 32px; height: 32px; max-width: 32px; max-height: 32px; object-fit: contain; display: block; }
 	.sub-card__label { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
 	.sub-card__plan { font-size: 1.4rem; font-weight: 800; letter-spacing: -.03em; margin: 4px 0; }
 	.sub-card__plan[data-tier="launch"] { color: #86efac; }
@@ -1206,12 +1207,13 @@ import { ROUTES } from "../data/routes";
 	.sub-card__link:hover { text-decoration: underline; }
 
 	/* Quick access grid */
-	.quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-	.quick-card { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 20px 12px; border-radius: 16px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); text-align: center; transition: all .2s; }
-	.quick-card:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.12); transform: translateY(-2px); }
-	.quick-card__icon { font-size: 1.8rem; }
-	.quick-card__title { font-size: .9rem; font-weight: 700; }
-	.quick-card__desc { font-size: .75rem; }
+	.quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+	.quick-card { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 22px 14px; border-radius: 16px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); text-align: center; transition: all .2s; text-decoration: none; color: inherit; }
+	.quick-card:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.12); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,240,255,.08); }
+	.quick-card__icon { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, rgba(0,240,255,.1), rgba(124,77,255,.08)); border: 1px solid rgba(255,255,255,.08); }
+	.quick-card__icon img { width: 40px; height: 40px; max-width: 40px; max-height: 40px; object-fit: contain; display: block; filter: drop-shadow(0 2px 8px rgba(0,240,255,.25)); }
+	.quick-card__title { font-size: .95rem; font-weight: 700; letter-spacing: -.01em; }
+	.quick-card__desc { font-size: .78rem; }
 
 	.bottom-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
 	.timeline-row { display: flex; align-items: flex-start; gap: 10px; }
