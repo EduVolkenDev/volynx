@@ -1087,6 +1087,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       checkAuth();
       await loadCatalog();
       await loadAssetShowcase();
+      harvestFeaturedSingles();
       renderSingleIcons();
 
       const y = document.getElementById("y");
@@ -1159,6 +1160,30 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       document.getElementById("packResetBtn")?.addEventListener("click", () => {
         clearPackSelection(false);
       });
+    }
+
+    // Pull the 40 inline neon SVG cards from the Featured section into the
+    // single-icons SVG pool so they surface under the "SVG" filter.
+    function harvestFeaturedSingles() {
+      const cards = document.querySelectorAll<HTMLButtonElement>(".featured-card[data-featured-filter]");
+      const items = Array.from(cards).map((card) => {
+        const svgEl = card.querySelector(".featured-svg-wrap svg");
+        const label = card.querySelector(".featured-label")?.textContent?.trim() || "Neon Icon";
+        const filterKey = card.dataset.featuredFilter || "futuristic";
+        return {
+          type: "svg",
+          label,
+          number: "",
+          svg: svgEl ? svgEl.outerHTML : "",
+          category: "Neon Essentials",
+          collection: "Neon Essentials",
+          relatedCollection: findCollectionForCategory(filterKey) || "Neon Icons",
+          priceVX: "29 VX",
+          money: "£1.90",
+        };
+      }).filter((item) => item.svg);
+      // Prepend neon essentials so they render first in the SVG filter
+      assetSingles = [...items, ...assetSingles];
     }
 
     async function loadAssetShowcase() {
