@@ -138,6 +138,7 @@ window.VX_TRANS = {
 
     /* === WIDGETS === */
     "widget.lang":  "EN",
+    "widget.lang_full": "Language",
     "widget.login": "Login",
     "widget.tokens": "VX",
     "widget.recharge": "Get VX",
@@ -2241,6 +2242,7 @@ window.VX_TRANS = {
 
     /* === WIDGETS === */
     "widget.lang":  "PT",
+    "widget.lang_full": "Idioma",
     "widget.login": "Entrar",
     "widget.tokens": "VX",
     "widget.recharge": "Comprar VX",

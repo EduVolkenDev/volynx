@@ -78,6 +78,10 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
     ))}
     <a href={ROUTES.pricing} class="vx-mobile__link" data-i18n="nav.pricing">Pricing</a>
     <hr class="vx-mobile__hr" />
+    <button type="button" class="vx-mobile__link vx-mobile__lang" id="vxLangToggleMobile" aria-label="Toggle language">
+      <span data-i18n="widget.lang_full">Language</span>
+      <span class="vx-mobile__lang-tag" id="vxLangTagMobile">EN</span>
+    </button>
     <a href={ROUTES.login} class="vx-mobile__link" data-auth="out" data-i18n="nav.login">Login</a>
     <a href={ctaHref} class="vx-mobile__cta" data-auth="out" data-i18n={ctaI18n}>{ctaLabel}</a>
     <a href={ROUTES.profile} class="vx-mobile__profile" data-auth="in">
@@ -383,9 +387,11 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
 
   /* ── RESPONSIVE ──────────────────────────────────── */
   @media (max-width: 979px) {
-    .vx-login, .vx-cta, .vx-lang { display: none !important; }
+    .vx-login, .vx-cta { display: none !important; }
     :global(.vx-authed) .vx-cta { display: none !important; }
     .vx-burger { display: inline-flex; }
+    /* Lang toggle stays visible on mobile — every page must expose it */
+    .vx-lang { display: inline-flex; min-width: 40px; height: 34px; padding: 0 10px; font-size: 11px; }
   }
   @media (max-width: 767px) {
     .vx-token-pill .vx-token-label { display: none; }
@@ -400,6 +406,40 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
   @media (max-width: 380px) {
     :global(.vx-authed) .vx-recharge { padding: 7px 12px; font-size: 11px; }
   }
+
+  /* Mobile lang toggle row */
+  .vx-mobile__lang {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: transparent;
+    border: 0;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 500;
+    font-family: inherit;
+  }
+  .vx-mobile__lang-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: #18181b;
+    border: 1px solid #3f3f46;
+    color: var(--topbar-muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+  .vx-mobile__lang:hover .vx-mobile__lang-tag {
+    color: #fff;
+    border-color: var(--topbar-accent);
+  }
 </style>
 
 <script>
@@ -413,6 +453,27 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
       btn.setAttribute("aria-expanded", String(open));
     });
   }
+
+  // Mobile lang toggle — forwards to the topbar toggle and syncs label
+  const langMobileBtn = document.getElementById("vxLangToggleMobile");
+  const langMobileTag = document.getElementById("vxLangTagMobile");
+  const topbarLangBtn = document.getElementById("vxLangToggle");
+  function syncMobileLangTag() {
+    if (!langMobileTag) return;
+    const lang = localStorage.getItem("volynx_lang") || "en";
+    langMobileTag.textContent = lang.toUpperCase();
+  }
+  syncMobileLangTag();
+  langMobileBtn?.addEventListener("click", () => {
+    // Forward the click to the canonical toggle so page-widgets.js handles persistence + applyTranslations
+    topbarLangBtn?.click();
+    // Close the mobile menu after language change for clean UX
+    nav?.classList.remove("is-open");
+    btn?.classList.remove("is-open");
+    btn?.setAttribute("aria-expanded", "false");
+    setTimeout(syncMobileLangTag, 50);
+  });
+  window.addEventListener("vx:lang-changed", syncMobileLangTag);
 
   // Token pill — resilient: cache → VxTokens (polled) → direct fetch fallback
   (function wireTokenPill() {
