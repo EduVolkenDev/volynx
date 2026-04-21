@@ -32,20 +32,20 @@ const IMAGE_EXT = new Set([".png", ".webp", ".jpg", ".jpeg", ".svg"]);
 // Only folders listed here will ship, AND the folder must be GREEN-tagged.
 const FOLDER_MANIFEST = {
   "Abstract-Free":         { name: "Abstract",         category: "futuristic", plan: "free" },
-  "BigIcons-Free":         { name: "Big Icons",        category: "simple",     plan: "free" },
-  "Chromed-Premium":       { name: "Chromed",          category: "metal",      plan: "premium" },
+  // "BigIcons-Free":      REMOVED — icons render broken; needs redo (re-enable after fix)
+  // "Chromed-Premium":    REMOVED — icons render broken (12, 115, 153… all); needs redo
   "Day-By-Day-free":       { name: "Day by Day",       category: "simple",     plan: "free" },
-  "Free-Greens":           { name: "Greens",           category: "green",      plan: "free" },
-  "Free-Purples":          { name: "Purples",          category: "purple",     plan: "free" },
+  // "Free-Greens":        REMOVED — icons render broken; needs redo
+  // "Free-Purples":       REMOVED — icons render broken; needs redo
   "Hyper-Icons-Premium":   { name: "Hyper Icons",      category: "futuristic", plan: "premium" },
   "Icons-Glass-Premium":   { name: "Glass Icons",      category: "futuristic", plan: "premium" },
   "Icons-Glass-Premium-2": { name: "Glass Icons",      category: "futuristic", plan: "premium" },
   "Iridescent-Premium":    { name: "Iridescent",       category: "futuristic", plan: "premium" },
   "Metal-Premium":         { name: "Metal",            category: "metal",      plan: "premium" },
-  "Nature-Premium":        { name: "Nature",           category: "green",      plan: "premium" },
+  // "Nature-Premium":     REMOVED — icons render broken (1, 24, 48… all); needs redo
   "Neon-Icons-Free":       { name: "Neon Icons",       category: "futuristic", plan: "free" },
   "Neon-Icons-Free3":      { name: "Neon Icons",       category: "futuristic", plan: "free" },
-  "Pink-Abstract-Free":    { name: "Pink Abstract",    category: "pink",       plan: "free" },
+  // "Pink-Abstract-Free": REMOVED — icons render broken; needs redo
   "Poligon-Premium":       { name: "Polygon",          category: "futuristic", plan: "premium" },
   "purple-icons-premium":  { name: "Purple Icons",     category: "purple",     plan: "premium" },
 };
