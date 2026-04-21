@@ -1071,12 +1071,102 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       iconsStore: "/products/volynx-icons-store/",
     };
 
+    const ICON_PRICE_TIERS = {
+      free: { vx: "0 VX", money: "", lookup: "", label: "Free" },
+      budget: { vx: "19 VX", money: "£0.90", lookup: "icons_single_budget", label: "Budget single" },
+      standard: { vx: "29 VX", money: "£1.90", lookup: "icons_single_standard", label: "Standard single" },
+      premium: { vx: "45 VX", money: "£2.90", lookup: "icons_single_premium", label: "Premium single" },
+      hyper: { vx: "95 VX", money: "£5.90", lookup: "icons_single_hyper", label: "Hyper 5000px single" },
+    } as const;
+
+    const ICON_PACK_PRICES = {
+      free: { label: "Free with signup", lookup: "", display: "" },
+      mixed: { label: "From 120 VX · £4.90", lookup: "icons_pack_mixed", display: "120 VX · £4.90" },
+      premium: { label: "From 240 VX · £9.90", lookup: "icons_pack_premium", display: "240 VX · £9.90" },
+      hyper: { label: "5000px Hyper pack · £19.90", lookup: "icons_pack_hyper", display: "490 VX · £19.90" },
+    } as const;
+
     function storeLang() {
       return localStorage.getItem("volynx_lang") === "pt" ? "pt" : "en";
     }
 
     function storeText(key: keyof typeof STORE_TEXT.en) {
       return STORE_TEXT[storeLang()][key] as string;
+    }
+
+    function checkoutCurrency() {
+      const value = new URLSearchParams(window.location.search).get("currency") || localStorage.getItem("volynx_currency") || "gbp";
+      return ["gbp", "eur", "brl"].includes(value.toLowerCase()) ? value.toLowerCase() : "gbp";
+    }
+
+    async function freshAccessToken() {
+      let token = localStorage.getItem("volynx_access_token") || "";
+      const refreshToken = localStorage.getItem("volynx_refresh_token") || "";
+      if (!token || !refreshToken) return token;
+      try {
+        const cfg = await fetch("/config.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null);
+        if (!cfg?.supabaseUrl || !cfg?.supabaseAnonKey) return token;
+        const rr = await fetch(cfg.supabaseUrl + "/auth/v1/token?grant_type=refresh_token", {
+          method: "POST",
+          headers: { apikey: cfg.supabaseAnonKey, "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh_token: refreshToken }),
+        });
+        if (!rr.ok) return token;
+        const sess = await rr.json();
+        if (sess.access_token) {
+          token = sess.access_token;
+          localStorage.setItem("volynx_access_token", sess.access_token);
+          if (sess.refresh_token) localStorage.setItem("volynx_refresh_token", sess.refresh_token);
+        }
+      } catch (e) {}
+      return token;
+    }
+
+    async function startIconCheckout(lookupPrefix: string, trigger?: HTMLElement | null) {
+      if (!lookupPrefix) {
+        window.location.href = `${STORE_ROUTES.signup}?return=${STORE_ROUTES.iconsStore}`;
+        return;
+      }
+
+      const token = await freshAccessToken();
+      if (!token) {
+        window.location.href = `${STORE_ROUTES.login}?return=${encodeURIComponent(STORE_ROUTES.iconsStore)}`;
+        return;
+      }
+
+      const originalText = trigger?.textContent || "";
+      try {
+        if (trigger) {
+          trigger.textContent = storeLang() === "pt" ? "Abrindo checkout..." : "Opening checkout...";
+          trigger.style.pointerEvents = "none";
+        }
+        const cfg = await fetch("/config.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null);
+        const apiBase = String(cfg?.functionsUrl || cfg?.apiBaseUrl || "").replace(/\/$/, "");
+        if (!apiBase) throw new Error("Checkout endpoint is not configured.");
+        const lookupKey = `${lookupPrefix}_${checkoutCurrency()}`;
+        const res = await fetch(`${apiBase}/create-checkout-session`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            lookup_key: lookupKey,
+            success_url: `${window.location.origin}/profile/?payment=success&product=icons-store`,
+            cancel_url: `${window.location.origin}${STORE_ROUTES.iconsStore}?payment=cancelled`,
+          }),
+        });
+        const data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+          return;
+        }
+        throw new Error(data.error || data.message || "Checkout failed.");
+      } catch (e) {
+        console.error("[icons-store] checkout failed:", e);
+        showNotification(e instanceof Error ? e.message : "Checkout failed.");
+        if (trigger) {
+          trigger.textContent = originalText || (storeLang() === "pt" ? "Tentar novamente" : "Try again");
+          trigger.style.pointerEvents = "";
+        }
+      }
     }
 
     // ===== INIT =====
@@ -1178,8 +1268,10 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
           category: "Neon Essentials",
           collection: "Neon Essentials",
           relatedCollection: findCollectionForCategory(filterKey) || "Neon Icons",
-          priceVX: "29 VX",
-          money: "£1.90",
+          priceVX: ICON_PRICE_TIERS.standard.vx,
+          money: ICON_PRICE_TIERS.standard.money,
+          checkoutLookup: ICON_PRICE_TIERS.standard.lookup,
+          priceTier: ICON_PRICE_TIERS.standard.label,
         };
       }).filter((item) => item.svg);
       // Prepend neon essentials so they render first in the SVG filter
@@ -1217,8 +1309,10 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
           category: category.title,
           collection: "SVG Essentials",
           relatedCollection: findCollectionForCategory("futuristic") || "Neon Icons",
-          priceVX: "29 VX",
-          money: "£1.90",
+          priceVX: ICON_PRICE_TIERS.budget.vx,
+          money: ICON_PRICE_TIERS.budget.money,
+          checkoutLookup: ICON_PRICE_TIERS.budget.lookup,
+          priceTier: ICON_PRICE_TIERS.budget.label,
         })));
 
         mount.innerHTML = `
@@ -1344,6 +1438,18 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       return icon?.plan === "premium" || icon?.plan === "paid";
     }
 
+    function isHyperIcon(icon: any) {
+      const haystack = [
+        icon?.collection,
+        icon?.category,
+        icon?.path,
+        icon?.file,
+        icon?.label,
+        icon?.name,
+      ].join(" ").toLowerCase();
+      return haystack.includes("hyper");
+    }
+
     function displayIconName(icon: any) {
       const raw = String(icon?.name || icon?.file || "Icon")
         .replace(/\.[a-z0-9]+$/i, "")
@@ -1356,9 +1462,16 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     }
 
     function singlePriceForIcon(icon: any) {
-      if (!icon) return { vx: "29 VX", money: "£1.90" };
-      if (isPremiumIcon(icon)) return { vx: "45 VX", money: "£2.90" };
-      return { vx: "19 VX", money: "£0.90" };
+      if (!icon) return ICON_PRICE_TIERS.standard;
+      if (isHyperIcon(icon)) return ICON_PRICE_TIERS.hyper;
+      if (isPremiumIcon(icon)) {
+        const collection = String(icon.collection || "").toLowerCase();
+        if (collection.includes("chromed") || collection.includes("iridescent") || collection.includes("metal")) {
+          return ICON_PRICE_TIERS.premium;
+        }
+        return ICON_PRICE_TIERS.standard;
+      }
+      return ICON_PRICE_TIERS.budget;
     }
 
     function iconToSingleItem(icon: any) {
@@ -1373,7 +1486,17 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         path: icon.path,
         priceVX: price.vx,
         money: price.money,
+        checkoutLookup: price.lookup,
+        priceTier: price.label,
       };
+    }
+
+    function packPriceForCollection(collection: string, icons: any[]) {
+      const freeCount = icons.filter((icon) => icon.plan === "free").length;
+      if (freeCount === icons.length) return ICON_PACK_PRICES.free;
+      if (collection.toLowerCase().includes("hyper")) return ICON_PACK_PRICES.hyper;
+      if (freeCount === 0) return ICON_PACK_PRICES.premium;
+      return ICON_PACK_PRICES.mixed;
     }
 
     function pickEvenly(items: any[], count: number) {
@@ -1414,8 +1537,10 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         category,
         collection: "SVG Essentials",
         relatedCollection: findCollectionForCategory("futuristic") || "Neon Icons",
-        priceVX: "29 VX",
-        money: "£1.90",
+        priceVX: ICON_PRICE_TIERS.standard.vx,
+        money: ICON_PRICE_TIERS.standard.money,
+        checkoutLookup: ICON_PRICE_TIERS.standard.lookup,
+        priceTier: ICON_PRICE_TIERS.standard.label,
       };
     }
 
@@ -1742,7 +1867,6 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       const openPackLabel = L === "pt" ? "Abrir pack relacionado" : "Open related pack";
       const requestLabel = L === "pt" ? "Pedir este ícone" : "Request this icon";
       const closeLabel = L === "pt" ? "Fechar" : "Close";
-      const requestHref = `${STORE_ROUTES.contact}?product=volynx-icons-store&intent=single-icon&icon=${encodeURIComponent(label)}`;
 
       openModal(`
         <div style="display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 20% 20%,rgba(124,77,255,.45),transparent 35%),radial-gradient(circle at 80% 25%,rgba(79,195,247,.35),transparent 32%),linear-gradient(145deg,#0d1117,#152035);border:1px solid rgba(124,77,255,.22);border-radius:18px;padding:32px;margin-bottom:1rem;min-height:220px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 18px 40px rgba(0,0,0,.28);">
@@ -1758,8 +1882,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         </div>
       `);
       document.getElementById("featuredRequestBtn")?.addEventListener("click", () => {
-        closeModal();
-        window.location.href = requestHref;
+        startIconCheckout(ICON_PRICE_TIERS.standard.lookup, document.getElementById("featuredRequestBtn"));
       });
       document.getElementById("featuredGoPackBtn")?.addEventListener("click", () => {
         closeModal();
@@ -1782,7 +1905,6 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       const description = L === "pt"
         ? "Ícone novo carregado direto do HTML de assets da Icons Store."
         : "New icon loaded directly from the Icons Store asset HTML.";
-      const requestHref = `${STORE_ROUTES.contact}?product=volynx-icons-store&intent=single-icon&source=asset-html&icon=${encodeURIComponent(label)}`;
 
       openModal(`
         <div style="display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 20% 20%,rgba(120,220,255,.18),transparent 34%),radial-gradient(circle at 80% 20%,rgba(176,132,255,.18),transparent 30%),linear-gradient(145deg,#10131f,#090b14);border:1px solid rgba(120,220,255,.16);border-radius:18px;padding:32px;margin-bottom:1rem;min-height:220px;">
@@ -1798,8 +1920,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         </div>
       `);
       document.getElementById("assetRequestBtn")?.addEventListener("click", () => {
-        closeModal();
-        window.location.href = requestHref;
+        startIconCheckout(ICON_PRICE_TIERS.budget.lookup, document.getElementById("assetRequestBtn"));
       });
       document.getElementById("assetCancelBtn")?.addEventListener("click", closeModal);
     }
@@ -1825,6 +1946,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       const hasPack = Boolean(relatedCollection && allIcons.some((icon) => icon.collection === relatedCollection));
       const requestHref = `${STORE_ROUTES.contact}?product=volynx-icons-store&intent=single-icon&icon=${encodeURIComponent(label)}&collection=${encodeURIComponent(collection)}`;
       const category = item.category || (item.icon?.category ?? "Icon");
+      const checkoutLookup = item.checkoutLookup || ICON_PRICE_TIERS.standard.lookup;
       const buyCopy = L === "pt" ? "Comprar este ícone" : "Buy this icon";
       const packCopy = L === "pt" ? "Ver pack relacionado" : "Open related pack";
       const closeCopy = L === "pt" ? "Continuar olhando" : "Keep browsing";
@@ -1845,7 +1967,8 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
               ${item.money ? `<span class="single-modal-price single-modal-price--cash"><strong>${escHtml(item.money)}</strong><small>${L === "pt" ? "dinheiro" : "cash"}</small></span>` : ""}
             </div>
             <div class="single-modal-actions">
-              <a class="modal-btn modal-btn--primary" href="${requestHref}">${buyCopy}</a>
+              <button class="modal-btn modal-btn--primary" type="button" id="singleCheckoutBtn">${buyCopy}</button>
+              <a class="modal-btn modal-btn--ghost" href="${requestHref}">${L === "pt" ? "Pedir manualmente" : "Manual request"}</a>
               ${hasPack ? `<button class="modal-btn modal-btn--secondary" type="button" id="singleRelatedPackBtn">${packCopy}</button>` : ""}
               <button class="modal-btn modal-btn--ghost" type="button" id="singleCloseBtn">${closeCopy}</button>
             </div>
@@ -1853,6 +1976,9 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         </div>
       `, "single");
 
+      document.getElementById("singleCheckoutBtn")?.addEventListener("click", (event) => {
+        startIconCheckout(checkoutLookup, event.currentTarget as HTMLElement);
+      });
       document.getElementById("singleRelatedPackBtn")?.addEventListener("click", () => {
         showPackModal(relatedCollection);
       });
@@ -1864,12 +1990,11 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       if (!icons.length) return;
       const L = storeLang();
       const freeCount = icons.filter((icon) => icon.plan === "free").length;
-      const isPremium = freeCount === 0;
       const isFree = freeCount === icons.length;
       const firstCategory = CATEGORY_CONFIG.find(c => c.key === icons[0]?.category)?.label || icons[0]?.category || "Icon Pack";
-      const planLabel = isPremium ? "Premium pack" : isFree ? "Free pack" : "Mixed pack";
-      const priceLabel = isPremium ? "From 240 VX · £9.90" : isFree ? (L === "pt" ? "Grátis com cadastro" : "Free with signup") : "From 120 VX";
-      const buyHref = `${STORE_ROUTES.contact}?product=volynx-icons-store&intent=pack&collection=${encodeURIComponent(collection)}`;
+      const packPrice = packPriceForCollection(collection, icons);
+      const planLabel = isFree ? "Free pack" : collection.toLowerCase().includes("hyper") ? "Hyper 5000px pack" : freeCount === 0 ? "Premium pack" : "Mixed pack";
+      const priceLabel = isFree ? (L === "pt" ? "Grátis com cadastro" : "Free with signup") : packPrice.label;
       const modalIcons = icons.map((icon, index) => `
         <button type="button" class="pack-modal-icon" style="${collectionStyle(collection)}" data-pack-icon-index="${index}">
           <img src="${icon.path}" alt="" loading="lazy" />
@@ -1891,12 +2016,15 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
             ${modalIcons}
           </div>
           <footer class="pack-modal-footer">
-            <a class="modal-btn modal-btn--primary" href="${buyHref}">${L === "pt" ? "Comprar pack" : "Buy pack"}</a>
+            <button class="modal-btn modal-btn--primary" type="button" id="packCheckoutBtn">${L === "pt" ? "Comprar pack" : "Buy pack"}</button>
             <button class="modal-btn modal-btn--ghost" type="button" id="packCloseBtn">${L === "pt" ? "Continuar vendo packs" : "Keep browsing packs"}</button>
           </footer>
         </div>
       `, "pack");
 
+      document.getElementById("packCheckoutBtn")?.addEventListener("click", (event) => {
+        startIconCheckout(packPrice.lookup, event.currentTarget as HTMLElement);
+      });
       document.querySelectorAll<HTMLButtonElement>(".pack-modal-icon").forEach((button) => {
         button.addEventListener("click", () => {
           const index = Number(button.dataset.packIconIndex || 0);

@@ -2,7 +2,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import Stripe from "https://esm.sh/stripe@14.14.0?target=deno";
 
-const STRIPE_API_VERSION = "2023-10-16";
+const STRIPE_API_VERSION = "2026-02-25.clover";
 const STRIPE_PIX_API_VERSION = "2026-02-25.clover";
 
 const CORS_HEADERS = {
@@ -90,7 +90,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const stripe = new Stripe(stripeKey, {
-      apiVersion: STRIPE_API_VERSION,
+      apiVersion: STRIPE_API_VERSION as any,
       httpClient: Stripe.createFetchHttpClient(),
     });
 
