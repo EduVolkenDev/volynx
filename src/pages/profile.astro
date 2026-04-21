@@ -1,37 +1,21 @@
 ---
-import PageWidgets from "../components/PageWidgets.astro";
-import Topbar from "../components/Topbar.astro";
+import FlagshipLayout from "../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "../components/FlagshipHeader.astro";
+import FlagshipFooter from "../components/FlagshipFooter.astro";
 import { ROUTES } from "../data/routes";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Profile — VOLYNX</title>
-		<meta name="description" content="Manage your VOLYNX account, profile settings, and subscription." />
+<FlagshipLayout
+	title="Profile — VOLYNX"
+	description="Manage your VOLYNX account, profile settings, and subscription."
+	ogImage="/assets/volynx-icon.webp"
+	pageClass="page-profile"
+>
+	<script is:inline src="/js/vx-plan.js"></script>
+	<FlagshipHeader current={ROUTES.profile} ctaLabel="Go Pro" ctaHref={ROUTES.pricing} ctaI18n="nav.go_pro" />
 
-		<!-- Open Graph Tags -->
-		<meta property="og:title" content="Profile — VOLYNX" />
-		<meta property="og:description" content="Manage your VOLYNX account, profile settings, and subscription." />
-		<meta property="og:type" content="website" />
-		<meta property="og:url" content="https://volynx.world/profile/" />
-		<meta property="og:image" content="https://volynx.world/assets/volynx-icon.webp" />
-
-		<script is:inline src="/js/vx-plan.js"></script>
-	</head>
-
-	<body>
-		<div class="orb orb-a" aria-hidden="true"></div>
-		<div class="orb orb-b" aria-hidden="true"></div>
-
-		<Topbar leftLinks={[
-			{ href: ROUTES.builder, label: "Builder" },
-			{ href: ROUTES.studio, label: "Studio" },
-			{ href: ROUTES.pricing, label: "Pricing" },
-		]}>
-			<button slot="right" type="button" class="logout-btn" id="logoutBtn" data-i18n="profile.sign_out">Sign out</button>
-		</Topbar>
+	<div class="orb orb-a" aria-hidden="true"></div>
+	<div class="orb orb-b" aria-hidden="true"></div>
 
 		<!-- ═══ VIEW: loading ═══ -->
 		<div id="viewLoading" class="view view--active">
@@ -265,6 +249,16 @@ import { ROUTES } from "../data/routes";
 						</div>
 					</div>
 					<div class="info-row" style="margin-top:8px;"><span data-i18n="profile.security_2fa">2FA</span><strong data-i18n="profile.security_not_enabled">Not enabled</strong></div>
+				</div>
+			</section>
+
+			<section class="glass-section" style="margin-top:20px;">
+				<div class="section-head" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+					<div>
+						<h3 style="margin:0 0 4px;font-size:1rem;" data-i18n="profile.session_title">Session</h3>
+						<p style="margin:0;color:rgba(255,255,255,.55);font-size:.85rem;" data-i18n="profile.session_desc">End your VOLYNX session on this device.</p>
+					</div>
+					<button type="button" class="btn btn--ghost logout-btn" id="logoutBtn" data-i18n="profile.sign_out">Sign out</button>
 				</div>
 			</section>
 		</div>
@@ -945,9 +939,8 @@ import { ROUTES } from "../data/routes";
 			} // end supabase check
 		</script>
 
-		<PageWidgets hideUtilBar />
-	</body>
-</html>
+	<FlagshipFooter />
+</FlagshipLayout>
 
 <style>
 	:root {
