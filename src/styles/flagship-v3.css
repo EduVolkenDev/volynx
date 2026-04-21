@@ -681,9 +681,18 @@ a, button{ touch-action: manipulation; }
   50%{ transform: translateY(-10px); }
 }
 .spotlight-img{
-  object-fit: cover;
-  border-radius: 16px;
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  object-fit: contain;
+  border-radius: 20px;
   animation: float 4s ease-in-out infinite;
+  filter: drop-shadow(0 16px 40px rgba(124,77,255,.35)) drop-shadow(0 0 24px rgba(89,195,255,.2));
+  transition: transform .4s ease, filter .4s ease;
+}
+.spotlight-card:hover .spotlight-img{
+  transform: translateY(-4px) scale(1.03);
+  filter: drop-shadow(0 20px 50px rgba(124,77,255,.48)) drop-shadow(0 0 32px rgba(89,195,255,.3));
 }
 
 /* ── Principles ──────────────────────────────────────────────────── */
@@ -1145,8 +1154,9 @@ a, button{ touch-action: manipulation; }
     align-items: center;
   }
   .spotlight-img{
-    width: 390px;
-    max-height: 390px;
+    width: 480px;
+    max-width: 480px;
+    max-height: 480px;
     flex-shrink: 0;
   }
   .footer-grid{

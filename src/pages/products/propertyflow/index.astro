@@ -155,10 +155,20 @@ const pageDescription = "Premium property management platform for real estate ag
     .hero__glow--b { width: 200px; height: 200px; bottom: 30px; left: 0; background: rgba(139,92,246,0.4); }
     .hero__img {
       position: relative; z-index: 1;
-      width: 100%; height: 100%; object-fit: cover;
-      border-radius: 30px;
-      border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: var(--shadow);
+      width: 100%; max-width: 560px; height: auto;
+      object-fit: contain;
+      border-radius: 0;
+      border: 0;
+      box-shadow: none;
+      filter: drop-shadow(0 24px 60px rgba(89,195,255,.4)) drop-shadow(0 0 48px rgba(139,92,246,.3));
+      transition: transform .6s ease, filter .6s ease;
+    }
+    .hero__img:hover {
+      transform: translateY(-6px) scale(1.02);
+      filter: drop-shadow(0 28px 72px rgba(89,195,255,.55)) drop-shadow(0 0 60px rgba(139,92,246,.42));
+    }
+    @media (min-width: 960px) {
+      .hero__img { max-width: 680px; }
     }
 
     /* ─── Section ─── */
@@ -324,7 +334,7 @@ const pageDescription = "Premium property management platform for real estate ag
       <div class="hero__visual">
         <div class="hero__glow hero__glow--a"></div>
         <div class="hero__glow hero__glow--b"></div>
-        <img src="/assets/propertyflow2.webp" alt="PropertyFlow interface preview" class="hero__img" />
+        <img src="/assets/newproperty.webp" alt="PropertyFlow interface preview" class="hero__img" />
       </div>
     </div>
 
