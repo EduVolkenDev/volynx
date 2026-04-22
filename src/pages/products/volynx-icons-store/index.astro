@@ -898,6 +898,11 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
             <button type="button" class="single-format-btn" data-single-format="svg" data-i18n="icons.single_filter_svg">SVG</button>
           </div>
         </div>
+        <div class="single-icons-currency-row">
+          <span class="single-icons-currency-label" data-i18n="icons.currency_label">Currency</span>
+          <div class="vx-currency-bar" aria-label="Currency selector"></div>
+          <span class="single-icons-currency-note" data-i18n="icons.currency_note">BRL checkout supports PIX via Stripe.</span>
+        </div>
 
         <div class="single-icons-grid" id="singleIconsGrid">
           <article class="soon-panel">
@@ -1016,7 +1021,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
   <!-- Premium modal for packs, singles, login gate -->
   <div id="vxModal" class="vx-modal" style="display:none;" aria-hidden="true">
     <div id="vxModalPanel" class="vx-modal-panel" role="dialog" aria-modal="true">
-      <button id="vxModalClose" class="vx-modal-close" type="button" aria-label="Close">✕</button>
+      <button id="vxModalClose" class="vx-modal-close" type="button" aria-label="Close" data-i18n-aria="icons.modal_close">✕</button>
       <div id="vxModalContent"></div>
     </div>
   </div>
@@ -1080,11 +1085,33 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     } as const;
 
     const ICON_PACK_PRICES = {
-      free: { label: "Free with signup", lookup: "", display: "" },
-      mixed: { label: "90 VX · £6.40", lookup: "icons_pack_mixed", display: "90 VX · £6.40" },
-      premium: { label: "260 VX · £14", lookup: "icons_pack_premium", display: "260 VX · £14" },
-      hyper: { label: "5000px Hyper pack · £48", lookup: "icons_pack_hyper", display: "820 VX · £48" },
+      free: { label: "Free with signup", lookup: "", display: "", vx: "" },
+      mixed: { label: "90 VX · £6.40", lookup: "icons_pack_mixed", display: "90 VX · £6.40", vx: "90 VX" },
+      premium: { label: "260 VX · £14", lookup: "icons_pack_premium", display: "260 VX · £14", vx: "260 VX" },
+      hyper: { label: "5000px Hyper pack · £48", lookup: "icons_pack_hyper", display: "820 VX · £48", vx: "820 VX" },
     } as const;
+
+    // Mirrors scripts/stripe-catalog-setup.ts (amounts in cents)
+    const ICON_MONEY_CENTS: Record<string, { gbp: number; eur: number; brl: number }> = {
+      icons_single_budget:   { gbp: 80,   eur: 95,   brl: 550   },
+      icons_single_standard: { gbp: 170,  eur: 195,  brl: 1190  },
+      icons_single_premium:  { gbp: 290,  eur: 340,  brl: 1890  },
+      icons_single_hyper:    { gbp: 750,  eur: 870,  brl: 4900  },
+      icons_pack_mixed:      { gbp: 640,  eur: 750,  brl: 4200  },
+      icons_pack_premium:    { gbp: 1400, eur: 1600, brl: 9200  },
+      icons_pack_hyper:      { gbp: 4800, eur: 5600, brl: 32000 },
+    };
+
+    function localizedMoney(lookup: string | undefined | null) {
+      if (!lookup) return "";
+      const cents = ICON_MONEY_CENTS[lookup];
+      if (!cents) return "";
+      const cur = checkoutCurrency() as "gbp" | "eur" | "brl";
+      const amount = (cents[cur] || 0) / 100;
+      if (cur === "brl") return "R$" + amount.toFixed(2).replace(".", ",");
+      if (cur === "eur") return "€" + amount.toFixed(2);
+      return "£" + amount.toFixed(2);
+    }
 
     function storeLang() {
       return localStorage.getItem("volynx_lang") === "pt" ? "pt" : "en";
@@ -1558,13 +1585,14 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       const visual = isSvg
         ? `<span class="single-icon-visual single-icon-visual--svg">${item.svg || ""}</span>`
         : `<span class="single-icon-visual"><img src="${escHtml(item.path)}" alt="" loading="lazy" /></span>`;
+      const money = localizedMoney(item.checkoutLookup) || item.money || "";
       return `
         <button type="button" class="single-icon-card single-icon-card--${isSvg ? "svg" : "png"}" style="${collectionStyle(item.collection)}" data-single-index="${index}">
           <span class="single-icon-format">${isSvg ? "SVG" : "PNG"}</span>
           ${visual}
           <span class="single-icon-name">${escHtml(item.label)}</span>
           <span class="single-icon-collection">${escHtml(item.collection)}</span>
-          <span class="single-icon-price">${escHtml(item.priceVX)}${item.money ? ` · ${escHtml(item.money)}` : ""}</span>
+          <span class="single-icon-price">${escHtml(item.priceVX)}${money ? ` · ${escHtml(money)}` : ""}</span>
         </button>
       `;
     }
@@ -1973,7 +2001,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
             <p class="single-modal-text">${bodyCopy}</p>
             <div class="single-modal-price-row">
               <span class="single-modal-price"><strong>${escHtml(item.priceVX || "24 VX")}</strong><small>VX</small></span>
-              ${item.money ? `<span class="single-modal-price single-modal-price--cash"><strong>${escHtml(item.money)}</strong><small>${L === "pt" ? "dinheiro" : "cash"}</small></span>` : ""}
+              ${(() => { const m = localizedMoney(item.checkoutLookup) || item.money; return m ? `<span class="single-modal-price single-modal-price--cash"><strong>${escHtml(m)}</strong><small>${L === "pt" ? "dinheiro" : "cash"}</small></span>` : ""; })()}
             </div>
             <div class="single-modal-actions">
               <button class="modal-btn modal-btn--primary" type="button" id="singleCheckoutBtn">${buyCopy}</button>
@@ -2002,8 +2030,17 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       const isFree = freeCount === icons.length;
       const firstCategory = CATEGORY_CONFIG.find(c => c.key === icons[0]?.category)?.label || icons[0]?.category || "Icon Pack";
       const packPrice = packPriceForCollection(collection, icons);
-      const planLabel = isFree ? "Free pack" : collection.toLowerCase().includes("hyper") ? "Hyper 5000px pack" : freeCount === 0 ? "Premium pack" : "Mixed pack";
-      const priceLabel = isFree ? (L === "pt" ? "Grátis com cadastro" : "Free with signup") : packPrice.label;
+      const planLabel = isFree
+        ? (L === "pt" ? "Pack grátis" : "Free pack")
+        : collection.toLowerCase().includes("hyper")
+          ? (L === "pt" ? "Pack Hyper 5000px" : "Hyper 5000px pack")
+          : freeCount === 0
+            ? (L === "pt" ? "Pack premium" : "Premium pack")
+            : (L === "pt" ? "Pack misto" : "Mixed pack");
+      const packMoney = localizedMoney(packPrice.lookup);
+      const priceLabel = isFree
+        ? (L === "pt" ? "Grátis com cadastro" : "Free with signup")
+        : (packPrice.vx && packMoney ? `${packPrice.vx} · ${packMoney}` : packPrice.label);
       const modalIcons = icons.map((icon, index) => `
         <button type="button" class="pack-modal-icon" style="${collectionStyle(collection)}" data-pack-icon-index="${index}">
           <img src="${icon.path}" alt="" loading="lazy" />
@@ -2046,16 +2083,17 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     // ===== PREVIEW MODAL =====
     function showPreviewModal(icon: any) {
       const isPremium = icon.plan === "premium" || icon.plan === "paid";
+      const closeLabel = storeLang() === "pt" ? "Fechar" : "Close";
       openModal(`
         <div style="display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 15% 15%,rgba(124,77,255,.18),transparent 30%),radial-gradient(circle at 85% 15%,rgba(79,195,247,.2),transparent 28%),linear-gradient(145deg,rgba(255,255,255,.98),rgba(243,247,255,.94));border:1px solid rgba(124,77,255,.12);border-radius:18px;padding:24px;margin-bottom:1.25rem;min-height:180px;box-shadow:inset 0 1px 0 rgba(255,255,255,.8);">
           <img src="${icon.path}" alt="" style="width:160px;height:160px;object-fit:contain;display:block;" />
         </div>
-        <p style="color:rgba(255,255,255,.5);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1.25rem;">${icon.category}</p>
+        <p style="color:rgba(255,255,255,.5);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1.25rem;">${escHtml(icon.category)}</p>
         <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
           <button id="previewDownloadBtn" style="padding:.75rem 2rem;background:linear-gradient(135deg,#00f0ff,#0066ff);color:#000;font-weight:700;border-radius:10px;border:none;font-size:.9rem;cursor:pointer;">
             ${isPremium ? storeText("openPack") : storeText("download")}
           </button>
-          <button id="previewCancelBtn" style="padding:.75rem 1.25rem;background:transparent;color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.15);border-radius:10px;font-size:.9rem;cursor:pointer;">Close</button>
+          <button id="previewCancelBtn" style="padding:.75rem 1.25rem;background:transparent;color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.15);border-radius:10px;font-size:.9rem;cursor:pointer;">${closeLabel}</button>
         </div>
       `);
       document.getElementById("previewDownloadBtn")?.addEventListener("click", () => {
@@ -2075,6 +2113,23 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       renderCollections();
     });
 
+    // Re-render price-bearing UI whenever the user flips GBP/EUR/BRL.
+    // Without this, Single Icons keeps the currency it was rendered with on
+    // page load — and the checkout, which reads checkoutCurrency() at click
+    // time, can diverge (display shows £ while checkout charges €).
+    window.addEventListener("vx:currency-changed", () => {
+      renderSingleIcons();
+      renderCollections();
+      // If a modal is open (single-icon, pack, featured), close it so the
+      // next open picks the new currency. Cheaper + safer than patching in
+      // place.
+      const openModalEl = document.querySelector(".vx-modal.is-open") as HTMLElement | null;
+      if (openModalEl) {
+        const closeBtn = document.getElementById("vxModalClose") as HTMLButtonElement | null;
+        closeBtn?.click();
+      }
+    });
+
     // ===== DOWNLOAD LOGIC =====
     function handleDownload(icon: any) {
       if (icon.plan === "premium" || icon.plan === "paid") {
@@ -2092,11 +2147,12 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     function triggerDownload(icon: any) {
       const a = document.createElement("a");
       a.href = icon.path;
-      a.download = icon.file;
+      a.download = icon.file || icon.name || "icon";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      showNotification(`Downloaded: ${icon.name}`);
+      const prefix = storeLang() === "pt" ? "Baixado" : "Downloaded";
+      showNotification(`${prefix}: ${icon.name || icon.file || "icon"}`);
     }
 
     // ===== LOAD MORE =====
@@ -2148,14 +2204,11 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
           en: { show: "Show all featured icons", hide: "Show fewer" },
           pt: { show: "Ver todos os ícones em destaque", hide: "Ver menos" },
         };
-        function lang(): "en" | "pt" {
-          return localStorage.getItem("volynx_lang") === "pt" ? "pt" : "en";
-        }
-        function syncLabel() {
+        const syncLabel = () => {
           if (!labelEl) return;
-          const expanded = featuredGrid!.dataset.expanded === "true";
-          labelEl.textContent = expanded ? LABELS[lang()].hide : LABELS[lang()].show;
-        }
+          const expanded = featuredGrid.dataset.expanded === "true";
+          labelEl.textContent = expanded ? LABELS[storeLang()].hide : LABELS[storeLang()].show;
+        };
         syncLabel();
         featuredToggleBtn.addEventListener("click", () => {
           const expanded = featuredGrid.dataset.expanded === "true";
@@ -2202,42 +2255,56 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     }
 
     function showLoginModal(icon: any) {
+      const L = storeLang();
+      const title = L === "pt" ? "Login necessário" : "Login required";
+      const desc = L === "pt"
+        ? "Entre para baixar ícones grátis — é rápido e sem custo."
+        : "Sign in to download free icons — it's quick and free.";
+      const signInLabel = L === "pt" ? "Entrar" : "Sign in";
+      const createLabel = L === "pt" ? "Criar conta grátis" : "Create free account";
       openModal(`
         <div style="font-size:2.5rem;margin-bottom:1rem;">🔒</div>
-        <h3 style="color:#fff;margin-bottom:.5rem;">Login required</h3>
-        <p style="color:rgba(255,255,255,.7);font-size:.9rem;margin-bottom:1.5rem;">
-          Sign in to download free icons — it's quick and free.
-        </p>
+        <h3 style="color:#fff;margin-bottom:.5rem;">${title}</h3>
+        <p style="color:rgba(255,255,255,.7);font-size:.9rem;margin-bottom:1.5rem;">${desc}</p>
         <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
-          <a href="${STORE_ROUTES.login}?return=${STORE_ROUTES.iconsStore}" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#00f0ff,#0066ff);color:#000;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;">Sign in</a>
-          <a href="${STORE_ROUTES.signup}?return=${STORE_ROUTES.iconsStore}" style="padding:.75rem 1.5rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;border:1px solid rgba(255,255,255,.3);">Create free account</a>
+          <a href="${STORE_ROUTES.login}?return=${STORE_ROUTES.iconsStore}" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#00f0ff,#0066ff);color:#000;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;">${signInLabel}</a>
+          <a href="${STORE_ROUTES.signup}?return=${STORE_ROUTES.iconsStore}" style="padding:.75rem 1.5rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;border:1px solid rgba(255,255,255,.3);">${createLabel}</a>
         </div>
       `);
     }
 
     function showPremiumModal(icon: any) {
-      const colPrice = (icon as any).collectionPrice || "£14";
+      const L = storeLang();
+      const premiumMoney = localizedMoney("icons_pack_premium") || "£14";
+      const hyperMoney = localizedMoney("icons_pack_hyper") || "£48";
+      const kicker = L === "pt" ? "Coleção premium" : "Premium Collection";
+      const colLabel = L === "pt" ? "Coleção individual" : "Individual collection";
+      const comboLabel = L === "pt" ? "Combo completo" : "Full combo";
+      const comboHint = L === "pt" ? "Todas as coleções premium" : "All premium collections";
+      const checkoutCollectionLabel = L === "pt" ? "Comprar coleção" : "Checkout collection";
+      const checkoutComboLabel = L === "pt" ? "Comprar combo completo" : "Checkout full combo";
+      const backLabel = L === "pt" ? "Voltar ao vault" : "Back to vault";
       openModal(`
         <img src="${icon.path}" alt="" style="width:80px;height:80px;object-fit:contain;background:#fff;border-radius:12px;padding:8px;margin:0 auto 1rem;display:block;" />
-        <p style="color:rgba(200,150,255,.9);font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem;">Premium Collection</p>
-        <h3 style="color:#fff;font-size:1.25rem;margin-bottom:1.25rem;">${icon.collection}</h3>
+        <p style="color:rgba(200,150,255,.9);font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem;">${kicker}</p>
+        <h3 style="color:#fff;font-size:1.25rem;margin-bottom:1.25rem;">${escHtml(icon.collection)}</h3>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.5rem;">
           <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:1rem;text-align:center;">
-            <div style="color:rgba(255,255,255,.5);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.25rem;">Individual collection</div>
-            <div style="color:#fff;font-size:1.5rem;font-weight:900;">${colPrice}</div>
+            <div style="color:rgba(255,255,255,.5);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.25rem;">${colLabel}</div>
+            <div style="color:#fff;font-size:1.5rem;font-weight:900;">${premiumMoney}</div>
           </div>
           <div style="background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(255,0,110,.15));border:1px solid rgba(139,92,246,.4);border-radius:12px;padding:1rem;text-align:center;">
-            <div style="color:rgba(200,150,255,.8);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.25rem;">Full combo</div>
-            <div style="color:#fff;font-size:1.5rem;font-weight:900;">£48</div>
-            <div style="color:rgba(200,150,255,.7);font-size:.65rem;margin-top:.15rem;">All premium collections</div>
+            <div style="color:rgba(200,150,255,.8);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.25rem;">${comboLabel}</div>
+            <div style="color:#fff;font-size:1.5rem;font-weight:900;">${hyperMoney}</div>
+            <div style="color:rgba(200,150,255,.7);font-size:.65rem;margin-top:.15rem;">${comboHint}</div>
           </div>
         </div>
 
         <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
-          <button id="premiumCollectionCheckoutBtn" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#8b5cf6,#ff006e);color:#fff;font-weight:700;border-radius:10px;border:none;font-size:.875rem;cursor:pointer;">Checkout collection</button>
-          <button id="premiumComboCheckoutBtn" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#00f0ff,#8b5cf6);color:#020617;font-weight:800;border-radius:10px;border:none;font-size:.875rem;cursor:pointer;">Checkout full combo</button>
-          <a href="/products/volynx-icons-store/" style="padding:.75rem 1.5rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.875rem;border:1px solid rgba(255,255,255,.2);">Back to vault</a>
+          <button id="premiumCollectionCheckoutBtn" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#8b5cf6,#ff006e);color:#fff;font-weight:700;border-radius:10px;border:none;font-size:.875rem;cursor:pointer;">${checkoutCollectionLabel}</button>
+          <button id="premiumComboCheckoutBtn" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#00f0ff,#8b5cf6);color:#020617;font-weight:800;border-radius:10px;border:none;font-size:.875rem;cursor:pointer;">${checkoutComboLabel}</button>
+          <a href="/products/volynx-icons-store/" style="padding:.75rem 1.5rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.875rem;border:1px solid rgba(255,255,255,.2);">${backLabel}</a>
         </div>
       `);
       document.getElementById("premiumCollectionCheckoutBtn")?.addEventListener("click", () => {
@@ -2277,6 +2344,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     });
   </script>
 
+  <script is:inline src="/js/vx-currency.js"></script>
   <FlagshipFooter />
 </FlagshipLayout>
 

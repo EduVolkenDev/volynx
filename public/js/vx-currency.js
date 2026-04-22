@@ -50,6 +50,18 @@
         btn.classList.remove("vx-cur-btn--active");
       }
     }
+
+    // Notify dynamic surfaces (e.g. JS-rendered price cards) so they can
+    // re-render with the new currency. Without this event, pages that
+    // build prices at runtime (icons store, etc.) render GBP once and
+    // never refresh when the user switches currency — creating a
+    // display/checkout mismatch where the card shows £ but the checkout
+    // goes to the selected currency.
+    try {
+      window.dispatchEvent(new CustomEvent("vx:currency-changed", {
+        detail: { code: code, currency: code.toLowerCase() }
+      }));
+    } catch (_) { /* ancient browsers */ }
   }
 
   function init() {
