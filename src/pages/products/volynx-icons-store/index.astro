@@ -1899,9 +1899,9 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
 
       const L = storeLang();
       const explainCopy = L === "pt"
-        ? "Este card pertence à linha Neon Singles. Você pode pedir este ícone individualmente ou abrir o pack relacionado para ver o restante da coleção."
-        : "This card belongs to the Neon Singles lane. You can request this icon individually or open the related pack to browse the rest of the collection.";
-      const openPackLabel = L === "pt" ? "Abrir pack relacionado" : "Open related pack";
+        ? "Este ícone é um single premium inline (não pertence a um pack específico). Peça ele sozinho ou navegue pela categoria para ver packs similares."
+        : "This is a premium inline single (not tied to a specific pack). Request it on its own, or browse the category to see related packs.";
+      const openPackLabel = L === "pt" ? `Ver pacote ${catLabel}` : `Browse ${catLabel}`;
       const requestLabel = L === "pt" ? "Pedir este ícone" : "Request this icon";
       const closeLabel = L === "pt" ? "Fechar" : "Close";
 
@@ -1922,9 +1922,20 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         startIconCheckout(ICON_PRICE_TIERS.standard.lookup, document.getElementById("featuredRequestBtn"));
       });
       document.getElementById("featuredGoPackBtn")?.addEventListener("click", () => {
+        // Featured SVGs don't belong to any concrete pack. Instead of
+        // shoving the user into whatever happens to be the biggest premium
+        // pack in this category (prior bug: Wallet → Neon Icons), close
+        // the modal and filter the main gallery by the icon's category so
+        // the user sees every real pack tagged with it.
         closeModal();
-        const collection = findCollectionForCategory(filterKey);
-        if (collection) showPackModal(collection);
+        const filterBtn = document.querySelector<HTMLButtonElement>(`.filter-btn[data-filter="${filterKey}"]`);
+        if (filterBtn) {
+          filterBtn.click();
+          document.getElementById("gallery")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        } else {
+          const fallback = findCollectionForCategory(filterKey);
+          if (fallback) showPackModal(fallback);
+        }
       });
       document.getElementById("featuredCancelBtn")?.addEventListener("click", closeModal);
     }
@@ -1979,8 +1990,16 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       const L = storeLang();
       const label = item.label || "Volynx Icon";
       const collection = item.collection || "Icon";
-      const relatedCollection = item.relatedCollection || collection;
-      const hasPack = Boolean(relatedCollection && allIcons.some((icon) => icon.collection === relatedCollection));
+      // Only trust relatedCollection when the icon is a REAL catalog entry
+      // (item.icon.collection exists in allIcons). Featured SVGs and asset
+      // showcase SVGs carry a synthetic relatedCollection picked by category
+      // fallback, which led clicks to the wrong pack (e.g. Wallet icon →
+      // "Neon Icons" pack). For those decorative SVGs we hide the button.
+      const catalogCollection = item.icon?.collection;
+      const relatedCollection = (catalogCollection && allIcons.some((i) => i.collection === catalogCollection))
+        ? catalogCollection
+        : "";
+      const hasPack = Boolean(relatedCollection);
       const requestHref = `${STORE_ROUTES.contact}?product=volynx-icons-store&intent=single-icon&icon=${encodeURIComponent(label)}&collection=${encodeURIComponent(collection)}`;
       const category = item.category || (item.icon?.category ?? "Icon");
       const checkoutLookup = item.checkoutLookup || ICON_PRICE_TIERS.standard.lookup;
