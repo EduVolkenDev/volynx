@@ -40,13 +40,13 @@ const FOLDER_MANIFEST = {
   "glow-premium":          { name: "Glow",             category: "futuristic", plan: "premium" },
   "Hyper-Icons-Premium":   { name: "Hyper Icons",      category: "futuristic", plan: "premium" },
   "Icons-Glass-Premium":   { name: "Glass Icons",      category: "futuristic", plan: "premium" },
-  "Icons-Glass-Premium-2": { name: "Glass Icons",      category: "futuristic", plan: "premium" },
+  // "Icons-Glass-Premium-2": REMOVED — folder deleted from disk
   "Iridescent-Premium":    { name: "Iridescent",       category: "futuristic", plan: "premium" },
-  "Metal-Premium":         { name: "Metal",            category: "metal",      plan: "premium" },
+  // "Metal-Premium":      REMOVED — folder deleted from disk (replaced by metal-chrome-premium)
   "metal-chrome-premium":  { name: "Metal Chrome",     category: "metal",      plan: "premium" },
   // "Nature-Premium":     REMOVED — icons render broken (1, 24, 48… all); needs redo
   "Neon-Icons-Free":       { name: "Neon Icons",       category: "futuristic", plan: "free" },
-  "Neon-Icons-Free3":      { name: "Neon Icons",       category: "futuristic", plan: "free" },
+  // "Neon-Icons-Free3":   REMOVED — folder deleted from disk
   // "Pink-Abstract-Free": REMOVED — icons render broken; needs redo
   "Poligon-Premium":       { name: "Polygon",          category: "futuristic", plan: "premium" },
   "purple-icons-premium":  { name: "Purple Icons",     category: "purple",     plan: "premium" },
