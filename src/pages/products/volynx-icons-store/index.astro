@@ -1470,11 +1470,11 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       if (!icon) return ICON_PRICE_TIERS.standard;
       if (isHyperIcon(icon)) return ICON_PRICE_TIERS.hyper;
       if (isPremiumIcon(icon)) {
-        const collection = String(icon.collection || "").toLowerCase();
-        if (collection.includes("chromed") || collection.includes("iridescent") || collection.includes("metal")) {
-          return ICON_PRICE_TIERS.premium;
-        }
-        return ICON_PRICE_TIERS.standard;
+        // Every premium-plan icon ships at the premium single-icon tier.
+        // Previous logic forked by collection name (chromed/iridescent/metal
+        // got premium; Soft Blue / Glow / Vintage / Purple Icons fell to
+        // standard or budget) — that made newer premium packs look underpriced.
+        return ICON_PRICE_TIERS.premium;
       }
       return ICON_PRICE_TIERS.budget;
     }
@@ -1517,9 +1517,13 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       preferred.forEach((collection) => {
         const icons = allIcons.filter((icon) => icon.collection === collection);
         if (!icons.length) return;
-        picks.push(...pickEvenly(icons, collection === "Neon Icons" ? 4 : 3));
+        // 4 per collection gives every pack a fair showcase regardless of size
+        picks.push(...pickEvenly(icons, 4));
       });
-      return picks.filter(Boolean).slice(0, 30).map(iconToSingleItem);
+      // Previous slice(0, 30) dropped the last ~4 packs (Soft Orange/Red,
+      // Polygon, Neon). Lift the cap so every green/purple-tagged pack lands
+      // at least one representative icon in the Single Icons PNG filter.
+      return picks.filter(Boolean).slice(0, 80).map(iconToSingleItem);
     }
 
     function getSingleIconItems() {
