@@ -206,6 +206,19 @@ import { ROUTES } from "../data/routes";
 				</div>
 			</section>
 
+			<section class="glass-section" id="iconPurchasesSection" style="display:none;">
+				<div class="section-headline">
+					<div>
+						<div class="section-label">Your icon purchases</div>
+						<p class="section-subcopy">Singles and packs unlocked through Stripe checkout.</p>
+					</div>
+					<a href={ROUTES.iconsStore} class="btn btn--sm btn--ghost">Open Icon Vault</a>
+				</div>
+				<div class="icon-purchases-grid" id="iconPurchasesGrid">
+					<p class="text-muted" style="font-size:.85rem;">Checking icon purchases...</p>
+				</div>
+			</section>
+
 			<!-- ═══ QUICK ACCESS ═══ -->
 			<section class="glass-section">
 				<div class="section-label" data-i18n="profile.quick_access">Quick Access</div>
@@ -305,6 +318,7 @@ import { ROUTES } from "../data/routes";
 		</script>
 
 		<script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+		<script is:inline src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 		<script is:inline>
 			console.log("[profile] main script loaded, supabase global:", typeof supabase);
 			if (typeof supabase === "undefined") {
@@ -655,6 +669,293 @@ import { ROUTES } from "../data/routes";
 				if (subTokensEl) {
 					subTokensEl.textContent = String(profile?.token_balance || 0);
 				}
+
+				// ══════════════════════════════════════════════════════
+				// PHASE 3a1: Icon purchases + automatic delivery
+				// ══════════════════════════════════════════════════════
+				const iconPurchasesSection = $("iconPurchasesSection");
+				const iconPurchasesGrid = $("iconPurchasesGrid");
+				let iconPurchaseRows = [];
+
+				function escapeHtml(value) {
+					return String(value ?? "")
+						.replace(/&/g, "&amp;")
+						.replace(/</g, "&lt;")
+						.replace(/>/g, "&gt;")
+						.replace(/"/g, "&quot;");
+				}
+
+				function titleCaseWords(value) {
+					return String(value || "")
+						.replace(/[_-]+/g, " ")
+						.replace(/\s+/g, " ")
+						.trim()
+						.replace(/\b\w/g, (letter) => letter.toUpperCase());
+				}
+
+				function iconMeta(row) {
+					return row && row.metadata && typeof row.metadata === "object" ? row.metadata : {};
+				}
+
+				function iconKind(row) {
+					const meta = iconMeta(row);
+					if (meta.kind === "single" || meta.kind === "pack") return meta.kind;
+					return String(row?.addon_id || "").includes("_pack_") ? "pack" : "single";
+				}
+
+				function iconTier(row) {
+					const meta = iconMeta(row);
+					if (meta.tier) return String(meta.tier);
+					return String(row?.addon_id || "")
+						.replace(/^icons_(single|pack)_/, "")
+						.replace(/_(gbp|eur|brl)$/i, "");
+				}
+
+				function safeAssetPath(raw) {
+					const path = String(raw || "").trim();
+					if (!path || path.includes("..") || path.includes("\\") || /^https?:\/\//i.test(path)) return "";
+					if (!path.startsWith("/assets/") && !path.startsWith("/icons/") && !path.startsWith("/products/")) return "";
+					return path;
+				}
+
+				function fileNameFromPath(path, fallback) {
+					const clean = String(path || "").split("?")[0].split("#")[0];
+					const file = clean.split("/").filter(Boolean).pop() || fallback || "volynx-icon";
+					return file.replace(/[^a-z0-9._-]+/gi, "-").slice(0, 120) || fallback || "volynx-icon";
+				}
+
+				function slugFileName(value, fallback) {
+					const slug = String(value || "")
+						.toLowerCase()
+						.replace(/[^a-z0-9]+/g, "-")
+						.replace(/^-+|-+$/g, "")
+						.slice(0, 90);
+					return slug || fallback || "volynx-icons";
+				}
+
+				function iconPurchaseTitle(row) {
+					const meta = iconMeta(row);
+					if (iconKind(row) === "single") {
+						return meta.icon_label || titleCaseWords(iconTier(row) + " icon");
+					}
+					return meta.icon_label || (meta.icon_collection === "__all_premium__" ? "Full premium combo" : meta.icon_collection) || titleCaseWords(iconTier(row) + " icon pack");
+				}
+
+				function iconPurchaseSubtitle(row) {
+					const kind = iconKind(row);
+					const tier = titleCaseWords(iconTier(row));
+					const meta = iconMeta(row);
+					if (kind === "single" && meta.icon_collection) return `${tier} single · ${meta.icon_collection}`;
+					if (kind === "pack" && meta.icon_collection === "__all_premium__") return `${tier} pack · All premium collections`;
+					if (kind === "pack" && meta.icon_collection) return `${tier} pack · ${meta.icon_collection}`;
+					return `${tier} ${kind}`;
+				}
+
+				function formatIconPurchasePrice(row) {
+					if (row?.price_paid == null) return "";
+					try {
+						return new Intl.NumberFormat(undefined, {
+							style: "currency",
+							currency: String(row.currency || "GBP").toUpperCase(),
+						}).format(Number(row.price_paid || 0));
+					} catch (_) {
+						return `${row.price_paid} ${row.currency || ""}`.trim();
+					}
+				}
+
+				function formatIconPurchaseDate(row) {
+					if (!row?.created_at) return "";
+					try {
+						return new Date(row.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+					} catch (_) {
+						return "";
+					}
+				}
+
+				function iconPurchaseDeliverable(row) {
+					const meta = iconMeta(row);
+					const kind = iconKind(row);
+					const directPath = safeAssetPath(meta.icon_path);
+					if (kind === "single" && directPath) {
+						return { ready: true, mode: "single", label: "Download icon" };
+					}
+					if (kind === "pack" && meta.icon_collection) {
+						return { ready: true, mode: "pack", label: "Download ZIP" };
+					}
+					if (directPath) {
+						return { ready: true, mode: "single", label: "Download file" };
+					}
+					return { ready: false, mode: "manual", label: "Prepare delivery" };
+				}
+
+				function iconPurchaseCard(row, index) {
+					const meta = iconMeta(row);
+					const deliverable = iconPurchaseDeliverable(row);
+					const title = iconPurchaseTitle(row);
+					const subtitle = iconPurchaseSubtitle(row);
+					const date = formatIconPurchaseDate(row);
+					const price = formatIconPurchasePrice(row);
+					const previewPath = safeAssetPath(meta.icon_path);
+					const badge = iconKind(row) === "pack" ? "Pack" : "Single";
+
+					return `
+						<article class="icon-purchase-card">
+							<div class="icon-purchase-card__preview">
+								${previewPath ? `<img src="${escapeHtml(previewPath)}" alt="" loading="lazy" />` : `<span>${escapeHtml(badge)}</span>`}
+							</div>
+							<div class="icon-purchase-card__body">
+								<div class="icon-purchase-card__topline">
+									<span>${escapeHtml(badge)}</span>
+									<span>${escapeHtml(titleCaseWords(iconTier(row)))}</span>
+								</div>
+								<h3>${escapeHtml(title)}</h3>
+								<p>${escapeHtml(subtitle)}</p>
+								<div class="icon-purchase-card__meta">
+									${date ? `<span>${escapeHtml(date)}</span>` : ""}
+									${price ? `<span>${escapeHtml(price)}</span>` : ""}
+									${row?.status ? `<span>${escapeHtml(titleCaseWords(row.status))}</span>` : ""}
+								</div>
+							</div>
+							<button class="btn btn--sm ${deliverable.ready ? "" : "btn--ghost"} icon-delivery-btn" type="button" data-icon-purchase-index="${index}">
+								${escapeHtml(deliverable.label)}
+							</button>
+						</article>
+					`;
+				}
+
+				function downloadBlob(blob, filename) {
+					const url = URL.createObjectURL(blob);
+					const anchor = document.createElement("a");
+					anchor.href = url;
+					anchor.download = filename;
+					document.body.appendChild(anchor);
+					anchor.click();
+					document.body.removeChild(anchor);
+					setTimeout(() => URL.revokeObjectURL(url), 1000);
+				}
+
+				function downloadDirect(path, filename) {
+					const anchor = document.createElement("a");
+					anchor.href = path;
+					anchor.download = filename || fileNameFromPath(path, "volynx-icon");
+					document.body.appendChild(anchor);
+					anchor.click();
+					document.body.removeChild(anchor);
+				}
+
+				async function downloadIconPackZip(row) {
+					const meta = iconMeta(row);
+					const collection = String(meta.icon_collection || "").trim();
+					if (!collection) throw new Error("Pack collection is missing.");
+					if (!window.JSZip) throw new Error("ZIP engine is still loading. Try again in a moment.");
+
+					const catalogRes = await fetch("/assets/icons-store/catalog.json", { cache: "no-store" });
+					if (!catalogRes.ok) throw new Error("Icon catalog is unavailable.");
+					const catalog = await catalogRes.json();
+					if (!Array.isArray(catalog)) throw new Error("Icon catalog is invalid.");
+
+					const icons = collection === "__all_premium__"
+						? catalog.filter((icon) => ["premium", "paid"].includes(String(icon?.plan || "").toLowerCase()))
+						: catalog.filter((icon) => String(icon?.collection || "") === collection);
+					if (!icons.length) throw new Error("No files found for this pack.");
+
+					const zip = new window.JSZip();
+					const folderName = slugFileName(collection, "volynx-icons-pack");
+
+					for (const icon of icons) {
+						const path = safeAssetPath(icon?.path);
+						if (!path) continue;
+						const fileRes = await fetch(path);
+						if (!fileRes.ok) continue;
+						const blob = await fileRes.blob();
+						const filename = fileNameFromPath(icon?.file || path, "icon.webp");
+						zip.file(`${folderName}/${filename}`, blob);
+					}
+
+					const content = await zip.generateAsync({ type: "blob" });
+					downloadBlob(content, `${folderName}.zip`);
+				}
+
+				async function handleIconDelivery(row, button) {
+					const originalText = button.textContent;
+					const meta = iconMeta(row);
+					const deliverable = iconPurchaseDeliverable(row);
+					button.disabled = true;
+					button.textContent = deliverable.mode === "pack" ? "Building ZIP..." : "Opening...";
+
+					try {
+						if (deliverable.mode === "single") {
+							const path = safeAssetPath(meta.icon_path);
+							if (!path) throw new Error("Icon path is missing.");
+							downloadDirect(path, fileNameFromPath(path, slugFileName(iconPurchaseTitle(row), "volynx-icon")));
+							button.textContent = "Downloaded";
+						} else if (deliverable.mode === "pack") {
+							await downloadIconPackZip(row);
+							button.textContent = "ZIP ready";
+						} else {
+							const purchaseId = encodeURIComponent(row?.id || row?.addon_id || "icons");
+							window.location.href = `/contact/?product=volynx-icons-store&intent=delivery&purchase=${purchaseId}`;
+							return;
+						}
+					} catch (error) {
+						console.error("[profile] icon delivery failed:", error);
+						button.textContent = "Delivery issue";
+						button.classList.add("btn--ghost");
+						setTimeout(() => { button.textContent = originalText; button.disabled = false; }, 2200);
+						return;
+					}
+
+					setTimeout(() => { button.textContent = originalText; button.disabled = false; }, 1800);
+				}
+
+				function bindIconDeliveryButtons() {
+					document.querySelectorAll(".icon-delivery-btn[data-icon-purchase-index]").forEach((button) => {
+						button.addEventListener("click", () => {
+							const index = Number(button.getAttribute("data-icon-purchase-index") || "0");
+							const row = iconPurchaseRows[index];
+							if (row) handleIconDelivery(row, button);
+						});
+					});
+				}
+
+				async function loadIconPurchases() {
+					if (!iconPurchasesSection || !iconPurchasesGrid) return;
+					try {
+						const { data, error } = await supabase
+							.from("addons_purchased")
+							.select("id,addon_id,price_paid,currency,status,metadata,created_at")
+							.eq("user_id", user.id)
+							.like("addon_id", "icons_%")
+							.order("created_at", { ascending: false });
+
+						if (error) throw error;
+
+						iconPurchaseRows = Array.isArray(data) ? data : [];
+						iconPurchasesSection.style.display = "";
+
+						if (!iconPurchaseRows.length) {
+							iconPurchasesGrid.innerHTML = `
+								<div class="icon-purchases-empty">
+									<strong>No icon purchases yet.</strong>
+									<span>Purchased singles and packs will appear here automatically.</span>
+								</div>
+							`;
+							return;
+						}
+
+						iconPurchasesGrid.innerHTML = iconPurchaseRows.map(iconPurchaseCard).join("");
+						bindIconDeliveryButtons();
+						log("icon purchases: " + iconPurchaseRows.length);
+					} catch (error) {
+						console.error("[profile] icon purchases failed:", error);
+						if (iconPurchasesSection && iconPurchasesGrid) {
+							iconPurchasesSection.style.display = "";
+							iconPurchasesGrid.innerHTML = '<p class="text-muted" style="font-size:.85rem;">Could not load icon purchases.</p>';
+						}
+					}
+				}
+
+				loadIconPurchases();
 
 				// ══════════════════════════════════════════════════════
 				// PHASE 3a2: Change password
@@ -1199,6 +1500,9 @@ import { ROUTES } from "../data/routes";
 
 	.section-label { font-size: .7rem; font-weight: 700; text-transform: uppercase;
 		letter-spacing: .12em; color: var(--accent); margin-bottom: 18px; opacity: .8; }
+	.section-headline { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+	.section-headline .section-label { margin-bottom: 4px; }
+	.section-subcopy { margin: 0; color: var(--muted); font-size: .85rem; }
 
 	.edit-form { display: grid; gap: 18px; }
 	.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -1231,6 +1535,39 @@ import { ROUTES } from "../data/routes";
 	.sub-card__plan[data-tier="diamond"] { color: #c084fc; }
 	.sub-card__link { display: inline-block; margin-top: 6px; font-size: .78rem; font-weight: 600; color: var(--accent); }
 	.sub-card__link:hover { text-decoration: underline; }
+
+	/* Icon purchases */
+	.icon-purchases-grid { display: grid; gap: 14px; }
+	.icon-purchase-card {
+		display: grid; grid-template-columns: 72px 1fr auto; align-items: center; gap: 16px;
+		padding: 16px; border-radius: 16px; background: rgba(255,255,255,.03);
+		border: 1px solid rgba(255,255,255,.06);
+	}
+	.icon-purchase-card__preview {
+		width: 72px; height: 72px; border-radius: 18px; display: grid; place-items: center;
+		background: linear-gradient(135deg, rgba(0,232,197,.1), rgba(120,0,255,.12));
+		border: 1px solid rgba(255,255,255,.08); overflow: hidden;
+	}
+	.icon-purchase-card__preview img { width: 100%; height: 100%; object-fit: contain; padding: 8px; display: block; }
+	.icon-purchase-card__preview span {
+		color: rgba(255,255,255,.62); font-size: .68rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em;
+	}
+	.icon-purchase-card__topline { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 5px; }
+	.icon-purchase-card__topline span {
+		padding: 3px 8px; border-radius: 999px; background: rgba(255,255,255,.04);
+		color: rgba(255,255,255,.48); font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em;
+	}
+	.icon-purchase-card h3 { margin: 0; font-size: 1rem; line-height: 1.25; }
+	.icon-purchase-card p { margin: 4px 0 0; color: var(--muted); font-size: .82rem; line-height: 1.4; }
+	.icon-purchase-card__meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; color: rgba(255,255,255,.38); font-size: .72rem; }
+	.icon-delivery-btn { white-space: nowrap; min-width: 128px; }
+	.icon-delivery-btn:disabled { opacity: .68; cursor: wait; transform: none; }
+	.icon-purchases-empty {
+		display: grid; gap: 4px; padding: 18px; border-radius: 14px;
+		background: rgba(255,255,255,.025); border: 1px dashed rgba(255,255,255,.09);
+	}
+	.icon-purchases-empty strong { font-size: .92rem; }
+	.icon-purchases-empty span { color: var(--muted); font-size: .82rem; }
 
 	/* Quick access grid */
 	.quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
@@ -1272,6 +1609,9 @@ import { ROUTES } from "../data/routes";
 		.glass-section { padding: 18px; border-radius: 16px; }
 		.hero-bio { max-width: none; }
 		.subs-grid { grid-template-columns: 1fr; }
+		.icon-purchase-card { grid-template-columns: 56px 1fr; }
+		.icon-purchase-card__preview { width: 56px; height: 56px; border-radius: 14px; }
+		.icon-delivery-btn { grid-column: 1 / -1; width: 100%; }
 		.quick-grid { grid-template-columns: repeat(2, 1fr); }
 		.form-footer { flex-direction: column; }
 		.btn { width: 100%; }

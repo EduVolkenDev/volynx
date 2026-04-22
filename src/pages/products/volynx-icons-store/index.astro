@@ -2122,7 +2122,10 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       `, "pack");
 
       document.getElementById("packCheckoutBtn")?.addEventListener("click", (event) => {
-        startIconCheckout(packPrice.lookup, event.currentTarget as HTMLElement);
+        startIconCheckout(packPrice.lookup, event.currentTarget as HTMLElement, {
+          label: collection,
+          collection,
+        });
       });
       document.querySelectorAll<HTMLButtonElement>(".pack-modal-icon").forEach((button) => {
         button.addEventListener("click", () => {
@@ -2361,10 +2364,16 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         </div>
       `);
       document.getElementById("premiumCollectionCheckoutBtn")?.addEventListener("click", () => {
-        startIconCheckout(ICON_PACK_PRICES.premium.lookup, document.getElementById("premiumCollectionCheckoutBtn"));
+        startIconCheckout(ICON_PACK_PRICES.premium.lookup, document.getElementById("premiumCollectionCheckoutBtn"), {
+          label: icon.collection,
+          collection: icon.collection,
+        });
       });
       document.getElementById("premiumComboCheckoutBtn")?.addEventListener("click", () => {
-        startIconCheckout(ICON_PACK_PRICES.hyper.lookup, document.getElementById("premiumComboCheckoutBtn"));
+        startIconCheckout(ICON_PACK_PRICES.hyper.lookup, document.getElementById("premiumComboCheckoutBtn"), {
+          label: storeLang() === "pt" ? "Combo premium completo" : "Full premium combo",
+          collection: "__all_premium__",
+        });
       });
     }
 

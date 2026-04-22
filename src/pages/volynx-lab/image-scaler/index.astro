@@ -54,10 +54,10 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
         </div>
 
         <div class="cardBody">
-          <div id="drop" class="drop" role="button" tabindex="0" aria-label="Drop zone">
+          <label for="file" id="drop" class="drop" aria-label="Drop zone">
             <span class="icon">⬆</span>
             <p data-i18n="scaler.drop_text">Drop images here or click to select</p>
-          </div>
+          </label>
 
           <div class="field-row">
             <label>
@@ -189,7 +189,6 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
     function $(id) { return document.getElementById(id); }
 
     const fileEl      = $("file");
-    const pickBtn     = $("pickBtn");
     const dropEl      = $("drop");
     const runBtn      = $("runBtn");
     const downloadBtn = $("downloadBtn");
@@ -260,15 +259,7 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
       return { baseName, originalFile: file, blob, width: canvas.width, height: canvas.height };
     }
 
-    // pickBtn is now a <label for="file"> — native HTML triggers file input, no JS needed.
-    // Keep keyboard support for the label (Enter/Space).
-    pickBtn.addEventListener("keydown", e => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileEl.click(); }
-    });
-    dropEl.addEventListener("click", () => fileEl.click());
-    dropEl.addEventListener("keydown", e => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileEl.click(); }
-    });
+    // Select button + drop zone are <label for="file"> — native click/Enter/Space, no JS needed.
     fileEl.addEventListener("change", async () => {
       const files = Array.from(fileEl.files || []);
       if (files.length) await loadFiles(files);

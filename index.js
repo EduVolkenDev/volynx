@@ -91,12 +91,19 @@ app.post("/create-checkout-session", async (req, res) => {
     const price = prices.data[0];
     const prefix = extractPrefix(lookup_key);
     const mode = getCheckoutMode(prefix);
+    const extraMeta = {};
+    for (const key of ["icon_id", "icon_label", "icon_path", "icon_collection"]) {
+      const value = req.body?.[key];
+      if (typeof value === "string" && value.length > 0 && value.length < 500) {
+        extraMeta[key] = value;
+      }
+    }
 
     const params = {
       mode,
       line_items: [{ price: price.id, quantity: 1 }],
       customer_email: user.email,
-      metadata: { user_id: user.id, lookup_key, product_family: prefix },
+      metadata: { user_id: user.id, lookup_key, product_family: prefix, ...extraMeta },
       success_url: success_url || `${FRONTEND_ORIGIN}/profile/?payment=success`,
       cancel_url: cancel_url || `${FRONTEND_ORIGIN}/pricing/?payment=cancelled`,
       allow_promotion_codes: true,
@@ -105,7 +112,7 @@ app.post("/create-checkout-session", async (req, res) => {
     if (mode === "subscription") {
       params.subscription_data = { metadata: { user_id: user.id, lookup_key, plan_key: prefix } };
     } else {
-      params.payment_intent_data = { metadata: { user_id: user.id, lookup_key } };
+      params.payment_intent_data = { metadata: { user_id: user.id, lookup_key, ...extraMeta } };
     }
 
     const session = await stripe.checkout.sessions.create(params);

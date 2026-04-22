@@ -40,14 +40,14 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       <div class="card">
         <div class="cardHead">
           <strong data-i18n="suite.card_upload">Upload &amp; Config</strong>
-          <button id="pickBtn" class="btn secondary" type="button" data-i18n="suite.btn_select">Select</button>
-          <input id="file" type="file" accept="image/*" multiple hidden aria-label="Select images" />
+          <label for="file" class="btn secondary" data-i18n="suite.btn_select">Select</label>
+          <input id="file" type="file" accept="image/*" multiple aria-label="Select images" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;" />
         </div>
 
         <div class="cardBody">
-          <div id="drop" class="drop" role="button" tabindex="0" aria-label="Drop zone" data-i18n="suite.drop_text">
+          <label for="file" id="drop" class="drop" data-i18n="suite.drop_text">
             Drag images here or click to select
-          </div>
+          </label>
 
           <div class="field-group">
             <label class="field">
@@ -193,7 +193,6 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
     }
 
     const fileEl = $("file");
-    const pickBtn = $("pickBtn");
     const dropEl = $("drop");
     const runBtn = $("runBtn");
     const downloadBtn = $("downloadBtn");
@@ -450,20 +449,8 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
     });
     fmtEl.addEventListener("change", checkFmtHint);
 
-    pickBtn.addEventListener("click", () => {
-      fileEl.click();
-    });
-
-    dropEl.addEventListener("click", () => {
-      fileEl.click();
-    });
-
-    dropEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        fileEl.click();
-      }
-    });
+    // Select button + drop zone are now <label for="file"> — native click, no JS needed.
+    // Keyboard Enter/Space on the label also opens the picker natively.
 
     fileEl.addEventListener("change", async () => {
       const files = Array.from(fileEl.files || []);
