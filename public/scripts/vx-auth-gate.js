@@ -152,11 +152,12 @@
     // Inject Pro top bar
     var toolName = (window.__vxTool || '').replace(/-/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
     var planLabel = window.VxPlan ? window.VxPlan.label(plan) : plan;
+    var studioBadge = planLabel === 'Studio' ? 'Studio' : ('Studio ' + planLabel);
     var proBar = document.createElement('div');
     proBar.className = 'studio-pro-bar';
     proBar.innerHTML = ''
       + '<div class="studio-pro-bar__left">'
-      + '  <span class="studio-pro-bar__badge">Studio ' + planLabel + '</span>'
+      + '  <span class="studio-pro-bar__badge">' + studioBadge + '</span>'
       + '  <span class="studio-pro-bar__tool">' + (toolName || 'Tool') + '</span>'
       + '</div>'
       + '<div class="studio-pro-bar__right">'

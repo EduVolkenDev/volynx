@@ -189,6 +189,7 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
     function $(id) { return document.getElementById(id); }
 
     const fileEl      = $("file");
+    const pickBtn     = $("pickBtn");
     const dropEl      = $("drop");
     const runBtn      = $("runBtn");
     const downloadBtn = $("downloadBtn");
@@ -259,9 +260,23 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
       return { baseName, originalFile: file, blob, width: canvas.width, height: canvas.height };
     }
 
-    // Select button + drop zone are <label for="file"> — native click/Enter/Space, no JS needed.
+    function triggerFilePicker() {
+      if (fileEl) fileEl.click();
+    }
+
+    function handlePickerKeydown(event) {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        triggerFilePicker();
+      }
+    }
+
+    pickBtn?.addEventListener("keydown", handlePickerKeydown);
+    dropEl?.addEventListener("keydown", handlePickerKeydown);
+
     fileEl.addEventListener("change", async () => {
       const files = Array.from(fileEl.files || []);
+      fileEl.value = "";
       if (files.length) await loadFiles(files);
     });
     dropEl.addEventListener("dragover", e => e.preventDefault());
