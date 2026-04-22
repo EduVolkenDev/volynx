@@ -1159,7 +1159,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       return token;
     }
 
-    async function startIconCheckout(lookupPrefix: string, trigger?: HTMLElement | null) {
+    async function startIconCheckout(lookupPrefix: string, trigger?: HTMLElement | null, iconItem?: any) {
       if (!lookupPrefix) {
         window.location.href = `${STORE_ROUTES.signup}?next=${encodeURIComponent(STORE_ROUTES.iconsStore)}`;
         return;
@@ -1181,6 +1181,16 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         const apiBase = String(cfg?.functionsUrl || cfg?.apiBaseUrl || "").replace(/\/$/, "");
         if (!apiBase) throw new Error("Checkout endpoint is not configured.");
         const lookupKey = `${lookupPrefix}_${checkoutCurrency()}`;
+        // Pass the specific icon metadata so the webhook can record exactly
+        // what was purchased and later power a deliverable (download / email).
+        const iconMeta: Record<string, string> = {};
+        if (iconItem) {
+          if (iconItem.icon?.id) iconMeta.icon_id = String(iconItem.icon.id);
+          else if (iconItem.label) iconMeta.icon_id = `inline-${String(iconItem.label).toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+          if (iconItem.label) iconMeta.icon_label = String(iconItem.label).slice(0, 200);
+          if (iconItem.path || iconItem.icon?.path) iconMeta.icon_path = String(iconItem.path || iconItem.icon.path).slice(0, 400);
+          if (iconItem.collection) iconMeta.icon_collection = String(iconItem.collection).slice(0, 120);
+        }
         const res = await fetch(`${apiBase}/create-checkout-session`, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -1188,6 +1198,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
             lookup_key: lookupKey,
             success_url: `${window.location.origin}/profile/?payment=success&product=icons-store`,
             cancel_url: `${window.location.origin}${STORE_ROUTES.iconsStore}?payment=cancelled`,
+            ...iconMeta,
           }),
         });
         const data = await res.json();
@@ -2056,7 +2067,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       `, "single");
 
       document.getElementById("singleCheckoutBtn")?.addEventListener("click", (event) => {
-        startIconCheckout(checkoutLookup, event.currentTarget as HTMLElement);
+        startIconCheckout(checkoutLookup, event.currentTarget as HTMLElement, item);
       });
       document.getElementById("singleRelatedPackBtn")?.addEventListener("click", () => {
         showPackModal(relatedCollection);

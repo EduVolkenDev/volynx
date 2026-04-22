@@ -141,12 +141,21 @@ Deno.serve(async (req: Request) => {
       await supabase.from("profiles").update({ stripe_customer_id: customerId }).eq("id", user.id);
     }
 
+    // Optional per-product metadata (icon purchase: which icon?)
+    const extraMeta: Record<string, string> = {};
+    for (const key of ["icon_id", "icon_label", "icon_path", "icon_collection"]) {
+      const value = (body as Record<string, unknown>)[key];
+      if (typeof value === "string" && value.length > 0 && value.length < 500) {
+        extraMeta[key] = value;
+      }
+    }
+
     // Build session
     const params: Record<string, unknown> = {
       customer: customerId,
       mode,
       line_items: [{ price: price.id, quantity: 1 }],
-      metadata: { user_id: user.id, lookup_key, product_family: prefix },
+      metadata: { user_id: user.id, lookup_key, product_family: prefix, ...extraMeta },
       success_url: success_url || `${FRONTEND_ORIGIN}/profile/?payment=success`,
       cancel_url: cancel_url || `${FRONTEND_ORIGIN}/pricing/?payment=cancelled`,
       allow_promotion_codes: true,

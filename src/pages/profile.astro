@@ -767,9 +767,12 @@ import { ROUTES } from "../data/routes";
 				// there is a real return URL saved (i.e. the user came from a
 				// product/checkout). Prevents stranding first-time signups
 				// mid-purchase with no way back.
+				// NOTE: this script block is <script is:inline> = plain JS. Do
+				// NOT use TypeScript casts here — they break the whole file at
+				// browser parse time and leave the page stuck on the spinner.
 				const pendingNext = localStorage.getItem("volynx_post_login_next") || "";
 				if (pendingNext && pendingNext.startsWith("/") && !pendingNext.startsWith("//") && pendingNext !== "/volynx-lab/" && !pendingNext.startsWith("/profile")) {
-					const firstTimeCta = $("firstTimeContinueBtn") as HTMLButtonElement | null;
+					const firstTimeCta = $("firstTimeContinueBtn");
 					if (firstTimeCta) {
 						firstTimeCta.hidden = false;
 						firstTimeCta.addEventListener("click", () => {

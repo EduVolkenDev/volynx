@@ -281,6 +281,32 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       console.log(`Addon ${addonId} activated for ${userId}`);
     }
 
+    // ── Icon purchases (icons_single_* / icons_pack_*) → record ──
+    // Without this row, the buyer has no trace of what they purchased on
+    // their profile and the platform has no way to surface a deliverable.
+    if (prefix.startsWith("icons_")) {
+      const meta = (session.metadata || {}) as Record<string, string>;
+      await supabase.from("addons_purchased").insert({
+        user_id: userId,
+        user_email: userEmail,
+        addon_id: prefix,
+        price_paid: (session.amount_total || 0) / 100,
+        currency: currency,
+        status: "active",
+        metadata: {
+          stripe_session_id: session.id,
+          lookup_key: lookupKey,
+          icon_id: meta.icon_id || null,
+          icon_label: meta.icon_label || null,
+          icon_path: meta.icon_path || null,
+          icon_collection: meta.icon_collection || null,
+          tier: prefix.replace(/^icons_(single|pack)_/, ""),
+          kind: prefix.startsWith("icons_single_") ? "single" : "pack",
+        },
+      });
+      console.log(`Icon purchase ${prefix} recorded for ${userId}`);
+    }
+
     // ── Kit purchases → record addon + auto-create Builder project ──
     if (prefix.startsWith("kit_") || prefix.startsWith("pf_")) {
       // Record as addon purchase
