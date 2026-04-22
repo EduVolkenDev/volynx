@@ -311,6 +311,8 @@ import PageWidgets from "../../components/PageWidgets.astro";
   let selectedVariants: Record<string, string> = {};
   let wizardStep = 1;
   let userProfile: any = null;
+  let currentUser: any = null;
+  let purchasedAddons = new Set<string>();
 
   const KEYS = ["volynx_access_token", "volynx_refresh_token", "volynx_user_email"];
 
@@ -335,6 +337,77 @@ import PageWidgets from "../../components/PageWidgets.astro";
       .single();
     if (error || !data) return { max_drafts: 1, max_published: 0, custom_domain: false, remove_branding: false, premium_kits: false };
     return data;
+  }
+
+  async function fetchPurchasedAddons(userId: string): Promise<Set<string>> {
+    const { data, error } = await supa
+      .from("addons_purchased")
+      .select("addon_id,status")
+      .eq("user_id", userId)
+      .eq("status", "active");
+    if (error || !data) {
+      if (error) log("addons fetch error: " + error.message);
+      return new Set();
+    }
+    return new Set(
+      data
+        .map((row: any) => String(row.addon_id || "").toLowerCase())
+        .filter(Boolean)
+    );
+  }
+
+  const PRESET_PURCHASE_PREFIXES: Record<string, string[]> = {
+    landing_express: ["kit_landing_express"],
+    saas: ["kit_saas"],
+    agency: ["kit_agency"],
+    portfolio: ["kit_portfolio"],
+  };
+
+  function normalizePresetId(presetId: string) {
+    return String(presetId || "").replace(/-/g, "_");
+  }
+
+  function presetDefinition(presetId: string) {
+    const id = normalizePresetId(presetId);
+    return presets.find((p: any) => p.id === id);
+  }
+
+  function isPremiumPreset(presetId: string) {
+    return presetDefinition(presetId)?.tier === "premium";
+  }
+
+  function hasPurchasedPreset(presetId: string) {
+    const prefixes = PRESET_PURCHASE_PREFIXES[normalizePresetId(presetId)] || [];
+    return prefixes.some((prefix) =>
+      Array.from(purchasedAddons).some((addonId) => addonId === prefix || addonId.startsWith(prefix + "_"))
+    );
+  }
+
+  function canUsePresetId(presetId: string) {
+    const id = normalizePresetId(presetId);
+    if (!id || id === "blank") return true;
+    const preset = presetDefinition(id);
+    if (!preset) return false;
+    if (!isPremiumPreset(id)) return true;
+    if (planLimits === null) return true;
+    return Boolean(planLimits?.premium_kits || hasPurchasedPreset(id));
+  }
+
+  function presetProductHref(presetId: string) {
+    const preset = presetDefinition(presetId);
+    return preset?.product_slug ? `/products/${preset.product_slug}/` : "/pricing/";
+  }
+
+  function lockedPresetMessage(presetId: string) {
+    const preset = presetDefinition(presetId);
+    const name = preset?.name || "This preset";
+    return `${name} is premium. Buy the kit or upgrade to Builder Pro to unlock it.`;
+  }
+
+  function defaultPresetId() {
+    if (canUsePresetId("saas")) return "saas";
+    const firstUnlocked = presets.find((p: any) => p.id !== "landing_express" && canUsePresetId(p.id));
+    return firstUnlocked?.id || "blank";
   }
 
   async function countActiveProjects(userId: string): Promise<{ drafts: number; published: number }> {
@@ -519,7 +592,11 @@ import PageWidgets from "../../components/PageWidgets.astro";
     const grid = $("presetGrid");
     if (!grid) return;
 
-    const blank = `<button type="button" class="archetype-card" data-preset="blank">
+    if (!canUsePresetId(selectedPresetId) || normalizePresetId(selectedPresetId) === "landing_express") {
+      selectedPresetId = defaultPresetId();
+    }
+
+    const blank = `<button type="button" class="archetype-card${selectedPresetId === "blank" ? " archetype-card--active" : ""}" data-preset="blank">
       <div class="archetype-icon">${presetIcons.blank}</div>
       <div class="archetype-body">
         <span class="archetype-name">Custom</span>
@@ -528,12 +605,17 @@ import PageWidgets from "../../components/PageWidgets.astro";
       </div>
     </button>`;
 
-    const cards = presets.map((p: any) => {
+    const cards = presets.filter((p: any) => p.id !== "landing_express").map((p: any) => {
       const info = archetypeInfo[p.id] || { outcome: p.description, ideal: "" };
-      return `<button type="button" class="archetype-card${p.id === 'saas' ? ' archetype-card--active' : ''}" data-preset="${p.id}">
+      const locked = !canUsePresetId(p.id);
+      const premiumTag = isPremiumPreset(p.id)
+        ? `<span class="archetype-tag">${locked ? "Buy kit" : "Unlocked"}</span>`
+        : "";
+      return `<button type="button" class="archetype-card${p.id === selectedPresetId ? ' archetype-card--active' : ''}${locked ? ' archetype-card--locked' : ''}" data-preset="${p.id}" ${locked ? 'aria-label="' + p.name + ' premium preset. Open purchase page."' : ""}>
       <div class="archetype-icon">${presetIcons[p.id] || p.icon || "📦"}</div>
       <div class="archetype-body">
         <span class="archetype-name">${p.name}</span>
+        ${premiumTag}
         <span class="archetype-outcome">${info.outcome}</span>
         <span class="archetype-ideal">${info.ideal}</span>
       </div>
@@ -541,11 +623,12 @@ import PageWidgets from "../../components/PageWidgets.astro";
     }).join("");
 
     // Landing Express quick-start
-    const landingExpress = `<button type="button" class="archetype-card archetype-card--express" data-preset="landing-express">
+    const expressLocked = !canUsePresetId("landing_express");
+    const landingExpress = `<button type="button" class="archetype-card archetype-card--express${expressLocked ? ' archetype-card--locked' : ''}" data-preset="landing_express" ${expressLocked ? 'aria-label="Landing Express premium preset. Open purchase page."' : ""}>
       <div class="archetype-icon archetype-icon--express">⚡</div>
       <div class="archetype-body">
         <span class="archetype-name">Landing Express</span>
-        <span class="archetype-tag">Guided</span>
+        <span class="archetype-tag">${expressLocked ? "Buy kit" : "Guided"}</span>
         <span class="archetype-outcome">Answer 3 questions and get a ready-to-edit landing page in seconds</span>
         <span class="archetype-ideal">The fastest way to launch. Perfect for first-time users.</span>
       </div>
@@ -553,27 +636,27 @@ import PageWidgets from "../../components/PageWidgets.astro";
 
     grid.innerHTML = landingExpress + cards + blank;
 
-    // Default selection
-    selectedPresetId = "saas";
     grid.querySelector('.archetype-card--active')?.scrollIntoView({ block: "nearest" });
 
     grid.querySelectorAll(".archetype-card").forEach(btn => {
       btn.addEventListener("click", () => {
-        grid.querySelectorAll(".archetype-card").forEach(b => b.classList.remove("archetype-card--active"));
-        btn.classList.add("archetype-card--active");
-        const preset = (btn as HTMLElement).dataset.preset || "blank";
+        const preset = normalizePresetId((btn as HTMLElement).dataset.preset || "blank");
 
-        // Landing Express redirects to a simplified flow
-        if (preset === "landing-express") {
-          selectedPresetId = "saas"; // default base for express
-          showLandingExpressFlow();
+        if (!canUsePresetId(preset)) {
+          setStatus(lockedPresetMessage(preset) + " Opening the product page...");
+          window.location.href = presetProductHref(preset);
           return;
         }
 
-        // TODO: premium gating — check planLimits.premium_kits here before allowing
-        // non-free presets. If planLimits.premium_kits === false and the selected preset
-        // is a paid kit, block selection and prompt the user to upgrade.
-        // Example: if (!planLimits?.premium_kits && PREMIUM_PRESET_IDS.includes(preset)) { ... }
+        grid.querySelectorAll(".archetype-card").forEach(b => b.classList.remove("archetype-card--active"));
+        btn.classList.add("archetype-card--active");
+
+        // Landing Express redirects to a simplified flow
+        if (preset === "landing_express") {
+          selectedPresetId = "landing_express";
+          showLandingExpressFlow();
+          return;
+        }
 
         selectedPresetId = preset;
         selectedVariants = {};
@@ -689,10 +772,23 @@ import PageWidgets from "../../components/PageWidgets.astro";
 
     // Generate
     $("exGenerate")?.addEventListener("click", async () => {
+      const user = currentUser;
+      if (!user?.id) {
+        setStatus("Session expired. Please sign in again.");
+        return;
+      }
+
       const brand = ($("exBrand") as HTMLInputElement)?.value?.trim() || "My Brand";
       const tagline = ($("exTagline") as HTMLInputElement)?.value?.trim() || "";
       const cta = ($("exCta") as HTMLInputElement)?.value?.trim() || "Get started";
       const slug = ($("exSlug") as HTMLInputElement)?.value?.trim() || brand.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+      const counts = await countActiveProjects(user.id);
+      const check = canCreate(counts);
+      if (!check.ok) {
+        setStatus(check.msg);
+        return;
+      }
 
       // Restore wizard + use selected archetype
       selectedPresetId = archetypeToPreset[exArchetype] || "saas";
@@ -1367,6 +1463,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
       return;
     }
 
+    currentUser = user;
     log("authenticated: " + user.email);
     const who = $("who");
     if (who) who.textContent = user.email || "";
@@ -1376,6 +1473,8 @@ import PageWidgets from "../../components/PageWidgets.astro";
     userProfile = await fetchUserProfile(user.id);
     const builderPlan = userProfile?.builder_plan || "free";
     planLimits = await fetchPlanLimits(builderPlan);
+    purchasedAddons = await fetchPurchasedAddons(user.id);
+    renderPresetPicker();
     log("builder_plan: " + builderPlan + " | tokens: " + (userProfile?.token_balance || 0));
 
     await listProjects(user.id);
@@ -1541,6 +1640,9 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     // Create project (with builder_plan limit check + usage logging)
     $("create")?.addEventListener("click", async () => {
       const btn = $("create") as HTMLButtonElement;
+      if (!canUsePresetId(selectedPresetId)) {
+        return setStatus(lockedPresetMessage(selectedPresetId));
+      }
       const counts = await countActiveProjects(user.id);
       const check = canCreate(counts);
       if (!check.ok) return setStatus(check.msg);
@@ -2093,6 +2195,14 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     border-color: rgba(125, 211, 252, 0.28);
     background: rgba(125, 211, 252, 0.04);
     transform: translateY(-1px);
+  }
+  .archetype-card--locked {
+    border-color: rgba(243, 225, 160, 0.18);
+    background: linear-gradient(135deg, rgba(243, 225, 160, 0.045), rgba(231, 238, 247, 0.015));
+  }
+  .archetype-card--locked:hover {
+    border-color: rgba(243, 225, 160, 0.34);
+    background: linear-gradient(135deg, rgba(243, 225, 160, 0.075), rgba(125, 211, 252, 0.03));
   }
   /* SELECIONADO — único estado com bg destacado e glow */
   .archetype-card--active {

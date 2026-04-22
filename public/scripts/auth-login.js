@@ -7,10 +7,21 @@ function t(key, fallback) {
 }
 
 function resolveRedirect() {
+  // Accept both ?next= and ?return= — most of the platform uses `next`
+  // but a few callers (icons-store) used `return`. Treat them identically
+  // so a stale-token redirect never drops the user at the default Lab.
   try {
     const url = new URL(window.location.href);
-    const next = url.searchParams.get("next") || "";
-    if (next.startsWith("/") && !next.startsWith("//")) return next;
+    const candidates = [
+      url.searchParams.get("next"),
+      url.searchParams.get("return"),
+      url.searchParams.get("redirect"),
+    ];
+    for (const raw of candidates) {
+      if (!raw) continue;
+      const next = decodeURIComponent(raw);
+      if (next.startsWith("/") && !next.startsWith("//")) return next;
+    }
   } catch {}
   return DEFAULT_REDIRECT;
 }

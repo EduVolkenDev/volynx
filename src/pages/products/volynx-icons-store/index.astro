@@ -1161,13 +1161,13 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
 
     async function startIconCheckout(lookupPrefix: string, trigger?: HTMLElement | null) {
       if (!lookupPrefix) {
-        window.location.href = `${STORE_ROUTES.signup}?return=${STORE_ROUTES.iconsStore}`;
+        window.location.href = `${STORE_ROUTES.signup}?next=${encodeURIComponent(STORE_ROUTES.iconsStore)}`;
         return;
       }
 
       const token = await freshAccessToken();
       if (!token) {
-        window.location.href = `${STORE_ROUTES.login}?return=${encodeURIComponent(STORE_ROUTES.iconsStore)}`;
+        window.location.href = `${STORE_ROUTES.login}?next=${encodeURIComponent(STORE_ROUTES.iconsStore)}`;
         return;
       }
 
@@ -2309,8 +2309,8 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         <h3 style="color:#fff;margin-bottom:.5rem;">${title}</h3>
         <p style="color:rgba(255,255,255,.7);font-size:.9rem;margin-bottom:1.5rem;">${desc}</p>
         <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
-          <a href="${STORE_ROUTES.login}?return=${STORE_ROUTES.iconsStore}" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#00f0ff,#0066ff);color:#000;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;">${signInLabel}</a>
-          <a href="${STORE_ROUTES.signup}?return=${STORE_ROUTES.iconsStore}" style="padding:.75rem 1.5rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;border:1px solid rgba(255,255,255,.3);">${createLabel}</a>
+          <a href="${STORE_ROUTES.login}?next=${encodeURIComponent(STORE_ROUTES.iconsStore)}" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#00f0ff,#0066ff);color:#000;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;">${signInLabel}</a>
+          <a href="${STORE_ROUTES.signup}?next=${encodeURIComponent(STORE_ROUTES.iconsStore)}" style="padding:.75rem 1.5rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;border:1px solid rgba(255,255,255,.3);">${createLabel}</a>
         </div>
       `);
     }

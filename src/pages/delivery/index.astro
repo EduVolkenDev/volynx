@@ -76,6 +76,26 @@ import { ROUTES } from "../../data/routes";
     function show(id) { const el = document.getElementById(id); if (el) el.style.display = ''; }
     function hide(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
 
+    function normalizeProductId(raw) {
+      return String(raw || '')
+        .trim()
+        .toLowerCase()
+        .replace(/_(gbp|eur|brl)$/i, '')
+        .replace(/-(gbp|eur|brl)$/i, '');
+    }
+
+    function jwtSub(jwt) {
+      try {
+        const part = String(jwt || '').split('.')[1];
+        if (!part) return null;
+        const normalized = part.replace(/-/g, '+').replace(/_/g, '/');
+        const payload = JSON.parse(atob(normalized.padEnd(normalized.length + (4 - normalized.length % 4) % 4, '=')));
+        return payload?.sub || null;
+      } catch {
+        return null;
+      }
+    }
+
     /** Derive a display name from addon_id.
      *  e.g. "kit-portfolio-personal" → "Portfolio Pro Kit — Personal"
      *       "kit-agency-launch"      → "Agency Launch Kit — Launch"
@@ -150,23 +170,22 @@ import { ROUTES } from "../../data/routes";
       } catch { return iso; }
     }
 
-    function formatPrice(amount, currency) {
+    function formatPrice(amount, currency, minorUnits = false) {
       if (!amount && amount !== 0) return '';
       try {
         const num = typeof amount === 'number' ? amount : parseFloat(amount);
         const cur = (currency || 'USD').toUpperCase();
-        // Stripe amounts are in cents for most currencies
-        const divisor = num > 1000 ? 100 : 1;
         return new Intl.NumberFormat(undefined, { style: 'currency', currency: cur })
-          .format(num / divisor);
+          .format(minorUnits ? num / 100 : num);
       } catch { return String(amount); }
     }
 
     function buildCard(item) {
-      const label   = addonLabel(item.addon_id || item.product_id || '');
+      const productId = normalizeProductId(item.addon_id || item.product_id || item.lookup_key || '');
+      const label   = addonLabel(productId);
       const date    = formatDate(item.created_at);
-      const price   = formatPrice(item.amount_paid ?? item.amount ?? item.price, item.currency);
-      const productId = item.addon_id || item.product_id || item.lookup_key || '';
+      const amount  = item.price_paid ?? item.amount_paid ?? item.amount ?? item.price;
+      const price   = formatPrice(amount, item.currency, item.price_paid == null);
       const builderHref = productHref(productId);
       const cta = productCta(productId);
 
@@ -192,8 +211,9 @@ import { ROUTES } from "../../data/routes";
       let userId = null;
       try {
         const session = JSON.parse(localStorage.getItem('volynx_session') || '{}');
-        userId = session?.user?.id || null;
+        userId = session?.user?.id || jwtSub(token);
       } catch {}
+      userId = userId || jwtSub(token);
 
       if (!userId) {
         window.location.href = '/login/?next=/delivery/';
@@ -242,11 +262,11 @@ import { ROUTES } from "../../data/routes";
         const items = [];
 
         for (const row of purchased) {
-          const key = row.addon_id || row.product_id || row.id;
+          const key = normalizeProductId(row.addon_id || row.product_id || row.lookup_key || row.id);
           if (!seen.has(key)) { seen.add(key); items.push(row); }
         }
         for (const row of events) {
-          const key = row.addon_id || row.product_id || row.id;
+          const key = normalizeProductId(row.addon_id || row.product_id || row.lookup_key || row.id);
           if (!seen.has(key)) { seen.add(key); items.push(row); }
         }
 
