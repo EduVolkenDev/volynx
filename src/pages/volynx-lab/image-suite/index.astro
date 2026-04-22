@@ -535,9 +535,9 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
           singleOutBlob = processedResults[0].blob;
         }
 
-        if (!isPro) {
-          logToolUsage("image-suite", processedResults.length);
-        }
+        // Log ALL users (free + pro) — pro just doesn't get a quota check.
+        // We still need per-tool call counts for analytics + total API calls.
+        logToolUsage("image-suite", processedResults.length);
 
         dropEl.textContent = `${processedResults.length} file(s) processed successfully`;
         downloadBtn.disabled = false;

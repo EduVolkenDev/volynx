@@ -1301,6 +1301,8 @@ import PageWidgets from "../../components/PageWidgets.astro";
       .eq("id", currentProject.id);
     if (error) { setStatus(error.message); return false; }
     currentProject.builder_data = parsed;
+    // Telemetry — every save counts as a Builder edit action
+    logUsage("builder_save");
     return true;
   }
 
