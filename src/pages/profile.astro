@@ -33,8 +33,15 @@ import { ROUTES } from "../data/routes";
 		<div id="viewProfile" class="view" style="display:none;">
 
 			<div id="firstTimeBanner" class="banner banner--welcome" style="display:none;">
-				<h2 data-i18n="profile.welcome_title">Welcome to VOLYNX</h2>
-				<p data-i18n="profile.welcome_desc">Complete your profile below to get started.</p>
+				<div class="banner-row">
+					<div>
+						<h2 data-i18n="profile.welcome_title">Welcome to VOLYNX</h2>
+						<p data-i18n="profile.welcome_desc">Complete your profile below to get started.</p>
+					</div>
+					<div class="banner-actions">
+						<button type="button" class="btn btn--sm btn--ghost" id="firstTimeContinueBtn" data-i18n="profile.btn_continue_later" hidden>Continue where you were</button>
+					</div>
+				</div>
 			</div>
 
 			<div id="paymentSuccessBanner" class="banner banner--success" style="display:none;">
@@ -755,6 +762,22 @@ import { ROUTES } from "../data/routes";
 					$("welcomeBanner").style.display = "none";
 					$("editPanel")?.scrollIntoView({ behavior: "smooth", block: "start" });
 				});
+
+				// Reveal the firstTime "Continue where you were" button only when
+				// there is a real return URL saved (i.e. the user came from a
+				// product/checkout). Prevents stranding first-time signups
+				// mid-purchase with no way back.
+				const pendingNext = localStorage.getItem("volynx_post_login_next") || "";
+				if (pendingNext && pendingNext.startsWith("/") && !pendingNext.startsWith("//") && pendingNext !== "/volynx-lab/" && !pendingNext.startsWith("/profile")) {
+					const firstTimeCta = $("firstTimeContinueBtn") as HTMLButtonElement | null;
+					if (firstTimeCta) {
+						firstTimeCta.hidden = false;
+						firstTimeCta.addEventListener("click", () => {
+							localStorage.removeItem("volynx_post_login_next");
+							window.location.href = pendingNext;
+						});
+					}
+				}
 
 				$("continueBtn")?.addEventListener("click", () => {
 					const next = localStorage.getItem("volynx_post_login_next") || "/volynx-lab/";

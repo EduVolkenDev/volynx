@@ -109,9 +109,22 @@ function persistSession(session, email) {
       });
 
       persistSession(session, email);
-      localStorage.setItem("volynx_post_login_next", resolveRedirect());
+      const redirect = resolveRedirect();
+      localStorage.setItem("volynx_post_login_next", redirect);
       setMsg(msg, t("login.msg_welcome", "Welcome back. Redirecting..."), "ok");
-      window.location.href = "/profile/?welcome=1";
+
+      // If the user came from a specific product / checkout / service
+      // (i.e. the login URL carried ?next=/?return=/?redirect= pointing
+      // somewhere other than the generic Lab default), send them DIRECTLY
+      // back. Passing through /profile/?welcome=1 + Continue is the right
+      // UX for organic login, but for "I was mid-purchase, token expired,
+      // sign me in again" it's pure friction and a common abandonment cause.
+      const isProductReturn = redirect !== DEFAULT_REDIRECT
+        && redirect !== "/profile/"
+        && redirect !== "/profile"
+        && !redirect.startsWith("/profile/?")
+        && redirect.startsWith("/");
+      window.location.href = isProductReturn ? redirect : "/profile/?welcome=1";
     } catch (err) {
       setMsg(msg, err?.message || t("login.err_failed", "Sign in failed. Please try again."), "err");
     } finally {
