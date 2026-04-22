@@ -1093,7 +1093,19 @@ body {
     color: rgba(200, 150, 255, 0.9);
 }
 
-.load-more-container { text-align: center; }
+.load-more-container {
+    text-align: center;
+    margin-top: clamp(1rem, 3vw, 1.5rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+.load-more-count {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+}
 
 /* ===== COLLECTIONS PREVIEW ===== */
 .collections-preview { padding: 4rem 0; }
@@ -1877,11 +1889,11 @@ body.vx-modal-open { overflow: hidden; }
     .asset-showcase-link { width: 100%; max-width: 300px; }
     .single-icons-head { flex-direction: column; align-items: flex-start; }
     .single-format-tabs { width: 100%; overflow-x: auto; }
-    .single-icons-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .single-icon-card { min-height: 238px; padding: 0.85rem; }
-    .single-icon-visual { width: 112px; height: 112px; }
+    .single-icons-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+    .single-icon-card { min-height: 210px; padding: 0.8rem; gap: 0.5rem; }
+    .single-icon-visual { width: 96px; height: 96px; }
     .single-icon-visual img,
-    .single-icon-visual svg { width: 92px; height: 92px; }
+    .single-icon-visual svg { width: 78px; height: 78px; }
     .single-modal-shell { grid-template-columns: 1fr; }
     .single-modal-art { min-height: 260px; }
     .single-modal-price-row { grid-template-columns: 1fr; }
@@ -1893,6 +1905,9 @@ body.vx-modal-open { overflow: hidden; }
     .section-header { flex-direction: column; align-items: flex-start; gap: 1rem; width: 100%; }
     .filters { justify-content: flex-start; }
     .gallery-section { padding: 2.5rem 0; }
+    .gallery-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .icon-card { padding: 14px 10px 12px; gap: 8px; }
+    .icon-img-wrap { width: 60px; height: 60px; border-radius: 14px; }
     .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
     .icon-img-wrap { width: 64px; height: 64px; }
     .collections-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
@@ -1922,18 +1937,26 @@ body.vx-modal-open { overflow: hidden; }
     .asset-showcase-title { font-size: clamp(1.6rem, 10vw, 2.4rem); }
     .single-icons-title { font-size: clamp(1.75rem, 10vw, 2.6rem); }
     .asset-category-grid { grid-template-columns: 1fr 1fr; }
-    .single-icons-grid { grid-template-columns: 1fr; }
-    .single-icon-card { min-height: 250px; }
+    .single-icons-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; }
+    .single-icon-card { min-height: 200px; padding: 0.7rem; gap: 0.45rem; }
+    .single-icon-visual { width: 82px; height: 82px; }
+    .single-icon-visual img,
+    .single-icon-visual svg { width: 66px; height: 66px; }
+    .single-icon-name { font-size: 0.82rem; }
+    .single-icon-collection,
+    .single-icon-format,
+    .single-icon-price { font-size: 0.7rem; }
     .vx-modal { padding: 0.65rem; }
     .vx-modal-panel,
     .vx-modal-panel--single,
     .vx-modal-panel--pack { width: 100%; max-height: 92vh; }
     .pack-modal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
-    .icon-card { padding: 16px 10px 12px; gap: 8px; }
-    .icon-img-wrap { width: 88px;
-    height: 88px;
-    border-radius: 14px; }
+    /* 2 columns guaranteed on any phone, with tighter gaps and smaller cards */
+    .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .icon-card { padding: 12px 8px 10px; gap: 6px; border-radius: 12px; }
+    .icon-img-wrap { width: 56px; height: 56px; border-radius: 12px; }
+    .icon-collection-label { font-size: 0.68rem; }
+    .icon-pro-badge { font-size: 7px; padding: 2px 5px; }
     .collections-grid { grid-template-columns: 1fr; }
     .footer-grid { grid-template-columns: 1fr; }
 }

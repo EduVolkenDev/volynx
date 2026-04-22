@@ -944,7 +944,8 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         </div>
 
         <div class="load-more-container">
-          <button class="btn btn-secondary" id="loadMoreBtn" style="display:none;">Load More</button>
+          <button class="btn btn-secondary" id="loadMoreBtn" style="display:none;" data-i18n="icons.load_more">Load More</button>
+          <span class="load-more-count" id="loadMoreCount" aria-live="polite"></span>
         </div>
       </div>
     </section>
@@ -1037,7 +1038,16 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     let allIcons: any[] = [];
     let assetSingles: any[] = [];
     let singleFormatFilter = "all";
-    let visibleCount = 48;
+
+    // Responsive page size: mobile 12, tablet 24, desktop 48.
+    // Kept small to prevent a giant endless scroll on phones.
+    function initialPageSize() {
+      const w = window.innerWidth;
+      if (w < 640) return 12;
+      if (w < 1024) return 24;
+      return 48;
+    }
+    let visibleCount = initialPageSize();
     // Catalog is deduped at generation time (see scripts/regenerate-icons-catalog.mjs).
     // Two disk folders can map to the same collection name — totals merge in the catalog.
     const DUPLICATE_COLLECTIONS = new Set();
@@ -1752,7 +1762,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     function clearPackSelection(scrollToGallery = false) {
       currentCollection = null;
       currentFilter = "all";
-      visibleCount = 48;
+      visibleCount = initialPageSize();
       document.querySelectorAll<HTMLButtonElement>(".filter-btn").forEach(b => {
         b.classList.toggle("active", b.dataset.filter === "all");
       });
@@ -1780,7 +1790,20 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       }
 
       const btn = document.getElementById("loadMoreBtn");
-      if (btn) btn.style.display = !currentCollection && filtered.length > visibleCount ? "inline-flex" : "none";
+      const count = document.getElementById("loadMoreCount");
+      const shown = Math.min(visibleCount, filtered.length);
+      const total = filtered.length;
+      const hasMore = !currentCollection && total > visibleCount;
+      if (btn) btn.style.display = hasMore ? "inline-flex" : "none";
+      if (count) {
+        if (!total) { count.textContent = ""; }
+        else {
+          const L = storeLang();
+          count.textContent = L === "pt"
+            ? `${shown} de ${total} ícones`
+            : `${shown} of ${total} icons`;
+        }
+      }
     }
 
     function createIconCard(icon: any) {
@@ -2176,7 +2199,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
 
     // ===== LOAD MORE =====
     document.getElementById("loadMoreBtn")?.addEventListener("click", () => {
-      visibleCount += 48;
+      visibleCount += initialPageSize();
       renderGallery();
     });
 
@@ -2189,7 +2212,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
           btn.classList.add("active");
           currentCollection = null;
           currentFilter = btn.dataset.filter ?? "all";
-          visibleCount = 48;
+          visibleCount = initialPageSize();
           updateGalleryHeading();
           renderGallery();
         });
