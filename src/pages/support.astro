@@ -2,8 +2,16 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import VxHeader from "../components/VxHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
+import PlatformAssistStrip from "../components/PlatformAssistStrip.astro";
 import { ROUTES } from "../data/routes";
 const title = "Support — VOLYNX";
+
+const supportAssistItems = [
+  { href: ROUTES.delivery, label: "Recovery", title: "Open my products", copy: "Use the delivery hub when a purchase already happened and you need the right file or access again.", emphasized: true },
+  { href: ROUTES.daily, label: "Workspace", title: "Open Daily", copy: "Jump back into My Day, Summary, Writing, Vault and the rest of the personal execution layer." },
+  { href: ROUTES.products, label: "Catalog", title: "Browse products", copy: "If you need the product path instead of support, keep discovery and recovery in the same loop." },
+  { href: ROUTES.iconsStore, label: "Assets", title: "Open Icons Store", copy: "Route icon delivery, pack access and visual asset issues from the same recovery entry point." },
+];
 ---
 
 <BaseLayout title={title} description="Fast recovery for purchases, delivery, product access and launch issues across VOLYNX.">
@@ -20,6 +28,13 @@ const title = "Support — VOLYNX";
       </div>
       <div id="supportContext" class="support-context" hidden></div>
     </section>
+
+    <PlatformAssistStrip
+      eyebrow="Support flow"
+      title="Keep the recovery lane connected."
+      description="The support surface should always lead back to the exact place where context matters most."
+      items={supportAssistItems}
+    />
 
     <section class="support-paths" aria-label="Support shortcuts">
       <a class="path-card" href={ROUTES.delivery}>

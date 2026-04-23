@@ -3,7 +3,15 @@ import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
 import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import FlagshipFooter from "../../components/FlagshipFooter.astro";
 import DeliveryTrustStrip from "../../components/DeliveryTrustStrip.astro";
+import PlatformAssistStrip from "../../components/PlatformAssistStrip.astro";
 import { ROUTES } from "../../data/routes";
+
+const deliveryAssistItems = [
+  { href: ROUTES.support, label: "Help", title: "Open support", copy: "Keep the checkout email and product name attached if recovery needs a human lane.", emphasized: true },
+  { href: ROUTES.products, label: "Catalog", title: "Browse products", copy: "Go back to the catalog if you need to compare what was purchased or what comes next." },
+  { href: ROUTES.pricing, label: "Plans", title: "Check pricing", copy: "Review access, bundles and token logic while the purchase context is still fresh." },
+  { href: ROUTES.daily, label: "Workspace", title: "Open Daily", copy: "Return to the daily workspace and keep the ecosystem connected beyond delivery." },
+];
 ---
 <FlagshipLayout title="My Products — VOLYNX" description="Access your purchased kits and products. Open them directly in Builder." pageClass="page-delivery">
   <FlagshipHeader ctaLabel="Open Builder" ctaHref="/builder/" />
@@ -33,6 +41,13 @@ import { ROUTES } from "../../data/routes";
         </div>
       </div>
     </section>
+
+    <PlatformAssistStrip
+      eyebrow="Delivery flow"
+      title="Recovered purchases should never feel like a dead end."
+      description="Use this layer to move from purchase, back into the right product or the right support lane."
+      items={deliveryAssistItems}
+    />
 
     <!-- ═══ PURCHASES ═══ -->
     <section class="page-section">
