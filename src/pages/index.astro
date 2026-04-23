@@ -2,7 +2,15 @@
 import FlagshipLayout from "../layouts/FlagshipLayout.astro";
 import FlagshipHeader from "../components/FlagshipHeader.astro";
 import FlagshipFooter from "../components/FlagshipFooter.astro";
+import PlatformAssistStrip from "../components/PlatformAssistStrip.astro";
 import { ROUTES } from "../data/routes";
+
+const homeAssistItems = [
+  { href: ROUTES.products, label: "Explore", title: "Browse products", copy: "Jump straight into kits, tools, PropertyFlow and the Icons Store.", emphasized: true },
+  { href: ROUTES.daily, label: "Workspace", title: "Open Daily", copy: "Go back to My Day, Vault, Summary, Writing and the rest of the daily system." },
+  { href: ROUTES.delivery, label: "Post-purchase", title: "My products", copy: "Recover downloads, check access and reopen purchased product paths." },
+  { href: ROUTES.support, label: "Help", title: "Open support", copy: "Route launch, billing and access issues without losing context." },
+];
 ---
 <FlagshipLayout title="VOLYNX — Building a Smarter Future" pageClass="page-home">
   <FlagshipHeader current={ROUTES.home} ctaLabel="Open Builder" ctaI18n="nav.open_builder" ctaHref={ROUTES.builder} />
@@ -60,6 +68,8 @@ import { ROUTES } from "../data/routes";
         </div>
       </div>
     </section>
+
+    <PlatformAssistStrip eyebrow="Platform flow" title="Already inside VOLYNX?" description="Move between discovery, daily work, purchases and support without hunting through the navigation." items={homeAssistItems} />
 
     <!-- floating: Ecosystem -->
     <div class="section-float section-float--right" aria-hidden="true">

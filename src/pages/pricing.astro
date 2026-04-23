@@ -6,6 +6,7 @@ import PricingCard from "../components/pricing/PricingCard.astro";
 import TokenPackCard from "../components/pricing/TokenPackCard.astro";
 import ToolUsageCard from "../components/pricing/ToolUsageCard.astro";
 import AddonCard from "../components/pricing/AddonCard.astro";
+import PlatformAssistStrip from "../components/PlatformAssistStrip.astro";
 import { sitePricing } from "../data/pricing";
 import { ROUTES } from "../data/routes";
 
@@ -28,6 +29,13 @@ const bundleLookupById = {
   bundle_essential: 'bundle_volynx_daily_pro',
   bundle_complete: 'bundle_volynx_daily_studio',
 } as Record<string, string>;
+
+const pricingAssistItems = [
+  { href: ROUTES.products, label: "Catalog", title: "Browse products", copy: "Go back to kits, tools and product pages while comparing plans.", emphasized: true },
+  { href: ROUTES.delivery, label: "Post-purchase", title: "My products", copy: "If checkout already happened, reopen delivery and access instead of staying stuck in pricing." },
+  { href: ROUTES.support, label: "Support", title: "Open support", copy: "Use the support lane for billing, launch and access questions tied to a purchase." },
+  { href: ROUTES.daily, label: "Workspace", title: "See Daily live", copy: "Jump into the live workspace while evaluating Daily and bundle value." },
+];
 ---
 <FlagshipLayout title="Pricing — VOLYNX" pageClass="page-pricing">
   <FlagshipHeader current={ROUTES.pricing} ctaLabel="Go Pro" ctaI18n="nav.go_pro" />
@@ -57,6 +65,8 @@ const bundleLookupById = {
         </div>
       </div>
     </section>
+
+    <PlatformAssistStrip eyebrow="Decision support" title="Pricing is one step, not the whole journey." description="Stay close to the operational paths while you compare plans, bundles and VX." items={pricingAssistItems} />
 
     <!-- ═══ CURRENCY BAR (lang toggle removed — already in topbar) ═══ -->
     <section class="page-section" style="padding-top:32px;">

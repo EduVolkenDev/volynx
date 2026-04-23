@@ -1,5 +1,14 @@
 ---
 import LegalLayout from "../layouts/LegalLayout.astro";
+import PlatformAssistStrip from "../components/PlatformAssistStrip.astro";
+import { ROUTES } from "../data/routes";
+
+const aboutAssistItems = [
+  { href: ROUTES.products, label: "Catalog", title: "Browse products", copy: "See the public product line and how the ecosystem is packaged today.", emphasized: true },
+  { href: ROUTES.support, label: "Support", title: "Open support", copy: "Use the operational lane for delivery, access and launch issues." },
+  { href: ROUTES.contact, label: "Sales", title: "Contact VOLYNX", copy: "Use the commercial lane for new work, partnerships and business conversations." },
+  { href: ROUTES.daily, label: "Workspace", title: "Open Daily", copy: "Jump from the company story into the live daily workspace." },
+];
 ---
 
 <LegalLayout
@@ -24,5 +33,7 @@ import LegalLayout from "../layouts/LegalLayout.astro";
     <li data-i18n="about.p3"><strong>Systems beat one-offs</strong> — consistency scales.</li>
   </ul>
 
-  <p class="meta" data-i18n="about.contact">For business inquiries: <a href="mailto:contact@volynx.world">contact@volynx.world</a></p>
+  <PlatformAssistStrip eyebrow="Practical path" title="The company story is useful. The next step should be obvious." description="If you came here to understand VOLYNX, these are the fastest paths back into the real platform." items={aboutAssistItems} />
+
+  <p class="meta" data-i18n="about.contact">For business inquiries: <a href={ROUTES.contact}>open contact</a> or <a href={ROUTES.support}>use support</a> if this is about access, delivery or launch help.</p>
 </LegalLayout>

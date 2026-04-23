@@ -2,7 +2,15 @@
 import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
 import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import FlagshipFooter from "../../components/FlagshipFooter.astro";
+import PlatformAssistStrip from "../../components/PlatformAssistStrip.astro";
 import { ROUTES } from "../../data/routes";
+
+const productAssistItems = [
+  { href: ROUTES.pricing, label: "Compare", title: "See pricing", copy: "Compare Builder, Daily, bundles and VX without leaving the platform flow.", emphasized: true },
+  { href: ROUTES.delivery, label: "Post-purchase", title: "My products", copy: "Already bought something? Reopen access, delivery and product recovery here." },
+  { href: ROUTES.support, label: "Support", title: "Need launch help?", copy: "Route delivery, billing and access issues from the same ecosystem path." },
+  { href: ROUTES.daily, label: "Workspace", title: "Open Daily", copy: "Jump from buying tools into the daily workspace where they connect back to use." },
+];
 ---
 <FlagshipLayout title="Products — VOLYNX" description="Premium kits, tools and systems for developers, designers and modern internet businesses." pageClass="page-products">
   <FlagshipHeader current={ROUTES.products} ctaLabel="Open Builder" ctaI18n="nav.open_builder" ctaHref={ROUTES.builder} />
@@ -25,6 +33,8 @@ import { ROUTES } from "../../data/routes";
         </div>
       </div>
     </section>
+
+    <PlatformAssistStrip eyebrow="Platform assist" title="Choose, buy, recover, continue." description="The public catalog should still feel operational. These paths keep discovery connected to pricing, purchases and support." items={productAssistItems} />
 
     <!-- ═══ PREMIUM KITS ═══ -->
     <section id="kits" class="page-section">
