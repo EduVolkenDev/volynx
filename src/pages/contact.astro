@@ -2,7 +2,8 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import VxHeader from "../components/VxHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
-const title = "Contact — VOLYNX";
+import { ROUTES } from "../data/routes";
+const title = "Contact & Sales — VOLYNX";
 ---
 
 <BaseLayout title={title} description="Talk to VOLYNX about your project, support needs, or partnership ideas.">
@@ -13,7 +14,19 @@ const title = "Contact — VOLYNX";
     <section class="hero">
       <div class="kicker" data-i18n="contact.kicker">Get in touch</div>
       <h1 data-i18n="contact.title">Let's talk about your project</h1>
-      <p class="sub" data-i18n="contact.subtitle">Whether you need support or want to start something — there's a path for that.</p>
+      <p class="sub" data-i18n="contact.subtitle">Need project help, product access, or launch support? Start in the right lane and we will route it faster.</p>
+    </section>
+
+    <section class="support-banner" aria-label="Support shortcut">
+      <div>
+        <div class="support-banner__label">Support first</div>
+        <strong>For delivery, billing, product access and launch issues, start in Support instead of sales.</strong>
+        <p>That keeps purchase context attached and makes recovery faster.</p>
+      </div>
+      <div class="support-banner__actions">
+        <a class="support-banner__btn support-banner__btn--primary" href={ROUTES.support}>Open support</a>
+        <a class="support-banner__btn" href={ROUTES.delivery}>My products</a>
+      </div>
     </section>
 
     <div class="two-col">
@@ -22,9 +35,9 @@ const title = "Contact — VOLYNX";
       <div class="panel support-panel">
         <div class="panel-label" data-i18n="contact.support_label">Support</div>
         <h2 data-i18n="contact.support_title">Need help?</h2>
-        <p data-i18n="contact.support_desc">If you hit a bug, have a billing question, or need help with a product — email is the fastest route.</p>
+        <p data-i18n="contact.support_desc">If you hit a bug, have a billing question, or need help with a product, open the support hub or email and we will route it fast.</p>
 
-        <a class="email-link" href="mailto:hello@volynx.world">hello@volynx.world</a>
+        <a class="email-link" href={ROUTES.email}>hello@volynx.world</a>
 
         <div class="sla-badge">
           <span class="dot"></span>
@@ -40,14 +53,14 @@ const title = "Contact — VOLYNX";
         </ul>
 
         <div class="alt-channels">
-          <div class="channel-label" data-i18n="contact.direct_label">Or reach out directly</div>
-          <a class="channel-btn" href="mailto:hello@volynx.world">
-            <span class="channel-icon">✉</span>
-            <span data-i18n="contact.email_support">Email support</span>
+          <div class="channel-label" data-i18n="contact.direct_label">Best next step</div>
+          <a class="channel-btn" href={ROUTES.support}>
+            <span class="channel-icon">→</span>
+            <span>Open support hub</span>
           </a>
-          <a class="channel-btn" href="mailto:hello@volynx.world">
-            <span class="channel-icon">🔒</span>
-            <span data-i18n="contact.privacy_requests">Privacy requests</span>
+          <a class="channel-btn" href={ROUTES.delivery}>
+            <span class="channel-icon">→</span>
+            <span>Open my products</span>
           </a>
         </div>
       </div>
@@ -160,6 +173,66 @@ const title = "Contact — VOLYNX";
     margin-bottom: 14px;
   }
   .sub { opacity: 0.75; font-size: 17px; }
+
+  .support-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 18px 20px;
+    margin: 0 0 24px;
+    border: 1px solid rgba(79,195,247,.16);
+    border-radius: 18px;
+    background: rgba(79,195,247,.05);
+  }
+  .support-banner__label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.55;
+    margin-bottom: 8px;
+  }
+  .support-banner strong {
+    display: block;
+    font-size: 16px;
+    line-height: 1.45;
+    margin-bottom: 8px;
+  }
+  .support-banner p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    opacity: 0.72;
+  }
+  .support-banner__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  .support-banner__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.1);
+    text-decoration: none;
+    color: rgba(255,255,255,.82);
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .support-banner__btn:hover {
+    border-color: rgba(79,195,247,.35);
+    color: #fff;
+  }
+  .support-banner__btn--primary {
+    background: rgba(79,195,247,.12);
+    border-color: rgba(79,195,247,.3);
+    color: #4fc3f7;
+  }
 
   .two-col {
     display: grid;
@@ -393,6 +466,8 @@ const title = "Contact — VOLYNX";
   .whatsapp-icon { font-size: 16px; }
 
   @media (max-width: 860px) {
+    .support-banner { flex-direction: column; align-items: flex-start; }
+    .support-banner__actions { justify-content: flex-start; }
     .two-col { grid-template-columns: 1fr; }
     .panel { padding: 24px; }
   }

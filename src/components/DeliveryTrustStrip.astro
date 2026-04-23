@@ -1,0 +1,78 @@
+---
+interface Props {
+  productName?: string;
+  className?: string;
+}
+
+const {
+  productName = "VOLYNX",
+  className = "",
+} = Astro.props;
+
+const trustItems = [
+  {
+    label: "Session checked",
+    copy: "Checkout and purchase context stay attached before delivery surfaces unlock."
+  },
+  {
+    label: "Protected access",
+    copy: "Products route through the right destination so downloads and unlocks are not exposed by accident."
+  },
+  {
+    label: "Support ready",
+    copy: "If delivery stalls, the same purchase context gives support a fast recovery path."
+  }
+];
+---
+
+<section class:list={["delivery-trust", className]} aria-label={productName + " delivery checks"}>
+  {trustItems.map((item) => (
+    <article class="delivery-trust__card">
+      <span class="delivery-trust__badge" aria-hidden="true"></span>
+      <div>
+        <h2>{item.label}</h2>
+        <p>{item.copy}</p>
+      </div>
+    </article>
+  ))}
+</section>
+
+<style>
+  .delivery-trust {
+    display: grid;
+    gap: 12px;
+  }
+  .delivery-trust__card {
+    display: flex;
+    gap: 14px;
+    min-height: 132px;
+    padding: 20px;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(10,12,20,.45);
+  }
+  .delivery-trust__badge {
+    display: inline-flex;
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    margin-top: 4px;
+    background: #4fc3f7;
+    box-shadow: 0 0 18px rgba(79,195,247,.45);
+    flex-shrink: 0;
+  }
+  .delivery-trust__card h2 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .delivery-trust__card p {
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 1.65;
+    color: rgba(255,255,255,.68);
+  }
+  @media (min-width: 860px) {
+    .delivery-trust { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+</style>

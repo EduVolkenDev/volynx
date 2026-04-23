@@ -2,6 +2,7 @@
 import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
 import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import FlagshipFooter from "../../components/FlagshipFooter.astro";
+import DeliveryTrustStrip from "../../components/DeliveryTrustStrip.astro";
 import { ROUTES } from "../../data/routes";
 ---
 <FlagshipLayout title="My Products — VOLYNX" description="Access your purchased kits and products. Open them directly in Builder." pageClass="page-delivery">
@@ -10,11 +11,25 @@ import { ROUTES } from "../../data/routes";
 
     <!-- ═══ HERO ═══ -->
     <section class="hero delivery-hero">
-      <div class="shell hero-grid">
-        <div class="hero-copy">
-          <span class="eyebrow">Your purchases</span>
-          <h1>Products &amp; Kits</h1>
-          <p>Every kit and product you've unlocked — ready to open directly in Builder.</p>
+      <div class="shell">
+        <nav class="delivery-breadcrumbs" aria-label="Breadcrumb">
+          <a href={ROUTES.home}>Home</a>
+          <span>/</span>
+          <a href={ROUTES.products}>Products</a>
+          <span>/</span>
+          <span>My Products</span>
+        </nav>
+
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <span class="eyebrow">Your purchases</span>
+            <h1>Downloads, access and recovery.</h1>
+            <p>Every kit and product you've unlocked - ready to open, recover or route into support without losing context.</p>
+            <div class="hero-actions">
+              <a href={ROUTES.support} class="button button--gold">Open support</a>
+              <a href={ROUTES.products} class="button button--ghost">Browse products</a>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -32,7 +47,10 @@ import { ROUTES } from "../../data/routes";
         <!-- Error state -->
         <div id="deliveryError" class="delivery-state" style="display:none;">
           <p class="delivery-state__label delivery-state__label--error" id="deliveryErrorMsg">Something went wrong. Please try again.</p>
-          <a href={ROUTES.login + "?next=/delivery/"} class="button button--ghost">Sign in again</a>
+          <div class="delivery-state__actions">
+            <a href={ROUTES.login + "?next=/delivery/"} class="button button--ghost">Sign in again</a>
+            <a href={ROUTES.support} class="button button--ghost">Open support</a>
+          </div>
         </div>
 
         <!-- Empty state -->
@@ -44,6 +62,26 @@ import { ROUTES } from "../../data/routes";
         <!-- Product grid -->
         <div id="deliveryGrid" class="delivery-grid" style="display:none;" aria-live="polite"></div>
 
+      </div>
+    </section>
+
+    <section class="page-section page-section--tight">
+      <div class="shell">
+        <DeliveryTrustStrip productName="VOLYNX delivery" />
+      </div>
+    </section>
+
+    <section class="page-section">
+      <div class="shell delivery-help panel">
+        <div>
+          <span class="eyebrow">Recovery path</span>
+          <strong>Missing download, billing question or launch issue?</strong>
+          <p>Open support with the same checkout email and product name so recovery keeps the right context.</p>
+        </div>
+        <div class="hero-actions">
+          <a href={ROUTES.support} class="button button--ghost">Open support</a>
+          <a href={ROUTES.contact} class="button button--ghost">Contact sales</a>
+        </div>
       </div>
     </section>
 
@@ -301,6 +339,21 @@ import { ROUTES } from "../../data/routes";
   /* ── Hero ───────────────────────────────────────────────────────────────── */
   .delivery-hero { padding-top: clamp(28px, 5vw, 52px); }
   .delivery-hero .hero-copy h1 { font-size: clamp(2rem, 5vw, 3.2rem); }
+  .delivery-breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    font-size: .82rem;
+    color: rgba(255,255,255,.5);
+  }
+  .delivery-breadcrumbs a {
+    color: rgba(255,255,255,.7);
+    text-decoration: none;
+    transition: color .15s;
+  }
+  .delivery-breadcrumbs a:hover { color: #fff; }
 
   /* ── Loading / states ────────────────────────────────────────────────────── */
   .delivery-state {
@@ -317,6 +370,12 @@ import { ROUTES } from "../../data/routes";
     margin: 0;
   }
   .delivery-state__label--error { color: rgba(255, 120, 120, .85); }
+  .delivery-state__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
 
   .delivery-spinner {
     width: 32px;
@@ -379,4 +438,25 @@ import { ROUTES } from "../../data/routes";
 
   .delivery-card__actions { margin-top: auto; }
   .delivery-card__cta { width: 100%; justify-content: center; text-align: center; }
+  .page-section--tight { padding-top: 0; }
+  .delivery-help {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .delivery-help strong {
+    display: block;
+    margin: 6px 0 10px;
+    font-size: 1.05rem;
+    line-height: 1.45;
+  }
+  .delivery-help p {
+    margin: 0;
+    color: rgba(255,255,255,.65);
+    line-height: 1.7;
+  }
+  @media (max-width: 860px) {
+    .delivery-help { flex-direction: column; align-items: flex-start; }
+  }
 </style>

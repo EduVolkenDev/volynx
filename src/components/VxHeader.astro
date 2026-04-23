@@ -10,6 +10,13 @@ const {
   primaryCtaLabel,
   primaryCtaHref = ROUTES.login,
 } = Astro.props;
+
+const mobileDefaultLinks = [
+  { href: ROUTES.products, label: "Products" },
+  { href: ROUTES.delivery, label: "My Products" },
+  { href: ROUTES.support, label: "Support" },
+  { href: ROUTES.daily, label: "Daily" },
+];
 ---
 
 <header class="vxh" role="banner">
@@ -49,6 +56,13 @@ const {
           <a href="#projects" data-i18n="vxh.projects">Projects</a>
           <a href="#faq" data-i18n="vxh.faq">FAQ</a>
           <a href="#access" data-i18n="vxh.access">Access</a>
+        </nav>
+      )}
+      {mode !== "sections" && (
+        <nav aria-label="Platform links — mobile">
+          {mobileDefaultLinks.map((link) => (
+            <a href={link.href}>{link.label}</a>
+          ))}
         </nav>
       )}
       {primaryCtaLabel && (

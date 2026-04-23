@@ -1,0 +1,317 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import VxHeader from "../components/VxHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import { ROUTES } from "../data/routes";
+const title = "Support — VOLYNX";
+---
+
+<BaseLayout title={title} description="Fast recovery for purchases, delivery, product access and launch issues across VOLYNX.">
+  <VxHeader />
+
+  <main class="shell support-page">
+    <section class="hero">
+      <div class="kicker">Support</div>
+      <h1>Fast recovery for purchases, delivery and access.</h1>
+      <p class="sub">Use Support for delivery, billing, product access and launch issues. Use Contact for new projects, partnerships and sales conversations.</p>
+      <div class="hero-actions">
+        <a class="hero-btn hero-btn--primary" href={ROUTES.delivery}>Open my products</a>
+        <a class="hero-btn" id="supportMailto" href={ROUTES.email}>Email support</a>
+      </div>
+      <div id="supportContext" class="support-context" hidden></div>
+    </section>
+
+    <section class="support-paths" aria-label="Support shortcuts">
+      <a class="path-card" href={ROUTES.delivery}>
+        <div class="path-card__eyebrow">Delivery hub</div>
+        <h2>Find a purchase</h2>
+        <p>Return to products, verify what unlocked, and recover delivery after checkout.</p>
+      </a>
+      <a class="path-card" href={ROUTES.daily}>
+        <div class="path-card__eyebrow">VOLYNX Daily</div>
+        <h2>Open Daily</h2>
+        <p>Jump back into My Day, Summary, Writing, Vault and the rest of the workspace.</p>
+      </a>
+      <a class="path-card" href={ROUTES.propertyflow}>
+        <div class="path-card__eyebrow">PropertyFlow</div>
+        <h2>Review product access</h2>
+        <p>Check the live product page, pricing, launch notes and the right support context.</p>
+      </a>
+      <a class="path-card" href={ROUTES.iconsStore}>
+        <div class="path-card__eyebrow">Icons Store</div>
+        <h2>Recover icon delivery</h2>
+        <p>Return to the store, match the pack name and route icon delivery issues fast.</p>
+      </a>
+      <a class="path-card" href={ROUTES.products}>
+        <div class="path-card__eyebrow">Platform</div>
+        <h2>Browse products</h2>
+        <p>Move across the ecosystem without losing the path back to support or delivery.</p>
+      </a>
+      <a class="path-card" href={ROUTES.contact}>
+        <div class="path-card__eyebrow">Contact & sales</div>
+        <h2>Start a project</h2>
+        <p>New build, partnership or commercial question? Use the sales lane instead of support.</p>
+      </a>
+    </section>
+
+    <section class="support-grid">
+      <article class="panel">
+        <div class="panel-label">What to include</div>
+        <h2>Make recovery fast</h2>
+        <ul class="checklist">
+          <li>Order email</li>
+          <li>Product or tier name</li>
+          <li>Purchase ID or Stripe session ID if you have it</li>
+          <li>Short issue summary</li>
+        </ul>
+      </article>
+
+      <article class="panel">
+        <div class="panel-label">Best next step</div>
+        <h2>Use the right lane</h2>
+        <p class="panel-copy">If you just checked out, open My Products first. If access or delivery still looks wrong, use the prefilled support email from this page so the context stays attached.</p>
+        <div class="panel-actions">
+          <a class="panel-link" href={ROUTES.delivery}>Open delivery</a>
+          <a class="panel-link" href={ROUTES.contact}>Contact sales</a>
+          <a class="panel-link" href={ROUTES.products}>Browse products</a>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<style>
+  .support-page { padding-bottom: 80px; }
+
+  .hero {
+    padding: 56px 0 30px;
+    max-width: 760px;
+  }
+  .kicker {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-size: clamp(30px, 5vw, 54px);
+    font-weight: 800;
+    line-height: 1.08;
+    margin-bottom: 16px;
+  }
+  .sub {
+    opacity: 0.76;
+    font-size: 17px;
+    line-height: 1.7;
+    margin: 0;
+  }
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 22px;
+  }
+  .hero-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0 18px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.1);
+    text-decoration: none;
+    color: rgba(255,255,255,.84);
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .hero-btn:hover {
+    color: #fff;
+    border-color: rgba(255,255,255,.2);
+  }
+  .hero-btn--primary {
+    background: rgba(79,195,247,.12);
+    border-color: rgba(79,195,247,.3);
+    color: #4fc3f7;
+  }
+  .support-context {
+    display: inline-flex;
+    margin-top: 16px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(79,195,247,.18);
+    background: rgba(79,195,247,.06);
+    font-size: 12px;
+    line-height: 1.4;
+    color: rgba(255,255,255,.78);
+  }
+
+  .support-paths {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .path-card {
+    display: block;
+    min-height: 220px;
+    padding: 24px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(10,12,20,.5);
+    backdrop-filter: blur(12px);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s, border-color 0.2s, background 0.2s;
+  }
+  .path-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(79,195,247,.24);
+    background: rgba(12,16,26,.62);
+  }
+  .path-card__eyebrow {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.45;
+    margin-bottom: 12px;
+  }
+  .path-card h2 {
+    margin: 0 0 12px;
+    font-size: 24px;
+    line-height: 1.15;
+  }
+  .path-card p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.7;
+    opacity: 0.74;
+  }
+
+  .support-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .panel {
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 20px;
+    padding: 32px;
+    background: rgba(10,12,20,.5);
+    backdrop-filter: blur(12px);
+  }
+  .panel-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.45;
+    margin-bottom: 12px;
+  }
+  .panel h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 12px;
+  }
+  .panel-copy {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.7;
+    opacity: 0.76;
+  }
+  .checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .checklist li {
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    font-size: 14px;
+    opacity: 0.84;
+  }
+  .checklist li::before {
+    content: "✓ ";
+    color: #4fc3f7;
+    opacity: 0.8;
+  }
+  .panel-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .panel-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 42px;
+    padding: 0 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.1);
+    text-decoration: none;
+    color: rgba(255,255,255,.82);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .panel-link:hover {
+    border-color: rgba(79,195,247,.24);
+    color: #fff;
+  }
+
+  @media (max-width: 980px) {
+    .support-paths { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 860px) {
+    .support-grid { grid-template-columns: 1fr; }
+    .panel { padding: 24px; }
+  }
+  @media (max-width: 620px) {
+    .support-paths { grid-template-columns: 1fr; }
+    .hero { padding: 36px 0 24px; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var product = params.get('product') || '';
+    var intent = params.get('intent') || '';
+    var purchase = params.get('purchase') || '';
+    var sessionId = params.get('session_id') || '';
+    var bits = [];
+
+    if (product) bits.push('Product: ' + product.replace(/[-_]/g, ' '));
+    if (intent) bits.push('Intent: ' + intent.replace(/[-_]/g, ' '));
+    if (purchase) bits.push('Purchase: ' + purchase);
+    if (sessionId) bits.push('Session: ' + sessionId);
+
+    var context = document.getElementById('supportContext');
+    if (context && bits.length) {
+      context.hidden = false;
+      context.textContent = 'Current context - ' + bits.join(' | ');
+    }
+
+    var mail = document.getElementById('supportMailto');
+    if (!mail) return;
+
+    var subject = 'VOLYNX support';
+    if (product) subject += ' - ' + product;
+
+    var bodyLines = [
+      'Please describe the issue.',
+      '',
+      'Useful context:'
+    ];
+
+    if (product) bodyLines.push('Product: ' + product);
+    if (intent) bodyLines.push('Intent: ' + intent);
+    if (purchase) bodyLines.push('Purchase: ' + purchase);
+    if (sessionId) bodyLines.push('Session ID: ' + sessionId);
+
+    bodyLines.push('', 'Issue summary:');
+
+    mail.href = 'mailto:hello@volynx.world?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(bodyLines.join('\n'));
+  })();
+</script>
