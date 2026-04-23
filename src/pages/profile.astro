@@ -676,6 +676,21 @@ import { ROUTES } from "../data/routes";
 				const iconPurchasesSection = $("iconPurchasesSection");
 				const iconPurchasesGrid = $("iconPurchasesGrid");
 				let iconPurchaseRows = [];
+				const iconDeliveryApiBase = ((cfg).apiBaseUrl || (cfg).functionsUrl || "").replace(/\/$/, "");
+				const iconDeliveryEndpoint = iconDeliveryApiBase
+					? iconDeliveryApiBase.includes("/functions/v1")
+						? `${iconDeliveryApiBase}/icon-purchase-delivery`
+						: `${iconDeliveryApiBase}/api/icon-purchase-delivery`
+					: "";
+				const ICON_CHECKOUT_PRICES = {
+					icons_single_budget:   { gbp: 0.8, eur: 0.95, brl: 5.5 },
+					icons_single_standard: { gbp: 1.7, eur: 1.95, brl: 11.9 },
+					icons_single_premium:  { gbp: 2.9, eur: 3.4, brl: 18.9 },
+					icons_single_hyper:    { gbp: 7.5, eur: 8.7, brl: 49 },
+					icons_pack_mixed:      { gbp: 6.4, eur: 7.5, brl: 42 },
+					icons_pack_premium:    { gbp: 14, eur: 16, brl: 92 },
+					icons_pack_hyper:      { gbp: 48, eur: 56, brl: 320 },
+				};
 
 				function escapeHtml(value) {
 					return String(value ?? "")
@@ -694,19 +709,45 @@ import { ROUTES } from "../data/routes";
 				}
 
 				function iconMeta(row) {
-					return row && row.metadata && typeof row.metadata === "object" ? row.metadata : {};
+					const value = row && row.metadata;
+					if (!value) return {};
+					if (typeof value === "string") {
+						try { return JSON.parse(value); } catch (_) { return {}; }
+					}
+					return typeof value === "object" ? value : {};
+				}
+
+				function stripCurrencySuffix(value) {
+					return String(value || "").trim().replace(/_(gbp|eur|brl)$/i, "");
+				}
+
+				function iconLookupBase(row) {
+					const meta = iconMeta(row);
+					return stripCurrencySuffix(meta.lookup_key || row?.lookup_key || row?.addon_id || "");
+				}
+
+				function iconSessionId(row) {
+					const meta = iconMeta(row);
+					return String(meta.stripe_session_id || row?.stripe_session_id || "").trim();
+				}
+
+				function iconPriceFromCatalog(row) {
+					const base = iconLookupBase(row);
+					const currency = String(row?.currency || "GBP").toLowerCase();
+					const priceTable = ICON_CHECKOUT_PRICES[base];
+					return priceTable && typeof priceTable[currency] === "number" ? priceTable[currency] : null;
 				}
 
 				function iconKind(row) {
 					const meta = iconMeta(row);
 					if (meta.kind === "single" || meta.kind === "pack") return meta.kind;
-					return String(row?.addon_id || "").includes("_pack_") ? "pack" : "single";
+					return iconLookupBase(row).includes("_pack_") ? "pack" : "single";
 				}
 
 				function iconTier(row) {
 					const meta = iconMeta(row);
 					if (meta.tier) return String(meta.tier);
-					return String(row?.addon_id || "")
+					return iconLookupBase(row)
 						.replace(/^icons_(single|pack)_/, "")
 						.replace(/_(gbp|eur|brl)$/i, "");
 				}
@@ -752,14 +793,15 @@ import { ROUTES } from "../data/routes";
 				}
 
 				function formatIconPurchasePrice(row) {
-					if (row?.price_paid == null) return "";
+					const amount = row?.price_paid != null ? Number(row.price_paid) : iconPriceFromCatalog(row);
+					if (amount == null || Number.isNaN(amount)) return "";
 					try {
 						return new Intl.NumberFormat(undefined, {
 							style: "currency",
 							currency: String(row.currency || "GBP").toUpperCase(),
-						}).format(Number(row.price_paid || 0));
+						}).format(amount);
 					} catch (_) {
-						return `${row.price_paid} ${row.currency || ""}`.trim();
+						return `${amount} ${row.currency || ""}`.trim();
 					}
 				}
 
@@ -785,7 +827,37 @@ import { ROUTES } from "../data/routes";
 					if (directPath) {
 						return { ready: true, mode: "single", label: "Download file" };
 					}
+					if (iconSessionId(row)) {
+						return { ready: false, mode: "recover", label: "Open delivery" };
+					}
 					return { ready: false, mode: "manual", label: "Prepare delivery" };
+				}
+
+				function mergeIconPurchaseRows(addonRows, eventRows) {
+					const seen = new Set();
+					const rows = [];
+					const pushRow = (row, source) => {
+						const key = iconSessionId(row) || iconLookupBase(row) || String(row?.id || "");
+						if (!key || seen.has(key)) return;
+						seen.add(key);
+						rows.push({ ...row, _source: source });
+					};
+
+					(addonRows || []).forEach((row) => {
+						if (!iconLookupBase(row).startsWith("icons_")) return;
+						pushRow(row, "addons");
+					});
+
+					(eventRows || []).forEach((row) => {
+						if (!iconLookupBase(row).startsWith("icons_")) return;
+						pushRow({
+							...row,
+							addon_id: row?.addon_id || iconLookupBase(row),
+							price_paid: row?.price_paid != null ? row.price_paid : iconPriceFromCatalog(row),
+						}, "events");
+					});
+
+					return rows.sort((a, b) => new Date(b?.created_at || 0).getTime() - new Date(a?.created_at || 0).getTime());
 				}
 
 				function iconPurchaseCard(row, index) {
@@ -876,24 +948,64 @@ import { ROUTES } from "../data/routes";
 					downloadBlob(content, `${folderName}.zip`);
 				}
 
+				async function resolveIconDelivery(row) {
+					if (iconPurchaseDeliverable(row).ready) return row;
+					if (!iconDeliveryEndpoint) return row;
+
+					const res = await fetch(iconDeliveryEndpoint, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${accessToken}`,
+						},
+						body: JSON.stringify({
+							purchase_id: row?.id || null,
+							session_id: iconSessionId(row) || null,
+							lookup_key: row?.lookup_key || iconLookupBase(row) || null,
+						}),
+					});
+
+					const payload = await res.json().catch(() => ({}));
+					if (!res.ok || !payload?.ok || !payload?.purchase) {
+						throw new Error(payload?.error || "Could not resolve icon delivery.");
+					}
+
+					const recovered = { ...row, ...payload.purchase, metadata: payload.purchase.metadata || row.metadata || {} };
+					const recoveredKey = iconSessionId(recovered) || iconLookupBase(recovered) || String(recovered?.id || "");
+					const index = iconPurchaseRows.findIndex((entry) => {
+						const entryKey = iconSessionId(entry) || iconLookupBase(entry) || String(entry?.id || "");
+						return entryKey === recoveredKey;
+					});
+					if (index >= 0) iconPurchaseRows[index] = recovered;
+					return recovered;
+				}
+
 				async function handleIconDelivery(row, button) {
 					const originalText = button.textContent;
-					const meta = iconMeta(row);
-					const deliverable = iconPurchaseDeliverable(row);
+					let workingRow = row;
+					let meta = iconMeta(workingRow);
+					let deliverable = iconPurchaseDeliverable(workingRow);
 					button.disabled = true;
 					button.textContent = deliverable.mode === "pack" ? "Building ZIP..." : "Opening...";
 
 					try {
+						if (!deliverable.ready && deliverable.mode === "recover") {
+							button.textContent = "Preparing delivery...";
+							workingRow = await resolveIconDelivery(workingRow);
+							meta = iconMeta(workingRow);
+							deliverable = iconPurchaseDeliverable(workingRow);
+						}
+
 						if (deliverable.mode === "single") {
 							const path = safeAssetPath(meta.icon_path);
 							if (!path) throw new Error("Icon path is missing.");
-							downloadDirect(path, fileNameFromPath(path, slugFileName(iconPurchaseTitle(row), "volynx-icon")));
+							downloadDirect(path, fileNameFromPath(path, slugFileName(iconPurchaseTitle(workingRow), "volynx-icon")));
 							button.textContent = "Downloaded";
 						} else if (deliverable.mode === "pack") {
-							await downloadIconPackZip(row);
+							await downloadIconPackZip(workingRow);
 							button.textContent = "ZIP ready";
 						} else {
-							const purchaseId = encodeURIComponent(row?.id || row?.addon_id || "icons");
+							const purchaseId = encodeURIComponent(workingRow?.id || workingRow?.addon_id || "icons");
 							window.location.href = `/contact/?product=volynx-icons-store&intent=delivery&purchase=${purchaseId}`;
 							return;
 						}
@@ -921,16 +1033,28 @@ import { ROUTES } from "../data/routes";
 				async function loadIconPurchases() {
 					if (!iconPurchasesSection || !iconPurchasesGrid) return;
 					try {
-						const { data, error } = await supabase
-							.from("addons_purchased")
-							.select("id,addon_id,price_paid,currency,status,metadata,created_at")
-							.eq("user_id", user.id)
-							.like("addon_id", "icons_%")
-							.order("created_at", { ascending: false });
+						const [addonResult, eventResult] = await Promise.all([
+							supabase
+								.from("addons_purchased")
+								.select("id,addon_id,price_paid,currency,status,metadata,created_at")
+								.eq("user_id", user.id)
+								.like("addon_id", "icons_%")
+								.order("created_at", { ascending: false }),
+							supabase
+								.from("purchase_events")
+								.select("id,stripe_session_id,lookup_key,product_key,amount_paid,currency,status,metadata,created_at")
+								.eq("user_id", user.id)
+								.like("lookup_key", "icons_%")
+								.order("created_at", { ascending: false }),
+						]);
 
-						if (error) throw error;
+						if (addonResult.error) throw addonResult.error;
+						if (eventResult.error) throw eventResult.error;
 
-						iconPurchaseRows = Array.isArray(data) ? data : [];
+						iconPurchaseRows = mergeIconPurchaseRows(
+							Array.isArray(addonResult.data) ? addonResult.data : [],
+							Array.isArray(eventResult.data) ? eventResult.data : [],
+						);
 						iconPurchasesSection.style.display = "";
 
 						if (!iconPurchaseRows.length) {

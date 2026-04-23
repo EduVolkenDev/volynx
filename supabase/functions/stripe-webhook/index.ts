@@ -115,6 +115,17 @@ function extractPrefix(lookupKey: string): string {
   return lookupKey;
 }
 
+function canonicalizeLookupPrefix(prefix: string): string {
+  return prefix === "pf_enterprise" ? "pf_white_label" : prefix;
+}
+
+function canonicalizeLookupKey(lookupKey: string): string {
+  const prefix = extractPrefix(lookupKey);
+  const canonicalPrefix = canonicalizeLookupPrefix(prefix);
+  if (!prefix || prefix === canonicalPrefix) return lookupKey;
+  return lookupKey.replace(prefix, canonicalPrefix);
+}
+
 function isSubscription(prefix: string): boolean {
   return !!(PLAN_PROFILE_MAP[prefix]) ||
     prefix === "addon_extra_slot";
@@ -155,8 +166,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     return;
   }
 
-  const lookupKey = price.lookup_key || "";
-  const prefix = extractPrefix(lookupKey);
+  const stripeLookupKey = price.lookup_key || "";
+  const stripePrefix = extractPrefix(stripeLookupKey);
+  const prefix = canonicalizeLookupPrefix(stripePrefix);
+  const lookupKey = canonicalizeLookupKey(stripeLookupKey);
   const currency = lookupKey.split("_").pop()?.toUpperCase() || "GBP";
   const productKey = detectProductKey(prefix);
 
@@ -168,7 +181,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     .single();
   const userEmail = userProfile?.email || session.customer_details?.email || "";
 
-  console.log(`Processing checkout for ${userEmail} (${userId}), lookup: ${lookupKey}, prefix: ${prefix}, product: ${productKey}`);
+  console.log(
+    `Processing checkout for ${userEmail} (${userId}), stripe_lookup: ${stripeLookupKey}, canonical_lookup: ${lookupKey}, prefix: ${prefix}, product: ${productKey}`,
+  );
 
   // ── Subscription (any product plan or bundle) ──
   if (session.mode === "subscription" && session.subscription) {
@@ -236,7 +251,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       currency: currency,
       tokens_credited: 0,
       status: "completed",
-      metadata: { mode: session.mode, subscription_id: subId, plan_key: prefix },
+      metadata: {
+        mode: session.mode,
+        subscription_id: subId,
+        plan_key: prefix,
+        stripe_lookup_key: stripeLookupKey,
+        stripe_prefix: stripePrefix,
+      },
     });
   }
 
@@ -256,6 +277,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           p_metadata: JSON.stringify({
             stripe_session_id: session.id,
             lookup_key: lookupKey,
+            stripe_lookup_key: stripeLookupKey,
           }),
         }
       );
@@ -276,7 +298,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         price_paid: (session.amount_total || 0) / 100,
         currency: currency,
         status: "active",
-        metadata: { stripe_session_id: session.id, lookup_key: lookupKey },
+        metadata: { stripe_session_id: session.id, lookup_key: lookupKey, stripe_lookup_key: stripeLookupKey },
       });
       console.log(`Addon ${addonId} activated for ${userId}`);
     }
@@ -296,6 +318,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         metadata: {
           stripe_session_id: session.id,
           lookup_key: lookupKey,
+          stripe_lookup_key: stripeLookupKey,
           icon_id: meta.icon_id || null,
           icon_label: meta.icon_label || null,
           icon_path: meta.icon_path || null,
@@ -309,15 +332,21 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
     // ── Kit purchases → record addon + auto-create Builder project ──
     if (prefix.startsWith("kit_") || prefix.startsWith("pf_")) {
+      const addonId = prefix === "pf_white_label" ? "pf_white_label" : prefix;
       // Record as addon purchase
       await supabase.from("addons_purchased").insert({
         user_id: userId,
         user_email: userEmail,
-        addon_id: prefix,
+        addon_id: addonId,
         price_paid: (session.amount_total || 0) / 100,
         currency: currency,
         status: "active",
-        metadata: { stripe_session_id: session.id, lookup_key: lookupKey },
+        metadata: {
+          stripe_session_id: session.id,
+          lookup_key: lookupKey,
+          stripe_lookup_key: stripeLookupKey,
+          stripe_prefix: stripePrefix,
+        },
       });
 
       // Auto-create a Builder project with the kit's preset
@@ -377,7 +406,11 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       currency: currency,
       tokens_credited: tokenAmount,
       status: "completed",
-      metadata: { mode: session.mode },
+      metadata: {
+        mode: session.mode,
+        stripe_lookup_key: stripeLookupKey,
+        stripe_prefix: stripePrefix,
+      },
     });
   }
 }

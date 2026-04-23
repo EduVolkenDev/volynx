@@ -364,11 +364,11 @@ const catalog = [
     amounts: { gbp: 44700, eur: 51900, brl: 309000 },
   },
   {
-    name: "PropertyFlow Enterprise (15 templates)",
-    description: "Complete PropertyFlow with 15 grid templates, custom branding kit, priority onboarding, data migration.",
+    name: "PropertyFlow White-Label (15 templates)",
+    description: "Complete PropertyFlow with 15 grid templates, branding starter kit, priority onboarding, data migration.",
     lookupPrefix: "pf_enterprise",
     family: "propertyflow",
-    tier: "enterprise",
+    tier: "white-label",
     amounts: { gbp: 89700, eur: 103900, brl: 619000 },
   },
 ];

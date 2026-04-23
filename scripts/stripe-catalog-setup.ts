@@ -642,8 +642,8 @@ const PROPERTYFLOW: ProductDef[] = [
     prices: { amounts: { gbp: 44700, eur: 51900, brl: 309000 } },
   },
   {
-    name: "PropertyFlow Enterprise (15 templates)",
-    description: "Complete PropertyFlow with 15 grid templates, custom branding kit, priority onboarding, data migration.",
+    name: "PropertyFlow White-Label (15 templates)",
+    description: "Complete PropertyFlow with 15 grid templates, branding starter kit, priority onboarding, data migration.",
     marketingFeatures: [
       "15 grid layout templates",
       "Custom branding starter kit",
@@ -654,7 +654,7 @@ const PROPERTYFLOW: ProductDef[] = [
     lookupPrefix: "pf_enterprise",
     metadata: {
       product_family: "propertyflow",
-      plan_tier: "enterprise",
+      plan_tier: "white-label",
       billing_type: "one_time",
       currency_scope: "multi",
       includes_tokens: "0",

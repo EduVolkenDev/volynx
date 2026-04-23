@@ -46,6 +46,7 @@ app.use(cors({ origin: FRONTEND_ORIGIN, credentials: true }));
 app.use(express.json());
 
 const SUBSCRIPTION_PREFIXES = ["builder_", "volynx_", "daily_", "bundle_"];
+const LOOKUP_KEY_CURRENCY_RE = /_(gbp|eur|brl)$/i;
 
 function extractPrefix(lookupKey) {
   const parts = String(lookupKey || "").split("_");
@@ -60,6 +61,30 @@ function getCheckoutMode(prefix) {
   if (SUBSCRIPTION_PREFIXES.some((p) => prefix.startsWith(p))) return "subscription";
   if (prefix === "studio_pro" || prefix === "addon_extra_slot") return "subscription";
   return "payment";
+}
+
+function resolveStripeLookupCandidates(lookupKey) {
+  const prefix = extractPrefix(lookupKey);
+  const currencyMatch = String(lookupKey || "").match(LOOKUP_KEY_CURRENCY_RE);
+  const currencySuffix = currencyMatch ? "_" + String(currencyMatch[1]).toLowerCase() : "";
+  const candidates = new Set([lookupKey]);
+
+  if (prefix === "pf_white_label") {
+    candidates.add("pf_enterprise" + currencySuffix);
+  }
+
+  return Array.from(candidates);
+}
+
+function canonicalizeLookupPrefix(prefix) {
+  return prefix === "pf_enterprise" ? "pf_white_label" : prefix;
+}
+
+function canonicalizeLookupKey(lookupKey) {
+  const prefix = extractPrefix(lookupKey);
+  const canonicalPrefix = canonicalizeLookupPrefix(prefix);
+  if (!prefix || prefix === canonicalPrefix) return lookupKey;
+  return String(lookupKey).replace(prefix, canonicalPrefix);
 }
 
 app.post("/create-checkout-session", async (req, res) => {
@@ -79,17 +104,20 @@ app.post("/create-checkout-session", async (req, res) => {
       return res.status(400).json({ error: "Missing lookup_key" });
     }
 
+    const lookupCandidates = resolveStripeLookupCandidates(lookup_key);
     const prices = await stripe.prices.list({
-      lookup_keys: [lookup_key],
-      limit: 1,
+      lookup_keys: lookupCandidates,
+      limit: lookupCandidates.length,
       expand: ["data.product"],
     });
     if (!prices.data.length) {
       return res.status(404).json({ error: `Price not found for: ${lookup_key}` });
     }
 
-    const price = prices.data[0];
-    const prefix = extractPrefix(lookup_key);
+    const price = prices.data.find((entry) => entry.lookup_key === lookup_key) || prices.data[0];
+    const stripeLookupKey = price.lookup_key || lookup_key;
+    const prefix = canonicalizeLookupPrefix(extractPrefix(lookup_key));
+    const canonicalLookupKey = canonicalizeLookupKey(lookup_key);
     const mode = getCheckoutMode(prefix);
     const extraMeta = {};
     for (const key of ["icon_id", "icon_label", "icon_path", "icon_collection"]) {
@@ -103,16 +131,40 @@ app.post("/create-checkout-session", async (req, res) => {
       mode,
       line_items: [{ price: price.id, quantity: 1 }],
       customer_email: user.email,
-      metadata: { user_id: user.id, lookup_key, product_family: prefix, ...extraMeta },
+      metadata: {
+        user_id: user.id,
+        lookup_key: canonicalLookupKey,
+        requested_lookup_key: lookup_key,
+        stripe_lookup_key: stripeLookupKey,
+        product_family: prefix,
+        product_prefix: prefix,
+        ...extraMeta,
+      },
       success_url: success_url || `${FRONTEND_ORIGIN}/profile/?payment=success`,
       cancel_url: cancel_url || `${FRONTEND_ORIGIN}/pricing/?payment=cancelled`,
       allow_promotion_codes: true,
     };
 
     if (mode === "subscription") {
-      params.subscription_data = { metadata: { user_id: user.id, lookup_key, plan_key: prefix } };
+      params.subscription_data = {
+        metadata: {
+          user_id: user.id,
+          lookup_key: canonicalLookupKey,
+          requested_lookup_key: lookup_key,
+          stripe_lookup_key: stripeLookupKey,
+          plan_key: prefix,
+        },
+      };
     } else {
-      params.payment_intent_data = { metadata: { user_id: user.id, lookup_key, ...extraMeta } };
+      params.payment_intent_data = {
+        metadata: {
+          user_id: user.id,
+          lookup_key: canonicalLookupKey,
+          requested_lookup_key: lookup_key,
+          stripe_lookup_key: stripeLookupKey,
+          ...extraMeta,
+        },
+      };
     }
 
     const session = await stripe.checkout.sessions.create(params);

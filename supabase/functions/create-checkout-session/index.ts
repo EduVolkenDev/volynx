@@ -19,6 +19,7 @@ function json(data: Record<string, unknown>, status = 200) {
 }
 
 const FRONTEND_ORIGIN = Deno.env.get("FRONTEND_ORIGIN") || "https://volynx.world";
+const LOOKUP_KEY_CURRENCY_RE = /_(gbp|eur|brl)$/i;
 
 function getCheckoutMode(prefix: string): "subscription" | "payment" {
   // All plan subscriptions: volynx, daily, bundles, legacy builder_
@@ -36,6 +37,30 @@ function extractPrefix(key: string): string {
     return parts.slice(0, -1).join("_");
   }
   return key;
+}
+
+function resolveStripeLookupCandidates(lookupKey: string): string[] {
+  const prefix = extractPrefix(lookupKey);
+  const currencyMatch = lookupKey.match(LOOKUP_KEY_CURRENCY_RE);
+  const currencySuffix = currencyMatch ? `_${currencyMatch[1].toLowerCase()}` : "";
+  const candidates = new Set([lookupKey]);
+
+  if (prefix === "pf_white_label") {
+    candidates.add(`pf_enterprise${currencySuffix}`);
+  }
+
+  return [...candidates];
+}
+
+function canonicalizeLookupPrefix(prefix: string): string {
+  return prefix === "pf_enterprise" ? "pf_white_label" : prefix;
+}
+
+function canonicalizeLookupKey(lookupKey: string): string {
+  const prefix = extractPrefix(lookupKey);
+  const canonicalPrefix = canonicalizeLookupPrefix(prefix);
+  if (!prefix || prefix === canonicalPrefix) return lookupKey;
+  return lookupKey.replace(prefix, canonicalPrefix);
 }
 
 function wantsPixCheckout(body: Record<string, unknown>): boolean {
@@ -94,28 +119,32 @@ Deno.serve(async (req: Request) => {
       httpClient: Stripe.createFetchHttpClient(),
     });
 
-    // Resolve Stripe price
+    // Resolve Stripe price. White-Label keeps compatibility with the
+    // existing `pf_enterprise_*` lookup keys already present in Stripe.
+    const lookupCandidates = resolveStripeLookupCandidates(lookup_key);
     const prices = await stripe.prices.list({
-      lookup_keys: [lookup_key],
-      limit: 1,
+      lookup_keys: lookupCandidates,
+      limit: lookupCandidates.length,
       expand: ["data.product"],
     });
 
     if (!prices.data.length) {
-      console.error("[checkout] No price for lookup_key:", lookup_key);
+      console.error("[checkout] No price for lookup_key:", lookup_key, "candidates:", lookupCandidates);
       return json({ error: `Price not found for: ${lookup_key}` }, 404);
     }
 
-    const price = prices.data[0];
-    const prefix = extractPrefix(lookup_key);
-    const mode = getCheckoutMode(prefix);
+    const price = prices.data.find((entry) => entry.lookup_key === lookup_key) || prices.data[0];
+    const stripeLookupKey = price.lookup_key || lookup_key;
+    const canonicalPrefix = canonicalizeLookupPrefix(extractPrefix(lookup_key));
+    const canonicalLookupKey = canonicalizeLookupKey(lookup_key);
+    const mode = getCheckoutMode(canonicalPrefix);
     const pixRequested = wantsPixCheckout(body);
 
     if (pixRequested) {
       if (mode !== "payment") {
         return json({ error: "Pix is only available for one-time payments." }, 400);
       }
-      if (!prefix.startsWith("tokens_")) {
+      if (!canonicalPrefix.startsWith("tokens_")) {
         return json({ error: "Pix is only available for token packs." }, 400);
       }
       if (price.currency.toLowerCase() !== "brl") {
@@ -150,12 +179,22 @@ Deno.serve(async (req: Request) => {
       }
     }
 
+    const sessionMetadata = {
+      user_id: user.id,
+      lookup_key: canonicalLookupKey,
+      requested_lookup_key: lookup_key,
+      stripe_lookup_key: stripeLookupKey,
+      product_family: canonicalPrefix,
+      product_prefix: canonicalPrefix,
+      ...extraMeta,
+    };
+
     // Build session
     const params: Record<string, unknown> = {
       customer: customerId,
       mode,
       line_items: [{ price: price.id, quantity: 1 }],
-      metadata: { user_id: user.id, lookup_key, product_family: prefix, ...extraMeta },
+      metadata: sessionMetadata,
       success_url: success_url || `${FRONTEND_ORIGIN}/profile/?payment=success`,
       cancel_url: cancel_url || `${FRONTEND_ORIGIN}/pricing/?payment=cancelled`,
       allow_promotion_codes: true,
@@ -163,11 +202,23 @@ Deno.serve(async (req: Request) => {
 
     if (mode === "subscription") {
       params.subscription_data = {
-        metadata: { user_id: user.id, lookup_key, plan_key: prefix },
+        metadata: {
+          user_id: user.id,
+          lookup_key: canonicalLookupKey,
+          requested_lookup_key: lookup_key,
+          stripe_lookup_key: stripeLookupKey,
+          plan_key: canonicalPrefix,
+        },
       };
     } else {
       params.payment_intent_data = {
-        metadata: { user_id: user.id, lookup_key, payment_method: pixRequested ? "pix" : "checkout" },
+        metadata: {
+          user_id: user.id,
+          lookup_key: canonicalLookupKey,
+          requested_lookup_key: lookup_key,
+          stripe_lookup_key: stripeLookupKey,
+          payment_method: pixRequested ? "pix" : "checkout",
+        },
       };
     }
 
@@ -177,7 +228,10 @@ Deno.serve(async (req: Request) => {
         pix: { expires_after_seconds: 1800 },
       };
       params.locale = "pt-BR";
-      params.metadata = { user_id: user.id, lookup_key, product_family: prefix, payment_method: "pix" };
+      params.metadata = {
+        ...sessionMetadata,
+        payment_method: "pix",
+      };
     }
 
     const sessionStripe = pixRequested

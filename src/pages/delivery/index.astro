@@ -77,11 +77,15 @@ import { ROUTES } from "../../data/routes";
     function hide(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
 
     function normalizeProductId(raw) {
-      return String(raw || '')
+      const normalized = String(raw || '')
         .trim()
         .toLowerCase()
         .replace(/_(gbp|eur|brl)$/i, '')
-        .replace(/-(gbp|eur|brl)$/i, '');
+        .replace(/-(gbp|eur|brl)$/i, '')
+        .replace(/_/g, '-');
+
+      if (normalized === 'pf-enterprise') return 'pf-white-label';
+      return normalized;
     }
 
     function jwtSub(jwt) {
@@ -119,6 +123,9 @@ import { ROUTES } from "../../data/routes";
       }
       if (id.startsWith('pf-')) {
         const variant = id.replace('pf-', '');
+        if (variant === 'enterprise' || variant === 'white-label') {
+          return 'PropertyFlow \u2014 White-Label';
+        }
         return 'PropertyFlow' + (variant ? ' \u2014 ' + titleCase(variant) : '');
       }
       if (id.startsWith('icons-')) {
@@ -152,14 +159,14 @@ import { ROUTES } from "../../data/routes";
       const preset = addonToPreset(addonId);
       if (preset) return '/builder/?preset=' + encodeURIComponent(preset);
       if (id.startsWith('pf-')) return '/products/propertyflow/';
-      if (id.startsWith('icons-')) return '/products/volynx-icons-store/';
+      if (id.startsWith('icons-')) return '/profile/#iconPurchasesSection';
       return '/builder/';
     }
 
     function productCta(addonId) {
       const id = (addonId || '').toLowerCase().replace(/_/g, '-');
       if (id.startsWith('pf-')) return 'Open PropertyFlow';
-      if (id.startsWith('icons-')) return 'Open Icon Vault';
+      if (id.startsWith('icons-')) return 'Open icon delivery';
       return 'Open in Builder';
     }
 
