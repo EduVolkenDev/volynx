@@ -261,16 +261,384 @@ const pageDescription = "Premium property management platform for real estate ag
     .price-card--featured { position:relative; }
 
     /* ─── Template preview grid ─── */
-    .template-preview-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; }
-    .tpl-card { border-radius:var(--radius); border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03); padding:16px; text-align:center; font-size:.85rem; font-weight:600; position:relative; }
-    .tpl-card--pro { opacity:.6; }
-    .tpl-thumb { height:120px; border-radius:12px; margin-bottom:10px; }
-    .tpl-thumb--1 { background:linear-gradient(135deg, rgba(214,179,106,.15), rgba(255,255,255,.05)); background-image:repeating-linear-gradient(0deg, rgba(255,255,255,.06) 0px, rgba(255,255,255,.06) 30px, transparent 30px, transparent 40px), repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0px, rgba(255,255,255,.06) 45%, transparent 45%, transparent 55%); }
-    .tpl-thumb--2 { background:linear-gradient(180deg, rgba(214,179,106,.12), rgba(139,92,246,.08)); background-image:linear-gradient(90deg, rgba(255,255,255,.04) 50%, transparent 50%); }
-    .tpl-thumb--3 { background:linear-gradient(135deg, rgba(59,130,246,.1), rgba(255,255,255,.03)); background-image:repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0px, rgba(255,255,255,.05) 20px, transparent 20px, transparent 28px); }
-    .tpl-thumb--4 { background:linear-gradient(180deg, rgba(214,179,106,.2) 40%, rgba(255,255,255,.03) 40%); }
-    .tpl-thumb--5 { background:linear-gradient(90deg, rgba(214,179,106,.12) 50%, rgba(139,92,246,.08) 50%); }
-    .tpl-thumb--6 { background:linear-gradient(135deg, rgba(214,179,106,.08), rgba(59,130,246,.08)); background-image:repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0px, rgba(255,255,255,.05) 25px, transparent 25px, transparent 30px), repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0px, rgba(255,255,255,.05) 30%, transparent 30%, transparent 36%); }
+    .template-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .tpl-card {
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      padding: 16px;
+      text-align: center;
+      font-size: .85rem;
+      font-weight: 600;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .tpl-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.04), transparent 42%);
+      pointer-events: none;
+    }
+    .tpl-card--pro {
+      border-color: rgba(214,179,106,.18);
+      background: linear-gradient(180deg, rgba(214,179,106,.09), rgba(255,255,255,.02));
+    }
+    .tpl-card > span {
+      position: relative;
+      z-index: 1;
+      display: block;
+      margin-top: 10px;
+      line-height: 1.25;
+    }
+    .tpl-card--pro .tpl-pro-tag {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: .65rem;
+      font-weight: 700;
+      background: rgba(139,92,246,.2);
+      border: 1px solid rgba(139,92,246,.3);
+      color: #c4b5fd;
+      z-index: 2;
+    }
+    .tpl-preview {
+      position: relative;
+      min-height: 176px;
+      padding: 12px;
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.08);
+      background:
+        radial-gradient(circle at 18% 18%, rgba(255,255,255,.08), transparent 30%),
+        linear-gradient(180deg, rgba(10,10,18,.95), rgba(15,15,24,.88));
+    }
+    .tpl-preview::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent, rgba(0,0,0,.1));
+      pointer-events: none;
+    }
+    .tpl-preview__topbar,
+    .tpl-preview__filterrow {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .tpl-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.18);
+    }
+    .tpl-dot--active {
+      background: var(--tpl-accent, #59c3ff);
+      box-shadow: 0 0 0 4px rgba(89,195,255,.12);
+    }
+    .tpl-pill {
+      margin-left: auto;
+      width: 42px;
+      height: 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+    }
+    .tpl-chip {
+      width: 36px;
+      height: 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+    }
+    .tpl-chip--active {
+      background: rgba(214,179,106,.24);
+      border: 1px solid rgba(214,179,106,.22);
+    }
+    .tpl-mini,
+    .tpl-row,
+    .tpl-masonry__card,
+    .tpl-split__panel,
+    .tpl-split__media,
+    .tpl-preview__gallery-image,
+    .tpl-gallery-card {
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .tpl-mini,
+    .tpl-row {
+      position: relative;
+      z-index: 1;
+    }
+    .tpl-mini {
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      min-height: 0;
+    }
+    .tpl-mini__media {
+      display: block;
+      height: 54px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(89,195,255,.22), rgba(139,92,246,.16));
+      border: 1px solid rgba(255,255,255,.06);
+    }
+    .tpl-mini__media--tall { height: 92px; }
+    .tpl-mini__meta {
+      display: block;
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.16);
+    }
+    .tpl-mini__meta--lg { width: 78%; }
+    .tpl-mini__meta--md { width: 56%; }
+    .tpl-mini__meta--sm { width: 42%; }
+    .tpl-mini--feature { grid-row: span 2; }
+
+    .tpl-preview--classic { --tpl-accent: #59c3ff; }
+    .tpl-preview__classic-grid {
+      display: grid;
+      grid-template-columns: 1.12fr .88fr;
+      grid-auto-rows: minmax(0, 1fr);
+      gap: 8px;
+      flex: 1;
+      min-height: 0;
+    }
+    .tpl-preview__classic-grid .tpl-mini:first-child {
+      background: linear-gradient(180deg, rgba(89,195,255,.12), rgba(255,255,255,.03));
+    }
+
+    .tpl-preview--magazine { --tpl-accent: #d6b36a; }
+    .tpl-preview__mag-layout {
+      display: grid;
+      grid-template-columns: 1.2fr .92fr;
+      gap: 8px;
+      flex: 1;
+      min-height: 0;
+    }
+    .tpl-preview__mag-stack {
+      display: grid;
+      grid-template-rows: repeat(2, 1fr);
+      gap: 8px;
+      min-height: 0;
+    }
+    .tpl-preview--magazine .tpl-mini--feature {
+      background: linear-gradient(180deg, rgba(214,179,106,.12), rgba(255,255,255,.03));
+    }
+
+    .tpl-preview--compact { --tpl-accent: #8b5cf6; }
+    .tpl-preview__list {
+      display: grid;
+      gap: 8px;
+      flex: 1;
+      min-height: 0;
+    }
+    .tpl-row {
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      padding: 8px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    }
+    .tpl-row__thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.07);
+      background: linear-gradient(135deg, rgba(139,92,246,.22), rgba(89,195,255,.16));
+    }
+    .tpl-row__copy {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .tpl-row__line {
+      display: block;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.14);
+    }
+    .tpl-row__line--lg { width: 82%; }
+    .tpl-row__line--md { width: 56%; }
+    .tpl-row__line--sm { width: 42%; }
+    .tpl-row__price {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: rgba(214,179,106,.22);
+      border: 1px solid rgba(214,179,106,.16);
+      flex-shrink: 0;
+    }
+    .tpl-preview__filterrow { flex-wrap: wrap; }
+
+    .tpl-preview--gallery { --tpl-accent: #59c3ff; }
+    .tpl-preview__gallery-layout {
+      display: grid;
+      grid-template-rows: 1.22fr .72fr;
+      gap: 8px;
+      flex: 1;
+      min-height: 0;
+    }
+    .tpl-preview__hero-spot {
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      background:
+        radial-gradient(circle at 18% 18%, rgba(89,195,255,.22), transparent 30%),
+        linear-gradient(135deg, rgba(89,195,255,.16), rgba(214,179,106,.10));
+    }
+    .tpl-preview__gallery-image {
+      position: absolute;
+      inset: 0;
+      border-radius: 0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)),
+        linear-gradient(135deg, rgba(89,195,255,.12), rgba(139,92,246,.14));
+    }
+    .tpl-preview__gallery-chip {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      width: 56px;
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(7,7,11,.72);
+      border: 1px solid rgba(255,255,255,.14);
+      z-index: 1;
+    }
+    .tpl-preview__gallery-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .tpl-gallery-card {
+      height: 36px;
+      background:
+        linear-gradient(135deg, rgba(89,195,255,.18), rgba(255,255,255,.05));
+    }
+
+    .tpl-preview--split { --tpl-accent: #d6b36a; }
+    .tpl-preview__split-layout {
+      display: grid;
+      grid-template-columns: .96fr .88fr;
+      gap: 8px;
+      flex: 1;
+      min-height: 0;
+    }
+    .tpl-split__media {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(214,179,106,.16), transparent 26%),
+        linear-gradient(135deg, rgba(214,179,106,.18), rgba(89,195,255,.10));
+    }
+    .tpl-split__media::before {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border-radius: 11px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.04)),
+        linear-gradient(135deg, rgba(214,179,106,.10), rgba(89,195,255,.10));
+      border: 1px solid rgba(255,255,255,.07);
+    }
+    .tpl-split__badge,
+    .tpl-split__price {
+      position: absolute;
+      z-index: 1;
+      border-radius: 999px;
+      background: rgba(7,7,11,.72);
+      border: 1px solid rgba(255,255,255,.14);
+    }
+    .tpl-split__badge {
+      left: 12px;
+      top: 12px;
+      width: 38px;
+      height: 16px;
+    }
+    .tpl-split__price {
+      right: 12px;
+      bottom: 12px;
+      width: 44px;
+      height: 18px;
+    }
+    .tpl-split__panel {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    }
+    .tpl-split__bar {
+      display: block;
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.15);
+    }
+    .tpl-split__bar--wide { width: 80%; }
+    .tpl-split__bar--mid { width: 58%; }
+    .tpl-split__bar--short { width: 40%; }
+    .tpl-split__stats {
+      margin-top: auto;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .tpl-split__stats span {
+      height: 24px;
+      border-radius: 999px;
+      background: rgba(214,179,106,.14);
+      border: 1px solid rgba(214,179,106,.12);
+    }
+
+    .tpl-preview--masonry { --tpl-accent: #f1deaa; }
+    .tpl-preview__masonry {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      flex: 1;
+      min-height: 0;
+    }
+    .tpl-masonry__col {
+      display: grid;
+      gap: 8px;
+      align-content: start;
+      min-height: 0;
+    }
+    .tpl-masonry__card {
+      border-radius: 12px;
+      background:
+        linear-gradient(135deg, rgba(214,179,106,.16), rgba(89,195,255,.10));
+    }
+    .tpl-masonry__card--tall { height: 72px; }
+    .tpl-masonry__card--mid { height: 52px; }
+    .tpl-masonry__card--short { height: 28px; }
+    .tpl-masonry__card--accent {
+      background:
+        linear-gradient(135deg, rgba(139,92,246,.16), rgba(214,179,106,.10));
+    }
     .tpl-pro-tag { position:absolute; top:8px; right:8px; padding:2px 8px; border-radius:999px; font-size:.65rem; font-weight:700; background:rgba(139,92,246,.2); border:1px solid rgba(139,92,246,.3); color:#c4b5fd; }
 
     /* ─── CTA block ─── */
@@ -427,12 +795,177 @@ const pageDescription = "Premium property management platform for real estate ag
         <p class="sub" data-i18n="pf.templates_desc">Each template is a different property grid layout — optimized for different listing styles, screen sizes, and use cases. Pick your package, pay once, plug it in.</p>
       </div>
       <div class="template-preview-grid">
-        <div class="tpl-card"><div class="tpl-thumb tpl-thumb--1"></div><span data-i18n="pf.tpl_classic">Classic Grid</span></div>
-        <div class="tpl-card"><div class="tpl-thumb tpl-thumb--2"></div><span data-i18n="pf.tpl_magazine">Magazine</span></div>
-        <div class="tpl-card"><div class="tpl-thumb tpl-thumb--3"></div><span data-i18n="pf.tpl_compact">Compact List</span></div>
-        <div class="tpl-card tpl-card--pro"><div class="tpl-thumb tpl-thumb--4"></div><span data-i18n="pf.tpl_gallery">Gallery Hero</span><span class="tpl-pro-tag">Pro+</span></div>
-        <div class="tpl-card tpl-card--pro"><div class="tpl-thumb tpl-thumb--5"></div><span data-i18n="pf.tpl_split">Split View</span><span class="tpl-pro-tag">Pro+</span></div>
-        <div class="tpl-card tpl-card--pro"><div class="tpl-thumb tpl-thumb--6"></div><span data-i18n="pf.tpl_masonry">Masonry</span><span class="tpl-pro-tag">Pro+</span></div>
+        <div class="tpl-card">
+          <div class="tpl-preview tpl-preview--classic" aria-hidden="true">
+            <div class="tpl-preview__topbar">
+              <span class="tpl-dot tpl-dot--active"></span>
+              <span class="tpl-dot"></span>
+              <span class="tpl-dot"></span>
+              <span class="tpl-pill"></span>
+            </div>
+            <div class="tpl-preview__classic-grid">
+              <div class="tpl-mini">
+                <span class="tpl-mini__media tpl-mini__media--tall"></span>
+                <span class="tpl-mini__meta tpl-mini__meta--lg"></span>
+                <span class="tpl-mini__meta tpl-mini__meta--md"></span>
+              </div>
+              <div class="tpl-mini">
+                <span class="tpl-mini__media"></span>
+                <span class="tpl-mini__meta tpl-mini__meta--md"></span>
+                <span class="tpl-mini__meta tpl-mini__meta--sm"></span>
+              </div>
+              <div class="tpl-mini">
+                <span class="tpl-mini__media"></span>
+                <span class="tpl-mini__meta tpl-mini__meta--md"></span>
+                <span class="tpl-mini__meta tpl-mini__meta--sm"></span>
+              </div>
+            </div>
+          </div>
+          <span data-i18n="pf.tpl_classic">Classic Grid</span>
+        </div>
+        <div class="tpl-card">
+          <div class="tpl-preview tpl-preview--magazine" aria-hidden="true">
+            <div class="tpl-preview__topbar">
+              <span class="tpl-dot tpl-dot--active"></span>
+              <span class="tpl-dot"></span>
+              <span class="tpl-pill"></span>
+            </div>
+            <div class="tpl-preview__mag-layout">
+              <div class="tpl-mini tpl-mini--feature">
+                <span class="tpl-mini__media tpl-mini__media--tall"></span>
+                <span class="tpl-mini__meta tpl-mini__meta--lg"></span>
+                <span class="tpl-mini__meta tpl-mini__meta--md"></span>
+              </div>
+              <div class="tpl-preview__mag-stack">
+                <div class="tpl-mini">
+                  <span class="tpl-mini__media"></span>
+                  <span class="tpl-mini__meta tpl-mini__meta--md"></span>
+                  <span class="tpl-mini__meta tpl-mini__meta--sm"></span>
+                </div>
+                <div class="tpl-mini">
+                  <span class="tpl-mini__media"></span>
+                  <span class="tpl-mini__meta tpl-mini__meta--md"></span>
+                  <span class="tpl-mini__meta tpl-mini__meta--sm"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span data-i18n="pf.tpl_magazine">Magazine</span>
+        </div>
+        <div class="tpl-card">
+          <div class="tpl-preview tpl-preview--compact" aria-hidden="true">
+            <div class="tpl-preview__topbar">
+              <span class="tpl-dot tpl-dot--active"></span>
+              <span class="tpl-dot"></span>
+              <span class="tpl-pill"></span>
+            </div>
+            <div class="tpl-preview__filterrow">
+              <span class="tpl-chip tpl-chip--active"></span>
+              <span class="tpl-chip"></span>
+              <span class="tpl-chip"></span>
+              <span class="tpl-chip"></span>
+            </div>
+            <div class="tpl-preview__list">
+              <div class="tpl-row">
+                <span class="tpl-row__thumb"></span>
+                <span class="tpl-row__copy">
+                  <span class="tpl-row__line tpl-row__line--lg"></span>
+                  <span class="tpl-row__line tpl-row__line--md"></span>
+                </span>
+                <span class="tpl-row__price"></span>
+              </div>
+              <div class="tpl-row">
+                <span class="tpl-row__thumb"></span>
+                <span class="tpl-row__copy">
+                  <span class="tpl-row__line tpl-row__line--lg"></span>
+                  <span class="tpl-row__line tpl-row__line--sm"></span>
+                </span>
+                <span class="tpl-row__price"></span>
+              </div>
+              <div class="tpl-row">
+                <span class="tpl-row__thumb"></span>
+                <span class="tpl-row__copy">
+                  <span class="tpl-row__line tpl-row__line--md"></span>
+                  <span class="tpl-row__line tpl-row__line--sm"></span>
+                </span>
+                <span class="tpl-row__price"></span>
+              </div>
+            </div>
+          </div>
+          <span data-i18n="pf.tpl_compact">Compact List</span>
+        </div>
+        <div class="tpl-card tpl-card--pro">
+          <div class="tpl-preview tpl-preview--gallery" aria-hidden="true">
+            <div class="tpl-preview__topbar">
+              <span class="tpl-dot tpl-dot--active"></span>
+              <span class="tpl-dot"></span>
+              <span class="tpl-pill"></span>
+            </div>
+            <div class="tpl-preview__gallery-layout">
+              <div class="tpl-preview__hero-spot">
+                <span class="tpl-preview__gallery-image"></span>
+                <span class="tpl-preview__gallery-chip"></span>
+              </div>
+              <div class="tpl-preview__gallery-grid">
+                <span class="tpl-gallery-card"></span>
+                <span class="tpl-gallery-card"></span>
+                <span class="tpl-gallery-card"></span>
+              </div>
+            </div>
+          </div>
+          <span data-i18n="pf.tpl_gallery">Gallery Hero</span>
+          <span class="tpl-pro-tag">Pro+</span>
+        </div>
+        <div class="tpl-card tpl-card--pro">
+          <div class="tpl-preview tpl-preview--split" aria-hidden="true">
+            <div class="tpl-preview__topbar">
+              <span class="tpl-dot tpl-dot--active"></span>
+              <span class="tpl-pill"></span>
+            </div>
+            <div class="tpl-preview__split-layout">
+              <div class="tpl-split__media">
+                <span class="tpl-split__badge"></span>
+                <span class="tpl-split__price"></span>
+              </div>
+              <div class="tpl-split__panel">
+                <span class="tpl-split__bar tpl-split__bar--wide"></span>
+                <span class="tpl-split__bar"></span>
+                <span class="tpl-split__bar tpl-split__bar--mid"></span>
+                <span class="tpl-split__bar tpl-split__bar--short"></span>
+                <div class="tpl-split__stats">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span data-i18n="pf.tpl_split">Split View</span>
+          <span class="tpl-pro-tag">Pro+</span>
+        </div>
+        <div class="tpl-card tpl-card--pro">
+          <div class="tpl-preview tpl-preview--masonry" aria-hidden="true">
+            <div class="tpl-preview__topbar">
+              <span class="tpl-dot tpl-dot--active"></span>
+              <span class="tpl-dot"></span>
+              <span class="tpl-pill"></span>
+            </div>
+            <div class="tpl-masonry__col">
+              <span class="tpl-masonry__card tpl-masonry__card--tall"></span>
+              <span class="tpl-masonry__card tpl-masonry__card--short"></span>
+            </div>
+            <div class="tpl-masonry__col">
+              <span class="tpl-masonry__card tpl-masonry__card--mid"></span>
+              <span class="tpl-masonry__card tpl-masonry__card--tall tpl-masonry__card--accent"></span>
+            </div>
+            <div class="tpl-masonry__col">
+              <span class="tpl-masonry__card tpl-masonry__card--short"></span>
+              <span class="tpl-masonry__card tpl-masonry__card--mid"></span>
+            </div>
+          </div>
+          <span data-i18n="pf.tpl_masonry">Masonry</span>
+          <span class="tpl-pro-tag">Pro+</span>
+        </div>
       </div>
       <p class="sub" style="margin-top:16px;font-size:.85rem;opacity:.5;" data-i18n="pf.templates_note">White-Label includes 15 templates with all variations. Preview all templates after purchase.</p>
     </section>
