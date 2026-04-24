@@ -443,7 +443,9 @@ const homeAssistItems = [
     line-height: 1.65;
     color: rgba(209, 215, 230, 0.78);
     margin: 0 0 36px;
-    max-width: 54ch;
+    max-width: min(100%, 54ch);
+    overflow-wrap: anywhere;
+    text-wrap: pretty;
   }
 
   .hero-v2__actions {
@@ -731,6 +733,11 @@ const homeAssistItems = [
 
   /* ── Mobile adjustments ── */
   @media (max-width: 639px) {
+    .hero-v2__desc {
+      max-width: 100%;
+      font-size: .96rem;
+    }
+    .hero-v2__desc br { display: none; }
     .hero-v2__trust { gap: 16px; font-size: .8rem; }
     .hero-v2__cta-main, .hero-v2__cta-ghost {
       padding: 16px 28px;

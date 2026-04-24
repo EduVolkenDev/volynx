@@ -139,7 +139,7 @@ const L = t[lang];
 
     <section class="shell rec-trust">
       <div class="rec-trust-item">
-        <div class="rec-trust-icon"><img src="/assets/"></div>
+        <div class="rec-trust-icon">✓</div>
         <div>
           <strong>{L.trustBilling}</strong>
           <p>{lang === 'pt' ? 'Stripe Checkout com Pix. Certificado PCI, criptografia end-to-end.' : 'Stripe Checkout with Pix. PCI certified, end-to-end encrypted.'}</p>
@@ -173,6 +173,7 @@ const L = t[lang];
     (function() {
       var token = localStorage.getItem('volynx_access_token') || '';
       var cfg = null;
+      var checkoutLoadingLabel = (localStorage.getItem('volynx_lang') === 'en' ? 'Opening checkout…' : 'Abrindo checkout…');
 
       // Load config
       fetch('/config.json', { cache: 'no-store' }).then(function(r) { return r.json(); }).then(function(c) { cfg = c; }).catch(function(){});
@@ -201,8 +202,9 @@ const L = t[lang];
           if (!apiBase) return;
           var lookup = btn.getAttribute('data-buy-card');
           btn.disabled = true;
+          btn.setAttribute('aria-busy', 'true');
           var orig = btn.textContent;
-          btn.textContent = '...';
+          btn.textContent = checkoutLoadingLabel;
           try {
             var res = await fetch(apiBase + '/create-checkout-session', {
               method: 'POST',
@@ -215,8 +217,8 @@ const L = t[lang];
             });
             var data = await res.json();
             if (data.url) window.location.href = data.url;
-            else { alert(data.error || 'Checkout failed'); btn.textContent = orig; btn.disabled = false; }
-          } catch (err) { btn.textContent = orig; btn.disabled = false; }
+            else { alert(data.error || 'Checkout failed'); btn.textContent = orig; btn.disabled = false; btn.removeAttribute('aria-busy'); }
+          } catch (err) { btn.textContent = orig; btn.disabled = false; btn.removeAttribute('aria-busy'); }
         });
       });
 

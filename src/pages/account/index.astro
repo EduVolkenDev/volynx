@@ -170,14 +170,30 @@ import { ROUTES } from "../../data/routes";
         document.getElementById('dailyPlanLabel').textContent = window.VxPlan?.label(dailyPlan) || 'Free';
       } catch {}
 
-      // Member since from session
+      // Member since from session, with auth fallback when local cache is incomplete
+      const memberSinceEl = document.getElementById('memberSince');
+      const formatMemberSince = (value) => {
+        if (!value) return '';
+        const d = new Date(value);
+        return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+      };
+      let memberSince = '';
       try {
         const session = JSON.parse(localStorage.getItem('volynx_session') || '{}');
-        if (session?.user?.created_at) {
-          const d = new Date(session.user.created_at);
-          document.getElementById('memberSince').textContent = d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
-        }
+        memberSince = formatMemberSince(session?.user?.created_at);
       } catch {}
+      if (!memberSince && cfg?.supabaseUrl && cfg?.supabaseAnonKey && token) {
+        try {
+          const authRes = await fetch(cfg.supabaseUrl + '/auth/v1/user', {
+            headers: { apikey: cfg.supabaseAnonKey, Authorization: 'Bearer ' + token },
+          });
+          if (authRes.ok) {
+            const authUser = await authRes.json();
+            memberSince = formatMemberSince(authUser?.created_at);
+          }
+        } catch {}
+      }
+      if (memberSinceEl) memberSinceEl.textContent = memberSince || '—';
     }
 
     // ── Token balance + history ──
@@ -205,7 +221,7 @@ import { ROUTES } from "../../data/routes";
           const isSpend = tx.amount < 0;
           const sign = isSpend ? '' : '+';
           const cls = isSpend ? 'tx-spend' : 'tx-credit';
-          const icon = isSpend ? '&#9660;' : '&#9650;';
+          const icon = isSpend ? '−' : '+';
           const date = new Date(tx.created_at);
           const dateStr = date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
           const timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
@@ -234,8 +250,10 @@ import { ROUTES } from "../../data/routes";
     // ── Billing portal ──
     document.getElementById('portalBtn')?.addEventListener('click', async () => {
       const btn = document.getElementById('portalBtn');
+      const idleText = btn?.textContent || 'Billing';
+      const billingLoadingText = (localStorage.getItem('volynx_lang') === 'pt' ? 'Abrindo faturamento…' : 'Opening billing…');
       btn.disabled = true;
-      btn.textContent = '...';
+      btn.textContent = billingLoadingText;
       try {
         const res = await fetch(apiBase + '/create-portal-session', {
           method: 'POST',
@@ -247,11 +265,11 @@ import { ROUTES } from "../../data/routes";
           window.location.href = data.url;
         } else {
           btn.textContent = data.error || 'No subscription';
-          setTimeout(() => { btn.textContent = 'Billing'; btn.disabled = false; }, 2500);
+          setTimeout(() => { btn.textContent = idleText; btn.disabled = false; }, 2500);
         }
       } catch {
         btn.textContent = 'Error';
-        setTimeout(() => { btn.textContent = 'Billing'; btn.disabled = false; }, 2500);
+        setTimeout(() => { btn.textContent = idleText; btn.disabled = false; }, 2500);
       }
     });
 
