@@ -5,6 +5,7 @@ interface AssistItem {
   title: string;
   copy: string;
   emphasized?: boolean;
+  iconSrc?: string;
 }
 
 interface Props {
@@ -35,10 +36,17 @@ const {
 
       <div class="platform-assist__grid">
         {items.map((item) => (
-          <a href={item.href} class:list={["platform-assist__card", item.emphasized && "is-emphasized"]}>
-            <span class="platform-assist__label">{item.label}</span>
-            <strong>{item.title}</strong>
-            <p>{item.copy}</p>
+          <a href={item.href} class:list={["platform-assist__card", item.emphasized && "is-emphasized", item.iconSrc && "has-art"]}>
+            {item.iconSrc && (
+              <div class="platform-assist__art-shell" aria-hidden="true">
+                <img src={item.iconSrc} alt="" class="platform-assist__art" loading="lazy" decoding="async" />
+              </div>
+            )}
+            <div class="platform-assist__copy">
+              <span class="platform-assist__label">{item.label}</span>
+              <strong>{item.title}</strong>
+              <p>{item.copy}</p>
+            </div>
           </a>
         ))}
       </div>
@@ -94,7 +102,9 @@ const {
     gap: 12px;
   }
   .platform-assist__card {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     min-height: 164px;
     padding: 18px;
     border-radius: 18px;
@@ -102,20 +112,76 @@ const {
     background: rgba(255,255,255,.028);
     text-decoration: none;
     color: inherit;
-    transition: transform .2s ease, border-color .2s ease, background .2s ease;
+    overflow: hidden;
+    transition: transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
   }
   .platform-assist__card:hover {
     transform: translateY(-2px);
     border-color: rgba(45,212,191,.24);
     background: rgba(255,255,255,.04);
+    box-shadow: 0 16px 34px rgba(0,0,0,.22);
   }
   .platform-assist__card.is-emphasized {
     border-color: rgba(45,212,191,.22);
     background: rgba(45,212,191,.06);
   }
+  .platform-assist__card.has-art {
+    min-height: 280px;
+  }
+  .platform-assist__art-shell {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 148px;
+    padding: 10px;
+    border-radius: 22px;
+    background:
+      linear-gradient(165deg, rgba(255,255,255,.10), rgba(255,255,255,.02)),
+      rgba(6, 10, 24, 0.72);
+    border: 1px solid rgba(255,255,255,.08);
+    isolation: isolate;
+  }
+  .platform-assist__art-shell::before {
+    content: "";
+    position: absolute;
+    inset: 12%;
+    border-radius: 999px;
+    filter: blur(18px);
+    opacity: .85;
+    z-index: -1;
+  }
+  .platform-assist__card:nth-child(1) .platform-assist__art-shell::before {
+    background: radial-gradient(circle, rgba(96, 165, 250, .22), transparent 64%);
+  }
+  .platform-assist__card:nth-child(2) .platform-assist__art-shell::before {
+    background: radial-gradient(circle, rgba(167, 139, 250, .2), transparent 64%);
+  }
+  .platform-assist__card:nth-child(3) .platform-assist__art-shell::before {
+    background: radial-gradient(circle, rgba(251, 191, 36, .2), transparent 64%);
+  }
+  .platform-assist__card:nth-child(4) .platform-assist__art-shell::before {
+    background: radial-gradient(circle, rgba(196, 181, 253, .2), transparent 64%);
+  }
+  .platform-assist__art {
+    width: min(100%, 180px);
+    max-height: 170px;
+    object-fit: contain;
+    filter: drop-shadow(0 16px 30px rgba(0,0,0,.28));
+    transition: transform .28s ease, filter .28s ease;
+  }
+  .platform-assist__card:hover .platform-assist__art {
+    transform: translateY(-3px) scale(1.03);
+    filter: drop-shadow(0 20px 36px rgba(0,0,0,.34));
+  }
+  .platform-assist__copy {
+    display: grid;
+    gap: 8px;
+  }
+  .platform-assist__card.has-art .platform-assist__copy {
+    margin-top: auto;
+  }
   .platform-assist__label {
     display: inline-flex;
-    margin-bottom: 12px;
     font-size: .72rem;
     font-weight: 700;
     letter-spacing: .08em;
@@ -124,12 +190,12 @@ const {
   }
   .platform-assist__card strong {
     display: block;
-    font-size: 1rem;
-    line-height: 1.3;
+    font-size: 1.02rem;
+    line-height: 1.28;
     color: rgba(255,255,255,.96);
   }
   .platform-assist__card p {
-    margin: 10px 0 0;
+    margin: 0;
     color: rgba(255,255,255,.62);
     font-size: .9rem;
     line-height: 1.65;
@@ -142,6 +208,18 @@ const {
   @media (min-width: 1100px) {
     .platform-assist__grid {
       grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 639px) {
+    .platform-assist__card.has-art {
+      min-height: 244px;
+    }
+    .platform-assist__art-shell {
+      min-height: 126px;
+    }
+    .platform-assist__art {
+      width: min(100%, 140px);
+      max-height: 132px;
     }
   }
 </style>
