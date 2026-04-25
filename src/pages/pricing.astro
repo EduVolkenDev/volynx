@@ -31,10 +31,10 @@ const bundleLookupById = {
 } as Record<string, string>;
 
 const pricingAssistItems = [
-  { href: ROUTES.products, label: "Catalog", title: "Browse products", copy: "Go back to kits, tools and product pages while comparing plans.", emphasized: true },
-  { href: ROUTES.delivery, label: "Post-purchase", title: "My products", copy: "If checkout already happened, reopen delivery and access instead of staying stuck in pricing." },
-  { href: ROUTES.support, label: "Support", title: "Open support", copy: "Use the support lane for billing, launch and access questions tied to a purchase." },
-  { href: ROUTES.daily, label: "Workspace", title: "See Daily live", copy: "Jump into the live workspace while evaluating Daily and bundle value." },
+  { href: ROUTES.products, label: "Catalog", title: "Browse products", copy: "Go back to kits, tools and product pages while comparing plans.", emphasized: true, iconSrc: "/assets/allproducts.webp" },
+  { href: ROUTES.delivery, label: "Post-purchase", title: "My products", copy: "If checkout already happened, reopen delivery and access instead of staying stuck in pricing.", iconSrc: "/assets/mybox.webp" },
+  { href: ROUTES.support, label: "Support", title: "Open support", copy: "Use the support lane for billing, launch and access questions tied to a purchase.", iconSrc: "/assets/support.webp" },
+  { href: ROUTES.daily, label: "Workspace", title: "See Daily live", copy: "Jump into the live workspace while evaluating Daily and bundle value.", iconSrc: "/assets/daily-icon.webp" },
 ];
 ---
 <FlagshipLayout title="Pricing — VOLYNX" pageClass="page-pricing">
@@ -111,10 +111,46 @@ const pricingAssistItems = [
         <p><span class="i18n-en">Your plan unlocks product access and feature availability. Your VX unlocks on-demand premium actions such as exports, deployments, and usage upgrades.</span><span class="i18n-pt">Seu plano libera acesso às ferramentas e recursos do produto. Seu VX libera ações premium sob demanda, como exports, deploys e upgrades de uso.</span></p>
       </div>
       <div class="shell how-grid">
-        <div class="how-card"><strong><span class="i18n-en">Plan</span><span class="i18n-pt">Plano</span></strong><span class="how-eq">=</span><span class="how-val"><span class="i18n-en">access</span><span class="i18n-pt">acesso</span></span></div>
-        <div class="how-card"><strong>VX</strong><span class="how-eq">=</span><span class="how-val"><span class="i18n-en">capacity</span><span class="i18n-pt">capacidade</span></span></div>
-        <div class="how-card"><strong><span class="i18n-en">Bundle</span><span class="i18n-pt">Bundle</span></strong><span class="how-eq">=</span><span class="how-val"><span class="i18n-en">savings</span><span class="i18n-pt">economia</span></span></div>
-        <div class="how-card"><strong><span class="i18n-en">Add-on</span><span class="i18n-pt">Add-on</span></strong><span class="how-eq">=</span><span class="how-val"><span class="i18n-en">expansion without a plan change</span><span class="i18n-pt">expansão sem trocar de plano</span></span></div>
+        <div class="how-card how-card--plan">
+          <div class="how-card__art-shell" aria-hidden="true">
+            <img src="/assets/allproducts.webp" alt="" class="how-card__art" loading="lazy" decoding="async" />
+          </div>
+          <div class="how-card__equation">
+            <strong><span class="i18n-en">Plan</span><span class="i18n-pt">Plano</span></strong>
+            <span class="how-eq">=</span>
+            <span class="how-val"><span class="i18n-en">access</span><span class="i18n-pt">acesso</span></span>
+          </div>
+        </div>
+        <div class="how-card how-card--vx">
+          <div class="how-card__art-shell" aria-hidden="true">
+            <img src="/assets/vx-new.webp" alt="" class="how-card__art" loading="lazy" decoding="async" />
+          </div>
+          <div class="how-card__equation">
+            <strong>VX</strong>
+            <span class="how-eq">=</span>
+            <span class="how-val"><span class="i18n-en">capacity</span><span class="i18n-pt">capacidade</span></span>
+          </div>
+        </div>
+        <div class="how-card how-card--bundle">
+          <div class="how-card__art-shell" aria-hidden="true">
+            <img src="/assets/icons-store/Hyper-Icons-Premium/infinity.png" alt="" class="how-card__art" loading="lazy" decoding="async" />
+          </div>
+          <div class="how-card__equation">
+            <strong><span class="i18n-en">Bundle</span><span class="i18n-pt">Bundle</span></strong>
+            <span class="how-eq">=</span>
+            <span class="how-val"><span class="i18n-en">savings</span><span class="i18n-pt">economia</span></span>
+          </div>
+        </div>
+        <div class="how-card how-card--addon">
+          <div class="how-card__art-shell" aria-hidden="true">
+            <img src="/assets/icons-store/Hyper-Icons-Premium/lightning.png" alt="" class="how-card__art" loading="lazy" decoding="async" />
+          </div>
+          <div class="how-card__equation">
+            <strong><span class="i18n-en">Add-on</span><span class="i18n-pt">Add-on</span></strong>
+            <span class="how-eq">=</span>
+            <span class="how-val"><span class="i18n-en">expansion without a plan change</span><span class="i18n-pt">expansão sem trocar de plano</span></span>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -342,11 +378,99 @@ const pricingAssistItems = [
     .hero-subcopy { margin-top:14px; color:var(--muted); font-size:14px; line-height:1.65; max-width:640px; }
 
     /* How it works grid */
-    .how-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; max-width:960px; margin:0 auto; }
-    .how-card { display:flex; align-items:center; gap:10px; padding:16px 18px; border-radius:14px; border:1px solid rgba(255,255,255,.06); background:rgba(255,255,255,.03); font-size:14px; }
-    .how-card strong { color:#fff; font-weight:700; }
-    .how-card .how-eq { color:rgba(255,255,255,.35); font-weight:600; }
-    .how-card .how-val { color:var(--muted); }
+    .how-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; max-width:1080px; margin:0 auto; }
+    .how-card {
+      position:relative;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:18px;
+      min-height:240px;
+      padding:18px;
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.022));
+      box-shadow:0 24px 56px rgba(0,0,0,.18);
+      overflow:hidden;
+      isolation:isolate;
+      font-size:14px;
+    }
+    .how-card::before {
+      content:"";
+      position:absolute;
+      inset:auto -18% -26% auto;
+      width:170px;
+      height:170px;
+      border-radius:999px;
+      opacity:.5;
+      z-index:0;
+      pointer-events:none;
+      background:radial-gradient(circle, rgba(255,255,255,.16), rgba(255,255,255,0));
+    }
+    .how-card > * { position:relative; z-index:1; }
+    .how-card__art-shell {
+      position:relative;
+      display:grid;
+      place-items:center;
+      align-self:flex-end;
+      width:136px;
+      height:136px;
+      border-radius:28px;
+      border:1px solid rgba(255,255,255,.1);
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      box-shadow:0 18px 36px rgba(0,0,0,.2);
+      overflow:hidden;
+    }
+    .how-card__art-shell::before {
+      content:"";
+      position:absolute;
+      inset:12px;
+      border-radius:22px;
+      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), rgba(255,255,255,0));
+      opacity:.9;
+    }
+    .how-card__art {
+      position:relative;
+      z-index:1;
+      width:104px;
+      height:104px;
+      object-fit:contain;
+      filter:drop-shadow(0 18px 36px rgba(0,0,0,.28));
+    }
+    .how-card__equation {
+      display:grid;
+      gap:6px;
+      max-width:20ch;
+    }
+    .how-card strong {
+      color:#fff;
+      font-weight:700;
+      font-size:1.06rem;
+      letter-spacing:-0.02em;
+    }
+    .how-card .how-eq {
+      color:rgba(255,255,255,.35);
+      font-weight:700;
+      font-size:1rem;
+      line-height:1;
+    }
+    .how-card .how-val {
+      color:var(--muted);
+      line-height:1.5;
+      font-size:.96rem;
+    }
+    .how-card--plan::before {
+      background:radial-gradient(circle, rgba(45,212,191,.22), rgba(45,212,191,0));
+    }
+    .how-card--vx::before {
+      background:radial-gradient(circle, rgba(251,191,36,.26), rgba(251,191,36,0));
+    }
+    .how-card--bundle::before {
+      background:radial-gradient(circle, rgba(129,140,248,.24), rgba(129,140,248,0));
+    }
+    .how-card--addon::before {
+      background:radial-gradient(circle, rgba(56,189,248,.24), rgba(56,189,248,0));
+    }
 
     /* VX lead block */
     .vx-lead { max-width:720px; margin:0 auto 24px; padding:20px 22px; border-radius:16px; border:1px solid rgba(52,211,153,.18); background:linear-gradient(180deg,rgba(52,211,153,.06),rgba(52,211,153,.02)); text-align:center; }
