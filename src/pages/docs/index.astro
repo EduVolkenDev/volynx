@@ -1,0 +1,225 @@
+---
+import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "../../components/FlagshipHeader.astro";
+import FlagshipFooter from "../../components/FlagshipFooter.astro";
+import { ROUTES } from "../../data/routes";
+import { kitPreviews } from "../../data/kit-previews";
+
+const previewSurfaces = [
+  ...kitPreviews,
+  {
+    id: "propertyflow",
+    name: "PropertyFlow",
+    route: ROUTES.propertyflow,
+    productRoute: ROUTES.propertyflow,
+    docsAnchor: "propertyflow",
+    art: "/assets/newproperty.webp",
+    summary:
+      "Preview the premium property platform, the delivery confidence and the buyer flow without exposing internal implementation details.",
+    docsPreview: [
+      "Template coverage, tier logic and launch guidance shown at a commercial level.",
+      "What the buyer receives is explained without exposing the private setup layer.",
+      "The premium implementation surface still stays protected after purchase.",
+    ],
+    deliveryPreview: [
+      "Public visitors can understand how tiered delivery and support work before checkout.",
+      "The real delivery area, support verification and gated material remain protected.",
+      "VOLYNX sells confidence, not public access to the paid stack.",
+    ],
+  },
+  {
+    id: "icons-store",
+    name: "VOLYNX Icon Vault",
+    route: ROUTES.iconsStore,
+    productRoute: ROUTES.iconsStore,
+    docsAnchor: "icons-store",
+    art: "/assets/icons-store-logo.webp",
+    summary:
+      "Preview the pack quality, buyer flow and delivery promise of the icon product line without exposing the paid files.",
+    docsPreview: [
+      "Public pages preview pack logic, licensing posture and product positioning.",
+      "The internal structure of the paid files stays behind the buying flow.",
+      "This keeps the asset line desirable without giving away the product.",
+    ],
+    deliveryPreview: [
+      "The buyer sees that support and access recovery exist before purchase.",
+      "Raw files, pack access and paid delivery stay private after checkout.",
+      "Preview first, unlock later.",
+    ],
+  },
+];
+---
+
+<FlagshipLayout
+  title="Product Preview Hub — VOLYNX"
+  description="Preview what each VOLYNX product unlocks after purchase without exposing the premium docs, files or delivery layers."
+  ogImage="/assets/allproducts.webp"
+  pageClass="page-docs-preview"
+>
+  <FlagshipHeader current={ROUTES.devHub} ctaLabel="Open products" ctaHref={ROUTES.products} />
+  <main>
+    <section class="hero docs-preview-hero">
+      <div class="shell hero-grid">
+        <div class="hero-copy">
+          <span class="kicker">Commercial previews</span>
+          <h1>Show what the buyer unlocks. Keep the premium layer protected.</h1>
+          <p>
+            This page previews the value, flow and operating depth powered by Volynx-OS inside VOLYNX. It does not expose the
+            real docs, source files or private delivery materials.
+          </p>
+          <div class="hero-actions">
+            <a href={ROUTES.products} class="button button--gold">Open products</a>
+            <a href={ROUTES.pricing} class="button button--ghost">See pricing</a>
+          </div>
+        </div>
+        <div class="panel docs-preview-hero__card">
+          <span class="label label--pro">Protected after purchase</span>
+          <h2>Docs, delivery, source and recovery remain premium.</h2>
+          <p>The public layer now previews the operating value so VOLYNX can sell better without cannibalizing the product.</p>
+          <ul>
+            <li>Preview what the customer gets.</li>
+            <li>Explain how delivery works.</li>
+            <li>Keep the real material gated.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">Preview surfaces</span>
+        <h2>The public site can now point to the product proof, not to hidden repo-only pages.</h2>
+      </div>
+      <div class="shell docs-preview-grid">
+        {previewSurfaces.map((surface) => (
+          <article id={surface.docsAnchor} class="panel docs-preview-card">
+            <img src={surface.art} alt="" loading="lazy" decoding="async" />
+            <div class="docs-preview-card__body">
+              <h3>{surface.name}</h3>
+              <p>{surface.summary}</p>
+              <div class="docs-preview-card__actions">
+                <a href={surface.route} class="button button--gold">Open preview</a>
+                <a href={surface.productRoute} class="button button--ghost">Open product</a>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">What unlocks later</span>
+        <h2>The product promise becomes visible before checkout, while the premium layer stays protected.</h2>
+      </div>
+      <div class="shell docs-preview-benefits">
+        <article class="panel docs-preview-benefit">
+          <h3>Docs preview</h3>
+          <p>Show the depth of setup, configuration and launch guidance without publishing the internal implementation material.</p>
+        </article>
+        <article class="panel docs-preview-benefit">
+          <h3>Delivery preview</h3>
+          <p>Let buyers see that recovery, support and post-purchase delivery are real parts of the product experience.</p>
+        </article>
+        <article class="panel docs-preview-benefit">
+          <h3>Revenue protection</h3>
+          <p>The premium files, source packages and protected hubs still unlock only after the correct commercial flow happens.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="page-section page-section--last">
+      <div class="shell docs-preview-surfaces">
+        {previewSurfaces.map((surface) => (
+          <article class="panel docs-preview-surface">
+            <div>
+              <span class="eyebrow">{surface.name}</span>
+              <h3>Docs preview</h3>
+              <ul>
+                {surface.docsPreview.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <span class="eyebrow">Delivery preview</span>
+              <h3>Buyer confidence without product leakage</h3>
+              <ul>
+                {surface.deliveryPreview.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  </main>
+  <FlagshipFooter />
+</FlagshipLayout>
+
+<style is:global>
+  .page-docs-preview .docs-preview-hero__card {
+    padding: 22px;
+    display: grid;
+    gap: 14px;
+    align-self: center;
+  }
+  .page-docs-preview .docs-preview-hero__card h2,
+  .page-docs-preview .docs-preview-hero__card p,
+  .page-docs-preview .docs-preview-hero__card ul,
+  .page-docs-preview .docs-preview-card p,
+  .page-docs-preview .docs-preview-benefit p,
+  .page-docs-preview .docs-preview-surface ul {
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .page-docs-preview .docs-preview-hero__card ul,
+  .page-docs-preview .docs-preview-surface ul {
+    margin: 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 10px;
+  }
+  .page-docs-preview .docs-preview-grid,
+  .page-docs-preview .docs-preview-benefits,
+  .page-docs-preview .docs-preview-surfaces {
+    display: grid;
+    gap: 14px;
+  }
+  .page-docs-preview .docs-preview-card {
+    overflow: hidden;
+  }
+  .page-docs-preview .docs-preview-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+  }
+  .page-docs-preview .docs-preview-card__body,
+  .page-docs-preview .docs-preview-benefit {
+    padding: 22px;
+  }
+  .page-docs-preview .docs-preview-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .page-docs-preview .docs-preview-surface {
+    padding: 22px;
+    display: grid;
+    gap: 18px;
+  }
+  @media (min-width: 900px) {
+    .page-docs-preview .docs-preview-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .page-docs-preview .docs-preview-benefits {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .page-docs-preview .docs-preview-surface {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

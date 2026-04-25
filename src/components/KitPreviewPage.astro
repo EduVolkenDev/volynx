@@ -1,0 +1,278 @@
+---
+import FlagshipLayout from "../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "./FlagshipHeader.astro";
+import FlagshipFooter from "./FlagshipFooter.astro";
+import { ROUTES } from "../data/routes";
+import type { KitPreview } from "../data/kit-previews";
+
+interface Props {
+  preview: KitPreview;
+}
+
+const { preview } = Astro.props;
+---
+
+<FlagshipLayout
+  title={`${preview.name} Preview — VOLYNX`}
+  description={preview.summary}
+  ogImage={preview.art}
+  pageClass={`page-kit-preview page-kit-preview--${preview.id}`}
+>
+  <FlagshipHeader current={ROUTES.products} ctaLabel="Open product page" ctaHref={preview.productRoute} />
+  <main>
+    <section class="hero kit-preview-hero">
+      <div class="shell kit-preview-hero__grid">
+        <div class="hero-copy">
+          <span class="kicker">{preview.kicker}</span>
+          <h1>{preview.title}</h1>
+          <p>{preview.summary}</p>
+          <div class="hero-actions">
+            <a href={preview.productRoute} class="button button--gold">Open product page</a>
+            <a href={`${ROUTES.docs}#${preview.docsAnchor}`} class="button button--ghost">Preview docs + delivery</a>
+          </div>
+          <div class="kit-preview-note">
+            <strong>Revenue-safe preview.</strong>
+            <span>Full source, buyer docs and delivery files stay gated after purchase.</span>
+          </div>
+        </div>
+        <div class="kit-preview-hero__art panel" aria-hidden="true">
+          <img src={preview.art} alt="" loading="eager" decoding="async" />
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section page-section--tight">
+      <div class="shell kit-preview-metrics">
+        {preview.metrics.map((metric) => (
+          <article class="panel kit-preview-metric">
+            <strong>{metric.value}</strong>
+            <span>{metric.label}</span>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">What the preview proves</span>
+        <h2>{preview.name} looks premium before the customer even unlocks it.</h2>
+        <p>The public layer now proves value, while the real operating package stays protected inside the paid flow.</p>
+      </div>
+      <div class="shell kit-preview-grid">
+        {preview.proofCards.map((card) => (
+          <article class="panel kit-preview-card">
+            <h3>{card.title}</h3>
+            <p>{card.copy}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">Unlock Preview</span>
+        <h2>Show what is included. Keep the premium layer gated.</h2>
+      </div>
+      <div class="shell kit-preview-unlock">
+        <article class="panel kit-preview-stack">
+          <span class="label">Docs preview</span>
+          <ul>
+            {preview.docsPreview.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </article>
+        <article class="panel kit-preview-stack">
+          <span class="label label--pro">Delivery preview</span>
+          <ul>
+            {preview.deliveryPreview.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">Preview Flow</span>
+        <h2>VOLYNX stays the storefront. Volynx-OS feeds the premium layer underneath.</h2>
+      </div>
+      <div class="shell kit-preview-steps">
+        {preview.steps.map((step, index) => (
+          <article class="panel kit-preview-step">
+            <span class="kit-preview-step__index">0{index + 1}</span>
+            <h3>{step.title}</h3>
+            <p>{step.copy}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">FAQ</span>
+        <h2>Common questions about the public preview layer.</h2>
+      </div>
+      <div class="shell kit-preview-faq">
+        {preview.faq.map((item) => (
+          <details class="panel kit-preview-faq__item">
+            <summary>{item.question}</summary>
+            <p>{item.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <section class="page-section page-section--last">
+      <div class="shell callout panel panel--pro kit-preview-cta">
+        <div>
+          <span class="eyebrow">Ready to buy?</span>
+          <strong>{preview.name} is sold on VOLYNX, with the premium material released only after checkout.</strong>
+          <p>Use the preview to judge quality. Use the product page to convert. Use the private delivery layer after purchase.</p>
+        </div>
+        <div class="hero-actions">
+          <a href={preview.productRoute} class="button button--gold">Open {preview.name}</a>
+          <a href={ROUTES.pricing} class="button button--ghost">See pricing</a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <FlagshipFooter />
+</FlagshipLayout>
+
+<style is:global>
+  .page-kit-preview .kit-preview-hero__grid {
+    display: grid;
+    gap: 24px;
+    align-items: center;
+  }
+  .page-kit-preview .kit-preview-hero__art {
+    padding: 18px;
+    min-height: 320px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .page-kit-preview .kit-preview-hero__art img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 20px;
+  }
+  .page-kit-preview .kit-preview-note {
+    margin-top: 18px;
+    padding: 16px 18px;
+    display: grid;
+    gap: 8px;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.035);
+    color: rgba(255,255,255,.72);
+  }
+  .page-kit-preview .kit-preview-note strong {
+    color: #fff;
+  }
+  .page-kit-preview .kit-preview-metrics,
+  .page-kit-preview .kit-preview-grid,
+  .page-kit-preview .kit-preview-steps,
+  .page-kit-preview .kit-preview-faq {
+    display: grid;
+    gap: 14px;
+  }
+  .page-kit-preview .kit-preview-metrics {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+  .page-kit-preview .kit-preview-metric {
+    padding: 18px;
+    display: grid;
+    gap: 6px;
+    text-align: center;
+  }
+  .page-kit-preview .kit-preview-metric strong {
+    font-size: 1.9rem;
+    color: #fff;
+    letter-spacing: -0.05em;
+  }
+  .page-kit-preview .kit-preview-metric span {
+    color: var(--muted);
+    font-size: .94rem;
+  }
+  .page-kit-preview .kit-preview-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+  .page-kit-preview .kit-preview-card,
+  .page-kit-preview .kit-preview-step {
+    padding: 22px;
+    min-height: 220px;
+  }
+  .page-kit-preview .kit-preview-card h3,
+  .page-kit-preview .kit-preview-step h3 {
+    margin: 0 0 12px;
+    font-size: 1.1rem;
+    color: #fff;
+  }
+  .page-kit-preview .kit-preview-card p,
+  .page-kit-preview .kit-preview-step p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .page-kit-preview .kit-preview-unlock {
+    display: grid;
+    gap: 14px;
+  }
+  .page-kit-preview .kit-preview-stack {
+    padding: 22px;
+  }
+  .page-kit-preview .kit-preview-stack ul {
+    margin: 16px 0 0;
+    padding-left: 18px;
+    color: var(--muted);
+    display: grid;
+    gap: 10px;
+    line-height: 1.7;
+  }
+  .page-kit-preview .kit-preview-step__index {
+    display: inline-flex;
+    margin-bottom: 16px;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .18em;
+    color: rgba(255,255,255,.45);
+  }
+  .page-kit-preview .kit-preview-faq__item {
+    padding: 18px 20px;
+  }
+  .page-kit-preview .kit-preview-faq__item summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: #fff;
+    list-style: none;
+  }
+  .page-kit-preview .kit-preview-faq__item summary::-webkit-details-marker {
+    display: none;
+  }
+  .page-kit-preview .kit-preview-faq__item p {
+    margin: 14px 0 0;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .page-kit-preview .kit-preview-cta {
+    display: grid;
+    gap: 18px;
+  }
+  @media (min-width: 900px) {
+    .page-kit-preview .kit-preview-hero__grid,
+    .page-kit-preview .kit-preview-unlock,
+    .page-kit-preview .kit-preview-cta {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .page-kit-preview .kit-preview-steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .page-kit-preview .kit-preview-faq {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

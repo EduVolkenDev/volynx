@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your PropertyFlow Kit — Ready</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #06060a;
+    --bg-elev: rgba(18, 18, 26, 0.65);
+    --border: rgba(255, 255, 255, 0.07);
+    --border-strong: rgba(255, 255, 255, 0.15);
+    --text: #f4f4f6;
+    --text-muted: #9a9aa5;
+    --text-dim: #5a5a65;
+    --accent: #78dcff;
+    --accent-violet: #b084ff;
+    --success: #7ee089;
+    --radius: 14px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    font-weight: 400;
+    letter-spacing: -0.005em;
+    line-height: 1.55;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(120, 220, 255, 0.1), transparent),
+      radial-gradient(ellipse 60% 40% at 90% 80%, rgba(176, 132, 255, 0.06), transparent);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 56px 40px 96px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .breadcrumb {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .breadcrumb a { color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
+  .breadcrumb a:hover { color: var(--text); }
+  .breadcrumb .sep { opacity: 0.4; }
+
+  .hero {
+    margin-bottom: 48px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    background: rgba(126, 224, 137, 0.08);
+    border: 1px solid rgba(126, 224, 137, 0.22);
+    border-radius: 100px;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--success);
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+  .hero-status::before {
+    content: '';
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 8px var(--success);
+  }
+
+  h1 {
+    font-family: 'Fraunces', 'Georgia', serif;
+    font-size: 56px;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    font-weight: 500;
+    margin-bottom: 18px;
+    max-width: 720px;
+  }
+  h1 .accent {
+    background: linear-gradient(120deg, var(--accent) 0%, var(--accent-violet) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-lede {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    max-width: 560px;
+  }
+
+  .meta-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 32px;
+    padding: 24px 28px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 48px;
+    backdrop-filter: blur(10px);
+  }
+  .meta-item { display: flex; flex-direction: column; gap: 6px; }
+  .meta-label {
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-weight: 600;
+  }
+  .meta-value {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.005em;
+  }
+
+  .primary-action { margin-bottom: 64px; }
+  .download-card {
+    background: linear-gradient(135deg, rgba(120, 220, 255, 0.08) 0%, rgba(176, 132, 255, 0.04) 100%);
+    border: 1px solid rgba(120, 220, 255, 0.25);
+    border-radius: var(--radius);
+    padding: 40px 40px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 32px;
+    align-items: center;
+  }
+  .download-info h2 {
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .download-info p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.55;
+  }
+  .download-info .filename {
+    display: inline-block;
+    margin-top: 10px;
+    margin-right: 8px;
+    font-family: 'SF Mono', 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 4px 10px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+  }
+
+  .btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--text);
+    color: var(--bg);
+    padding: 16px 32px;
+    border-radius: 100px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    letter-spacing: -0.005em;
+    transition: transform 0.15s, box-shadow 0.15s;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-download:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 40px rgba(120, 220, 255, 0.2);
+  }
+  .btn-download svg { width: 16px; height: 16px; }
+
+  .section { margin-bottom: 56px; }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: 'SF Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    font-weight: 500;
+    letter-spacing: 0.1em;
+  }
+  .section-title {
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    color: var(--text);
+  }
+  .section-sub {
+    margin-left: auto;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .inside-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+  }
+  .inside-item {
+    padding: 20px 22px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .inside-item[data-locked="true"] { opacity: 0.4; }
+  .inside-item[data-locked="true"]::after {
+    content: '🔒 ' attr(data-upgrade-tier);
+    display: block;
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--accent-violet);
+    letter-spacing: 0.05em;
+    font-weight: 500;
+  }
+  .inside-item:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+  .inside-item-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .inside-icon {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: rgba(120, 220, 255, 0.1);
+    border: 1px solid rgba(120, 220, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    font-size: 14px;
+  }
+  .inside-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .inside-desc { font-size: 13px; color: var(--text-muted); line-height: 1.55; }
+
+  .docs-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+  }
+  .doc-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.15s;
+    font-size: 14px;
+  }
+  .doc-link:hover {
+    border-color: var(--accent);
+    background: rgba(120, 220, 255, 0.04);
+    color: var(--accent);
+  }
+  .doc-link .arrow { opacity: 0.4; transition: transform 0.15s, opacity 0.15s; }
+  .doc-link:hover .arrow { opacity: 1; transform: translateX(2px); }
+
+  .support-card {
+    padding: 32px 36px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 32px;
+  }
+  .support-info h3 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .support-info p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.55;
+  }
+  .support-info a { color: var(--accent); text-decoration: none; }
+  .support-info a:hover { text-decoration: underline; }
+  .btn-secondary {
+    padding: 12px 22px;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .btn-secondary:hover {
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.3);
+  }
+
+  .download-history {
+    margin-top: 40px;
+    padding: 20px 22px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .download-history-title {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .download-history-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .download-history-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-muted);
+    padding: 6px 0;
+  }
+  .download-history-item span { font-variant-numeric: tabular-nums; }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+  }
+  footer a { color: var(--text-muted); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+  footer .links { display: flex; gap: 20px; }
+
+  @media (max-width: 720px) {
+    .wrap { padding: 32px 20px 64px; }
+    h1 { font-size: 36px; }
+    .hero-lede { font-size: 15px; }
+    .download-card, .support-card {
+      grid-template-columns: 1fr;
+      padding: 28px 24px;
+    }
+    .btn-download { justify-content: center; }
+    footer { flex-direction: column; gap: 14px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <nav class="breadcrumb">
+    <a href="/dashboard/">Dashboard</a>
+    <span class="sep">/</span>
+    <a href="/dashboard/purchases/">Purchases</a>
+    <span class="sep">/</span>
+    <span>PropertyFlow · <span data-bind="tierLabel">White-Label</span></span>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-status">Ready to download</div>
+    <h1>Your <span class="accent">PropertyFlow</span> kit is ready.</h1>
+    <p class="hero-lede">
+      Everything you need to launch a premium real-estate site — source code, admin dashboard (Professional+), documentation and commercial license. Download below and follow the setup guide to ship in under an hour.
+    </p>
+  </header>
+
+  <div class="meta-strip">
+    <div class="meta-item">
+      <span class="meta-label">Tier</span>
+      <span class="meta-value" data-bind="tierLabel">White-Label</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">License</span>
+      <span class="meta-value" data-bind="licenseScope">Agency · unlimited clients</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Version</span>
+      <span class="meta-value" data-bind="version">v1.0.0</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Purchased</span>
+      <span class="meta-value" data-bind="purchaseDate">21 Apr 2026</span>
+    </div>
+  </div>
+
+  <section class="primary-action">
+    <div class="download-card">
+      <div class="download-info">
+        <h2>PropertyFlow · Source code</h2>
+        <p>Full React 19 + Vite 7 codebase with tier-specific features. Ready to deploy.</p>
+        <span class="filename" data-bind="filename">propertyflow-white-label-v1.0.0.zip</span>
+        <span class="filename" data-bind="filesize">142.8 MB</span>
+      </div>
+      <a href="#" class="btn-download" data-bind="downloadHref" data-action="download">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download kit
+      </a>
+    </div>
+
+    <div class="download-history">
+      <div class="download-history-title">Previous downloads</div>
+      <ul class="download-history-list" data-bind="downloadHistory">
+        <li class="download-history-item">
+          <span>21 Apr 2026 · 14:32 from 203.0.113.42</span>
+          <span>v1.0.0</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <span class="section-title">What's inside</span>
+      <span class="section-sub" data-bind="tierSubtitle">White-Label tier · 15 templates · multi-tenant</span>
+    </div>
+
+    <div class="inside-grid" data-bind="featureCards">
+      <!-- STARTER features (always shown) -->
+      <div class="inside-item" data-tier-min="starter">
+        <div class="inside-item-head">
+          <div class="inside-icon">⚡</div>
+          <div class="inside-title">React 19 + Vite 7 codebase</div>
+        </div>
+        <div class="inside-desc">Full source, typed, modular. Hot reload, fast builds.</div>
+      </div>
+      <div class="inside-item" data-tier-min="starter">
+        <div class="inside-item-head">
+          <div class="inside-icon">◇</div>
+          <div class="inside-title">Property catalogue</div>
+        </div>
+        <div class="inside-desc">Grid view, cover images, filters by name, neighbourhood, type, price.</div>
+      </div>
+      <div class="inside-item" data-tier-min="starter">
+        <div class="inside-item-head">
+          <div class="inside-icon">⌥</div>
+          <div class="inside-title">Bilingual (EN + PT-BR)</div>
+        </div>
+        <div class="inside-desc">Full i18n, every string translated, language toggle.</div>
+      </div>
+
+      <!-- PROFESSIONAL features -->
+      <div class="inside-item" data-tier-min="professional" data-upgrade-tier="Professional">
+        <div class="inside-item-head">
+          <div class="inside-icon">🗄</div>
+          <div class="inside-title">Supabase backend</div>
+        </div>
+        <div class="inside-desc">Auth, database, storage. Free tier handles most agencies.</div>
+      </div>
+      <div class="inside-item" data-tier-min="professional" data-upgrade-tier="Professional">
+        <div class="inside-item-head">
+          <div class="inside-icon">◈</div>
+          <div class="inside-title">Admin dashboard</div>
+        </div>
+        <div class="inside-desc">Properties CRUD, leads inbox, featured toggles, image upload.</div>
+      </div>
+      <div class="inside-item" data-tier-min="professional" data-upgrade-tier="Professional">
+        <div class="inside-item-head">
+          <div class="inside-icon">✉</div>
+          <div class="inside-title">Enquiry capture</div>
+        </div>
+        <div class="inside-desc">Contact forms, email notifications, CRM webhook ready.</div>
+      </div>
+
+      <!-- WHITE-LABEL features -->
+      <div class="inside-item" data-tier-min="white-label" data-upgrade-tier="White-Label">
+        <div class="inside-item-head">
+          <div class="inside-icon">⊞</div>
+          <div class="inside-title">Multi-tenant mode</div>
+        </div>
+        <div class="inside-desc">1 install, unlimited agency clients. Path or domain tenancy.</div>
+      </div>
+      <div class="inside-item" data-tier-min="white-label" data-upgrade-tier="White-Label">
+        <div class="inside-item-head">
+          <div class="inside-icon">⚙</div>
+          <div class="inside-title">CRM integrations</div>
+        </div>
+        <div class="inside-desc">HubSpot, Pipedrive, Salesforce webhooks pre-wired.</div>
+      </div>
+      <div class="inside-item" data-tier-min="white-label" data-upgrade-tier="White-Label">
+        <div class="inside-item-head">
+          <div class="inside-icon">📊</div>
+          <div class="inside-title">Advanced analytics</div>
+        </div>
+        <div class="inside-desc">Per-tenant, per-agent metrics. Trends, exports.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <span class="section-title">Start here</span>
+    </div>
+
+    <div class="docs-row">
+      <a class="doc-link" href="/dashboard/purchases/propertyflow/docs/setup/">
+        <span>Setup guide (step-by-step)</span>
+        <span class="arrow">→</span>
+      </a>
+      <a class="doc-link" href="/dashboard/purchases/propertyflow/docs/customization/">
+        <span>Customization</span>
+        <span class="arrow">→</span>
+      </a>
+      <a class="doc-link" href="/dashboard/purchases/propertyflow/docs/admin/" data-tier-min="professional">
+        <span>Admin dashboard guide</span>
+        <span class="arrow">→</span>
+      </a>
+      <a class="doc-link" href="/dashboard/purchases/propertyflow/docs/supabase/" data-tier-min="professional">
+        <span>Supabase setup</span>
+        <span class="arrow">→</span>
+      </a>
+      <a class="doc-link" href="/dashboard/purchases/propertyflow/docs/multi-tenant/" data-tier-min="white-label">
+        <span>Multi-tenant mode</span>
+        <span class="arrow">→</span>
+      </a>
+      <a class="doc-link" href="/dashboard/purchases/propertyflow/docs/license/">
+        <span>License (commercial)</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <span class="section-title">Need a hand?</span>
+    </div>
+
+    <div class="support-card">
+      <div class="support-info">
+        <h3>We answer every email within a day.</h3>
+        <p>Reply to your delivery email directly, or write us at <a href="mailto:support@volynx.world">support@volynx.world</a>. Include your order ID so we route it fast.</p>
+        <p data-bind="supportWindow" style="margin-top:8px; font-size:12px; opacity:0.7;">Your support window: 12 months (priority queue).</p>
+      </div>
+      <a href="mailto:support@volynx.world?subject=PropertyFlow%20support%20-%20Order%20[ORDER_ID]" class="btn-secondary">Email support</a>
+    </div>
+  </section>
+
+  <footer>
+    <div>© 2026 VOLYNX · PropertyFlow is a VOLYNX product.</div>
+    <div class="links">
+      <a href="/terms/">Terms</a>
+      <a href="/dashboard/purchases/propertyflow/docs/license/">License</a>
+      <a href="/refund/">Refund policy</a>
+    </div>
+  </footer>
+
+</div>
+
+<!--
+  INTEGRATION NOTES FOR CODEX / DEV:
+
+  1. Route: /dashboard/purchases/propertyflow/
+  2. Access: require logged-in user + matching purchase in addons_purchased
+  3. Data bindings (data-bind attributes):
+     - tierLabel: "Starter" | "Professional" | "White-Label"
+     - licenseScope: from LICENSE matrix
+     - version: latest version user has access to
+     - purchaseDate: formatted
+     - filename: `propertyflow-{tier}-{version}.zip`
+     - filesize: from storage
+     - downloadHref: signed URL (15min TTL) generated ON click, not on render
+     - downloadHistory: last 10 download events {timestamp, ip, version}
+     - tierSubtitle: brief feature count per tier
+     - supportWindow: "30 days" | "90 days" | "12 months (priority queue)"
+  4. Feature card visibility (data-tier-min):
+     - starter: always visible
+     - professional: visible only if user tier is professional or white-label
+     - white-label: visible only if user tier is white-label
+     - Tiers BELOW: show with data-locked="true" styling (opacity 0.4 + lock badge)
+  5. Docs link visibility (data-tier-min):
+     - Hide links to docs not applicable to user's tier (admin for starter, multi-tenant for pro, etc.)
+  6. Download button:
+     - On click: POST /api/downloads/propertyflow → returns signed URL
+     - Log: user_id, ip, ua, version, timestamp
+  7. If no purchase: redirect to /products/propertyflow/ with UTM source="dashboard_noaccess"
+-->
+
+</body>
+</html>
