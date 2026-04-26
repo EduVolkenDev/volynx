@@ -25,6 +25,7 @@ function getCheckoutMode(prefix: string): "subscription" | "payment" {
   // All plan subscriptions: volynx, daily, bundles, legacy builder_
   if (prefix.startsWith("builder_") || prefix.startsWith("volynx_")) return "subscription";
   if (prefix.startsWith("daily_")) return "subscription";
+  if (prefix === "cvitae_business") return "subscription";
   if (prefix.startsWith("bundle_")) return "subscription";
   if (prefix === "studio_pro" || prefix === "addon_extra_slot") return "subscription";
   return "payment";

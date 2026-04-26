@@ -37,19 +37,24 @@ type BuilderAddon = {
   name: Record<Locale, string>;
   description: Record<Locale, string>;
   price: MoneyMap;
-  comingSoon?: boolean;
+  availability?: 'active' | 'manual' | 'coming_soon';
+  href?: string;
+  cta?: Record<Locale, string>;
+  note?: Record<Locale, string>;
 };
 
-type PropertyFlowTier = {
+type PropertyFlowOffer = {
   id: string;
-  name: Record<Locale, string>;
   badge?: Record<Locale, string>;
-  featured?: boolean;
+  name: Record<Locale, string>;
   description: Record<Locale, string>;
   price: MoneyMap;
   billing: Record<Locale, string>;
-  features: Record<Locale, string[]>;
   cta: Record<Locale, string>;
+  href: string;
+  featured?: boolean;
+  features: Record<Locale, string[]>;
+  note?: Record<Locale, string>;
 };
 
 export const sitePricing = {
@@ -285,6 +290,70 @@ export const sitePricing = {
       }
     }
   ] satisfies Plan[],
+  propertyFlowPackages: [
+    {
+      id: 'pf_starter',
+      name: { pt: 'PropertyFlow Starter', en: 'PropertyFlow Starter' },
+      description: {
+        pt: 'Catálogo premium com código-fonte completo para lançar a presença imobiliária sem assinatura recorrente.',
+        en: 'Premium property catalogue with full source code for launching a real-estate presence without recurring fees.'
+      },
+      price: { GBP: '£187', EUR: '€217', BRL: 'R$1.290' },
+      billing: { pt: 'pagamento único · 3 templates', en: 'one-time · 3 templates' },
+      cta: { pt: 'Ver PropertyFlow', en: 'View PropertyFlow' },
+      href: '/products/propertyflow/#pricing',
+      features: {
+        pt: ['código React completo', 'catálogo + filtros', 'interface bilíngue EN/PT', 'modo com dados estáticos'],
+        en: ['full React source code', 'catalogue + filters', 'bilingual EN/PT interface', 'static data mode']
+      },
+      note: {
+        pt: 'Delivery e documentação vivem no fluxo dedicado do PropertyFlow.',
+        en: 'Delivery and documentation live in the dedicated PropertyFlow flow.'
+      }
+    },
+    {
+      id: 'pf_professional',
+      badge: { pt: 'Mais popular', en: 'Most popular' },
+      featured: true,
+      name: { pt: 'PropertyFlow Professional', en: 'PropertyFlow Professional' },
+      description: {
+        pt: 'Versão para operação real com Supabase, admin, captura de enquiries e licença de entrega para 1 cliente.',
+        en: 'Operating tier with Supabase, admin, enquiry capture and a delivery license for 1 client.'
+      },
+      price: { GBP: '£447', EUR: '€519', BRL: 'R$3.090' },
+      billing: { pt: 'pagamento único · 6 templates', en: 'one-time · 6 templates' },
+      cta: { pt: 'Ver PropertyFlow', en: 'View PropertyFlow' },
+      href: '/products/propertyflow/#pricing',
+      features: {
+        pt: ['tudo do Starter', 'integração Supabase', 'dashboard admin', 'guia completo de deploy'],
+        en: ['everything in Starter', 'Supabase integration', 'admin dashboard', 'full deployment guide']
+      },
+      note: {
+        pt: 'Ideal para agências e imobiliárias que precisam operar em produção.',
+        en: 'Best fit for agencies and brokerages shipping a real production setup.'
+      }
+    },
+    {
+      id: 'pf_white_label',
+      name: { pt: 'PropertyFlow White-Label', en: 'PropertyFlow White-Label' },
+      description: {
+        pt: 'Pacote para revenda, multi-tenant, analytics avançado e remoção total da marca VOLYNX.',
+        en: 'Resale-ready package with multi-tenant mode, advanced analytics and full VOLYNX branding removal.'
+      },
+      price: { GBP: '£897', EUR: '€1.039', BRL: 'R$6.190' },
+      billing: { pt: 'pagamento único · 15 templates', en: 'one-time · 15 templates' },
+      cta: { pt: 'Ver PropertyFlow', en: 'View PropertyFlow' },
+      href: '/products/propertyflow/#pricing',
+      features: {
+        pt: ['tudo do Professional', 'modo multi-tenant', 'CRM integrations', 'rights white-label'],
+        en: ['everything in Professional', 'multi-tenant mode', 'CRM integrations', 'white-label rights']
+      },
+      note: {
+        pt: 'Fluxo voltado para agências que querem operar como produto próprio.',
+        en: 'Built for agencies that want to operate it as their own product.'
+      }
+    }
+  ] satisfies PropertyFlowOffer[],
   bundles: [
     {
       id: 'bundle_essential',
@@ -313,42 +382,74 @@ export const sitePricing = {
       id: 'domain-setup',
       name: { pt: 'Configuração assistida de domínio', en: 'Assisted domain setup' },
       description: { pt: 'Ativação rápida do domínio com menos fricção.', en: 'Faster domain activation with less friction.' },
-      price: { GBP: '£15', EUR: '€17', BRL: 'R$99' }
+      price: { GBP: '£15', EUR: '€17', BRL: 'R$99' },
+      availability: 'manual',
+      href: '/support/?product=volynx&intent=domain_setup',
+      cta: { pt: 'Solicitar setup', en: 'Request setup' },
+      note: {
+        pt: 'White-glove. Não é checkout instantâneo.',
+        en: 'White-glove lane. Not an instant checkout.'
+      }
     },
     {
       id: 'template-pack',
       name: { pt: 'Template / kit premium', en: 'Premium template / kit' },
       description: { pt: 'Kits prontos para páginas premium de conversão.', en: 'Ready-made kits for premium conversion pages.' },
       price: { GBP: '£28', EUR: '€32', BRL: 'R$179' },
-      comingSoon: true
+      availability: 'coming_soon',
+      cta: { pt: 'Em breve', en: 'Coming soon' },
+      note: {
+        pt: 'Desativado até o fulfillment autônomo existir.',
+        en: 'Disabled until autonomous fulfillment ships.'
+      }
     },
     {
       id: 'html-export',
       name: { pt: 'HTML export', en: 'HTML export' },
       description: { pt: 'Pacote exportável para uso fora da plataforma.', en: 'Exportable package for use outside the platform.' },
       price: { GBP: '£44', EUR: '€51', BRL: 'R$299' },
-      comingSoon: true
+      availability: 'coming_soon',
+      cta: { pt: 'Em breve', en: 'Coming soon' },
+      note: {
+        pt: 'Volta quando a entrega estiver realmente automatizada.',
+        en: 'Returns when delivery is genuinely automated.'
+      }
     },
     {
       id: 'extra-slot',
       name: { pt: 'Site slot extra', en: 'Extra site slot' },
       description: { pt: 'Mais capacidade sem troca imediata de plano.', en: 'More capacity without an immediate plan upgrade.' },
       price: { GBP: '£7/mo', EUR: '€8/mo', BRL: 'R$49/mês' },
-      comingSoon: true
+      availability: 'coming_soon',
+      cta: { pt: 'Em breve', en: 'Coming soon' },
+      note: {
+        pt: 'Oculto até o slot extra refletir de verdade no produto.',
+        en: 'Hidden until the extra slot truly changes product capacity.'
+      }
     },
     {
       id: 'bilingual',
       name: { pt: 'Bilingual pack', en: 'Bilingual pack' },
       description: { pt: 'Suporte a versão em dois idiomas no publish.', en: 'Two-language support in published projects.' },
       price: { GBP: '£19', EUR: '€22', BRL: 'R$129' },
-      comingSoon: true
+      availability: 'coming_soon',
+      cta: { pt: 'Em breve', en: 'Coming soon' },
+      note: {
+        pt: 'Ative só quando o publish bilíngue estiver conectado.',
+        en: 'Only activate when bilingual publish is wired end to end.'
+      }
     },
     {
       id: 'icons-addon',
       name: { pt: 'Icon collection pack', en: 'Icon collection pack' },
       description: { pt: 'Coleções premium permanentes para usar nos seus projetos.', en: 'Permanent premium collections for your own projects.' },
       price: { GBP: '£18', EUR: '€21', BRL: 'R$119' },
-      comingSoon: true
+      availability: 'coming_soon',
+      cta: { pt: 'Em breve', en: 'Coming soon' },
+      note: {
+        pt: 'Sem checkout até a entrega pós-compra estar fechada.',
+        en: 'No checkout until post-purchase delivery is closed.'
+      }
     }
   ] satisfies BuilderAddon[],
   propertyFlow: [
@@ -359,6 +460,7 @@ export const sitePricing = {
       price: { GBP: '£187', EUR: '€219', BRL: 'R$1.290' },
       billing: { pt: 'pagamento único', en: 'one-time' },
       cta: { pt: 'Comprar Starter', en: 'Get Starter' },
+      href: '/products/propertyflow/#pricing',
       features: {
         pt: ['3 templates de grid', 'código-fonte React completo', 'catálogo + filtros', 'interface bilíngue (EN/PT)', 'modo de dados estático'],
         en: ['3 grid templates', 'full React source code', 'property catalogue + filters', 'bilingual interface (EN/PT)', 'static data mode']
@@ -373,6 +475,7 @@ export const sitePricing = {
       price: { GBP: '£447', EUR: '€519', BRL: 'R$3.090' },
       billing: { pt: 'pagamento único', en: 'one-time' },
       cta: { pt: 'Comprar Professional', en: 'Get Professional' },
+      href: '/products/propertyflow/#pricing',
       features: {
         pt: ['6 templates de grid', 'tudo do Starter', 'integração com Supabase', 'painel admin', 'galeria + modais', 'captura de leads', 'guia de deploy'],
         en: ['6 grid templates', 'everything in Starter', 'Supabase backend integration', 'admin dashboard', 'image gallery + modals', 'enquiry capture system', 'deployment guide']
@@ -385,12 +488,13 @@ export const sitePricing = {
       price: { GBP: '£897', EUR: '€1.039', BRL: 'R$6.190' },
       billing: { pt: 'pagamento único', en: 'one-time' },
       cta: { pt: 'Comprar White-Label', en: 'Get White-Label' },
+      href: '/products/propertyflow/#pricing',
       features: {
         pt: ['15 templates de grid', 'tudo do Professional', 'kit de branding customizado', 'onboarding prioritário', 'suporte de migração de dados', 'canal de suporte dedicado'],
         en: ['15 grid templates', 'everything in Professional', 'custom branding starter kit', 'priority onboarding', 'data migration support', 'dedicated support channel']
       }
     }
-  ] satisfies PropertyFlowTier[],
+  ] satisfies PropertyFlowOffer[],
   labels: {
     pricingTitle: {
       pt: 'Preços globais, com lógica premium e monetização real.',

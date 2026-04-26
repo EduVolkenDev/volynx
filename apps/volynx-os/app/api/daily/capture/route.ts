@@ -8,6 +8,7 @@ type CaptureRequestBody = {
   id?: string
   rawContent?: string
   source?: DailyCaptureSource
+  accessToken?: string | null
 }
 
 export async function POST(request: Request) {
@@ -29,7 +30,8 @@ export async function POST(request: Request) {
   const item = await createDailyItemRecord({
     id: body.id,
     rawContent,
-    source: body.source
+    source: body.source,
+    accessToken: body.accessToken
   })
 
   return NextResponse.json({

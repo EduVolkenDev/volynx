@@ -57,6 +57,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
           id="email"
           type="email"
           placeholder="your@email.com"
+          data-i18n-placeholder="builder.ph_email"
           autocomplete="email"
           class="field"
         />
@@ -101,11 +102,11 @@ import PageWidgets from "../../components/PageWidgets.astro";
             <div class="row" style="margin-top:16px">
               <div class="field-group">
                 <label class="label" for="pname">Project name</label>
-                <input id="pname" class="field" placeholder="My landing page" />
+                <input id="pname" class="field" placeholder="My landing page" data-i18n-placeholder="builder.ph_pname" />
               </div>
               <div class="field-group">
                 <label class="label" for="pslug">Slug</label>
-                <input id="pslug" class="field" placeholder="my-landing-page" />
+                <input id="pslug" class="field" placeholder="my-landing-page" data-i18n-placeholder="builder.ph_pslug" />
               </div>
             </div>
 
@@ -139,22 +140,22 @@ import PageWidgets from "../../components/PageWidgets.astro";
             <div class="row">
               <div class="field-group">
                 <label class="label" for="wBrand">Brand name</label>
-                <input id="wBrand" class="field" placeholder="Acme Inc" />
+                <input id="wBrand" class="field" placeholder="Acme Inc" data-i18n-placeholder="builder.ph_brand" />
               </div>
               <div class="field-group">
                 <label class="label" for="wTagline">Tagline</label>
-                <input id="wTagline" class="field" placeholder="Build faster, ship smarter." />
+                <input id="wTagline" class="field" placeholder="Build faster, ship smarter." data-i18n-placeholder="builder.ph_tagline" />
               </div>
             </div>
 
             <div class="row" style="margin-top:12px">
               <div class="field-group">
                 <label class="label" for="wCta">Primary CTA label</label>
-                <input id="wCta" class="field" placeholder="Get started" />
+                <input id="wCta" class="field" placeholder="Get started" data-i18n-placeholder="builder.ph_cta" />
               </div>
               <div class="field-group">
                 <label class="label" for="wCtaHref">CTA link</label>
-                <input id="wCtaHref" class="field" placeholder="https://..." />
+                <input id="wCtaHref" class="field" placeholder="https://..." data-i18n-placeholder="builder.ph_cta_href" />
               </div>
             </div>
 
@@ -259,7 +260,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
 
           <!-- TAB: JSON -->
           <div class="editor-panel" id="panelJson" hidden>
-            <textarea id="json" class="json-editor" placeholder="Select a project to edit…" spellcheck="false"></textarea>
+            <textarea id="json" class="json-editor" placeholder="Select a project to edit…" data-i18n-placeholder="builder.ph_json" spellcheck="false"></textarea>
           </div>
 
           <!-- TAB: Preview -->
@@ -274,7 +275,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
                 <span class="ai-panel-badge">✦ AI Builder</span>
                 <p class="ai-panel-sub">Describe the site you want — AI will generate valid VxOS sections for you.</p>
               </div>
-              <textarea id="aiPrompt" class="ai-textarea" rows="5" placeholder="Ex: A SaaS landing page for a project management tool for remote teams. Include pricing with 3 tiers, a workflow section showing 3 steps, and a FAQ."></textarea>
+              <textarea id="aiPrompt" class="ai-textarea" rows="5" placeholder="Ex: A SaaS landing page for a project management tool for remote teams. Include pricing with 3 tiers, a workflow section showing 3 steps, and a FAQ." data-i18n-placeholder="builder.ph_ai"></textarea>
               <div class="ai-actions">
                 <button class="btn btn--primary" id="aiGenerate">✦ Generate site</button>
                 <button class="btn btn--ghost" id="aiRefine" disabled title="Select a project first to refine it">Refine current</button>
@@ -707,21 +708,21 @@ import PageWidgets from "../../components/PageWidgets.astro";
           <div class="row">
             <div class="field-group">
               <label class="label" for="exBrand">Brand name</label>
-              <input id="exBrand" class="field" placeholder="Your brand" />
+              <input id="exBrand" class="field" placeholder="Your brand" data-i18n-placeholder="builder.ph_ex_brand" />
             </div>
             <div class="field-group">
               <label class="label" for="exTagline">One-line description</label>
-              <input id="exTagline" class="field" placeholder="What you do, in one sentence" />
+              <input id="exTagline" class="field" placeholder="What you do, in one sentence" data-i18n-placeholder="builder.ph_ex_tagline" />
             </div>
           </div>
           <div class="row" style="margin-top:12px">
             <div class="field-group">
               <label class="label" for="exCta">Main button text</label>
-              <input id="exCta" class="field" placeholder="Get started" />
+              <input id="exCta" class="field" placeholder="Get started" data-i18n-placeholder="builder.ph_ex_cta" />
             </div>
             <div class="field-group">
               <label class="label" for="exSlug">Slug</label>
-              <input id="exSlug" class="field" placeholder="my-brand" />
+              <input id="exSlug" class="field" placeholder="my-brand" data-i18n-placeholder="builder.ph_ex_slug" />
             </div>
           </div>
           <button class="btn btn--primary" id="exGenerate" style="margin-top:18px;width:100%">
@@ -738,6 +739,10 @@ import PageWidgets from "../../components/PageWidgets.astro";
       (wizCard as any)._originalHTML = wizCard.innerHTML;
     }
     wizCard.innerHTML = expressHtml;
+    // Apply i18n to dynamically injected elements (placeholders, aria, text)
+    if (typeof (window as any).applyTranslations === "function") {
+      (window as any).applyTranslations(localStorage.getItem("volynx_lang") || "en");
+    }
 
     let exArchetype = "saas";
     let exGoal = "leads";

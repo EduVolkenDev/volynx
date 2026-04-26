@@ -1,0 +1,316 @@
+---
+import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "../../components/FlagshipHeader.astro";
+import FlagshipFooter from "../../components/FlagshipFooter.astro";
+import { ROUTES } from "../../data/routes";
+---
+
+<FlagshipLayout
+  title="Secure Checkout — VOLYNX"
+  description="VOLYNX secure checkout bridge. Validates access, restores auth if needed and redirects into Stripe Checkout."
+  pageClass="page-checkout"
+>
+  <FlagshipHeader ctaHref={ROUTES.products} ctaLabel="Browse products" />
+
+  <main class="checkout-shell">
+    <section class="checkout-hero">
+      <span class="checkout-kicker">Secure checkout</span>
+      <h1 id="checkoutTitle">Preparing your VOLYNX checkout.</h1>
+      <p id="checkoutMessage">
+        Verifying access, currency and product context before opening Stripe Checkout.
+      </p>
+    </section>
+
+    <section class="checkout-panel" aria-live="polite">
+      <div class="checkout-state" id="checkoutLoading">
+        <div class="checkout-spinner" aria-hidden="true"></div>
+        <strong>Opening secure checkout...</strong>
+        <p>If you just signed in, stay on this page for a moment while we restore your session.</p>
+      </div>
+
+      <div class="checkout-state checkout-state--error" id="checkoutError" hidden>
+        <strong id="checkoutErrorTitle">Could not open checkout.</strong>
+        <p id="checkoutErrorMessage">Try again, or return to the product page and reopen the checkout flow.</p>
+        <div class="checkout-actions">
+          <a class="button button--gold" id="checkoutRetry" href={ROUTES.pricing}>Try again</a>
+          <a class="button button--ghost" id="checkoutBack" href={ROUTES.products}>Back to product</a>
+          <a class="button button--ghost" href={ROUTES.support}>Open support</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <FlagshipFooter />
+</FlagshipLayout>
+
+<script is:inline type="module">
+  const params = new URLSearchParams(window.location.search);
+  const lookupBase = String(params.get("lookup_key") || "").trim();
+  const requestedCurrency = String(params.get("currency") || "").trim().toLowerCase();
+  const requestedNext = String(params.get("next") || "").trim();
+
+  const titleEl = document.getElementById("checkoutTitle");
+  const messageEl = document.getElementById("checkoutMessage");
+  const errorWrap = document.getElementById("checkoutError");
+  const errorTitle = document.getElementById("checkoutErrorTitle");
+  const errorMessage = document.getElementById("checkoutErrorMessage");
+  const retryLink = document.getElementById("checkoutRetry");
+  const backLink = document.getElementById("checkoutBack");
+
+  const FALLBACK_LABELS = {
+    portfolio: "Portfolio Pro Kit",
+    agency: "Agency Launch Kit",
+    saas: "SaaS Landing System",
+    propertyflow: "PropertyFlow",
+    pricing: "VOLYNX pricing",
+  };
+
+  function normalizeCurrency(value) {
+    const currency = String(value || "gbp").toLowerCase();
+    return /^(gbp|eur|brl)$/.test(currency) ? currency : "gbp";
+  }
+
+  function hasCurrencySuffix(value) {
+    return /_(gbp|eur|brl)$/i.test(String(value || ""));
+  }
+
+  function sanitizeInternalPath(value) {
+    if (!value || typeof value !== "string") return "";
+    if (!value.startsWith("/")) return "";
+    if (value.startsWith("//")) return "";
+    return value;
+  }
+
+  function inferProductPath(lookup) {
+    const key = String(lookup || "").toLowerCase().replace(/_(gbp|eur|brl)$/i, "");
+    if (key.startsWith("kit_portfolio_")) return { href: "/products/portfolio-pro-kit/", label: FALLBACK_LABELS.portfolio };
+    if (key.startsWith("kit_agency_")) return { href: "/products/agency-launch-kit/", label: FALLBACK_LABELS.agency };
+    if (key.startsWith("kit_saas_")) return { href: "/products/saas-landing-system/", label: FALLBACK_LABELS.saas };
+    if (key.startsWith("pf_")) return { href: "/products/propertyflow/", label: FALLBACK_LABELS.propertyflow };
+    return { href: "/pricing/", label: FALLBACK_LABELS.pricing };
+  }
+
+  async function loadConfig() {
+    const res = await fetch("/config.json", { cache: "no-store" });
+    return res.json();
+  }
+
+  async function freshAccessToken(cfg) {
+    let token = localStorage.getItem("volynx_access_token") || "";
+    const refreshToken = localStorage.getItem("volynx_refresh_token") || "";
+
+    if (!token || !refreshToken || !cfg?.supabaseUrl || !cfg?.supabaseAnonKey) {
+      return token;
+    }
+
+    try {
+      const res = await fetch(`${cfg.supabaseUrl}/auth/v1/token?grant_type=refresh_token`, {
+        method: "POST",
+        headers: {
+          apikey: cfg.supabaseAnonKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+
+      if (!res.ok) {
+        return token;
+      }
+
+      const session = await res.json();
+      if (session.access_token) {
+        token = session.access_token;
+        localStorage.setItem("volynx_access_token", session.access_token);
+        if (session.refresh_token) {
+          localStorage.setItem("volynx_refresh_token", session.refresh_token);
+        }
+      }
+    } catch (_) {}
+
+    return token;
+  }
+
+  function showError(title, message) {
+    errorTitle.textContent = title;
+    errorMessage.textContent = message;
+    errorWrap.hidden = false;
+  }
+
+  async function startCheckout() {
+    const fallback = inferProductPath(lookupBase);
+    const fallbackBackHref = sanitizeInternalPath(requestedNext) || fallback.href;
+    const retryHref = window.location.pathname + window.location.search;
+
+    retryLink.setAttribute("href", retryHref);
+    backLink.setAttribute("href", fallbackBackHref);
+
+    if (!lookupBase) {
+      if (titleEl) titleEl.textContent = "Missing checkout target.";
+      if (messageEl) messageEl.textContent = "This checkout link does not include a product lookup key.";
+      showError("Missing checkout target.", "Return to the product page and reopen the secure checkout link.");
+      return;
+    }
+
+    if (titleEl) titleEl.textContent = `Preparing checkout for ${fallback.label}.`;
+    if (messageEl) messageEl.textContent = "Checking your session and opening Stripe Checkout.";
+
+    let token = localStorage.getItem("volynx_access_token") || "";
+    const currentPath = window.location.pathname + window.location.search;
+
+    if (!token) {
+      window.location.href = `/login/?next=${encodeURIComponent(currentPath)}`;
+      return;
+    }
+
+    try {
+      const cfg = await loadConfig();
+      const apiBase = String((cfg && (cfg.functionsUrl || cfg.apiBaseUrl)) || "").replace(/\/$/, "");
+
+      if (!apiBase) {
+        throw new Error("Checkout configuration is missing.");
+      }
+
+      token = await freshAccessToken(cfg);
+
+      if (!token) {
+        window.location.href = `/login/?next=${encodeURIComponent(currentPath)}`;
+        return;
+      }
+
+      const currency = normalizeCurrency(
+        requestedCurrency || localStorage.getItem("volynx_currency") || "gbp",
+      );
+      const lookupKey = hasCurrencySuffix(lookupBase) ? lookupBase : `${lookupBase}_${currency}`;
+      const cancelPath = sanitizeInternalPath(requestedNext) || fallback.href;
+      const cancelUrl = new URL(cancelPath, window.location.origin);
+      cancelUrl.searchParams.set("payment", "cancelled");
+
+      const res = await fetch(`${apiBase}/create-checkout-session`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          lookup_key: lookupKey,
+          success_url: `${window.location.origin}/delivery/?payment=success`,
+          cancel_url: cancelUrl.toString(),
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (data?.url) {
+        window.location.href = data.url;
+        return;
+      }
+
+      throw new Error(data?.error || data?.message || "Stripe checkout did not return a redirect URL.");
+    } catch (error) {
+      console.error("[checkout-page] failed:", error);
+      if (titleEl) titleEl.textContent = "Checkout could not start.";
+      if (messageEl) messageEl.textContent = "You can retry, return to the product page or open support with the same purchase context.";
+      showError(
+        "Checkout could not start.",
+        error instanceof Error ? error.message : "Unexpected checkout error.",
+      );
+    }
+  }
+
+  startCheckout();
+</script>
+
+<style>
+  .checkout-shell {
+    width: min(960px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: clamp(32px, 6vw, 72px) 0 96px;
+  }
+
+  .checkout-hero {
+    max-width: 720px;
+    margin-bottom: 28px;
+  }
+
+  .checkout-kicker {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .checkout-hero h1 {
+    margin: 18px 0 12px;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    line-height: 1.02;
+  }
+
+  .checkout-hero p {
+    margin: 0;
+    max-width: 56ch;
+    color: rgba(255, 255, 255, 0.72);
+    line-height: 1.7;
+    font-size: 1rem;
+  }
+
+  .checkout-panel {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+    backdrop-filter: blur(12px);
+    padding: clamp(24px, 4vw, 36px);
+  }
+
+  .checkout-state {
+    display: grid;
+    gap: 12px;
+  }
+
+  .checkout-state strong {
+    font-size: 1.05rem;
+  }
+
+  .checkout-state p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.7;
+  }
+
+  .checkout-spinner {
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    border: 3px solid rgba(255, 255, 255, 0.12);
+    border-top-color: rgba(214, 179, 106, 0.9);
+    animation: checkout-spin 0.85s linear infinite;
+  }
+
+  .checkout-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 6px;
+  }
+
+  @keyframes checkout-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 640px) {
+    .checkout-actions {
+      flex-direction: column;
+    }
+
+    .checkout-actions :global(.button) {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>

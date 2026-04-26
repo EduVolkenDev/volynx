@@ -51,7 +51,7 @@ import { ROUTES } from "../../data/routes";
           <p data-i18n="lab2.tool_scaler_desc">Upscale with clearer controls and a stronger before/after experience in Pro.</p>
           <div class="mini-stats"><span class="chip" data-i18n="lab2.tool_scaler_chip1">2x / 3x base modes</span><span class="chip" data-i18n="lab2.tool_scaler_chip2">Preview-first</span></div>
         </article>
-        <article class="panel tool-card panel--pro">
+        <article class="panel tool-card panel--pro tool-card--suite">
           <div class="tool-icon"><img src="/assets/newimagesuite.webp" alt="" /></div>
           <div class="head-row">
             <div><span class="label label--pro" data-i18n="lab2.tool_suite_label">Pro</span><h3 data-i18n="lab2.tool_suite_title">Image Suite</h3></div>
@@ -82,10 +82,34 @@ import { ROUTES } from "../../data/routes";
           <a href={ROUTES.studio} class="button button--gold studio-cta" data-i18n="lab2.cta_btn">Open Studio</a>
         </div>
         <div class="stats-row">
-          <div class="stat-block"><b data-i18n="lab2.stat_queue_title">Queue</b><span data-i18n="lab2.stat_queue_desc">Batch workflows with less manual friction.</span></div>
-          <div class="stat-block"><b data-i18n="lab2.stat_memory_title">Memory</b><span data-i18n="lab2.stat_memory_desc">Saved presets, history and brand defaults.</span></div>
-          <div class="stat-block"><b data-i18n="lab2.stat_quality_title">Quality</b><span data-i18n="lab2.stat_quality_desc">Premium export modes and stronger control.</span></div>
-          <div class="stat-block"><b data-i18n="lab2.stat_status_title">Status</b><span data-i18n="lab2.stat_status_desc">Cleaner workspace and earlier access.</span></div>
+          <div class="stat-block stat-block--queue">
+            <div class="stat-icon-wrap" aria-hidden="true">
+              <img src="/assets/lab-studio-queue.webp" alt="" class="stat-icon stat-icon--queue" />
+            </div>
+            <b data-i18n="lab2.stat_queue_title">Queue</b>
+            <span data-i18n="lab2.stat_queue_desc">Batch workflows with less manual friction.</span>
+          </div>
+          <div class="stat-block stat-block--memory">
+            <div class="stat-icon-wrap" aria-hidden="true">
+              <img src="/assets/lab-studio-memory.webp" alt="" class="stat-icon stat-icon--memory" />
+            </div>
+            <b data-i18n="lab2.stat_memory_title">Memory</b>
+            <span data-i18n="lab2.stat_memory_desc">Saved presets, history and brand defaults.</span>
+          </div>
+          <div class="stat-block stat-block--quality">
+            <div class="stat-icon-wrap" aria-hidden="true">
+              <img src="/assets/lab-studio-quality.webp" alt="" class="stat-icon stat-icon--quality" />
+            </div>
+            <b data-i18n="lab2.stat_quality_title">Quality</b>
+            <span data-i18n="lab2.stat_quality_desc">Premium export modes and stronger control.</span>
+          </div>
+          <div class="stat-block stat-block--status">
+            <div class="stat-icon-wrap" aria-hidden="true">
+              <img src="/assets/lab-studio-status.webp" alt="" class="stat-icon stat-icon--status" />
+            </div>
+            <b data-i18n="lab2.stat_status_title">Status</b>
+            <span data-i18n="lab2.stat_status_desc">Cleaner workspace and earlier access.</span>
+          </div>
         </div>
       </div>
     </section>
@@ -95,19 +119,48 @@ import { ROUTES } from "../../data/routes";
 </FlagshipLayout>
 
 <style is:global>
+  .page-lab .tool-grid {
+    align-items: stretch;
+  }
+  .page-lab .tool-card {
+    height: 100%;
+  }
+  .page-lab .tool-card .head-row {
+    min-height: 92px;
+  }
+  .page-lab .tool-card .head-row > div {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .page-lab .tool-card p {
+    margin: 0;
+    min-height: 5.5rem;
+  }
+  .page-lab .tool-card .mini-stats {
+    margin-top: auto;
+  }
   .page-lab .tool-icon {
-    width: 200px;
-    height: auto;
+    display: grid;
+    place-items: end center;
+    width: 100%;
+    min-height: clamp(240px, 26vw, 320px);
+    margin-bottom: 10px;
     background: none;
     border: none;
     border-radius: 12px;
   }
   .page-lab .tool-icon img {
-    width: 200px;
-    height: auto;
+    width: min(100%, 420px);
+    max-height: clamp(220px, 24vw, 300px);
+    height: 100%;
     object-fit: contain;
     border-radius: 12px;
     filter: drop-shadow(0 0 7px);
+    display: block;
+  }
+  .page-lab .tool-card--suite .tool-icon img {
+    width: min(100%, 452px);
+    max-height: clamp(232px, 25vw, 312px);
   }
   .page-lab .studio-badge img {
     width: 16px;
@@ -115,5 +168,105 @@ import { ROUTES } from "../../data/routes";
     object-fit: contain;
     display: block;
     flex: 0 0 auto;
+  }
+  .page-lab .stats-row {
+    align-items: stretch;
+  }
+  .page-lab .stat-block {
+    --stat-glow: rgba(132, 201, 255, .18);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 100%;
+    overflow: hidden;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)),
+      radial-gradient(circle at top, var(--stat-glow), transparent 68%);
+  }
+  .page-lab .stat-block--queue {
+    --stat-glow: rgba(92, 204, 255, .18);
+  }
+  .page-lab .stat-block--memory {
+    --stat-glow: rgba(106, 164, 255, .16);
+  }
+  .page-lab .stat-block--quality {
+    --stat-glow: rgba(196, 109, 255, .14);
+  }
+  .page-lab .stat-block--status {
+    --stat-glow: rgba(105, 255, 209, .14);
+  }
+  .page-lab .stat-icon-wrap {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: clamp(180px, 18vw, 230px);
+    margin: -4px -2px 2px;
+    padding: 8px;
+    border-radius: 22px;
+    background:
+      radial-gradient(circle at 50% 22%, rgba(255,255,255,.12), transparent 34%),
+      linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    border: 1px solid rgba(255,255,255,.08);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .page-lab .stat-icon-wrap::before {
+    content: "";
+    position: absolute;
+    inset: auto 10% 4% 10%;
+    height: 26%;
+    border-radius: 999px;
+    background: radial-gradient(circle, var(--stat-glow), transparent 72%);
+    filter: blur(16px);
+    opacity: .95;
+    pointer-events: none;
+  }
+  .page-lab .stat-icon {
+    width: min(100%, 250px);
+    max-height: clamp(170px, 17vw, 220px);
+    object-fit: contain;
+    display: block;
+    position: relative;
+    z-index: 1;
+    filter:
+      drop-shadow(0 20px 28px rgba(0, 0, 0, .28))
+      drop-shadow(0 0 18px rgba(255, 255, 255, .08));
+  }
+  .page-lab .stat-icon--queue {
+    width: min(100%, 238px);
+  }
+  .page-lab .stat-icon--memory {
+    width: min(100%, 232px);
+  }
+  .page-lab .stat-icon--quality {
+    width: min(100%, 214px);
+  }
+  .page-lab .stat-icon--status {
+    width: min(100%, 210px);
+  }
+  .page-lab .stat-block b,
+  .page-lab .stat-block span {
+    position: relative;
+    z-index: 1;
+  }
+  @media (max-width: 900px) {
+    .page-lab .tool-icon {
+      min-height: clamp(220px, 54vw, 300px);
+    }
+    .page-lab .tool-icon img {
+      width: min(100%, 400px);
+      max-height: clamp(205px, 50vw, 280px);
+    }
+    .page-lab .tool-card--suite .tool-icon img {
+      width: min(100%, 428px);
+      max-height: clamp(216px, 52vw, 292px);
+    }
+    .page-lab .stat-icon-wrap {
+      min-height: clamp(170px, 48vw, 220px);
+      padding: 10px;
+    }
+    .page-lab .stat-icon {
+      max-height: clamp(160px, 44vw, 210px);
+    }
   }
 </style>

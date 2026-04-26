@@ -2,7 +2,7 @@ import { existsSync, readdirSync, statSync } from "node:fs"
 import path from "node:path"
 import type Stripe from "stripe"
 import { iconPacks, type IconPack } from "@/content/icon-packs"
-import { getStripe } from "@/lib/stripe"
+import { allowTestStripeDelivery, getStripe } from "@/lib/stripe"
 import type { ZipFileEntry } from "@/lib/zip-stream"
 
 export type IconDeliveryPack = {
@@ -119,7 +119,7 @@ export async function verifyIconPackSession(
     throw new Error("Stripe session is not paid and complete")
   }
 
-  if (process.env.NODE_ENV === "production" && !session.livemode) {
+  if (process.env.NODE_ENV === "production" && !session.livemode && !allowTestStripeDelivery()) {
     throw new Error("Test Stripe sessions cannot unlock production delivery")
   }
 

@@ -1,6 +1,6 @@
 ---
 import PageWidgets from "../../../components/PageWidgets.astro";
-import { ROUTES } from "../../../data/routes";
+import { ROUTES, checkoutHref } from "../../../data/routes";
 const pageTitle = "VOLYNX — Portfolio Pro Kit";
 const pageDescription = "Premium portfolio system with Volynx design - Showcase your work with style";
 ---
@@ -487,19 +487,19 @@ const pageDescription = "Premium portfolio system with Volynx design - Showcase 
               <div style="font-size:12px;font-weight:800;color:#c084fc;letter-spacing:.08em;text-transform:uppercase;">Starter</div>
               <div style="font-size:34px;font-weight:900;line-height:1;"><span data-price-gbp="£47" data-price-eur="€54" data-price-brl="R$329">£47</span></div>
               <p style="font-size:13px;color:rgba(200,180,255,.78);margin:0;">Hero minimal, feature split, value grid, FAQ and CTA.</p>
-              <a class="btn vx-checkout-btn" href="#" data-lookup="kit_portfolio_personal" data-label="Buy Starter" style="margin-top:auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;font-size:14px;text-decoration:none;">Buy Starter <span aria-hidden="true">→</span></a>
+              <a class="btn vx-checkout-btn" href={checkoutHref("kit_portfolio_personal", { next: ROUTES.portfolioKit })} data-lookup="kit_portfolio_personal" data-label="Buy Starter" style="margin-top:auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;font-size:14px;text-decoration:none;">Buy Starter <span aria-hidden="true">→</span></a>
             </article>
             <article class="card" style="padding:20px;display:flex;flex-direction:column;gap:12px;border-color:rgba(34,211,238,.5);">
               <div style="font-size:12px;font-weight:800;color:#22d3ee;letter-spacing:.08em;text-transform:uppercase;">Pro</div>
               <div style="font-size:34px;font-weight:900;line-height:1;"><span data-price-gbp="£117" data-price-eur="€136" data-price-brl="R$819">£117</span></div>
               <p style="font-size:13px;color:rgba(200,180,255,.78);margin:0;">Adds split hero, logo cloud, workflow and single pricing.</p>
-              <a class="btn vx-checkout-btn" href="#" data-lookup="kit_portfolio_commercial" data-label="Buy Pro" style="margin-top:auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;font-size:14px;text-decoration:none;">Buy Pro <span aria-hidden="true">→</span></a>
+              <a class="btn vx-checkout-btn" href={checkoutHref("kit_portfolio_commercial", { next: ROUTES.portfolioKit })} data-lookup="kit_portfolio_commercial" data-label="Buy Pro" style="margin-top:auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;font-size:14px;text-decoration:none;">Buy Pro <span aria-hidden="true">→</span></a>
             </article>
             <article class="card" style="padding:20px;display:flex;flex-direction:column;gap:12px;">
               <div style="font-size:12px;font-weight:800;color:#c084fc;letter-spacing:.08em;text-transform:uppercase;">Studio</div>
               <div style="font-size:34px;font-weight:900;line-height:1;"><span data-price-gbp="£247" data-price-eur="€287" data-price-brl="R$1.720">£247</span></div>
               <p style="font-size:13px;color:rgba(200,180,255,.78);margin:0;">Adds extra pages, case study support and dark/light mode.</p>
-              <a class="btn vx-checkout-btn" href="#" data-lookup="kit_portfolio_studio" data-label="Buy Studio" style="margin-top:auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;font-size:14px;text-decoration:none;">Buy Studio <span aria-hidden="true">→</span></a>
+              <a class="btn vx-checkout-btn" href={checkoutHref("kit_portfolio_studio", { next: ROUTES.portfolioKit })} data-lookup="kit_portfolio_studio" data-label="Buy Studio" style="margin-top:auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;font-size:14px;text-decoration:none;">Buy Studio <span aria-hidden="true">→</span></a>
             </article>
           </div>
           <p style="font-size:12px;opacity:.4;margin-top:10px;">Instant delivery after payment — auto-created in your Builder.</p>
@@ -524,8 +524,8 @@ const pageDescription = "Premium portfolio system with Volynx design - Showcase 
 
     <footer class="footer">
       <div class="social-links">
-        <a class="social-link" href="/contact/" aria-label="Contact us"><span>✉️</span></a>
-        <a class="social-link" href="https://wa.me/447438656769" aria-label="WhatsApp" target="_blank" rel="noreferrer"><span>💬</span></a>
+        <a class="social-link" href="/contact/" aria-label="Contact us" data-i18n-aria="portfolio.aria_contact"><span>✉️</span></a>
+        <a class="social-link" href="https://wa.me/447438656769" aria-label="WhatsApp" data-i18n-aria="portfolio.aria_whatsapp" target="_blank" rel="noreferrer"><span>💬</span></a>
       </div>
       <p>© <span id="year"></span> VOLYNX Portfolio Pro Kit — Built with passion and precision</p>
       <div class="footer-legal-links">

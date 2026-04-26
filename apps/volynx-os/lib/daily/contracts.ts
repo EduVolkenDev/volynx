@@ -55,8 +55,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function parseObject(value: unknown): ContractParseResult<Record<string, unknown>> {
   if (typeof value === "string") {
+    const candidate = extractJsonObjectCandidate(value)
+
     try {
-      const parsed = JSON.parse(value) as unknown
+      const parsed = JSON.parse(candidate) as unknown
 
       return isRecord(parsed) ? { ok: true, data: parsed } : { ok: false, error: "Contract JSON must be an object." }
     } catch {
@@ -65,6 +67,23 @@ function parseObject(value: unknown): ContractParseResult<Record<string, unknown
   }
 
   return isRecord(value) ? { ok: true, data: value } : { ok: false, error: "Contract payload must be an object." }
+}
+
+function extractJsonObjectCandidate(value: string) {
+  const trimmed = value.trim()
+  const fencedMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i)
+  if (fencedMatch?.[1]) {
+    return fencedMatch[1].trim()
+  }
+
+  const firstBrace = trimmed.indexOf("{")
+  const lastBrace = trimmed.lastIndexOf("}")
+
+  if (firstBrace >= 0 && lastBrace > firstBrace) {
+    return trimmed.slice(firstBrace, lastBrace + 1)
+  }
+
+  return trimmed
 }
 
 function asString(value: unknown, fallback = "") {
@@ -259,4 +278,3 @@ export const dailyContractExamples = {
     options: []
   }
 } as const
-

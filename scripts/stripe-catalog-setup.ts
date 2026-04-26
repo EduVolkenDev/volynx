@@ -509,6 +509,32 @@ const DAILY_SUBS: ProductDef[] = [
   },
 ];
 
+const CVITAE_SUBS: ProductDef[] = [
+  {
+    name: "CVitae Business",
+    description: "Unlimited CV management, premium templates and included professional exports for people who use CVitae every day.",
+    marketingFeatures: [
+      "Unlimited CVs",
+      "Premium templates included",
+      "Professional exports included",
+      "Cloud sync across devices",
+      "Best fit for recruiters and career coaches",
+    ],
+    lookupPrefix: "cvitae_business",
+    metadata: {
+      product_family: "cvitae",
+      plan_tier: "business",
+      billing_type: "subscription",
+      currency_scope: "multi",
+      includes_tokens: "0",
+      includes_icons: "false",
+      builder_sites_limit: "0",
+      is_addon: "false",
+    },
+    prices: { recurring: { interval: "month" }, amounts: { gbp: 1500, eur: 1800, brl: 9900 } },
+  },
+];
+
 // ── Bundle Subscriptions ─────────────────────────────────
 
 const BUNDLE_SUBS: ProductDef[] = [
@@ -788,6 +814,9 @@ async function main() {
 
   console.log("── Daily OS Subscriptions ──\n");
   for (const def of DAILY_SUBS) await createProductWithPrices(def);
+
+  console.log("── CVitae Subscriptions ──\n");
+  for (const def of CVITAE_SUBS) await createProductWithPrices(def);
 
   console.log("── Bundle Subscriptions ──\n");
   for (const def of BUNDLE_SUBS) await createProductWithPrices(def);

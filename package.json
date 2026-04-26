@@ -1,15 +1,22 @@
 {
   "name": "volynx",
   "version": "1.0.0",
+  "private": true,
   "description": "VOLYNX Ecosystem: Premium kits, browser tools, launch systems for devs/designers/businesses. Astro static site + Express API + Supabase + Stripe subscriptions.",
   "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/EduVolkenDev/volynx"
   },
+  "workspaces": [
+    "apps/volynx-os"
+  ],
   "scripts": {
     "dev": "astro dev",
+    "dev:volynx-os": "npm run dev --workspace volynx-os",
     "build": "astro build",
+    "build:volynx-os": "npm run build --workspace volynx-os",
+    "lint:volynx-os": "npm run lint --workspace volynx-os",
     "preview": "astro preview",
     "start": "node index.js",
     "api": "node index.js",

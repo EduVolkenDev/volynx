@@ -85,11 +85,11 @@ export function CommandInbox() {
       const captureResponse = await fetch("/api/daily/capture", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({
+        body: JSON.stringify(withAccessToken({
           id: localItem.id,
           rawContent: content,
           source
-        })
+        }))
       })
       const captureData = (await captureResponse.json()) as CaptureResponse
       const item = captureData.item ?? localItem
@@ -100,6 +100,7 @@ export function CommandInbox() {
       setStatus(`${nextRoute.label}...`)
 
       const outputCount = await executeRoute(item, nextRoute)
+      const wasRouted = nextRoute.kind !== "vault"
       const latency = Math.round(performance.now() - startedAt)
       const nextMetrics = incrementDailyMetrics({
         captures: 1,
@@ -109,7 +110,13 @@ export function CommandInbox() {
       })
 
       setMetrics(nextMetrics)
-      setStatus(outputCount ? `${nextRoute.label} complete in ${latency}ms` : `Saved to Vault in ${latency}ms`)
+      setStatus(
+        outputCount
+          ? `${nextRoute.label} complete in ${latency}ms`
+          : wasRouted
+            ? `${nextRoute.label} queued in ${latency}ms`
+            : `Saved to Vault in ${latency}ms`
+      )
       setInput("")
       setSelectedFile(null)
     } catch (error) {
@@ -126,7 +133,10 @@ export function CommandInbox() {
     if (nextRoute.kind === "task") {
       const tasks = await createDailyTaskRecords({ sourceItemId: item.id, rawContent: item.rawContent })
       upsertDailyTasksLocal(tasks)
-      syncOutput("/api/daily/tasks", { sourceItemId: item.id, rawContent: item.rawContent }, (data) => {
+      syncOutput("/api/daily/tasks", withAccessToken({
+        sourceItemId: item.id,
+        rawContent: item.rawContent
+      }), (data) => {
         if (data.tasks) upsertDailyTasksLocal(data.tasks)
       })
 
@@ -164,6 +174,10 @@ export function CommandInbox() {
       })
 
       return 1
+    }
+
+    if (nextRoute.kind === "scanner" || nextRoute.kind === "search") {
+      return 0
     }
 
     return 0

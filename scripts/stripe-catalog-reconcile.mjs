@@ -117,6 +117,15 @@ const catalog = [
     amounts: { gbp: 3400, eur: 3900, brl: 21900 },
   },
   {
+    name: "CVitae Business",
+    description: "Unlimited CV management, premium templates and included professional exports for people who use CVitae every day.",
+    lookupPrefix: "cvitae_business",
+    family: "cvitae",
+    tier: "business",
+    recurring: "month",
+    amounts: { gbp: 1500, eur: 1800, brl: 9900 },
+  },
+  {
     name: "VOLYNX + Daily Pro Bundle",
     description: "Builder Pro + Daily Pro in one subscription. Save vs buying separately.",
     lookupPrefix: "bundle_volynx_daily_pro",

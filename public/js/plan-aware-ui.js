@@ -33,7 +33,7 @@
       } catch (_) {}
       if (!userId) return;
 
-      return fetch(cfg.supabaseUrl + '/rest/v1/profiles?id=eq.' + userId + '&select=plan,builder_plan,daily_plan', {
+      return fetch(cfg.supabaseUrl + '/rest/v1/profiles?id=eq.' + userId + '&select=plan,builder_plan,daily_plan,cvitae_plan', {
         headers: {
           apikey: cfg.supabaseAnonKey,
           Authorization: 'Bearer ' + token,
@@ -44,8 +44,8 @@
         return res.json();
       }).then(function (rows) {
         if (!rows || !rows[0]) return;
-        var _rank = { free: 0, launch: 1, pro: 2, diamond: 2, studio: 3, teams: 4, enterprise: 5 };
-        var _plans = [rows[0].plan, rows[0].builder_plan, rows[0].daily_plan]
+        var _rank = { free: 0, launch: 1, business: 2, pro: 2, diamond: 2, studio: 3, teams: 4, enterprise: 5 };
+        var _plans = [rows[0].plan, rows[0].builder_plan, rows[0].daily_plan, rows[0].cvitae_plan]
           .map(function(p) { return (p || 'free').toLowerCase().trim(); });
         var plan = _plans.reduce(function(best, p) {
           return (_rank[p] || 0) > (_rank[best] || 0) ? p : best;

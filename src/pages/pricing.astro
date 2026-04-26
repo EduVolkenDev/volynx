@@ -222,13 +222,61 @@ const pricingAssistItems = [
         <div class="panel" style="padding:24px;">
           <strong><span class="i18n-en">CVitae Business</span><span class="i18n-pt">CVitae Business</span></strong>
           <div style="font-size:1.1rem;font-weight:700;margin:8px 0;color:var(--muted);">
-            <span class="vx-price" data-currency="GBP">£18</span>
-            <span class="vx-price vx-price--hidden" data-currency="EUR">€21</span>
-            <span class="vx-price vx-price--hidden" data-currency="BRL">R$119</span>
+            <span class="vx-price" data-currency="GBP">£15</span>
+            <span class="vx-price vx-price--hidden" data-currency="EUR">€18</span>
+            <span class="vx-price vx-price--hidden" data-currency="BRL">R$99</span>
             <span style="font-size:13px;font-weight:400;"><span class="i18n-en">/month</span><span class="i18n-pt">/mês</span></span>
           </div>
           <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.6;"><span class="i18n-en">For professionals who need unlimited exports, premium templates, and multi-CV management.</span><span class="i18n-pt">Para profissionais que precisam de exports ilimitados, templates premium e gestão de múltiplos CVs.</span></p>
         </div>
+      </div>
+      <div class="shell" style="max-width:960px;">
+        <div class="checkout-support">
+          <span class="i18n-en"><strong>CVitae keeps the default path simple.</strong> Build for free, use VX when you want a professional export, and unlock premium templates inside CVitae. Business is for people who need unlimited exports and templates every week.</span>
+          <span class="i18n-pt"><strong>O caminho padrão do CVitae continua simples.</strong> Monte grátis, use VX quando quiser exportação profissional e libere templates premium dentro do CVitae. O Business existe para quem precisa de exports e templates sem limite toda semana.</span>
+        </div>
+        <div class="cvitae-actions">
+          <a class="button button--ghost" href={`${ROUTES.cvitae}/editor/`}><span class="i18n-en">Open CVitae</span><span class="i18n-pt">Abrir CVitae</span></a>
+          <a class="button button--ghost" href={ROUTES.recarregar}><span class="i18n-en">Get VX</span><span class="i18n-pt">Comprar VX</span></a>
+          <button type="button" class="button button--gold" id="cvitaeBusinessBtn"><span class="i18n-en">Activate Business</span><span class="i18n-pt">Ativar Business</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ PROPERTYFLOW ═══ -->
+    <section id="propertyflow" class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow">PropertyFlow</span>
+        <h2><span class="i18n-en">PropertyFlow pricing, documented clearly.</span><span class="i18n-pt">Pricing do PropertyFlow, documentado com clareza.</span></h2>
+        <p><span class="i18n-en">Source-code product. One-time purchase. Dedicated delivery and docs flow.</span><span class="i18n-pt">Produto com código-fonte. Pagamento único. Fluxo dedicado de entrega e documentação.</span></p>
+      </div>
+      <div class="shell pricing-grid pricing-grid--plans" style="max-width:1100px;">
+        {sitePricing.propertyFlowPackages.map((plan) => (
+          <article class={`pricing-card ${plan.featured ? 'pricing-card--featured' : ''}`}>
+            <div class="pricing-card__head">
+              <div>
+                {plan.badge && <span class="pricing-pill"><span class="i18n-en">{plan.badge.en}</span><span class="i18n-pt">{plan.badge.pt}</span></span>}
+                <h3 class="pricing-card__name"><span class="i18n-en">{plan.name.en}</span><span class="i18n-pt">{plan.name.pt}</span></h3>
+                <p class="pricing-card__desc"><span class="i18n-en">{plan.description.en}</span><span class="i18n-pt">{plan.description.pt}</span></p>
+              </div>
+              <div class="pricing-card__price-block">
+                <span class="pricing-card__price" data-currency="GBP">{plan.price.GBP}</span>
+                <span class="pricing-card__price pricing-card__price--hidden" data-currency="EUR">{plan.price.EUR}</span>
+                <span class="pricing-card__price pricing-card__price--hidden" data-currency="BRL">{plan.price.BRL}</span>
+                <span class="pricing-card__billing"><span class="i18n-en">{plan.billing.en}</span><span class="i18n-pt">{plan.billing.pt}</span></span>
+              </div>
+            </div>
+            <ul class="pricing-card__features">
+              {plan.features.en.map((f: string, i: number) => (
+                <li><span class="i18n-en">{f}</span><span class="i18n-pt">{plan.features.pt[i] || f}</span></li>
+              ))}
+            </ul>
+            <a href={plan.href} class={`pricing-card__cta ${plan.featured ? 'pricing-card__cta--primary' : ''}`}>
+              <span class="i18n-en">{plan.cta.en}</span><span class="i18n-pt">{plan.cta.pt}</span>
+            </a>
+            {plan.note && <p class="pricing-card__footnote"><span class="i18n-en">{plan.note.en}</span><span class="i18n-pt">{plan.note.pt}</span></p>}
+          </article>
+        ))}
       </div>
     </section>
 
@@ -310,6 +358,9 @@ const pricingAssistItems = [
       <div class="shell">
         <div class="checkout-support"><span class="i18n-en"><strong>You are adding an extra to your plan.</strong> This add-on expands your capacity or unlocks an extra feature without requiring an immediate plan change.</span><span class="i18n-pt"><strong>Você está adicionando um extra ao seu plano.</strong> Este add-on amplia sua capacidade ou desbloqueia um recurso complementar sem exigir troca imediata de plano.</span></div>
       </div>
+      <div class="shell" style="max-width:760px;">
+        <div class="checkout-support"><span class="i18n-en"><strong>Add-ons are staged intentionally.</strong> Assisted domain setup opens a white-glove support lane. The remaining add-ons stay disabled until autonomous fulfillment is real.</span><span class="i18n-pt"><strong>Os add-ons estão em rollout controlado.</strong> A configuração assistida de domínio abre um fluxo white-glove via suporte. Os demais continuam desativados até o fulfillment autônomo existir de verdade.</span></div>
+      </div>
       <div class="shell">
         <div class="trust-block">
           <div class="trust-block__item"><span class="i18n-en">One account for the full ecosystem</span><span class="i18n-pt">Uma conta para todo o ecossistema</span></div>
@@ -373,6 +424,14 @@ const pricingAssistItems = [
     .bundle-card__cta { display:flex; align-items:center; justify-content:center; width:100%; min-height:44px; margin-top:16px; padding:12px; border-radius:8px; border:1px solid rgba(196,181,253,.28); background:rgba(196,181,253,.1); color:#C4B5FD; font-weight:700; font-size:14px; cursor:pointer; transition:all .2s; }
     .bundle-card__cta:hover { background:rgba(196,181,253,.18); border-color:rgba(196,181,253,.42); color:#fff; }
     .vx-price--hidden, .pricing-card__price--hidden { display:none !important; }
+    .cvitae-actions { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-top:20px; }
+    .cvitae-actions :global(.button) { min-width:180px; justify-content:center; }
+    .pricing-card__footnote {
+      margin: 12px 0 0;
+      color: rgba(255,255,255,.52);
+      font-size: 12px;
+      line-height: 1.55;
+    }
 
     /* Hero subcopy */
     .hero-subcopy { margin-top:14px; color:var(--muted); font-size:14px; line-height:1.65; max-width:640px; }
@@ -668,8 +727,8 @@ const pricingAssistItems = [
       });
     });
 
-    // ── Add-ons: checkout via Stripe (skip coming-soon) ──
-    document.querySelectorAll('.addon-card__cta:not([disabled])').forEach(btn => {
+    // ── Add-ons: checkout via Stripe (only active addons have data-addon-key) ──
+    document.querySelectorAll('.addon-card__cta[data-addon-key]').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -693,14 +752,46 @@ const pricingAssistItems = [
       });
     });
 
-    // Clicking the card itself also triggers the button (skip coming-soon cards)
-    document.querySelectorAll('.addon-card:not([data-coming-soon="true"])').forEach(card => {
+    // Clicking the card itself also triggers the active checkout button (no-op on manual / coming_soon).
+    document.querySelectorAll('.addon-card').forEach(card => {
       card.addEventListener('click', (e) => {
         if (e.target.closest('.addon-card__cta')) return;
-        const btn = card.querySelector('.addon-card__cta:not([disabled])');
+        const btn = card.querySelector('.addon-card__cta[data-addon-key]');
         if (btn) btn.click();
       });
     });
+
+    const cvitaeBusinessBtn = document.getElementById('cvitaeBusinessBtn');
+    if (cvitaeBusinessBtn) {
+      cvitaeBusinessBtn.addEventListener('click', async () => {
+        if (!token) { window.location.href = '/login/?next=/pricing/#cvitae'; return; }
+        if (!apiBase) { alert('Checkout not configured.'); return; }
+        cvitaeBusinessBtn.textContent = 'Redirecting...';
+        cvitaeBusinessBtn.style.pointerEvents = 'none';
+        try {
+          const res = await fetch(apiBase + '/create-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+            body: JSON.stringify({
+              lookup_key: 'cvitae_business_' + getCheckoutCurrency(),
+              success_url: window.location.origin + '/profile/?payment=success&product=cvitae_business',
+              cancel_url: window.location.origin + '/pricing/?payment=cancelled#cvitae',
+            }),
+          });
+          const data = await res.json();
+          if (data.url) window.location.href = data.url;
+          else {
+            alert(data.error || data.msg || data.message || 'Checkout failed. Please try again.');
+            cvitaeBusinessBtn.textContent = 'Try again';
+            cvitaeBusinessBtn.style.pointerEvents = '';
+          }
+        } catch {
+          alert('Connection error. Please check your network and try again.');
+          cvitaeBusinessBtn.textContent = 'Try again';
+          cvitaeBusinessBtn.style.pointerEvents = '';
+        }
+      });
+    }
 
     if (token && apiBase) {
       try {

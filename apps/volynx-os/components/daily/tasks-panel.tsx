@@ -84,7 +84,8 @@ export function TasksPanel() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           sourceItemId: selectedItem?.id ?? "ad-hoc",
-          rawContent: taskSourceText
+          rawContent: taskSourceText,
+          accessToken: window.localStorage.getItem("volynx_access_token")
         })
       })
       const data = (await response.json()) as TasksResponse
@@ -221,4 +222,3 @@ export function TasksPanel() {
     </section>
   )
 }
-

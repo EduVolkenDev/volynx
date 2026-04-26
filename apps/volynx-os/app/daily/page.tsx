@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/common/site-footer"
 import { SiteHeader } from "@/components/common/site-header"
 import { CommandInbox } from "@/components/daily/command-inbox"
 import { CaptureBar } from "@/components/daily/capture-bar"
+import { DailySyncBootstrap } from "@/components/daily/daily-sync-bootstrap"
 import { DecisionPanel } from "@/components/daily/decision-panel"
 import { MyDayPanel } from "@/components/daily/my-day-panel"
 import { SummaryPanel } from "@/components/daily/summary-panel"
@@ -29,6 +30,7 @@ const dailyModules = [
 export default function DailyPage() {
   return (
     <>
+      <DailySyncBootstrap />
       <SiteHeader />
       <main className="min-h-screen border-t border-white/5 bg-[radial-gradient(circle_at_28%_0%,rgba(45,212,191,.11),transparent_30rem),radial-gradient(circle_at_80%_10%,rgba(251,191,36,.08),transparent_26rem)]">
         <section className="container-shell py-8 md:py-10">

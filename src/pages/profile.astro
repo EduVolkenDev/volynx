@@ -198,6 +198,12 @@ import { ROUTES } from "../data/routes";
 						<a href="https://daily.volynx.world/pricing/" class="sub-card__link" id="subDailyCta" data-i18n="profile.sub_upgrade">Upgrade</a>
 					</div>
 					<div class="sub-card">
+						<div class="sub-card__icon"><img src="/assets/cvitae.webp" alt="" loading="lazy" /></div>
+						<div class="sub-card__label">CVitae</div>
+						<div class="sub-card__plan" id="subCvitaePlan">Free</div>
+						<a href="https://cvitae.volynx.world/profile/" class="sub-card__link" id="subCvitaeCta" data-i18n="profile.sub_upgrade">Upgrade</a>
+					</div>
+					<div class="sub-card">
 						<div class="sub-card__icon"><img src="/assets/V.webp" alt="" loading="lazy" /></div>
 						<div class="sub-card__label" data-i18n="profile.sub_tokens_label">VX</div>
 						<div class="sub-card__plan" id="subTokens">0</div>
@@ -597,8 +603,8 @@ import { ROUTES } from "../data/routes";
 
 				// Read plan from profile row (Supabase source of truth)
 				// Use the higher of plan vs builder_plan
-				const _planRank = { free: 0, launch: 1, pro: 2, diamond: 2, studio: 3, teams: 4, enterprise: 5 };
-				const _allPlans = [profile?.plan, profile?.builder_plan, profile?.daily_plan, profile?.cvitae_plan]
+				const _planRank = { free: 0, launch: 1, business: 2, pro: 2, diamond: 2, studio: 3, teams: 4 };
+				const _allPlans = [profile?.builder_plan, profile?.daily_plan, profile?.cvitae_plan, profile?.plan]
 					.map(p => (p || "free").toLowerCase().trim());
 				const dbPlan = _allPlans.reduce((best, p) => (_planRank[p] || 0) > (_planRank[best] || 0) ? p : best, "free");
 				const dbPaid = dbPlan && dbPlan !== "free";
@@ -623,7 +629,7 @@ import { ROUTES } from "../data/routes";
 							if (res.ok) {
 								const d = await res.json();
 								// Use server-computed effective_tier if available, else compute from all plans
-								const p = d.effective_tier || [d.plan, d.builder_plan, d.daily_plan, d.cvitae_plan]
+								const p = d.effective_tier || [d.builder_plan, d.daily_plan, profile?.cvitae_plan, d.plan]
 									.map(pp => (pp || "free").toLowerCase().trim())
 									.reduce((best, pp) => (_planRank[pp] || 0) > (_planRank[best] || 0) ? pp : best, "free");
 								const paid = p && p !== "free";
@@ -644,12 +650,15 @@ import { ROUTES } from "../data/routes";
 				// ══════════════════════════════════════════════════════
 				const builderTier = (profile?.builder_plan || "free").toLowerCase().trim();
 				const dailyTier = (profile?.daily_plan || "free").toLowerCase().trim();
+				const cvitaeTier = (profile?.cvitae_plan || "free").toLowerCase().trim();
 
 				const subBuilderEl = $("subBuilderPlan");
 				const subDailyEl = $("subDailyPlan");
+				const subCvitaeEl = $("subCvitaePlan");
 				const subTokensEl = $("subTokens");
 				const subBuilderCta = $("subBuilderCta");
 				const subDailyCta = $("subDailyCta");
+				const subCvitaeCta = $("subCvitaeCta");
 
 				if (subBuilderEl) {
 					subBuilderEl.textContent = builderTier.charAt(0).toUpperCase() + builderTier.slice(1);
@@ -664,6 +673,13 @@ import { ROUTES } from "../data/routes";
 					subDailyEl.setAttribute("data-tier", dailyTier);
 					if (dailyTier !== "free" && subDailyCta) {
 						subDailyCta.textContent = "Manage";
+					}
+				}
+				if (subCvitaeEl) {
+					subCvitaeEl.textContent = cvitaeTier.charAt(0).toUpperCase() + cvitaeTier.slice(1);
+					subCvitaeEl.setAttribute("data-tier", cvitaeTier);
+					if (cvitaeTier !== "free" && subCvitaeCta) {
+						subCvitaeCta.textContent = "Manage";
 					}
 				}
 				if (subTokensEl) {
@@ -1646,7 +1662,7 @@ import { ROUTES } from "../data/routes";
 	.form-status { margin: 0; font-size: .85rem; color: var(--muted); }
 
 	/* Subscription cards */
-	.subs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+	.subs-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 	.sub-card { padding: 18px; border-radius: 16px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); text-align: center; }
 	.sub-card__icon { font-size: 1.5rem; margin-bottom: 10px; display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.05); }
 	.sub-card__icon img { width: 32px; height: 32px; max-width: 32px; max-height: 32px; object-fit: contain; display: block; }
@@ -1657,6 +1673,7 @@ import { ROUTES } from "../data/routes";
 	.sub-card__plan[data-tier="studio"] { color: #ffd580; }
 	.sub-card__plan[data-tier="teams"] { color: #fca5a5; }
 	.sub-card__plan[data-tier="diamond"] { color: #c084fc; }
+	.sub-card__plan[data-tier="business"] { color: #2dd4bf; }
 	.sub-card__link { display: inline-block; margin-top: 6px; font-size: .78rem; font-weight: 600; color: var(--accent); }
 	.sub-card__link:hover { text-decoration: underline; }
 
@@ -1717,7 +1734,7 @@ import { ROUTES } from "../data/routes";
 	@media (max-width: 900px) {
 		.details-strip { grid-template-columns: 1fr 1fr; }
 		.bottom-grid { grid-template-columns: 1fr; }
-		.subs-grid { grid-template-columns: 1fr 1fr 1fr; }
+		.subs-grid { grid-template-columns: 1fr 1fr; }
 		.quick-grid { grid-template-columns: repeat(2, 1fr); }
 	}
 	@media (max-width: 640px) {

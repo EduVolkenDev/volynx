@@ -4,18 +4,20 @@
  * Used by both Astro components and referenced by client-side scripts.
  */
 
-export const PLAN_IDS = ["free", "launch", "pro", "diamond", "studio", "teams", "enterprise"] as const;
+export const PLAN_IDS = ["free", "launch", "business", "pro", "diamond", "studio", "teams"] as const;
 export type PlanId = (typeof PLAN_IDS)[number];
 
-/** Numeric rank for plan comparison — higher = more access */
+/** Numeric rank for plan comparison — higher = more access.
+ *  business (CVitae) and diamond (Daily) share rank 2 with pro because any
+ *  paid product subscription also flips the global profiles.plan to 'pro'. */
 export const PLAN_RANK: Record<PlanId, number> = {
   free: 0,
   launch: 1,
+  business: 2,
   pro: 2,
   diamond: 2,
   studio: 3,
   teams: 4,
-  enterprise: 5,
 };
 
 /** Returns true if the user's plan meets or exceeds the required plan */

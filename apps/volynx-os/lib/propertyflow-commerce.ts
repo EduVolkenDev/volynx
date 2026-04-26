@@ -9,7 +9,7 @@ import {
   type PropertyFlowCurrencyCode,
   type PropertyFlowTierId
 } from "@/content/propertyflow"
-import { getStripe } from "@/lib/stripe"
+import { allowTestStripeDelivery, getStripe } from "@/lib/stripe"
 
 export type VerifiedPropertyFlowPurchase = {
   sessionId: string
@@ -102,7 +102,7 @@ export async function verifyPropertyFlowSession(sessionId: string): Promise<Veri
     throw new Error("Stripe session is not paid and complete")
   }
 
-  if (process.env.NODE_ENV === "production" && !session.livemode) {
+  if (process.env.NODE_ENV === "production" && !session.livemode && !allowTestStripeDelivery()) {
     throw new Error("Test Stripe sessions cannot unlock production delivery")
   }
 

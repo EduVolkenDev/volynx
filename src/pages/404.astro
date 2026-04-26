@@ -75,13 +75,15 @@ import { ROUTES } from "../data/routes";
 </html>
 
 <script>
-  // Typewriter
-  const phrases = [
-    "initializing node...",
-    "scanning coordinates...",
-    "signal lost.",
-    "rerouting...",
-  ];
+  // Typewriter — pulls phrases from translations dictionary so PT users see PT
+  const TW_KEYS = ["e404.tw_init", "e404.tw_scanning", "e404.tw_lost", "e404.tw_rerouting"];
+  const TW_FALLBACK_EN = ["initializing node...", "scanning coordinates...", "signal lost.", "rerouting..."];
+  function getPhrases(): string[] {
+    const lang = (localStorage.getItem("volynx_lang") || "en") as "en" | "pt";
+    const dict: Record<string, string> | undefined = (window as any).VX_TRANS?.[lang];
+    return TW_KEYS.map((k, i) => (dict && dict[k]) || TW_FALLBACK_EN[i]);
+  }
+  let phrases = getPhrases();
   let pi = 0, ci = 0, deleting = false;
   const el = document.getElementById("typewriter")!;
   function tick() {
@@ -95,6 +97,8 @@ import { ROUTES } from "../data/routes";
     }
     setTimeout(tick, deleting ? 40 : 70);
   }
+  // Re-pull phrases when language toggles mid-page
+  window.addEventListener("vx:lang-changed", () => { phrases = getPhrases(); ci = 0; pi = 0; deleting = false; });
   tick();
 
   // Particles

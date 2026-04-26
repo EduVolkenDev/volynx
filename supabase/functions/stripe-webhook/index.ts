@@ -53,6 +53,9 @@ const PLAN_PROFILE_MAP: Record<string, Record<string, string>> = {
   daily_pro:      { daily_plan: "pro",     plan: "pro" },
   daily_diamond:  { daily_plan: "diamond", plan: "pro" },
 
+  // CVitae
+  cvitae_business: { cvitae_plan: "business", plan: "pro" },
+
   // Bundles
   bundle_volynx_daily_pro:    { builder_plan: "pro",    daily_plan: "pro",     plan: "pro" },
   bundle_volynx_daily_studio: { builder_plan: "studio", daily_plan: "diamond", plan: "pro" },
@@ -73,6 +76,7 @@ const PLAN_DOWNGRADE_MAP: Record<string, Record<string, string>> = {
   volynx_teams:   { builder_plan: "free" },
   daily_pro:      { daily_plan: "free" },
   daily_diamond:  { daily_plan: "free" },
+  cvitae_business: { cvitae_plan: "free" },
   bundle_volynx_daily_pro:    { builder_plan: "free", daily_plan: "free" },
   bundle_volynx_daily_studio: { builder_plan: "free", daily_plan: "free" },
   builder_launch: { builder_plan: "free" },
@@ -86,6 +90,7 @@ const PLAN_DOWNGRADE_MAP: Record<string, Record<string, string>> = {
 function detectProductKey(prefix: string): string {
   if (prefix.startsWith("bundle_")) return "bundle";
   if (prefix.startsWith("daily_")) return "daily";
+  if (prefix.startsWith("cvitae_")) return "cvitae";
   if (prefix.startsWith("volynx_") || prefix.startsWith("builder_")) return "volynx";
   if (prefix.startsWith("studio_")) return "volynxlab";
   if (prefix.startsWith("tokens_")) return "tokens";

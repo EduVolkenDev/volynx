@@ -1,12 +1,12 @@
 /**
  * VOLYNX — AI Tools (Supabase Edge Function)
  *
- * Routes AI requests for summary, writing, and decision tools.
+ * Routes AI requests for intent, summary, writing, task, and decision tools.
  * Called by daily.volynx.world after token deduction is handled client-side.
  *
  * Request:
  *   POST /ai-tools
- *   { tool: "summary"|"writing"|"decision", input: {...}, lite: boolean }
+ *   { tool: "intent"|"summary"|"writing"|"task"|"decision", input: {...}, lite: boolean }
  *
  * Response:
  *   200: { result: string, lite: boolean }
@@ -77,8 +77,50 @@ Deno.serve(async (req: Request) => {
     let system = "";
     let user = "";
 
+    // ── Intent ─────────────────────────────────────────────────
+    if (tool === "intent") {
+      const { text, sourceKind, sourceUrl, filename } = input;
+      if (!text?.trim() && !filename?.trim()) return json({ error: "Missing text" }, 400);
+
+      system = `You classify captures for a personal execution system.
+Return valid JSON only. No markdown, no preamble, no code fences.
+
+Schema:
+{
+  "intent": "task" | "summary" | "writing" | "vault" | "decision" | "scanner" | "search" | "unknown",
+  "confidence": number,
+  "suggestedActions": [
+    {
+      "type": "create_task" | "summarize" | "draft_text" | "save_to_vault" | "make_decision" | "scan_file" | "search_context",
+      "label": string,
+      "confidence": number,
+      "reason": string
+    }
+  ],
+  "entities": [
+    {
+      "type": "person" | "company" | "project" | "place" | "date" | "topic" | "url" | "file" | "unknown",
+      "name": string,
+      "normalizedName": string,
+      "confidence": number
+    }
+  ]
+}
+
+Routing rules:
+- "scanner" for files, screenshots, PDFs, invoices, or content that should be processed before action.
+- "search" for requests to find, locate, retrieve, or pull up previous context.
+- "task" for explicit action items, follow-ups, deadlines, or next steps.
+- "summary" for source material, long notes, raw links, transcripts, or reading material.
+- "writing" for explicit drafting/rewriting requests.
+- "decision" for A vs B style comparison or choice.
+- "vault" for ideas, references, or context worth storing without immediate action.
+
+Choose the single best intent and include 1-2 suggestedActions. Keep entities short and high-confidence only.`;
+      user = `Source kind: ${sourceKind || "text"}\nSource URL: ${sourceUrl || ""}\nFilename: ${filename || ""}\n\nCapture:\n${text || ""}`;
+
     // ── Summary ────────────────────────────────────────────────
-    if (tool === "summary") {
+    } else if (tool === "summary") {
       const { text } = input;
       if (!text?.trim()) return json({ error: "Missing text" }, 400);
 
@@ -111,6 +153,33 @@ ACTIONS:
       const suffix = isLite ? " Be concise — output only the rewritten text, no commentary." : " Output only the rewritten text, no preamble or explanation.";
       system = instruction + suffix;
       user = text;
+
+    // ── Task extraction ────────────────────────────────────────
+    } else if (tool === "task") {
+      const { text, referenceDate } = input;
+      if (!text?.trim()) return json({ error: "Missing text" }, 400);
+
+      system = `You extract actionable tasks from captures for a personal execution system.
+Return valid JSON only. No markdown, no preamble, no code fences.
+
+Schema:
+{
+  "tasks": [
+    {
+      "title": string,
+      "dueDate": "YYYY-MM-DD" | null
+    }
+  ]
+}
+
+Rules:
+- Only output concrete, actionable tasks.
+- Titles must start with a verb when possible.
+- Remove meeting headings, context-only sentences, and duplicates.
+- If a due date is explicit or strongly implied, normalize it to YYYY-MM-DD using the provided reference date.
+- If no due date is clear, use null.
+- If there are no real tasks, return {"tasks":[]}.`;
+      user = `Reference date: ${referenceDate || ""}\n\nCapture:\n${text}`;
 
     // ── Decision ───────────────────────────────────────────────
     } else if (tool === "decision") {

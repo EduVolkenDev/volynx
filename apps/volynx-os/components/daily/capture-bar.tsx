@@ -65,7 +65,8 @@ export function CaptureBar() {
         body: JSON.stringify({
           id: localItem.id,
           rawContent: content,
-          source
+          source,
+          accessToken: window.localStorage.getItem("volynx_access_token")
         })
       })
       const data = (await response.json()) as CaptureResponse

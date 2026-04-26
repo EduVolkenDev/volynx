@@ -11,7 +11,7 @@ export function getStripe() {
 
   if (!stripeClient) {
     stripeClient = new Stripe(secretKey, {
-      apiVersion: "2026-03-25.dahlia",
+      apiVersion: "2026-04-22.dahlia",
       appInfo: {
         name: "VolynxOS PropertyFlow",
         version: "1.0.0"
@@ -39,4 +39,8 @@ export function getBaseUrl(request: Request) {
   const protocol = host?.startsWith("localhost") || host?.startsWith("127.0.0.1") ? "http" : "https"
 
   return host ? `${protocol}://${host}` : "http://127.0.0.1:3000"
+}
+
+export function allowTestStripeDelivery() {
+  return process.env.ALLOW_TEST_STRIPE_DELIVERY === "true"
 }

@@ -7,9 +7,11 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-// Plan hierarchy — higher rank = more access
+// Plan hierarchy — higher rank = more access.
+// business (CVitae) and diamond (Daily) share rank 2 with pro because any
+// paid product subscription also flips the global profiles.plan to 'pro'.
 const PLAN_RANK: Record<string, number> = {
-  free: 0, launch: 1, pro: 2, studio: 3, teams: 4, enterprise: 5, diamond: 2,
+  free: 0, launch: 1, business: 2, pro: 2, diamond: 2, studio: 3, teams: 4,
 };
 
 // Daily free limits per tool (volynxlab tools — free plan only)
@@ -17,20 +19,23 @@ const FREE_LIMITS: Record<string, number> = {
   converter: 5,
   "image-scaler": 5,
   "image-suite": 0, // Pro-only
+  "bg-remove": 0, // Studio Pro-only mode inside Image Suite
   "qr-gen": 5,
 };
 
 // Daily OS free limits per tool
 const DAILY_FREE_LIMITS: Record<string, number> = {
+  intent: 20,
   scanner: 5,
   summary: 5,
+  task: 8,
   vault: 20,
   writing: 5,
   decision: 3,
 };
 
 // Daily OS tools list (for product detection)
-const DAILY_TOOLS = new Set(["scanner", "summary", "vault", "writing", "decision", "my-day"]);
+const DAILY_TOOLS = new Set(["intent", "scanner", "summary", "task", "vault", "writing", "decision", "my-day"]);
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -61,6 +66,7 @@ Deno.serve(async (req: Request) => {
         plan: "free",
         builder_plan: "free",
         daily_plan: "free",
+        cvitae_plan: "free",
         product: productKey,
         allowed: true,
         limit: limits[toolName] ?? 5,
@@ -71,16 +77,16 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    // Fetch user profile (includes daily_plan now)
+    // Fetch user profile (includes daily_plan and cvitae_plan)
     const { data: profile, error: profErr } = await supabase
       .from("profiles")
-      .select("plan, builder_plan, daily_plan, token_balance, org_id")
+      .select("plan, builder_plan, daily_plan, cvitae_plan, token_balance, org_id")
       .eq("id", user.id)
       .single();
 
     if (profErr || !profile) {
       return json({
-        plan: "free", builder_plan: "free", daily_plan: "free",
+        plan: "free", builder_plan: "free", daily_plan: "free", cvitae_plan: "free",
         product: productKey,
         allowed: true, limit: 5, used: 0, remaining: 5,
         useLocalStorage: true, pro_features: [],
@@ -90,11 +96,14 @@ Deno.serve(async (req: Request) => {
     const globalPlan = (profile.plan || "free").toLowerCase();
     const builderPlan = (profile.builder_plan || "free").toLowerCase();
     const dailyPlan = (profile.daily_plan || "free").toLowerCase();
+    const cvitaePlan = (profile.cvitae_plan || "free").toLowerCase();
 
     // Determine the relevant plan based on product
     let activePlan: string;
     if (productKey === "daily") {
       activePlan = dailyPlan;
+    } else if (productKey === "cvitae") {
+      activePlan = cvitaePlan;
     } else {
       activePlan = globalPlan; // volynxlab uses profiles.plan
     }
@@ -103,7 +112,7 @@ Deno.serve(async (req: Request) => {
     const isPaid = rank >= 1;
 
     // Compute highest effective tier across all products (for badge/cache)
-    const allPlans = [globalPlan, builderPlan, dailyPlan];
+    const allPlans = [globalPlan, builderPlan, dailyPlan, cvitaePlan];
     const effectiveTier = allPlans.reduce((best, p) =>
       (PLAN_RANK[p] ?? 0) > (PLAN_RANK[best] ?? 0) ? p : best, "free"
     );
@@ -123,12 +132,15 @@ Deno.serve(async (req: Request) => {
 
       const proFeatures = productKey === "daily"
         ? ["sync", "export", "cloud", ...(activePlan === "diamond" ? ["api", "priority", "shared_vaults", "team_notes", "analytics"] : [])]
-        : ["batch", "zip", "commercial", "no-watermark"];
+        : productKey === "cvitae"
+          ? ["cloud_sync", "templates", "export_included"]
+          : ["batch", "zip", "commercial", "no-watermark"];
 
       return json({
         plan: globalPlan,
         builder_plan: builderPlan,
         daily_plan: dailyPlan,
+        cvitae_plan: cvitaePlan,
         effective_tier: effectiveTier,
         product: productKey,
         allowed: true,
@@ -151,6 +163,7 @@ Deno.serve(async (req: Request) => {
         plan: globalPlan,
         builder_plan: builderPlan,
         daily_plan: dailyPlan,
+        cvitae_plan: cvitaePlan,
         product: productKey,
         allowed: false,
         limit: 0,
@@ -180,6 +193,7 @@ Deno.serve(async (req: Request) => {
       plan: globalPlan,
       builder_plan: builderPlan,
       daily_plan: dailyPlan,
+      cvitae_plan: cvitaePlan,
       effective_tier: effectiveTier,
       product: productKey,
       allowed: remaining > 0,
@@ -193,7 +207,7 @@ Deno.serve(async (req: Request) => {
   } catch (err) {
     console.error("[check-permission] Error:", err);
     return json({
-      plan: "free", builder_plan: "free", daily_plan: "free",
+      plan: "free", builder_plan: "free", daily_plan: "free", cvitae_plan: "free",
       allowed: true, limit: 5, used: 0, remaining: 5,
       useLocalStorage: true, pro_features: [],
     }, 500);

@@ -2,7 +2,7 @@
 import PageWidgets from "../../../components/PageWidgets.astro";
 import SiteFooter from "../../../components/SiteFooter.astro";
 import Topbar from "../../../components/Topbar.astro";
-import { ROUTES } from "../../../data/routes";
+import { ROUTES, checkoutHref } from "../../../data/routes";
 const pageTitle = "PropertyFlow — VOLYNX Real Estate Platform";
 const pageDescription = "Premium property management platform for real estate agencies. Smart catalogue, bilingual interface, filters, and Supabase-ready backend.";
 ---
@@ -982,7 +982,7 @@ const pageDescription = "Premium property management platform for real estate ag
       <div class="pricing-grid">
         <div class="price-card">
           <span class="price-card__name" data-i18n="pf.plan1_name">Starter</span>
-          <div class="price-card__price"><span data-price-gbp="£187" data-price-eur="€219" data-price-brl="R$1.290">£187</span></div>
+          <div class="price-card__price"><span data-price-gbp="£187" data-price-eur="€217" data-price-brl="R$1.290">£187</span></div>
           <div class="price-card__billing" data-i18n="pf.plan1_billing">One-time · 3 templates</div>
           <ul class="price-card__features">
             <li data-i18n="pf.plan1_f1">3 grid layout templates</li>
@@ -992,7 +992,7 @@ const pageDescription = "Premium property management platform for real estate ag
             <li data-i18n="pf.plan1_f5">Responsive design</li>
             <li data-i18n="pf.plan1_f6">Static data mode</li>
           </ul>
-          <button type="button" class="btn btn--ghost price-card__cta vx-checkout-btn" data-lookup="pf_starter" data-i18n="pf.plan1_cta">Get Starter</button>
+          <a href={checkoutHref("pf_starter", { next: ROUTES.propertyflow })} class="btn btn--ghost price-card__cta vx-checkout-btn" data-lookup="pf_starter" data-i18n="pf.plan1_cta">Get Starter</a>
         </div>
         <div class="price-card price-card--featured">
           <span class="price-card__name" data-i18n="pf.plan2_name">Professional</span>
@@ -1006,9 +1006,10 @@ const pageDescription = "Premium property management platform for real estate ag
             <li data-i18n="pf.plan2_f4">Admin dashboard</li>
             <li data-i18n="pf.plan2_f5">Image gallery + modals</li>
             <li data-i18n="pf.plan2_f6">Enquiry capture system</li>
-            <li data-i18n="pf.plan2_f7">Deployment guide</li>
+            <li data-i18n="pf.plan2_f7">Full deployment guide</li>
+            <li data-i18n="pf.plan2_f8">Agency delivery license (1 client)</li>
           </ul>
-          <button type="button" class="btn btn--primary price-card__cta vx-checkout-btn" data-lookup="pf_professional" data-i18n="pf.plan2_cta">Get Professional</button>
+          <a href={checkoutHref("pf_professional", { next: ROUTES.propertyflow })} class="btn btn--primary price-card__cta vx-checkout-btn" data-lookup="pf_professional" data-i18n="pf.plan2_cta">Get Professional</a>
         </div>
         <div class="price-card">
           <span class="price-card__name" data-i18n="pf.plan3_name">White-Label</span>
@@ -1017,15 +1018,17 @@ const pageDescription = "Premium property management platform for real estate ag
           <ul class="price-card__features">
             <li data-i18n="pf.plan3_f1">15 grid layout templates</li>
             <li data-i18n="pf.plan3_f2">Everything in Professional</li>
-            <li data-i18n="pf.plan3_f3">Custom branding starter kit</li>
-            <li data-i18n="pf.plan3_f4">Priority onboarding</li>
-            <li data-i18n="pf.plan3_f5">Data migration support</li>
-            <li data-i18n="pf.plan3_f6">Dedicated support channel</li>
+            <li data-i18n="pf.plan3_f3">Multi-tenant mode (1 install, unlimited clients)</li>
+            <li data-i18n="pf.plan3_f4">CRM integrations pack</li>
+            <li data-i18n="pf.plan3_f5">Advanced analytics (per-tenant, per-agent, trends)</li>
+            <li data-i18n="pf.plan3_f6">White-label rights (strip all VOLYNX attribution)</li>
+            <li data-i18n="pf.plan3_f7">Automated onboarding + self-serve migration toolkit</li>
+            <li data-i18n="pf.plan3_f8">Priority email queue (24h SLA · 12 months)</li>
           </ul>
-          <button type="button" class="btn btn--primary price-card__cta vx-checkout-btn" data-lookup="pf_white_label" data-i18n="pf.plan3_cta">Get White-Label</button>
+          <a href={checkoutHref("pf_white_label", { next: ROUTES.propertyflow })} class="btn btn--primary price-card__cta vx-checkout-btn" data-lookup="pf_white_label" data-i18n="pf.plan3_cta">Get White-Label</a>
         </div>
       </div>
-      <p class="sub" style="margin-top:20px;font-size:.85rem;text-align:center;opacity:.5;" data-i18n="pf.pricing_note">All packages are one-time purchases. No free updates included. Template updates available at a fixed price — we'll contact you when new layouts are ready.</p>
+      <p class="sub" style="margin-top:20px;font-size:.85rem;text-align:center;opacity:.5;" data-i18n="pf.pricing_note">All packages are one-time purchases. Starter uses paid update releases. Professional and White-Label include the support and update windows defined in the license.</p>
     </section>
 
     <!-- CTA -->

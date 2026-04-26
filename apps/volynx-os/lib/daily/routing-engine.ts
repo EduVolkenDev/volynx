@@ -1,6 +1,6 @@
 import type { DailyActionType, DailyItem } from "@/types/daily"
 
-export type DailyRouteKind = "task" | "summary" | "writing" | "decision" | "vault"
+export type DailyRouteKind = "task" | "summary" | "writing" | "decision" | "scanner" | "search" | "vault"
 
 export type DailyRoute = {
   kind: DailyRouteKind
@@ -18,6 +18,26 @@ export type ParsedDecisionInput = {
 
 export function routeDailyItem(item: DailyItem): DailyRoute {
   const suggested = item.intent.suggestedActions[0]
+
+  if (item.intent.intent === "scanner" || suggested?.type === "scan_file") {
+    return {
+      kind: "scanner",
+      action: "scan_file",
+      label: "Queue scanner",
+      reason: suggested?.reason ?? "The input looks like file capture that should be scanned first.",
+      confidence: Math.max(item.intent.confidence, suggested?.confidence ?? 0.62)
+    }
+  }
+
+  if (item.intent.intent === "search" || suggested?.type === "search_context") {
+    return {
+      kind: "search",
+      action: "search_context",
+      label: "Search context",
+      reason: suggested?.reason ?? "The input looks like a retrieval request.",
+      confidence: Math.max(item.intent.confidence, suggested?.confidence ?? 0.58)
+    }
+  }
 
   if (item.intent.intent === "task" || suggested?.type === "create_task") {
     return {
@@ -83,4 +103,3 @@ export function parseDecisionInput(content: string): ParsedDecisionInput | null 
 
   return { optionA, optionB, criteria }
 }
-

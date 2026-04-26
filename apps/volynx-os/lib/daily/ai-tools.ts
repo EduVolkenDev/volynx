@@ -1,4 +1,4 @@
-export type DailyAiTool = "summary" | "writing" | "decision"
+export type DailyAiTool = "intent" | "summary" | "writing" | "task" | "decision"
 export type DailyAiActionClass = "light" | "medium" | "pro"
 
 type AuthorizeInput = {

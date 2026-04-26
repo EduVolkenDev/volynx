@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server"
-import { createDailyTaskRecords } from "@/lib/daily/task-engine"
+import { createDailyTaskResult } from "@/lib/daily/task-engine"
 
 export const runtime = "nodejs"
 
 type TasksRequestBody = {
   sourceItemId?: string
   rawContent?: string
+  accessToken?: string | null
 }
 
 export async function POST(request: Request) {
@@ -23,14 +24,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Task source content is required." }, { status: 400 })
   }
 
-  const tasks = await createDailyTaskRecords({
+  const result = await createDailyTaskResult({
     sourceItemId: body.sourceItemId ?? "ad-hoc",
-    rawContent
+    rawContent,
+    accessToken: body.accessToken
   })
 
   return NextResponse.json({
-    tasks,
-    fallbackUsed: true
+    tasks: result.tasks,
+    fallbackUsed: result.fallbackUsed
   })
 }
-

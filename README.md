@@ -4,14 +4,23 @@ Premium ecosystem for developers, designers & businesses: launch kits, browser t
 
 Live: [volynx.world](https://volynx.world)
 
+## Source Of Truth
+
+`VOLYNX` is the main repo and source of truth for the platform.
+
+- `src/`, `public/`, `supabase/` and `index.js` own the public storefront, API surfaces and customer-facing product flows.
+- `apps/volynx-os` is the internal operational workspace that feeds VOLYNX with manifests, delivery rules, protected docs and ZIP payloads.
+- The old standalone `Volynx-OS` repo should be treated as a legacy copy during migration, not as the primary repo for new work.
+
 ## 🏗️ Structure
 ```
 .
+├── apps/volynx-os/   # Internal operational workspace (delivery, manifests, protected docs)
 ├── public/           # Static assets, Netlify _headers/_redirects
-├── src/              # Astro pages/components/layouts
-├── index.js          # Express API (Stripe/Supabase auth)
+├── src/              # Astro pages/components/layouts for volynx.world
+├── index.js          # Express API fallback / compat server
 ├── supabase/         # DB migrations/functions
-├── scripts/          # Utils (QR, auth)
+├── scripts/          # Utils (QR, auth, Stripe catalog)
 └── TODO.md           # Current tasks
 ```
 
@@ -23,6 +32,8 @@ Frontend: Astro hybrid (static + API routes). Backend: Express API + Supabase.
    ```
    npm install
    ```
+
+   This root install also wires the `apps/volynx-os` workspace.
 
 2. **Env Setup** (`.env`):
    ```
@@ -43,6 +54,7 @@ Frontend: Astro hybrid (static + API routes). Backend: Express API + Supabase.
 4. **Dev**:
    - Frontend: `npm run dev` → http://localhost:4321
    - API: `npm run api` → http://localhost:3000/health
+   - Internal workspace: `npm run dev:volynx-os`
 
 5. **Build/Preview**:
    ```
@@ -65,8 +77,11 @@ Frontend: Astro hybrid (static + API routes). Backend: Express API + Supabase.
 | Command | Purpose |
 |---------|---------|
 | `npm run dev` | Astro dev server |
+| `npm run dev:volynx-os` | Next dev server for the internal VolynxOS workspace |
 | `npm run api` | Express API |
 | `npm run build` | Production build |
+| `npm run build:volynx-os` | Build the internal VolynxOS workspace |
+| `npm run lint:volynx-os` | Lint the internal VolynxOS workspace |
 | `npm run start` | API prod |
 
 ## Next
@@ -74,4 +89,3 @@ See [TODO.md]. Contributions: Fork → PR.
 
 ---
 Built with ❤️ by VOLYNX Team. Questions? [contact](https://volynx.world/contact)
-

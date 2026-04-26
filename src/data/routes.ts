@@ -87,3 +87,23 @@ export const ROUTES = {
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;
+
+export function checkoutHref(
+  lookupKey: string,
+  options?: {
+    currency?: string;
+    next?: string;
+  },
+) {
+  const params = new URLSearchParams({ lookup_key: lookupKey });
+
+  if (options?.currency) {
+    params.set("currency", options.currency.toLowerCase());
+  }
+
+  if (options?.next) {
+    params.set("next", options.next);
+  }
+
+  return `${ROUTES.checkout}?${params.toString()}`;
+}

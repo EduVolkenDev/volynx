@@ -211,14 +211,14 @@ const deliveryAssistItems = [
       const id = addonId.toLowerCase().replace(/_/g, '-');
       const preset = addonToPreset(addonId);
       if (preset) return '/builder/?preset=' + encodeURIComponent(preset);
-      if (id.startsWith('pf-')) return '/products/propertyflow/';
+      if (id.startsWith('pf-')) return '/support/?product=propertyflow&intent=delivery';
       if (id.startsWith('icons-')) return '/profile/#iconPurchasesSection';
       return '/builder/';
     }
 
     function productCta(addonId) {
       const id = (addonId || '').toLowerCase().replace(/_/g, '-');
-      if (id.startsWith('pf-')) return 'Open PropertyFlow';
+      if (id.startsWith('pf-')) return 'Recover PropertyFlow delivery';
       if (id.startsWith('icons-')) return 'Open icon delivery';
       return 'Open in Builder';
     }

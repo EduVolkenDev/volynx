@@ -1,6 +1,6 @@
 # Volynx Ecosystem Boundary
 
-This repo is the operational layer of the Volynx ecosystem.
+This workspace is the operational layer inside the main `VOLYNX` monorepo.
 
 ## VolynxOS owns
 
@@ -21,17 +21,17 @@ This repo is the operational layer of the Volynx ecosystem.
 ## Current launch rule
 
 - `VOLYNX` is the public home of PropertyFlow
-- `VolynxOS` keeps the PropertyFlow operational payload:
+- `apps/volynx-os` keeps the PropertyFlow operational payload:
   - tier definitions
   - protected docs
   - delivery logic
   - ZIP manifests and private bundles
 
-To reduce duplication, `VolynxOS` should not act as a second public product page for PropertyFlow. Internal links that refer to the product page should point back to `https://volynx.world/products/propertyflow/`.
+To reduce duplication, this workspace should not act as a second public product page for PropertyFlow. Internal links that refer to the product page should point back to `https://volynx.world/products/propertyflow/`.
 
 ## Migration direction
 
-These items should eventually become operational source of truth inside `VolynxOS`:
+These items should eventually become operational source of truth inside `apps/volynx-os`:
 
 - CV / CVitae base templates
 - icon catalog source data and pack metadata
@@ -47,4 +47,4 @@ These items should stay in `VOLYNX`:
 
 If a file exists mainly to sell a product, it belongs in `VOLYNX`.
 
-If a file exists mainly to power, deliver, validate or feed a product, it belongs in `VolynxOS`.
+If a file exists mainly to power, deliver, validate or feed a product, it belongs in `apps/volynx-os`.

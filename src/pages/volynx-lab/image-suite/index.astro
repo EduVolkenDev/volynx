@@ -7,7 +7,7 @@ import LabUpgradeBanner from "../../../components/LabUpgradeBanner.astro";
 import Topbar from "../../../components/Topbar.astro";
 
 const pageTitle = "VOLYNX Lab • iMage Suite";
-const pageDescription = "Free image suite — upscale, compress and convert images directly in your browser, no upload required.";
+const pageDescription = "Local-first image suite — upscale, compress, convert and remove backgrounds directly in your browser, no upload required.";
 ---
 
 <!DOCTYPE html>
@@ -34,7 +34,17 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
   <Topbar rightLinks={[{ href: "/volynx-lab/", label: "← Back", i18n: "suite.back" }]} />
 
   <main class="wrap">
-    <h1 data-i18n="suite.title">iMage Suite</h1>
+    <h1 class="tool-hero-title suite-logo-title" aria-label="iMage Suite">
+      <span class="tool-hero-stage suite-hero-stage" aria-hidden="true">
+        <span class="tool-hero-orbit tool-hero-orbit--a suite-hero-orbit suite-hero-orbit--a"></span>
+        <span class="tool-hero-orbit tool-hero-orbit--b suite-hero-orbit suite-hero-orbit--b"></span>
+        <span class="tool-hero-beam suite-hero-beam"></span>
+        <span class="tool-hero-shell suite-logo-shell">
+          <img src="/assets/newimagesuite.webp" alt="" class="suite-logo" aria-hidden="true" />
+        </span>
+      </span>
+      <span class="sr-only" data-i18n="suite.title">iMage Suite</span>
+    </h1>
 
     <div class="suite-grid">
       <div class="card">
@@ -73,10 +83,11 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
                 <option value="upscale" selected data-i18n="suite.tool_upscale">Upscale</option>
                 <option value="compress" data-i18n="suite.tool_compress">Compress</option>
                 <option value="convert" data-i18n="suite.tool_convert">Convert</option>
+                <option value="bg-remove" data-i18n="suite.tool_bg_remove" data-pro="true">Remove BG</option>
               </select>
             </label>
 
-            <label class="field">
+            <label class="field" id="scaleGroup">
               <span data-i18n="suite.scale_label">Escala (Upscale)</span>
               <select id="scale" aria-label="Scale">
                 <option value="2">2x</option>
@@ -85,7 +96,7 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
               </select>
             </label>
 
-            <label class="field">
+            <label class="field" id="formatGroup">
               <span data-i18n="suite.format_label">Formato</span>
               <select id="format" aria-label="Output format">
                 <option value="image/png">PNG</option>
@@ -94,11 +105,48 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
               </select>
             </label>
 
-            <label class="field">
+            <label class="field" id="qualityGroup">
               <span data-i18n="suite.quality_label">Qualidade (Compress)</span>
               <input id="quality" type="range" min="0.3" max="1" step="0.05" value="0.85" aria-label="Quality" />
               <em id="qualityVal" style="font-style:normal;font-size:12px;color:rgba(255,255,255,.68)">0.85</em>
             </label>
+          </div>
+
+          <div class="field-group" id="bgRemoveGroup" hidden>
+            <label class="field">
+              <span data-i18n="suite.bg_format_label">Output Format</span>
+              <select id="bgFormat" aria-label="Background removal output format">
+                <option value="image/png" data-i18n="suite.bg_fmt_png">PNG (transparent)</option>
+                <option value="image/webp" data-i18n="suite.bg_fmt_webp">WebP (transparent)</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span data-i18n="suite.bg_fill_label">Background Fill</span>
+              <div class="bg-fill-row">
+                <select id="bgFill" aria-label="Background fill">
+                  <option value="transparent" data-i18n="suite.bg_fill_none">None (transparent)</option>
+                  <option value="white" data-i18n="suite.bg_fill_white">White</option>
+                  <option value="black" data-i18n="suite.bg_fill_black">Black</option>
+                  <option value="custom" data-i18n="suite.bg_fill_custom">Custom color</option>
+                </select>
+                <input
+                  type="color"
+                  id="bgFillColor"
+                  value="#ffffff"
+                  hidden
+                  aria-label="Custom background color"
+                  data-i18n-aria="suite.bg_fill_color_aria"
+                />
+              </div>
+            </label>
+
+            <div class="bg-progress" id="bgProgress" hidden>
+              <span class="bg-progress__label" id="bgProgressLabel" data-i18n="suite.bg_progress">Loading AI model...</span>
+              <div class="bg-progress__bar" aria-hidden="true">
+                <div class="bg-progress__fill" id="bgProgressFill" style="width:0%"></div>
+              </div>
+            </div>
           </div>
 
           <p id="fmtHint" class="fmt-hint" hidden></p>
@@ -139,6 +187,12 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
   <script is:inline>
     const FREE_LIMIT = 3;
     const STORAGE_KEY = "volynx_suite_usage";
+    const BG_REMOVAL_PUBLIC_PATH = "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/browser/";
+    const BG_REMOVAL_MODULE = `${BG_REMOVAL_PUBLIC_PATH}index.mjs`;
+    const BG_REMOVAL_META = {
+      model: "medium",
+      lib: "@imgly/background-removal@1.4.5"
+    };
     // License keys removed — plan is checked server-side via check-permission API
 
     function todayKey() {
@@ -168,7 +222,8 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       catch { return {}; }
     }
 
-    async function checkToolPermission(toolName, count) {
+    async function checkToolPermission(toolName, count, options = {}) {
+      const { allowLocalFallback = true } = options;
       const cfg = await getConfig();
       const apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
       const token = localStorage.getItem('volynx_access_token') || '';
@@ -185,9 +240,29 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
           clearTimeout(t);
           if (res.ok) {
             const perm = await res.json();
-            if (!perm.useLocalStorage) return { allowed: perm.remaining === -1 || perm.remaining >= count, plan: perm.plan, remaining: perm.remaining, limit: perm.limit, source: 'server' };
+            const normalized = {
+              allowed: perm.remaining === -1 || perm.remaining >= count,
+              plan: perm.plan,
+              remaining: perm.remaining,
+              limit: perm.limit,
+              source: 'server',
+            };
+            if (!perm.useLocalStorage || !allowLocalFallback || perm.limit === 0) return normalized;
           }
         } catch (_) {}
+      }
+      if (!allowLocalFallback) {
+        const cachedPlan = window.VxPlan?.getCached()?.plan || (isPro ? "pro" : "free");
+        const cachedPaid = window.VxPlan
+          ? window.VxPlan.isPaid(cachedPlan)
+          : (cachedPlan !== "free" && cachedPlan !== "");
+        return {
+          allowed: cachedPaid,
+          plan: cachedPlan,
+          remaining: cachedPaid ? -1 : 0,
+          limit: cachedPaid ? -1 : 0,
+          source: cachedPaid ? "cache" : "local",
+        };
       }
       const usage = getLocalUsage();
       const remaining = Math.max(0, FREE_LIMIT - usage.used);
@@ -224,16 +299,215 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
     const fmtEl = $("format");
     const qualityEl = $("quality");
     const qualityValEl = $("qualityVal");
+    const scaleGroup = $("scaleGroup");
+    const formatGroup = $("formatGroup");
+    const qualityGroup = $("qualityGroup");
+    const bgRemoveGroup = $("bgRemoveGroup");
+    const bgFormatEl = $("bgFormat");
+    const bgFillEl = $("bgFill");
+    const bgFillColorEl = $("bgFillColor");
+    const bgProgress = $("bgProgress");
+    const bgProgressLabel = $("bgProgressLabel");
+    const bgProgressFill = $("bgProgressFill");
     const origMeta = $("origMeta");
     const outMeta = $("outMeta");
     const proStatus = $("proStatus");
 
     // isPro determined by server-side plan check, not localStorage
     let isPro = false;
+    let bgRemovalLibPromise = null;
     let loadedImages = [];
     let processedResults = [];
     let singleOutBlob = null;
     let previewUrl = "";
+
+    function t(key, fallback) {
+      const lang = ((localStorage.getItem("volynx_lang") || "en").toLowerCase().startsWith("pt")) ? "pt" : "en";
+      return window.VX_TRANS?.[lang]?.[key] || fallback;
+    }
+
+    function fileExtFromName(name) {
+      const match = (name || "").match(/\.([a-z0-9]+)$/i);
+      return match ? match[1].toLowerCase() : "";
+    }
+
+    function mimeToExtension(mime, fallbackName = "") {
+      if (mime === "image/jpeg") return "jpg";
+      if (mime === "image/png") return "png";
+      if (mime === "image/webp") return "webp";
+      return fileExtFromName(fallbackName) || (mime.split("/")[1] || "png");
+    }
+
+    function setBgProgressHidden(hidden) {
+      if (!bgProgress) return;
+      bgProgress.hidden = hidden;
+      if (hidden && bgProgressFill) {
+        bgProgressFill.style.width = "0%";
+      }
+    }
+
+    function updateProgressUI(pct, key) {
+      if (!bgProgress || !bgProgressLabel || !bgProgressFill) return;
+
+      const safePct = Math.max(0, Math.min(100, Number.isFinite(pct) ? pct : 0));
+      bgProgress.hidden = false;
+      bgProgressFill.style.width = `${safePct}%`;
+
+      if (key?.startsWith("fetch")) {
+        bgProgressLabel.textContent = `${t("suite.bg_downloading", "Downloading model...")} ${safePct}%`;
+      } else if (key === "compute:inference") {
+        bgProgressLabel.textContent = `${t("suite.bg_removing", "Removing background...")} ${safePct}%`;
+      } else if (safePct >= 100) {
+        bgProgressLabel.textContent = t("suite.bg_done", "Done!");
+        window.setTimeout(() => {
+          if (bgProgress) bgProgress.hidden = true;
+        }, 900);
+      } else {
+        bgProgressLabel.textContent = t("suite.bg_progress", "Loading AI model...");
+      }
+    }
+
+    function createCanvasSurface(width, height) {
+      if (typeof OffscreenCanvas === "function") {
+        return new OffscreenCanvas(width, height);
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      return canvas;
+    }
+
+    async function withDrawableFromBlob(blob, fn) {
+      if (typeof createImageBitmap === "function") {
+        const bitmap = await createImageBitmap(blob);
+        try {
+          return await fn(bitmap, bitmap.width, bitmap.height);
+        } finally {
+          if (typeof bitmap.close === "function") bitmap.close();
+        }
+      }
+
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.src = url;
+
+      try {
+        if (typeof img.decode === "function") {
+          await img.decode();
+        } else {
+          await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
+          });
+        }
+
+        return await fn(img, img.naturalWidth || img.width, img.naturalHeight || img.height);
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    async function surfaceToBlob(surface, mime, quality) {
+      if (typeof surface.convertToBlob === "function") {
+        return surface.convertToBlob({ type: mime, quality });
+      }
+      return canvasToBlob(surface, mime, quality);
+    }
+
+    async function loadBgRemoval() {
+      if (bgRemovalLibPromise) return bgRemovalLibPromise;
+
+      updateProgressUI(0, "fetch:model");
+      bgRemovalLibPromise = import(BG_REMOVAL_MODULE)
+        .then((mod) => mod.removeBackground);
+
+      try {
+        return await bgRemovalLibPromise;
+      } catch (error) {
+        bgRemovalLibPromise = null;
+        setBgProgressHidden(true);
+        throw error;
+      }
+    }
+
+    function hasPaidPlan() {
+      if (isPro) return true;
+      if (!window.VxPlan) return false;
+      const cached = window.VxPlan.getCached();
+      return Boolean(cached?.plan && window.VxPlan.isPaid(cached.plan));
+    }
+
+    function isBgRemoveLocked() {
+      return !hasPaidPlan();
+    }
+
+    function syncRunAvailability() {
+      if (!runBtn) return;
+      runBtn.disabled = !loadedImages.length || (toolEl?.value === "bg-remove" && isBgRemoveLocked());
+    }
+
+    function syncBgFillColorVisibility() {
+      if (!bgFillColorEl) return;
+      bgFillColorEl.hidden = bgFillEl?.value !== "custom";
+    }
+
+    function renderToolStatus() {
+      if (!proStatus) return;
+      if (toolEl?.value === "bg-remove" && isBgRemoveLocked()) {
+        proStatus.innerHTML = t(
+          "suite.bg_upgrade_html",
+          'Remove BG is a <strong>Pro</strong> feature — <a href="/pricing/">Upgrade</a>'
+        );
+        return;
+      }
+      proStatus.textContent = isPro ? t("suite.pro_status", "PRO Activated ✔ Unlimited access enabled") : "";
+    }
+
+    function checkFmtHint() {
+      if (!fmtHint) return;
+      const isCompress = toolEl.value === "compress";
+      const isPng = fmtEl.value === "image/png";
+      if (isCompress && isPng) {
+        fmtHint.textContent = "Tip: PNG is lossless — switch to WebP or JPG for smaller files.";
+        fmtHint.hidden = false;
+      } else {
+        fmtHint.hidden = true;
+      }
+    }
+
+    function updateFieldVisibility(tool) {
+      [scaleGroup, qualityGroup, formatGroup, bgRemoveGroup].forEach((group) => {
+        if (group) group.hidden = true;
+      });
+
+      if (tool === "upscale") {
+        scaleGroup.hidden = false;
+        formatGroup.hidden = false;
+        setBgProgressHidden(true);
+      } else if (tool === "compress") {
+        qualityGroup.hidden = false;
+        formatGroup.hidden = false;
+        if (fmtEl.value === "image/png") {
+          fmtEl.value = "image/webp";
+        }
+        setBgProgressHidden(true);
+      } else if (tool === "convert") {
+        formatGroup.hidden = false;
+        setBgProgressHidden(true);
+      } else if (tool === "bg-remove") {
+        bgRemoveGroup.hidden = false;
+        syncBgFillColorVisibility();
+        if (isBgRemoveLocked()) {
+          setBgProgressHidden(true);
+        } else {
+          loadBgRemoval().catch(() => {});
+        }
+      }
+
+      checkFmtHint();
+      renderToolStatus();
+      syncRunAvailability();
+    }
 
     function setDropMessage(message) {
       const textEl = dropEl && dropEl.querySelector("p");
@@ -261,7 +535,7 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
     }
 
     function updateProUI() {
-      proStatus.textContent = isPro ? "PRO Activated ✔ Unlimited access enabled" : "";
+      renderToolStatus();
     }
 
     function resetPreview() {
@@ -275,6 +549,7 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       if (downloadBtn) downloadBtn.disabled = true;
       processedResults = [];
       singleOutBlob = null;
+      setBgProgressHidden(true);
     }
 
     async function fileToImage(file) {
@@ -329,7 +604,7 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       const M = window.VxFileMetrics;
       origMeta.textContent = `${validFiles.length} file(s) • ${M ? M.formatBytes(totalBytes) : (totalBytes / 1024 / 1024).toFixed(2) + "MB"}`;
       setDropMessage(`${validFiles.length} file(s) ready to process`);
-      runBtn.disabled = false;
+      syncRunAvailability();
     }
 
     // ── AI Upscaler (Real-ESRGAN via UpscalerJS + TF.js, lazy-loaded) ──────────
@@ -407,6 +682,50 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
     }
 
     async function processOne(item, tool, scale, mime, quality) {
+      if (tool === "bg-remove") {
+        const removeBackground = await loadBgRemoval();
+        const bgMime = bgFormatEl?.value || "image/png";
+        const fillValue = bgFillEl?.value || "transparent";
+        const fillColor = bgFillColorEl?.value || "#ffffff";
+        const resultPng = await removeBackground(item.file, {
+          publicPath: BG_REMOVAL_PUBLIC_PATH,
+          model: BG_REMOVAL_META.model,
+          progress: (key, current, total) => {
+            const pct = total ? Math.round((current / total) * 100) : 0;
+            updateProgressUI(pct, key);
+          },
+          output: { format: "image/png", quality: 1 },
+        });
+
+        let finalBlob = resultPng;
+        if (fillValue !== "transparent" || bgMime !== "image/png") {
+          finalBlob = await withDrawableFromBlob(resultPng, async (drawable, width, height) => {
+            const surface = createCanvasSurface(width, height);
+            const ctx = surface.getContext("2d");
+            if (!ctx) throw new Error("Failed to create background removal canvas context.");
+            if (fillValue !== "transparent") {
+              ctx.fillStyle = fillValue === "custom" ? fillColor : fillValue;
+              ctx.fillRect(0, 0, width, height);
+            }
+            ctx.drawImage(drawable, 0, 0, width, height);
+            return surfaceToBlob(surface, bgMime, 1);
+          });
+        }
+
+        updateProgressUI(100, "done");
+        return {
+          baseName: `${item.baseName}-no-bg`,
+          originalFile: item.file,
+          blob: finalBlob,
+          width: item.img.width,
+          height: item.img.height,
+          inputBytes: item.file.size,
+          keptOriginal: false,
+          mimeType: bgMime,
+          extension: mimeToExtension(bgMime, item.file.name),
+        };
+      }
+
       const img = item.img;
       const file = item.file;
       const baseName = item.baseName;
@@ -456,6 +775,8 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
         kept = true;
       }
 
+      const finalMime = kept ? (file.type || mime) : mime;
+
       return {
         baseName,
         originalFile: file,
@@ -464,6 +785,10 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
         height: canvas.height,
         inputBytes: file.size,
         keptOriginal: kept,
+        mimeType: finalMime,
+        extension: kept
+          ? (fileExtFromName(file.name) || mimeToExtension(finalMime, file.name))
+          : mimeToExtension(finalMime, file.name),
       };
     }
 
@@ -488,6 +813,7 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
         }
       } catch {}
       updateProUI();
+      updateFieldVisibility(toolEl?.value || "upscale");
     }
     const proReady = detectPro();
 
@@ -495,28 +821,19 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       qualityValEl.textContent = qualityEl.value;
     });
 
-    // ── Format mismatch warning for Compress ────────────────
     const fmtHint = $("fmtHint");
-    function checkFmtHint() {
-      if (!fmtHint) return;
-      const isCompress = toolEl.value === "compress";
-      const isPng = fmtEl.value === "image/png";
-      if (isCompress && isPng) {
-        fmtHint.textContent = "Tip: PNG is lossless — switch to WebP or JPG for smaller files.";
-        fmtHint.hidden = false;
-      } else {
-        fmtHint.hidden = true;
-      }
-    }
     toolEl.addEventListener("change", () => {
-      checkFmtHint();
-      // Auto-switch to WebP when entering Compress mode with PNG selected
-      if (toolEl.value === "compress" && fmtEl.value === "image/png") {
-        fmtEl.value = "image/webp";
-        checkFmtHint();
-      }
+      updateFieldVisibility(toolEl.value);
     });
     fmtEl.addEventListener("change", checkFmtHint);
+    bgFillEl?.addEventListener("change", syncBgFillColorVisibility);
+    window.addEventListener("vx:lang-changed", () => {
+      renderToolStatus();
+      if (!bgProgress?.hidden && bgProgressLabel && !bgProgressFill?.style.width) {
+        bgProgressLabel.textContent = t("suite.bg_progress", "Loading AI model...");
+      }
+    });
+    updateFieldVisibility(toolEl.value);
 
     function triggerFilePicker() {
       if (fileEl) fileEl.click();
@@ -566,11 +883,19 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       const mime = fmtEl.value;
       const quality = parseFloat(qualityEl.value);
 
-      if (!isPro) {
-        const perm = await checkToolPermission("image-suite", loadedImages.length);
+      const permissionTool = tool === "bg-remove" ? "bg-remove" : "image-suite";
+      const shouldCheckPermission = tool === "bg-remove" ? !hasPaidPlan() : !isPro;
+
+      if (shouldCheckPermission) {
+        const perm = await checkToolPermission(permissionTool, loadedImages.length, {
+          allowLocalFallback: tool !== "bg-remove",
+        });
         if (!perm.allowed) {
           const isFreeUser = window.VxPlan ? !window.VxPlan.isPaid(perm.plan) : (perm.plan === 'free');
-          alert(`Daily limit reached (${perm.limit}). ${isFreeUser ? 'Upgrade to Pro for more.' : 'Try again tomorrow.'}`);
+          const message = tool === "bg-remove"
+            ? t("suite.bg_upgrade_alert", "Remove BG is available on paid plans. Upgrade to unlock it.")
+            : `Daily limit reached (${perm.limit}). ${isFreeUser ? 'Upgrade to Pro for more.' : 'Try again tomorrow.'}`;
+          alert(message);
           return;
         }
       }
@@ -614,6 +939,34 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
         // We still need per-tool call counts for analytics + total API calls.
         logToolUsage("image-suite", processedResults.length);
 
+        if (tool === "bg-remove") {
+          const totalBgBytes = processedResults.reduce((sum, result) => sum + result.inputBytes, 0);
+          const cfg = await getConfig();
+          const apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
+          const token = localStorage.getItem('volynx_access_token') || '';
+          const cachedPlan = window.VxPlan?.getCached()?.plan;
+          if (apiBase && token) {
+            fetch(`${apiBase}/track-tool-usage`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                tool: "bg-remove",
+                input_bytes: totalBgBytes,
+                plan_at_time: cachedPlan || "free",
+                metadata: {
+                  ...BG_REMOVAL_META,
+                  files: processedResults.length,
+                  output_format: bgFormatEl?.value || "image/png",
+                  fill: bgFillEl?.value || "transparent",
+                },
+              }),
+            }).catch(() => {});
+          }
+        }
+
         setDropMessage(`${processedResults.length} file(s) processed successfully`);
         downloadBtn.disabled = false;
       } catch (error) {
@@ -628,13 +981,13 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
     downloadBtn.addEventListener("click", async () => {
       if (!processedResults.length) return;
 
-      const ext = fmtEl.value.split("/")[1];
-
       if (processedResults.length === 1 && singleOutBlob) {
         const a = document.createElement("a");
-        a.href = URL.createObjectURL(singleOutBlob);
-        a.download = `${processedResults[0].baseName}.${ext}`;
+        const url = URL.createObjectURL(singleOutBlob);
+        a.href = url;
+        a.download = `${processedResults[0].baseName}.${processedResults[0].extension}`;
         a.click();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1500);
         return;
       }
 
@@ -646,15 +999,17 @@ const pageDescription = "Free image suite — upscale, compress and convert imag
       const zip = new window.JSZip();
 
       for (const result of processedResults) {
-        zip.file(`${result.baseName}.${ext}`, result.blob);
+        zip.file(`${result.baseName}.${result.extension}`, result.blob);
       }
 
       const zipBlob = await zip.generateAsync({ type: "blob" });
 
       const a = document.createElement("a");
-      a.href = URL.createObjectURL(zipBlob);
+      const url = URL.createObjectURL(zipBlob);
+      a.href = url;
       a.download = "volynx-image-suite-batch.zip";
       a.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1500);
     });
   </script>
 

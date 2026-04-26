@@ -4,7 +4,7 @@
  * Single source of truth for all products, plans, pricing, entitlements,
  * bundles, and backward-compatibility mappings.
  *
- * product_key : volynx | daily | bundle | volynxlab
+ * product_key : volynx | daily | cvitae | bundle | volynxlab
  * plan_key    : {product}_{tier}  e.g. volynx_pro, daily_diamond
  * bundle key  : bundle_{product1}_{product2}_{tier}
  */
@@ -13,7 +13,7 @@ import type { Currency, Locale } from './pricing';
 
 // ── Product keys ────────────────────────────────────────────
 
-export type ProductKey = 'volynx' | 'daily' | 'bundle' | 'volynxlab';
+export type ProductKey = 'volynx' | 'daily' | 'cvitae' | 'bundle' | 'volynxlab';
 
 export const PRODUCTS: Record<string, {
   key: ProductKey;
@@ -38,6 +38,15 @@ export const PRODUCTS: Record<string, {
       pt: 'A camada pessoal do seu dia digital.',
     },
     profileField: 'daily_plan',
+  },
+  cvitae: {
+    key: 'cvitae',
+    name: { en: 'CVitae', pt: 'CVitae' },
+    tagline: {
+      en: 'Build free, export with premium polish when it matters.',
+      pt: 'Monte grátis, exporte com acabamento premium quando precisar.',
+    },
+    profileField: 'cvitae_plan',
   },
   volynxlab: {
     key: 'volynxlab',
@@ -70,6 +79,10 @@ export const PLAN_TIERS: Record<string, PlanTier> = {
   daily_free:    { product: 'daily', tier: 'free',    rank: 0 },
   daily_pro:     { product: 'daily', tier: 'pro',     rank: 1 },
   daily_diamond: { product: 'daily', tier: 'diamond', rank: 2 },
+
+  // CVitae
+  cvitae_free:     { product: 'cvitae', tier: 'free',     rank: 0 },
+  cvitae_business: { product: 'cvitae', tier: 'business', rank: 1 },
 };
 
 export type PlanKey = keyof typeof PLAN_TIERS;
@@ -83,19 +96,22 @@ export const PLAN_PRICING: Record<string, {
   billing: 'subscription' | 'one_time';
   interval?: 'month' | 'year';
 }> = {
-  // Volynx (same as existing builder prices)
-  volynx_launch:  { amounts: { GBP: 900,  EUR: 1090, BRL: 5900  }, billing: 'subscription', interval: 'month' },
-  volynx_pro:     { amounts: { GBP: 1900, EUR: 2290, BRL: 12900 }, billing: 'subscription', interval: 'month' },
-  volynx_studio:  { amounts: { GBP: 3900, EUR: 4590, BRL: 24900 }, billing: 'subscription', interval: 'month' },
-  volynx_teams:   { amounts: { GBP: 7900, EUR: 8990, BRL: 49900 }, billing: 'subscription', interval: 'month' },
+  // Volynx (mirror of scripts/stripe-catalog-setup.ts BUILDER_SUBS amounts)
+  volynx_launch:  { amounts: { GBP: 1100,  EUR: 1300,  BRL: 6900  }, billing: 'subscription', interval: 'month' },
+  volynx_pro:     { amounts: { GBP: 2400,  EUR: 2800,  BRL: 14900 }, billing: 'subscription', interval: 'month' },
+  volynx_studio:  { amounts: { GBP: 5400,  EUR: 6300,  BRL: 34900 }, billing: 'subscription', interval: 'month' },
+  volynx_teams:   { amounts: { GBP: 11800, EUR: 13800, BRL: 74900 }, billing: 'subscription', interval: 'month' },
 
-  // Daily
-  daily_pro:      { amounts: { GBP: 1200, EUR: 1490, BRL: 8900  }, billing: 'subscription', interval: 'month' },
-  daily_diamond:  { amounts: { GBP: 2900, EUR: 3490, BRL: 19900 }, billing: 'subscription', interval: 'month' },
+  // Daily (mirror of DAILY_SUBS amounts)
+  daily_pro:      { amounts: { GBP: 1400,  EUR: 1600,  BRL: 8900  }, billing: 'subscription', interval: 'month' },
+  daily_diamond:  { amounts: { GBP: 3400,  EUR: 3900,  BRL: 21900 }, billing: 'subscription', interval: 'month' },
 
-  // Bundles (real discount vs separate)
-  bundle_volynx_daily_pro:    { amounts: { GBP: 2900, EUR: 3490, BRL: 19900 }, billing: 'subscription', interval: 'month' },
-  bundle_volynx_daily_studio: { amounts: { GBP: 5900, EUR: 6990, BRL: 39900 }, billing: 'subscription', interval: 'month' },
+  // CVitae
+  cvitae_business:{ amounts: { GBP: 1500,  EUR: 1800,  BRL: 9900  }, billing: 'subscription', interval: 'month' },
+
+  // Bundles (real discount vs separate; mirror of BUNDLE_SUBS amounts)
+  bundle_volynx_daily_pro:    { amounts: { GBP: 3500, EUR: 4100, BRL: 22900 }, billing: 'subscription', interval: 'month' },
+  bundle_volynx_daily_studio: { amounts: { GBP: 8200, EUR: 9600, BRL: 54900 }, billing: 'subscription', interval: 'month' },
 };
 
 // ── Bundles ─────────────────────────────────────────────────
@@ -176,6 +192,10 @@ export const ENTITLEMENTS: Record<string, string[]> = {
   daily_free:    ['daily_myday', 'daily_scanner_basic', 'daily_summary_basic', 'daily_vault_basic', 'daily_writing_basic', 'daily_decision_basic'],
   daily_pro:     ['daily_myday', 'daily_scanner_full', 'daily_summary_full', 'daily_vault_full', 'daily_writing_full', 'daily_decision_full', 'daily_sync', 'daily_export', 'daily_cloud'],
   daily_diamond: ['daily_myday', 'daily_scanner_full', 'daily_summary_full', 'daily_vault_full', 'daily_writing_full', 'daily_decision_full', 'daily_sync', 'daily_export', 'daily_cloud', 'daily_api', 'daily_priority', 'daily_shared_vaults', 'daily_team_notes', 'daily_analytics'],
+
+  // CVitae
+  cvitae_free:     ['cvitae_editor', 'cvitae_preview', 'cvitae_1_cv', 'cvitae_cloud_sync', 'cvitae_export_vx'],
+  cvitae_business: ['cvitae_editor', 'cvitae_preview', 'cvitae_unlimited_cvs', 'cvitae_cloud_sync', 'cvitae_templates', 'cvitae_export_included'],
 };
 
 // ── Helpers ─────────────────────────────────────────────────

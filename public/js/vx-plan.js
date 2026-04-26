@@ -14,11 +14,12 @@
 window.VxPlan = (function () {
   'use strict';
 
-  var PLAN_IDS = ['free', 'launch', 'pro', 'diamond', 'studio', 'teams', 'enterprise'];
+  var PLAN_IDS = ['free', 'launch', 'business', 'pro', 'diamond', 'studio', 'teams', 'enterprise'];
 
   var PLAN_RANK = {
     free: 0,
     launch: 1,
+    business: 2,
     pro: 2,
     diamond: 2,
     studio: 3,
@@ -29,6 +30,7 @@ window.VxPlan = (function () {
   var PLAN_LABELS = {
     free: 'Free',
     launch: 'Launch',
+    business: 'Business',
     pro: 'Pro',
     diamond: 'Diamond',
     studio: 'Studio',
