@@ -187,11 +187,16 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
   <script is:inline>
     const FREE_LIMIT = 3;
     const STORAGE_KEY = "volynx_suite_usage";
-    const BG_REMOVAL_PUBLIC_PATH = "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/browser/";
-    const BG_REMOVAL_MODULE = `${BG_REMOVAL_PUBLIC_PATH}index.mjs`;
+    // Background removal: U²-Net portable (Apache-2.0) running fully local via onnxruntime-web.
+    // Replaces the previous @imgly/background-removal (AGPL-3.0) integration so the
+    // pipeline stays commercial-safe without paying a copyleft license fee.
+    const ORT_VERSION = "1.21.0";
+    const ORT_BASE = `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ORT_VERSION}/dist/`;
+    const BG_MODEL_URL = "/models/u2netp.onnx";
+    const BG_MODEL_INPUT_SIZE = 320;
     const BG_REMOVAL_META = {
-      model: "medium",
-      lib: "@imgly/background-removal@1.4.5"
+      model: "u2netp",
+      lib: `onnxruntime-web@${ORT_VERSION} + u2netp (Apache-2.0)`
     };
     // License keys removed — plan is checked server-side via check-permission API
 
@@ -315,7 +320,6 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
 
     // isPro determined by server-side plan check, not localStorage
     let isPro = false;
-    let bgRemovalLibPromise = null;
     let loadedImages = [];
     let processedResults = [];
     let singleOutBlob = null;
@@ -377,36 +381,6 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       return canvas;
     }
 
-    async function withDrawableFromBlob(blob, fn) {
-      if (typeof createImageBitmap === "function") {
-        const bitmap = await createImageBitmap(blob);
-        try {
-          return await fn(bitmap, bitmap.width, bitmap.height);
-        } finally {
-          if (typeof bitmap.close === "function") bitmap.close();
-        }
-      }
-
-      const url = URL.createObjectURL(blob);
-      const img = new Image();
-      img.src = url;
-
-      try {
-        if (typeof img.decode === "function") {
-          await img.decode();
-        } else {
-          await new Promise((resolve, reject) => {
-            img.onload = resolve;
-            img.onerror = reject;
-          });
-        }
-
-        return await fn(img, img.naturalWidth || img.width, img.naturalHeight || img.height);
-      } finally {
-        URL.revokeObjectURL(url);
-      }
-    }
-
     async function surfaceToBlob(surface, mime, quality) {
       if (typeof surface.convertToBlob === "function") {
         return surface.convertToBlob({ type: mime, quality });
@@ -414,21 +388,159 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       return canvasToBlob(surface, mime, quality);
     }
 
-    async function loadBgRemoval() {
-      if (bgRemovalLibPromise) return bgRemovalLibPromise;
+    // ── Background removal pipeline (U²-Net portable + onnxruntime-web) ────────
+    let _ortRuntime = null;
+    let _bgSession = null;
 
-      updateProgressUI(0, "fetch:model");
-      bgRemovalLibPromise = import(BG_REMOVAL_MODULE)
-        .then((mod) => mod.removeBackground);
-
-      try {
-        return await bgRemovalLibPromise;
-      } catch (error) {
-        bgRemovalLibPromise = null;
-        setBgProgressHidden(true);
-        throw error;
-      }
+    async function loadOrtOnce() {
+      if (_ortRuntime) return _ortRuntime;
+      await loadScriptOnce(`${ORT_BASE}ort.min.js`);
+      if (!window.ort) throw new Error("onnxruntime-web failed to load");
+      // Pin WASM artifacts to the same CDN folder so dev + prod resolve them
+      // without needing a Vite plugin or local copy.
+      window.ort.env.wasm.wasmPaths = ORT_BASE;
+      _ortRuntime = window.ort;
+      return _ortRuntime;
     }
+
+    async function fetchModelWithProgress(url, onProgress) {
+      const response = await fetch(url, { cache: "force-cache" });
+      if (!response.ok) throw new Error(`Model fetch failed: ${response.status}`);
+      const total = Number(response.headers.get("content-length")) || 4574861;
+      if (!response.body || typeof response.body.getReader !== "function") {
+        // Older browsers — single-shot
+        const buf = await response.arrayBuffer();
+        onProgress?.(100);
+        return new Uint8Array(buf);
+      }
+      const reader = response.body.getReader();
+      const chunks = [];
+      let received = 0;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.length;
+        onProgress?.(Math.min(95, Math.round((received / total) * 95)));
+      }
+      const out = new Uint8Array(received);
+      let off = 0;
+      for (const c of chunks) { out.set(c, off); off += c.length; }
+      return out;
+    }
+
+    async function loadBgSession() {
+      if (_bgSession) return _bgSession;
+      const ort = await loadOrtOnce();
+      updateProgressUI(0, "fetch:model");
+      const modelBytes = await fetchModelWithProgress(BG_MODEL_URL, (pct) => {
+        updateProgressUI(pct, "fetch:model");
+      });
+      updateProgressUI(98, "fetch:model");
+      _bgSession = await ort.InferenceSession.create(modelBytes.buffer, {
+        executionProviders: ["wasm"],
+        graphOptimizationLevel: "all",
+      });
+      return _bgSession;
+    }
+
+    // Kept for callers that still expect a function reference; routes through the
+    // new local pipeline. Never returns the legacy imgly callback.
+    async function loadBgRemoval() {
+      await loadBgSession();
+      return removeBackgroundLocalToCanvas;
+    }
+
+    async function removeBackgroundLocalToCanvas(srcImage, onProgress) {
+      const session = await loadBgSession();
+      const ort = await loadOrtOnce();
+
+      const W = srcImage.naturalWidth || srcImage.width;
+      const H = srcImage.naturalHeight || srcImage.height;
+      const N = BG_MODEL_INPUT_SIZE;
+
+      onProgress?.(40, "process");
+
+      // Preprocess — resize to N×N, normalise to ImageNet stats, NCHW float32
+      const inCanvas = document.createElement("canvas");
+      inCanvas.width = N;
+      inCanvas.height = N;
+      const inCtx = inCanvas.getContext("2d");
+      if (!inCtx) throw new Error("Failed to create preprocess canvas context.");
+      inCtx.imageSmoothingEnabled = true;
+      inCtx.imageSmoothingQuality = "high";
+      inCtx.drawImage(srcImage, 0, 0, N, N);
+      const pixels = inCtx.getImageData(0, 0, N, N).data;
+
+      const tensorData = new Float32Array(3 * N * N);
+      const HW = N * N;
+      const mean = [0.485, 0.456, 0.406];
+      const std = [0.229, 0.224, 0.225];
+      for (let i = 0; i < HW; i++) {
+        const p = i * 4;
+        tensorData[i]            = ((pixels[p]     / 255) - mean[0]) / std[0];
+        tensorData[i + HW]       = ((pixels[p + 1] / 255) - mean[1]) / std[1];
+        tensorData[i + HW + HW]  = ((pixels[p + 2] / 255) - mean[2]) / std[2];
+      }
+
+      onProgress?.(55, "process");
+
+      const inputTensor = new ort.Tensor("float32", tensorData, [1, 3, N, N]);
+      const inputName = session.inputNames[0];
+      const feeds = { [inputName]: inputTensor };
+
+      const results = await session.run(feeds);
+      const outputName = session.outputNames[0];
+      const maskTensor = results[outputName];
+      const maskData = maskTensor.data; // U²-Net's d0 is post-sigmoid in [0,1]
+
+      onProgress?.(80, "process");
+
+      // Robust normalisation — rembg uses (x - min) / (max - min) before α
+      let mi = Infinity;
+      let ma = -Infinity;
+      for (let i = 0; i < maskData.length; i++) {
+        const v = maskData[i];
+        if (v < mi) mi = v;
+        if (v > ma) ma = v;
+      }
+      const range = ma - mi || 1;
+
+      // Build mask canvas at N×N as RGBA where alpha == mask probability
+      const maskCanvas = document.createElement("canvas");
+      maskCanvas.width = N;
+      maskCanvas.height = N;
+      const maskCtx = maskCanvas.getContext("2d");
+      if (!maskCtx) throw new Error("Failed to create mask canvas context.");
+      const maskImage = maskCtx.createImageData(N, N);
+      for (let i = 0; i < maskData.length; i++) {
+        const a = Math.round(((maskData[i] - mi) / range) * 255);
+        const idx = i * 4;
+        maskImage.data[idx]     = 255;
+        maskImage.data[idx + 1] = 255;
+        maskImage.data[idx + 2] = 255;
+        maskImage.data[idx + 3] = a;
+      }
+      maskCtx.putImageData(maskImage, 0, 0);
+
+      // Output canvas at the original resolution — quality preserved
+      const outCanvas = document.createElement("canvas");
+      outCanvas.width = W;
+      outCanvas.height = H;
+      const outCtx = outCanvas.getContext("2d");
+      if (!outCtx) throw new Error("Failed to create output canvas context.");
+      outCtx.imageSmoothingEnabled = true;
+      outCtx.imageSmoothingQuality = "high";
+      outCtx.drawImage(srcImage, 0, 0, W, H);
+      // Apply the up-scaled mask as the alpha channel
+      outCtx.globalCompositeOperation = "destination-in";
+      outCtx.drawImage(maskCanvas, 0, 0, W, H);
+      outCtx.globalCompositeOperation = "source-over";
+
+      onProgress?.(100, "done");
+      return outCanvas;
+    }
+    // ────────────────────────────────────────────────────────────────────────────
 
     function hasPaidPlan() {
       if (isPro) return true;
@@ -683,34 +795,27 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
 
     async function processOne(item, tool, scale, mime, quality) {
       if (tool === "bg-remove") {
-        const removeBackground = await loadBgRemoval();
         const bgMime = bgFormatEl?.value || "image/png";
         const fillValue = bgFillEl?.value || "transparent";
         const fillColor = bgFillColorEl?.value || "#ffffff";
-        const resultPng = await removeBackground(item.file, {
-          publicPath: BG_REMOVAL_PUBLIC_PATH,
-          model: BG_REMOVAL_META.model,
-          progress: (key, current, total) => {
-            const pct = total ? Math.round((current / total) * 100) : 0;
-            updateProgressUI(pct, key);
-          },
-          output: { format: "image/png", quality: 1 },
+
+        const cutoutCanvas = await removeBackgroundLocalToCanvas(item.img, (pct, key) => {
+          updateProgressUI(pct, key);
         });
 
-        let finalBlob = resultPng;
-        if (fillValue !== "transparent" || bgMime !== "image/png") {
-          finalBlob = await withDrawableFromBlob(resultPng, async (drawable, width, height) => {
-            const surface = createCanvasSurface(width, height);
-            const ctx = surface.getContext("2d");
-            if (!ctx) throw new Error("Failed to create background removal canvas context.");
-            if (fillValue !== "transparent") {
-              ctx.fillStyle = fillValue === "custom" ? fillColor : fillValue;
-              ctx.fillRect(0, 0, width, height);
-            }
-            ctx.drawImage(drawable, 0, 0, width, height);
-            return surfaceToBlob(surface, bgMime, 1);
-          });
+        // Compose the chosen background fill (or keep transparent) on top of the cutout
+        let finalCanvas = cutoutCanvas;
+        if (fillValue !== "transparent") {
+          const composed = createCanvasSurface(cutoutCanvas.width, cutoutCanvas.height);
+          const ctx = composed.getContext("2d");
+          if (!ctx) throw new Error("Failed to create background removal canvas context.");
+          ctx.fillStyle = fillValue === "custom" ? fillColor : fillValue;
+          ctx.fillRect(0, 0, composed.width, composed.height);
+          ctx.drawImage(cutoutCanvas, 0, 0);
+          finalCanvas = composed;
         }
+
+        const finalBlob = await surfaceToBlob(finalCanvas, bgMime, 1);
 
         updateProgressUI(100, "done");
         return {

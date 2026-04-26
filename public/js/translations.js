@@ -2664,7 +2664,7 @@ window.VX_TRANS = {
     "suite.bg_fill_color_aria": "Cor personalizada do fundo",
     "suite.bg_progress":        "Carregando modelo de IA...",
     "suite.bg_downloading":     "Baixando modelo...",
-    "suite.bg_removing":        "Removendo background...",
+    "suite.bg_removing":        "Removendo o fundo...",
     "suite.bg_done":            "Pronto!",
     "suite.bg_upgrade_html":    "Remover BG é um recurso <strong>Pro</strong> — <a href=\"/pricing/\">Fazer upgrade</a>",
     "suite.bg_upgrade_alert":   "Remover BG está disponível nos planos pagos. Faça upgrade para desbloquear.",
