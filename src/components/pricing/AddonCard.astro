@@ -9,19 +9,31 @@ const addonLookupKey = ({
   'bilingual': 'addon_bilingual',
   'icons-addon': 'addon_icons',
 } as Record<string, string>)[addon.id] || `addon_${String(addon.id).replace(/-/g, '_')}`;
+const isComingSoon = addon.comingSoon === true;
 ---
-<div class="addon-card" data-addon-id={addon.id}>
+<div class={`addon-card${isComingSoon ? ' addon-card--soon' : ''}`} data-addon-id={addon.id} data-coming-soon={isComingSoon ? 'true' : null}>
   <div class="addon-card__info">
-    <h3 class="addon-card__name"><span class="i18n-en">{addon.name.en}</span><span class="i18n-pt">{addon.name.pt}</span></h3>
+    <h3 class="addon-card__name">
+      <span class="i18n-en">{addon.name.en}</span><span class="i18n-pt">{addon.name.pt}</span>
+      {isComingSoon && (
+        <span class="addon-card__pill"><span class="i18n-en">Coming soon</span><span class="i18n-pt">Em breve</span></span>
+      )}
+    </h3>
     <p class="addon-card__desc"><span class="i18n-en">{addon.description.en}</span><span class="i18n-pt">{addon.description.pt}</span></p>
   </div>
   <div class="addon-card__right">
     {currencies.map((c) => (
       <span class={`addon-card__price ${c !== currency ? 'vx-price--hidden' : ''}`} data-currency={c}>{addon.price[c]}</span>
     ))}
-    <button type="button" class="addon-card__cta" data-addon-key={addonLookupKey}>
-      <span class="i18n-en">Add</span><span class="i18n-pt">Adicionar</span>
-    </button>
+    {isComingSoon ? (
+      <button type="button" class="addon-card__cta addon-card__cta--soon" disabled aria-disabled="true">
+        <span class="i18n-en">Notify me</span><span class="i18n-pt">Avise-me</span>
+      </button>
+    ) : (
+      <button type="button" class="addon-card__cta" data-addon-key={addonLookupKey}>
+        <span class="i18n-en">Add</span><span class="i18n-pt">Adicionar</span>
+      </button>
+    )}
   </div>
 </div>
 
@@ -97,5 +109,30 @@ const addonLookupKey = ({
     border-color: rgba(52,211,153,.25);
     color: #34D399;
     pointer-events: none;
+  }
+  .addon-card--soon { opacity: .68; cursor: default; }
+  .addon-card--soon:hover { transform: none; box-shadow: none; border-color: rgba(255,255,255,.06); }
+  .addon-card__pill {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    background: rgba(255,255,255,.06);
+    color: rgba(255,255,255,.55);
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .addon-card__cta--soon {
+    background: rgba(255,255,255,.04);
+    border-color: rgba(255,255,255,.08);
+    color: rgba(255,255,255,.4);
+    cursor: not-allowed;
+  }
+  .addon-card__cta--soon:hover {
+    background: rgba(255,255,255,.04);
+    border-color: rgba(255,255,255,.08);
   }
 </style>

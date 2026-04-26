@@ -668,8 +668,8 @@ const pricingAssistItems = [
       });
     });
 
-    // ── Add-ons: checkout via Stripe ──
-    document.querySelectorAll('.addon-card__cta').forEach(btn => {
+    // ── Add-ons: checkout via Stripe (skip coming-soon) ──
+    document.querySelectorAll('.addon-card__cta:not([disabled])').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -693,11 +693,11 @@ const pricingAssistItems = [
       });
     });
 
-    // Clicking the card itself also triggers the button
-    document.querySelectorAll('.addon-card').forEach(card => {
+    // Clicking the card itself also triggers the button (skip coming-soon cards)
+    document.querySelectorAll('.addon-card:not([data-coming-soon="true"])').forEach(card => {
       card.addEventListener('click', (e) => {
         if (e.target.closest('.addon-card__cta')) return;
-        const btn = card.querySelector('.addon-card__cta');
+        const btn = card.querySelector('.addon-card__cta:not([disabled])');
         if (btn) btn.click();
       });
     });

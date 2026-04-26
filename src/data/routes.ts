@@ -27,6 +27,7 @@ export const ROUTES = {
   profile: "/profile/",
   recarregar: "/recarregar/",
   delivery: "/delivery/",
+  checkout: "/checkout/",
 
   // ── Products ──────────────────────────
   products: "/products/",

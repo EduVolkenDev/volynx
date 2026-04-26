@@ -37,6 +37,19 @@ type BuilderAddon = {
   name: Record<Locale, string>;
   description: Record<Locale, string>;
   price: MoneyMap;
+  comingSoon?: boolean;
+};
+
+type PropertyFlowTier = {
+  id: string;
+  name: Record<Locale, string>;
+  badge?: Record<Locale, string>;
+  featured?: boolean;
+  description: Record<Locale, string>;
+  price: MoneyMap;
+  billing: Record<Locale, string>;
+  features: Record<Locale, string[]>;
+  cta: Record<Locale, string>;
 };
 
 export const sitePricing = {
@@ -306,33 +319,78 @@ export const sitePricing = {
       id: 'template-pack',
       name: { pt: 'Template / kit premium', en: 'Premium template / kit' },
       description: { pt: 'Kits prontos para páginas premium de conversão.', en: 'Ready-made kits for premium conversion pages.' },
-      price: { GBP: '£28', EUR: '€32', BRL: 'R$179' }
+      price: { GBP: '£28', EUR: '€32', BRL: 'R$179' },
+      comingSoon: true
     },
     {
       id: 'html-export',
       name: { pt: 'HTML export', en: 'HTML export' },
       description: { pt: 'Pacote exportável para uso fora da plataforma.', en: 'Exportable package for use outside the platform.' },
-      price: { GBP: '£44', EUR: '€51', BRL: 'R$299' }
+      price: { GBP: '£44', EUR: '€51', BRL: 'R$299' },
+      comingSoon: true
     },
     {
       id: 'extra-slot',
       name: { pt: 'Site slot extra', en: 'Extra site slot' },
       description: { pt: 'Mais capacidade sem troca imediata de plano.', en: 'More capacity without an immediate plan upgrade.' },
-      price: { GBP: '£7/mo', EUR: '€8/mo', BRL: 'R$49/mês' }
+      price: { GBP: '£7/mo', EUR: '€8/mo', BRL: 'R$49/mês' },
+      comingSoon: true
     },
     {
       id: 'bilingual',
       name: { pt: 'Bilingual pack', en: 'Bilingual pack' },
       description: { pt: 'Suporte a versão em dois idiomas no publish.', en: 'Two-language support in published projects.' },
-      price: { GBP: '£19', EUR: '€22', BRL: 'R$129' }
+      price: { GBP: '£19', EUR: '€22', BRL: 'R$129' },
+      comingSoon: true
     },
     {
       id: 'icons-addon',
       name: { pt: 'Icon collection pack', en: 'Icon collection pack' },
       description: { pt: 'Coleções premium permanentes para usar nos seus projetos.', en: 'Permanent premium collections for your own projects.' },
-      price: { GBP: '£18', EUR: '€21', BRL: 'R$119' }
+      price: { GBP: '£18', EUR: '€21', BRL: 'R$119' },
+      comingSoon: true
     }
   ] satisfies BuilderAddon[],
+  propertyFlow: [
+    {
+      id: 'pf_starter',
+      name: { pt: 'PropertyFlow Starter', en: 'PropertyFlow Starter' },
+      description: { pt: '3 grids, código-fonte React, catálogo + filtros, bilíngue, design responsivo.', en: '3 grids, full React source, catalogue + filters, bilingual, responsive design.' },
+      price: { GBP: '£187', EUR: '€219', BRL: 'R$1.290' },
+      billing: { pt: 'pagamento único', en: 'one-time' },
+      cta: { pt: 'Comprar Starter', en: 'Get Starter' },
+      features: {
+        pt: ['3 templates de grid', 'código-fonte React completo', 'catálogo + filtros', 'interface bilíngue (EN/PT)', 'modo de dados estático'],
+        en: ['3 grid templates', 'full React source code', 'property catalogue + filters', 'bilingual interface (EN/PT)', 'static data mode']
+      }
+    },
+    {
+      id: 'pf_professional',
+      badge: { pt: 'Mais popular', en: 'Most popular' },
+      featured: true,
+      name: { pt: 'PropertyFlow Professional', en: 'PropertyFlow Professional' },
+      description: { pt: 'Tudo do Starter, mais 6 templates, integração Supabase, painel admin, captura de leads.', en: 'Everything in Starter, plus 6 templates, Supabase backend, admin dashboard, lead capture.' },
+      price: { GBP: '£447', EUR: '€519', BRL: 'R$3.090' },
+      billing: { pt: 'pagamento único', en: 'one-time' },
+      cta: { pt: 'Comprar Professional', en: 'Get Professional' },
+      features: {
+        pt: ['6 templates de grid', 'tudo do Starter', 'integração com Supabase', 'painel admin', 'galeria + modais', 'captura de leads', 'guia de deploy'],
+        en: ['6 grid templates', 'everything in Starter', 'Supabase backend integration', 'admin dashboard', 'image gallery + modals', 'enquiry capture system', 'deployment guide']
+      }
+    },
+    {
+      id: 'pf_white_label',
+      name: { pt: 'PropertyFlow White-Label', en: 'PropertyFlow White-Label' },
+      description: { pt: '15 templates, branding kit, onboarding prioritário, migração de dados, canal dedicado.', en: '15 templates, branding starter kit, priority onboarding, data migration, dedicated support.' },
+      price: { GBP: '£897', EUR: '€1.039', BRL: 'R$6.190' },
+      billing: { pt: 'pagamento único', en: 'one-time' },
+      cta: { pt: 'Comprar White-Label', en: 'Get White-Label' },
+      features: {
+        pt: ['15 templates de grid', 'tudo do Professional', 'kit de branding customizado', 'onboarding prioritário', 'suporte de migração de dados', 'canal de suporte dedicado'],
+        en: ['15 grid templates', 'everything in Professional', 'custom branding starter kit', 'priority onboarding', 'data migration support', 'dedicated support channel']
+      }
+    }
+  ] satisfies PropertyFlowTier[],
   labels: {
     pricingTitle: {
       pt: 'Preços globais, com lógica premium e monetização real.',
