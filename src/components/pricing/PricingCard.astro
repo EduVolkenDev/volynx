@@ -42,27 +42,28 @@ const currencies = ['GBP', 'EUR', 'BRL'] as const;
     box-sizing: border-box;
   }
 
-  /* Floating plan icon — top-right, matches home card-asset pattern but scaled for pricing cards */
+  /* Floating plan icon — top-right hero, scaled to read as the card's identity */
   .pricing-card > .card-asset {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    width: min(96px, 30%);
+    top: -6px;
+    right: -10px;
+    width: min(150px, 42%);
     height: auto;
-    opacity: 0.55;
+    opacity: 0.78;
     pointer-events: none;
     z-index: 0;
-    transition: opacity .35s ease, transform .35s ease;
-    filter: drop-shadow(0 10px 28px rgba(0,0,0,.35));
+    transition: opacity .35s ease, transform .35s ease, filter .35s ease;
+    filter: drop-shadow(0 14px 32px rgba(0,0,0,.45));
     mix-blend-mode: normal;
   }
   .pricing-card:hover > .card-asset {
-    opacity: 0.8;
-    transform: scale(1.06) rotate(-3deg);
+    opacity: 1;
+    transform: scale(1.08) rotate(-3deg);
+    filter: drop-shadow(0 22px 44px rgba(0,0,0,.55));
   }
   .pricing-card > *:not(.card-asset) { position: relative; z-index: 1; }
   @media (min-width: 768px) {
-    .pricing-card > .card-asset { width: 130px; top: -8px; right: -8px; }
+    .pricing-card > .card-asset { width: 200px; top: -16px; right: -16px; }
   }
   .pricing-card:hover {
     border-color: rgba(255,255,255,.12);

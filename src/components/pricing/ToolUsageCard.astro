@@ -18,7 +18,11 @@ const currencies = ['GBP', 'EUR', 'BRL'] as const;
 ---
 <div class="usage-card">
   <h3 class="usage-card__label"><span class="i18n-en">{item.label.en}</span><span class="i18n-pt">{item.label.pt}</span></h3>
-  <span class="usage-card__tokens" style={`background:${classColors[item.tool_class || 'A']};border-color:${classBorders[item.tool_class || 'A']}`}>{item.tokens}</span>
+  <span class="usage-card__tokens" style={`background:${classColors[item.tool_class || 'A']};border-color:${classBorders[item.tool_class || 'A']}`}>
+    <img src="/assets/vx-new.webp" alt="" class="usage-card__token-icon" loading="lazy" decoding="async" />
+    <span class="usage-card__token-amount">{item.tokens}</span>
+    <span class="usage-card__token-suffix">VX</span>
+  </span>
   {currencies.map((c) => (
     <span class={`usage-card__price ${c !== currency ? 'vx-price--hidden' : ''}`} data-currency={c}>{item.price[c]}</span>
   ))}
@@ -48,14 +52,31 @@ const currencies = ['GBP', 'EUR', 'BRL'] as const;
     margin: 0 0 10px;
   }
   .usage-card__tokens {
-    display: inline-block;
-    padding: 4px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px 5px 6px;
     border-radius: 999px;
     font-size: 12px;
     font-weight: 700;
     letter-spacing: .06em;
     border: 1px solid;
     margin-bottom: 8px;
+  }
+  .usage-card__token-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 6px rgba(15, 244, 212, .45));
+  }
+  .usage-card__token-amount {
+    color: #fff;
+    font-weight: 800;
+  }
+  .usage-card__token-suffix {
+    color: rgba(255, 255, 255, .55);
+    font-size: 10px;
+    letter-spacing: .12em;
   }
   .usage-card__price {
     display: block;
