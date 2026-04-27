@@ -135,38 +135,38 @@ const homeAssistItems = [
               <h2 data-i18n="home2.free_title">Premium things you can use without paying a cent.</h2>
             </div>
             <div class="free-strip__grid">
-              <article class="free-strip__item">
+              <a href={ROUTES.lab} class="free-strip__item">
                 <div class="free-strip__item-top">
                   <img src="/assets/icons-store/Hyper-Icons-Premium/render.png" alt="" class="free-strip__item-art" loading="lazy" />
                   <span class="free-strip__icon" aria-hidden="true">&#10003;</span>
                 </div>
                 <strong data-i18n="home2.free_1_title">All Lab tools, free</strong>
                 <p data-i18n="home2.free_1_desc">Converter, Image Scaler, Image Suite, QR Generator — full power, zero paywall.</p>
-              </article>
-              <article class="free-strip__item">
+              </a>
+              <a href={ROUTES.iconsStore} class="free-strip__item">
                 <div class="free-strip__item-top">
                   <img src="/assets/icons-store/Hyper-Icons-Premium/premium.png" alt="" class="free-strip__item-art" loading="lazy" />
                   <span class="free-strip__icon" aria-hidden="true">&#10003;</span>
                 </div>
                 <strong data-i18n="home2.free_2_title">Free icon packs after signup</strong>
                 <p data-i18n="home2.free_2_desc">Hundreds of curated icons unlocked the moment you create your account.</p>
-              </article>
-              <article class="free-strip__item">
+              </a>
+              <a href={ROUTES.cvitae} class="free-strip__item">
                 <div class="free-strip__item-top">
                   <img src="/assets/cvitae.webp" alt="" class="free-strip__item-art" loading="lazy" />
                   <span class="free-strip__icon" aria-hidden="true">&#10003;</span>
                 </div>
                 <strong data-i18n="home2.free_3_title">CVitae — free to build</strong>
                 <p data-i18n="home2.free_3_desc">Design a professional CV with live preview. Only pay if you want a clean PDF export.</p>
-              </article>
-              <article class="free-strip__item">
+              </a>
+              <a href={ROUTES.daily} class="free-strip__item">
                 <div class="free-strip__item-top">
                   <img src="/assets/daily-icon.webp" alt="" class="free-strip__item-art" loading="lazy" />
                   <span class="free-strip__icon" aria-hidden="true">&#10003;</span>
                 </div>
                 <strong data-i18n="home2.free_4_title">Daily lite — free daily use</strong>
                 <p data-i18n="home2.free_4_desc">Scan, summarize, write, decide — the VOLYNX Daily basics stay free for everyone.</p>
-              </article>
+              </a>
             </div>
           </div>
         </div>
@@ -190,19 +190,19 @@ const homeAssistItems = [
           <p data-i18n="home2.lab_tool_converter_desc">Convert images across formats — WebP, PNG, JPG, AVIF — in-browser.</p>
         </a>
         <a href={ROUTES.labImageScaler} class="panel feature-card lab-tool-card">
-          <img src="/assets/scalericonofi.webp" alt="" class="lab-tool-card__icon" loading="lazy" />
+          <img src="/assets/newimagescaler.webp" alt="" class="lab-tool-card__icon" loading="lazy" />
           <span class="label label--free" data-i18n="home2.lab_free_chip">Free</span>
           <h3 data-i18n="home2.lab_tool_scaler_title">Image Scaler</h3>
           <p data-i18n="home2.lab_tool_scaler_desc">Resize images at scale with precise presets and a clean batch pipeline.</p>
         </a>
         <a href={ROUTES.labImageSuite} class="panel feature-card lab-tool-card">
-          <img src="/assets/suiteiconofi.webp" alt="" class="lab-tool-card__icon" loading="lazy" />
+          <img src="/assets/newimagesuite.webp" alt="" class="lab-tool-card__icon" loading="lazy" />
           <span class="label label--free" data-i18n="home2.lab_free_chip">Free</span>
           <h3 data-i18n="home2.lab_tool_suite_title">Image Suite</h3>
           <p data-i18n="home2.lab_tool_suite_desc">Cleanup, crop and export in one flow — designed for creators who ship.</p>
         </a>
         <a href={ROUTES.labQrGen} class="panel feature-card lab-tool-card">
-          <img src="/assets/qrgen.webp" alt="" class="lab-tool-card__icon" loading="lazy" />
+          <img src="/assets/newqrgen.webp" alt="" class="lab-tool-card__icon" loading="lazy" />
           <span class="label label--free" data-i18n="home2.lab_free_chip">Free</span>
           <h3 data-i18n="home2.lab_tool_qr_title">QR Generator</h3>
           <p data-i18n="home2.lab_tool_qr_desc">Premium branded QR codes with logo, palette and download-ready exports.</p>
@@ -743,6 +743,21 @@ const homeAssistItems = [
       rgba(4, 10, 24, 0.72);
     border: 1px solid rgba(255,255,255,0.08);
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    color: inherit;
+    text-decoration: none;
+    transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease, background .25s ease;
+  }
+  a.free-strip__item { cursor: pointer; }
+  a.free-strip__item:hover {
+    transform: translateY(-3px);
+    border-color: rgba(0, 240, 255, .32);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.06),
+      0 14px 32px rgba(0, 240, 255, .14);
+  }
+  a.free-strip__item:focus-visible {
+    outline: 2px solid rgba(0, 240, 255, .6);
+    outline-offset: 3px;
   }
   .free-strip__item-top {
     display: flex;
@@ -808,9 +823,10 @@ const homeAssistItems = [
   .lab-tool-card {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 20px;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    padding: 22px 20px 24px;
     text-decoration: none;
     color: inherit;
     position: relative;
@@ -823,10 +839,13 @@ const homeAssistItems = [
     box-shadow: 0 12px 32px rgba(0,240,255,.15);
   }
   .lab-tool-card__icon {
-    width: 64px;
-    height: 64px;
+    width: min(100%, 220px);
+    max-height: clamp(150px, 17vw, 200px);
+    height: auto;
     object-fit: contain;
-    filter: drop-shadow(0 4px 12px rgba(0,240,255,.18));
+    margin: 4px auto 6px;
+    filter: drop-shadow(0 0 7px rgba(0,240,255,.22)) drop-shadow(0 14px 28px rgba(0,0,0,.35));
+    display: block;
   }
   .lab-tool-card h3 {
     margin: 0;
@@ -838,6 +857,7 @@ const homeAssistItems = [
     color: var(--muted, rgba(255,255,255,.6));
     font-size: 0.88rem;
     line-height: 1.55;
+    max-width: 32ch;
   }
   .lab-section-cta {
     display: flex;
