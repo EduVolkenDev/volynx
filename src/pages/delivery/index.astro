@@ -156,6 +156,19 @@ const deliveryAssistItems = [
         .replace(/-(gbp|eur|brl)$/i, '');
     }
 
+    function hasValue(value) {
+      if (value == null) return false;
+      if (typeof value === 'string') return value.trim() !== '';
+      return true;
+    }
+
+    function firstValue(...values) {
+      for (const value of values) {
+        if (hasValue(value)) return value;
+      }
+      return null;
+    }
+
     function purchaseLookupBase(item) {
       const meta = parseMeta(item?.metadata);
       return normalizeProductId(
@@ -175,6 +188,85 @@ const deliveryAssistItems = [
       return String(meta.stripe_session_id || item?.stripe_session_id || '').trim();
     }
 
+    function purchaseAliases(item) {
+      const aliases = new Set();
+      const sessionId = purchaseSessionId(item);
+      const lookupBase = purchaseLookupBase(item);
+      const rawId = String(item?.id || '').trim();
+
+      if (sessionId) aliases.add(`session:${sessionId}`);
+      if (lookupBase) aliases.add(`product:${lookupBase}`);
+      if (rawId) aliases.add(`id:${rawId}`);
+
+      return aliases;
+    }
+
+    function sharesPurchaseAlias(a, b) {
+      const aAliases = purchaseAliases(a);
+      if (!aAliases.size) return false;
+      for (const alias of purchaseAliases(b)) {
+        if (aAliases.has(alias)) return true;
+      }
+      return false;
+    }
+
+    function mergedMetadata(baseItem, incomingItem) {
+      return {
+        ...parseMeta(incomingItem?.metadata),
+        ...parseMeta(baseItem?.metadata),
+      };
+    }
+
+    function mergedPricePaid(baseItem, incomingItem) {
+      const basePrice = baseItem?.price_paid;
+      const incomingPrice = incomingItem?.price_paid;
+      const incomingAmountPaid = incomingItem?.amount_paid;
+
+      if (hasValue(basePrice)) return basePrice;
+      if (hasValue(incomingPrice)) return incomingPrice;
+      if (typeof incomingAmountPaid === 'number') return incomingAmountPaid / 100;
+      return null;
+    }
+
+    function mergePurchaseRecords(baseItem, incomingItem) {
+      const metadata = mergedMetadata(baseItem, incomingItem);
+      const merged = {
+        ...incomingItem,
+        ...baseItem,
+        id: firstValue(baseItem?.id, incomingItem?.id),
+        addon_id: firstValue(
+          baseItem?.addon_id,
+          incomingItem?.addon_id,
+          metadata.lookup_key,
+          metadata.stripe_lookup_key,
+          incomingItem?.lookup_key,
+          baseItem?.lookup_key
+        ),
+        product_id: firstValue(baseItem?.product_id, incomingItem?.product_id),
+        lookup_key: firstValue(
+          baseItem?.lookup_key,
+          incomingItem?.lookup_key,
+          metadata.lookup_key,
+          metadata.stripe_lookup_key
+        ),
+        stripe_session_id: firstValue(
+          purchaseSessionId(baseItem),
+          purchaseSessionId(incomingItem),
+          metadata.stripe_session_id
+        ),
+        price_paid: mergedPricePaid(baseItem, incomingItem),
+        amount_paid: firstValue(incomingItem?.amount_paid, baseItem?.amount_paid),
+        amount: firstValue(baseItem?.amount, incomingItem?.amount),
+        price: firstValue(baseItem?.price, incomingItem?.price),
+        currency: firstValue(baseItem?.currency, incomingItem?.currency),
+        status: firstValue(baseItem?.status, incomingItem?.status),
+        created_at: firstValue(baseItem?.created_at, incomingItem?.created_at),
+        metadata,
+      };
+
+      return merged;
+    }
+
     function withQuery(path, params) {
       const search = new URLSearchParams();
       Object.entries(params || {}).forEach(([key, value]) => {
@@ -190,6 +282,16 @@ const deliveryAssistItems = [
       if (base.includes('professional')) return 'professional';
       if (base.includes('starter')) return 'starter';
       return '';
+    }
+
+    function supportHref(item, product) {
+      return withQuery(ROUTES.support, {
+        intent: 'delivery',
+        product,
+        purchase: firstValue(item?.id, purchaseLookupBase(item), item?.addon_id),
+        session_id: purchaseSessionId(item),
+        lookup_key: firstValue(item?.lookup_key, parseMeta(item?.metadata).lookup_key),
+      });
     }
 
     function jwtSub(jwt) {
@@ -266,20 +368,17 @@ const deliveryAssistItems = [
         const sessionId = purchaseSessionId(item);
         const tier = propertyFlowTier(item);
         if (sessionId) {
-          return withQuery('/dashboard/purchases/propertyflow', {
+          return withQuery(ROUTES.propertyflowDelivery, {
             session_id: sessionId,
             tier,
           });
         }
-        if (tier) {
-          return withQuery('/dashboard/purchases/propertyflow', { tier });
-        }
-        return '/support/?product=propertyflow&intent=delivery';
+        return supportHref(item, 'propertyflow');
       }
       if (id.startsWith('icons-')) {
         const sessionId = purchaseSessionId(item);
         if (sessionId) {
-          return withQuery('/dashboard/purchases/icons', { session_id: sessionId });
+          return withQuery(ROUTES.iconsDelivery, { session_id: sessionId });
         }
         return '/profile/#iconPurchasesSection';
       }
@@ -289,7 +388,7 @@ const deliveryAssistItems = [
     function productCta(item) {
       const id = purchaseLookupBase(item);
       const sessionId = purchaseSessionId(item);
-      if (id.startsWith('pf-')) return sessionId ? 'Open PropertyFlow delivery' : 'Recover PropertyFlow purchase';
+      if (id.startsWith('pf-')) return sessionId ? 'Open PropertyFlow delivery' : 'Recover PropertyFlow access';
       if (id.startsWith('icons-')) return sessionId ? 'Open icon delivery' : 'Open icon purchases';
       return 'Open in Builder';
     }
@@ -387,19 +486,30 @@ const deliveryAssistItems = [
           try { events = await eventsRes.json(); } catch {}
         }
 
-        // Merge: use addons_purchased as primary, supplement with purchase_events
-        // De-duplicate by addon_id so we don't show the same product twice
-        const seen = new Set();
+        // Merge addons + events into a single card per product while preserving
+        // the best delivery context (especially Stripe session IDs from events).
         const items = [];
+        const upsertItem = (row) => {
+          const existingIndex = items.findIndex((entry) => sharesPurchaseAlias(entry, row));
+          if (existingIndex === -1) {
+            items.push(mergePurchaseRecords(row, {}));
+            return;
+          }
+          items[existingIndex] = mergePurchaseRecords(items[existingIndex], row);
+        };
 
         for (const row of purchased) {
-          const key = normalizeProductId(row.addon_id || row.product_id || row.lookup_key || row.id);
-          if (!seen.has(key)) { seen.add(key); items.push(row); }
+          upsertItem(row);
         }
         for (const row of events) {
-          const key = normalizeProductId(row.addon_id || row.product_id || row.lookup_key || row.id);
-          if (!seen.has(key)) { seen.add(key); items.push(row); }
+          upsertItem(row);
         }
+
+        items.sort((a, b) => {
+          const aTime = new Date(a?.created_at || 0).getTime();
+          const bTime = new Date(b?.created_at || 0).getTime();
+          return bTime - aTime;
+        });
 
         hide('deliveryLoading');
 
