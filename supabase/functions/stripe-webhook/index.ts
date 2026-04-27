@@ -335,12 +335,14 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       console.log(`Icon purchase ${prefix} recorded for ${userId}`);
     }
 
-    // ── Kit purchases → record addon + auto-create Builder project ──
+    // ── Kit + PropertyFlow purchases → record addon + tier-aware delivery ──
     if (prefix.startsWith("kit_") || prefix.startsWith("pf_")) {
       const addonId = prefix === "pf_white_label" ? "pf_white_label" : prefix;
+      const isPropertyFlow = prefix.startsWith("pf_");
 
       // Tier extracted from lookup_key suffix — used for delivery differentiation
-      // and as the in-product license label (Starter / Pro / Studio).
+      // and as the in-product license label (Starter / Pro / Studio for kits;
+      // Starter / Professional / White-Label for PropertyFlow).
       const tierMatch = prefix.match(/_(personal|commercial|studio|starter|professional|white_label)$/);
       const tier = tierMatch ? tierMatch[1] : null;
       const tierLabel = tier
@@ -348,7 +350,40 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
              starter: "Starter", professional: "Professional", white_label: "White-Label" } as Record<string, string>)[tier] || tier
         : null;
 
-      // Record as addon purchase (single source of truth for /delivery/)
+      // PropertyFlow signed URL — minted before the addon row is written so the
+      // download link is available in metadata from the very first read on
+      // /delivery/. Failure is non-fatal: the row still inserts with
+      // delivery_status=pending_signed_url and the user can hit "Refresh link"
+      // (refresh-pf-url edge function) to retry.
+      let pfDownloadUrl: string | null = null;
+      let pfDownloadExpiresAt: string | null = null;
+      let pfSignError: string | null = null;
+      const PF_VERSION = "v1.0.0";
+      const PF_SIGNED_URL_TTL = 60 * 60 * 24; // 24h
+      if (isPropertyFlow) {
+        const objectPath = `${addonId}/${PF_VERSION}.zip`;
+        try {
+          const { data: signed, error: signErr } = await supabase
+            .storage
+            .from("propertyflow")
+            .createSignedUrl(objectPath, PF_SIGNED_URL_TTL);
+          if (signErr) {
+            pfSignError = signErr.message;
+          } else if (signed?.signedUrl) {
+            pfDownloadUrl = signed.signedUrl;
+            pfDownloadExpiresAt = new Date(Date.now() + PF_SIGNED_URL_TTL * 1000).toISOString();
+          }
+        } catch (e) {
+          pfSignError = (e as Error).message;
+        }
+        if (pfSignError) {
+          console.error(`PropertyFlow ${prefix} signed-url error for ${userId}: ${pfSignError}`);
+        }
+      }
+
+      // Record as addon purchase (single source of truth for /delivery/).
+      // For PF, metadata already carries the signed URL on insert; for kits,
+      // we patch project_slug + delivery_status after the project insert below.
       await supabase.from("addons_purchased").insert({
         user_id: userId,
         user_email: userEmail,
@@ -363,10 +398,18 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           stripe_prefix: stripePrefix,
           tier,
           tier_label: tierLabel,
+          ...(isPropertyFlow ? {
+            download_url: pfDownloadUrl,
+            download_expires_at: pfDownloadExpiresAt,
+            download_version: PF_VERSION,
+            delivery_status: pfDownloadUrl ? "ready" : "pending_signed_url",
+            delivery_error: pfSignError,
+          } : {}),
         },
       });
 
-      // Auto-create a Builder project with the kit's preset
+      // Kit branch — auto-create a Builder project with the kit's preset.
+      // PropertyFlow does NOT use presets (it ships as a ZIP) so it skips this.
       const presetMap: Record<string, string> = {
         kit_landing_express: "saas",
         kit_landing_express_personal: "saas",
@@ -388,7 +431,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         let projectSlug: string | null = null;
         let presetFetchError: string | null = null;
         try {
-          // Fetch preset data from the public presets.json
           const presetsRes = await fetch("https://volynx.world/builder/presets.json");
           if (!presetsRes.ok) {
             presetFetchError = `presets.json HTTP ${presetsRes.status}`;
@@ -424,8 +466,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           presetFetchError = (e as Error).message;
         }
 
-        // Update the addon row with delivery state so /delivery/ can show
-        // either "Open in Builder" (success) or a recovery CTA (failure).
         await supabase
           .from("addons_purchased")
           .update({
@@ -451,7 +491,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         }
       }
 
-      console.log(`Kit purchase ${prefix} activated for ${userId}`);
+      console.log(`${isPropertyFlow ? "PropertyFlow" : "Kit"} purchase ${prefix} activated for ${userId}`);
     }
 
     await supabase.from("purchase_events").insert({

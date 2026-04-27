@@ -2196,6 +2196,25 @@ window.VX_TRANS = {
     "portfolio.aria_contact": "Contact us",
     "portfolio.aria_whatsapp": "WhatsApp",
 
+    /* === POST-PURCHASE DELIVERY === */
+    "delivery.pf.tier_starter":      "Starter",
+    "delivery.pf.tier_professional": "Professional",
+    "delivery.pf.tier_white_label":  "White-Label",
+    "delivery.pf.download":          "Download ZIP",
+    "delivery.pf.refresh":           "Refresh download link",
+    "delivery.pf.refreshing":        "Refreshing…",
+    "delivery.pf.expires_in":        "Expires in {time}",
+    "delivery.pf.expired":           "Link expired — refresh below",
+    "delivery.pf.pending":           "Preparing your download…",
+    "delivery.pf.error":             "We couldn't prepare your link. Refresh in a moment.",
+    "delivery.pf.docs":              "View setup docs",
+    "delivery.kit.open_builder":     "Open in Builder",
+    "delivery.kit.pending":          "Preparing your Builder project…",
+    "delivery.kit.error":            "We couldn't load the preset. Try opening Builder, or contact support.",
+    "delivery.kit.tier_starter":     "Starter license",
+    "delivery.kit.tier_pro":         "Pro license",
+    "delivery.kit.tier_studio":      "Studio license",
+
   },
 
   pt: {
@@ -4390,6 +4409,25 @@ window.VX_TRANS = {
     "aria.back_to_top": "Voltar ao topo",
     "portfolio.aria_contact": "Fale conosco",
     "portfolio.aria_whatsapp": "WhatsApp",
+
+    /* === ENTREGA PÓS-COMPRA === */
+    "delivery.pf.tier_starter":      "Starter",
+    "delivery.pf.tier_professional": "Professional",
+    "delivery.pf.tier_white_label":  "White-Label",
+    "delivery.pf.download":          "Baixar ZIP",
+    "delivery.pf.refresh":           "Renovar link de download",
+    "delivery.pf.refreshing":        "Renovando…",
+    "delivery.pf.expires_in":        "Expira em {time}",
+    "delivery.pf.expired":           "Link expirado — renove abaixo",
+    "delivery.pf.pending":           "Preparando seu download…",
+    "delivery.pf.error":             "Não conseguimos preparar seu link. Renove em alguns segundos.",
+    "delivery.pf.docs":              "Ver docs de configuração",
+    "delivery.kit.open_builder":     "Abrir no Builder",
+    "delivery.kit.pending":          "Preparando seu projeto no Builder…",
+    "delivery.kit.error":            "Não conseguimos carregar o preset. Abra o Builder ou fale com o suporte.",
+    "delivery.kit.tier_starter":     "Licença Starter",
+    "delivery.kit.tier_pro":         "Licença Pro",
+    "delivery.kit.tier_studio":      "Licença Studio",
 
   }
 };
