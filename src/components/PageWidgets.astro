@@ -10,8 +10,16 @@ const isProfile = Astro.url.pathname.startsWith("/profile");
 
 {!hideUtilBar && (
 <div class="vx-util-bar" id="vxUtilBar">
-  <button id="vxLangToggle" class="vx-widget vx-lang-btn" aria-label="Toggle language" title="Switch language / Mudar idioma">
-    <span class="vx-lang-label" data-i18n="widget.lang">EN</span>
+  <button
+    id="vxLangToggle"
+    class="vx-widget vx-lang-btn"
+    type="button"
+    aria-label="Toggle language"
+    data-i18n-aria="aria.toggle_lang"
+    data-vx-lang-toggle
+    data-vx-lang-title
+  >
+    <span class="vx-lang-label" data-i18n="widget.lang" data-vx-lang-label>EN</span>
   </button>
   {!isAuth && (
     <a href={ROUTES.login} id="vxLoginBtn" class="vx-widget vx-login-btn" data-i18n="widget.login">
@@ -22,12 +30,12 @@ const isProfile = Astro.url.pathname.startsWith("/profile");
 )}
 
 {!isHome && (
-  <a href={ROUTES.home} id="vxHomeBtn" class="vx-widget vx-home-btn" aria-label="Go home" data-i18n="widget.home">
+  <a href={ROUTES.home} id="vxHomeBtn" class="vx-widget vx-home-btn" aria-label="Go home" data-i18n="widget.home" data-i18n-aria="aria.go_home">
     ← Home
   </a>
 )}
 
-<button id="vxBackTop" class="vx-widget vx-backtop" aria-label="Back to top" type="button">
+<button id="vxBackTop" class="vx-widget vx-backtop" aria-label="Back to top" data-i18n-aria="aria.back_to_top" type="button">
   ↑
 </button>
 

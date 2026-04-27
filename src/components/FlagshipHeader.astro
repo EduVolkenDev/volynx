@@ -50,8 +50,15 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
       <a href={ROUTES.recarregar} class="vx-recharge" data-i18n="widget.recharge">Get VX</a>
 
       <!-- Lang toggle -->
-      <button id="vxLangToggle" class="vx-lang" aria-label="Toggle language" data-i18n-aria="aria.toggle_lang" title="Switch language / Mudar idioma">
-        <span data-i18n="widget.lang">EN</span>
+      <button
+        id="vxLangToggle"
+        class="vx-lang"
+        aria-label="Toggle language"
+        data-i18n-aria="aria.toggle_lang"
+        data-vx-lang-toggle
+        data-vx-lang-title
+      >
+        <span data-i18n="widget.lang" data-vx-lang-label>EN</span>
       </button>
 
       <!-- Signed-out: login + CTA -->
@@ -76,12 +83,20 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
     {nav.map((item) => (
       <a href={item.href} class:list={{ "is-active": current === item.href }} data-i18n={item.i18n}>{item.label}</a>
     ))}
-    <a href={ROUTES.delivery} class="vx-mobile__link">My Products</a>
-    <a href={ROUTES.support} class="vx-mobile__link">Support</a>
+    <a href={ROUTES.delivery} class="vx-mobile__link" data-i18n="nav.my_products">My Products</a>
+    <a href={ROUTES.support} class="vx-mobile__link" data-i18n="nav.support">Support</a>
     <hr class="vx-mobile__hr" />
-    <button type="button" class="vx-mobile__link vx-mobile__lang" id="vxLangToggleMobile" aria-label="Toggle language" data-i18n-aria="aria.toggle_lang">
+    <button
+      type="button"
+      class="vx-mobile__link vx-mobile__lang"
+      id="vxLangToggleMobile"
+      aria-label="Toggle language"
+      data-i18n-aria="aria.toggle_lang"
+      data-vx-lang-toggle
+      data-vx-lang-title
+    >
       <span data-i18n="widget.lang_full">Language</span>
-      <span class="vx-mobile__lang-tag" id="vxLangTagMobile">EN</span>
+      <span class="vx-mobile__lang-tag" id="vxLangTagMobile" data-vx-lang-label>EN</span>
     </button>
     <a href={ROUTES.login} class="vx-mobile__link" data-auth="out" data-i18n="nav.login">Login</a>
     <a href={ctaHref} class="vx-mobile__cta" data-auth="out" data-i18n={ctaI18n}>{ctaLabel}</a>
@@ -462,26 +477,14 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
     });
   }
 
-  // Mobile lang toggle — forwards to the topbar toggle and syncs label
+  // Mobile lang toggle — toggle is handled globally by i18n.js.
+  // We only close the menu here for a cleaner mobile flow.
   const langMobileBtn = document.getElementById("vxLangToggleMobile");
-  const langMobileTag = document.getElementById("vxLangTagMobile");
-  const topbarLangBtn = document.getElementById("vxLangToggle");
-  function syncMobileLangTag() {
-    if (!langMobileTag) return;
-    const lang = localStorage.getItem("volynx_lang") || "en";
-    langMobileTag.textContent = lang.toUpperCase();
-  }
-  syncMobileLangTag();
   langMobileBtn?.addEventListener("click", () => {
-    // Forward the click to the canonical toggle so page-widgets.js handles persistence + applyTranslations
-    topbarLangBtn?.click();
-    // Close the mobile menu after language change for clean UX
     nav?.classList.remove("is-open");
     btn?.classList.remove("is-open");
     btn?.setAttribute("aria-expanded", "false");
-    setTimeout(syncMobileLangTag, 50);
   });
-  window.addEventListener("vx:lang-changed", syncMobileLangTag);
 
   // Token pill — resilient: cache → VxTokens (polled) → direct fetch fallback
   (function wireTokenPill() {

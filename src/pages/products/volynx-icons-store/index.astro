@@ -1198,7 +1198,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify({
             lookup_key: lookupKey,
-            success_url: `${window.location.origin}/profile/?payment=success&product=icons-store`,
+            success_url: `${window.location.origin}/dashboard/purchases/icons?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${window.location.origin}${STORE_ROUTES.iconsStore}?payment=cancelled`,
             ...iconMeta,
           }),

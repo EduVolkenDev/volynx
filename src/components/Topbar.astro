@@ -19,8 +19,16 @@ const {
 <header class="vx-topbar">
   <div class="vx-topbar-left">
     {showLang && (
-      <button type="button" class="vx-topbar-lang" id="vxTopbarLang" aria-label="Toggle language">
-        <span class="vx-topbar-lang-label" data-i18n="widget.lang">EN</span>
+      <button
+        type="button"
+        class="vx-topbar-lang"
+        id="vxTopbarLang"
+        aria-label="Toggle language"
+        data-i18n-aria="aria.toggle_lang"
+        data-vx-lang-toggle
+        data-vx-lang-title
+      >
+        <span class="vx-topbar-lang-label" data-i18n="widget.lang" data-vx-lang-label>EN</span>
       </button>
     )}
     {leftLinks.map(link => (
@@ -28,7 +36,7 @@ const {
     ))}
     <slot name="left" />
   </div>
-  <a href={ROUTES.home} class="vx-topbar-brand" aria-label="VOLYNX home">
+  <a href={ROUTES.home} class="vx-topbar-brand" aria-label="VOLYNX home" data-i18n-aria="aria.go_home">
     <img src="/assets/V.webp" alt="" class="vx-topbar-icon" width="44" height="44" aria-hidden="true" loading="eager" decoding="async" />
     <img src="/assets/wordmark.webp" alt="VOLYNX" class="vx-topbar-wordmark" width="132" height="72" loading="eager" decoding="async" />
   </a>
@@ -154,21 +162,3 @@ const {
     .vx-topbar-wordmark { width: 116px; }
   }
 </style>
-
-<script is:inline>
-(function() {
-  var btn = document.getElementById('vxTopbarLang');
-  if (!btn) return;
-  var label = btn.querySelector('.vx-topbar-lang-label');
-  var KEY = 'volynx_lang';
-  function upd() { if (label) label.textContent = (localStorage.getItem(KEY) || 'en').toUpperCase(); }
-  upd();
-  btn.addEventListener('click', function() {
-    var cur = localStorage.getItem(KEY) || 'en';
-    var next = cur === 'en' ? 'pt' : 'en';
-    localStorage.setItem(KEY, next);
-    if (window.applyTranslations) window.applyTranslations(next);
-    upd();
-  });
-})();
-</script>

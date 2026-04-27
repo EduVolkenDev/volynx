@@ -23,6 +23,26 @@
     return /^(gbp|eur|brl)$/.test(currency) ? currency : 'gbp';
   }
 
+  function isPropertyFlowLookup(value) {
+    return /^pf[_-]/i.test(String(value || ''));
+  }
+
+  function propertyFlowTierFromLookup(value) {
+    var normalized = String(value || '').trim().toLowerCase().replace(/_/g, '-');
+    if (normalized.indexOf('white-label') !== -1 || normalized.indexOf('enterprise') !== -1) return 'white-label';
+    if (normalized.indexOf('professional') !== -1) return 'professional';
+    return 'starter';
+  }
+
+  function successUrlForLookup(lookupBase) {
+    if (!isPropertyFlowLookup(lookupBase)) {
+      return window.location.origin + '/delivery/?payment=success';
+    }
+
+    var tier = propertyFlowTierFromLookup(lookupBase);
+    return window.location.origin + '/dashboard/purchases/propertyflow?session_id={CHECKOUT_SESSION_ID}&tier=' + encodeURIComponent(tier);
+  }
+
   async function freshAccessToken(cfg) {
     var token = localStorage.getItem('volynx_access_token') || '';
     var refreshToken = localStorage.getItem('volynx_refresh_token') || '';
@@ -87,7 +107,7 @@
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
         body: JSON.stringify({
           lookup_key: lookupKey,
-          success_url: window.location.origin + '/delivery/?payment=success',
+          success_url: successUrlForLookup(lookupBase),
           cancel_url: window.location.href.split('?')[0] + '?payment=cancelled',
         }),
       });

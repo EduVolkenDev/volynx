@@ -747,6 +747,12 @@ import { ROUTES } from "../data/routes";
 					return String(meta.stripe_session_id || row?.stripe_session_id || "").trim();
 				}
 
+				function iconRecoveryHref(row) {
+					const sessionId = iconSessionId(row);
+					if (!sessionId) return "";
+					return `/dashboard/purchases/icons?session_id=${encodeURIComponent(sessionId)}`;
+				}
+
 				function iconPriceFromCatalog(row) {
 					const base = iconLookupBase(row);
 					const currency = String(row?.currency || "GBP").toLowerCase();
@@ -1021,12 +1027,22 @@ import { ROUTES } from "../data/routes";
 							await downloadIconPackZip(workingRow);
 							button.textContent = "ZIP ready";
 						} else {
+							const recoveryHref = iconRecoveryHref(workingRow);
+							if (recoveryHref) {
+								window.location.href = recoveryHref;
+								return;
+							}
 							const purchaseId = encodeURIComponent(workingRow?.id || workingRow?.addon_id || "icons");
 							window.location.href = `/support/?product=volynx-icons-store&intent=delivery&purchase=${purchaseId}`;
 							return;
 						}
 					} catch (error) {
 						console.error("[profile] icon delivery failed:", error);
+						const recoveryHref = iconRecoveryHref(workingRow);
+						if (recoveryHref) {
+							window.location.href = recoveryHref;
+							return;
+						}
 						button.textContent = "Delivery issue";
 						button.classList.add("btn--ghost");
 						setTimeout(() => { button.textContent = originalText; button.disabled = false; }, 2200);

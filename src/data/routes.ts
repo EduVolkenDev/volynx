@@ -49,6 +49,10 @@ export const ROUTES = {
   devHub: "/dev-hub/",
   builder: "/builder/",
   builderLegacy: "/builder/",  // alias for backwards-compat (unified into /builder/)
+  dashboard: "/dashboard/",
+  purchases: "/dashboard/purchases/",
+  propertyflowDelivery: "/dashboard/purchases/propertyflow",
+  iconsDelivery: "/dashboard/purchases/icons",
 
   // ── Lab (Free) ────────────────────────
   lab: "/volynx-lab/",

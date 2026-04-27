@@ -141,6 +141,57 @@ const deliveryAssistItems = [
       return normalized;
     }
 
+    function parseMeta(value) {
+      if (!value) return {};
+      if (typeof value === 'string') {
+        try { return JSON.parse(value); } catch { return {}; }
+      }
+      return typeof value === 'object' ? value : {};
+    }
+
+    function stripCurrencySuffix(value) {
+      return String(value || '')
+        .trim()
+        .replace(/_(gbp|eur|brl)$/i, '')
+        .replace(/-(gbp|eur|brl)$/i, '');
+    }
+
+    function purchaseLookupBase(item) {
+      const meta = parseMeta(item?.metadata);
+      return normalizeProductId(
+        stripCurrencySuffix(
+          meta.lookup_key ||
+          meta.stripe_lookup_key ||
+          item?.lookup_key ||
+          item?.addon_id ||
+          item?.product_id ||
+          ''
+        )
+      );
+    }
+
+    function purchaseSessionId(item) {
+      const meta = parseMeta(item?.metadata);
+      return String(meta.stripe_session_id || item?.stripe_session_id || '').trim();
+    }
+
+    function withQuery(path, params) {
+      const search = new URLSearchParams();
+      Object.entries(params || {}).forEach(([key, value]) => {
+        if (value) search.set(key, String(value));
+      });
+      const query = search.toString();
+      return query ? `${path}?${query}` : path;
+    }
+
+    function propertyFlowTier(item) {
+      const base = purchaseLookupBase(item);
+      if (base.includes('white-label') || base.includes('enterprise')) return 'white-label';
+      if (base.includes('professional')) return 'professional';
+      if (base.includes('starter')) return 'starter';
+      return '';
+    }
+
     function jwtSub(jwt) {
       try {
         const part = String(jwt || '').split('.')[1];
@@ -206,20 +257,40 @@ const deliveryAssistItems = [
       return null;
     }
 
-    function productHref(addonId) {
-      if (!addonId) return '/builder/';
-      const id = addonId.toLowerCase().replace(/_/g, '-');
-      const preset = addonToPreset(addonId);
+    function productHref(item) {
+      const id = purchaseLookupBase(item);
+      if (!id) return '/builder/';
+      const preset = addonToPreset(id);
       if (preset) return '/builder/?preset=' + encodeURIComponent(preset);
-      if (id.startsWith('pf-')) return '/support/?product=propertyflow&intent=delivery';
-      if (id.startsWith('icons-')) return '/profile/#iconPurchasesSection';
+      if (id.startsWith('pf-')) {
+        const sessionId = purchaseSessionId(item);
+        const tier = propertyFlowTier(item);
+        if (sessionId) {
+          return withQuery('/dashboard/purchases/propertyflow', {
+            session_id: sessionId,
+            tier,
+          });
+        }
+        if (tier) {
+          return withQuery('/dashboard/purchases/propertyflow', { tier });
+        }
+        return '/support/?product=propertyflow&intent=delivery';
+      }
+      if (id.startsWith('icons-')) {
+        const sessionId = purchaseSessionId(item);
+        if (sessionId) {
+          return withQuery('/dashboard/purchases/icons', { session_id: sessionId });
+        }
+        return '/profile/#iconPurchasesSection';
+      }
       return '/builder/';
     }
 
-    function productCta(addonId) {
-      const id = (addonId || '').toLowerCase().replace(/_/g, '-');
-      if (id.startsWith('pf-')) return 'Recover PropertyFlow delivery';
-      if (id.startsWith('icons-')) return 'Open icon delivery';
+    function productCta(item) {
+      const id = purchaseLookupBase(item);
+      const sessionId = purchaseSessionId(item);
+      if (id.startsWith('pf-')) return sessionId ? 'Open PropertyFlow delivery' : 'Recover PropertyFlow purchase';
+      if (id.startsWith('icons-')) return sessionId ? 'Open icon delivery' : 'Open icon purchases';
       return 'Open in Builder';
     }
 
@@ -241,13 +312,13 @@ const deliveryAssistItems = [
     }
 
     function buildCard(item) {
-      const productId = normalizeProductId(item.addon_id || item.product_id || item.lookup_key || '');
+      const productId = purchaseLookupBase(item);
       const label   = addonLabel(productId);
       const date    = formatDate(item.created_at);
       const amount  = item.price_paid ?? item.amount_paid ?? item.amount ?? item.price;
       const price   = formatPrice(amount, item.currency, item.price_paid == null);
-      const builderHref = productHref(productId);
-      const cta = productCta(productId);
+      const builderHref = productHref(item);
+      const cta = productCta(item);
 
       return `
         <article class="panel delivery-card">

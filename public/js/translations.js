@@ -19,6 +19,8 @@ window.VX_TRANS = {
     "nav.start_pro": "Start Pro",
     "nav.open_builder": "Open Builder",
     "nav.profile": "Profile",
+    "nav.my_products": "My Products",
+    "nav.support": "Support",
 
     /* === FOOTER === */
     "footer.tagline": "Building a smarter future through premium kits, local-first tools and production-grade digital systems.",
@@ -2190,6 +2192,7 @@ window.VX_TRANS = {
     "aria.studio_upgrade": "Studio Pro upgrade",
     "aria.support_shortcut": "Support shortcut",
     "aria.support_shortcuts": "Support shortcuts",
+    "aria.back_to_top": "Back to top",
     "portfolio.aria_contact": "Contact us",
     "portfolio.aria_whatsapp": "WhatsApp",
 
@@ -2212,6 +2215,8 @@ window.VX_TRANS = {
     "nav.start_pro": "Começar Pro",
     "nav.open_builder": "Abrir Builder",
     "nav.profile": "Perfil",
+    "nav.my_products": "Meus produtos",
+    "nav.support": "Suporte",
 
     /* === FOOTER === */
     "footer.tagline": "Construindo um futuro mais inteligente com kits premium, ferramentas locais e sistemas digitais de nível profissional.",
@@ -4382,6 +4387,7 @@ window.VX_TRANS = {
     "aria.studio_upgrade": "Upgrade Studio Pro",
     "aria.support_shortcut": "Atalho de suporte",
     "aria.support_shortcuts": "Atalhos de suporte",
+    "aria.back_to_top": "Voltar ao topo",
     "portfolio.aria_contact": "Fale conosco",
     "portfolio.aria_whatsapp": "WhatsApp",
 
