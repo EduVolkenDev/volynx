@@ -109,6 +109,76 @@ const TOKEN_CREDITS: Record<string, number> = {
   tokens_scale: 200,
 };
 
+// ── Email dispatch helper ──────────────────────────────────
+// Fire-and-forget queueing into email_log. The send-purchase-email function
+// is invoked after the row exists, so even if the HTTP call cold-starts past
+// the webhook's response window, the pending row remains for a future retry
+// (cron worker, manual replay, etc.).
+
+const SUPABASE_URL_SELF = Deno.env.get("SUPABASE_URL")!;
+const SERVICE_ROLE_SELF = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+type EmailEventType =
+  | "tokens_credited"
+  | "plan_activated"
+  | "bundle_activated"
+  | "voucher_redeemed"
+  | "propertyflow_ready"
+  | "addon_activated"
+  | "kit_delivered"
+  | "icons_delivered"
+  | "cvitae_template_unlocked";
+
+async function queueEmail(args: {
+  event_type: EmailEventType;
+  user_id: string;
+  recipient_email: string;
+  idempotency_key: string;
+  payload: Record<string, unknown>;
+}): Promise<void> {
+  try {
+    const { error } = await supabase.from("email_log").insert({
+      user_id: args.user_id,
+      event_type: args.event_type,
+      idempotency_key: args.idempotency_key,
+      recipient_email: args.recipient_email || "pending",
+      payload: args.payload,
+      status: "pending",
+    });
+    if (error && error.code !== "23505") {
+      console.error(`email_log insert error (${args.event_type}):`, error.message);
+      return;
+    }
+    if (error?.code === "23505") {
+      // Duplicate idempotency_key — already queued/sent, fine.
+      return;
+    }
+  } catch (e) {
+    console.error(`email_log insert threw (${args.event_type}):`, (e as Error).message);
+    return;
+  }
+
+  // Fire-and-forget dispatch — the function reads the pending row by
+  // (event_type, idempotency_key) lookup. If this fetch fails, the row stays
+  // pending and any replay tooling can pick it up.
+  fetch(`${SUPABASE_URL_SELF}/functions/v1/send-purchase-email`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${SERVICE_ROLE_SELF}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      event_type: args.event_type,
+      user_id: args.user_id,
+      idempotency_key: args.idempotency_key,
+      payload: args.payload,
+      recipient_email: args.recipient_email,
+    }),
+  }).catch((e) => {
+    console.error(`send-purchase-email dispatch failed (${args.event_type}):`, (e as Error).message);
+  });
+}
+
 // ── Helpers ─────────────────────────────────────────────────
 
 function extractPrefix(lookupKey: string): string {
@@ -244,6 +314,39 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       );
     }
 
+    // Subscription add-ons (currently only addon_extra_slot). Each renewal
+    // ticks through this path; we keep one active row per (user, addon, sub)
+    // so the slot counter stays accurate even across reactivations.
+    if (prefix.startsWith("addon_")) {
+      const addonId = prefix.replace(/^addon_/, "");
+      const { data: existing } = await supabase
+        .from("addons_purchased")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("addon_id", addonId)
+        .eq("metadata->>stripe_subscription_id", subId || "")
+        .maybeSingle();
+      if (!existing) {
+        await supabase.from("addons_purchased").insert({
+          user_id: userId,
+          user_email: userEmail,
+          addon_id: addonId,
+          price_paid: (session.amount_total || 0) / 100,
+          currency: currency,
+          status: "active",
+          metadata: {
+            stripe_session_id: session.id,
+            stripe_subscription_id: subId,
+            lookup_key: lookupKey,
+            stripe_lookup_key: stripeLookupKey,
+            stripe_prefix: stripePrefix,
+            billing: "subscription",
+          },
+        });
+        console.log(`Subscription addon ${addonId} activated for ${userId} (sub ${subId})`);
+      }
+    }
+
     // Log purchase event
     await supabase.from("purchase_events").insert({
       user_id: userId,
@@ -264,6 +367,43 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         stripe_prefix: stripePrefix,
       },
     });
+
+    // Notify the buyer — bundle gets its own template, single-product subs
+    // get plan_activated.
+    if (prefix.startsWith("bundle_")) {
+      const bundleProducts = (PLAN_PROFILE_MAP[prefix] && Object.keys(PLAN_PROFILE_MAP[prefix]).filter(k => k.endsWith("_plan"))) || [];
+      await queueEmail({
+        event_type: "bundle_activated",
+        user_id: userId,
+        recipient_email: userEmail,
+        idempotency_key: session.id,
+        payload: {
+          bundle_label: prefix,
+          products: bundleProducts.map(k => {
+            const p = k.replace(/_plan$/, "");
+            const url = p === "daily" ? "https://daily.volynx.world/"
+              : p === "cvitae" ? "https://cvitae.volynx.world/"
+              : "https://volynx.world/builder/";
+            return { name: p, url };
+          }),
+        },
+      });
+    } else if (PLAN_PROFILE_MAP[prefix]) {
+      const productKeyForEmail = prefix.startsWith("daily_") ? "daily"
+        : prefix.startsWith("cvitae_") ? "cvitae"
+        : "volynx";
+      await queueEmail({
+        event_type: "plan_activated",
+        user_id: userId,
+        recipient_email: userEmail,
+        idempotency_key: session.id,
+        payload: {
+          plan_name: prefix,
+          product: productKeyForEmail,
+          features: [],
+        },
+      });
+    }
   }
 
   // ── One-time payment (Token packs, Add-ons) ──
@@ -291,21 +431,74 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         console.error(`credit_tokens_atomic error for ${userId}:`, creditErr.message);
       } else {
         console.log(`Credited ${tokenAmount} tokens to ${userId}. New balance: ${creditResult?.balance}`);
+        await queueEmail({
+          event_type: "tokens_credited",
+          user_id: userId,
+          recipient_email: userEmail,
+          idempotency_key: session.id,
+          payload: {
+            tokens: tokenAmount,
+            new_balance: creditResult?.balance ?? null,
+            pack_name: prefix,
+          },
+        });
       }
     }
 
     if (prefix.startsWith("addon_")) {
-      const addonId = prefix.replace("addon_", "");
-      await supabase.from("addons_purchased").insert({
-        user_id: userId,
-        user_email: userEmail,
-        addon_id: addonId,
-        price_paid: (session.amount_total || 0) / 100,
-        currency: currency,
-        status: "active",
-        metadata: { stripe_session_id: session.id, lookup_key: lookupKey, stripe_lookup_key: stripeLookupKey },
-      });
-      console.log(`Addon ${addonId} activated for ${userId}`);
+      const addonId = prefix.replace(/^addon_/, "");
+
+      // Idempotency: Stripe can retry the same checkout.session.completed
+      // event. Reject the second insert so a retry never double-grants.
+      const { data: existing } = await supabase
+        .from("addons_purchased")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("metadata->>stripe_session_id", session.id)
+        .maybeSingle();
+      if (existing) {
+        console.log(`Addon ${addonId} already recorded for session ${session.id} — skip`);
+      } else {
+        // Pull entitlement so the row carries the feature list inline. UI can
+        // read either v_user_entitlements (joined) or this row directly.
+        const { data: entitlement } = await supabase
+          .from("addon_entitlements")
+          .select("features, slot_delta, download_zip, billing")
+          .eq("addon_id", addonId)
+          .maybeSingle();
+
+        await supabase.from("addons_purchased").insert({
+          user_id: userId,
+          user_email: userEmail,
+          addon_id: addonId,
+          price_paid: (session.amount_total || 0) / 100,
+          currency: currency,
+          status: "active",
+          metadata: {
+            stripe_session_id: session.id,
+            lookup_key: lookupKey,
+            stripe_lookup_key: stripeLookupKey,
+            stripe_prefix: stripePrefix,
+            billing: "one_time",
+            features: entitlement?.features || [],
+            slot_delta: entitlement?.slot_delta || 0,
+            download_zip: entitlement?.download_zip || null,
+            delivery_status: entitlement?.download_zip ? "pending_download" : "ready",
+          },
+        });
+        console.log(`Addon ${addonId} activated for ${userId} (features: ${(entitlement?.features || []).join(",")})`);
+        await queueEmail({
+          event_type: "addon_activated",
+          user_id: userId,
+          recipient_email: userEmail,
+          idempotency_key: session.id,
+          payload: {
+            addon_id: addonId,
+            addon_name: addonId.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+            features: entitlement?.features || [],
+          },
+        });
+      }
     }
 
     // ── Icon purchases (icons_single_* / icons_pack_*) → record ──
@@ -333,6 +526,17 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         },
       });
       console.log(`Icon purchase ${prefix} recorded for ${userId}`);
+      await queueEmail({
+        event_type: "icons_delivered",
+        user_id: userId,
+        recipient_email: userEmail,
+        idempotency_key: session.id,
+        payload: {
+          tier: prefix.replace(/^icons_(single|pack)_/, ""),
+          kind: prefix.startsWith("icons_single_") ? "single" : "pack",
+          session_id: session.id,
+        },
+      });
     }
 
     // ── Kit + PropertyFlow purchases → record addon + tier-aware delivery ──
@@ -492,6 +696,39 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       }
 
       console.log(`${isPropertyFlow ? "PropertyFlow" : "Kit"} purchase ${prefix} activated for ${userId}`);
+
+      if (isPropertyFlow) {
+        await queueEmail({
+          event_type: "propertyflow_ready",
+          user_id: userId,
+          recipient_email: userEmail,
+          idempotency_key: session.id,
+          payload: {
+            tier,
+            tier_label: tierLabel,
+            signed_url: pfDownloadUrl,
+            expires_at: pfDownloadExpiresAt,
+          },
+        });
+      } else if (presetId) {
+        const kitDisplayName = ({
+          agency: "Agency Launch Kit",
+          portfolio: "Portfolio Pro Kit",
+          saas: "SaaS Landing System",
+        } as Record<string, string>)[presetId] || "Kit";
+        await queueEmail({
+          event_type: "kit_delivered",
+          user_id: userId,
+          recipient_email: userEmail,
+          idempotency_key: session.id,
+          payload: {
+            kit_name: kitDisplayName,
+            tier,
+            tier_label: tierLabel,
+            preset_id: presetId,
+          },
+        });
+      }
     }
 
     await supabase.from("purchase_events").insert({
@@ -605,6 +842,21 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
       .eq("bundle_key", prefix);
   }
 
+  // Subscription add-ons (e.g. addon_extra_slot) — flip the matching addon
+  // row to canceled so v_user_entitlements stops returning it. We don't
+  // unpublish overflow sites here; that's a soft-cap concern handled by the
+  // Builder UI when the user next opens it.
+  if (prefix.startsWith("addon_")) {
+    const addonId = prefix.replace(/^addon_/, "");
+    await supabase
+      .from("addons_purchased")
+      .update({ status: "canceled" })
+      .eq("user_id", user_id)
+      .eq("addon_id", addonId)
+      .eq("metadata->>stripe_subscription_id", subscription.id);
+    console.log(`Subscription addon ${addonId} canceled for ${user_id} (sub ${subscription.id})`);
+  }
+
   // Check for other active subscriptions
   const { data: activeSubs } = await supabase
     .from("subscriptions")
@@ -620,6 +872,45 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   await supabase.rpc("sync_plan_to_app_metadata", { p_user_id: user_id });
 
   console.log(`Subscription deleted: ${subscription.id}, user ${user_id} downgraded`);
+}
+
+async function handleChargeRefunded(charge: Stripe.Charge) {
+  // For one-time add-ons, the corresponding addons_purchased row carries the
+  // originating session_id in metadata. Match against that and flip the row
+  // to refunded so v_user_entitlements stops returning the feature. Already-
+  // downloaded ZIPs cannot be revoked — the signed URL refresh endpoint will
+  // 403 on next call because status != 'active'.
+  const paymentIntentId = typeof charge.payment_intent === "string"
+    ? charge.payment_intent
+    : charge.payment_intent?.id;
+  if (!paymentIntentId) {
+    console.log(`Refund event without payment_intent — skipping`);
+    return;
+  }
+
+  // purchase_events stores the payment_intent_id we wrote at purchase time;
+  // join through it to find the session_id that the addon row references.
+  const { data: pe } = await supabase
+    .from("purchase_events")
+    .select("user_id, stripe_session_id")
+    .eq("stripe_payment_intent_id", paymentIntentId)
+    .maybeSingle();
+
+  if (!pe?.stripe_session_id) {
+    console.log(`No purchase_events row for payment_intent ${paymentIntentId}`);
+    return;
+  }
+
+  const { data: addons } = await supabase
+    .from("addons_purchased")
+    .update({ status: "refunded" })
+    .eq("user_id", pe.user_id)
+    .eq("metadata->>stripe_session_id", pe.stripe_session_id)
+    .select("id, addon_id");
+
+  if (addons && addons.length > 0) {
+    console.log(`Refund for ${pe.user_id}: ${addons.length} addon(s) revoked — ${addons.map(a => a.addon_id).join(", ")}`);
+  }
 }
 
 async function handleInvoiceSucceeded(invoice: Stripe.Invoice) {
@@ -742,6 +1033,11 @@ serve(async (req: Request) => {
 
       case "invoice.payment_failed":
         await handleInvoiceFailed(event.data.object as Stripe.Invoice);
+        break;
+
+      case "charge.refunded":
+      case "charge.dispute.closed":
+        await handleChargeRefunded(event.data.object as Stripe.Charge);
         break;
 
       default:
