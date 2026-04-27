@@ -338,7 +338,17 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     // ── Kit purchases → record addon + auto-create Builder project ──
     if (prefix.startsWith("kit_") || prefix.startsWith("pf_")) {
       const addonId = prefix === "pf_white_label" ? "pf_white_label" : prefix;
-      // Record as addon purchase
+
+      // Tier extracted from lookup_key suffix — used for delivery differentiation
+      // and as the in-product license label (Starter / Pro / Studio).
+      const tierMatch = prefix.match(/_(personal|commercial|studio|starter|professional|white_label)$/);
+      const tier = tierMatch ? tierMatch[1] : null;
+      const tierLabel = tier
+        ? ({ personal: "Starter", commercial: "Pro", studio: "Studio",
+             starter: "Starter", professional: "Professional", white_label: "White-Label" } as Record<string, string>)[tier] || tier
+        : null;
+
+      // Record as addon purchase (single source of truth for /delivery/)
       await supabase.from("addons_purchased").insert({
         user_id: userId,
         user_email: userEmail,
@@ -351,6 +361,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           lookup_key: lookupKey,
           stripe_lookup_key: stripeLookupKey,
           stripe_prefix: stripePrefix,
+          tier,
+          tier_label: tierLabel,
         },
       });
 
@@ -373,27 +385,69 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
       const presetId = presetMap[prefix];
       if (presetId) {
+        let projectSlug: string | null = null;
+        let presetFetchError: string | null = null;
         try {
           // Fetch preset data from the public presets.json
           const presetsRes = await fetch("https://volynx.world/builder/presets.json");
-          if (presetsRes.ok) {
+          if (!presetsRes.ok) {
+            presetFetchError = `presets.json HTTP ${presetsRes.status}`;
+          } else {
             const presetsData = await presetsRes.json();
             const preset = presetsData.presets?.find((p: any) => p.id === presetId);
-            if (preset?.data) {
-              const slug = `${presetId}-${Date.now().toString(36)}`;
+            if (!preset?.data) {
+              presetFetchError = `preset '${presetId}' not found in presets.json`;
+            } else {
+              projectSlug = `${presetId}-${Date.now().toString(36)}`;
+              const projectName = tierLabel
+                ? `${preset.name} Kit — ${tierLabel}`
+                : `${preset.name} Kit — ${new Date().toLocaleDateString("en-GB")}`;
               await supabase.from("projects").insert({
                 user_id: userId,
-                name: `${preset.name} Kit — ${new Date().toLocaleDateString("en-GB")}`,
-                slug: slug,
+                name: projectName,
+                slug: projectSlug,
                 builder_data: preset.data,
                 status: "draft",
                 domain_type: "subdomain",
+                metadata: {
+                  source_kit: addonId,
+                  preset_id: presetId,
+                  tier,
+                  tier_label: tierLabel,
+                  stripe_session_id: session.id,
+                },
               });
-              console.log(`Auto-created Builder project '${slug}' for ${userId} from kit ${prefix}`);
+              console.log(`Auto-created Builder project '${projectSlug}' (${tierLabel || "unknown tier"}) for ${userId} from kit ${prefix}`);
             }
           }
         } catch (e) {
-          console.error(`Failed to auto-create project for kit ${prefix}:`, (e as Error).message);
+          presetFetchError = (e as Error).message;
+        }
+
+        // Update the addon row with delivery state so /delivery/ can show
+        // either "Open in Builder" (success) or a recovery CTA (failure).
+        await supabase
+          .from("addons_purchased")
+          .update({
+            metadata: {
+              stripe_session_id: session.id,
+              lookup_key: lookupKey,
+              stripe_lookup_key: stripeLookupKey,
+              stripe_prefix: stripePrefix,
+              tier,
+              tier_label: tierLabel,
+              project_slug: projectSlug,
+              preset_id: presetId,
+              delivery_status: projectSlug ? "ready" : "pending_preset_fetch",
+              delivery_error: presetFetchError,
+            },
+          })
+          .eq("user_id", userId)
+          .eq("addon_id", addonId)
+          .eq("metadata->>stripe_session_id", session.id);
+
+        if (presetFetchError) {
+          console.error(`Kit ${prefix} for ${userId}: preset fetch failed — ${presetFetchError}`);
         }
       }
 
