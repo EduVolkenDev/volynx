@@ -90,19 +90,26 @@ const L = t[lang];
     <section class="rec-hero">
       <div class="rec-bg" aria-hidden="true"></div>
       <div class="shell rec-hero-inner">
-        <div class="rec-pill">
-          <span class="rec-pill-dot"></span>
-          <span>{L.pill}</span>
-        </div>
-        <h1 class="rec-title">
-          {L.title}<br />
-          <span class="gradient-text">{L.titleAccent}</span>
-        </h1>
-        <p class="rec-subtitle">{L.subtitle}</p>
+        <div class="rec-hero-grid">
+          <div class="rec-hero-copy">
+            <div class="rec-pill">
+              <span class="rec-pill-dot"></span>
+              <span>{L.pill}</span>
+            </div>
+            <h1 class="rec-title">
+              {L.title}<br />
+              <span class="gradient-text">{L.titleAccent}</span>
+            </h1>
+            <p class="rec-subtitle">{L.subtitle}</p>
 
-        <div class="rec-methods">
-          <span class="rec-method-pill rec-method-pill--pix">{L.pixBadge}</span>
-          <span class="rec-method-pill">{L.stripeBadge}</span>
+            <div class="rec-methods">
+              <span class="rec-method-pill rec-method-pill--pix">{L.pixBadge}</span>
+              <span class="rec-method-pill">{L.stripeBadge}</span>
+            </div>
+          </div>
+          <div class="hero-visual hero-visual--float rec-hero-visual" aria-hidden="true">
+            <img src="/assets/VX5.webp" alt="" class="rec-hero-icon" width="1536" height="1536" loading="eager" />
+          </div>
         </div>
       </div>
     </section>
@@ -251,9 +258,18 @@ const L = t[lang];
     .rec-hero-inner {
       position: relative;
       z-index: 2;
-      max-width: 720px;
+      max-width: 1180px;
       margin: 0 auto;
       padding: 0 20px;
+    }
+    .rec-hero-grid {
+      display: grid;
+      gap: clamp(24px, 4vw, 56px);
+      align-items: center;
+    }
+    .rec-hero-copy {
+      max-width: 720px;
+      margin: 0 auto;
     }
     .rec-pill {
       display: inline-flex;
@@ -322,6 +338,20 @@ const L = t[lang];
       background: rgba(45, 212, 191, 0.1);
       border-color: rgba(45, 212, 191, 0.35);
       color: #5eead4;
+    }
+    .rec-hero-visual {
+      display: none;
+      min-height: clamp(380px, 38vw, 660px);
+      justify-items: end;
+      overflow: visible;
+      pointer-events: none;
+    }
+    .rec-hero-icon {
+      width: min(100%, 560px);
+      max-width: none;
+      height: auto;
+      margin: 0 -12px -24px 0;
+      filter: drop-shadow(0 32px 80px rgba(0,0,0,.48));
     }
 
     /* ── Pack cards ── */
@@ -532,6 +562,24 @@ const L = t[lang];
       color: rgba(200, 205, 255, 0.4);
       text-align: center;
       line-height: 1.6;
+    }
+    @media (min-width: 1024px) {
+      .rec-hero {
+        text-align: left;
+      }
+      .rec-hero-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(380px, .92fr);
+      }
+      .rec-hero-copy {
+        margin: 0;
+      }
+      .rec-subtitle {
+        margin: 0 0 24px;
+      }
+      .rec-methods {
+        justify-content: flex-start;
+      }
+      .rec-hero-visual { display: grid; }
     }
   </style>
 </FlagshipLayout>

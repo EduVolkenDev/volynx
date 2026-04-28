@@ -10,8 +10,15 @@ const title = "Status — VOLYNX";
 
   <main class="shell status">
     <section class="hero">
-      <h1 data-i18n="status.title">Status</h1>
-      <p class="sub" data-i18n="status.subtitle">Transparency builds trust. Here’s the current platform health.</p>
+      <div class="status-hero-grid">
+        <div class="status-hero-copy">
+          <h1 data-i18n="status.title">Status</h1>
+          <p class="sub" data-i18n="status.subtitle">Transparency builds trust. Here’s the current platform health.</p>
+        </div>
+        <div class="status-hero-visual" aria-hidden="true">
+          <img src="/assets/status.webp" alt="" class="status-hero-icon" width="512" height="1000" loading="eager" />
+        </div>
+      </div>
     </section>
 
     <section class="panel">
@@ -71,7 +78,34 @@ const title = "Status — VOLYNX";
   @import "../styles/services.css";
 
   .status .hero { padding: 48px 0 18px; }
+  .status-hero-grid {
+    display: grid;
+    gap: clamp(24px, 4vw, 52px);
+    align-items: center;
+  }
+  .status-hero-copy {
+    max-width: 760px;
+  }
   .status .sub { opacity: .85; max-width: 70ch; }
+  .status-hero-visual {
+    display: none;
+    min-height: clamp(360px, 38vw, 620px);
+    align-items: end;
+    justify-items: end;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .status-hero-icon {
+    width: min(100%, 380px);
+    height: auto;
+    margin: 0 -8px -16px 0;
+    filter: drop-shadow(0 28px 72px rgba(0,0,0,.48));
+    animation: statusHeroFloat 4.4s ease-in-out infinite;
+  }
+  @keyframes statusHeroFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
 
   .panel {
     margin: 18px 0;
@@ -107,6 +141,12 @@ const title = "Status — VOLYNX";
   .planned { opacity: .75; }
   .resolved { }
 
+  @media (min-width: 1024px) {
+    .status-hero-grid {
+      grid-template-columns: minmax(0, 1.04fr) minmax(280px, .96fr);
+    }
+    .status-hero-visual { display: grid; }
+  }
   @media (max-width: 860px) {
     .svc { grid-column: span 12; }
   }

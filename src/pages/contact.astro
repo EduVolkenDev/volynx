@@ -12,9 +12,16 @@ const title = "Contact & Sales — VOLYNX";
   <main class="shell contact-page">
 
     <section class="hero">
-      <div class="kicker" data-i18n="contact.kicker">Get in touch</div>
-      <h1 data-i18n="contact.title">Let's talk about your project</h1>
-      <p class="sub" data-i18n="contact.subtitle">Need project help, product access, or launch support? Start in the right lane and we will route it faster.</p>
+      <div class="contact-hero-grid">
+        <div class="contact-hero-copy">
+          <div class="kicker" data-i18n="contact.kicker">Get in touch</div>
+          <h1 data-i18n="contact.title">Let's talk about your project</h1>
+          <p class="sub" data-i18n="contact.subtitle">Need project help, product access, or launch support? Start in the right lane and we will route it faster.</p>
+        </div>
+        <div class="contact-hero-visual" aria-hidden="true">
+          <img src="/assets/contacticon.webp" alt="" class="contact-hero-icon" width="320" height="316" loading="eager" />
+        </div>
+      </div>
     </section>
 
     <section class="support-banner" aria-label="Support shortcut" data-i18n-aria="aria.support_shortcut">
@@ -157,6 +164,13 @@ const title = "Contact & Sales — VOLYNX";
 
   .hero {
     padding: 56px 0 36px;
+  }
+  .contact-hero-grid {
+    display: grid;
+    gap: clamp(24px, 4vw, 44px);
+    align-items: center;
+  }
+  .contact-hero-copy {
     max-width: 680px;
   }
   .kicker {
@@ -173,6 +187,24 @@ const title = "Contact & Sales — VOLYNX";
     margin-bottom: 14px;
   }
   .sub { opacity: 0.75; font-size: 17px; }
+  .contact-hero-visual {
+    display: none;
+    min-height: 320px;
+    align-items: center;
+    justify-items: end;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .contact-hero-icon {
+    width: min(100%, 320px);
+    height: auto;
+    filter: drop-shadow(0 28px 72px rgba(0,0,0,.42));
+    animation: contactHeroFloat 4.6s ease-in-out infinite;
+  }
+  @keyframes contactHeroFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
 
   .support-banner {
     display: flex;
@@ -509,6 +541,12 @@ const title = "Contact & Sales — VOLYNX";
   }
   .form-error a { color: #4fc3f7; text-decoration: underline; }
 
+  @media (min-width: 1024px) {
+    .contact-hero-grid {
+      grid-template-columns: minmax(0, 1.04fr) minmax(260px, .96fr);
+    }
+    .contact-hero-visual { display: grid; }
+  }
   @media (max-width: 860px) {
     .two-col { grid-template-columns: 1fr; }
     .panel { padding: 24px; }

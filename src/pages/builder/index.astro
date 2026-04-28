@@ -31,17 +31,24 @@ import PageWidgets from "../../components/PageWidgets.astro";
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero__badge">
-      <span class="badge-dot" aria-hidden="true"></span>
-      <span data-i18n="builder.badge">VOLYNX Builder</span>
+    <div class="hero-grid builder-hero-grid">
+      <div class="builder-hero-copy">
+        <div class="hero__badge">
+          <span class="badge-dot" aria-hidden="true"></span>
+          <span data-i18n="builder.badge">VOLYNX Builder</span>
+        </div>
+        <h1 class="hero__title" data-i18n="builder.title">
+          Build &amp; <span class="accent">Deploy</span> Sites
+        </h1>
+        <p class="hero__sub" data-i18n="builder.subtitle">
+          Create mini-sites with JSON, manage them in one place,
+          and publish to your own subdomain.
+        </p>
+      </div>
+      <div class="builder-hero-visual" aria-hidden="true">
+        <img src="/assets/hero-builder.webp" alt="" class="builder-hero-icon" width="1103" height="1186" loading="eager" />
+      </div>
     </div>
-    <h1 class="hero__title" data-i18n="builder.title">
-      Build &amp; <span class="accent">Deploy</span> Sites
-    </h1>
-    <p class="hero__sub" data-i18n="builder.subtitle">
-      Create mini-sites with JSON, manage them in one place,
-      and publish to your own subdomain.
-    </p>
   </section>
 
   <!-- APP SHELL -->
@@ -1959,8 +1966,19 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
 
   /* HERO */
   .hero {
-    text-align: center;
     padding: 56px 24px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .builder-hero-grid {
+    display: grid;
+    gap: clamp(24px, 4vw, 56px);
+    align-items: center;
+  }
+
+  .builder-hero-copy {
+    text-align: center;
     max-width: 680px;
     margin: 0 auto;
   }
@@ -2016,6 +2034,25 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     font-size: clamp(14px, 2vw, 16px);
     color: var(--mut);
     line-height: 1.7;
+  }
+  .builder-hero-visual {
+    display: none;
+    min-height: clamp(380px, 38vw, 660px);
+    align-items: end;
+    justify-items: end;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .builder-hero-icon {
+    width: min(100%, 560px);
+    height: auto;
+    margin: 0 -12px -18px 0;
+    filter: drop-shadow(0 28px 72px rgba(0,0,0,.44));
+    animation: builderHeroFloat 4.6s ease-in-out infinite;
+  }
+  @keyframes builderHeroFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
   }
 
   /* APP */
@@ -2643,6 +2680,18 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
   a { color: inherit; }
 
   .btn[disabled] { opacity: .5; cursor: not-allowed; }
+
+  @media (min-width: 1024px) {
+    .builder-hero-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(380px, .92fr);
+    }
+    .builder-hero-copy {
+      text-align: left;
+      max-width: 760px;
+      margin: 0;
+    }
+    .builder-hero-visual { display: grid; }
+  }
 
   /* Mobile */
   @media (max-width: 680px) {

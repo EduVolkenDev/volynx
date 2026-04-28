@@ -28,7 +28,7 @@ const deliveryAssistItems = [
           <span>My Products</span>
         </nav>
 
-        <div class="hero-grid">
+        <div class="hero-grid delivery-hero-grid">
           <div class="hero-copy">
             <span class="eyebrow">Your purchases</span>
             <h1>Downloads, access and recovery.</h1>
@@ -37,6 +37,9 @@ const deliveryAssistItems = [
               <a href={ROUTES.support} class="button button--gold">Open support</a>
               <a href={ROUTES.products} class="button button--ghost">Browse products</a>
             </div>
+          </div>
+          <div class="hero-visual hero-visual--float delivery-hero-visual" aria-hidden="true">
+            <img src="/assets/mybox.webp" alt="" class="hero-float-icon delivery-hero-icon" width="1380" height="1580" loading="eager" />
           </div>
         </div>
       </div>
@@ -544,7 +547,27 @@ const deliveryAssistItems = [
 <style>
   /* ── Hero ───────────────────────────────────────────────────────────────── */
   .delivery-hero { padding-top: clamp(28px, 5vw, 52px); }
+  .delivery-hero-grid {
+    align-items: center;
+    gap: clamp(24px, 4vw, 52px);
+  }
+  .delivery-hero .hero-copy {
+    max-width: 760px;
+  }
   .delivery-hero .hero-copy h1 { font-size: clamp(2rem, 5vw, 3.2rem); }
+  .delivery-hero-visual {
+    display: none;
+    min-height: clamp(380px, 38vw, 640px);
+    justify-items: end;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .delivery-hero-icon {
+    width: min(100%, 560px);
+    max-width: none;
+    margin: 0 -16px -16px 0;
+    filter: drop-shadow(0 28px 72px rgba(0,0,0,.5));
+  }
   .delivery-breadcrumbs {
     display: flex;
     flex-wrap: wrap;
@@ -661,6 +684,12 @@ const deliveryAssistItems = [
     margin: 0;
     color: rgba(255,255,255,.65);
     line-height: 1.7;
+  }
+  @media (min-width: 1024px) {
+    .delivery-hero-grid {
+      grid-template-columns: minmax(0, 1.02fr) minmax(360px, .98fr);
+    }
+    .delivery-hero-visual { display: grid; }
   }
   @media (max-width: 860px) {
     .delivery-help { flex-direction: column; align-items: flex-start; }

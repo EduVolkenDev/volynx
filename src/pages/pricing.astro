@@ -49,7 +49,7 @@ const pricingAssistItems = [
 
     <!-- ═══ HERO ═══ -->
     <section class="hero">
-      <div class="shell hero-grid">
+      <div class="shell hero-grid hero-grid--pricing">
         <div class="hero-copy">
           <span class="kicker" data-i18n="price.hero_kicker">Ecosystem pricing</span>
           <h1 data-i18n="price.hero_title">One ecosystem. Clear pricing. Premium capacity at every tier.</h1>
@@ -60,8 +60,8 @@ const pricingAssistItems = [
             <a href={ROUTES.lab} class="button button--ghost" data-i18n="price.hero_cta2">Open the Lab</a>
           </div>
         </div>
-        <div class="pricing-hero-visual" aria-hidden="true">
-          <img src="/assets/volynx-icon.webp" alt="" class="pricing-hero-icon" width="200" height="200" loading="eager" />
+        <div class="hero-visual hero-visual--float pricing-hero-visual" aria-hidden="true">
+          <img src="/assets/pricing.webp" alt="" class="pricing-hero-icon" width="842" height="1264" loading="eager" />
         </div>
       </div>
     </section>
@@ -141,7 +141,7 @@ const pricingAssistItems = [
         </div>
         <div class="how-card how-card--vx">
           <div class="how-card__art-shell" aria-hidden="true">
-            <img src="/assets/vx-new.webp" alt="" class="how-card__art" loading="lazy" decoding="async" />
+            <img src="/assets/VX4.webp" alt="" class="how-card__art" loading="lazy" decoding="async" />
           </div>
           <div class="how-card__equation">
             <strong>VX</strong>
@@ -151,7 +151,7 @@ const pricingAssistItems = [
         </div>
         <div class="how-card how-card--bundle">
           <div class="how-card__art-shell" aria-hidden="true">
-            <img src="/assets/icons-store/Hyper-Icons-Premium/infinity.png" alt="" class="how-card__art how-card__art--icon" loading="lazy" decoding="async" />
+            <img src="/assets/bundle.webp" alt="" class="how-card__art how-card__art--icon" loading="lazy" decoding="async" />
           </div>
           <div class="how-card__equation">
             <strong><span class="i18n-en">Bundle</span><span class="i18n-pt">Bundle</span></strong>
@@ -414,27 +414,32 @@ const pricingAssistItems = [
     }
     .page-pricing .hero-grid {
       align-items: center;
+      gap: clamp(24px, 4vw, 52px);
     }
     .pricing-hero-visual {
-      display:none;
-      place-items:center;
-      justify-content:center;
-      overflow:hidden;
+      display: none;
+      min-height: clamp(420px, 42vw, 700px);
+      justify-items: end;
+      overflow: visible;
+      pointer-events: none;
     }
     .pricing-hero-icon {
-      width:min(650px, 100%);
-      height:auto;
-      filter:drop-shadow(0 24px 56px rgba(0,0,0,.4));
-      animation:floatIcon 4s ease-in-out infinite;
-      border-left:1px inset;
-      margin:0;
+      width: min(100%, 620px);
+      max-width: none;
+      height: auto;
+      filter: drop-shadow(0 28px 72px rgba(0,0,0,.48));
+      animation: floatIcon 4s ease-in-out infinite;
+      margin: 0 -18px -20px 0;
     }
     @keyframes floatIcon {
       0%, 100% { transform:translateY(0); }
       50% { transform:translateY(-12px); }
     }
     @media (min-width:1024px) {
-      .pricing-hero-visual { display:grid; }
+      .page-pricing .hero-grid--pricing {
+        grid-template-columns: minmax(0, 1.02fr) minmax(420px, .98fr);
+      }
+      .pricing-hero-visual { display: grid; }
     }
     /* Currency bar — premium pills with currency symbol + glow on active */
     .currency-bar {

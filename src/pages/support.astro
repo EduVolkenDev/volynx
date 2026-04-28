@@ -19,14 +19,21 @@ const supportAssistItems = [
 
   <main class="shell support-page">
     <section class="hero">
-      <div class="kicker">Support</div>
-      <h1>Fast recovery for purchases, delivery and access.</h1>
-      <p class="sub">Use Support for delivery, billing, product access and launch issues. Use Contact for new projects, partnerships and sales conversations.</p>
-      <div class="hero-actions">
-        <a class="hero-btn hero-btn--primary" href={ROUTES.delivery}>Open my products</a>
-        <a class="hero-btn" id="supportMailto" href={ROUTES.email}>Email support</a>
+      <div class="hero-grid support-hero-grid">
+        <div class="support-hero-copy">
+          <div class="kicker">Support</div>
+          <h1>Fast recovery for purchases, delivery and access.</h1>
+          <p class="sub">Use Support for delivery, billing, product access and launch issues. Use Contact for new projects, partnerships and sales conversations.</p>
+          <div class="hero-actions">
+            <a class="hero-btn hero-btn--primary" href={ROUTES.delivery}>Open my products</a>
+            <a class="hero-btn" id="supportMailto" href={ROUTES.email}>Email support</a>
+          </div>
+          <div id="supportContext" class="support-context" hidden></div>
+        </div>
+        <div class="hero-visual hero-visual--float support-hero-visual" aria-hidden="true">
+          <img src="/assets/support.webp" alt="" class="hero-float-icon support-hero-icon" width="1380" height="1580" loading="eager" />
+        </div>
       </div>
-      <div id="supportContext" class="support-context" hidden></div>
     </section>
 
     <PlatformAssistStrip
@@ -102,6 +109,12 @@ const supportAssistItems = [
 
   .hero {
     padding: 56px 0 30px;
+  }
+  .support-hero-grid {
+    align-items: center;
+    gap: clamp(24px, 4vw, 52px);
+  }
+  .support-hero-copy {
     max-width: 760px;
   }
   .kicker {
@@ -151,6 +164,19 @@ const supportAssistItems = [
     background: rgba(79,195,247,.12);
     border-color: rgba(79,195,247,.3);
     color: #4fc3f7;
+  }
+  .support-hero-visual {
+    display: none;
+    min-height: clamp(380px, 38vw, 640px);
+    justify-items: end;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .support-hero-icon {
+    width: min(100%, 560px);
+    max-width: none;
+    margin: 0 -14px -12px 0;
+    filter: drop-shadow(0 28px 72px rgba(0,0,0,.48));
   }
   .support-context {
     display: inline-flex;
@@ -277,6 +303,12 @@ const supportAssistItems = [
 
   @media (max-width: 980px) {
     .support-paths { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1024px) {
+    .support-hero-grid {
+      grid-template-columns: minmax(0, 1.02fr) minmax(360px, .98fr);
+    }
+    .support-hero-visual { display: grid; }
   }
   @media (max-width: 860px) {
     .support-grid { grid-template-columns: 1fr; }
