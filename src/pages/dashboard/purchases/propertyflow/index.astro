@@ -28,7 +28,7 @@ const assistItems = [
           <span>PropertyFlow</span>
         </nav>
 
-        <div class="hero-grid">
+        <div class="hero-grid pf-hero-grid">
           <div class="hero-copy">
             <span class="eyebrow"><span class="i18n-en">Your PropertyFlow downloads</span><span class="i18n-pt">Seus downloads PropertyFlow</span></span>
             <h1><span class="i18n-en">Download, refresh, deploy.</span><span class="i18n-pt">Baixar, renovar, deploy.</span></h1>
@@ -40,6 +40,11 @@ const assistItems = [
               <a href={ROUTES.docs + "#propertyflow"} class="button button--ghost"><span class="i18n-en">Setup docs</span><span class="i18n-pt">Documentação</span></a>
               <a href={ROUTES.support + "?product=propertyflow"} class="button button--ghost"><span class="i18n-en">Support</span><span class="i18n-pt">Suporte</span></a>
             </div>
+          </div>
+          <div class="pf-hero-visual" aria-hidden="true">
+            <span class="vx-glow-container vx-glow-container--blue vx-glow-container--strong vx-glow-container--xl">
+              <img src="/assets/Volynx-OS-Cards/newpropertyflow.webp" alt="" loading="eager" />
+            </span>
           </div>
         </div>
       </div>
@@ -370,6 +375,33 @@ const assistItems = [
   /* ── Hero ───────────────────────────────────────────────── */
   .pf-hero { padding-top: clamp(28px, 5vw, 52px); }
   .pf-hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); margin: 12px 0 16px; }
+  .pf-hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  .pf-hero-visual {
+    display: flex; justify-content: center; align-items: center;
+    min-height: 280px;
+  }
+  .pf-hero-visual .vx-glow-container { width: 280px; height: 280px; }
+  .pf-hero-visual img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 24px 48px rgba(89,195,255,.32)) drop-shadow(0 0 32px rgba(139,92,246,.18));
+    animation: pfd-float 6s ease-in-out infinite;
+  }
+  @keyframes pfd-float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-12px) scale(1.015); }
+  }
+  @media (prefers-reduced-motion: reduce) { .pf-hero-visual img { animation: none; } }
+  @media (max-width: 860px) {
+    .pf-hero-grid { grid-template-columns: 1fr; gap: 24px; }
+    .pf-hero-visual { min-height: auto; }
+    .pf-hero-visual .vx-glow-container { width: 200px; height: 200px; }
+  }
   .pf-breadcrumbs {
     display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
     margin-bottom: 18px; font-size: .82rem; color: rgba(255,255,255,.5);

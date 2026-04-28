@@ -87,3 +87,73 @@ button {
 .skip-link:focus {
   top: 8px;
 }
+
+/* =========================================================
+   VX Glow Container — premium icon halo
+   Drop-in wrapper for any icon that needs a soft pulsing
+   halo. Picks a tinted glow from the platform palette
+   (gold default, or override via class modifier or
+   --vx-glow-color custom property).
+
+   Usage:
+     <span class="vx-glow-container">
+       <img src="/assets/Volynx-OS-Cards/agencykit.webp" />
+     </span>
+     <!-- or, for a blue/violet variant -->
+     <span class="vx-glow-container vx-glow-container--blue">…</span>
+
+   Notes:
+   - Parent is forced to position:relative so the absolutely
+     positioned ::before can sit behind. z-index:0 on the parent
+     prevents Safari/Firefox from rendering the ::before behind
+     the page background entirely.
+   - Animation honours prefers-reduced-motion.
+========================================================= */
+.vx-glow-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 0;
+  --vx-glow-color: #d6b36a;     /* gold, palette default */
+  --vx-glow-opacity: 0.18;
+  --vx-glow-spread: 80%;
+  --vx-glow-blur: 40px;
+}
+.vx-glow-container > img,
+.vx-glow-container > svg,
+.vx-glow-container > span,
+.vx-glow-container > picture {
+  position: relative;
+  z-index: 1;
+}
+.vx-glow-container::before {
+  content: "";
+  position: absolute;
+  width: var(--vx-glow-spread);
+  height: var(--vx-glow-spread);
+  background: var(--vx-glow-color);
+  filter: blur(var(--vx-glow-blur));
+  opacity: var(--vx-glow-opacity);
+  z-index: -1;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: vx-glow-pulse 4s infinite ease-in-out;
+}
+@keyframes vx-glow-pulse {
+  0%, 100% { transform: scale(1);   opacity: var(--vx-glow-opacity); }
+  50%      { transform: scale(1.2); opacity: calc(var(--vx-glow-opacity) + 0.1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vx-glow-container::before { animation: none; }
+}
+
+/* Palette-correct variants. Default is gold; switch with a modifier. */
+.vx-glow-container--blue   { --vx-glow-color: #59c3ff; }
+.vx-glow-container--violet { --vx-glow-color: #8b5cf6; }
+.vx-glow-container--teal   { --vx-glow-color: #34d399; }
+.vx-glow-container--gold   { --vx-glow-color: #d6b36a; }
+
+/* Intensity variants — for hero-level icons that need to dominate. */
+.vx-glow-container--strong { --vx-glow-opacity: 0.32; --vx-glow-blur: 56px; }
+.vx-glow-container--xl     { --vx-glow-spread: 110%; --vx-glow-blur: 64px; }

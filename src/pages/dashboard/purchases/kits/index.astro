@@ -28,7 +28,7 @@ const assistItems = [
           <span>Kits</span>
         </nav>
 
-        <div class="hero-grid">
+        <div class="hero-grid kits-hero-grid">
           <div class="hero-copy">
             <span class="eyebrow"><span class="i18n-en">Your kits</span><span class="i18n-pt">Seus kits</span></span>
             <h1><span class="i18n-en">Open. Edit. Ship.</span><span class="i18n-pt">Abrir. Editar. Publicar.</span></h1>
@@ -40,6 +40,11 @@ const assistItems = [
               <a href={ROUTES.builder} class="button button--gold"><span class="i18n-en">Open Builder</span><span class="i18n-pt">Abrir Builder</span></a>
               <a href={ROUTES.products} class="button button--ghost"><span class="i18n-en">Browse kits</span><span class="i18n-pt">Ver kits</span></a>
             </div>
+          </div>
+          <div class="kits-hero-visual" aria-hidden="true">
+            <span class="vx-glow-container vx-glow-container--gold vx-glow-container--strong vx-glow-container--xl">
+              <img src="/assets/Volynx-OS-Cards/kits.webp" alt="" loading="eager" />
+            </span>
           </div>
         </div>
       </div>
@@ -373,6 +378,33 @@ const assistItems = [
   /* ── Hero ───────────────────────────────────────────────── */
   .kits-hero { padding-top: clamp(28px, 5vw, 52px); }
   .kits-hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); margin: 12px 0 16px; }
+  .kits-hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  .kits-hero-visual {
+    display: flex; justify-content: center; align-items: center;
+    min-height: 280px;
+  }
+  .kits-hero-visual .vx-glow-container { width: 280px; height: 280px; }
+  .kits-hero-visual img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 24px 48px rgba(0,0,0,.5));
+    animation: kits-float 6s ease-in-out infinite;
+  }
+  @keyframes kits-float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-12px); }
+  }
+  @media (prefers-reduced-motion: reduce) { .kits-hero-visual img { animation: none; } }
+  @media (max-width: 860px) {
+    .kits-hero-grid { grid-template-columns: 1fr; gap: 24px; }
+    .kits-hero-visual { min-height: auto; }
+    .kits-hero-visual .vx-glow-container { width: 200px; height: 200px; }
+  }
   .kits-breadcrumbs {
     display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
     margin-bottom: 18px; font-size: .82rem; color: rgba(255,255,255,.5);

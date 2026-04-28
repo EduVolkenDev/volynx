@@ -211,8 +211,10 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
   .vx-actions {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     flex-shrink: 0;
+    position: relative;
+    z-index: 100;
   }
 
   /* Token pill */
@@ -365,6 +367,8 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
     padding: 32px 24px;
     gap: 8px;
     flex-direction: column;
+    position: relative;
+    z-index: 999; /* Above .vx-actions so the menu wins when open. */
   }
   .vx-mobile.is-open { display: flex; }
   .vx-mobile a, .vx-mobile__profile {
@@ -427,6 +431,8 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
     .vx-burger { display: inline-flex !important; margin-right: -4px; }
   }
   @media (max-width: 380px) {
+    .vx-actions { gap: 4px; }
+    .vx-lang { padding: 0 8px; min-width: 36px; }
     :global(.vx-authed) .vx-recharge { padding: 7px 12px; font-size: 11px; }
   }
 
@@ -512,22 +518,65 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
       }
     } catch (_) {}
 
-    // 2. Direct fetch — independent of VxTokens (used as fallback)
+    // 2. Direct fetch — independent of VxTokens (used as fallback).
+    //    Two tiers: edge function first, Supabase REST as last-resort.
     async function directFetch() {
       try {
         const jwt = localStorage.getItem("volynx_access_token");
         if (!jwt) return;
         const cfg = await fetch("/config.json", { cache: "no-store" }).then(r => r.json());
         const apiBase = ((cfg && (cfg.functionsUrl || cfg.apiBaseUrl)) || "").replace(/\/$/, "");
-        if (!apiBase) return;
-        const res = await fetch(apiBase + "/get-balance", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + jwt },
-          body: JSON.stringify({}),
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        const bal = (data && typeof data.balance === "number") ? data.balance : null;
+
+        // Tier A — edge function (audit trail, rate-limited, recommended path).
+        if (apiBase) {
+          try {
+            const res = await fetch(apiBase + "/get-balance", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "Authorization": "Bearer " + jwt },
+              body: JSON.stringify({}),
+            });
+            if (res.ok) {
+              const data = await res.json();
+              const bal = (data && typeof data.balance === "number") ? data.balance : null;
+              if (bal !== null) { setCount(bal); persistBalance(bal); return; }
+            }
+          } catch (_) { /* fall through to REST */ }
+        }
+
+        // Tier B — Supabase REST direct read on profiles.token_balance.
+        //   Column is `token_balance` (NOT `vx_balance` — VX is presentation-only;
+        //   the DB always uses 'tokens'). Filter by auth.uid() so RLS returns
+        //   exactly one row when the JWT is valid.
+        const supaUrl = (cfg && (cfg.supabaseUrl || cfg.supabase_url) || "").replace(/\/$/, "");
+        const anonKey = (cfg && (cfg.supabaseAnonKey || cfg.anonKey)) || "";
+        if (!supaUrl || !anonKey) return;
+
+        // Decode user_id from the JWT sub claim — same trick the dashboard pages use.
+        let uid = null;
+        try {
+          const part = jwt.split(".")[1];
+          if (part) {
+            const norm = part.replace(/-/g, "+").replace(/_/g, "/");
+            const payload = JSON.parse(atob(norm.padEnd(norm.length + (4 - norm.length % 4) % 4, "=")));
+            uid = payload && payload.sub ? payload.sub : null;
+          }
+        } catch (_) {}
+        if (!uid) return;
+
+        const restRes = await fetch(
+          supaUrl + "/rest/v1/profiles?select=token_balance&id=eq." + encodeURIComponent(uid),
+          {
+            headers: {
+              apikey: anonKey,
+              Authorization: "Bearer " + jwt,
+              "Accept": "application/json",
+            },
+          }
+        );
+        if (!restRes.ok) return;
+        const rows = await restRes.json();
+        const row = Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+        const bal = row && typeof row.token_balance === "number" ? row.token_balance : null;
         if (bal !== null) { setCount(bal); persistBalance(bal); }
       } catch (_) {}
     }

@@ -212,14 +212,50 @@ const pageDescription = "Premium property management platform for real estate ag
       gap: 12px;
     }
     .feature__icon {
+      position: relative;
       width: 120px;
       height: 120px;
       flex-shrink: 0;
+      z-index: 0;
     }
     .feature__icon img {
+      position: relative;
+      z-index: 1;
       width: 100%;
       height: 100%;
       object-fit: contain;
+      filter: drop-shadow(0 12px 28px rgba(89,195,255,.18)) drop-shadow(0 0 22px rgba(139,92,246,.14));
+      transition: transform .35s ease, filter .35s ease;
+    }
+    .feature__icon::before {
+      content: "";
+      position: absolute;
+      width: 86%; height: 86%;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--blue) 0%, transparent 65%);
+      filter: blur(28px);
+      opacity: 0.22;
+      z-index: -1;
+      animation: pf-feat-glow 5s infinite ease-in-out;
+    }
+    @keyframes pf-feat-glow {
+      0%, 100% { transform: translate(-50%, -50%) scale(1);    opacity: 0.22; }
+      50%      { transform: translate(-50%, -50%) scale(1.18); opacity: 0.32; }
+    }
+    /* Rotate glow tint per feature so the row reads as a chord, not a unison */
+    .feature:nth-child(2) .feature__icon::before { background: radial-gradient(circle, var(--violet) 0%, transparent 65%); }
+    .feature:nth-child(3) .feature__icon::before { background: radial-gradient(circle, var(--gold) 0%, transparent 65%); opacity: 0.28; }
+    .feature:nth-child(4) .feature__icon::before { background: radial-gradient(circle, var(--blue) 0%, transparent 65%); }
+    .feature:nth-child(5) .feature__icon::before { background: radial-gradient(circle, var(--violet) 0%, transparent 65%); }
+    .feature:nth-child(6) .feature__icon::before { background: radial-gradient(circle, var(--gold) 0%, transparent 65%); opacity: 0.28; }
+    .feature:hover .feature__icon img {
+      transform: translateY(-3px) scale(1.04);
+      filter: drop-shadow(0 18px 40px rgba(89,195,255,.32)) drop-shadow(0 0 32px rgba(139,92,246,.24));
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .feature__icon::before { animation: none; }
     }
     .feature h3 { margin: 0; font-size: 1rem; }
 
@@ -686,15 +722,36 @@ const pageDescription = "Premium property management platform for real estate ag
       transition: padding .35s ease;
     }
     .audience__card__icon {
-      width: 36px; height: 36px;
-      border-radius: 10px;
+      position: relative;
+      width: 64px; height: 64px;
+      border-radius: 16px;
       display: inline-flex; align-items: center; justify-content: center;
-      background: linear-gradient(135deg, rgba(89,195,255,.18), rgba(139,92,246,.14));
-      border: 1px solid rgba(255,255,255,.08);
+      background: linear-gradient(135deg, rgba(89,195,255,.22), rgba(139,92,246,.16));
+      border: 1px solid rgba(255,255,255,.10);
       flex-shrink: 0;
       transition: background .35s ease, border-color .35s ease, transform .35s ease;
+      z-index: 0;
     }
-    .audience__card__icon svg { width: 18px; height: 18px; color: var(--gold-soft); }
+    .audience__card__icon svg {
+      position: relative; z-index: 1;
+      width: 32px; height: 32px;
+      color: var(--gold-soft);
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,.4));
+      transition: color .35s ease, transform .35s ease;
+    }
+    .audience__card__icon::before {
+      content: "";
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      background: var(--blue);
+      filter: blur(18px);
+      opacity: 0;
+      z-index: -1;
+      transition: opacity .45s ease;
+    }
+    .audience__card.is-open .audience__card__icon::before { opacity: 0.32; background: var(--gold); }
+    .audience__card.is-open .audience__card__icon svg { transform: scale(1.05); }
     .audience__card h3 { margin: 0; transition: color .35s ease; }
     .audience__card__chevron {
       margin-left: auto;
@@ -736,8 +793,8 @@ const pageDescription = "Premium property management platform for real estate ag
       box-shadow: 0 12px 40px rgba(89,195,255,.06), 0 0 0 1px rgba(214,179,106,.12);
     }
     .audience__card.is-open .audience__card__icon {
-      background: linear-gradient(135deg, rgba(214,179,106,.22), rgba(89,195,255,.16));
-      border-color: rgba(214,179,106,.35);
+      background: linear-gradient(135deg, rgba(214,179,106,.32), rgba(89,195,255,.18));
+      border-color: rgba(214,179,106,.45);
       transform: scale(1.05);
     }
     .audience__card.is-open .audience__card__icon svg { color: var(--gold); }
@@ -1012,22 +1069,44 @@ const pageDescription = "Premium property management platform for real estate ag
     }
     .price-card > * { position: relative; z-index: 1; }
     .price-card__tier-icon {
-      width: 44px; height: 44px;
-      border-radius: 12px;
+      position: relative;
+      width: 96px; height: 96px;
       display: inline-flex; align-items: center; justify-content: center;
-      background: linear-gradient(135deg, rgba(89,195,255,.18), rgba(139,92,246,.14));
-      border: 1px solid rgba(255,255,255,.08);
-      margin-bottom: 14px;
+      margin: 0 auto 18px;
+      z-index: 0;
     }
-    .price-card__tier-icon img { width: 26px; height: 26px; object-fit: contain; }
-    .price-card--featured .price-card__tier-icon {
-      background: linear-gradient(135deg, rgba(214,179,106,.28), rgba(214,179,106,.12));
-      border-color: rgba(214,179,106,.35);
-      box-shadow: 0 0 24px rgba(214,179,106,.16);
+    .price-card__tier-icon img {
+      position: relative;
+      z-index: 1;
+      width: 100%; height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 22px rgba(0,0,0,.5));
+      transition: transform .35s ease, filter .35s ease;
     }
-    .price-card--studio .price-card__tier-icon {
-      background: linear-gradient(135deg, rgba(139,92,246,.28), rgba(89,195,255,.12));
-      border-color: rgba(139,92,246,.35);
+    .price-card__tier-icon::before {
+      content: "";
+      position: absolute;
+      width: 90%; height: 90%;
+      background: var(--blue);
+      filter: blur(36px);
+      opacity: 0.22;
+      z-index: -1;
+      border-radius: 50%;
+      animation: pf-tier-glow 4.5s infinite ease-in-out;
+    }
+    @keyframes pf-tier-glow {
+      0%, 100% { transform: scale(1);   opacity: 0.22; }
+      50%      { transform: scale(1.18); opacity: 0.32; }
+    }
+    .price-card:hover .price-card__tier-icon img {
+      transform: translateY(-2px) scale(1.04);
+      filter: drop-shadow(0 12px 30px rgba(0,0,0,.6));
+    }
+    /* Tier-specific glow tint */
+    .price-card--featured .price-card__tier-icon::before { background: var(--gold); opacity: 0.32; }
+    .price-card--studio   .price-card__tier-icon::before { background: var(--violet); opacity: 0.28; }
+    @media (prefers-reduced-motion: reduce) {
+      .price-card__tier-icon::before { animation: none; }
     }
     .price-card__price-row {
       display: flex; align-items: baseline; gap: 10px;
@@ -1904,7 +1983,7 @@ const pageDescription = "Premium property management platform for real estate ag
       <div class="pricing-grid">
         <div class="price-card">
           <span class="price-card__tier-icon" aria-hidden="true">
-            <img src="/assets/builderlaunch.webp" alt="" loading="lazy" />
+            <img src="/assets/flow-starter.webp" alt="" loading="lazy" />
           </span>
           <span class="price-card__name" data-i18n="pf.plan1_name">Starter</span>
           <div class="price-card__price-row">
@@ -1924,7 +2003,7 @@ const pageDescription = "Premium property management platform for real estate ag
         </div>
         <div class="price-card price-card--featured">
           <span class="price-card__tier-icon" aria-hidden="true">
-            <img src="/assets/builderpro.webp" alt="" loading="lazy" />
+            <img src="/assets/flow-professional.webp" alt="" loading="lazy" />
           </span>
           <span class="price-card__name" data-i18n="pf.plan2_name">Professional</span>
           <div class="price-card__badge">Most popular</div>
@@ -1947,7 +2026,7 @@ const pageDescription = "Premium property management platform for real estate ag
         </div>
         <div class="price-card price-card--studio">
           <span class="price-card__tier-icon" aria-hidden="true">
-            <img src="/assets/blackdiamond.webp" alt="" loading="lazy" />
+            <img src="/assets/flow-whitelabel.webp" alt="" loading="lazy" />
           </span>
           <span class="price-card__name" data-i18n="pf.plan3_name">White-Label</span>
           <div class="price-card__price-row">
