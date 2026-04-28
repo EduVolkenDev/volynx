@@ -53,6 +53,7 @@ export const ROUTES = {
   purchases: "/dashboard/purchases/",
   propertyflowDelivery: "/dashboard/purchases/propertyflow",
   iconsDelivery: "/dashboard/purchases/icons",
+  kitsDelivery: "/dashboard/purchases/kits",
 
   // ── Lab (Free) ────────────────────────
   lab: "/volynx-lab/",

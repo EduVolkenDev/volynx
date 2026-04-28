@@ -362,6 +362,16 @@ const deliveryAssistItems = [
     function productHref(item) {
       const id = purchaseLookupBase(item);
       if (!id) return '/builder/';
+      // Kit purchases route to the dedicated kits dashboard so we keep one
+      // delivery experience per product family. The dashboard surfaces tier,
+      // license, and an Open-in-Builder CTA that already loads the preset.
+      if (id.startsWith('kit-')) {
+        const sessionId = purchaseSessionId(item);
+        if (sessionId) {
+          return withQuery(ROUTES.kitsDelivery, { session_id: sessionId });
+        }
+        return ROUTES.kitsDelivery;
+      }
       const preset = addonToPreset(id);
       if (preset) return '/builder/?preset=' + encodeURIComponent(preset);
       if (id.startsWith('pf-')) {
