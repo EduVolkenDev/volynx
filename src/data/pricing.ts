@@ -27,6 +27,7 @@ type Plan = {
 type TokenPack = {
   id: string;
   amount: number;
+  icon?: string;
   price: MoneyMap;
   badge?: Record<Locale, string>;
   description?: Record<Locale, string>;
@@ -76,6 +77,7 @@ export const sitePricing = {
     {
       id: 'starter',
       amount: 12,
+      icon: '/assets/vx-2.webp',
       price: { GBP: '£8.40', EUR: '€9.80', BRL: 'R$54' },
       badge: { pt: 'Starter', en: 'Starter' },
       description: {
@@ -86,6 +88,7 @@ export const sitePricing = {
     {
       id: 'core',
       amount: 32,
+      icon: '/assets/vx3.webp',
       price: { GBP: '£18', EUR: '€21', BRL: 'R$119' },
       badge: { pt: 'Core · Mais popular', en: 'Core · Most popular' },
       description: {
@@ -96,6 +99,7 @@ export const sitePricing = {
     {
       id: 'pro',
       amount: 80,
+      icon: '/assets/VX4.webp',
       price: { GBP: '£42', EUR: '€49', BRL: 'R$279' },
       badge: { pt: 'Pro · Melhor custo', en: 'Pro · Best value' },
       description: {
@@ -106,6 +110,7 @@ export const sitePricing = {
     {
       id: 'scale',
       amount: 200,
+      icon: '/assets/VX5.webp',
       price: { GBP: '£88', EUR: '€102', BRL: 'R$589' },
       badge: { pt: 'Elite', en: 'Elite' },
       description: {

@@ -3,7 +3,7 @@ const { pack, locale, currency } = Astro.props;
 const currencies = ['GBP', 'EUR', 'BRL'] as const;
 ---
 <div class="token-card" data-pack-id={pack.id}>
-  <img src="/assets/vx-new.webp" alt="" class="token-card__icon" loading="lazy" decoding="async" />
+  <img src={pack.icon || "/assets/vx-new.webp"} alt="" class="token-card__icon" loading="lazy" decoding="async" />
   {pack.badge && <span class="token-pill"><span class="i18n-en">{pack.badge.en}</span><span class="i18n-pt">{pack.badge.pt}</span></span>}
   <h3 class="token-card__amount">{pack.amount} VX</h3>
   {currencies.map((c) => (
