@@ -2,67 +2,135 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import VxHeader from "../../components/VxHeader.astro";
 import SiteFooter from "../../components/SiteFooter.astro";
+import { ROUTES } from "../../data/routes";
 
 const title = "Tools — VOLYNX";
+const description = "Premium tools, free Lab tier and Studio tier with VX-priced premium actions. Converter, scaler, suite, QR generator.";
+
+const tools = [
+  {
+    id: "converter",
+    icon: "/assets/converterbig.webp",
+    iconAlt: "VOLYNX Converter",
+    glow: "blue",
+    tag: "Image",
+    name: "Converter",
+    descEn: "Convert images between formats fast — PNG, JPG, WebP, AVIF. Quality preserved, batches supported.",
+    descPt: "Converta imagens entre formatos rapidamente — PNG, JPG, WebP, AVIF. Qualidade preservada, lotes suportados.",
+    labHref: ROUTES.labConverter,
+    studioHref: ROUTES.labConverter,
+  },
+  {
+    id: "scaler",
+    icon: "/assets/newimagescaler.webp",
+    iconAlt: "VOLYNX Image Scaler",
+    glow: "violet",
+    tag: "Image",
+    name: "Image Scaler",
+    descEn: "Resize without losing sharpness. Lab covers basic resizing; Studio runs the upscaler with neural detail recovery.",
+    descPt: "Redimensione sem perder nitidez. Lab faz o resize básico; Studio roda o upscaler com recuperação neural de detalhe.",
+    labHref: ROUTES.labImageScaler,
+    studioHref: ROUTES.labImageScaler,
+  },
+  {
+    id: "suite",
+    icon: "/assets/newimagesuite.webp",
+    iconAlt: "VOLYNX Image Suite",
+    glow: "gold",
+    tag: "Pro-ready",
+    name: "Image Suite",
+    descEn: "Batch optimise, export, compress. The full image pipeline — for whole shoots, full inventories, repeated workflows.",
+    descPt: "Otimize, exporte e comprima em lote. Pipeline completo de imagem — pra ensaios inteiros, catálogos completos, workflows repetidos.",
+    labHref: ROUTES.labImageSuite,
+    studioHref: ROUTES.labImageSuite,
+  },
+  {
+    id: "qr",
+    icon: "/assets/newqrgen.webp",
+    iconAlt: "VOLYNX QR Generator",
+    glow: "teal",
+    tag: "Utility",
+    name: "QR Generator",
+    descEn: "Premium QR codes in seconds. Lab gives you a clean baseline; Studio adds branding, colours, logo overlay, vector export.",
+    descPt: "QR codes premium em segundos. Lab entrega o básico limpo; Studio adiciona branding, cores, logo no centro, export vetorial.",
+    labHref: ROUTES.labQrGen,
+    studioHref: ROUTES.labQrGen,
+  },
+];
 ---
 
-<BaseLayout title={title}>
+<BaseLayout title={title} description={description}>
   <VxHeader />
 
-  <main class="shell tools">
-    <section class="hero">
-      <h1 data-i18n="tools.title">Tools</h1>
-      <p class="sub" data-i18n="tools.subtitle">One catalog. Two tiers: Lab (free) and Studio (pro).</p>
+  <main class="shell tools-page">
+    <section class="tools-hero">
+      <span class="tools-kicker"><span class="i18n-en">All tools, two lanes</span><span class="i18n-pt">Todas as tools, dois caminhos</span></span>
+      <h1 class="tools-title" data-i18n="tools.title">
+        <span class="i18n-en">Premium tools.<span class="tools-title__accent">Free where it counts.</span></span>
+        <span class="i18n-pt">Tools premium.<span class="tools-title__accent">Grátis onde importa.</span></span>
+      </h1>
+      <p class="tools-sub" data-i18n="tools.subtitle">
+        <span class="i18n-en">One catalog, two tiers. Lab is free, runs locally in your browser. Studio uses your VX balance for premium actions — better quality, batches, advanced exports.</span>
+        <span class="i18n-pt">Um catálogo, dois tiers. Lab é grátis, roda local no seu browser. Studio usa seu saldo VX pra ações premium — qualidade melhor, lotes, exports avançados.</span>
+      </p>
+
+      <div class="tools-tiers">
+        <div class="tools-tier">
+          <span class="tools-tier__badge tools-tier__badge--lab">Lab</span>
+          <strong><span class="i18n-en">Free, browser-local</span><span class="i18n-pt">Grátis, no browser</span></strong>
+          <span><span class="i18n-en">No account required for most tools.</span><span class="i18n-pt">Maioria sem conta.</span></span>
+        </div>
+        <div class="tools-tier">
+          <span class="tools-tier__badge tools-tier__badge--studio">Studio</span>
+          <strong><span class="i18n-en">VX-priced, premium</span><span class="i18n-pt">VX-priced, premium</span></strong>
+          <span><span class="i18n-en">Heavy actions cost a few VX each.</span><span class="i18n-pt">Ações pesadas custam alguns VX.</span></span>
+        </div>
+      </div>
     </section>
 
-    <section class="grid">
-      <article class="card">
-        <div class="top">
-          <span class="tag" data-i18n="tools.tag_image">Image</span>
-          <h2>Converter</h2>
-          <p data-i18n="tools.converter_desc">Convert images fast. Keep quality.</p>
-        </div>
-        <div class="actions">
-          <a class="btn" href="/volynx-lab/converter/" data-i18n="tools.btn_lab">Open Lab</a>
-          <a class="btn secondary" href="/volynx-lab/converter/" data-i18n="tools.btn_studio">Go Studio</a>
-        </div>
-      </article>
+    <section class="tools-grid">
+      {tools.map((tool) => (
+        <article class={`tool-card tool-card--${tool.glow}`} data-tool={tool.id}>
+          <div class="tool-card__visual">
+            <span class={`vx-glow-container vx-glow-container--${tool.glow} vx-glow-container--strong vx-glow-container--xl`}>
+              <img src={tool.icon} alt={tool.iconAlt} loading="lazy" />
+            </span>
+          </div>
+          <div class="tool-card__body">
+            <span class="tool-card__tag">{tool.tag}</span>
+            <h2 class="tool-card__name">{tool.name}</h2>
+            <p class="tool-card__desc">
+              <span class="i18n-en">{tool.descEn}</span>
+              <span class="i18n-pt">{tool.descPt}</span>
+            </p>
+          </div>
+          <div class="tool-card__actions">
+            <a class="tool-card__btn tool-card__btn--lab" href={tool.labHref}>
+              <span class="tool-card__btn-tier">Lab</span>
+              <span class="i18n-en">Open free</span><span class="i18n-pt">Abrir grátis</span>
+            </a>
+            <a class="tool-card__btn tool-card__btn--studio" href={tool.studioHref}>
+              <span class="tool-card__btn-tier">Studio</span>
+              <span class="i18n-en">Use VX</span><span class="i18n-pt">Usar VX</span>
+            </a>
+          </div>
+        </article>
+      ))}
+    </section>
 
-      <article class="card">
-        <div class="top">
-          <span class="tag" data-i18n="tools.tag_image">Image</span>
-          <h2>Image Scaler</h2>
-          <p data-i18n="tools.scaler_desc">Resize without losing sharpness.</p>
-        </div>
-        <div class="actions">
-          <a class="btn" href="/volynx-lab/image-scaler/" data-i18n="tools.btn_lab">Open Lab</a>
-          <a class="btn secondary" href="/volynx-lab/image-scaler/" data-i18n="tools.btn_studio">Go Studio</a>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="top">
-          <span class="tag" data-i18n="tools.tag_pro">Pro-ready</span>
-          <h2>Image Suite</h2>
-          <p data-i18n="tools.suite_desc">Batch optimize, export, compress.</p>
-        </div>
-        <div class="actions">
-          <a class="btn" href="/volynx-lab/image-suite/" data-i18n="tools.btn_lab">Open Lab</a>
-          <a class="btn secondary" href="/volynx-lab/image-suite/" data-i18n="tools.btn_studio">Go Studio</a>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="top">
-          <span class="tag" data-i18n="tools.tag_utility">Utility</span>
-          <h2>QR Generator</h2>
-          <p data-i18n="tools.qr_desc">Premium QR codes in seconds.</p>
-        </div>
-        <div class="actions">
-          <a class="btn" href="/volynx-lab/qr-gen/" data-i18n="tools.btn_lab">Open Lab</a>
-          <a class="btn secondary" href="/volynx-lab/qr-gen/" data-i18n="tools.btn_studio">Go Studio</a>
-        </div>
-      </article>
+    <section class="tools-footer">
+      <div class="tools-footer__signal">
+        <span class="tools-footer__dot"></span>
+        <span><span class="i18n-en">VX charges only on Studio actions — Lab stays free forever.</span><span class="i18n-pt">VX é cobrado só em ações Studio — Lab segue grátis pra sempre.</span></span>
+      </div>
+      <div class="tools-footer__actions">
+        <a class="tools-footer__link" href={ROUTES.recarregar}>
+          <span class="i18n-en">Top up VX →</span><span class="i18n-pt">Recarregar VX →</span>
+        </a>
+        <a class="tools-footer__link tools-footer__link--ghost" href={ROUTES.pricing + "#vx-packs"}>
+          <span class="i18n-en">See VX packs</span><span class="i18n-pt">Ver packs VX</span>
+        </a>
+      </div>
     </section>
   </main>
 
@@ -70,35 +138,307 @@ const title = "Tools — VOLYNX";
 </BaseLayout>
 
 <style>
-  .tools .hero { padding: 48px 0 18px; }
-  .tools .sub { opacity: .85; max-width: 70ch; }
+  .tools-page { padding: 0 20px 80px; max-width: 1200px; margin: 0 auto; }
 
-  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; padding: 12px 0 70px; }
-  .card {
-    grid-column: span 6;
-    border-radius: 22px;
-    padding: 18px;
-    border: 1px solid rgba(255,255,255,.08);
-    background: rgba(10,12,20,.45);
+  /* ── Hero ───────────────────────────────────────────────── */
+  .tools-hero {
+    padding: 56px 0 32px;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
   }
-  .tag {
-    display: inline-flex; padding: 6px 10px; border-radius: 999px;
-    border: 1px solid rgba(255,255,255,.14); font-size: 12px; opacity: .9;
+  .tools-kicker {
+    display: inline-block;
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(214,179,106,0.25);
+    background: rgba(214,179,106,0.08);
+    color: #ead8aa;
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 18px;
   }
-  .top h2 { margin: 10px 0 8px; }
-  .top p { margin: 0; opacity: .85; }
+  .tools-title {
+    margin: 0 0 18px;
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    font-weight: 800;
+  }
+  .tools-title__accent {
+    display: block;
+    background: linear-gradient(135deg, #fff, #e8d49a, #89d7ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .tools-sub {
+    margin: 0 auto 32px;
+    color: rgba(255,255,255,0.62);
+    font-size: 1.02rem;
+    line-height: 1.75;
+    max-width: 640px;
+  }
 
-  .actions { display: flex; gap: 10px; margin-top: 16px; }
-  .btn {
-    display: inline-flex; justify-content: center; flex: 1;
-    padding: 12px 14px; border-radius: 14px;
-    border: 1px solid rgba(255,255,255,.12);
+  .tools-tiers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  .tools-tier {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+    text-align: left;
+  }
+  .tools-tier__badge {
+    display: inline-flex;
+    align-self: flex-start;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .tools-tier__badge--lab {
+    background: rgba(89,195,255,0.14);
+    border: 1px solid rgba(89,195,255,0.28);
+    color: #89d7ff;
+  }
+  .tools-tier__badge--studio {
+    background: rgba(214,179,106,0.16);
+    border: 1px solid rgba(214,179,106,0.32);
+    color: #e8d49a;
+  }
+  .tools-tier strong { font-size: 0.92rem; color: #fafafa; }
+  .tools-tier span:last-child { font-size: 0.82rem; color: rgba(255,255,255,0.55); line-height: 1.55; }
+
+  /* ── Grid ───────────────────────────────────────────────── */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+    margin: 24px 0;
+  }
+
+  /* ── Cards ──────────────────────────────────────────────── */
+  .tool-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 28px 26px;
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,0.04), transparent 50%),
+      linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+    backdrop-filter: blur(12px);
+    overflow: hidden;
+    transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+  }
+  .tool-card::before {
+    content: "";
+    position: absolute;
+    top: -40%; left: 50%;
+    transform: translateX(-50%);
+    width: 480px; height: 480px;
+    border-radius: 50%;
+    opacity: 0.15;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+    transition: opacity .35s ease;
+  }
+  .tool-card--blue::before    { background: radial-gradient(circle, rgba(89,195,255,1), transparent 60%); }
+  .tool-card--violet::before  { background: radial-gradient(circle, rgba(139,92,246,1), transparent 60%); }
+  .tool-card--gold::before    { background: radial-gradient(circle, rgba(214,179,106,1), transparent 60%); }
+  .tool-card--teal::before    { background: radial-gradient(circle, rgba(45,212,191,1), transparent 60%); }
+  .tool-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255,255,255,0.18);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  }
+  .tool-card:hover::before { opacity: 0.28; }
+  .tool-card > * { position: relative; z-index: 1; }
+
+  /* ── Icon ───────────────────────────────────────────────── */
+  .tool-card__visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 160px;
+  }
+  .tool-card__visual .vx-glow-container { width: 160px; height: 160px; }
+  .tool-card__visual img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 16px 36px rgba(0,0,0,0.6));
+    transition: transform .35s ease, filter .35s ease;
+    animation: tool-icon-float 5.5s ease-in-out infinite;
+  }
+  .tool-card:hover .tool-card__visual img {
+    transform: translateY(-4px) scale(1.04);
+    filter: drop-shadow(0 22px 48px rgba(0,0,0,0.7));
+  }
+  @keyframes tool-icon-float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tool-card__visual img { animation: none; }
+  }
+
+  /* ── Body ───────────────────────────────────────────────── */
+  .tool-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+    flex: 1;
+  }
+  .tool-card__tag {
+    display: inline-flex;
+    align-self: center;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.10);
+    color: rgba(255,255,255,0.7);
+  }
+  .tool-card__name {
+    margin: 4px 0 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #fafafa;
+  }
+  .tool-card__desc {
+    margin: 0;
+    color: rgba(255,255,255,0.62);
+    line-height: 1.7;
+    font-size: 0.92rem;
+    max-width: 42ch;
+    margin: 0 auto;
+  }
+
+  /* ── Actions ────────────────────────────────────────────── */
+  .tool-card__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: auto;
+  }
+  .tool-card__btn {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.10);
     text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 600;
+    transition: background .15s ease, border-color .15s ease, transform .15s ease;
+    cursor: pointer;
   }
-  .btn.secondary { opacity: .9; }
+  .tool-card__btn:hover { transform: translateY(-1px); }
+  .tool-card__btn-tier {
+    display: block;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+    margin-bottom: 2px;
+  }
+  .tool-card__btn--lab {
+    background: rgba(89,195,255,0.06);
+    border-color: rgba(89,195,255,0.22);
+    color: #89d7ff;
+  }
+  .tool-card__btn--lab:hover {
+    background: rgba(89,195,255,0.12);
+    border-color: rgba(89,195,255,0.4);
+  }
+  .tool-card__btn--lab .tool-card__btn-tier { color: rgba(137,215,255,0.7); }
+  .tool-card__btn--studio {
+    background: linear-gradient(135deg, rgba(241,222,170,0.12), rgba(214,179,106,0.18));
+    border-color: rgba(214,179,106,0.4);
+    color: #f1deaa;
+  }
+  .tool-card__btn--studio:hover {
+    background: linear-gradient(135deg, rgba(241,222,170,0.20), rgba(214,179,106,0.28));
+    border-color: rgba(214,179,106,0.6);
+  }
+  .tool-card__btn--studio .tool-card__btn-tier { color: rgba(232,212,154,0.8); }
+
+  /* ── Footer band ────────────────────────────────────────── */
+  .tools-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 32px 0 0;
+    padding: 22px 26px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.02);
+  }
+  .tools-footer__signal {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.88rem;
+  }
+  .tools-footer__dot {
+    width: 8px; height: 8px;
+    border-radius: 999px;
+    background: #34D399;
+    box-shadow: 0 0 10px rgba(52,211,153,0.6);
+    animation: tools-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes tools-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%      { transform: scale(1.4); opacity: 0.5; }
+  }
+  .tools-footer__actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .tools-footer__link {
+    display: inline-flex;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--gold-soft, #f1deaa), var(--gold, #d6b36a));
+    color: #0a0a0f;
+    font-weight: 600;
+    font-size: 0.88rem;
+    text-decoration: none;
+    transition: transform .15s ease;
+  }
+  .tools-footer__link:hover { transform: translateY(-1px); }
+  .tools-footer__link--ghost {
+    background: rgba(255,255,255,0.04);
+    color: rgba(255,255,255,0.85);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
 
   @media (max-width: 860px) {
-    .card { grid-column: span 12; }
-    .actions { flex-direction: column; }
+    .tools-grid { grid-template-columns: 1fr; }
+    .tools-tiers { grid-template-columns: 1fr; }
+    .tools-footer { flex-direction: column; align-items: flex-start; }
   }
 </style>

@@ -20,7 +20,31 @@ window.VxTokens = (function () {
 
   var BALANCE_KEY = 'volynx_token_balance';
   var BALANCE_TS_KEY = 'volynx_token_balance_ts';
-  var CACHE_TTL = 2 * 60 * 1000; // 2 minutes
+
+  // Listen for balance-changed events from any source (purchase webhook,
+  // realtime subscription, manual update) and invalidate the cache so the
+  // next getBalance() call goes to the server. Without this, a 2-min TTL
+  // means the topbar shows stale numbers after a purchase even though the
+  // DB and the realtime channel both already know the new value.
+  if (typeof window !== 'undefined') {
+    window.addEventListener('vx:balance-changed', function (e) {
+      try {
+        var newBal = e && e.detail && typeof e.detail.balance === 'number' ? e.detail.balance : null;
+        if (newBal !== null) {
+          // Refresh cache with the new value AND timestamp so other readers
+          // see it immediately rather than a 0-but-fresh hit.
+          localStorage.setItem(BALANCE_KEY, String(newBal));
+          localStorage.setItem(BALANCE_TS_KEY, String(Date.now()));
+        } else {
+          // No balance attached — invalidate so the next read hits the server.
+          localStorage.removeItem(BALANCE_TS_KEY);
+        }
+      } catch (_) {}
+    });
+  }
+  // 30s TTL — long enough to avoid hammering /get-balance on every page nav,
+  // short enough that a missed vx:balance-changed event self-heals fast.
+  var CACHE_TTL = 30 * 1000;
 
   var CLASS_COSTS = {
     light: 1,
@@ -71,10 +95,14 @@ window.VxTokens = (function () {
     } catch (_) {}
   }
 
-  /** Fetch current token balance from server */
-  async function getBalance() {
-    var cached = getCachedBalance();
-    if (cached !== null) return cached;
+  /** Fetch current token balance from server.
+   *  Optional: pass true to force a server roundtrip (bypasses cache).
+   */
+  async function getBalance(forceRefresh) {
+    if (!forceRefresh) {
+      var cached = getCachedBalance();
+      if (cached !== null) return cached;
+    }
 
     var token = getAccessToken();
     if (!token) return 0;
