@@ -1,0 +1,531 @@
+---
+import FlagshipLayout from "../../../../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "../../../../components/FlagshipHeader.astro";
+import FlagshipFooter from "../../../../components/FlagshipFooter.astro";
+import DeliveryTrustStrip from "../../../../components/DeliveryTrustStrip.astro";
+import PlatformAssistStrip from "../../../../components/PlatformAssistStrip.astro";
+import { ROUTES } from "../../../../data/routes";
+
+const assistItems = [
+  { href: ROUTES.delivery, label: "All purchases", title: "Back to my products", copy: "Switch to the full delivery dashboard to access kits, tokens and other purchases.", emphasized: true },
+  { href: ROUTES.propertyflow, label: "Product", title: "PropertyFlow page", copy: "Compare tiers and feature lists if you're considering an upgrade." },
+  { href: ROUTES.support, label: "Help", title: "Open support", copy: "Use the support lane if your download fails or licensing needs clarification." },
+  { href: ROUTES.docs, label: "Docs", title: "Setup guide", copy: "Find install, deploy and customisation docs while the ZIP is downloading." },
+];
+---
+<FlagshipLayout title="PropertyFlow downloads — VOLYNX" description="Download your PropertyFlow ZIP, refresh expired links, and recover your purchase." pageClass="page-pf-delivery">
+  <FlagshipHeader ctaLabel="Back to delivery" ctaHref={ROUTES.delivery} />
+  <main>
+
+    <!-- ═══ HERO ═══ -->
+    <section class="hero pf-hero">
+      <div class="shell">
+        <nav class="pf-breadcrumbs" aria-label="Breadcrumb">
+          <a href={ROUTES.home}>Home</a>
+          <span>/</span>
+          <a href={ROUTES.delivery}>My products</a>
+          <span>/</span>
+          <span>PropertyFlow</span>
+        </nav>
+
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <span class="eyebrow"><span class="i18n-en">Your PropertyFlow downloads</span><span class="i18n-pt">Seus downloads PropertyFlow</span></span>
+            <h1><span class="i18n-en">Download, refresh, deploy.</span><span class="i18n-pt">Baixar, renovar, deploy.</span></h1>
+            <p>
+              <span class="i18n-en">Each PropertyFlow tier ships as a versioned ZIP with full React source. Links expire after 24 hours for security — refresh anytime from this page.</span>
+              <span class="i18n-pt">Cada tier do PropertyFlow é entregue como ZIP versionado com código-fonte React completo. Links expiram em 24 horas por segurança — atualize aqui sempre que precisar.</span>
+            </p>
+            <div class="hero-actions">
+              <a href={ROUTES.docs + "#propertyflow"} class="button button--ghost"><span class="i18n-en">Setup docs</span><span class="i18n-pt">Documentação</span></a>
+              <a href={ROUTES.support + "?product=propertyflow"} class="button button--ghost"><span class="i18n-en">Support</span><span class="i18n-pt">Suporte</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <PlatformAssistStrip
+      eyebrow="PropertyFlow lane"
+      title="Stay close to delivery, docs, and support."
+      description="Refreshing a link is one click. Everything else you might need is one click further."
+      items={assistItems}
+    />
+
+    <!-- ═══ PURCHASES ═══ -->
+    <section class="page-section">
+      <div class="shell">
+
+        <!-- Loading state -->
+        <div id="pfLoading" class="pf-state">
+          <div class="pf-spinner" aria-hidden="true"></div>
+          <p class="pf-state__label"><span class="i18n-en">Loading your PropertyFlow purchases...</span><span class="i18n-pt">Carregando suas compras PropertyFlow...</span></p>
+        </div>
+
+        <!-- Error state -->
+        <div id="pfError" class="pf-state" style="display:none;">
+          <p class="pf-state__label pf-state__label--error" id="pfErrorMsg">Something went wrong. Please try again.</p>
+          <div class="pf-state__actions">
+            <a href={ROUTES.login + "?next=/dashboard/purchases/propertyflow/"} class="button button--ghost">Sign in again</a>
+            <a href={ROUTES.support + "?product=propertyflow"} class="button button--ghost">Open support</a>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div id="pfEmpty" class="pf-state" style="display:none;">
+          <p class="pf-state__label"><span class="i18n-en">You don't have a PropertyFlow purchase yet.</span><span class="i18n-pt">Você ainda não tem uma compra PropertyFlow.</span></p>
+          <a href={ROUTES.propertyflow} class="button button--gold"><span class="i18n-en">Browse PropertyFlow</span><span class="i18n-pt">Conhecer PropertyFlow</span></a>
+        </div>
+
+        <!-- Purchase grid -->
+        <div id="pfGrid" class="pf-grid" style="display:none;" aria-live="polite"></div>
+
+      </div>
+    </section>
+
+    <section class="page-section page-section--tight">
+      <div class="shell">
+        <DeliveryTrustStrip productName="PropertyFlow" />
+      </div>
+    </section>
+
+    <!-- ═══ RECOVERY ═══ -->
+    <section class="page-section">
+      <div class="shell pf-help panel">
+        <div>
+          <span class="eyebrow"><span class="i18n-en">Need a hand?</span><span class="i18n-pt">Precisa de ajuda?</span></span>
+          <strong><span class="i18n-en">Link expired or download failed?</span><span class="i18n-pt">Link expirou ou download falhou?</span></strong>
+          <p>
+            <span class="i18n-en">Click <em>Generate fresh link</em> on any card to mint a new 24-hour signed URL. The download starts automatically.</span>
+            <span class="i18n-pt">Clique em <em>Gerar novo link</em> em qualquer card para criar um novo URL assinado de 24h. O download começa automaticamente.</span>
+          </p>
+        </div>
+        <div class="hero-actions">
+          <a href={ROUTES.support + "?product=propertyflow&intent=delivery"} class="button button--ghost">Contact support</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  <FlagshipFooter />
+
+  <script is:inline type="module">
+    // ── Auth guard ────────────────────────────────────────────────────────
+    const token = localStorage.getItem('volynx_access_token');
+    if (!token) {
+      window.location.href = '/login/?next=/dashboard/purchases/propertyflow/';
+    }
+
+    function show(id) { const el = document.getElementById(id); if (el) el.style.display = ''; }
+    function hide(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
+
+    function jwtSub(jwt) {
+      try {
+        const part = String(jwt || '').split('.')[1];
+        if (!part) return null;
+        const normalized = part.replace(/-/g, '+').replace(/_/g, '/');
+        const payload = JSON.parse(atob(normalized.padEnd(normalized.length + (4 - normalized.length % 4) % 4, '=')));
+        return payload?.sub || null;
+      } catch { return null; }
+    }
+
+    const TIER_LABELS = {
+      pf_starter:      { name: 'PropertyFlow Starter',      pt: 'PropertyFlow Starter',      tone: 'starter' },
+      pf_professional: { name: 'PropertyFlow Professional', pt: 'PropertyFlow Professional', tone: 'pro' },
+      pf_white_label:  { name: 'PropertyFlow White-Label',  pt: 'PropertyFlow White-Label',  tone: 'studio' },
+    };
+
+    function canonicalAddonId(raw) {
+      const id = String(raw || '').toLowerCase();
+      if (id === 'pf_enterprise' || id === 'pf-enterprise') return 'pf_white_label';
+      return id.replace(/-/g, '_');
+    }
+
+    function isPfAddon(raw) {
+      const id = canonicalAddonId(raw);
+      return id === 'pf_starter' || id === 'pf_professional' || id === 'pf_white_label';
+    }
+
+    function urlIsValid(meta) {
+      if (!meta || !meta.download_url) return false;
+      const exp = meta.download_expires_at ? new Date(meta.download_expires_at).getTime() : 0;
+      // Treat <60s as expired so we never hand out a URL that dies mid-request.
+      return Number.isFinite(exp) && exp - Date.now() > 60_000;
+    }
+
+    function fmtDate(iso, locale) {
+      if (!iso) return '';
+      try {
+        return new Date(iso).toLocaleDateString(locale === 'pt' ? 'pt-BR' : undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+      } catch { return iso; }
+    }
+
+    function fmtMoney(amount, currency, minor = false) {
+      if (amount == null) return '';
+      try {
+        const n = typeof amount === 'number' ? amount : parseFloat(amount);
+        return new Intl.NumberFormat(undefined, { style: 'currency', currency: (currency || 'GBP').toUpperCase() })
+          .format(minor ? n / 100 : n);
+      } catch { return String(amount); }
+    }
+
+    function statusPill(meta) {
+      const s = meta?.delivery_status || (urlIsValid(meta) ? 'ready' : 'pending_signed_url');
+      const label = ({
+        ready:                 { en: 'Ready', pt: 'Pronto',           tone: 'ok' },
+        pending_signed_url:    { en: 'Awaiting link', pt: 'Aguardando link', tone: 'warn' },
+        pending_download:      { en: 'Awaiting file',  pt: 'Aguardando arquivo', tone: 'warn' },
+        refunded:              { en: 'Refunded',       pt: 'Reembolsado',  tone: 'muted' },
+      })[s] || { en: s, pt: s, tone: 'muted' };
+      return `<span class="pf-pill pf-pill--${label.tone}"><span class="i18n-en">${label.en}</span><span class="i18n-pt">${label.pt}</span></span>`;
+    }
+
+    function featureList(features) {
+      const arr = Array.isArray(features) ? features : [];
+      if (arr.length === 0) return '';
+      const items = arr.slice(0, 12).map(f => `<li>${escapeHtml(f.replace(/^pf_/, '').replace(/_/g, ' '))}</li>`).join('');
+      return `<details class="pf-features"><summary><span class="i18n-en">License + features (${arr.length})</span><span class="i18n-pt">Licença + recursos (${arr.length})</span></summary><ul>${items}</ul></details>`;
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    function buildCard(item) {
+      const addonId = canonicalAddonId(item.addon_id);
+      const tier = TIER_LABELS[addonId] || { name: 'PropertyFlow', tone: 'starter' };
+      const meta = item.metadata || {};
+      const purchaseDate = fmtDate(item.created_at);
+      const price = fmtMoney(item.price_paid, item.currency);
+      const valid = urlIsValid(meta);
+      const expiry = meta.download_expires_at ? fmtDate(meta.download_expires_at) : '';
+      const version = meta.download_version || 'v1.0.0';
+      const errorNote = meta.delivery_error
+        ? `<p class="pf-card__error" data-i18n-html="">${escapeHtml(String(meta.delivery_error))}</p>`
+        : '';
+
+      const primary = valid
+        ? `<a href="${escapeHtml(meta.download_url)}" class="button button--gold pf-card__cta" download>
+             <span class="i18n-en">Download ZIP</span><span class="i18n-pt">Baixar ZIP</span>
+           </a>`
+        : `<button type="button" class="button button--gold pf-card__cta pf-card__refresh" data-purchase-id="${escapeHtml(item.id)}" data-addon-id="${escapeHtml(addonId)}">
+             <span class="i18n-en">Generate fresh link</span><span class="i18n-pt">Gerar novo link</span>
+           </button>`;
+
+      return `
+        <article class="panel pf-card pf-card--${tier.tone}" data-row-id="${escapeHtml(item.id)}">
+          <header class="pf-card__head">
+            <div class="pf-card__title">
+              <span class="eyebrow">${statusPill(meta)}</span>
+              <h2 class="i18n-en">${escapeHtml(tier.name)}</h2>
+              <h2 class="i18n-pt">${escapeHtml(tier.pt || tier.name)}</h2>
+            </div>
+            <span class="pf-card__version">${escapeHtml(version)}</span>
+          </header>
+
+          <dl class="pf-card__meta">
+            ${purchaseDate ? `<div><dt><span class="i18n-en">Purchased</span><span class="i18n-pt">Compra</span></dt><dd>${purchaseDate}</dd></div>` : ''}
+            ${price        ? `<div><dt><span class="i18n-en">Paid</span><span class="i18n-pt">Pago</span></dt><dd>${price}</dd></div>` : ''}
+            ${expiry && valid ? `<div><dt><span class="i18n-en">Link expires</span><span class="i18n-pt">Link expira</span></dt><dd data-pf-expires>${expiry}</dd></div>` : ''}
+          </dl>
+
+          <p class="pf-card__hint" data-pf-status>${valid
+            ? `<span class="i18n-en">Direct download — link expires after ${expiry}.</span><span class="i18n-pt">Download direto — o link expira após ${expiry}.</span>`
+            : `<span class="i18n-en">Click below to mint a new 24h download link.</span><span class="i18n-pt">Clique abaixo para gerar um novo link de download de 24h.</span>`}</p>
+
+          ${errorNote}
+          ${featureList(meta.features)}
+
+          <div class="pf-card__actions">
+            ${primary}
+            <a href="/products/propertyflow/" class="button button--ghost pf-card__cta-secondary">
+              <span class="i18n-en">Product page</span><span class="i18n-pt">Página do produto</span>
+            </a>
+          </div>
+        </article>`;
+    }
+
+    /** Wire the "Generate fresh link" buttons to refresh-pf-url. */
+    function attachRefreshHandlers(supabaseUrl, anonKey) {
+      const fnUrl = supabaseUrl + '/functions/v1/refresh-pf-url';
+      document.querySelectorAll('.pf-card__refresh').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const purchaseId = btn.getAttribute('data-purchase-id');
+          const addonId    = btn.getAttribute('data-addon-id');
+          if (!purchaseId && !addonId) return;
+          const card = btn.closest('.pf-card');
+          const status = card?.querySelector('[data-pf-status]');
+          const original = btn.innerHTML;
+
+          btn.innerHTML = '<span class="i18n-en">Generating...</span><span class="i18n-pt">Gerando...</span>';
+          btn.setAttribute('disabled', 'true');
+
+          try {
+            const res = await fetch(fnUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
+                apikey: anonKey,
+              },
+              // Send both keys so this works against either contract
+              // (purchase_id = main HEAD, addon_id = legacy fallback).
+              body: JSON.stringify({ purchase_id: purchaseId, addon_id: addonId }),
+            });
+            const data = await res.json().catch(() => ({}));
+            const url = data?.download_url || data?.url;
+            if (res.ok && url) {
+              const a = document.createElement('a');
+              a.href = url;
+              a.className = 'button button--gold pf-card__cta';
+              a.setAttribute('download', '');
+              a.innerHTML = '<span class="i18n-en">Download ZIP</span><span class="i18n-pt">Baixar ZIP</span>';
+              btn.replaceWith(a);
+              if (status) {
+                const exp = data.download_expires_at || data.expires_at;
+                const when = exp ? new Date(exp).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+                status.innerHTML = `<span class="i18n-en">Direct download — link expires after ${when}.</span><span class="i18n-pt">Download direto — o link expira após ${when}.</span>`;
+              }
+              // Auto-trigger so the buyer doesn't have to click twice.
+              a.click();
+            } else {
+              btn.innerHTML = original;
+              btn.removeAttribute('disabled');
+              if (status) {
+                const msg = data?.error || 'unknown error';
+                status.innerHTML = '<span class="i18n-en">Could not generate link: ' + msg + '. Please try again or contact support.</span><span class="i18n-pt">Não foi possível gerar o link: ' + msg + '. Tente novamente ou abra suporte.</span>';
+              }
+            }
+          } catch (err) {
+            btn.innerHTML = original;
+            btn.removeAttribute('disabled');
+            if (status) status.innerHTML = '<span class="i18n-en">Network error. Please try again.</span><span class="i18n-pt">Erro de rede. Tente novamente.</span>';
+          }
+        });
+      });
+    }
+
+    // ── Main fetch ────────────────────────────────────────────────────────
+    (async () => {
+      let userId = null;
+      try {
+        const session = JSON.parse(localStorage.getItem('volynx_session') || '{}');
+        userId = session?.user?.id || jwtSub(token);
+      } catch {}
+      userId = userId || jwtSub(token);
+
+      if (!userId) {
+        window.location.href = '/login/?next=/dashboard/purchases/propertyflow/';
+        return;
+      }
+
+      let cfg = null;
+      try { cfg = await fetch('/config.json', { cache: 'no-store' }).then(r => r.json()); } catch {}
+      const supabaseUrl = (cfg?.supabaseUrl || '').replace(/\/$/, '');
+      const anonKey     = cfg?.supabaseAnonKey || cfg?.anonKey || '';
+
+      if (!supabaseUrl || !anonKey) {
+        hide('pfLoading');
+        document.getElementById('pfErrorMsg').textContent = 'Configuration error. Please contact support.';
+        show('pfError');
+        return;
+      }
+
+      try {
+        const url = `${supabaseUrl}/rest/v1/addons_purchased?select=id,addon_id,price_paid,currency,status,metadata,created_at&user_id=eq.${userId}&status=eq.active&order=created_at.desc`;
+        const res = await fetch(url, {
+          headers: {
+            apikey: anonKey,
+            Authorization: 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!res.ok) throw new Error('rest fetch failed: ' + res.status);
+        const rows = await res.json();
+        const pfRows = (Array.isArray(rows) ? rows : []).filter(r => isPfAddon(r.addon_id));
+
+        hide('pfLoading');
+
+        if (pfRows.length === 0) {
+          show('pfEmpty');
+          return;
+        }
+
+        const grid = document.getElementById('pfGrid');
+        grid.innerHTML = pfRows.map(buildCard).join('');
+        grid.style.display = '';
+        attachRefreshHandlers(supabaseUrl, anonKey);
+      } catch (err) {
+        hide('pfLoading');
+        const errEl = document.getElementById('pfErrorMsg');
+        if (errEl) errEl.textContent = 'Failed to load PropertyFlow purchases. Please refresh and try again.';
+        show('pfError');
+      }
+    })();
+  </script>
+</FlagshipLayout>
+
+<style>
+  /* ── Hero ───────────────────────────────────────────────── */
+  .pf-hero { padding-top: clamp(28px, 5vw, 52px); }
+  .pf-hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); margin: 12px 0 16px; }
+  .pf-breadcrumbs {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+    margin-bottom: 18px; font-size: .82rem; color: rgba(255,255,255,.5);
+  }
+  .pf-breadcrumbs a { color: rgba(255,255,255,.7); text-decoration: none; transition: color .15s; }
+  .pf-breadcrumbs a:hover { color: #fff; }
+
+  /* ── States ─────────────────────────────────────────────── */
+  .pf-state {
+    display: flex; flex-direction: column; align-items: center; gap: 20px;
+    padding: clamp(40px, 8vw, 80px) 0; text-align: center;
+  }
+  .pf-state__label { color: rgba(255,255,255,.55); font-size: .95rem; margin: 0; }
+  .pf-state__label--error { color: rgba(255,120,120,.85); }
+  .pf-state__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .pf-spinner {
+    width: 32px; height: 32px;
+    border: 2px solid rgba(255,255,255,.12);
+    border-top-color: rgba(196,181,253,.8);
+    border-radius: 50%;
+    animation: pfspin 700ms linear infinite;
+  }
+  @keyframes pfspin { to { transform: rotate(360deg); } }
+
+  /* ── Grid ───────────────────────────────────────────────── */
+  .pf-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
+    gap: 20px;
+  }
+
+  /* ── Card ───────────────────────────────────────────────── */
+  .pf-card {
+    display: flex; flex-direction: column; gap: 16px;
+    padding: 24px;
+    border: 1px solid rgba(255,255,255,.06);
+    background: rgba(255,255,255,.03);
+    backdrop-filter: blur(10px);
+    border-radius: 14px;
+    transition: border-color .2s, box-shadow .2s, transform .2s;
+  }
+  .pf-card:hover {
+    border-color: rgba(196,181,253,.22);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 28px rgba(0,0,0,.18);
+  }
+  .pf-card--starter { border-top: 2px solid rgba(196,181,253,.32); }
+  .pf-card--pro     { border-top: 2px solid rgba(245,158,11,.42); }
+  .pf-card--studio  { border-top: 2px solid rgba(52,211,153,.42); }
+
+  .pf-card__head {
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+  }
+  .pf-card__title h2 {
+    font-size: clamp(1.05rem, 2.6vw, 1.25rem);
+    font-weight: 700;
+    margin: 6px 0 0;
+    line-height: 1.3;
+    color: rgba(255,255,255,.96);
+  }
+  .pf-card__version {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .72rem;
+    color: rgba(255,255,255,.45);
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.06);
+  }
+
+  .pf-card__meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px 12px;
+    margin: 0;
+  }
+  .pf-card__meta > div { display: flex; flex-direction: column; gap: 2px; }
+  .pf-card__meta dt {
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: rgba(255,255,255,.38);
+    font-weight: 600;
+  }
+  .pf-card__meta dd { margin: 0; color: rgba(255,255,255,.78); font-size: .88rem; }
+
+  .pf-card__hint {
+    font-size: .82rem;
+    color: rgba(255,255,255,.55);
+    line-height: 1.55;
+    margin: 0;
+  }
+  .pf-card__error {
+    font-size: .78rem;
+    color: rgba(255,140,140,.85);
+    background: rgba(255,90,90,.06);
+    border: 1px solid rgba(255,90,90,.18);
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin: 0;
+  }
+
+  /* ── Pills ──────────────────────────────────────────────── */
+  .pf-pill {
+    display: inline-flex; align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: .68rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .pf-pill--ok    { background: rgba(52,211,153,.1);  color: #34D399; border-color: rgba(52,211,153,.25); }
+  .pf-pill--warn  { background: rgba(251,191,36,.1);  color: #fbbf24; border-color: rgba(251,191,36,.28); }
+  .pf-pill--muted { background: rgba(255,255,255,.04); color: rgba(255,255,255,.55); }
+
+  /* ── Features ───────────────────────────────────────────── */
+  .pf-features summary {
+    cursor: pointer;
+    font-size: .82rem;
+    color: rgba(196,181,253,.78);
+    font-weight: 600;
+    list-style: none;
+    padding: 4px 0;
+  }
+  .pf-features summary::-webkit-details-marker { display: none; }
+  .pf-features summary::before { content: "+ "; opacity: .6; }
+  .pf-features[open] summary::before { content: "− "; }
+  .pf-features ul {
+    list-style: none;
+    padding: 6px 0 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 4px;
+  }
+  .pf-features li {
+    font-size: .78rem;
+    color: rgba(255,255,255,.6);
+    text-transform: capitalize;
+  }
+
+  /* ── Actions ────────────────────────────────────────────── */
+  .pf-card__actions {
+    display: flex; flex-direction: column; gap: 8px;
+    margin-top: auto;
+  }
+  .pf-card__cta { width: 100%; justify-content: center; text-align: center; }
+  .pf-card__cta-secondary { width: 100%; justify-content: center; text-align: center; font-size: .85rem; }
+
+  /* ── Recovery panel ─────────────────────────────────────── */
+  .pf-help { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .pf-help strong { display: block; margin: 6px 0 10px; font-size: 1.05rem; line-height: 1.45; }
+  .pf-help p { margin: 0; color: rgba(255,255,255,.65); line-height: 1.7; }
+  .pf-help em { color: rgba(196,181,253,.85); font-style: normal; }
+  .page-section--tight { padding-top: 0; }
+
+  @media (max-width: 860px) {
+    .pf-help { flex-direction: column; align-items: flex-start; }
+  }
+</style>
