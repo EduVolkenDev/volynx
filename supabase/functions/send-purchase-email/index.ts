@@ -51,16 +51,24 @@ const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
 });
 
 async function loadProfile(userId: string): Promise<Profile | null> {
-  const { data: prof } = await supabase
+  // profiles has no `locale` column today — keep the SELECT minimal so a
+  // missing/extra column never makes the row come back null. Locale is
+  // resolved from the webhook payload (or defaults to en) instead.
+  const { data: prof, error } = await supabase
     .from("profiles")
-    .select("email, full_name, locale")
+    .select("email, full_name")
     .eq("id", userId)
     .maybeSingle();
+  if (error) {
+    console.error(`loadProfile error for ${userId}:`, error.message);
+    return null;
+  }
   if (!prof?.email) return null;
-  const locale: Locale = (prof.locale === "pt" || prof.locale === "pt-BR") ? "pt" : "en";
   const fullName = String(prof.full_name || "").trim();
   const firstName = fullName ? fullName.split(/\s+/)[0] : (prof.email.split("@")[0] || "there");
-  return { email: prof.email, first_name: firstName, locale };
+  // Default to en; webhook payload can override via payload.locale (resolved
+  // in the dispatcher's render path).
+  return { email: prof.email, first_name: firstName, locale: "en" };
 }
 
 interface IncomingDirect {

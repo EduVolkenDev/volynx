@@ -136,44 +136,51 @@ async function queueEmail(args: {
   idempotency_key: string;
   payload: Record<string, unknown>;
 }): Promise<void> {
+  // Insert pending row first; capture the id so the dispatcher can process
+  // the *same* row instead of trying to insert a duplicate (which would hit
+  // the unique idempotency_key index, return "skipped", and leave the row
+  // forever pending).
+  let logId: string | null = null;
   try {
-    const { error } = await supabase.from("email_log").insert({
-      user_id: args.user_id,
-      event_type: args.event_type,
-      idempotency_key: args.idempotency_key,
-      recipient_email: args.recipient_email || "pending",
-      payload: args.payload,
-      status: "pending",
-    });
-    if (error && error.code !== "23505") {
+    const { data: inserted, error } = await supabase
+      .from("email_log")
+      .insert({
+        user_id: args.user_id,
+        event_type: args.event_type,
+        idempotency_key: args.idempotency_key,
+        recipient_email: args.recipient_email || "pending",
+        payload: args.payload,
+        status: "pending",
+      })
+      .select("id")
+      .maybeSingle();
+
+    if (error) {
+      if (error.code === "23505") {
+        // Duplicate idempotency_key — already queued/sent on a previous
+        // webhook delivery, nothing else to do.
+        return;
+      }
       console.error(`email_log insert error (${args.event_type}):`, error.message);
       return;
     }
-    if (error?.code === "23505") {
-      // Duplicate idempotency_key — already queued/sent, fine.
-      return;
-    }
+    logId = inserted?.id || null;
   } catch (e) {
     console.error(`email_log insert threw (${args.event_type}):`, (e as Error).message);
     return;
   }
 
-  // Fire-and-forget dispatch — the function reads the pending row by
-  // (event_type, idempotency_key) lookup. If this fetch fails, the row stays
-  // pending and any replay tooling can pick it up.
+  if (!logId) return;
+
+  // Fire-and-forget dispatch by id — dispatcher fetches the pending row,
+  // calls Resend, and updates status. No race on the unique index.
   fetch(`${SUPABASE_URL_SELF}/functions/v1/send-purchase-email`, {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${SERVICE_ROLE_SELF}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      event_type: args.event_type,
-      user_id: args.user_id,
-      idempotency_key: args.idempotency_key,
-      payload: args.payload,
-      recipient_email: args.recipient_email,
-    }),
+    body: JSON.stringify({ email_log_id: logId }),
   }).catch((e) => {
     console.error(`send-purchase-email dispatch failed (${args.event_type}):`, (e as Error).message);
   });
@@ -329,7 +336,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       if (!existing) {
         await supabase.from("addons_purchased").insert({
           user_id: userId,
-          user_email: userEmail,
           addon_id: addonId,
           price_paid: (session.amount_total || 0) / 100,
           currency: currency,
@@ -469,7 +475,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
         await supabase.from("addons_purchased").insert({
           user_id: userId,
-          user_email: userEmail,
           addon_id: addonId,
           price_paid: (session.amount_total || 0) / 100,
           currency: currency,
@@ -508,7 +513,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       const meta = (session.metadata || {}) as Record<string, string>;
       await supabase.from("addons_purchased").insert({
         user_id: userId,
-        user_email: userEmail,
         addon_id: prefix,
         price_paid: (session.amount_total || 0) / 100,
         currency: currency,
@@ -590,7 +594,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       // we patch project_slug + delivery_status after the project insert below.
       await supabase.from("addons_purchased").insert({
         user_id: userId,
-        user_email: userEmail,
         addon_id: addonId,
         price_paid: (session.amount_total || 0) / 100,
         currency: currency,
