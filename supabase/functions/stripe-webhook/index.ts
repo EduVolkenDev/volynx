@@ -208,6 +208,27 @@ function canonicalizeLookupKey(lookupKey: string): string {
   return lookupKey.replace(prefix, canonicalPrefix);
 }
 
+function getKitStorageSlug(prefix: string): string | null {
+  if (prefix.startsWith("kit_portfolio")) return "portfolio";
+  if (prefix.startsWith("kit_agency")) return "agency";
+  if (prefix.startsWith("kit_saas") || prefix.startsWith("kit_landing_express")) return "saas";
+  return null;
+}
+
+function getKitStorageTier(tier: string | null): string | null {
+  if (!tier) return null;
+  const map: Record<string, string> = {
+    personal: "starter",
+    commercial: "pro",
+    studio: "studio",
+  };
+  return map[tier] || null;
+}
+
+function isLikelyMissingStorageAsset(message: string | null): boolean {
+  return /not found|does not exist|404|no such object|object not found|failed to find/i.test(String(message || ""));
+}
+
 function isSubscription(prefix: string): boolean {
   return !!(PLAN_PROFILE_MAP[prefix]) ||
     prefix === "addon_extra_slot";
@@ -547,6 +568,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     if (prefix.startsWith("kit_") || prefix.startsWith("pf_")) {
       const addonId = prefix === "pf_white_label" ? "pf_white_label" : prefix;
       const isPropertyFlow = prefix.startsWith("pf_");
+      const isKit = prefix.startsWith("kit_");
 
       // Tier extracted from lookup_key suffix — used for delivery differentiation
       // and as the in-product license label (Starter / Pro / Studio for kits;
@@ -566,7 +588,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       let pfDownloadUrl: string | null = null;
       let pfDownloadExpiresAt: string | null = null;
       let pfSignError: string | null = null;
-      const PF_VERSION = "v1.0.0";
+      const PF_VERSION = "v1.1.0";
       const PF_SIGNED_URL_TTL = 60 * 60 * 24; // 24h
       if (isPropertyFlow) {
         const objectPath = `${addonId}/${PF_VERSION}.zip`;
@@ -589,9 +611,56 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         }
       }
 
+      // Kit signed URL — these ZIPs are built in Volynx-OS/out/kits and then
+      // uploaded to the "kits" bucket using {kit_slug}_{tier}/v1.0.0.zip.
+      // Builder project creation remains as a secondary convenience path, but
+      // ZIP delivery is now the primary fulfillment layer.
+      let kitDownloadUrl: string | null = null;
+      let kitDownloadExpiresAt: string | null = null;
+      let kitDownloadError: string | null = null;
+      let kitDownloadFilename: string | null = null;
+      let kitDownloadPath: string | null = null;
+      const KIT_VERSION = "v1.0.0";
+      const KIT_SIGNED_URL_TTL = 60 * 60 * 24; // 24h
+      const kitSlug = isKit ? getKitStorageSlug(prefix) : null;
+      const kitStorageTier = isKit ? getKitStorageTier(tier) : null;
+
+      if (isKit && kitSlug && kitStorageTier) {
+        kitDownloadPath = `${kitSlug}_${kitStorageTier}/${KIT_VERSION}.zip`;
+        kitDownloadFilename = `${kitSlug}-${kitStorageTier}-${KIT_VERSION}.zip`;
+        try {
+          const { data: signed, error: signErr } = await supabase
+            .storage
+            .from("kits")
+            .createSignedUrl(kitDownloadPath, KIT_SIGNED_URL_TTL);
+          if (signErr) {
+            kitDownloadError = signErr.message;
+          } else if (signed?.signedUrl) {
+            kitDownloadUrl = signed.signedUrl;
+            kitDownloadExpiresAt = new Date(Date.now() + KIT_SIGNED_URL_TTL * 1000).toISOString();
+          }
+        } catch (e) {
+          kitDownloadError = (e as Error).message;
+        }
+
+        if (kitDownloadError) {
+          console.error(`Kit ${prefix} signed-url error for ${userId}: ${kitDownloadError}`);
+        }
+      }
+
+      const kitDeliveryStatus = isKit
+        ? (
+          kitDownloadUrl
+            ? "ready"
+            : isLikelyMissingStorageAsset(kitDownloadError)
+              ? "missing_storage_asset"
+              : "pending_signed_url"
+        )
+        : null;
+
       // Record as addon purchase (single source of truth for /delivery/).
-      // For PF, metadata already carries the signed URL on insert; for kits,
-      // we patch project_slug + delivery_status after the project insert below.
+      // For PF and kits, metadata carries delivery context on first insert.
+      // Kits still receive a Builder project below as a secondary fallback.
       await supabase.from("addons_purchased").insert({
         user_id: userId,
         addon_id: addonId,
@@ -611,6 +680,17 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             download_version: PF_VERSION,
             delivery_status: pfDownloadUrl ? "ready" : "pending_signed_url",
             delivery_error: pfSignError,
+          } : isKit ? {
+            kit_slug: kitSlug,
+            zip_tier: kitStorageTier,
+            download_bucket: "kits",
+            download_path: kitDownloadPath,
+            download_filename: kitDownloadFilename,
+            download_url: kitDownloadUrl,
+            download_expires_at: kitDownloadExpiresAt,
+            download_version: KIT_VERSION,
+            delivery_status: kitDeliveryStatus,
+            delivery_error: kitDownloadError,
           } : {}),
         },
       });
@@ -634,9 +714,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       };
 
       const presetId = presetMap[prefix];
+      let projectSlug: string | null = null;
+      let presetFetchError: string | null = null;
       if (presetId) {
-        let projectSlug: string | null = null;
-        let presetFetchError: string | null = null;
         try {
           const presetsRes = await fetch("https://volynx.world/builder/presets.json");
           if (!presetsRes.ok) {
@@ -683,10 +763,20 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
               stripe_prefix: stripePrefix,
               tier,
               tier_label: tierLabel,
+              kit_slug: kitSlug,
+              zip_tier: kitStorageTier,
+              download_bucket: "kits",
+              download_path: kitDownloadPath,
+              download_filename: kitDownloadFilename,
+              download_url: kitDownloadUrl,
+              download_expires_at: kitDownloadExpiresAt,
+              download_version: KIT_VERSION,
+              delivery_status: kitDeliveryStatus,
+              delivery_error: kitDownloadError,
               project_slug: projectSlug,
               preset_id: presetId,
-              delivery_status: projectSlug ? "ready" : "pending_preset_fetch",
-              delivery_error: presetFetchError,
+              project_delivery_status: projectSlug ? "ready" : "pending_preset_fetch",
+              project_delivery_error: presetFetchError,
             },
           })
           .eq("user_id", userId)
@@ -728,7 +818,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             kit_name: kitDisplayName,
             tier,
             tier_label: tierLabel,
+            project_slug: projectSlug,
             preset_id: presetId,
+            download_url: kitDownloadUrl,
           },
         });
       }
