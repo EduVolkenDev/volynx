@@ -1,0 +1,544 @@
+---
+import FlagshipLayout from "../../../../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "../../../../components/FlagshipHeader.astro";
+import FlagshipFooter from "../../../../components/FlagshipFooter.astro";
+import DeliveryTrustStrip from "../../../../components/DeliveryTrustStrip.astro";
+import PlatformAssistStrip from "../../../../components/PlatformAssistStrip.astro";
+import { ROUTES } from "../../../../data/routes";
+
+const assistItems = [
+  { href: ROUTES.delivery, label: "All purchases", title: "Back to my products", copy: "Switch to the full delivery dashboard for tokens, PropertyFlow and other purchases.", emphasized: true },
+  { href: ROUTES.builder, label: "Builder", title: "Open Builder", copy: "Pick up where the kit left off — every kit ships pre-loaded as a draft project." },
+  { href: ROUTES.products, label: "Catalog", title: "Browse products", copy: "Compare tiers across Portfolio, Agency and SaaS kits before adding more." },
+  { href: ROUTES.support, label: "Help", title: "Open support", copy: "Hit support if a kit didn't auto-load, the preset is missing, or licensing needs clarification." },
+];
+---
+<FlagshipLayout title="Kits — VOLYNX" description="Open your purchased Portfolio, Agency, and SaaS kits in Builder, manage tier licenses, recover preset drafts." pageClass="page-kits-delivery">
+  <FlagshipHeader ctaLabel="Open Builder" ctaHref={ROUTES.builder} />
+  <main>
+
+    <!-- ═══ HERO ═══ -->
+    <section class="hero kits-hero">
+      <div class="shell">
+        <nav class="kits-breadcrumbs" aria-label="Breadcrumb">
+          <a href={ROUTES.home}>Home</a>
+          <span>/</span>
+          <a href={ROUTES.delivery}>My products</a>
+          <span>/</span>
+          <span>Kits</span>
+        </nav>
+
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <span class="eyebrow"><span class="i18n-en">Your kits</span><span class="i18n-pt">Seus kits</span></span>
+            <h1><span class="i18n-en">Open. Edit. Ship.</span><span class="i18n-pt">Abrir. Editar. Publicar.</span></h1>
+            <p>
+              <span class="i18n-en">Every kit you've purchased is auto-loaded into Builder as a draft. Open it to start customising — content, branding, and sections are pre-wired by tier.</span>
+              <span class="i18n-pt">Cada kit comprado é carregado no Builder como rascunho. Abra para personalizar — conteúdo, branding e seções já vêm pré-montados pelo tier.</span>
+            </p>
+            <div class="hero-actions">
+              <a href={ROUTES.builder} class="button button--gold"><span class="i18n-en">Open Builder</span><span class="i18n-pt">Abrir Builder</span></a>
+              <a href={ROUTES.products} class="button button--ghost"><span class="i18n-en">Browse kits</span><span class="i18n-pt">Ver kits</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <PlatformAssistStrip
+      eyebrow="Kit lane"
+      title="Stay close to delivery, Builder, and support."
+      description="One click to your draft. One click to recovery if the preset didn't auto-load."
+      items={assistItems}
+    />
+
+    <!-- ═══ PURCHASES ═══ -->
+    <section class="page-section">
+      <div class="shell">
+
+        <!-- Loading state -->
+        <div id="kitsLoading" class="kits-state">
+          <div class="kits-spinner" aria-hidden="true"></div>
+          <p class="kits-state__label"><span class="i18n-en">Loading your kits...</span><span class="i18n-pt">Carregando seus kits...</span></p>
+        </div>
+
+        <!-- Error state -->
+        <div id="kitsError" class="kits-state" style="display:none;">
+          <p class="kits-state__label kits-state__label--error" id="kitsErrorMsg">Something went wrong. Please try again.</p>
+          <div class="kits-state__actions">
+            <a href={ROUTES.login + "?next=/dashboard/purchases/kits/"} class="button button--ghost">Sign in again</a>
+            <a href={ROUTES.support + "?product=kits"} class="button button--ghost">Open support</a>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div id="kitsEmpty" class="kits-state" style="display:none;">
+          <p class="kits-state__label"><span class="i18n-en">You don't have any kits yet.</span><span class="i18n-pt">Você ainda não tem kits.</span></p>
+          <a href={ROUTES.products} class="button button--gold"><span class="i18n-en">Browse Portfolio · Agency · SaaS</span><span class="i18n-pt">Ver Portfolio · Agency · SaaS</span></a>
+        </div>
+
+        <!-- Purchase grid -->
+        <div id="kitsGrid" class="kits-grid" style="display:none;" aria-live="polite"></div>
+
+      </div>
+    </section>
+
+    <section class="page-section page-section--tight">
+      <div class="shell">
+        <DeliveryTrustStrip productName="kit" />
+      </div>
+    </section>
+
+    <!-- ═══ RECOVERY ═══ -->
+    <section class="page-section">
+      <div class="shell kits-help panel">
+        <div>
+          <span class="eyebrow"><span class="i18n-en">Need a hand?</span><span class="i18n-pt">Precisa de ajuda?</span></span>
+          <strong><span class="i18n-en">Preset didn't auto-load?</span><span class="i18n-pt">Preset não carregou automaticamente?</span></strong>
+          <p>
+            <span class="i18n-en">Click <em>Set up in Builder</em> on any card. Builder will pick up the preset and create your project draft from scratch.</span>
+            <span class="i18n-pt">Clique em <em>Configurar no Builder</em> em qualquer card. O Builder pega o preset e cria seu projeto draft do zero.</span>
+          </p>
+        </div>
+        <div class="hero-actions">
+          <a href={ROUTES.support + "?product=kits&intent=delivery"} class="button button--ghost">Contact support</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  <FlagshipFooter />
+
+  <script is:inline type="module">
+    // ── Auth guard ────────────────────────────────────────────────────────
+    const token = localStorage.getItem('volynx_access_token');
+    if (!token) {
+      window.location.href = '/login/?next=/dashboard/purchases/kits/';
+    }
+
+    function show(id) { const el = document.getElementById(id); if (el) el.style.display = ''; }
+    function hide(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
+
+    function jwtSub(jwt) {
+      try {
+        const part = String(jwt || '').split('.')[1];
+        if (!part) return null;
+        const normalized = part.replace(/-/g, '+').replace(/_/g, '/');
+        const payload = JSON.parse(atob(normalized.padEnd(normalized.length + (4 - normalized.length % 4) % 4, '=')));
+        return payload?.sub || null;
+      } catch { return null; }
+    }
+
+    // Per-family branding. Keep in sync with Volynx-OS demo themes:
+    // portfolio = teal, agency = violet, saas = cyan.
+    const KIT_FAMILIES = {
+      portfolio: {
+        en: 'Portfolio Pro Kit', pt: 'Portfolio Pro Kit',
+        tone: 'portfolio',
+        preset: 'portfolio',
+        product_url: '/products/portfolio-pro-kit/',
+      },
+      agency: {
+        en: 'Agency Launch Kit', pt: 'Agency Launch Kit',
+        tone: 'agency',
+        preset: 'agency',
+        product_url: '/products/agency-launch-kit/',
+      },
+      saas: {
+        en: 'SaaS Landing System', pt: 'SaaS Landing System',
+        tone: 'saas',
+        preset: 'saas',
+        product_url: '/products/saas-landing-system/',
+      },
+    };
+
+    const TIER_LABELS = {
+      personal:     { en: 'Starter',  pt: 'Starter' },
+      commercial:   { en: 'Pro',      pt: 'Pro' },
+      studio:       { en: 'Studio',   pt: 'Studio' },
+    };
+
+    /** Identify the kit family from a kit_* addon_id. */
+    function kitFamily(addonId) {
+      const id = String(addonId || '').toLowerCase();
+      if (id.startsWith('kit_portfolio') || id.startsWith('kit-portfolio')) return 'portfolio';
+      if (id.startsWith('kit_agency')    || id.startsWith('kit-agency'))    return 'agency';
+      if (id.startsWith('kit_saas')      || id.startsWith('kit-saas'))      return 'saas';
+      // landing_express maps to saas family per webhook presetMap
+      if (id.startsWith('kit_landing')   || id.startsWith('kit-landing'))   return 'saas';
+      return null;
+    }
+
+    /** Extract tier suffix from kit_* addon_id. */
+    function kitTier(addonId, metaTier) {
+      if (metaTier) return metaTier;
+      const m = String(addonId || '').toLowerCase().match(/_(personal|commercial|studio)$/);
+      return m ? m[1] : null;
+    }
+
+    function isKitAddon(addonId) {
+      return kitFamily(addonId) !== null;
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return '';
+      try {
+        return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+      } catch { return iso; }
+    }
+
+    function fmtMoney(amount, currency) {
+      if (amount == null) return '';
+      try {
+        const n = typeof amount === 'number' ? amount : parseFloat(amount);
+        return new Intl.NumberFormat(undefined, { style: 'currency', currency: (currency || 'GBP').toUpperCase() }).format(n);
+      } catch { return String(amount); }
+    }
+
+    function statusPill(meta) {
+      const s = meta?.delivery_status || (meta?.project_slug ? 'ready' : 'pending_preset_fetch');
+      const map = {
+        ready:                { en: 'Loaded', pt: 'Carregado',  tone: 'ok' },
+        pending_preset_fetch: { en: 'Awaiting setup', pt: 'Aguardando setup', tone: 'warn' },
+        refunded:             { en: 'Refunded', pt: 'Reembolsado', tone: 'muted' },
+        canceled:             { en: 'Canceled', pt: 'Cancelado', tone: 'muted' },
+      };
+      const label = map[s] || { en: s, pt: s, tone: 'muted' };
+      return `<span class="kit-pill kit-pill--${label.tone}"><span class="i18n-en">${label.en}</span><span class="i18n-pt">${label.pt}</span></span>`;
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    /** Pretty-print an addon_entitlement feature key (e.g. "agency_proposal_full" → "Proposal full"). */
+    function prettyFeature(key) {
+      const stripped = String(key).replace(/^(kit_|portfolio_|agency_|saas_)/, '').replace(/_/g, ' ');
+      return stripped.charAt(0).toUpperCase() + stripped.slice(1);
+    }
+
+    function featureList(features) {
+      const arr = Array.isArray(features) ? features : [];
+      if (arr.length === 0) return '';
+      const items = arr.slice(0, 14).map(f => `<li>${escapeHtml(prettyFeature(f))}</li>`).join('');
+      return `<details class="kit-features">
+        <summary><span class="i18n-en">License + sections (${arr.length})</span><span class="i18n-pt">Licença + seções (${arr.length})</span></summary>
+        <ul>${items}</ul>
+      </details>`;
+    }
+
+    function buildCard(item, entitlements) {
+      const addonId = String(item.addon_id || '').toLowerCase();
+      const family = kitFamily(addonId);
+      if (!family) return '';
+      const fam = KIT_FAMILIES[family];
+
+      const meta = item.metadata || {};
+      const tier = kitTier(addonId, meta.tier);
+      const tierLabel = (tier && TIER_LABELS[tier]) || null;
+
+      const purchaseDate = fmtDate(item.created_at);
+      const price = fmtMoney(item.price_paid, item.currency);
+
+      const projectSlug = meta.project_slug || null;
+      const presetId = meta.preset_id || fam.preset;
+
+      const features = entitlements?.[addonId]?.features || meta.features || [];
+      const description = entitlements?.[addonId]?.description || '';
+
+      // Primary CTA — open the project draft if we have one, otherwise route
+      // to /builder/?preset=<> which lets Builder pick up the preset and
+      // create the draft on first open.
+      const primary = projectSlug
+        ? `<a href="/builder/?project=${encodeURIComponent(projectSlug)}" class="button button--gold kit-card__cta">
+             <span class="i18n-en">Open in Builder</span><span class="i18n-pt">Abrir no Builder</span>
+           </a>`
+        : `<a href="/builder/?preset=${encodeURIComponent(presetId)}" class="button button--gold kit-card__cta">
+             <span class="i18n-en">Set up in Builder</span><span class="i18n-pt">Configurar no Builder</span>
+           </a>`;
+
+      const errorNote = meta.delivery_error
+        ? `<p class="kit-card__error">${escapeHtml(String(meta.delivery_error))}</p>`
+        : '';
+
+      return `
+        <article class="panel kit-card kit-card--${fam.tone}" data-row-id="${escapeHtml(item.id)}">
+          <header class="kit-card__head">
+            <div class="kit-card__title">
+              <span class="eyebrow">${statusPill(meta)}</span>
+              <h2 class="i18n-en">${escapeHtml(fam.en)}${tierLabel ? ' — ' + escapeHtml(tierLabel.en) : ''}</h2>
+              <h2 class="i18n-pt">${escapeHtml(fam.pt)}${tierLabel ? ' — ' + escapeHtml(tierLabel.pt) : ''}</h2>
+            </div>
+            <span class="kit-card__family">${escapeHtml(family)}</span>
+          </header>
+
+          ${description ? `<p class="kit-card__desc">${escapeHtml(description)}</p>` : ''}
+
+          <dl class="kit-card__meta">
+            ${purchaseDate ? `<div><dt><span class="i18n-en">Purchased</span><span class="i18n-pt">Compra</span></dt><dd>${purchaseDate}</dd></div>` : ''}
+            ${price        ? `<div><dt><span class="i18n-en">Paid</span><span class="i18n-pt">Pago</span></dt><dd>${price}</dd></div>` : ''}
+            ${projectSlug  ? `<div><dt><span class="i18n-en">Project</span><span class="i18n-pt">Projeto</span></dt><dd class="kit-card__slug">${escapeHtml(projectSlug)}</dd></div>` : ''}
+          </dl>
+
+          ${errorNote}
+          ${featureList(features)}
+
+          <div class="kit-card__actions">
+            ${primary}
+            <a href="${escapeHtml(fam.product_url)}" class="button button--ghost kit-card__cta-secondary">
+              <span class="i18n-en">Product page</span><span class="i18n-pt">Página do produto</span>
+            </a>
+          </div>
+        </article>`;
+    }
+
+    // ── Main fetch ────────────────────────────────────────────────────────
+    (async () => {
+      let userId = null;
+      try {
+        const session = JSON.parse(localStorage.getItem('volynx_session') || '{}');
+        userId = session?.user?.id || jwtSub(token);
+      } catch {}
+      userId = userId || jwtSub(token);
+
+      if (!userId) {
+        window.location.href = '/login/?next=/dashboard/purchases/kits/';
+        return;
+      }
+
+      let cfg = null;
+      try { cfg = await fetch('/config.json', { cache: 'no-store' }).then(r => r.json()); } catch {}
+      const supabaseUrl = (cfg?.supabaseUrl || '').replace(/\/$/, '');
+      const anonKey     = cfg?.supabaseAnonKey || cfg?.anonKey || '';
+
+      if (!supabaseUrl || !anonKey) {
+        hide('kitsLoading');
+        document.getElementById('kitsErrorMsg').textContent = 'Configuration error. Please contact support.';
+        show('kitsError');
+        return;
+      }
+
+      const headers = {
+        apikey: anonKey,
+        Authorization: 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      };
+
+      try {
+        // Fetch purchases + entitlements in parallel. Entitlements are public
+        // catalog data, so the per-row feature list shows up on first paint.
+        const [purchasesRes, entitlementsRes] = await Promise.all([
+          fetch(`${supabaseUrl}/rest/v1/addons_purchased?select=id,addon_id,price_paid,currency,status,metadata,created_at&user_id=eq.${userId}&status=eq.active&order=created_at.desc`, { headers }),
+          fetch(`${supabaseUrl}/rest/v1/addon_entitlements?select=addon_id,features,description&addon_id=like.kit_*`, { headers }),
+        ]);
+
+        if (!purchasesRes.ok) throw new Error('purchases fetch failed: ' + purchasesRes.status);
+
+        const rows = await purchasesRes.json();
+        const kitRows = (Array.isArray(rows) ? rows : []).filter(r => isKitAddon(r.addon_id));
+
+        // Build a lookup so each card can pull its entitlement inline.
+        let entitlements = {};
+        if (entitlementsRes.ok) {
+          try {
+            const ent = await entitlementsRes.json();
+            entitlements = (Array.isArray(ent) ? ent : []).reduce((acc, e) => {
+              acc[e.addon_id] = e;
+              return acc;
+            }, {});
+          } catch {}
+        }
+
+        hide('kitsLoading');
+
+        if (kitRows.length === 0) {
+          show('kitsEmpty');
+          return;
+        }
+
+        const grid = document.getElementById('kitsGrid');
+        grid.innerHTML = kitRows.map(item => buildCard(item, entitlements)).join('');
+        grid.style.display = '';
+      } catch (err) {
+        hide('kitsLoading');
+        const errEl = document.getElementById('kitsErrorMsg');
+        if (errEl) errEl.textContent = 'Failed to load kits. Please refresh and try again.';
+        show('kitsError');
+      }
+    })();
+  </script>
+</FlagshipLayout>
+
+<style>
+  /* ── Hero ───────────────────────────────────────────────── */
+  .kits-hero { padding-top: clamp(28px, 5vw, 52px); }
+  .kits-hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); margin: 12px 0 16px; }
+  .kits-breadcrumbs {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+    margin-bottom: 18px; font-size: .82rem; color: rgba(255,255,255,.5);
+  }
+  .kits-breadcrumbs a { color: rgba(255,255,255,.7); text-decoration: none; transition: color .15s; }
+  .kits-breadcrumbs a:hover { color: #fff; }
+
+  /* ── States ─────────────────────────────────────────────── */
+  .kits-state {
+    display: flex; flex-direction: column; align-items: center; gap: 20px;
+    padding: clamp(40px, 8vw, 80px) 0; text-align: center;
+  }
+  .kits-state__label { color: rgba(255,255,255,.55); font-size: .95rem; margin: 0; }
+  .kits-state__label--error { color: rgba(255,120,120,.85); }
+  .kits-state__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .kits-spinner {
+    width: 32px; height: 32px;
+    border: 2px solid rgba(255,255,255,.12);
+    border-top-color: rgba(196,181,253,.8);
+    border-radius: 50%;
+    animation: kitspin 700ms linear infinite;
+  }
+  @keyframes kitspin { to { transform: rotate(360deg); } }
+
+  /* ── Grid ───────────────────────────────────────────────── */
+  .kits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
+    gap: 20px;
+  }
+
+  /* ── Card ───────────────────────────────────────────────── */
+  .kit-card {
+    display: flex; flex-direction: column; gap: 16px;
+    padding: 24px;
+    border: 1px solid rgba(255,255,255,.06);
+    background: rgba(255,255,255,.03);
+    backdrop-filter: blur(10px);
+    border-radius: 14px;
+    transition: border-color .2s, box-shadow .2s, transform .2s;
+  }
+  .kit-card:hover {
+    border-color: rgba(196,181,253,.22);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 28px rgba(0,0,0,.18);
+  }
+  /* Family-coloured top border: portfolio = teal, agency = violet, saas = cyan */
+  .kit-card--portfolio { border-top: 2px solid rgba(45,212,191,.45); }
+  .kit-card--agency    { border-top: 2px solid rgba(167,139,250,.45); }
+  .kit-card--saas      { border-top: 2px solid rgba(34,211,238,.45); }
+
+  .kit-card__head {
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+  }
+  .kit-card__title h2 {
+    font-size: clamp(1.05rem, 2.6vw, 1.25rem);
+    font-weight: 700;
+    margin: 6px 0 0;
+    line-height: 1.3;
+    color: rgba(255,255,255,.96);
+  }
+  .kit-card__family {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: rgba(255,255,255,.42);
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.06);
+  }
+
+  .kit-card__desc {
+    font-size: .85rem;
+    color: rgba(255,255,255,.65);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .kit-card__meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px 12px;
+    margin: 0;
+  }
+  .kit-card__meta > div { display: flex; flex-direction: column; gap: 2px; }
+  .kit-card__meta dt {
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: rgba(255,255,255,.38);
+    font-weight: 600;
+  }
+  .kit-card__meta dd { margin: 0; color: rgba(255,255,255,.78); font-size: .88rem; }
+  .kit-card__slug {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .78rem !important;
+    color: rgba(196,181,253,.78) !important;
+    word-break: break-all;
+  }
+
+  .kit-card__error {
+    font-size: .78rem;
+    color: rgba(255,140,140,.85);
+    background: rgba(255,90,90,.06);
+    border: 1px solid rgba(255,90,90,.18);
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin: 0;
+  }
+
+  /* ── Pills ──────────────────────────────────────────────── */
+  .kit-pill {
+    display: inline-flex; align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: .68rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .kit-pill--ok    { background: rgba(52,211,153,.1);  color: #34D399; border-color: rgba(52,211,153,.25); }
+  .kit-pill--warn  { background: rgba(251,191,36,.1);  color: #fbbf24; border-color: rgba(251,191,36,.28); }
+  .kit-pill--muted { background: rgba(255,255,255,.04); color: rgba(255,255,255,.55); }
+
+  /* ── Features ───────────────────────────────────────────── */
+  .kit-features summary {
+    cursor: pointer;
+    font-size: .82rem;
+    color: rgba(196,181,253,.78);
+    font-weight: 600;
+    list-style: none;
+    padding: 4px 0;
+  }
+  .kit-features summary::-webkit-details-marker { display: none; }
+  .kit-features summary::before { content: "+ "; opacity: .6; }
+  .kit-features[open] summary::before { content: "− "; }
+  .kit-features ul {
+    list-style: none;
+    padding: 6px 0 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 4px;
+  }
+  .kit-features li {
+    font-size: .78rem;
+    color: rgba(255,255,255,.6);
+    text-transform: capitalize;
+  }
+
+  /* ── Actions ────────────────────────────────────────────── */
+  .kit-card__actions {
+    display: flex; flex-direction: column; gap: 8px;
+    margin-top: auto;
+  }
+  .kit-card__cta { width: 100%; justify-content: center; text-align: center; }
+  .kit-card__cta-secondary { width: 100%; justify-content: center; text-align: center; font-size: .85rem; }
+
+  /* ── Recovery panel ─────────────────────────────────────── */
+  .kits-help { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .kits-help strong { display: block; margin: 6px 0 10px; font-size: 1.05rem; line-height: 1.45; }
+  .kits-help p { margin: 0; color: rgba(255,255,255,.65); line-height: 1.7; }
+  .kits-help em { color: rgba(196,181,253,.85); font-style: normal; }
+  .page-section--tight { padding-top: 0; }
+
+  @media (max-width: 860px) {
+    .kits-help { flex-direction: column; align-items: flex-start; }
+  }
+</style>
