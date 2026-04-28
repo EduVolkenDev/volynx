@@ -9,7 +9,7 @@
  *   2. Resolves recipient + locale from public.profiles,
  *   3. Renders the matching template,
  *   4. Sends via Resend,
- *   5. Updates email_log status (sent | failed) with the resend_message_id.
+ *   5. Updates email_log status (sent | failed) with provider + provider_id.
  *
  * Two call modes:
  *
@@ -158,7 +158,7 @@ serve(async (req) => {
 
   if (!profile || !finalEmail) {
     await supabase.from("email_log")
-      .update({ status: "failed", last_error: "profile_or_email_missing" })
+      .update({ status: "failed", error: "profile_or_email_missing" })
       .eq("id", logId);
     return jsonResponse({ error: "profile_or_email_missing" }, 422);
   }
@@ -172,7 +172,7 @@ serve(async (req) => {
     rendered = renderTemplate({ event_type: eventType, profile: sendingProfile, payload });
   } catch (e) {
     await supabase.from("email_log")
-      .update({ status: "failed", last_error: `render_error: ${(e as Error).message}` })
+      .update({ status: "failed", error: `render_error: ${(e as Error).message}` })
       .eq("id", logId);
     return jsonResponse({ error: "render_failed", detail: (e as Error).message }, 500);
   }
@@ -192,7 +192,8 @@ serve(async (req) => {
       .update({
         status: "failed",
         attempts: (payload?._attempts || 0) + 1,
-        last_error: sendRes.error,
+        provider: "resend",
+        error: sendRes.error,
       })
       .eq("id", logId);
     return jsonResponse({ ok: false, error: sendRes.error }, 502);
@@ -202,7 +203,8 @@ serve(async (req) => {
     .update({
       status: "sent",
       sent_at: new Date().toISOString(),
-      resend_message_id: sendRes.messageId || null,
+      provider: "resend",
+      provider_id: sendRes.messageId || null,
       recipient_email: finalEmail,
     })
     .eq("id", logId);
