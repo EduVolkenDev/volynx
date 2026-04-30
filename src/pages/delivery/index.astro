@@ -270,6 +270,18 @@ const deliveryAssistItems = [
       return merged;
     }
 
+    function safeBuildCard(item) {
+      try {
+        return buildCard(item);
+      } catch (err) {
+        console.error('delivery card render failed', {
+          item,
+          error: err instanceof Error ? err.message : String(err),
+        });
+        return '';
+      }
+    }
+
     function withQuery(path, params) {
       const search = new URLSearchParams();
       Object.entries(params || {}).forEach(([key, value]) => {
@@ -280,7 +292,7 @@ const deliveryAssistItems = [
     }
 
     function propertyFlowTier(item) {
-      const base = purchaseLookupBase(item);
+      const base = String(purchaseLookupBase(item) || '');
       if (base.includes('white-label') || base.includes('enterprise')) return 'white-label';
       if (base.includes('professional')) return 'professional';
       if (base.includes('starter')) return 'starter';
@@ -317,7 +329,7 @@ const deliveryAssistItems = [
      */
     function addonLabel(addonId) {
       if (!addonId) return 'Unknown Product';
-      const id = addonId.toLowerCase().replace(/_/g, '-');
+      const id = String(addonId).toLowerCase().replace(/_/g, '-');
       if (id.startsWith('kit-portfolio')) {
         const variant = id.replace('kit-portfolio-', '');
         return 'Portfolio Pro Kit' + (variant ? ' \u2014 ' + titleCase(variant) : '');
@@ -354,7 +366,7 @@ const deliveryAssistItems = [
     /** Map addon_id to a Builder preset slug. */
     function addonToPreset(addonId) {
       if (!addonId) return null;
-      const id = addonId.toLowerCase().replace(/_/g, '-');
+      const id = String(addonId).toLowerCase().replace(/_/g, '-');
       if (id.startsWith('kit-portfolio')) return 'portfolio';
       if (id.startsWith('kit-agency'))    return 'agency';
       if (id.startsWith('kit-saas'))      return 'saas';
@@ -363,7 +375,7 @@ const deliveryAssistItems = [
     }
 
     function productHref(item) {
-      const id = purchaseLookupBase(item);
+      const id = String(purchaseLookupBase(item) || '');
       if (!id) return '/builder/';
       // Kit purchases route to the dedicated kits dashboard so we keep one
       // delivery experience per product family. The dashboard surfaces tier,
@@ -399,8 +411,9 @@ const deliveryAssistItems = [
     }
 
     function productCta(item) {
-      const id = purchaseLookupBase(item);
+      const id = String(purchaseLookupBase(item) || '');
       const sessionId = purchaseSessionId(item);
+      if (id.startsWith('kit-')) return sessionId ? 'Open kit delivery' : 'Recover kit delivery';
       if (id.startsWith('pf-')) return sessionId ? 'Open PropertyFlow delivery' : 'Recover PropertyFlow access';
       if (id.startsWith('icons-')) return sessionId ? 'Open icon delivery' : 'Open icon purchases';
       return 'Open in Builder';
@@ -424,7 +437,7 @@ const deliveryAssistItems = [
     }
 
     function buildCard(item) {
-      const productId = purchaseLookupBase(item);
+      const productId = String(purchaseLookupBase(item) || '');
       const label   = addonLabel(productId);
       const date    = formatDate(item.created_at);
       const amount  = item.price_paid ?? item.amount_paid ?? item.amount ?? item.price;
@@ -503,12 +516,20 @@ const deliveryAssistItems = [
         // the best delivery context (especially Stripe session IDs from events).
         const items = [];
         const upsertItem = (row) => {
-          const existingIndex = items.findIndex((entry) => sharesPurchaseAlias(entry, row));
-          if (existingIndex === -1) {
-            items.push(mergePurchaseRecords(row, {}));
-            return;
+          try {
+            const existingIndex = items.findIndex((entry) => sharesPurchaseAlias(entry, row));
+            if (existingIndex === -1) {
+              items.push(mergePurchaseRecords(row, {}));
+              return;
+            }
+            items[existingIndex] = mergePurchaseRecords(items[existingIndex], row);
+          } catch (err) {
+            console.error('delivery merge failed', {
+              row,
+              error: err instanceof Error ? err.message : String(err),
+            });
+            items.push(row);
           }
-          items[existingIndex] = mergePurchaseRecords(items[existingIndex], row);
         };
 
         for (const row of purchased) {
@@ -532,10 +553,20 @@ const deliveryAssistItems = [
         }
 
         const grid = document.getElementById('deliveryGrid');
-        grid.innerHTML = items.map(buildCard).join('');
+        const cards = items.map(safeBuildCard).filter(Boolean);
+
+        if (cards.length === 0) {
+          console.error('delivery render produced zero cards', { items });
+          document.getElementById('deliveryErrorMsg').textContent = 'Purchases were found, but delivery cards could not be rendered. Please open support so we can recover the exact product context.';
+          show('deliveryError');
+          return;
+        }
+
+        grid.innerHTML = cards.join('');
         grid.style.display = '';
 
       } catch (err) {
+        console.error('delivery page load failed', err);
         hide('deliveryLoading');
         document.getElementById('deliveryErrorMsg').textContent = 'Failed to load purchases. Please refresh and try again.';
         show('deliveryError');

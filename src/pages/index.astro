@@ -734,26 +734,50 @@ const homeAssistItems = [
     gap: 14px;
   }
   .free-strip__item {
+    position: relative;
     display: grid;
     gap: 14px;
-    padding: 18px;
-    border-radius: 18px;
+    padding: 26px 22px 22px;
+    border-radius: 22px;
     background:
-      linear-gradient(160deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015)),
+      linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.015)),
       rgba(4, 10, 24, 0.72);
     border: 1px solid rgba(255,255,255,0.08);
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
     color: inherit;
     text-decoration: none;
-    transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease, background .25s ease;
+    overflow: hidden;
+    transition: transform .35s cubic-bezier(.2,.7,.2,1), border-color .35s ease, box-shadow .35s ease, background .35s ease;
   }
+  .free-strip__item::before {
+    content: "";
+    position: absolute;
+    inset: -30%;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(0, 240, 255, 0.16), transparent 55%),
+      radial-gradient(circle at 75% 80%, rgba(124, 77, 255, 0.14), transparent 55%);
+    opacity: 0;
+    transition: opacity .4s ease;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .free-strip__item > * { position: relative; z-index: 1; }
   a.free-strip__item { cursor: pointer; }
   a.free-strip__item:hover {
-    transform: translateY(-3px);
-    border-color: rgba(0, 240, 255, .32);
+    transform: translateY(-6px);
+    border-color: rgba(0, 240, 255, .42);
     box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.06),
-      0 14px 32px rgba(0, 240, 255, .14);
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      0 22px 50px rgba(0, 240, 255, .22),
+      0 8px 20px rgba(124, 77, 255, .12);
+  }
+  a.free-strip__item:hover::before { opacity: 1; }
+  a.free-strip__item:hover .free-strip__item-art {
+    transform: translateY(-6px) scale(1.06);
+    filter:
+      drop-shadow(0 0 14px rgba(0, 240, 255, 0.55))
+      drop-shadow(0 24px 48px rgba(0, 240, 255, 0.32))
+      drop-shadow(0 8px 18px rgba(124, 77, 255, 0.22));
   }
   a.free-strip__item:focus-visible {
     outline: 2px solid rgba(0, 240, 255, .6);
@@ -766,40 +790,53 @@ const homeAssistItems = [
     gap: 12px;
   }
   .free-strip__item-art {
-    width: 98px;
-    height: 98px;
+    width: 140px;
+    height: 140px;
     object-fit: contain;
-    filter: drop-shadow(0 16px 32px rgba(0, 240, 255, 0.18));
+    filter:
+      drop-shadow(0 0 8px rgba(0, 240, 255, 0.32))
+      drop-shadow(0 18px 36px rgba(0, 240, 255, 0.22));
+    transition: transform .45s cubic-bezier(.2,.7,.2,1), filter .45s ease;
+    animation: freeStripFloat 5.5s ease-in-out infinite;
+  }
+  .free-strip__item:nth-child(2) .free-strip__item-art { animation-delay: -1.2s; }
+  .free-strip__item:nth-child(3) .free-strip__item-art { animation-delay: -2.4s; }
+  .free-strip__item:nth-child(4) .free-strip__item-art { animation-delay: -3.6s; }
+  @keyframes freeStripFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
   }
   .free-strip__item strong {
     display: block;
-    font-size: 1rem;
+    font-size: 1.05rem;
     color: var(--text, #fff);
+    letter-spacing: -0.01em;
   }
   .free-strip__item p {
     margin: 0;
     color: var(--muted, rgba(255,255,255,.6));
-    font-size: 0.9rem;
-    line-height: 1.5;
+    font-size: 0.92rem;
+    line-height: 1.55;
   }
   .free-strip__icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 999px;
-    background: linear-gradient(135deg, rgba(0,240,255,.22), rgba(124,77,255,.18));
-    border: 1px solid rgba(0,240,255,.3);
+    background: linear-gradient(135deg, rgba(0,240,255,.26), rgba(124,77,255,.22));
+    border: 1px solid rgba(0,240,255,.34);
     color: #00f0ff;
     font-weight: 800;
     flex-shrink: 0;
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.28);
   }
   @media (min-width: 760px) {
     .free-strip__grid { grid-template-columns: repeat(2, 1fr); }
     .free-strip__item-art {
-      width: 116px;
-      height: 116px;
+      width: 168px;
+      height: 168px;
     }
   }
   @media (min-width: 1040px) {

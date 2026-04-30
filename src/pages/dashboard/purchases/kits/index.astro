@@ -185,6 +185,108 @@ const assistItems = [
       return kitFamily(addonId) !== null;
     }
 
+    function parseMeta(value) {
+      if (!value) return {};
+      if (typeof value === 'string') {
+        try { return JSON.parse(value); } catch { return {}; }
+      }
+      return typeof value === 'object' ? value : {};
+    }
+
+    function hasValue(value) {
+      if (value == null) return false;
+      if (typeof value === 'string') return value.trim() !== '';
+      return true;
+    }
+
+    function firstValue(...values) {
+      for (const value of values) {
+        if (hasValue(value)) return value;
+      }
+      return null;
+    }
+
+    function stripCurrencySuffix(value) {
+      return String(value || '')
+        .trim()
+        .replace(/_(gbp|eur|brl)$/i, '')
+        .replace(/-(gbp|eur|brl)$/i, '');
+    }
+
+    function canonicalAddonId(value) {
+      return stripCurrencySuffix(value).toLowerCase();
+    }
+
+    function purchaseSessionId(item) {
+      const meta = parseMeta(item?.metadata);
+      return String(meta.stripe_session_id || item?.stripe_session_id || '').trim();
+    }
+
+    function samePurchase(a, b) {
+      const aSession = purchaseSessionId(a);
+      const bSession = purchaseSessionId(b);
+      if (aSession && bSession) return aSession === bSession;
+      return false;
+    }
+
+    function mergedMetadata(baseItem, incomingItem) {
+      return {
+        ...parseMeta(incomingItem?.metadata),
+        ...parseMeta(baseItem?.metadata),
+      };
+    }
+
+    function mergedPricePaid(baseItem, incomingItem) {
+      const basePrice = baseItem?.price_paid;
+      const incomingPrice = incomingItem?.price_paid;
+      const incomingAmountPaid = incomingItem?.amount_paid;
+
+      if (hasValue(basePrice)) return basePrice;
+      if (hasValue(incomingPrice)) return incomingPrice;
+      if (typeof incomingAmountPaid === 'number') return incomingAmountPaid / 100;
+      return null;
+    }
+
+    function mergePurchaseRecords(baseItem, incomingItem) {
+      const metadata = mergedMetadata(baseItem, incomingItem);
+      const baseAddonId = canonicalAddonId(baseItem?.addon_id || baseItem?.lookup_key);
+      const incomingAddonId = canonicalAddonId(incomingItem?.addon_id || incomingItem?.lookup_key);
+
+      return {
+        ...incomingItem,
+        ...baseItem,
+        id: firstValue(baseItem?.id, incomingItem?.id),
+        addon_id: firstValue(
+          baseAddonId,
+          incomingAddonId,
+          canonicalAddonId(metadata.lookup_key),
+          canonicalAddonId(metadata.stripe_lookup_key)
+        ),
+        lookup_key: firstValue(
+          baseItem?.lookup_key,
+          incomingItem?.lookup_key,
+          metadata.lookup_key,
+          metadata.stripe_lookup_key
+        ),
+        stripe_session_id: firstValue(
+          purchaseSessionId(baseItem),
+          purchaseSessionId(incomingItem),
+          metadata.stripe_session_id
+        ),
+        purchase_id: firstValue(
+          baseItem?.purchase_id,
+          incomingItem?.purchase_id,
+          baseItem?.source === 'addon' ? baseItem?.id : null,
+          incomingItem?.source === 'addon' ? incomingItem?.id : null
+        ),
+        price_paid: mergedPricePaid(baseItem, incomingItem),
+        currency: firstValue(baseItem?.currency, incomingItem?.currency),
+        status: firstValue(baseItem?.status, incomingItem?.status, 'completed'),
+        created_at: firstValue(baseItem?.created_at, incomingItem?.created_at),
+        metadata,
+      };
+    }
+
     function fmtDate(iso) {
       if (!iso) return '';
       try {
@@ -201,7 +303,7 @@ const assistItems = [
     }
 
     function statusPill(meta) {
-      const s = meta?.delivery_status || (meta?.project_slug ? 'ready' : 'pending_preset_fetch');
+      const s = meta?.delivery_status || (meta?.download_url ? 'ready' : meta?.project_slug ? 'ready' : 'pending_signed_url');
       const map = {
         ready:                  { en: 'Ready', pt: 'Pronto',           tone: 'ok' },
         pending_signed_url:     { en: 'Awaiting link', pt: 'Aguardando link', tone: 'warn' },
@@ -244,12 +346,12 @@ const assistItems = [
     }
 
     function buildCard(item, entitlements) {
-      const addonId = String(item.addon_id || '').toLowerCase();
+      const addonId = canonicalAddonId(item.addon_id || item.lookup_key);
       const family = kitFamily(addonId);
       if (!family) return '';
       const fam = KIT_FAMILIES[family];
 
-      const meta = item.metadata || {};
+      const meta = parseMeta(item.metadata);
       const tier = kitTier(addonId, meta.tier);
       const tierLabel = (tier && TIER_LABELS[tier]) || null;
 
@@ -260,6 +362,7 @@ const assistItems = [
       const presetId = meta.preset_id || fam.preset;
       const downloadValid = isDownloadValid(meta);
       const expiresLabel = meta.download_expires_at ? fmtDate(meta.download_expires_at) : '';
+      const purchaseId = item.purchase_id || null;
 
       const features = entitlements?.[addonId]?.features || meta.features || [];
       const description = entitlements?.[addonId]?.description || '';
@@ -279,7 +382,8 @@ const assistItems = [
              <span class="i18n-en">Download ZIP</span><span class="i18n-pt">Baixar ZIP</span>
            </a>`
         : `<button type="button" class="button button--gold kit-card__cta kit-card__refresh"
-                   data-purchase-id="${escapeHtml(item.id)}" data-addon-id="${escapeHtml(addonId)}">
+                   ${purchaseId ? `data-purchase-id="${escapeHtml(purchaseId)}"` : ''}
+                   data-addon-id="${escapeHtml(addonId)}">
              <span class="i18n-en">Generate download link</span><span class="i18n-pt">Gerar link de download</span>
            </button>`;
 
@@ -424,17 +528,46 @@ const assistItems = [
       };
 
       try {
-        // Fetch purchases + entitlements in parallel. Entitlements are public
-        // catalog data, so the per-row feature list shows up on first paint.
-        const [purchasesRes, entitlementsRes] = await Promise.all([
+        // Fetch addon purchases + purchase events together so a kit card never
+        // disappears just because /delivery/ merged one table and this page
+        // only read the other.
+        const [purchasesRes, eventsRes, entitlementsRes] = await Promise.all([
           fetch(`${supabaseUrl}/rest/v1/addons_purchased?select=id,addon_id,price_paid,currency,status,metadata,created_at&user_id=eq.${userId}&status=eq.active&order=created_at.desc`, { headers }),
+          fetch(`${supabaseUrl}/rest/v1/purchase_events?select=id,lookup_key,amount_paid,currency,status,metadata,created_at,stripe_session_id&user_id=eq.${userId}&status=eq.completed&order=created_at.desc`, { headers }),
           fetch(`${supabaseUrl}/rest/v1/addon_entitlements?select=addon_id,features,description&addon_id=like.kit_*`, { headers }),
         ]);
 
         if (!purchasesRes.ok) throw new Error('purchases fetch failed: ' + purchasesRes.status);
 
-        const rows = await purchasesRes.json();
-        const kitRows = (Array.isArray(rows) ? rows : []).filter(r => isKitAddon(r.addon_id));
+        const purchaseRows = await purchasesRes.json().catch(() => []);
+        const eventRows = eventsRes.ok ? await eventsRes.json().catch(() => []) : [];
+        const mergedRows = [];
+
+        const upsertRow = (row) => {
+          const existingIndex = mergedRows.findIndex((entry) => samePurchase(entry, row));
+          if (existingIndex === -1) {
+            mergedRows.push(mergePurchaseRecords(row, {}));
+            return;
+          }
+          mergedRows[existingIndex] = mergePurchaseRecords(mergedRows[existingIndex], row);
+        };
+
+        for (const row of (Array.isArray(purchaseRows) ? purchaseRows : [])) {
+          upsertRow({ ...row, source: 'addon', purchase_id: row.id });
+        }
+
+        for (const row of (Array.isArray(eventRows) ? eventRows : [])) {
+          upsertRow({ ...row, source: 'event' });
+        }
+
+        const requestedSessionId = new URLSearchParams(window.location.search).get('session_id');
+        let kitRows = mergedRows.filter((row) => isKitAddon(row.addon_id || row.lookup_key));
+        if (requestedSessionId) {
+          const focusedRows = kitRows.filter((row) => purchaseSessionId(row) === requestedSessionId);
+          if (focusedRows.length > 0) {
+            kitRows = focusedRows;
+          }
+        }
 
         // Build a lookup so each card can pull its entitlement inline.
         let entitlements = {};
