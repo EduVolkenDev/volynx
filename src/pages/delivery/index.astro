@@ -191,28 +191,6 @@ const deliveryAssistItems = [
       return String(meta.stripe_session_id || item?.stripe_session_id || '').trim();
     }
 
-    function purchaseAliases(item) {
-      const aliases = new Set();
-      const sessionId = purchaseSessionId(item);
-      const lookupBase = purchaseLookupBase(item);
-      const rawId = String(item?.id || '').trim();
-
-      if (sessionId) aliases.add(`session:${sessionId}`);
-      if (lookupBase) aliases.add(`product:${lookupBase}`);
-      if (rawId) aliases.add(`id:${rawId}`);
-
-      return aliases;
-    }
-
-    function sharesPurchaseAlias(a, b) {
-      const aAliases = purchaseAliases(a);
-      if (!aAliases.size) return false;
-      for (const alias of purchaseAliases(b)) {
-        if (aAliases.has(alias)) return true;
-      }
-      return false;
-    }
-
     function mergedMetadata(baseItem, incomingItem) {
       return {
         ...parseMeta(incomingItem?.metadata),
@@ -268,6 +246,22 @@ const deliveryAssistItems = [
       };
 
       return merged;
+    }
+
+    function sameProductPurchase(existingItem, incomingItem) {
+      const existingProduct = purchaseLookupBase(existingItem);
+      const incomingProduct = purchaseLookupBase(incomingItem);
+      const existingSession = purchaseSessionId(existingItem);
+      const incomingSession = purchaseSessionId(incomingItem);
+
+      if (existingProduct && incomingProduct) {
+        if (existingProduct !== incomingProduct) return false;
+        if (existingSession && incomingSession) return existingSession === incomingSession;
+        return true;
+      }
+
+      if (existingSession && incomingSession) return existingSession === incomingSession;
+      return false;
     }
 
     function safeBuildCard(item) {
@@ -512,12 +506,19 @@ const deliveryAssistItems = [
           try { events = await eventsRes.json(); } catch {}
         }
 
-        // Merge addons + events into a single card per product while preserving
-        // the best delivery context (especially Stripe session IDs from events).
-        const items = [];
-        const upsertItem = (row) => {
+        // Preserve one card per purchased row. `addons_purchased` is the source
+        // of truth for what the user owns; `purchase_events` only enriches an
+        // existing purchase or backfills when no purchased row exists yet.
+        const items = purchased.map((row) => mergePurchaseRecords(row, {}));
+
+        const upsertEvent = (row) => {
+          const productId = purchaseLookupBase(row);
+          const sessionId = purchaseSessionId(row);
+
+          if (!productId && !sessionId) return;
+
           try {
-            const existingIndex = items.findIndex((entry) => sharesPurchaseAlias(entry, row));
+            const existingIndex = items.findIndex((entry) => sameProductPurchase(entry, row));
             if (existingIndex === -1) {
               items.push(mergePurchaseRecords(row, {}));
               return;
@@ -528,15 +529,11 @@ const deliveryAssistItems = [
               row,
               error: err instanceof Error ? err.message : String(err),
             });
-            items.push(row);
           }
         };
 
-        for (const row of purchased) {
-          upsertItem(row);
-        }
         for (const row of events) {
-          upsertItem(row);
+          upsertEvent(row);
         }
 
         items.sort((a, b) => {
