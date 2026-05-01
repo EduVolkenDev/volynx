@@ -97,8 +97,8 @@
 
   // Inject styles once
   var style = document.createElement("style");
-  style.textContent = ".vx-currency-bar{display:flex;gap:4px;justify-content:center;margin-bottom:24px}" +
-    ".vx-cur-btn{padding:6px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.55);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit}" +
+  style.textContent = ".vx-currency-bar{display:flex;gap:6px;justify-content:center;margin-bottom:24px;flex-wrap:wrap}" +
+    ".vx-cur-btn{padding:10px 16px;min-height:44px;border-radius:999px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.55);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit}" +
     ".vx-cur-btn:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.8)}" +
     ".vx-cur-btn--active{background:rgba(125,211,252,.12);border-color:rgba(125,211,252,.3);color:#7DD3FC}";
   document.head.appendChild(style);
