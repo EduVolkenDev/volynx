@@ -2752,9 +2752,29 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     .hero { padding: 40px 16px 28px; }
     .hero__title { font-size: 34px; }
     .panel { padding: 28px 20px; }
-    .card { padding: 16px; }
+    .card { padding: 16px; max-width: 100%; box-sizing: border-box; }
     .json-editor { min-height: 220px; }
-    .editor-header { flex-direction: column; align-items: flex-start; }
+    .editor-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .editor-tabs { flex-wrap: wrap; }
+    /* Builder app shell + workspace must respect viewport at 375px */
+    .app { padding: 0 14px 60px; max-width: 100%; box-sizing: border-box; overflow-x: hidden; }
+    .workspace, .grid, .card, .card--wizard, .card--list, .card--info, .card--editor { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; }
+    /* Wizard step labels — stack tight on narrow viewport */
+    .wizard-steps { gap: 0; padding: 0; }
+    .wizard-step-dot small { font-size: 9px; }
+    .wizard-line-bar { margin: 0 4px; }
+    /* Archetype picker — single col, tighter padding */
+    .archetype-grid { padding: 12px; gap: 10px; }
+    .archetype-card { padding: 12px 14px; gap: 12px; }
+    .archetype-icon { font-size: 22px; flex-shrink: 0; }
+    .archetype-body { min-width: 0; }
+    .archetype-name, .archetype-outcome, .archetype-ideal { word-break: break-word; }
+    /* JSON editor + AI textarea cap to viewport */
+    .json-editor, .ai-textarea { max-width: 100%; }
+    /* Project list items tighten */
+    .project-btn { padding: 12px; }
+    /* Form rows stack */
+    .row { grid-template-columns: 1fr; }
   }
 
   /* EDITOR TABS */
