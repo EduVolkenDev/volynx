@@ -17,6 +17,10 @@ import { ROUTES } from "../../data/routes";
           <p data-i18n="login2.desc">Sign in to access your tools, projects, and workspace. Pro members unlock the full premium experience with advanced features and higher limits.</p>
         </div>
         <div class="form-card">
+          <div id="sessionExpiredKicker" class="session-expired" role="status" aria-live="polite" hidden>
+            <span class="session-expired__dot" aria-hidden="true"></span>
+            <span><strong data-i18n="login2.expired_title">Session expired.</strong> <span data-i18n="login2.expired_desc">Sign in again to continue where you left off.</span></span>
+          </div>
           <form class="form-grid" id="loginForm" action="#" method="get">
             <div class="field">
               <label for="email" data-i18n="login2.email_label">Email</label>
@@ -46,6 +50,19 @@ import { ROUTES } from "../../data/routes";
   </main>
   <FlagshipFooter />
 
+  <script is:inline>
+    // Session-expired kicker — shown when caller redirected here with ?next=
+    // (e.g., checkout/builder hit a 401 from a stale token and bounced).
+    (function () {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has("next")) {
+          const el = document.getElementById("sessionExpiredKicker");
+          if (el) el.hidden = false;
+        }
+      } catch (_) {}
+    })();
+  </script>
   <script is:inline type="module" src="/scripts/auth-login.js"></script>
 </FlagshipLayout>
 
@@ -54,4 +71,28 @@ import { ROUTES } from "../../data/routes";
   .msg.err{ color: rgba(255, 140, 140, .95); }
   .msg.ok{ color: rgba(140, 255, 210, .92); }
   .account-hero{ padding-top: clamp(40px, 6vw, 80px); padding-bottom: clamp(40px, 6vw, 80px); }
+
+  .session-expired {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 200, 120, 0.28);
+    background: rgba(255, 180, 80, 0.08);
+    color: rgba(255, 220, 180, 0.95);
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+  .session-expired strong { color: #fff; font-weight: 700; }
+  .session-expired__dot {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    margin-top: 6px;
+    border-radius: 50%;
+    background: rgba(255, 190, 100, 0.95);
+    box-shadow: 0 0 10px rgba(255, 190, 100, 0.6);
+  }
 </style>

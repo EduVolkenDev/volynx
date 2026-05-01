@@ -33,10 +33,10 @@ import { ROUTES } from "../data/routes";
 		<!-- ═══ VIEW: profile ═══ -->
 		<div id="viewProfile" class="view" style="display:none;">
 
-			<div id="firstTimeBanner" class="banner banner--welcome" style="display:none;">
+			<div id="firstTimeBanner" class="banner banner--welcome" style="display:none;" role="status">
 				<div class="banner-row">
 					<div>
-						<h2 data-i18n="profile.welcome_title">Welcome to VOLYNX</h2>
+						<p class="banner-title"><strong data-i18n="profile.welcome_title">Welcome to VOLYNX</strong></p>
 						<p data-i18n="profile.welcome_desc">Complete your profile below to get started.</p>
 					</div>
 					<div class="banner-actions">
@@ -66,7 +66,7 @@ import { ROUTES } from "../data/routes";
 				<div class="hero-inner">
 					<div class="avatar-zone">
 						<div class="avatar-glow" aria-hidden="true"></div>
-						<div class="avatar-frame" id="avatarFrameBtn" role="button" tabindex="0" title="Change avatar">
+						<div class="avatar-frame" id="avatarFrameBtn" role="button" tabindex="0" title="Change avatar" aria-haspopup="dialog" aria-expanded="false" aria-controls="avatarPanel">
 							<img id="avatarPreview" class="avatar-img" src="/assets/avatar.webp" alt=""
 								style="display:none;"
 								onerror="this.style.display='none';this.nextElementSibling.style.display='grid';" />
@@ -76,10 +76,10 @@ import { ROUTES } from "../data/routes";
 						<input id="avatarInput" type="file" accept="image/*" hidden />
 
 						<!-- Avatar picker panel -->
-						<div class="avatar-panel" id="avatarPanel" hidden>
+						<div class="avatar-panel" id="avatarPanel" role="dialog" aria-modal="true" aria-labelledby="avatarPanelTitle" hidden>
 							<div class="avatar-panel__header">
-								<span class="avatar-panel__title" data-i18n="profile.avatar_choose">Choose avatar</span>
-								<button type="button" class="avatar-panel__close" id="avatarPanelClose">✕</button>
+								<span class="avatar-panel__title" id="avatarPanelTitle" data-i18n="profile.avatar_choose">Choose avatar</span>
+								<button type="button" class="avatar-panel__close" id="avatarPanelClose" aria-label="Close avatar picker">✕</button>
 							</div>
 
 							<div class="avatar-panel__section">
@@ -236,7 +236,7 @@ import { ROUTES } from "../data/routes";
 						<span class="quick-card__desc text-muted" data-i18n="profile.quick_builder_desc">Create & publish sites</span>
 					</a>
 					<a href={ROUTES.studio} class="quick-card">
-						<span class="quick-card__icon"><img src="/assets/studio-logo.webp" alt="" class="profile-card__art profile-card__art--studio" loading="lazy" /></span>
+						<span class="quick-card__icon"><img src="/assets/volynxstudio.webp" alt="" class="profile-card__art profile-card__art--studio" loading="lazy" /></span>
 						<span class="quick-card__title" data-i18n="profile.quick_studio_title">Studio Pro</span>
 						<span class="quick-card__desc text-muted" data-i18n="profile.quick_studio_desc">Image tools & exports</span>
 					</a>
@@ -305,7 +305,6 @@ import { ROUTES } from "../data/routes";
 					if (btn._mainHandlerAttached) return; /* main script owns it */
 					KEYS.forEach(function(k) { localStorage.removeItem(k); });
 					if (window.VxAuthBridge) window.VxAuthBridge.clear();
-					console.log("[profile] fallback logout: cleared storage");
 					window.location.href = "/";
 				});
 			}
@@ -327,7 +326,6 @@ import { ROUTES } from "../data/routes";
 		<script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 		<script is:inline src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 		<script is:inline>
-			console.log("[profile] main script loaded, supabase global:", typeof supabase);
 			if (typeof supabase === "undefined") {
 				console.error("[profile] FATAL: supabase UMD not loaded");
 				document.getElementById("viewLoading").classList.remove("view--active");
@@ -338,7 +336,10 @@ import { ROUTES } from "../data/routes";
 
 			(async function main() {
 				const t0 = performance.now();
-				const log = (msg) => console.log(`[profile] ${msg} (${Math.round(performance.now() - t0)}ms)`);
+				const DEBUG = (() => { try { return new URLSearchParams(location.search).has("debug"); } catch (_) { return false; } })();
+				const log = DEBUG
+					? (msg) => console.log(`[profile] ${msg} (${Math.round(performance.now() - t0)}ms)`)
+					: () => {};
 
 				log("script start");
 
@@ -1254,15 +1255,73 @@ import { ROUTES } from "../data/routes";
 					$("editPanel")?.scrollIntoView({ behavior: "smooth", block: "start" });
 				});
 
-				// Avatar panel toggle — click on avatar frame to open
+				// Avatar panel — accessible dialog with focus management
 				const avatarPanel = $("avatarPanel");
-				$("avatarFrameBtn")?.addEventListener("click", () => {
-					avatarPanel.hidden = !avatarPanel.hidden;
+				const avatarTrigger = $("avatarFrameBtn");
+				const avatarCloseBtn = $("avatarPanelClose");
+				let avatarLastFocus = null;
+
+				function getAvatarFocusables() {
+					if (!avatarPanel) return [];
+					return Array.from(avatarPanel.querySelectorAll(
+						'button, [href], input, [tabindex]:not([tabindex="-1"])'
+					)).filter(el => !el.hasAttribute("disabled") && el.offsetParent !== null);
+				}
+
+				function openAvatarPanel() {
+					if (!avatarPanel) return;
+					avatarLastFocus = document.activeElement;
+					avatarPanel.hidden = false;
+					avatarTrigger?.setAttribute("aria-expanded", "true");
+					// Focus first interactive element so screen readers announce dialog
+					const focusables = getAvatarFocusables();
+					(focusables[0] || avatarCloseBtn)?.focus();
+				}
+
+				function closeAvatarPanel() {
+					if (!avatarPanel || avatarPanel.hidden) return;
+					avatarPanel.hidden = true;
+					avatarTrigger?.setAttribute("aria-expanded", "false");
+					// Restore focus to the trigger so keyboard users keep their place
+					if (avatarLastFocus && typeof avatarLastFocus.focus === "function") {
+						avatarLastFocus.focus();
+					} else {
+						avatarTrigger?.focus();
+					}
+				}
+
+				avatarTrigger?.addEventListener("click", () => {
+					avatarPanel.hidden ? openAvatarPanel() : closeAvatarPanel();
 				});
-				$("avatarFrameBtn")?.addEventListener("keydown", (e) => {
-					if (e.key === "Enter" || e.key === " ") { e.preventDefault(); avatarPanel.hidden = !avatarPanel.hidden; }
+				avatarTrigger?.addEventListener("keydown", (e) => {
+					if (e.key === "Enter" || e.key === " ") {
+						e.preventDefault();
+						avatarPanel.hidden ? openAvatarPanel() : closeAvatarPanel();
+					}
 				});
-				$("avatarPanelClose")?.addEventListener("click", () => { avatarPanel.hidden = true; });
+				avatarCloseBtn?.addEventListener("click", closeAvatarPanel);
+
+				// Escape closes; Tab cycles focus inside the panel
+				document.addEventListener("keydown", (e) => {
+					if (avatarPanel?.hidden) return;
+					if (e.key === "Escape") {
+						e.preventDefault();
+						closeAvatarPanel();
+						return;
+					}
+					if (e.key !== "Tab") return;
+					const focusables = getAvatarFocusables();
+					if (focusables.length === 0) return;
+					const first = focusables[0];
+					const last = focusables[focusables.length - 1];
+					if (e.shiftKey && document.activeElement === first) {
+						e.preventDefault();
+						last.focus();
+					} else if (!e.shiftKey && document.activeElement === last) {
+						e.preventDefault();
+						first.focus();
+					}
+				});
 
 				// Pro avatars
 				const FREE_AVATARS = ["/assets/avatarfree/1.webp", "/assets/avatarfree/2.webp", "/assets/avatarfree/avatarfree3.webp"];
@@ -1302,7 +1361,7 @@ import { ROUTES } from "../data/routes";
 							avatarPreview.src = url;
 							avatarPreview.style.display = "block";
 							avatarFallback.style.display = "none";
-							avatarPanel.hidden = true;
+							closeAvatarPanel();
 							(avatarPreview)._selectedFreeAvatar = url;
 							(avatarPreview)._pendingFile = null;
 							document.querySelectorAll(".avatar-option").forEach(o => o.classList.remove("avatar-option--selected"));
@@ -1320,7 +1379,7 @@ import { ROUTES } from "../data/routes";
 					avatarPreview.src = URL.createObjectURL(file);
 					avatarPreview.style.display = "block";
 					avatarFallback.style.display = "none";
-					avatarPanel.hidden = true;
+					closeAvatarPanel();
 					(avatarPreview)._selectedFreeAvatar = null;
 					(avatarPreview)._pendingFile = file;
 				});
@@ -1493,7 +1552,8 @@ import { ROUTES } from "../data/routes";
 	.banner { padding: 20px 24px; border-radius: 16px; backdrop-filter: blur(12px); }
 	.banner--welcome { background: linear-gradient(135deg, rgba(0,232,197,.06), rgba(120,0,255,.04));
 		border: 1px solid rgba(0,232,197,.18); text-align: center; }
-	.banner--welcome h2 { margin: 0 0 4px; font-size: 1.2rem; }
+	.banner--welcome .banner-title { margin: 0 0 4px; font-size: 1.2rem; color: var(--text); }
+	.banner--welcome .banner-title strong { font-weight: 700; }
 	.banner--welcome p { margin: 0; color: var(--muted); font-size: .9rem; }
 	.banner--success { background: linear-gradient(135deg, rgba(0,232,120,.08), rgba(0,180,255,.04));
 		border: 1px solid rgba(0,232,120,.25); }

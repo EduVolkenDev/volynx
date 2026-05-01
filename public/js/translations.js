@@ -64,6 +64,8 @@ window.VX_TRANS = {
     "login2.btn_studio": "Go to Studio",
     "login2.btn_lab": "Try Lab",
     "login2.btn_compare": "Compare Free vs Pro",
+    "login2.expired_title": "Session expired.",
+    "login2.expired_desc": "Sign in again to continue where you left off.",
 
     /* === AUTH === */
     "recover.title": "Reset your password",
@@ -1899,7 +1901,7 @@ window.VX_TRANS = {
     "svc2.stat3_val":            "Quote",
     "svc2.stat3_label":          "Fixed, written, approved",
     "svc2.stat4_val":            "1-to-1",
-    "svc2.stat4_label":          "Direct with Eduardo",
+    "svc2.stat4_label":          "1-to-1 guidance",
     "svc2.fit_eyebrow":          "Fit check",
     "svc2.fit_title":            "Who this is for — and who it isn't.",
     "svc2.fit_yes_title":        "This is for you if",
@@ -3958,6 +3960,8 @@ window.VX_TRANS = {
     "login2.btn_lab": "Experimentar Lab",
     "login2.btn_studio": "Ir para Studio",
     "login2.desc": "Entre para acessar suas ferramentas, projetos e espaço de trabalho. Membros Pro desbloqueiam a experiência premium completa com recursos avançados e limites maiores.",
+    "login2.expired_title": "Sessão expirada.",
+    "login2.expired_desc": "Entre novamente para continuar de onde parou.",
     "login2.kicker": "Entrar",
     "login2.title": "Acesse uma camada de comando mais limpa, não apenas uma página de conta.",
 
@@ -4152,7 +4156,7 @@ window.VX_TRANS = {
     "svc2.stat3_val":            "Orçamento",
     "svc2.stat3_label":          "Fechado, escrito, aprovado",
     "svc2.stat4_val":            "1-a-1",
-    "svc2.stat4_label":          "Direto com o Eduardo",
+    "svc2.stat4_label":          "Acompanhamento 1:1",
     "svc2.fit_eyebrow":          "Faz sentido?",
     "svc2.fit_title":            "Pra quem é — e pra quem não é.",
     "svc2.fit_yes_title":        "É pra você se",

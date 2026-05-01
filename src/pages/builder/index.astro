@@ -325,7 +325,8 @@ import PageWidgets from "../../components/PageWidgets.astro";
   import { createClient } from "@supabase/supabase-js";
 
   const $ = (id: string) => document.getElementById(id);
-  const log = (msg: string) => console.log(`[builder] ${msg}`);
+  const DEBUG = (() => { try { return new URLSearchParams(location.search).has("debug"); } catch (_) { return false; } })();
+  const log = DEBUG ? (msg: string) => console.log(`[builder] ${msg}`) : (_msg: string) => {};
 
   let supa: any = null;
   let currentProject: any = null;
@@ -700,29 +701,29 @@ import PageWidgets from "../../components/PageWidgets.astro";
     const expressHtml = `
       <div class="express-flow" id="expressFlow">
         <div class="express-header">
-          <span class="express-badge">⚡ Landing Express</span>
+          <span class="express-badge"><span aria-hidden="true">⚡</span> Landing Express</span>
           <h3 class="card__title">Build your landing page in 60 seconds</h3>
         </div>
 
         <div class="express-step" id="exStep1">
           <div class="express-q">What type of business is this for?</div>
           <div class="express-options" id="exArchetype">
-            <button class="express-opt" data-val="saas">⚡ Software / SaaS</button>
-            <button class="express-opt" data-val="agency">🏢 Agency / Studio</button>
-            <button class="express-opt" data-val="portfolio">👤 Freelancer / Portfolio</button>
-            <button class="express-opt" data-val="local">📍 Local Business</button>
-            <button class="express-opt" data-val="ecommerce">🛒 E-commerce</button>
-            <button class="express-opt" data-val="event">🎯 Event / Launch</button>
+            <button class="express-opt" data-val="saas"><span aria-hidden="true">⚡</span> Software / SaaS</button>
+            <button class="express-opt" data-val="agency"><span aria-hidden="true">🏢</span> Agency / Studio</button>
+            <button class="express-opt" data-val="portfolio"><span aria-hidden="true">👤</span> Freelancer / Portfolio</button>
+            <button class="express-opt" data-val="local"><span aria-hidden="true">📍</span> Local Business</button>
+            <button class="express-opt" data-val="ecommerce"><span aria-hidden="true">🛒</span> E-commerce</button>
+            <button class="express-opt" data-val="event"><span aria-hidden="true">🎯</span> Event / Launch</button>
           </div>
         </div>
 
         <div class="express-step" id="exStep2" hidden>
           <div class="express-q">What should visitors do?</div>
           <div class="express-options" id="exGoal">
-            <button class="express-opt" data-val="leads">📩 Book a call / Get in touch</button>
-            <button class="express-opt" data-val="sales">💳 Buy or subscribe</button>
-            <button class="express-opt" data-val="waitlist">📋 Join a waitlist</button>
-            <button class="express-opt" data-val="showcase">👁 Learn and trust</button>
+            <button class="express-opt" data-val="leads"><span aria-hidden="true">📩</span> Book a call / Get in touch</button>
+            <button class="express-opt" data-val="sales"><span aria-hidden="true">💳</span> Buy or subscribe</button>
+            <button class="express-opt" data-val="waitlist"><span aria-hidden="true">📋</span> Join a waitlist</button>
+            <button class="express-opt" data-val="showcase"><span aria-hidden="true">👁</span> Learn and trust</button>
           </div>
         </div>
 
@@ -749,11 +750,11 @@ import PageWidgets from "../../components/PageWidgets.astro";
             </div>
           </div>
           <button class="btn btn--primary" id="exGenerate" style="margin-top:18px;width:100%">
-            Generate my landing page →
+            Generate my landing page <span aria-hidden="true">→</span>
           </button>
         </div>
 
-        <button class="btn btn--ghost btn--sm" id="exBack" style="margin-top:12px">← Back to templates</button>
+        <button class="btn btn--ghost btn--sm" id="exBack" style="margin-top:12px"><span aria-hidden="true">←</span> Back to templates</button>
       </div>
     `;
 
