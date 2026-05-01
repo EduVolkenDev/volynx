@@ -14,7 +14,7 @@ const { preview } = Astro.props;
 
 <FlagshipLayout
   title={`${preview.name} Preview — VOLYNX`}
-  description={preview.summary}
+  description={preview.summary.en}
   ogImage={preview.art}
   pageClass={`page-kit-preview page-kit-preview--${preview.id}`}
 >
@@ -23,16 +23,12 @@ const { preview } = Astro.props;
     <section class="hero kit-preview-hero">
       <div class="shell kit-preview-hero__grid">
         <div class="hero-copy">
-          <span class="kicker">{preview.kicker}</span>
-          <h1>{preview.title}</h1>
-          <p>{preview.summary}</p>
+          <span class="kicker"><span class="i18n-en">{preview.kicker.en}</span><span class="i18n-pt">{preview.kicker.pt}</span></span>
+          <h1><span class="i18n-en">{preview.title.en}</span><span class="i18n-pt">{preview.title.pt}</span></h1>
+          <p><span class="i18n-en">{preview.summary.en}</span><span class="i18n-pt">{preview.summary.pt}</span></p>
           <div class="hero-actions">
-            <a href={preview.productRoute} class="button button--gold">Open product page</a>
-            <a href={`${ROUTES.docs}#${preview.docsAnchor}`} class="button button--ghost">Preview docs + delivery</a>
-          </div>
-          <div class="kit-preview-note">
-            <strong>Revenue-safe preview.</strong>
-            <span>Full source, buyer docs and delivery files stay gated after purchase.</span>
+            <a href={preview.productRoute} class="button button--gold"><span class="i18n-en">Buy {preview.name}</span><span class="i18n-pt">Comprar {preview.name}</span></a>
+            <a href={ROUTES.pricing} class="button button--ghost"><span class="i18n-en">See pricing</span><span class="i18n-pt">Ver preços</span></a>
           </div>
         </div>
         <div class="kit-preview-hero__art panel" aria-hidden="true">
@@ -46,7 +42,7 @@ const { preview } = Astro.props;
         {preview.metrics.map((metric) => (
           <article class="panel kit-preview-metric">
             <strong>{metric.value}</strong>
-            <span>{metric.label}</span>
+            <span><span class="i18n-en">{metric.label.en}</span><span class="i18n-pt">{metric.label.pt}</span></span>
           </article>
         ))}
       </div>
@@ -54,15 +50,14 @@ const { preview } = Astro.props;
 
     <section class="page-section">
       <div class="shell section-head">
-        <span class="eyebrow">What the preview proves</span>
-        <h2>{preview.name} looks premium before the customer even unlocks it.</h2>
-        <p>The public layer now proves value, while the real operating package stays protected inside the paid flow.</p>
+        <span class="eyebrow"><span class="i18n-en">Why it works</span><span class="i18n-pt">Por que funciona</span></span>
+        <h2><span class="i18n-en">{preview.name} ships with the parts that actually move the buyer.</span><span class="i18n-pt">{preview.name} já vem com as partes que de fato movem o comprador.</span></h2>
       </div>
       <div class="shell kit-preview-grid">
         {preview.proofCards.map((card) => (
           <article class="panel kit-preview-card">
-            <h3>{card.title}</h3>
-            <p>{card.copy}</p>
+            <h3><span class="i18n-en">{card.title.en}</span><span class="i18n-pt">{card.title.pt}</span></h3>
+            <p><span class="i18n-en">{card.copy.en}</span><span class="i18n-pt">{card.copy.pt}</span></p>
           </article>
         ))}
       </div>
@@ -70,23 +65,23 @@ const { preview } = Astro.props;
 
     <section class="page-section">
       <div class="shell section-head">
-        <span class="eyebrow">Unlock Preview</span>
-        <h2>Show what is included. Keep the premium layer gated.</h2>
+        <span class="eyebrow"><span class="i18n-en">What you get</span><span class="i18n-pt">O que você recebe</span></span>
+        <h2><span class="i18n-en">Exact deliverables — no surprises after checkout.</span><span class="i18n-pt">Entregas exatas — sem surpresa depois do checkout.</span></h2>
       </div>
       <div class="shell kit-preview-unlock">
         <article class="panel kit-preview-stack">
-          <span class="label">Docs preview</span>
+          <span class="label"><span class="i18n-en">Inside the kit</span><span class="i18n-pt">Dentro do kit</span></span>
           <ul>
-            {preview.docsPreview.map((item) => (
-              <li>{item}</li>
+            {preview.whatYouGet.map((item) => (
+              <li><span class="i18n-en">{item.en}</span><span class="i18n-pt">{item.pt}</span></li>
             ))}
           </ul>
         </article>
         <article class="panel kit-preview-stack">
-          <span class="label label--pro">Delivery preview</span>
+          <span class="label label--pro"><span class="i18n-en">Who it's for</span><span class="i18n-pt">Pra quem é</span></span>
           <ul>
-            {preview.deliveryPreview.map((item) => (
-              <li>{item}</li>
+            {preview.whoItsFor.map((item) => (
+              <li><span class="i18n-en">{item.en}</span><span class="i18n-pt">{item.pt}</span></li>
             ))}
           </ul>
         </article>
@@ -95,15 +90,15 @@ const { preview } = Astro.props;
 
     <section class="page-section">
       <div class="shell section-head">
-        <span class="eyebrow">Preview Flow</span>
-        <h2>VOLYNX stays the storefront. Volynx-OS feeds the premium layer underneath.</h2>
+        <span class="eyebrow"><span class="i18n-en">How it works</span><span class="i18n-pt">Como funciona</span></span>
+        <h2><span class="i18n-en">From checkout to a published site in three steps.</span><span class="i18n-pt">Do checkout ao site no ar em três passos.</span></h2>
       </div>
       <div class="shell kit-preview-steps">
         {preview.steps.map((step, index) => (
           <article class="panel kit-preview-step">
             <span class="kit-preview-step__index">0{index + 1}</span>
-            <h3>{step.title}</h3>
-            <p>{step.copy}</p>
+            <h3><span class="i18n-en">{step.title.en}</span><span class="i18n-pt">{step.title.pt}</span></h3>
+            <p><span class="i18n-en">{step.copy.en}</span><span class="i18n-pt">{step.copy.pt}</span></p>
           </article>
         ))}
       </div>
@@ -111,14 +106,14 @@ const { preview } = Astro.props;
 
     <section class="page-section">
       <div class="shell section-head">
-        <span class="eyebrow">FAQ</span>
-        <h2>Common questions about the public preview layer.</h2>
+        <span class="eyebrow"><span class="i18n-en">FAQ</span><span class="i18n-pt">Perguntas frequentes</span></span>
+        <h2><span class="i18n-en">What buyers ask before checkout.</span><span class="i18n-pt">O que compradores perguntam antes de fechar.</span></h2>
       </div>
       <div class="shell kit-preview-faq">
         {preview.faq.map((item) => (
           <details class="panel kit-preview-faq__item">
-            <summary>{item.question}</summary>
-            <p>{item.answer}</p>
+            <summary><span class="i18n-en">{item.question.en}</span><span class="i18n-pt">{item.question.pt}</span></summary>
+            <p><span class="i18n-en">{item.answer.en}</span><span class="i18n-pt">{item.answer.pt}</span></p>
           </details>
         ))}
       </div>
@@ -127,13 +122,13 @@ const { preview } = Astro.props;
     <section class="page-section page-section--last">
       <div class="shell callout panel panel--pro kit-preview-cta">
         <div>
-          <span class="eyebrow">Ready to buy?</span>
-          <strong>{preview.name} is sold on VOLYNX, with the premium material released only after checkout.</strong>
-          <p>Use the preview to judge quality. Use the product page to convert. Use the private delivery layer after purchase.</p>
+          <span class="eyebrow"><span class="i18n-en">Ready to ship?</span><span class="i18n-pt">Pronto pra publicar?</span></span>
+          <strong><span class="i18n-en">{preview.name} — auto-loaded into Builder the moment you buy.</span><span class="i18n-pt">{preview.name} — carregado no Builder no momento da compra.</span></strong>
+          <p><span class="i18n-en">No setup, no zip extracting. Edit content, hit publish, your site is live.</span><span class="i18n-pt">Sem setup, sem extrair zip. Edite o conteúdo, clique em publicar e seu site fica no ar.</span></p>
         </div>
         <div class="hero-actions">
-          <a href={preview.productRoute} class="button button--gold">Open {preview.name}</a>
-          <a href={ROUTES.pricing} class="button button--ghost">See pricing</a>
+          <a href={preview.productRoute} class="button button--gold"><span class="i18n-en">Buy {preview.name}</span><span class="i18n-pt">Comprar {preview.name}</span></a>
+          <a href={ROUTES.pricing} class="button button--ghost"><span class="i18n-en">Compare tiers</span><span class="i18n-pt">Comparar tiers</span></a>
         </div>
       </div>
     </section>
@@ -159,19 +154,6 @@ const { preview } = Astro.props;
     height: auto;
     object-fit: cover;
     border-radius: 20px;
-  }
-  .page-kit-preview .kit-preview-note {
-    margin-top: 18px;
-    padding: 16px 18px;
-    display: grid;
-    gap: 8px;
-    border-radius: 18px;
-    border: 1px solid rgba(255,255,255,.08);
-    background: rgba(255,255,255,.035);
-    color: rgba(255,255,255,.72);
-  }
-  .page-kit-preview .kit-preview-note strong {
-    color: #fff;
   }
   .page-kit-preview .kit-preview-metrics,
   .page-kit-preview .kit-preview-grid,

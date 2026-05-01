@@ -10,31 +10,31 @@ import { ROUTES } from "../../data/routes";
   description="VOLYNX secure checkout bridge. Validates access, restores auth if needed and redirects into Stripe Checkout."
   pageClass="page-checkout"
 >
-  <FlagshipHeader ctaHref={ROUTES.products} ctaLabel="Browse products" />
+  <FlagshipHeader ctaHref={ROUTES.products} ctaLabel="Browse products" ctaI18n="header.browse_products" />
 
   <main class="checkout-shell">
     <section class="checkout-hero">
-      <span class="checkout-kicker">Secure checkout</span>
-      <h1 id="checkoutTitle">Preparing your VOLYNX checkout.</h1>
+      <span class="checkout-kicker"><span class="i18n-en">Secure checkout</span><span class="i18n-pt">Checkout seguro</span></span>
+      <h1 id="checkoutTitle"><span class="i18n-en">Preparing your VOLYNX checkout.</span><span class="i18n-pt">Preparando seu checkout VOLYNX.</span></h1>
       <p id="checkoutMessage">
-        Verifying access, currency and product context before opening Stripe Checkout.
+        <span class="i18n-en">Verifying access, currency and product context before opening Stripe Checkout.</span><span class="i18n-pt">Verificando acesso, moeda e contexto do produto antes de abrir o Stripe Checkout.</span>
       </p>
     </section>
 
     <section class="checkout-panel" aria-live="polite">
       <div class="checkout-state" id="checkoutLoading">
         <div class="checkout-spinner" aria-hidden="true"></div>
-        <strong>Opening secure checkout...</strong>
-        <p>If you just signed in, stay on this page for a moment while we restore your session.</p>
+        <strong><span class="i18n-en">Opening secure checkout...</span><span class="i18n-pt">Abrindo checkout seguro...</span></strong>
+        <p><span class="i18n-en">If you just signed in, stay on this page for a moment while we restore your session.</span><span class="i18n-pt">Se você acabou de entrar, fique nesta página um instante enquanto restauramos sua sessão.</span></p>
       </div>
 
       <div class="checkout-state checkout-state--error" id="checkoutError" hidden>
-        <strong id="checkoutErrorTitle">Could not open checkout.</strong>
-        <p id="checkoutErrorMessage">Try again, or return to the product page and reopen the checkout flow.</p>
+        <strong id="checkoutErrorTitle"><span class="i18n-en">Could not open checkout.</span><span class="i18n-pt">Não foi possível abrir o checkout.</span></strong>
+        <p id="checkoutErrorMessage"><span class="i18n-en">Try again, or return to the product page and reopen the checkout flow.</span><span class="i18n-pt">Tente novamente ou volte à página do produto e reabra o fluxo de checkout.</span></p>
         <div class="checkout-actions">
-          <a class="button button--gold" id="checkoutRetry" href={ROUTES.pricing}>Try again</a>
-          <a class="button button--ghost" id="checkoutBack" href={ROUTES.products}>Back to product</a>
-          <a class="button button--ghost" href={ROUTES.support}>Open support</a>
+          <a class="button button--gold" id="checkoutRetry" href={ROUTES.pricing}><span class="i18n-en">Try again</span><span class="i18n-pt">Tentar novamente</span></a>
+          <a class="button button--ghost" id="checkoutBack" href={ROUTES.products}><span class="i18n-en">Back to product</span><span class="i18n-pt">Voltar ao produto</span></a>
+          <a class="button button--ghost" href={ROUTES.support}><span class="i18n-en">Open support</span><span class="i18n-pt">Abrir suporte</span></a>
         </div>
       </div>
     </section>
@@ -56,6 +56,35 @@ import { ROUTES } from "../../data/routes";
   const errorMessage = document.getElementById("checkoutErrorMessage");
   const retryLink = document.getElementById("checkoutRetry");
   const backLink = document.getElementById("checkoutBack");
+
+  const LANG = (localStorage.getItem("volynx_lang") || "en").toLowerCase().startsWith("pt") ? "pt" : "en";
+  const T = {
+    en: {
+      missing_target: "Missing checkout target.",
+      missing_target_msg: "This checkout link does not include a product lookup key.",
+      missing_target_hint: "Return to the product page and reopen the secure checkout link.",
+      preparing_for: (label) => `Preparing checkout for ${label}.`,
+      checking_session: "Checking your session and opening Stripe Checkout.",
+      could_not_start: "Checkout could not start.",
+      could_not_start_hint: "You can retry, return to the product page or open support with the same purchase context.",
+      unexpected: "Unexpected checkout error.",
+      missing_config: "Checkout configuration is missing.",
+      no_redirect: "Stripe checkout did not return a redirect URL.",
+    },
+    pt: {
+      missing_target: "Checkout sem destino.",
+      missing_target_msg: "Este link de checkout não inclui o lookup_key do produto.",
+      missing_target_hint: "Volte à página do produto e reabra o link do checkout seguro.",
+      preparing_for: (label) => `Preparando checkout de ${label}.`,
+      checking_session: "Verificando sua sessão e abrindo o Stripe Checkout.",
+      could_not_start: "Não foi possível iniciar o checkout.",
+      could_not_start_hint: "Você pode tentar novamente, voltar ao produto ou abrir o suporte com o mesmo contexto de compra.",
+      unexpected: "Erro inesperado no checkout.",
+      missing_config: "Configuração do checkout ausente.",
+      no_redirect: "O Stripe Checkout não retornou um URL de redirecionamento.",
+    },
+  };
+  const tt = T[LANG];
 
   const FALLBACK_LABELS = {
     portfolio: "Portfolio Pro Kit",
@@ -145,14 +174,14 @@ import { ROUTES } from "../../data/routes";
     backLink.setAttribute("href", fallbackBackHref);
 
     if (!lookupBase) {
-      if (titleEl) titleEl.textContent = "Missing checkout target.";
-      if (messageEl) messageEl.textContent = "This checkout link does not include a product lookup key.";
-      showError("Missing checkout target.", "Return to the product page and reopen the secure checkout link.");
+      if (titleEl) titleEl.textContent = tt.missing_target;
+      if (messageEl) messageEl.textContent = tt.missing_target_msg;
+      showError(tt.missing_target, tt.missing_target_hint);
       return;
     }
 
-    if (titleEl) titleEl.textContent = `Preparing checkout for ${fallback.label}.`;
-    if (messageEl) messageEl.textContent = "Checking your session and opening Stripe Checkout.";
+    if (titleEl) titleEl.textContent = tt.preparing_for(fallback.label);
+    if (messageEl) messageEl.textContent = tt.checking_session;
 
     let token = localStorage.getItem("volynx_access_token") || "";
     const currentPath = window.location.pathname + window.location.search;
@@ -167,7 +196,7 @@ import { ROUTES } from "../../data/routes";
       const apiBase = String((cfg && (cfg.functionsUrl || cfg.apiBaseUrl)) || "").replace(/\/$/, "");
 
       if (!apiBase) {
-        throw new Error("Checkout configuration is missing.");
+        throw new Error(tt.missing_config);
       }
 
       token = await freshAccessToken(cfg);
@@ -205,14 +234,14 @@ import { ROUTES } from "../../data/routes";
         return;
       }
 
-      throw new Error(data?.error || data?.message || "Stripe checkout did not return a redirect URL.");
+      throw new Error(data?.error || data?.message || tt.no_redirect);
     } catch (error) {
       console.error("[checkout-page] failed:", error);
-      if (titleEl) titleEl.textContent = "Checkout could not start.";
-      if (messageEl) messageEl.textContent = "You can retry, return to the product page or open support with the same purchase context.";
+      if (titleEl) titleEl.textContent = tt.could_not_start;
+      if (messageEl) messageEl.textContent = tt.could_not_start_hint;
       showError(
-        "Checkout could not start.",
-        error instanceof Error ? error.message : "Unexpected checkout error.",
+        tt.could_not_start,
+        error instanceof Error ? error.message : tt.unexpected,
       );
     }
   }

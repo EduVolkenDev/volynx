@@ -715,6 +715,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
       const presetId = presetMap[prefix];
       let projectSlug: string | null = null;
+      let projectIdCreated: string | null = null;
       let presetFetchError: string | null = null;
       if (presetId) {
         try {
@@ -731,21 +732,28 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
               const projectName = tierLabel
                 ? `${preset.name} Kit — ${tierLabel}`
                 : `${preset.name} Kit — ${new Date().toLocaleDateString("en-GB")}`;
-              await supabase.from("projects").insert({
-                user_id: userId,
-                name: projectName,
-                slug: projectSlug,
-                builder_data: preset.data,
-                status: "draft",
-                domain_type: "subdomain",
-                metadata: {
-                  source_kit: addonId,
-                  preset_id: presetId,
-                  tier,
-                  tier_label: tierLabel,
-                  stripe_session_id: session.id,
-                },
-              });
+              const { data: insertedProject } = await supabase
+                .from("projects")
+                .insert({
+                  user_id: userId,
+                  name: projectName,
+                  slug: projectSlug,
+                  builder_data: preset.data,
+                  status: "draft",
+                  domain_type: "subdomain",
+                  metadata: {
+                    source_kit: addonId,
+                    preset_id: presetId,
+                    tier,
+                    tier_label: tierLabel,
+                    stripe_session_id: session.id,
+                  },
+                })
+                .select("id")
+                .single();
+              // Capture the project UUID so the email CTA can deep-link directly
+              // into /builder/?project={uuid} and skip the empty-editor confusion.
+              projectIdCreated = insertedProject?.id || null;
               console.log(`Auto-created Builder project '${projectSlug}' (${tierLabel || "unknown tier"}) for ${userId} from kit ${prefix}`);
             }
           }
@@ -818,6 +826,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             kit_name: kitDisplayName,
             tier,
             tier_label: tierLabel,
+            project_id: projectIdCreated,
             project_slug: projectSlug,
             preset_id: presetId,
             download_url: kitDownloadUrl,

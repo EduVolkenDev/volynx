@@ -5,8 +5,34 @@ import FlagshipFooter from "../../components/FlagshipFooter.astro";
 import { ROUTES } from "../../data/routes";
 import { kitPreviews } from "../../data/kit-previews";
 
-const previewSurfaces = [
-  ...kitPreviews,
+type SurfaceLangPair = { en: string; pt: string };
+type Surface = {
+  id: string;
+  name: string;
+  route: string;
+  productRoute: string;
+  docsAnchor: string;
+  art: string;
+  summary: SurfaceLangPair;
+  whatYouGet: SurfaceLangPair[];
+  whoItsFor: SurfaceLangPair[];
+};
+
+// Adapt the new {en,pt} LangPair shape from kit-previews into the local
+// Surface shape used by this page, then add PropertyFlow + Icon Vault entries
+// with their own buyer-facing copy.
+const previewSurfaces: Surface[] = [
+  ...kitPreviews.map((kp): Surface => ({
+    id: kp.id,
+    name: kp.name,
+    route: kp.route,
+    productRoute: kp.productRoute,
+    docsAnchor: kp.docsAnchor,
+    art: kp.art,
+    summary: kp.summary,
+    whatYouGet: kp.whatYouGet,
+    whoItsFor: kp.whoItsFor,
+  })),
   {
     id: "propertyflow",
     name: "PropertyFlow",
@@ -14,17 +40,45 @@ const previewSurfaces = [
     productRoute: ROUTES.propertyflow,
     docsAnchor: "propertyflow",
     art: "/assets/newproperty.webp",
-    summary:
-      "Preview the premium property platform, the delivery confidence and the buyer flow without exposing internal implementation details.",
-    docsPreview: [
-      "Template coverage, tier logic and launch guidance shown at a commercial level.",
-      "What the buyer receives is explained without exposing the private setup layer.",
-      "The premium implementation surface still stays protected after purchase.",
+    summary: {
+      en: "A bilingual property platform with smart catalog, live filters and a polished client showcase — built for real estate teams that want to stop fighting WordPress plugins.",
+      pt: "Uma plataforma bilíngue de imóveis com catálogo inteligente, filtros ao vivo e showcase polido — feita para times imobiliários que querem parar de brigar com plugin de WordPress.",
+    },
+    whatYouGet: [
+      {
+        en: "Full React + TypeScript source — clean codebase ready to deploy on Cloudflare, Vercel or your own infra.",
+        pt: "Código-fonte completo React + TypeScript — codebase limpo pronto pra deploy em Cloudflare, Vercel ou infra própria.",
+      },
+      {
+        en: "Smart property catalog with cover images, featured badges and detail modals with full gallery.",
+        pt: "Catálogo inteligente de imóveis com imagens de capa, badges de destaque e modais de detalhe com galeria completa.",
+      },
+      {
+        en: "Live filters: search by name, neighborhood or city · filter by purpose (sale/rent), type, price range.",
+        pt: "Filtros ao vivo: busca por nome, bairro ou cidade · filtrar por finalidade (venda/aluguel), tipo, faixa de preço.",
+      },
+      {
+        en: "Bilingual EN / PT-BR by default — every string translated, zero hardcoded text.",
+        pt: "Bilíngue EN / PT-BR de fábrica — toda string traduzida, zero texto hardcoded.",
+      },
+      {
+        en: "Supabase-ready data layer — swap the static data for live queries in minutes.",
+        pt: "Camada de dados pronta para Supabase — troque os dados estáticos por queries reais em minutos.",
+      },
     ],
-    deliveryPreview: [
-      "Public visitors can understand how tiered delivery and support work before checkout.",
-      "The real delivery area, support verification and gated material remain protected.",
-      "VOLYNX sells confidence, not public access to the paid stack.",
+    whoItsFor: [
+      {
+        en: "Real estate agencies tired of the WordPress + plugin tax — the kit replaces 4-5 plugins with one clean codebase.",
+        pt: "Imobiliárias cansadas do imposto WordPress + plugin — o kit substitui 4-5 plugins por um codebase limpo.",
+      },
+      {
+        en: "Independent brokers who need a portfolio that looks established from day one, not a Wix template.",
+        pt: "Corretores independentes que precisam de um portfolio com cara de consolidado desde o dia um, não um template Wix.",
+      },
+      {
+        en: "Property developers launching a project that needs its own dedicated landing with gallery + enquiry capture.",
+        pt: "Construtoras lançando um empreendimento que precisa de landing dedicada com galeria + captura de interesse.",
+      },
     ],
   },
   {
@@ -34,17 +88,41 @@ const previewSurfaces = [
     productRoute: ROUTES.iconsStore,
     docsAnchor: "icons-store",
     art: "/assets/icons-store-logo.webp",
-    summary:
-      "Preview the pack quality, buyer flow and delivery promise of the icon product line without exposing the paid files.",
-    docsPreview: [
-      "Public pages preview pack logic, licensing posture and product positioning.",
-      "The internal structure of the paid files stays behind the buying flow.",
-      "This keeps the asset line desirable without giving away the product.",
+    summary: {
+      en: "1,000+ premium icons across 19 curated packs in 8 distinct styles. Buy a single icon, a full pack or unlock the entire vault.",
+      pt: "1.000+ ícones premium em 19 packs curados, 8 estilos distintos. Compre um ícone avulso, um pack completo ou desbloqueie o vault inteiro.",
+    },
+    whatYouGet: [
+      {
+        en: "Instant download in PNG + WebP at multiple resolutions, plus SVG on Pro+ tiers.",
+        pt: "Download instantâneo em PNG + WebP em múltiplas resoluções, mais SVG nos tiers Pro+.",
+      },
+      {
+        en: "Commercial-use license included — use in client work, paid products and marketing without paying again.",
+        pt: "Licença de uso comercial incluída — use em trabalho de cliente, produtos pagos e marketing sem pagar de novo.",
+      },
+      {
+        en: "Single-icon checkout (£1.70) or pack purchase — no subscription required.",
+        pt: "Checkout de ícone único (R$10) ou compra de pack — sem assinatura obrigatória.",
+      },
+      {
+        en: "All 19 packs available: Hyper, Glass, Glow, Neon, Gradient, Outline, Solid and more.",
+        pt: "Todos os 19 packs disponíveis: Hyper, Glass, Glow, Neon, Gradient, Outline, Solid e mais.",
+      },
     ],
-    deliveryPreview: [
-      "The buyer sees that support and access recovery exist before purchase.",
-      "Raw files, pack access and paid delivery stay private after checkout.",
-      "Preview first, unlock later.",
+    whoItsFor: [
+      {
+        en: "Developers who don't want to spend an afternoon on Heroicons + custom SVG patches.",
+        pt: "Desenvolvedores que não querem gastar uma tarde em Heroicons + patches custom de SVG.",
+      },
+      {
+        en: "Designers building UI kits, brand systems or product launches that need premium-feeling icons fast.",
+        pt: "Designers montando UI kits, brand systems ou lançamentos que precisam de ícones com cara premium rápido.",
+      },
+      {
+        en: "Product teams scaling design ops — buy the vault once, use across every app and marketing surface.",
+        pt: "Times de produto escalando design ops — compra o vault uma vez, usa em todo app e superfície de marketing.",
+      },
     ],
   },
 ];
@@ -56,30 +134,29 @@ const previewSurfaces = [
   ogImage="/assets/allproducts.webp"
   pageClass="page-docs-preview"
 >
-  <FlagshipHeader current={ROUTES.devHub} ctaLabel="Open products" ctaHref={ROUTES.products} />
+  <FlagshipHeader current={ROUTES.devHub} ctaLabel="Browse products" ctaI18n="header.browse_products" ctaHref={ROUTES.products} />
   <main>
     <section class="hero docs-preview-hero">
       <div class="shell hero-grid">
         <div class="hero-copy">
-          <span class="kicker">Commercial previews</span>
-          <h1>Show what the buyer unlocks. Keep the premium layer protected.</h1>
+          <span class="kicker"><span class="i18n-en">Product hub</span><span class="i18n-pt">Hub de produtos</span></span>
+          <h1><span class="i18n-en">See exactly what each VOLYNX product ships with.</span><span class="i18n-pt">Veja exatamente o que cada produto VOLYNX entrega.</span></h1>
           <p>
-            This page previews the value, flow and operating depth powered by Volynx-OS inside VOLYNX. It does not expose the
-            real docs, source files or private delivery materials.
+            <span class="i18n-en">Concrete deliverables, ideal buyer profiles and outcomes for every kit, platform and asset pack — so you know what you're paying for before you click buy.</span><span class="i18n-pt">Entregas concretas, perfil de comprador ideal e resultados para cada kit, plataforma e pack de assets — pra você saber pelo que está pagando antes de clicar em comprar.</span>
           </p>
           <div class="hero-actions">
-            <a href={ROUTES.products} class="button button--gold">Open products</a>
-            <a href={ROUTES.pricing} class="button button--ghost">See pricing</a>
+            <a href={ROUTES.products} class="button button--gold"><span class="i18n-en">Browse products</span><span class="i18n-pt">Ver produtos</span></a>
+            <a href={ROUTES.pricing} class="button button--ghost"><span class="i18n-en">See pricing</span><span class="i18n-pt">Ver preços</span></a>
           </div>
         </div>
         <div class="panel docs-preview-hero__card">
-          <span class="label label--pro">Protected after purchase</span>
-          <h2>Docs, delivery, source and recovery remain premium.</h2>
-          <p>The public layer now previews the operating value so VOLYNX can sell better without cannibalizing the product.</p>
+          <span class="label label--pro"><span class="i18n-en">Auto-loaded into Builder</span><span class="i18n-pt">Carregado direto no Builder</span></span>
+          <h2><span class="i18n-en">Buy a kit, the project shows up in your Builder ready to edit.</span><span class="i18n-pt">Comprou um kit, o projeto aparece no seu Builder pronto pra editar.</span></h2>
+          <p><span class="i18n-en">No setup, no zip extracting, no theme installation — every kit is auto-created as a draft project on checkout.</span><span class="i18n-pt">Sem setup, sem extrair zip, sem instalar tema — todo kit é criado automaticamente como projeto draft no checkout.</span></p>
           <ul>
-            <li>Preview what the customer gets.</li>
-            <li>Explain how delivery works.</li>
-            <li>Keep the real material gated.</li>
+            <li><span class="i18n-en">Edit content inline through the Builder UI.</span><span class="i18n-pt">Edite conteúdo inline pela interface do Builder.</span></li>
+            <li><span class="i18n-en">Swap colors, fonts and brand tokens — no code.</span><span class="i18n-pt">Troque cores, fontes e tokens — sem código.</span></li>
+            <li><span class="i18n-en">Publish in one click to your VOLYNX subdomain.</span><span class="i18n-pt">Publique em um clique no seu subdomínio VOLYNX.</span></li>
           </ul>
         </div>
       </div>
@@ -87,8 +164,8 @@ const previewSurfaces = [
 
     <section class="page-section">
       <div class="shell section-head">
-        <span class="eyebrow">Preview surfaces</span>
-        <h2>The public site can now point to the product proof, not to hidden repo-only pages.</h2>
+        <span class="eyebrow"><span class="i18n-en">All products</span><span class="i18n-pt">Todos os produtos</span></span>
+        <h2><span class="i18n-en">Every kit, platform and asset pack — with the full pitch + the full deliverables list.</span><span class="i18n-pt">Cada kit, plataforma e pack — com o pitch completo + a lista completa de entregas.</span></h2>
       </div>
       <div class="shell docs-preview-grid">
         {previewSurfaces.map((surface) => (
@@ -96,10 +173,12 @@ const previewSurfaces = [
             <img src={surface.art} alt="" loading="lazy" decoding="async" />
             <div class="docs-preview-card__body">
               <h3>{surface.name}</h3>
-              <p>{surface.summary}</p>
+              <p>
+                <span class="i18n-en">{surface.summary.en}</span><span class="i18n-pt">{surface.summary.pt}</span>
+              </p>
               <div class="docs-preview-card__actions">
-                <a href={surface.route} class="button button--gold">Open preview</a>
-                <a href={surface.productRoute} class="button button--ghost">Open product</a>
+                <a href={surface.route} class="button button--gold"><span class="i18n-en">Full preview</span><span class="i18n-pt">Ver preview</span></a>
+                <a href={surface.productRoute} class="button button--ghost"><span class="i18n-en">Pricing &amp; tiers</span><span class="i18n-pt">Preços e tiers</span></a>
               </div>
             </div>
           </article>
@@ -107,46 +186,33 @@ const previewSurfaces = [
       </div>
     </section>
 
-    <section class="page-section">
-      <div class="shell section-head">
-        <span class="eyebrow">What unlocks later</span>
-        <h2>The product promise becomes visible before checkout, while the premium layer stays protected.</h2>
-      </div>
-      <div class="shell docs-preview-benefits">
-        <article class="panel docs-preview-benefit">
-          <h3>Docs preview</h3>
-          <p>Show the depth of setup, configuration and launch guidance without publishing the internal implementation material.</p>
-        </article>
-        <article class="panel docs-preview-benefit">
-          <h3>Delivery preview</h3>
-          <p>Let buyers see that recovery, support and post-purchase delivery are real parts of the product experience.</p>
-        </article>
-        <article class="panel docs-preview-benefit">
-          <h3>Revenue protection</h3>
-          <p>The premium files, source packages and protected hubs still unlock only after the correct commercial flow happens.</p>
-        </article>
-      </div>
-    </section>
-
     <section class="page-section page-section--last">
+      <div class="shell section-head">
+        <span class="eyebrow"><span class="i18n-en">Full breakdown</span><span class="i18n-pt">Detalhe completo</span></span>
+        <h2><span class="i18n-en">Exact deliverables and ideal buyer profile for each product.</span><span class="i18n-pt">Entregas exatas e perfil de comprador ideal para cada produto.</span></h2>
+      </div>
       <div class="shell docs-preview-surfaces">
         {previewSurfaces.map((surface) => (
           <article class="panel docs-preview-surface">
             <div>
               <span class="eyebrow">{surface.name}</span>
-              <h3>Docs preview</h3>
+              <h3><span class="i18n-en">What you get</span><span class="i18n-pt">O que você recebe</span></h3>
               <ul>
-                {surface.docsPreview.map((item) => (
-                  <li>{item}</li>
+                {surface.whatYouGet.map((item) => (
+                  <li>
+                    <span class="i18n-en">{item.en}</span><span class="i18n-pt">{item.pt}</span>
+                  </li>
                 ))}
               </ul>
             </div>
             <div>
-              <span class="eyebrow">Delivery preview</span>
-              <h3>Buyer confidence without product leakage</h3>
+              <span class="eyebrow"><span class="i18n-en">Who it's for</span><span class="i18n-pt">Pra quem é</span></span>
+              <h3><span class="i18n-en">Ideal buyer profile</span><span class="i18n-pt">Perfil ideal de comprador</span></h3>
               <ul>
-                {surface.deliveryPreview.map((item) => (
-                  <li>{item}</li>
+                {surface.whoItsFor.map((item) => (
+                  <li>
+                    <span class="i18n-en">{item.en}</span><span class="i18n-pt">{item.pt}</span>
+                  </li>
                 ))}
               </ul>
             </div>
