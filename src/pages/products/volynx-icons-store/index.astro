@@ -2472,12 +2472,16 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     .featured-section {
       padding: clamp(48px,6vw,72px) 0 clamp(28px,4vw,44px);
       position: relative;
+      overflow: hidden;             /* prevent decorative background bleed */
     }
     .featured-section::before {
       content: "";
       position: absolute;
-      inset: 10% 5% auto;
-      height: 70%;
+      /* Was: inset: 10% 5% auto; height: 70%  → froze the deco at 70% of an
+         estimated section height. When the grid expanded the deco didn't
+         follow, leaving the bottom of the section + the toggle CTA visually
+         outside the framed area. Anchor the deco to all four sides instead. */
+      inset: clamp(28px, 4vw, 56px) clamp(12px, 3vw, 40px);
       border-radius: 28px;
       background:
         radial-gradient(circle at 12% 20%, rgba(124,77,255,.18), transparent 28%),

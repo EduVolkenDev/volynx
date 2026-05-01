@@ -462,6 +462,14 @@ body {
     gap: 1.6rem;
 }
 
+/* Asset showcase is a teaser, not the catalogue. Cap each category to its
+ * first 6 visible cards; the "See SVG singles" link in the head + the full
+ * Icon Vault grid above already host the rest. Keeps the section compact
+ * regardless of how many singles ship in the asset HTML payload. */
+.asset-category-grid > .asset-card:nth-child(n+7) {
+    display: none;
+}
+
 .asset-showcase-defs {
     position: absolute;
     width: 0;
@@ -1188,8 +1196,8 @@ body {
     position: relative;
     display: flex;
     flex-direction: column;
-    grid-column: span 4;
-    min-height: 470px;
+    grid-column: span 6;          /* 2 packs per row on desktop (was span 4 / 3-up) */
+    min-height: 380px;            /* trimmed from 470 — packs read tighter, less vertical scroll */
     background:
         radial-gradient(circle at 16% 10%, var(--collection-soft, rgba(0, 240, 255, 0.2)), transparent 34%),
         radial-gradient(circle at 88% 0%, rgba(255, 255, 255, 0.11), transparent 28%),
@@ -1924,7 +1932,9 @@ body.vx-modal-open { overflow: hidden; }
     .cta-section { padding: 6rem 0; }
     .cta-box { padding: 4rem 3rem; }
     .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
-    .collections-grid { grid-template-columns: repeat(4, 1fr); }
+    /* Pack cards: 2 per row on desktop. The base `.collection-card` is
+       grid-column: span 6 against the 12-col base grid. Keeping the grid
+       at base lets the span control the layout cleanly. */
 }
 
 /* ── Tablet (768px–1023px) ── */
