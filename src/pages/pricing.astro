@@ -853,6 +853,41 @@ const pricingAssistItems = [
   </style>
 
   <script is:inline>
+    // Premium inline toast helper — replaces native vxToast() so checkout
+    // failures don't yank the user into a system dialog mid-funnel.
+    // Auto-dismisses after 6s; supports a "Try again" affordance via the
+    // calling site (button state is reset there).
+    function vxToast(msg, opts) {
+      opts = opts || {};
+      var type = opts.type || 'error';
+      var el = document.getElementById('vxCheckoutToast');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'vxCheckoutToast';
+        el.setAttribute('role', 'status');
+        el.setAttribute('aria-live', 'polite');
+        el.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(0);max-width:min(560px,calc(100% - 32px));padding:14px 56px 14px 20px;border-radius:14px;border:1px solid;background:rgba(15,16,28,.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#fff;font-size:14px;line-height:1.5;z-index:99999;box-shadow:0 22px 56px rgba(0,0,0,.5);opacity:0;transition:opacity .25s ease, transform .25s ease;pointer-events:auto;letter-spacing:.01em;';
+        var close = document.createElement('button');
+        close.type = 'button';
+        close.setAttribute('aria-label', 'Close');
+        close.style.cssText = 'position:absolute;top:8px;right:10px;width:28px;height:28px;background:transparent;border:0;color:rgba(255,255,255,.55);cursor:pointer;font-size:20px;line-height:1;border-radius:8px;';
+        close.textContent = '×';
+        close.addEventListener('click', function(){ el.style.opacity='0'; });
+        el.appendChild(close);
+        var msgEl = document.createElement('span');
+        msgEl.id = 'vxCheckoutToastMsg';
+        el.appendChild(msgEl);
+        document.body.appendChild(el);
+      }
+      el.style.borderColor = type === 'error' ? 'rgba(255,107,107,.55)' : 'rgba(45,212,191,.55)';
+      var msgEl = document.getElementById('vxCheckoutToastMsg');
+      if (msgEl) msgEl.textContent = msg;
+      el.style.opacity = '1';
+      el.style.transform = 'translateX(-50%) translateY(0)';
+      clearTimeout(el._t);
+      el._t = setTimeout(function(){ el.style.opacity = '0'; }, opts.duration || 6000);
+    }
+
     // Currency switcher
     document.querySelectorAll('[data-switch-currency]').forEach(function(btn) {
       btn.addEventListener('click', function() {
@@ -958,7 +993,7 @@ const pricingAssistItems = [
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
         if (!token) { window.location.href = '/login/?next=/pricing/'; return; }
-        if (!apiBase) { alert('Checkout not configured.'); return; }
+        if (!apiBase) { vxToast('Checkout not configured.'); return; }
         const lookupKey = lookupPrefix + '_' + getCheckoutCurrency();
         btn.textContent = 'Redirecting...';
         btn.style.pointerEvents = 'none';
@@ -970,8 +1005,8 @@ const pricingAssistItems = [
           });
           const data = await res.json();
           if (data.url) window.location.href = data.url;
-          else { alert(data.error || data.msg || data.message || 'Checkout failed. Please try again.'); btn.textContent = 'Try again'; btn.style.pointerEvents = ''; }
-        } catch { alert('Connection error. Please check your network and try again.'); btn.textContent = 'Try again'; btn.style.pointerEvents = ''; }
+          else { vxToast(data.error || data.msg || data.message || 'Checkout failed. Please try again.'); btn.textContent = 'Try again'; btn.style.pointerEvents = ''; }
+        } catch { vxToast('Connection error. Please check your network and try again.'); btn.textContent = 'Try again'; btn.style.pointerEvents = ''; }
       });
     });
 
@@ -980,7 +1015,7 @@ const pricingAssistItems = [
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
         if (!token) { window.location.href = '/login/?next=/pricing/'; return; }
-        if (!apiBase) { alert('Checkout not configured.'); return; }
+        if (!apiBase) { vxToast('Checkout not configured.'); return; }
         const bundleKey = btn.getAttribute('data-bundle-key');
         if (!bundleKey) return;
         btn.textContent = 'Redirecting...';
@@ -993,8 +1028,8 @@ const pricingAssistItems = [
           });
           const data = await res.json();
           if (data.url) window.location.href = data.url;
-          else { alert(data.error || data.msg || data.message || 'Checkout failed. Please try again.'); btn.textContent = 'Try again'; btn.style.pointerEvents = ''; }
-        } catch { alert('Connection error. Please check your network and try again.'); btn.textContent = 'Try again'; btn.style.pointerEvents = ''; }
+          else { vxToast(data.error || data.msg || data.message || 'Checkout failed. Please try again.'); btn.textContent = 'Try again'; btn.style.pointerEvents = ''; }
+        } catch { vxToast('Connection error. Please check your network and try again.'); btn.textContent = 'Try again'; btn.style.pointerEvents = ''; }
       });
     });
 
@@ -1016,7 +1051,7 @@ const pricingAssistItems = [
           });
           const data = await res.json();
           if (data.url) window.location.href = data.url;
-          else { alert(data.error || data.msg || data.message || 'Checkout failed. Please try again.'); btn.textContent = 'Buy'; }
+          else { vxToast(data.error || data.msg || data.message || 'Checkout failed. Please try again.'); btn.textContent = 'Buy'; }
         } catch { btn.textContent = 'Buy'; }
       });
     });
@@ -1062,7 +1097,7 @@ const pricingAssistItems = [
           });
           const data = await res.json();
           if (data.url) window.location.href = data.url;
-          else { alert(data.error || 'Checkout failed.'); btn.textContent = 'Add'; btn.style.pointerEvents = ''; }
+          else { vxToast(data.error || 'Checkout failed.'); btn.textContent = 'Add'; btn.style.pointerEvents = ''; }
         } catch { btn.textContent = 'Add'; btn.style.pointerEvents = ''; }
       });
     });
@@ -1080,7 +1115,7 @@ const pricingAssistItems = [
     if (cvitaeBusinessBtn) {
       cvitaeBusinessBtn.addEventListener('click', async () => {
         if (!token) { window.location.href = '/login/?next=/pricing/#cvitae'; return; }
-        if (!apiBase) { alert('Checkout not configured.'); return; }
+        if (!apiBase) { vxToast('Checkout not configured.'); return; }
         cvitaeBusinessBtn.textContent = 'Redirecting...';
         cvitaeBusinessBtn.style.pointerEvents = 'none';
         try {
@@ -1096,12 +1131,12 @@ const pricingAssistItems = [
           const data = await res.json();
           if (data.url) window.location.href = data.url;
           else {
-            alert(data.error || data.msg || data.message || 'Checkout failed. Please try again.');
+            vxToast(data.error || data.msg || data.message || 'Checkout failed. Please try again.');
             cvitaeBusinessBtn.textContent = 'Try again';
             cvitaeBusinessBtn.style.pointerEvents = '';
           }
         } catch {
-          alert('Connection error. Please check your network and try again.');
+          vxToast('Connection error. Please check your network and try again.');
           cvitaeBusinessBtn.textContent = 'Try again';
           cvitaeBusinessBtn.style.pointerEvents = '';
         }
@@ -1155,8 +1190,8 @@ const pricingAssistItems = [
                     });
                     const portalData = await portalRes.json();
                     if (portalData.url) window.location.href = portalData.url;
-                    else { alert(portalData.error || 'Could not open subscription manager.'); manageBtn.textContent = 'Manage subscription'; manageBtn.style.pointerEvents = ''; }
-                  } catch { alert('Connection error.'); manageBtn.textContent = 'Manage subscription'; manageBtn.style.pointerEvents = ''; }
+                    else { vxToast(portalData.error || 'Could not open subscription manager.'); manageBtn.textContent = 'Manage subscription'; manageBtn.style.pointerEvents = ''; }
+                  } catch { vxToast('Connection error.'); manageBtn.textContent = 'Manage subscription'; manageBtn.style.pointerEvents = ''; }
                 });
                 cta.parentElement.appendChild(manageBtn);
               }

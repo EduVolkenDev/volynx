@@ -52,15 +52,19 @@ serve(async (req: Request) => {
 
     const userId = userData.user.id;
 
-    // Fetch balance
+    // Fetch balance — use maybeSingle so a brand-new signup whose profiles
+    // row hasn't been inserted yet (auth trigger lag) doesn't 404. Treat
+    // null as balance 0 so the topbar pill shows "0 VX" instead of looking
+    // unauthenticated to the user.
     const { data: profile, error: profErr } = await supabase
       .from("profiles")
       .select("token_balance")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
 
     if (profErr) {
-      return json({ error: "Profile not found" }, 404);
+      console.error(`[get-balance] profiles read error for ${userId}:`, profErr.message);
+      return json({ error: "balance_read_failed", detail: profErr.message }, 500);
     }
 
     // Fetch recent transactions (last 20)
@@ -72,7 +76,7 @@ serve(async (req: Request) => {
       .limit(20);
 
     return json({
-      balance: profile.token_balance || 0,
+      balance: profile?.token_balance ?? 0,
       recent: transactions || [],
     });
 

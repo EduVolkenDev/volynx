@@ -76,6 +76,11 @@ window.VX_TRANS = {
     "recover.sent_title": "Check your inbox",
     "recover.sent_desc": "We sent a password reset link to your email. Click the link to set a new password.",
     "recover.sent_hint": "Didn't receive it? Check your spam folder or try again.",
+    "recover.msg_enter_email": "Please enter your email.",
+    "recover.msg_sending": "Sending reset link...",
+    "recover.msg_failed": "Failed to send reset link.",
+    "recover.msg_unknown": "Something went wrong.",
+    "recover.msg_rate_limited": "Too many attempts. Please wait a minute and try again.",
 
     /* === CONTACT === */
     "contact.kicker": "Get in touch",
@@ -2317,6 +2322,11 @@ window.VX_TRANS = {
     "recover.sent_title": "Verifique sua caixa de entrada",
     "recover.sent_desc": "Enviamos um link de redefinição de senha para seu email. Clique no link para criar uma nova senha.",
     "recover.sent_hint": "Não recebeu? Verifique a pasta de spam ou tente novamente.",
+    "recover.msg_enter_email": "Por favor, insira seu email.",
+    "recover.msg_sending": "Enviando link de redefinição...",
+    "recover.msg_failed": "Falha ao enviar o link de redefinição.",
+    "recover.msg_unknown": "Algo deu errado.",
+    "recover.msg_rate_limited": "Muitas tentativas. Aguarde um minuto e tente novamente.",
 
     /* === CONTACT === */
     "contact.kicker": "Entre em contato",

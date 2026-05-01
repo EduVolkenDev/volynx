@@ -532,36 +532,50 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     // their profile and the platform has no way to surface a deliverable.
     if (prefix.startsWith("icons_")) {
       const meta = (session.metadata || {}) as Record<string, string>;
-      await supabase.from("addons_purchased").insert({
-        user_id: userId,
-        addon_id: prefix,
-        price_paid: (session.amount_total || 0) / 100,
-        currency: currency,
-        status: "active",
-        metadata: {
-          stripe_session_id: session.id,
-          lookup_key: lookupKey,
-          stripe_lookup_key: stripeLookupKey,
-          icon_id: meta.icon_id || null,
-          icon_label: meta.icon_label || null,
-          icon_path: meta.icon_path || null,
-          icon_collection: meta.icon_collection || null,
-          tier: prefix.replace(/^icons_(single|pack)_/, ""),
-          kind: prefix.startsWith("icons_single_") ? "single" : "pack",
-        },
-      });
-      console.log(`Icon purchase ${prefix} recorded for ${userId}`);
-      await queueEmail({
-        event_type: "icons_delivered",
-        user_id: userId,
-        recipient_email: userEmail,
-        idempotency_key: session.id,
-        payload: {
-          tier: prefix.replace(/^icons_(single|pack)_/, ""),
-          kind: prefix.startsWith("icons_single_") ? "single" : "pack",
-          session_id: session.id,
-        },
-      });
+
+      // Idempotency: Stripe retries (or async_payment_succeeded firing after
+      // checkout.session.completed) would otherwise double-grant the row,
+      // double-fire the icons_delivered email, and skew purchase_events.
+      const { data: existingIcon } = await supabase
+        .from("addons_purchased")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("metadata->>stripe_session_id", session.id)
+        .maybeSingle();
+      if (existingIcon) {
+        console.log(`Icon purchase ${prefix} already recorded for session ${session.id} — skip`);
+      } else {
+        await supabase.from("addons_purchased").insert({
+          user_id: userId,
+          addon_id: prefix,
+          price_paid: (session.amount_total || 0) / 100,
+          currency: currency,
+          status: "active",
+          metadata: {
+            stripe_session_id: session.id,
+            lookup_key: lookupKey,
+            stripe_lookup_key: stripeLookupKey,
+            icon_id: meta.icon_id || null,
+            icon_label: meta.icon_label || null,
+            icon_path: meta.icon_path || null,
+            icon_collection: meta.icon_collection || null,
+            tier: prefix.replace(/^icons_(single|pack)_/, ""),
+            kind: prefix.startsWith("icons_single_") ? "single" : "pack",
+          },
+        });
+        console.log(`Icon purchase ${prefix} recorded for ${userId}`);
+        await queueEmail({
+          event_type: "icons_delivered",
+          user_id: userId,
+          recipient_email: userEmail,
+          idempotency_key: session.id,
+          payload: {
+            tier: prefix.replace(/^icons_(single|pack)_/, ""),
+            kind: prefix.startsWith("icons_single_") ? "single" : "pack",
+            session_id: session.id,
+          },
+        });
+      }
     }
 
     // ── Kit + PropertyFlow purchases → record addon + tier-aware delivery ──
@@ -658,42 +672,56 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         )
         : null;
 
+      // Idempotency guard — Stripe retries (or async_payment_succeeded
+      // firing after checkout.session.completed) would otherwise re-INSERT
+      // the row on every redelivery and double-create the Builder project.
+      const { data: existingKitOrPf } = await supabase
+        .from("addons_purchased")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("metadata->>stripe_session_id", session.id)
+        .maybeSingle();
+
       // Record as addon purchase (single source of truth for /delivery/).
       // For PF and kits, metadata carries delivery context on first insert.
       // Kits still receive a Builder project below as a secondary fallback.
-      await supabase.from("addons_purchased").insert({
-        user_id: userId,
-        addon_id: addonId,
-        price_paid: (session.amount_total || 0) / 100,
-        currency: currency,
-        status: "active",
-        metadata: {
-          stripe_session_id: session.id,
-          lookup_key: lookupKey,
-          stripe_lookup_key: stripeLookupKey,
-          stripe_prefix: stripePrefix,
-          tier,
-          tier_label: tierLabel,
-          ...(isPropertyFlow ? {
-            download_url: pfDownloadUrl,
-            download_expires_at: pfDownloadExpiresAt,
-            download_version: PF_VERSION,
-            delivery_status: pfDownloadUrl ? "ready" : "pending_signed_url",
-            delivery_error: pfSignError,
-          } : isKit ? {
-            kit_slug: kitSlug,
-            zip_tier: kitStorageTier,
-            download_bucket: "kits",
-            download_path: kitDownloadPath,
-            download_filename: kitDownloadFilename,
-            download_url: kitDownloadUrl,
-            download_expires_at: kitDownloadExpiresAt,
-            download_version: KIT_VERSION,
-            delivery_status: kitDeliveryStatus,
-            delivery_error: kitDownloadError,
-          } : {}),
-        },
-      });
+      if (!existingKitOrPf) {
+        await supabase.from("addons_purchased").insert({
+          user_id: userId,
+          addon_id: addonId,
+          price_paid: (session.amount_total || 0) / 100,
+          currency: currency,
+          status: "active",
+          metadata: {
+            stripe_session_id: session.id,
+            lookup_key: lookupKey,
+            stripe_lookup_key: stripeLookupKey,
+            stripe_prefix: stripePrefix,
+            tier,
+            tier_label: tierLabel,
+            ...(isPropertyFlow ? {
+              download_url: pfDownloadUrl,
+              download_expires_at: pfDownloadExpiresAt,
+              download_version: PF_VERSION,
+              delivery_status: pfDownloadUrl ? "ready" : "pending_signed_url",
+              delivery_error: pfSignError,
+            } : isKit ? {
+              kit_slug: kitSlug,
+              zip_tier: kitStorageTier,
+              download_bucket: "kits",
+              download_path: kitDownloadPath,
+              download_filename: kitDownloadFilename,
+              download_url: kitDownloadUrl,
+              download_expires_at: kitDownloadExpiresAt,
+              download_version: KIT_VERSION,
+              delivery_status: kitDeliveryStatus,
+              delivery_error: kitDownloadError,
+            } : {}),
+          },
+        });
+      } else {
+        console.log(`Kit/PF purchase ${prefix} already recorded for session ${session.id} — skip insert`);
+      }
 
       // Kit branch — auto-create a Builder project with the kit's preset.
       // PropertyFlow does NOT use presets (it ships as a ZIP) so it skips this.
@@ -1148,9 +1176,13 @@ serve(async (req: Request) => {
         console.log(`Unhandled event type: ${event.type}`);
     }
   } catch (err) {
+    // Return 500 so Stripe retries with backoff. Returning 200 here marked
+    // the event "delivered" and the customer's purchase was silently lost
+    // on any transient DB outage. The handler branches above are now
+    // idempotent so retries are safe.
     console.error(`Error handling ${event.type}:`, (err as Error).message);
-    return new Response(JSON.stringify({ received: true, error: (err as Error).message }), {
-      status: 200,
+    return new Response(JSON.stringify({ received: false, error: (err as Error).message }), {
+      status: 500,
       headers: { "Content-Type": "application/json" },
     });
   }

@@ -28,6 +28,27 @@ const deliveryAssistItems = [
           <span><span class="i18n-en">My Products</span><span class="i18n-pt">Meus produtos</span></span>
         </nav>
 
+        <!-- Payment success banner — shown when ?payment=success in URL after Stripe redirect -->
+        <div id="paymentSuccessBanner" class="payment-banner payment-banner--success" role="status" aria-live="polite" hidden>
+          <div class="payment-banner__icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <div class="payment-banner__copy">
+            <strong><span class="i18n-en">Payment confirmed.</span><span class="i18n-pt">Pagamento confirmado.</span></strong>
+            <span><span class="i18n-en">Your purchase is below. Downloads and access were unlocked automatically.</span><span class="i18n-pt">Sua compra está abaixo. Downloads e acessos foram liberados automaticamente.</span></span>
+          </div>
+          <button type="button" class="payment-banner__close" id="paymentBannerClose" aria-label="Dismiss notification">×</button>
+        </div>
+
+        <!-- Payment cancelled banner -->
+        <div id="paymentCancelledBanner" class="payment-banner payment-banner--info" role="status" aria-live="polite" hidden>
+          <div class="payment-banner__copy">
+            <strong><span class="i18n-en">Checkout cancelled.</span><span class="i18n-pt">Checkout cancelado.</span></strong>
+            <span><span class="i18n-en">No charge was made. You can resume from the catalog whenever you're ready.</span><span class="i18n-pt">Nenhuma cobrança foi feita. Você pode retomar pelo catálogo quando quiser.</span></span>
+          </div>
+          <button type="button" class="payment-banner__close" id="paymentCancelledClose" aria-label="Dismiss notification">×</button>
+        </div>
+
         <div class="hero-grid delivery-hero-grid">
           <div class="hero-copy">
             <span class="eyebrow"><span class="i18n-en">Your purchases</span><span class="i18n-pt">Suas compras</span></span>
@@ -127,6 +148,35 @@ const deliveryAssistItems = [
     if (!token) {
       window.location.href = '/login/?next=/delivery/';
     }
+
+    // ── Payment status banner ──────────────────────────────────────────────
+    // Stripe redirects to /delivery/?payment=success after a successful
+    // checkout. Show a banner so the user gets explicit confirmation
+    // (not just "the page loaded with my purchase in it").
+    (function showPaymentBanner() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const status = params.get('payment');
+        const successEl = document.getElementById('paymentSuccessBanner');
+        const cancelledEl = document.getElementById('paymentCancelledBanner');
+        if (status === 'success' && successEl) {
+          successEl.hidden = false;
+          const closeBtn = document.getElementById('paymentBannerClose');
+          if (closeBtn) closeBtn.addEventListener('click', () => { successEl.hidden = true; });
+        } else if (status === 'cancelled' && cancelledEl) {
+          cancelledEl.hidden = false;
+          const closeBtn = document.getElementById('paymentCancelledClose');
+          if (closeBtn) closeBtn.addEventListener('click', () => { cancelledEl.hidden = true; });
+        }
+        if (status) {
+          // Strip the param so a refresh doesn't re-show the banner forever.
+          params.delete('payment');
+          const qs = params.toString();
+          const url = window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash;
+          window.history.replaceState({}, '', url);
+        }
+      } catch (_) {}
+    })();
 
     // ── Helpers ─────────────────────────────────────────────────────────────
     function show(id) { const el = document.getElementById(id); if (el) el.style.display = ''; }
@@ -834,6 +884,73 @@ const deliveryAssistItems = [
 </FlagshipLayout>
 
 <style>
+  /* ── Payment status banner ──────────────────────────────────────────────── */
+  .payment-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 16px 0 24px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(8px);
+    animation: payment-banner-in 0.32s ease;
+  }
+  .payment-banner--success {
+    border-color: rgba(140, 255, 210, 0.32);
+    background: rgba(60, 200, 150, 0.08);
+  }
+  .payment-banner--info {
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .payment-banner__icon {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(140, 255, 210, 0.16);
+    color: rgba(150, 255, 220, 0.95);
+  }
+  .payment-banner__copy {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.86);
+  }
+  .payment-banner__copy strong {
+    color: #fff;
+    font-weight: 700;
+    font-size: 14.5px;
+  }
+  .payment-banner__close {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    transition: background 0.18s, color 0.18s;
+  }
+  .payment-banner__close:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+  }
+  @keyframes payment-banner-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: none; }
+  }
+
   /* ── Hero ───────────────────────────────────────────────────────────────── */
   .delivery-hero { padding-top: clamp(28px, 5vw, 52px); }
   .delivery-hero-grid {

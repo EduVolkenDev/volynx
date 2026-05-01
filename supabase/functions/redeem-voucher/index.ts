@@ -31,6 +31,28 @@ function json(data: unknown, status = 200) {
   });
 }
 
+// In-memory rate limiter (per isolate instance) — caps voucher brute-force.
+// 10 attempts/min/user is generous for legit redeems (a user typing a
+// single code) and tight enough to make scanning Black-Diamond codes
+// infeasible. Per-isolate is acceptable: Edge runtimes don't pin users
+// to isolates, so worst-case attackers get N×limit across isolates,
+// which is still bounded compared to no limiter.
+const RL_WINDOW_MS = 60_000;
+const RL_MAX = 10;
+const rlMap = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const entry = rlMap.get(userId);
+  if (!entry || now > entry.resetAt) {
+    rlMap.set(userId, { count: 1, resetAt: now + RL_WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= RL_MAX) return false;
+  entry.count++;
+  return true;
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS_HEADERS });
   if (req.method !== "POST") return json({ ok: false, error: "Method not allowed" }, 405);
@@ -52,6 +74,11 @@ Deno.serve(async (req: Request) => {
 
     const userId = userData.user.id;
     const userEmail = userData.user.email || "";
+
+    // ── Rate limit ────────────────────────────────────────────
+    if (!checkRateLimit(userId)) {
+      return json({ ok: false, error: "rate_limited", retry_after_seconds: 60 }, 429);
+    }
 
     // ── Parse request ─────────────────────────────────────────
     const body = await req.json().catch(() => ({}));
@@ -198,14 +225,19 @@ Deno.serve(async (req: Request) => {
       return json({ ok: false, error: "grant_failed" }, 500);
     }
 
-    // Atomic increment — prevents race condition exceeding max_uses
-    await supabase.rpc("increment_voucher_usage", { p_voucher_id: voucher.id }).catch(() => {
-      // Fallback if RPC not available
-      supabase
-        .from("vouchers")
-        .update({ times_used: voucher.times_used + 1 })
-        .eq("id", voucher.id);
-    });
+    // Atomic increment — prevents race condition exceeding max_uses.
+    // The previous fallback (read-then-write using cached times_used) was
+    // racy: under concurrent redemptions reading the same value, the
+    // counter could be left at the old number indefinitely, allowing
+    // more redemptions than max_uses. If the RPC fails, surface the error
+    // and rollback the redemption row instead of pretending it worked.
+    const { error: incErr } = await supabase.rpc("increment_voucher_usage", { p_voucher_id: voucher.id });
+    if (incErr) {
+      console.error(`[redeem-voucher] increment_voucher_usage failed for ${code}:`, incErr.message);
+      // Rollback the redemption insert so a retry can proceed cleanly.
+      await supabase.from("voucher_redemptions").delete().eq("voucher_id", voucher.id).eq("user_id", userId);
+      return json({ ok: false, error: "increment_failed", detail: incErr.message }, 500);
+    }
 
     console.log(`Voucher ${code} (${voucher.type}) redeemed by ${userEmail}. Grants: ${JSON.stringify(grants)}`);
 

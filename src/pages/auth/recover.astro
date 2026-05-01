@@ -55,6 +55,16 @@ const title = "Reset Password — VOLYNX";
     return await res.json();
   }
 
+  function t(key, fallback) {
+    try {
+      const lang = localStorage.getItem("volynx_lang") || "en";
+      const dict = (window.VX_TRANS && window.VX_TRANS[lang]) || {};
+      return dict[key] || fallback;
+    } catch (_) {
+      return fallback;
+    }
+  }
+
   const form = document.getElementById("recoverForm");
   const emailEl = document.getElementById("email");
   const btn = document.getElementById("submitBtn");
@@ -64,10 +74,14 @@ const title = "Reset Password — VOLYNX";
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = emailEl.value.trim();
-      if (!email) { msg.textContent = "Please enter your email."; msg.className = "msg err"; return; }
+      if (!email) {
+        msg.textContent = t("recover.msg_enter_email", "Please enter your email.");
+        msg.className = "msg err";
+        return;
+      }
 
       btn.disabled = true;
-      msg.textContent = "Sending reset link...";
+      msg.textContent = t("recover.msg_sending", "Sending reset link...");
       msg.className = "msg";
 
       try {
@@ -78,9 +92,13 @@ const title = "Reset Password — VOLYNX";
           body: JSON.stringify({ email }),
         });
 
+        if (res.status === 429) {
+          throw new Error(t("recover.msg_rate_limited", "Too many attempts. Please wait a minute and try again."));
+        }
+
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
-          throw new Error(data.error_description || data.msg || "Failed to send reset link.");
+          throw new Error(data.error_description || data.msg || t("recover.msg_failed", "Failed to send reset link."));
         }
 
         // Show success
@@ -89,7 +107,7 @@ const title = "Reset Password — VOLYNX";
         document.getElementById("sentEmail").textContent = email;
 
       } catch (err) {
-        msg.textContent = err.message || "Something went wrong.";
+        msg.textContent = err.message || t("recover.msg_unknown", "Something went wrong.");
         msg.className = "msg err";
       } finally {
         btn.disabled = false;
