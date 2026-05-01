@@ -415,6 +415,13 @@ body {
   color: var(--muted);
 }
 
+/* Critical: explicit [hidden] override. The .field { display: flex } rule
+   above out-specifies the UA default `[hidden] { display: none }`, which is
+   why setting `scaleGroup.hidden = true` from JS used to leave the 2x/3x/4x
+   selector visible when the bg-remove tool was active. */
+.field[hidden],
+.field-group[hidden] { display: none !important; }
+
 .bg-fill-row {
   display: flex;
   gap: 8px;

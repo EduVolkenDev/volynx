@@ -357,15 +357,22 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       bgProgress.hidden = false;
       bgProgressFill.style.width = `${safePct}%`;
 
-      if (key?.startsWith("fetch")) {
-        bgProgressLabel.textContent = `${t("suite.bg_downloading", "Downloading model...")} ${safePct}%`;
-      } else if (key === "compute:inference") {
-        bgProgressLabel.textContent = `${t("suite.bg_removing", "Removing background...")} ${safePct}%`;
-      } else if (safePct >= 100) {
+      // 100% always wins regardless of key — fixes the bug where the label
+      // got stuck on "Loading AI model..." after the image was already
+      // processed because key="done" or key="process" with pct=100 fell into
+      // the wrong branch.
+      if (safePct >= 100) {
         bgProgressLabel.textContent = t("suite.bg_done", "Done!");
         window.setTimeout(() => {
           if (bgProgress) bgProgress.hidden = true;
         }, 900);
+        return;
+      }
+
+      if (key?.startsWith("fetch")) {
+        bgProgressLabel.textContent = `${t("suite.bg_downloading", "Downloading model...")} ${safePct}%`;
+      } else if (key === "compute:inference" || key === "process" || key === "compute") {
+        bgProgressLabel.textContent = `${t("suite.bg_removing", "Removing background...")} ${safePct}%`;
       } else {
         bgProgressLabel.textContent = t("suite.bg_progress", "Loading AI model...");
       }
@@ -1080,6 +1087,11 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         setDropMessage("Error processing files");
       } finally {
         runBtn.disabled = false;
+        // Always release the progress widget — without this, errors mid-
+        // process or any path that didn't reach updateProgressUI(100,"done")
+        // left "Loading AI model..." stuck on screen even after the image
+        // was visibly processed.
+        setBgProgressHidden(true);
       }
     });
 
