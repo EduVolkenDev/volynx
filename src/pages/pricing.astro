@@ -934,9 +934,25 @@ const pricingAssistItems = [
       } catch {}
     }
 
+    // Free / Daily Free plan CTAs route to the actual product instead of
+    // dead-clicking. Without this the buttons looked clickable but did
+    // nothing, which buyers (correctly) read as "broken".
+    const FREE_PLAN_HREFS = {
+      free: '/builder/',          // Builder Free → open Builder
+      daily_free: 'https://daily.volynx.world/',
+    };
+
     document.querySelectorAll('.pricing-card__cta').forEach((btn) => {
       const card = btn.closest('.pricing-card');
       const planId = card?.getAttribute('data-plan') || '';
+      const freeHref = FREE_PLAN_HREFS[planId];
+      if (freeHref) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.location.href = freeHref;
+        });
+        return;
+      }
       const lookupPrefix = PLAN_LOOKUP_PREFIX[planId];
       if (!lookupPrefix) return;
       btn.addEventListener('click', async (e) => {

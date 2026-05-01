@@ -42,11 +42,14 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
           </div>
           <div class="hero-stats">
             <div class="stat">
-              <span class="stat-number" id="heroIconCount">0</span>
+              <!-- Static fallback: "1,000+" mirrors the home page promise. JS
+                   hydration will replace with the live count from catalog.json,
+                   but buyers never see "0" while waiting for hydration. -->
+              <span class="stat-number" id="heroIconCount">1,000+</span>
               <span class="stat-label" data-i18n="icons.hero_stat_library">Icons</span>
             </div>
             <div class="stat">
-              <span class="stat-number">0</span>
+              <span class="stat-number">19</span>
               <span class="stat-label" data-i18n="icons.hero_stat_packs">Packs</span>
             </div>
             <div class="stat">
@@ -1108,6 +1111,91 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       hyper: { label: "5000px Hyper pack · £48", lookup: "icons_pack_hyper", display: "820 VX · £48", vx: "820 VX" },
     } as const;
 
+    const FEATURED_PREMIUM_LABELS = new Set([
+      "AI Brain",
+      "Shield Lock",
+      "Analytics",
+      "Rocket",
+      "Diamond",
+      "VPN",
+      "Retina Scan",
+      "DNA",
+      "3D Cube",
+      "CPU Chip",
+      "Bitcoin",
+      "Drone",
+      "Atom",
+    ]);
+
+    const FEATURED_CURATION_ORDER = [
+      "AI Brain",
+      "Shield Lock",
+      "Analytics",
+      "Rocket",
+      "Diamond",
+      "VPN",
+      "Retina Scan",
+      "DNA",
+      "3D Cube",
+      "CPU Chip",
+      "Bitcoin",
+      "Drone",
+      "Atom",
+      "Wallet",
+      "Cloud Sync",
+      "Battery",
+      "Biometric",
+      "Terminal",
+      "Camera",
+      "Messages",
+      "GPS",
+      "Settings",
+      "Boost",
+      "Wi-Fi 6E",
+      "Cloud Folder",
+      "QR Code",
+      "Calendar",
+      "Notifications",
+      "Timer",
+      "AR Glasses",
+      "Server",
+      "Smartwatch",
+      "Globe",
+      "Flame Mode",
+      "Pulse",
+      "Satellite",
+      "Audio",
+      "NFT Token",
+      "Power",
+      "Waveform",
+    ];
+
+    const COLLECTION_CURATION = {
+      "Hyper Icons": { order: 0, band: "flagship", packLookup: "icons_pack_hyper" },
+      "Metal Chrome": { order: 1, band: "premium", packLookup: "icons_pack_premium" },
+      "Glass Icons": { order: 2, band: "premium", packLookup: "icons_pack_premium" },
+      "Iridescent": { order: 3, band: "premium", packLookup: "icons_pack_premium" },
+      "Vintage": { order: 4, band: "premium", packLookup: "icons_pack_premium" },
+      "Polygon": { order: 5, band: "premium", packLookup: "icons_pack_premium" },
+      "Glow": { order: 6, band: "curated", packLookup: "icons_pack_mixed" },
+      "Soft Blue": { order: 7, band: "curated", packLookup: "icons_pack_mixed" },
+      "Soft Dark Blue": { order: 8, band: "curated", packLookup: "icons_pack_mixed" },
+      "Soft Green": { order: 9, band: "curated", packLookup: "icons_pack_mixed" },
+      "Soft Orange": { order: 10, band: "curated", packLookup: "icons_pack_mixed" },
+      "Soft Red": { order: 11, band: "curated", packLookup: "icons_pack_mixed" },
+      "Purple Icons": { order: 12, band: "curated", packLookup: "icons_pack_mixed" },
+      "Day by Day": { order: 13, band: "free", packLookup: "" },
+      "Neon Icons": { order: 14, band: "free", packLookup: "" },
+      "Abstract": { order: 15, band: "free", packLookup: "" },
+    } as const;
+
+    const PACK_LOOKUP_TO_PRICE = {
+      "": ICON_PACK_PRICES.free,
+      icons_pack_mixed: ICON_PACK_PRICES.mixed,
+      icons_pack_premium: ICON_PACK_PRICES.premium,
+      icons_pack_hyper: ICON_PACK_PRICES.hyper,
+    } as const;
+
     // Mirrors scripts/stripe-catalog-setup.ts (amounts in cents)
     const ICON_MONEY_CENTS: Record<string, { gbp: number; eur: number; brl: number }> = {
       icons_single_budget:   { gbp: 80,   eur: 95,   brl: 550   },
@@ -1141,6 +1229,84 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     function checkoutCurrency() {
       const value = new URLSearchParams(window.location.search).get("currency") || localStorage.getItem("volynx_currency") || "gbp";
       return ["gbp", "eur", "brl"].includes(value.toLowerCase()) ? value.toLowerCase() : "gbp";
+    }
+
+    function featuredSinglePriceForLabel(label: string) {
+      return FEATURED_PREMIUM_LABELS.has(label) ? ICON_PRICE_TIERS.premium : ICON_PRICE_TIERS.standard;
+    }
+
+    function featuredRank(label: string) {
+      const index = FEATURED_CURATION_ORDER.indexOf(label);
+      return index === -1 ? FEATURED_CURATION_ORDER.length + 100 : index;
+    }
+
+    function curateFeaturedGrid() {
+      const grid = document.getElementById("featuredGrid");
+      if (!grid) return;
+      const cards = Array.from(grid.querySelectorAll<HTMLButtonElement>(".featured-card"));
+      cards
+        .map((card, index) => ({
+          card,
+          index,
+          label: card.querySelector(".featured-label .i18n-en")?.textContent?.trim()
+            || card.querySelector(".featured-label")?.textContent?.trim()
+            || "",
+        }))
+        .sort((a, b) => {
+          const rankDelta = featuredRank(a.label) - featuredRank(b.label);
+          if (rankDelta) return rankDelta;
+          return a.index - b.index;
+        })
+        .forEach(({ card }) => grid.appendChild(card));
+    }
+
+    function defaultCollectionPackPrice(collection: string, icons: any[]) {
+      const freeCount = icons.filter((icon) => icon.plan === "free").length;
+      if (freeCount === icons.length) return ICON_PACK_PRICES.free;
+      if (collection.toLowerCase().includes("hyper")) return ICON_PACK_PRICES.hyper;
+      if (freeCount === 0) return ICON_PACK_PRICES.premium;
+      return ICON_PACK_PRICES.mixed;
+    }
+
+    function collectionBandMeta(band: string) {
+      const L = storeLang();
+      if (band === "flagship") return { badge: "Flagship", display: L === "pt" ? "Flagship" : "Flagship" };
+      if (band === "premium") return { badge: "Premium", display: "Premium" };
+      if (band === "curated") return { badge: L === "pt" ? "Curada" : "Curated", display: L === "pt" ? "Curada" : "Curated" };
+      return { badge: L === "pt" ? "Grátis" : "Free", display: L === "pt" ? "Grátis" : "Free" };
+    }
+
+    function packDisplayText(packPrice: typeof ICON_PACK_PRICES[keyof typeof ICON_PACK_PRICES]) {
+      if (!packPrice.lookup) {
+        return storeLang() === "pt" ? "Grátis com cadastro" : packPrice.label;
+      }
+      const money = localizedMoney(packPrice.lookup);
+      if (packPrice.vx && money) return `${packPrice.vx} · ${money}`;
+      return money || packPrice.display || packPrice.label;
+    }
+
+    function collectionStrategy(collection: string, icons: any[]) {
+      const override = COLLECTION_CURATION[collection as keyof typeof COLLECTION_CURATION];
+      const packPrice = override
+        ? PACK_LOOKUP_TO_PRICE[override.packLookup as keyof typeof PACK_LOOKUP_TO_PRICE]
+        : defaultCollectionPackPrice(collection, icons);
+      const band = override?.band || (packPrice.lookup === "icons_pack_hyper"
+        ? "flagship"
+        : packPrice.lookup === "icons_pack_premium"
+          ? "premium"
+          : packPrice.lookup === "icons_pack_mixed"
+            ? "curated"
+            : "free");
+      const order = override?.order ?? 999;
+      const meta = collectionBandMeta(band);
+      return {
+        band,
+        order,
+        packPrice,
+        badgeLabel: meta.badge,
+        bandLabel: meta.display,
+        priceDisplay: packDisplayText(packPrice),
+      };
     }
 
     async function freshAccessToken() {
@@ -1228,6 +1394,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     document.addEventListener("DOMContentLoaded", async () => {
       initNavigation();
       initModal();
+      curateFeaturedGrid();
       initFilters();
       checkAuth();
       await loadCatalog();
@@ -1315,6 +1482,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         const svgEl = card.querySelector(".featured-svg-wrap svg");
         const label = card.querySelector(".featured-label")?.textContent?.trim() || "Neon Icon";
         const filterKey = card.dataset.featuredFilter || "futuristic";
+        const price = featuredSinglePriceForLabel(label);
         return {
           type: "svg",
           label,
@@ -1323,10 +1491,10 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
           category: "Neon Essentials",
           collection: "Neon Essentials",
           relatedCollection: findCollectionForCategory(filterKey) || "Neon Icons",
-          priceVX: ICON_PRICE_TIERS.standard.vx,
-          money: ICON_PRICE_TIERS.standard.money,
-          checkoutLookup: ICON_PRICE_TIERS.standard.lookup,
-          priceTier: ICON_PRICE_TIERS.standard.label,
+          priceVX: price.vx,
+          money: price.money,
+          checkoutLookup: price.lookup,
+          priceTier: price.label,
         };
       }).filter((item) => item.svg);
       // Prepend neon essentials so they render first in the SVG filter
@@ -1552,11 +1720,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     }
 
     function packPriceForCollection(collection: string, icons: any[]) {
-      const freeCount = icons.filter((icon) => icon.plan === "free").length;
-      if (freeCount === icons.length) return ICON_PACK_PRICES.free;
-      if (collection.toLowerCase().includes("hyper")) return ICON_PACK_PRICES.hyper;
-      if (freeCount === 0) return ICON_PACK_PRICES.premium;
-      return ICON_PACK_PRICES.mixed;
+      return collectionStrategy(collection, icons).packPrice;
     }
 
     function pickEvenly(items: any[], count: number) {
@@ -1670,7 +1834,11 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
 
       return Array.from(groups.entries())
         .map(([name, icons]) => ({ name, icons }))
-        .sort((a, b) => a.name.localeCompare(b.name));
+        .sort((a, b) => {
+          const orderDelta = collectionStrategy(a.name, a.icons).order - collectionStrategy(b.name, b.icons).order;
+          if (orderDelta) return orderDelta;
+          return a.name.localeCompare(b.name);
+        });
     }
 
     function renderCollections() {
@@ -1686,27 +1854,28 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         ).join("");
 
         const count = pack.icons.length;
-        const freeCount = pack.icons.filter(i => i.plan === "free").length;
-        const isPremium = freeCount === 0;
-        const isFree = freeCount === count;
         const firstCategory = CATEGORY_CONFIG.find(c => c.key === pack.icons[0]?.category)?.label || pack.icons[0]?.category || "Icon Pack";
-        const planLabel = isPremium ? "PREMIUM" : isFree ? "FREE" : "MIXED";
-        const planClass = isPremium ? "premium" : isFree ? "free" : "mixed";
+        const strategy = collectionStrategy(pack.name, pack.icons);
+        const isPremiumSurface = strategy.band === "flagship" || strategy.band === "premium";
 
         const card = document.createElement("article");
-        card.className = "collection-card" + (isPremium ? " collection-card--premium" : "");
+        card.className = "collection-card"
+          + (isPremiumSurface ? " collection-card--premium" : "")
+          + (strategy.band === "flagship" ? " collection-card--flagship" : "")
+          + (strategy.band === "curated" ? " collection-card--curated" : "");
         card.tabIndex = 0;
         card.dataset.collection = pack.name;
         card.setAttribute("style", collectionStyle(pack.name));
         card.style.cursor = "pointer";
         card.innerHTML = `
-          <span class="collection-plan-badge collection-plan-badge--${planClass}">${planLabel}</span>
+          <span class="collection-plan-badge collection-plan-badge--${strategy.band}">${escHtml(strategy.badgeLabel)}</span>
           <div class="collection-preview">${previews}</div>
           <div class="collection-meta-row">
             <span class="collection-category">${escHtml(firstCategory)}</span>
-            <p class="collection-count">${count} icons</p>
+            <p class="collection-count">${escHtml(strategy.bandLabel)}</p>
           </div>
           <h3 class="collection-title">${escHtml(pack.name)}</h3>
+          <p class="collection-count">${count} icons · ${escHtml(strategy.priceDisplay)}</p>
           <button class="collection-open-btn" type="button">${storeText("openPack")}</button>
         `;
 
@@ -1952,14 +2121,17 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       const filterKey = card.dataset.featuredFilter ?? "";
       const catLabel = CATEGORY_CONFIG.find(c => c.key === filterKey)?.label || filterKey;
       const svgMarkup = svgEl ? svgEl.outerHTML.replace(/width="54"/g, 'width="180"').replace(/height="54"/g, 'height="180"') : "";
+      const price = featuredSinglePriceForLabel(label);
 
       const L = storeLang();
       const explainCopy = L === "pt"
         ? "Este ícone é um single premium inline (não pertence a um pack específico). Peça ele sozinho ou navegue pela categoria para ver packs similares."
         : "This is a premium inline single (not tied to a specific pack). Request it on its own, or browse the category to see related packs.";
       const openPackLabel = L === "pt" ? `Ver pacote ${catLabel}` : `Browse ${catLabel}`;
-      const requestLabel = L === "pt" ? "Pedir este ícone" : "Request this icon";
+      const requestLabel = L === "pt" ? "Comprar este ícone" : "Buy this icon";
       const closeLabel = L === "pt" ? "Fechar" : "Close";
+      const money = localizedMoney(price.lookup) || price.money;
+      const buyLine = money ? `${price.vx} · ${money}` : price.vx;
 
       openModal(`
         <div style="display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 20% 20%,rgba(124,77,255,.45),transparent 35%),radial-gradient(circle at 80% 25%,rgba(79,195,247,.35),transparent 32%),linear-gradient(145deg,#0d1117,#152035);border:1px solid rgba(124,77,255,.22);border-radius:18px;padding:32px;margin-bottom:1rem;min-height:220px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 18px 40px rgba(0,0,0,.28);">
@@ -1968,6 +2140,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         <h3 style="margin:0 0 .5rem;color:#fff;font-size:1.25rem;font-weight:700;">${label}${badge ? ` <span style="margin-left:.5rem;font-size:.7rem;padding:2px 8px;border-radius:999px;background:rgba(79,195,247,.15);color:#4fc3f7;border:1px solid rgba(79,195,247,.3);vertical-align:middle;">${badge}</span>` : ""}</h3>
         <p style="color:rgba(255,255,255,.5);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin:0 0 1rem;">${catLabel}</p>
         <p style="color:rgba(255,255,255,.7);font-size:.85rem;line-height:1.6;margin:0 0 1.5rem;">${explainCopy}</p>
+        <p style="color:#fff;font-size:.9rem;font-weight:800;letter-spacing:.02em;margin:0 0 1.25rem;">${buyLine}</p>
         <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
           <button id="featuredRequestBtn" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#7c4dff,#00f0ff);color:#05070f;font-weight:800;border-radius:10px;border:none;font-size:.9rem;cursor:pointer;">${requestLabel}</button>
           <button id="featuredGoPackBtn" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#00f0ff,#0066ff);color:#000;font-weight:700;border-radius:10px;border:none;font-size:.9rem;cursor:pointer;">${openPackLabel}</button>
@@ -1975,7 +2148,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         </div>
       `);
       document.getElementById("featuredRequestBtn")?.addEventListener("click", () => {
-        startIconCheckout(ICON_PRICE_TIERS.standard.lookup, document.getElementById("featuredRequestBtn"));
+        startIconCheckout(price.lookup, document.getElementById("featuredRequestBtn"));
       });
       document.getElementById("featuredGoPackBtn")?.addEventListener("click", () => {
         // Featured SVGs don't belong to any concrete pack. Instead of
@@ -2003,12 +2176,14 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       const category = card.closest(".asset-category")?.getAttribute("data-category") || "Latest Assets";
       const svgMarkup = svgEl ? svgEl.outerHTML.replace("<svg ", '<svg style="width:180px;height:180px;" ') : "";
       const L = storeLang();
-      const requestLabel = L === "pt" ? "Pedir este ícone" : "Request this icon";
+      const requestLabel = L === "pt" ? "Comprar este ícone" : "Buy this icon";
       const sourceLabel = L === "pt" ? "Ver singles SVG" : "See SVG singles";
       const closeLabel = L === "pt" ? "Fechar" : "Close";
       const description = L === "pt"
         ? "Ícone novo carregado direto do HTML de assets da Icons Store."
         : "New icon loaded directly from the Icons Store asset HTML.";
+      const money = localizedMoney(ICON_PRICE_TIERS.budget.lookup) || ICON_PRICE_TIERS.budget.money;
+      const buyLine = money ? `${ICON_PRICE_TIERS.budget.vx} · ${money}` : ICON_PRICE_TIERS.budget.vx;
 
       openModal(`
         <div style="display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 20% 20%,rgba(120,220,255,.18),transparent 34%),radial-gradient(circle at 80% 20%,rgba(176,132,255,.18),transparent 30%),linear-gradient(145deg,#10131f,#090b14);border:1px solid rgba(120,220,255,.16);border-radius:18px;padding:32px;margin-bottom:1rem;min-height:220px;">
@@ -2017,6 +2192,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         <h3 style="margin:0 0 .35rem;color:#fff;font-size:1.2rem;font-weight:700;">${label}</h3>
         <p style="margin:0 0 .35rem;color:rgba(255,255,255,.55);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;">${category}${number ? ` · ${number}` : ""}</p>
         <p style="margin:0 0 1.4rem;color:rgba(255,255,255,.74);font-size:.9rem;line-height:1.65;">${description}</p>
+        <p style="color:#fff;font-size:.9rem;font-weight:800;letter-spacing:.02em;margin:0 0 1.25rem;">${buyLine}</p>
         <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
           <button id="assetRequestBtn" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#7c4dff,#00f0ff);color:#05070f;font-weight:800;border-radius:10px;border:none;font-size:.9rem;cursor:pointer;">${requestLabel}</button>
           <a id="assetSourceBtn" href="#single-icons" style="padding:.75rem 1.25rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;border:1px solid rgba(255,255,255,.18);">${sourceLabel}</a>
