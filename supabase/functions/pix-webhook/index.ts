@@ -179,13 +179,17 @@ async function processPayment(
     .eq("id", recordId);
 
   // ── Credit tokens on approval ──
+  // Uses credit_pix_payment_atomic so the credit and credited_at write
+  // happen in the same transaction. Without this, an error or timeout
+  // between the RPC and a separate UPDATE would let MP's webhook retry
+  // double-credit the same payment.
   if (newStatus === "approved" && tokensAmount > 0 && !record.credited_at) {
     const { data: creditResult, error: creditErr } = await supabase.rpc(
-      "credit_tokens_atomic",
+      "credit_pix_payment_atomic",
       {
+        p_pix_payment_id: recordId,
         p_user_id: userId,
         p_amount: tokensAmount,
-        p_type: "purchase",
         p_description: `Pix: ${productKey} (${tokensAmount} tokens)`,
         p_metadata: JSON.stringify({
           source: "mercadopago_pix",
@@ -198,17 +202,16 @@ async function processPayment(
 
     if (creditErr) {
       console.error(
-        `[pix-webhook] credit_tokens_atomic failed for ${userId}:`,
+        `[pix-webhook] credit_pix_payment_atomic failed for ${userId}:`,
         creditErr.message
       );
       return;
     }
 
-    // Mark as credited
-    await supabase
-      .from("pix_payments")
-      .update({ credited_at: new Date().toISOString() })
-      .eq("id", recordId);
+    if (creditResult && (creditResult as Record<string, unknown>).already_credited) {
+      console.log(`[pix-webhook] Pix payment ${recordId} already credited (concurrent retry) — skipping log`);
+      return;
+    }
 
     // Log purchase event (same format as Stripe)
     await supabase.from("purchase_events").insert({
@@ -227,7 +230,7 @@ async function processPayment(
     });
 
     console.log(
-      `[pix-webhook] Credited ${tokensAmount} tokens to ${userId} via Pix. New balance: ${creditResult?.balance}`
+      `[pix-webhook] Credited ${tokensAmount} tokens to ${userId} via Pix. New balance: ${(creditResult as Record<string, unknown>)?.balance}`
     );
   }
 
