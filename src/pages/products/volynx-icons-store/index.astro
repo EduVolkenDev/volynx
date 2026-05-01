@@ -76,6 +76,48 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       </div>
     </section>
 
+    <section class="gallery-section" id="gallery">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title" id="iconsGalleryTitle" data-i18n="icons.gallery_title">Icon Vault</h2>
+          <p class="pack-meta" id="iconsGalleryMeta"><span class="i18n-en">Browse all curated icons or open a pack below.</span><span class="i18n-pt">Navegue por todos os ícones curados ou abra um pack abaixo.</span></p>
+          <button class="pack-reset" id="packResetBtn" type="button" hidden><span class="i18n-en">Show all icons</span><span class="i18n-pt">Mostrar todos os ícones</span></button>
+          <div class="filters" id="vaultFilters">
+            <button class="filter-btn active" data-filter="all"><span class="i18n-en">All</span><span class="i18n-pt">Todos</span></button>
+            <button class="filter-btn" data-filter="neon">Neon</button>
+            <button class="filter-btn" data-filter="polygon">Polygon</button>
+            <button class="filter-btn" data-filter="hyper">Hyper</button>
+            <button class="filter-btn" data-filter="glass">Glass</button>
+            <button class="filter-btn" data-filter="iridescent">Iridescent</button>
+            <button class="filter-btn" data-filter="metal">Metal</button>
+            <button class="filter-btn" data-filter="vintage">Vintage</button>
+            <button class="filter-btn" data-filter="purple">Purple</button>
+            <button class="filter-btn" data-filter="soft"><span class="i18n-en">Soft Pastel</span><span class="i18n-pt">Pastel</span></button>
+            <button class="filter-btn" data-filter="daily"><span class="i18n-en">Day by Day</span><span class="i18n-pt">Dia a Dia</span></button>
+            <button class="filter-btn" data-filter="abstract">Abstract</button>
+          </div>
+          <div class="format-toggle" role="group" aria-label="Format">
+            <button class="format-btn active" data-format="all"><span class="i18n-en">Any format</span><span class="i18n-pt">Qualquer formato</span></button>
+            <button class="format-btn" data-format="webp">WEBP</button>
+            <button class="format-btn" data-format="png">PNG</button>
+          </div>
+        </div>
+
+        <div class="gallery-grid" id="galleryGrid">
+          <article class="soon-panel">
+            <p class="soon-kicker"><span class="i18n-en">Loading vault</span><span class="i18n-pt">Carregando o vault</span></p>
+            <h3><span class="i18n-en">Icon packs are loading.</span><span class="i18n-pt">Os packs de ícones estão carregando.</span></h3>
+            <p><span class="i18n-en">Open any pack to see the rest of its icons here, without leaving the store.</span><span class="i18n-pt">Abra qualquer pack pra ver o resto dos ícones aqui, sem sair da loja.</span></p>
+          </article>
+        </div>
+
+        <div class="load-more-container">
+          <button class="btn btn-secondary" id="loadMoreBtn" style="display:none;" data-i18n="icons.load_more">Load More</button>
+          <span class="load-more-count" id="loadMoreCount" aria-live="polite"></span>
+        </div>
+      </div>
+    </section>
+
     <section class="asset-showcase" id="asset-showcase">
       <div class="container">
         <div class="asset-showcase-head">
@@ -98,7 +140,38 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       </div>
     </section>
 
-    <!-- Featured Icons (inline SVG neon cards — premium showcase) -->
+    <section class="single-icons-section" id="single-icons">
+      <div class="container">
+        <div class="single-icons-head">
+          <div>
+            <p class="single-icons-kicker" data-i18n="icons.single_kicker">Single Icon Gallery</p>
+            <h2 class="single-icons-title" data-i18n="icons.single_title">Premium singles worth choosing one by one.</h2>
+            <p class="single-icons-desc" data-i18n="icons.single_desc">
+              A tighter selection of the strongest SVG and PNG icons, shown larger so each one can work as an icon, card asset, or hero detail.
+            </p>
+          </div>
+          <div class="single-format-tabs" role="tablist" aria-label="Single icon format">
+            <button type="button" class="single-format-btn active" data-single-format="all" data-i18n="icons.single_filter_all">All singles</button>
+            <button type="button" class="single-format-btn" data-single-format="webp" data-i18n="icons.single_filter_webp">WEBP</button>
+            <button type="button" class="single-format-btn" data-single-format="png" data-i18n="icons.single_filter_png">PNG</button>
+          </div>
+        </div>
+        <div class="single-icons-currency-row">
+          <span class="single-icons-currency-label" data-i18n="icons.currency_label">Currency</span>
+          <div class="vx-currency-bar" aria-label="Currency selector"></div>
+          <span class="single-icons-currency-note" data-i18n="icons.currency_note">BRL checkout supports PIX via Stripe.</span>
+        </div>
+
+        <div class="single-icons-grid" id="singleIconsGrid">
+          <article class="soon-panel">
+            <p class="soon-kicker"><span class="i18n-en">Loading singles</span><span class="i18n-pt">Carregando avulsos</span></p>
+            <h3><span class="i18n-en">Preparing the premium single-icon gallery.</span><span class="i18n-pt">Preparando a galeria premium de ícones avulsos.</span></h3>
+            <p><span class="i18n-en">The best PNG and SVG singles will appear here.</span><span class="i18n-pt">Os melhores avulsos PNG e SVG vão aparecer aqui.</span></p>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <section class="featured-section" id="featured">
       <div class="container">
         <div class="featured-shell">
@@ -883,75 +956,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       </div>
     </section>
 
-    <section class="single-icons-section" id="single-icons">
-      <div class="container">
-        <div class="single-icons-head">
-          <div>
-            <p class="single-icons-kicker" data-i18n="icons.single_kicker">Single Icon Gallery</p>
-            <h2 class="single-icons-title" data-i18n="icons.single_title">Premium singles worth choosing one by one.</h2>
-            <p class="single-icons-desc" data-i18n="icons.single_desc">
-              A tighter selection of the strongest SVG and PNG icons, shown larger so each one can work as an icon, card asset, or hero detail.
-            </p>
-          </div>
-          <div class="single-format-tabs" role="tablist" aria-label="Single icon format">
-            <button type="button" class="single-format-btn active" data-single-format="all" data-i18n="icons.single_filter_all">All singles</button>
-            <button type="button" class="single-format-btn" data-single-format="png" data-i18n="icons.single_filter_png">PNG</button>
-            <button type="button" class="single-format-btn" data-single-format="svg" data-i18n="icons.single_filter_svg">SVG</button>
-          </div>
-        </div>
-        <div class="single-icons-currency-row">
-          <span class="single-icons-currency-label" data-i18n="icons.currency_label">Currency</span>
-          <div class="vx-currency-bar" aria-label="Currency selector"></div>
-          <span class="single-icons-currency-note" data-i18n="icons.currency_note">BRL checkout supports PIX via Stripe.</span>
-        </div>
 
-        <div class="single-icons-grid" id="singleIconsGrid">
-          <article class="soon-panel">
-            <p class="soon-kicker"><span class="i18n-en">Loading singles</span><span class="i18n-pt">Carregando avulsos</span></p>
-            <h3><span class="i18n-en">Preparing the premium single-icon gallery.</span><span class="i18n-pt">Preparando a galeria premium de ícones avulsos.</span></h3>
-            <p><span class="i18n-en">The best PNG and SVG singles will appear here.</span><span class="i18n-pt">Os melhores avulsos PNG e SVG vão aparecer aqui.</span></p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- Gallery Section -->
-    <section class="gallery-section" id="gallery">
-      <div class="container">
-        <div class="section-header">
-          <h2 class="section-title" id="iconsGalleryTitle" data-i18n="icons.gallery_title">Icon Vault</h2>
-          <p class="pack-meta" id="iconsGalleryMeta"><span class="i18n-en">Browse all curated icons or open a pack below.</span><span class="i18n-pt">Navegue por todos os ícones curados ou abra um pack abaixo.</span></p>
-          <button class="pack-reset" id="packResetBtn" type="button" hidden><span class="i18n-en">Show all icons</span><span class="i18n-pt">Mostrar todos os ícones</span></button>
-          <div class="filters">
-            <button class="filter-btn active" data-filter="all"><span class="i18n-en">All</span><span class="i18n-pt">Todos</span></button>
-            <button class="filter-btn" data-filter="pink"><span class="i18n-en">Pink</span><span class="i18n-pt">Rosa</span></button>
-            <button class="filter-btn" data-filter="futuristic"><span class="i18n-en">Futuristic</span><span class="i18n-pt">Futurista</span></button>
-            <button class="filter-btn" data-filter="green"><span class="i18n-en">Green</span><span class="i18n-pt">Verde</span></button>
-            <button class="filter-btn" data-filter="simple"><span class="i18n-en">Simple</span><span class="i18n-pt">Simples</span></button>
-            <button class="filter-btn" data-filter="draw"><span class="i18n-en">Draw</span><span class="i18n-pt">Desenho</span></button>
-            <button class="filter-btn" data-filter="metal"><span class="i18n-en">Metal</span><span class="i18n-pt">Metal</span></button>
-            <button class="filter-btn" data-filter="blue"><span class="i18n-en">Blue</span><span class="i18n-pt">Azul</span></button>
-            <button class="filter-btn" data-filter="purple"><span class="i18n-en">Purple</span><span class="i18n-pt">Roxo</span></button>
-            <button class="filter-btn" data-filter="food"><span class="i18n-en">Food ⭐</span><span class="i18n-pt">Comida ⭐</span></button>
-          </div>
-        </div>
-
-        <div class="gallery-grid" id="galleryGrid">
-          <article class="soon-panel">
-            <p class="soon-kicker"><span class="i18n-en">Loading vault</span><span class="i18n-pt">Carregando o vault</span></p>
-            <h3><span class="i18n-en">Icon packs are loading.</span><span class="i18n-pt">Os packs de ícones estão carregando.</span></h3>
-            <p><span class="i18n-en">Open any pack to see the rest of its icons here, without leaving the store.</span><span class="i18n-pt">Abra qualquer pack pra ver o resto dos ícones aqui, sem sair da loja.</span></p>
-          </article>
-        </div>
-
-        <div class="load-more-container">
-          <button class="btn btn-secondary" id="loadMoreBtn" style="display:none;" data-i18n="icons.load_more">Load More</button>
-          <span class="load-more-count" id="loadMoreCount" aria-live="polite"></span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Collections Preview -->
     <section class="collections-preview" id="collections">
       <div class="container">
         <div class="section-header">
@@ -1577,11 +1582,11 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     }
 
     function getSingleIconItems() {
-      const png = getCuratedPngSingles();
-      const svg = assetSingles;
-      const merged = [...png, ...svg];
+      const png = getCuratedPngSingles();      // Curated PNG singles (Purple Icons)
+      const webp = assetSingles;               // Latest WEBP singles (asset-showcase)
+      const merged = [...png, ...webp];
       if (singleFormatFilter === "png") return png;
-      if (singleFormatFilter === "svg") return svg;
+      if (singleFormatFilter === "webp") return webp;
       return merged;
     }
 
@@ -1723,22 +1728,37 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     }
 
     // ===== CATEGORY CONFIG =====
+    // Each filter chip maps to one or more catalog `collection` names.
+    // null = "all" (no collection match needed).
     const CATEGORY_CONFIG = [
-      { key: "pink",       label: "Pink Icons",       color: "#f48fb1", glow: "rgba(244,143,177,0.2)" },
-      { key: "futuristic", label: "Futuristic Icons",  color: "#00f0ff", glow: "rgba(0,240,255,0.2)"   },
-      { key: "green",      label: "Green Icons",       color: "#66bb6a", glow: "rgba(102,187,106,0.2)" },
-      { key: "simple",     label: "Simple Icons",      color: "#e8eaf6", glow: "rgba(232,234,246,0.15)" },
-      { key: "draw",       label: "Draw Icons",        color: "#ffb74d", glow: "rgba(255,183,77,0.2)"  },
-      { key: "metal",      label: "Metal Icons",       color: "#90a4ae", glow: "rgba(144,164,174,0.2)" },
-      { key: "blue",       label: "Blue Icons",        color: "#4fc3f7", glow: "rgba(79,195,247,0.2)"  },
-      { key: "purple",     label: "Purple Icons",      color: "#b39ddb", glow: "rgba(179,157,219,0.2)" },
-      { key: "food",       label: "Food Icons",        color: "#ff8a65", glow: "rgba(255,138,101,0.2)"  },
+      { key: "neon",       label: "Neon Icons",        collections: ["Neon Icons"],                                           color: "#00f0ff", glow: "rgba(0,240,255,0.22)"   },
+      { key: "polygon",    label: "Polygon",            collections: ["Polygon"],                                              color: "#f97316", glow: "rgba(249,115,22,0.22)"  },
+      { key: "hyper",      label: "Hyper Icons",        collections: ["Hyper Icons"],                                          color: "#38bdf8", glow: "rgba(56,189,248,0.22)"  },
+      { key: "glass",      label: "Glass Icons",        collections: ["Glass Icons"],                                          color: "#a5f3fc", glow: "rgba(165,243,252,0.22)" },
+      { key: "iridescent", label: "Iridescent",         collections: ["Iridescent"],                                           color: "#f0abfc", glow: "rgba(240,171,252,0.22)" },
+      { key: "metal",      label: "Metal Chrome",       collections: ["Metal Chrome"],                                         color: "#cbd5e1", glow: "rgba(203,213,225,0.18)" },
+      { key: "vintage",    label: "Vintage",            collections: ["Vintage"],                                              color: "#d4a574", glow: "rgba(212,165,116,0.22)" },
+      { key: "purple",     label: "Purple Icons (PNG)", collections: ["Purple Icons"],                                         color: "#c084fc", glow: "rgba(192,132,252,0.22)" },
+      { key: "soft",       label: "Soft Pastel",        collections: ["Soft Blue","Soft Dark Blue","Soft Green","Soft Orange","Soft Red","Glow"], color: "#86efac", glow: "rgba(134,239,172,0.18)" },
+      { key: "daily",      label: "Day by Day",         collections: ["Day by Day"],                                           color: "#7dd3fc", glow: "rgba(125,211,252,0.22)" },
+      { key: "abstract",   label: "Abstract",           collections: ["Abstract"],                                             color: "#ff5ec4", glow: "rgba(255,94,196,0.22)"  },
     ];
 
+    let currentFormat: "all" | "webp" | "png" = "all";
+
+    function matchesFormat(i: any) {
+      if (currentFormat === "all") return true;
+      const ext = String(i?.path || "").split(".").pop()?.toLowerCase() || "";
+      return ext === currentFormat;
+    }
+
     function getFilteredIcons() {
-      if (currentCollection) return allIcons.filter(i => i.collection === currentCollection);
-      if (currentFilter === "all") return allIcons;
-      return allIcons.filter(i => i.category === currentFilter);
+      let pool = allIcons.filter(matchesFormat);
+      if (currentCollection) return pool.filter(i => i.collection === currentCollection);
+      if (currentFilter === "all") return pool;
+      const group = CATEGORY_CONFIG.find(c => c.key === currentFilter)?.collections;
+      if (!group || group.length === 0) return pool;
+      return pool.filter(i => group.includes(i.collection));
     }
 
     function updateGalleryHeading() {
@@ -2228,6 +2248,19 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
           btn.classList.add("active");
           currentCollection = null;
           currentFilter = btn.dataset.filter ?? "all";
+          visibleCount = initialPageSize();
+          updateGalleryHeading();
+          renderGallery();
+        });
+      });
+
+      // Format toggle (All / WEBP / PNG) — orthogonal to collection filter.
+      const formatBtns = document.querySelectorAll<HTMLButtonElement>(".format-btn");
+      formatBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          formatBtns.forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentFormat = (btn.dataset.format as "all" | "webp" | "png") || "all";
           visibleCount = initialPageSize();
           updateGalleryHeading();
           renderGallery();
