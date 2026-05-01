@@ -12,21 +12,45 @@ window.VxSectionEditor = (function () {
 
   function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-  // ── Section type metadata ──
+  // Detect active language for buyer-facing labels
+  function getLang() {
+    try {
+      var l = (localStorage.getItem('volynx_lang') || 'en').toLowerCase();
+      return l.startsWith('pt') ? 'pt' : 'en';
+    } catch (_) { return 'en'; }
+  }
+
+  // ── Section type metadata — bilingual EN/PT-BR ──
   var SECTION_META = {
-    hero:             { label: 'Hero',            icon: '🏠', desc: 'Main headline and call to action' },
-    logoCloud:        { label: 'Logo Cloud',      icon: '🏢', desc: 'Trusted-by company logos' },
-    metrics:          { label: 'Metrics',         icon: '📊', desc: 'Key numbers and stats' },
-    valueGrid:        { label: 'Value Grid',      icon: '✦',  desc: 'Feature cards in a grid' },
-    featureSplit:     { label: 'Feature List',    icon: '📋', desc: 'Features with optional CTA' },
-    pricing:          { label: 'Pricing',         icon: '💰', desc: 'Plan comparison cards' },
-    faq:              { label: 'FAQ',             icon: '❓', desc: 'Questions and answers' },
-    workflow:         { label: 'Process',         icon: '⚙️', desc: 'Step-by-step workflow' },
-    cta:              { label: 'Call to Action',  icon: '🎯', desc: 'Final conversion block' },
-    contactForm:      { label: 'Contact Form',   icon: '✉️', desc: 'Inline contact form' },
-    problemStatement: { label: 'Problem',         icon: '⚠️', desc: 'Pain points and challenges' },
-    scopeGrid:        { label: 'Scope',           icon: '📦', desc: 'Deliverables overview' },
-    testimonial:      { label: 'Testimonial',     icon: '💬', desc: 'Client quote' },
+    hero:             { label: { en: 'Hero',            pt: 'Hero (topo)' },        icon: '🏠', desc: { en: 'Main headline and call to action',          pt: 'Headline principal e CTA' } },
+    logoCloud:        { label: { en: 'Logo Cloud',      pt: 'Logos de clientes' },  icon: '🏢', desc: { en: 'Trusted-by company logos',                 pt: 'Logos de quem já confia em você' } },
+    metrics:          { label: { en: 'Metrics',         pt: 'Métricas' },           icon: '📊', desc: { en: 'Key numbers and stats',                    pt: 'Números e estatísticas-chave' } },
+    valueGrid:        { label: { en: 'Value Grid',      pt: 'Grid de valor' },      icon: '✦',  desc: { en: 'Feature cards in a grid',                  pt: 'Cards de features em grid' } },
+    featureSplit:     { label: { en: 'Feature List',    pt: 'Lista de features' },  icon: '📋', desc: { en: 'Features with optional CTA',               pt: 'Features com CTA opcional' } },
+    pricing:          { label: { en: 'Pricing',         pt: 'Preços' },             icon: '💰', desc: { en: 'Plan comparison cards',                    pt: 'Cards de comparação de planos' } },
+    faq:              { label: { en: 'FAQ',             pt: 'Perguntas frequentes' },icon: '❓',desc: { en: 'Questions and answers',                    pt: 'Perguntas e respostas' } },
+    workflow:         { label: { en: 'Process',         pt: 'Processo' },           icon: '⚙️', desc: { en: 'Step-by-step workflow',                    pt: 'Workflow passo a passo' } },
+    cta:              { label: { en: 'Call to Action',  pt: 'Call to Action' },     icon: '🎯', desc: { en: 'Final conversion block',                   pt: 'Bloco final de conversão' } },
+    contactForm:      { label: { en: 'Contact Form',    pt: 'Formulário de contato' },icon: '✉️',desc: { en: 'Inline contact form',                     pt: 'Formulário de contato inline' } },
+    problemStatement: { label: { en: 'Problem',         pt: 'Problema' },           icon: '⚠️', desc: { en: 'Pain points and challenges',               pt: 'Dores e desafios do público' } },
+    scopeGrid:        { label: { en: 'Scope',           pt: 'Escopo' },             icon: '📦', desc: { en: 'Deliverables overview',                    pt: 'Visão geral das entregas' } },
+    testimonial:      { label: { en: 'Testimonial',     pt: 'Depoimento' },         icon: '💬', desc: { en: 'Client quote',                             pt: 'Citação de cliente' } },
+  };
+
+  // UI strings used by the editor surface itself (intro, hints, action buttons)
+  var UI = {
+    en: {
+      intro_kicker: 'How to edit',
+      intro_title: 'Click any block below to edit its content.',
+      intro_help:  'Edit the copy inline, swap colors and assets, then hit Save above. Click Publish when ready to push it live.',
+      tap_hint:    'Tap to edit',
+    },
+    pt: {
+      intro_kicker: 'Como editar',
+      intro_title: 'Clique em qualquer bloco abaixo para editar o conteúdo.',
+      intro_help:  'Edite a copy inline, troque cores e assets, depois clique em Salvar acima. Clique em Publicar quando estiver pronto para colocar no ar.',
+      tap_hint:    'Toque para editar',
+    },
   };
 
   // ── Field Builders ──
@@ -265,6 +289,8 @@ window.VxSectionEditor = (function () {
     if (!container || !data) return;
     var sections = data.sections || [];
     var brand = data.brand || {};
+    var lang = getLang();
+    var t = UI[lang];
     var h = '';
 
     // Brand header
@@ -276,19 +302,35 @@ window.VxSectionEditor = (function () {
     h += '</div>';
     h += '</div>';
 
-    // Section list
-    sections.forEach(function (s, i) {
-      var meta = SECTION_META[s.type] || { label: s.type, icon: '📄', desc: '' };
-      var formFn = FORM_RENDERERS[s.type] || formGeneric;
+    // Intro / how-to-use — shows up once when a project loads. Without this,
+    // buyers landed on the section list and asked "what do I do with this?".
+    h += '<div class="se-intro">';
+    h += '<span class="se-intro__kicker">' + esc(t.intro_kicker) + '</span>';
+    h += '<strong class="se-intro__title">' + esc(t.intro_title) + '</strong>';
+    h += '<p class="se-intro__help">' + esc(t.intro_help) + '</p>';
+    h += '</div>';
 
-      h += '<div class="se-section" data-section-index="' + i + '">';
-      h += '<button class="se-section-header" type="button" data-toggle="' + i + '">';
-      h += '<span class="se-section-icon">' + meta.icon + '</span>';
-      h += '<span class="se-section-title">' + esc(meta.label) + '</span>';
-      h += '<span class="se-section-desc">' + esc(meta.desc) + '</span>';
-      h += '<span class="se-section-chevron">›</span>';
+    // Section list — first section open by default so the user immediately
+    // sees the editable form fields and the affordance becomes obvious.
+    sections.forEach(function (s, i) {
+      var rawMeta = SECTION_META[s.type] || { label: { en: s.type, pt: s.type }, icon: '📄', desc: { en: '', pt: '' } };
+      // Backward-compat: if label is a string (old data), normalize to {en,pt}
+      var label = (typeof rawMeta.label === 'string') ? rawMeta.label : (rawMeta.label[lang] || rawMeta.label.en || s.type);
+      var desc  = (typeof rawMeta.desc  === 'string') ? rawMeta.desc  : (rawMeta.desc[lang]  || rawMeta.desc.en  || '');
+      var formFn = FORM_RENDERERS[s.type] || formGeneric;
+      var isFirst = (i === 0);
+
+      h += '<div class="se-section' + (isFirst ? ' se-section--open' : '') + '" data-section-index="' + i + '">';
+      h += '<button class="se-section-header" type="button" data-toggle="' + i + '" aria-expanded="' + (isFirst ? 'true' : 'false') + '">';
+      h += '<span class="se-section-icon">' + rawMeta.icon + '</span>';
+      h += '<span class="se-section-titleblock">';
+      h += '<span class="se-section-title">' + esc(label) + '</span>';
+      h += '<span class="se-section-desc">' + esc(desc) + '</span>';
+      h += '</span>';
+      h += '<span class="se-section-edit-hint">' + esc(t.tap_hint) + '</span>';
+      h += '<span class="se-section-chevron" aria-hidden="true">▾</span>';
       h += '</button>';
-      h += '<div class="se-section-body" id="seBody_' + i + '" hidden>';
+      h += '<div class="se-section-body" id="seBody_' + i + '"' + (isFirst ? '' : ' hidden') + '>';
       h += formFn(s, i);
       h += '</div>';
       h += '</div>';
@@ -307,10 +349,12 @@ window.VxSectionEditor = (function () {
         // Close all
         container.querySelectorAll('.se-section-body').forEach(function (b) { b.hidden = true; });
         container.querySelectorAll('.se-section').forEach(function (s) { s.classList.remove('se-section--open'); });
+        container.querySelectorAll('.se-section-header').forEach(function (h) { h.setAttribute('aria-expanded', 'false'); });
         // Toggle
         if (!isOpen) {
           body.hidden = false;
           section.classList.add('se-section--open');
+          btn.setAttribute('aria-expanded', 'true');
         }
       });
     });
