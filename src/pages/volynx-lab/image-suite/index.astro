@@ -910,7 +910,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         // Check VxPlan cache first for instant result
         if (window.VxPlan) {
           const cached = window.VxPlan.getCached();
-          if (cached && window.VxPlan.canAccess(cached.plan, 'launch')) {
+          if (cached && cached.plan && window.VxPlan.isPaid(cached.plan)) {
             isPro = true;
           }
         }
@@ -1004,10 +1004,25 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         });
         if (!perm.allowed) {
           const isFreeUser = window.VxPlan ? !window.VxPlan.isPaid(perm.plan) : (perm.plan === 'free');
-          const message = tool === "bg-remove"
-            ? t("suite.bg_upgrade_alert", "Remove BG is available on paid plans. Upgrade to unlock it.")
-            : `Daily limit reached (${perm.limit}). ${isFreeUser ? 'Upgrade to Pro for more.' : 'Try again tomorrow.'}`;
-          alert(message);
+          
+          // Show upgrade/purchase options with VX option
+          if (tool === "bg-remove") {
+            const confirmMsg = t("suite.bg_upgrade_alert", "Remove BG is available on paid plans. Upgrade to unlock it.");
+            const goPricing = confirm(confirmMsg + "\n\nClick OK to see pricing options.");
+            if (goPricing) window.location.href = "/pricing/";
+            return;
+          }
+          
+          // For daily limit - offer VX purchase or upgrade
+          const limitMsg = `Daily limit reached (${perm.limit}).`;
+          const upgradeMsg = isFreeUser 
+            ? "\n\nYou can:\n• Upgrade to Pro for unlimited access\n• Buy VX tokens for immediate use\n\nClick OK to see options."
+            : "\n\nYou've used your daily allowance. Try again tomorrow or add VX tokens for immediate access.\n\nClick OK to add VX.";
+          
+          const showOptions = confirm(limitMsg + upgradeMsg);
+          if (showOptions) {
+            window.location.href = isFreeUser ? "/pricing/" : "/recarregar";
+          }
           return;
         }
       }
