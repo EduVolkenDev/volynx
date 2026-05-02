@@ -93,8 +93,8 @@ import { ROUTES } from "../../data/routes";
       <div class="shell grid-3 svc-plans-grid">
         <article class="panel svc-plan-card svc-plan-card--process">
           <div class="svc-card-top">
-            <div class="svc-card-icon" aria-hidden="true">
-              <img src="/assets/contacticon.webp" alt="" loading="lazy" />
+            <div class="svc-card-icon svc-card-icon--process" aria-hidden="true">
+              <img src="/assets/discoverycall1.png" alt="" loading="lazy" decoding="async" />
             </div>
             <span class="label" data-i18n="svc2.step1_num">01</span>
           </div>
@@ -103,8 +103,8 @@ import { ROUTES } from "../../data/routes";
         </article>
         <article class="panel svc-plan-card svc-plan-card--process">
           <div class="svc-card-top">
-            <div class="svc-card-icon" aria-hidden="true">
-              <img src="/assets/smartcatalogue.webp" alt="" loading="lazy" />
+            <div class="svc-card-icon svc-card-icon--process" aria-hidden="true">
+              <img src="/assets/briefanalysis1.png" alt="" loading="lazy" decoding="async" />
             </div>
             <span class="label" data-i18n="svc2.step2_num">02</span>
           </div>
@@ -113,8 +113,8 @@ import { ROUTES } from "../../data/routes";
         </article>
         <article class="panel svc-plan-card svc-plan-card--process">
           <div class="svc-card-top">
-            <div class="svc-card-icon" aria-hidden="true">
-              <img src="/assets/queue.webp" alt="" loading="lazy" />
+            <div class="svc-card-icon svc-card-icon--process" aria-hidden="true">
+              <img src="/assets/quoteandtimeline1.png" alt="" loading="lazy" decoding="async" />
             </div>
             <span class="label" data-i18n="svc2.step3_num">03</span>
           </div>
@@ -123,8 +123,8 @@ import { ROUTES } from "../../data/routes";
         </article>
         <article class="panel svc-plan-card svc-plan-card--process">
           <div class="svc-card-top">
-            <div class="svc-card-icon" aria-hidden="true">
-              <img src="/assets/quality.webp" alt="" loading="lazy" />
+            <div class="svc-card-icon svc-card-icon--process" aria-hidden="true">
+              <img src="/assets/approval1.png" alt="" loading="lazy" decoding="async" />
             </div>
             <span class="label" data-i18n="svc2.step4_num">04</span>
           </div>
@@ -133,8 +133,8 @@ import { ROUTES } from "../../data/routes";
         </article>
         <article class="panel svc-plan-card svc-plan-card--process">
           <div class="svc-card-top">
-            <div class="svc-card-icon" aria-hidden="true">
-              <img src="/assets/card-engineering.webp" alt="" loading="lazy" />
+            <div class="svc-card-icon svc-card-icon--process" aria-hidden="true">
+              <img src="/assets/buildanditeration1.png" alt="" loading="lazy" decoding="async" />
             </div>
             <span class="label" data-i18n="svc2.step5_num">05</span>
           </div>
@@ -143,8 +143,8 @@ import { ROUTES } from "../../data/routes";
         </article>
         <article class="panel svc-plan-card svc-plan-card--process">
           <div class="svc-card-top">
-            <div class="svc-card-icon" aria-hidden="true">
-              <img src="/assets/cloud.webp" alt="" loading="lazy" />
+            <div class="svc-card-icon svc-card-icon--process" aria-hidden="true">
+              <img src="/assets/deliveryandhandoff1.png" alt="" loading="lazy" decoding="async" />
             </div>
             <span class="label" data-i18n="svc2.step6_num">06</span>
           </div>
@@ -474,6 +474,34 @@ import { ROUTES } from "../../data/routes";
     object-fit: contain;
     filter: drop-shadow(0 14px 28px rgba(0,0,0,.28));
   }
+  .svc-plan-card--process .svc-card-top {
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .svc-card-icon--process {
+    width: clamp(118px, 12vw, 154px);
+    height: clamp(118px, 12vw, 154px);
+    min-width: clamp(118px, 12vw, 154px);
+    padding: 0;
+    border-radius: 26px;
+    background:
+      radial-gradient(circle at 50% 18%, rgba(255,255,255,.16), transparent 34%),
+      linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.018));
+    border-color: rgba(255,255,255,.075);
+    box-shadow: none;
+    overflow: visible;
+  }
+  .svc-card-icon--process img {
+    width: 112%;
+    height: 112%;
+    margin: -6%;
+    object-fit: contain;
+    filter: drop-shadow(0 22px 38px rgba(0,0,0,.34));
+  }
+  .svc-plan-card--process:hover .svc-card-icon--process img {
+    transform: translateY(-4px) scale(1.04);
+    filter: drop-shadow(0 28px 48px rgba(0,0,0,.46));
+  }
 
   /* Add-ons */
   .svc-addon {
@@ -631,7 +659,6 @@ import { ROUTES } from "../../data/routes";
     background: rgba(37,211,102,.12) !important;
     border-color: rgba(37,211,102,.5) !important;
   }
-  .svc-plan-card--process:hover .svc-card-icon img,
   .svc-addon:hover .svc-card-icon img,
   .svc-showcase-card:hover .svc-card-showcase img {
     transform: translateY(-4px) scale(1.035);
@@ -665,6 +692,12 @@ import { ROUTES } from "../../data/routes";
       height: 64px;
       min-width: 64px;
       border-radius: 18px;
+    }
+    .svc-card-icon--process {
+      width: 130px;
+      height: 130px;
+      min-width: 130px;
+      border-radius: 24px;
     }
     .svc-card-showcase {
       min-height: 128px;
