@@ -51,12 +51,12 @@ import { ROUTES } from "../../data/routes";
   <FlagshipFooter />
 
   <script is:inline>
-    // Session-expired kicker — shown when caller redirected here with ?next=
-    // (e.g., checkout/builder hit a 401 from a stale token and bounced).
+    // Session-expired kicker — only shown when there's an actual expired session redirect
     (function () {
       try {
         const params = new URLSearchParams(window.location.search);
-        if (params.has("next")) {
+        // Only show if explicitly redirected with ?next= or ?session_expired=1
+        if (params.has("next") || params.get("session_expired") === "1") {
           const el = document.getElementById("sessionExpiredKicker");
           if (el) el.hidden = false;
         }
