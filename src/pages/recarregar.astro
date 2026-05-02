@@ -61,6 +61,8 @@ const t = {
     trustNoExpiry: '✓ VX nunca expira',
     footerNote: 'Todos os packs incluem Power User badge quando você acumula 100+ VX. Um único saldo funciona em Builder, Daily, CVitae e PropertyFlow.',
     from: 'Era',
+    currencyLabel: 'Moeda',
+    currencyHint: 'Escolha a moeda para cartão. Pix fica em BRL.',
   },
   en: {
     pill: 'Add VX with bonus',
@@ -79,6 +81,8 @@ const t = {
     trustNoExpiry: '✓ VX never expires',
     footerNote: 'Every pack includes a Power User badge when you reach 100+ VX. Single balance works across Builder, Daily, CVitae and PropertyFlow.',
     from: 'Was',
+    currencyLabel: 'Currency',
+    currencyHint: 'Choose card currency. Pix stays in BRL.',
   }
 };
 const L = t[lang];
@@ -114,6 +118,28 @@ const L = t[lang];
       </div>
     </section>
 
+    <section class="shell rec-currency-shell" aria-label={L.currencyLabel}>
+      <div class="rec-currency-bar">
+        <div class="rec-currency-copy">
+          <span class="rec-currency-label">{L.currencyLabel}</span>
+          <span class="rec-currency-hint">{L.currencyHint}</span>
+        </div>
+        <div class="rec-currency-pills">
+          {(['BRL', 'GBP', 'EUR'] as const).map((c) => (
+            <button
+              type="button"
+              class={`rec-currency-pill ${c === currency ? 'rec-currency-pill--active' : ''}`}
+              data-rec-currency={c}
+              aria-pressed={c === currency ? 'true' : 'false'}
+            >
+              <span>{c === 'GBP' ? '£' : c === 'EUR' ? '€' : 'R$'}</span>
+              <strong>{c}</strong>
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+
     <section class="shell rec-packs">
       {packs.map((pack, i) => (
         <article class={`rec-card${pack.featured ? ' rec-card--featured' : ''}`} data-pack-id={`tokens_${pack.id}`}>
@@ -125,18 +151,36 @@ const L = t[lang];
               <p class="rec-card-desc">{pack.desc[lang]}</p>
             </div>
             <div class="rec-card-price">
-              {pack.priceOriginal && <span class="rec-card-price-original">{L.from} {pack.priceOriginal[currency]}</span>}
-              <div class="rec-card-price-current">{getPackPrice(pack.id)}</div>
+              {pack.priceOriginal && (
+                <span
+                  class="rec-card-price-original"
+                  data-rec-price-original
+                  data-price-gbp={pack.priceOriginal.GBP}
+                  data-price-eur={pack.priceOriginal.EUR}
+                  data-price-brl={pack.priceOriginal.BRL}
+                >
+                  {L.from} {pack.priceOriginal[currency]}
+                </span>
+              )}
+              <div
+                class="rec-card-price-current"
+                data-rec-price
+                data-price-gbp={tokenPackById[pack.id]?.price.GBP}
+                data-price-eur={tokenPackById[pack.id]?.price.EUR}
+                data-price-brl={tokenPackById[pack.id]?.price.BRL}
+              >
+                {getPackPrice(pack.id)}
+              </div>
               {pack.bonus[lang] && <span class="rec-card-bonus">🎁 {pack.bonus[lang]}</span>}
             </div>
           </div>
 
-          <div class="rec-card-actions">
-            <button class="rec-btn rec-btn--pix" data-buy-pix={`tokens_${pack.id}_brl`} type="button">
+          <div class={`rec-card-actions ${currency !== 'BRL' ? 'rec-card-actions--single' : ''}`}>
+            <button class={`rec-btn rec-btn--pix ${currency !== 'BRL' ? 'rec-btn--hidden' : ''}`} data-buy-pix={`tokens_${pack.id}_brl`} type="button">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M17.7 6.3c-1.2-1.2-2.8-1.8-4.5-1.8s-3.3.6-4.5 1.8L5.4 9.6l2.1 2.1 3.3-3.3c.6-.6 1.4-.9 2.4-.9s1.8.3 2.4.9l3.3 3.3 2.1-2.1-3.3-3.3z" fill="currentColor"/><path d="M6.3 17.7c1.2 1.2 2.8 1.8 4.5 1.8s3.3-.6 4.5-1.8l3.3-3.3-2.1-2.1-3.3 3.3c-.6.6-1.4.9-2.4.9s-1.8-.3-2.4-.9l-3.3-3.3-2.1 2.1 3.3 3.3z" fill="currentColor"/></svg>
               {L.buyPix}
             </button>
-            <button class="rec-btn rec-btn--card" data-buy-card={`tokens_${pack.id}_${currency.toLowerCase()}`} type="button">
+            <button class="rec-btn rec-btn--card" data-buy-card-base={`tokens_${pack.id}`} data-buy-card={`tokens_${pack.id}_${currency.toLowerCase()}`} type="button">
               {L.buyCard}
             </button>
           </div>
@@ -181,6 +225,72 @@ const L = t[lang];
       var token = localStorage.getItem('volynx_access_token') || '';
       var cfg = null;
       var checkoutLoadingLabel = (localStorage.getItem('volynx_lang') === 'en' ? 'Opening checkout…' : 'Abrindo checkout…');
+      var validCurrencies = ['BRL', 'GBP', 'EUR'];
+
+      function normalizeCurrency(value) {
+        var code = String(value || 'BRL').toUpperCase();
+        return validCurrencies.indexOf(code) !== -1 ? code : 'BRL';
+      }
+
+      function currentCurrency() {
+        var fromUrl = new URLSearchParams(window.location.search).get('currency');
+        var fromStorage = '';
+        try { fromStorage = localStorage.getItem('volynx_currency') || ''; } catch {}
+        return normalizeCurrency(fromUrl || fromStorage || 'BRL');
+      }
+
+      function loginHref() {
+        return '/login/?next=' + encodeURIComponent('/recarregar/?currency=' + currentCurrency());
+      }
+
+      function priceFor(el, code) {
+        return el.getAttribute('data-price-' + code.toLowerCase()) || '';
+      }
+
+      function applyCurrency(code) {
+        var target = normalizeCurrency(code);
+        try { localStorage.setItem('volynx_currency', target); } catch {}
+
+        document.querySelectorAll('[data-rec-currency]').forEach(function(btn) {
+          var active = btn.getAttribute('data-rec-currency') === target;
+          btn.classList.toggle('rec-currency-pill--active', active);
+          btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+
+        document.querySelectorAll('[data-rec-price]').forEach(function(el) {
+          var price = priceFor(el, target);
+          if (price) el.textContent = price;
+        });
+        document.querySelectorAll('[data-rec-price-original]').forEach(function(el) {
+          var price = priceFor(el, target);
+          if (price) {
+            var prefix = el.textContent.trim().split(/\s+/)[0] || '';
+            el.textContent = prefix + ' ' + price;
+          }
+        });
+        document.querySelectorAll('[data-buy-card-base]').forEach(function(btn) {
+          var base = btn.getAttribute('data-buy-card-base');
+          if (base) btn.setAttribute('data-buy-card', base + '_' + target.toLowerCase());
+        });
+        document.querySelectorAll('.rec-card-actions').forEach(function(actions) {
+          actions.classList.toggle('rec-card-actions--single', target !== 'BRL');
+        });
+        document.querySelectorAll('[data-buy-pix]').forEach(function(btn) {
+          btn.classList.toggle('rec-btn--hidden', target !== 'BRL');
+        });
+
+        var url = new URL(window.location.href);
+        url.searchParams.set('currency', target);
+        history.replaceState(null, '', url.toString());
+      }
+
+      applyCurrency(currentCurrency());
+
+      document.querySelectorAll('[data-rec-currency]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          applyCurrency(btn.getAttribute('data-rec-currency') || 'BRL');
+        });
+      });
 
       // Load config
       fetch('/config.json', { cache: 'no-store' }).then(function(r) { return r.json(); }).then(function(c) { cfg = c; }).catch(function(){});
@@ -189,7 +299,7 @@ const L = t[lang];
       document.querySelectorAll('[data-buy-pix]').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
           e.preventDefault();
-          if (!token) { window.location.href = '/login/?next=/recarregar/'; return; }
+          if (!token) { window.location.href = loginHref(); return; }
           var lookup = btn.getAttribute('data-buy-pix');
           if (!lookup || !window.VxPix) return;
           window.VxPix.checkout(lookup, {
@@ -203,7 +313,7 @@ const L = t[lang];
       document.querySelectorAll('[data-buy-card]').forEach(function(btn) {
         btn.addEventListener('click', async function(e) {
           e.preventDefault();
-          if (!token) { window.location.href = '/login/?next=/recarregar/'; return; }
+          if (!token) { window.location.href = loginHref(); return; }
           if (!cfg) cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r){return r.json();});
           var apiBase = (cfg.functionsUrl || '').replace(/\/$/, '');
           if (!apiBase) return;
@@ -338,6 +448,87 @@ const L = t[lang];
       background: rgba(45, 212, 191, 0.1);
       border-color: rgba(45, 212, 191, 0.35);
       color: #5eead4;
+    }
+    .rec-currency-shell {
+      max-width: 760px;
+      padding: 0 20px;
+      margin-top: -8px;
+    }
+    .rec-currency-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.08);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(45,212,191,.16), transparent 34%),
+        rgba(255,255,255,.035);
+      box-shadow: 0 18px 42px rgba(0,0,0,.24);
+    }
+    .rec-currency-copy {
+      display: grid;
+      gap: 3px;
+      text-align: left;
+    }
+    .rec-currency-label {
+      color: #fff;
+      font-size: .84rem;
+      font-weight: 850;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .rec-currency-hint {
+      color: rgba(209, 215, 230, .55);
+      font-size: .78rem;
+      line-height: 1.35;
+    }
+    .rec-currency-pills {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      min-width: min(360px, 48vw);
+    }
+    .rec-currency-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 42px;
+      padding: 9px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(255,255,255,.045);
+      color: rgba(255,255,255,.72);
+      cursor: pointer;
+      font: inherit;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease, color .18s ease;
+    }
+    .rec-currency-pill:hover {
+      transform: translateY(-1px);
+      border-color: rgba(45,212,191,.35);
+      background: rgba(45,212,191,.08);
+      color: #fff;
+    }
+    .rec-currency-pill span {
+      display: grid;
+      place-items: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      font-weight: 900;
+    }
+    .rec-currency-pill strong {
+      font-size: .8rem;
+      letter-spacing: .05em;
+    }
+    .rec-currency-pill--active {
+      border-color: rgba(45,212,191,.55);
+      background: linear-gradient(135deg, rgba(45,212,191,.22), rgba(34,211,238,.12));
+      color: #fff;
+      box-shadow: 0 10px 28px rgba(45,212,191,.13);
     }
     .rec-hero-visual {
       display: none;
@@ -479,7 +670,9 @@ const L = t[lang];
     }
     @media (min-width: 540px) {
       .rec-card-actions { grid-template-columns: 1fr 1fr; }
+      .rec-card-actions--single { grid-template-columns: 1fr; }
     }
+    .rec-btn--hidden { display: none; }
 
     .rec-btn {
       display: inline-flex;
@@ -582,6 +775,23 @@ const L = t[lang];
         justify-content: flex-start;
       }
       .rec-hero-visual { display: grid; }
+    }
+    @media (max-width: 680px) {
+      .rec-currency-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .rec-currency-copy {
+        text-align: center;
+      }
+      .rec-currency-pills {
+        min-width: 0;
+        width: 100%;
+      }
+      .rec-currency-pill {
+        padding-left: 8px;
+        padding-right: 8px;
+      }
     }
   </style>
 </FlagshipLayout>

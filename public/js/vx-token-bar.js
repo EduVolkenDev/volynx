@@ -3,7 +3,7 @@
  * Animated token progress bar with color transitions.
  *
  * Usage:
- *   <div data-vx-token-bar data-max="100"></div>
+ *   <div data-vx-token-bar data-max="200"></div>
  *   <script src="/js/vx-token-bar.js"></script>
  *
  * Colors shift: green (>50%) → yellow (20-50%) → red (<20%)
@@ -12,6 +12,7 @@
 (function () {
   'use strict';
 
+  var DEFAULT_PACK_REFERENCE = 200;
   var bars = [];
 
   function colorForPct(pct) {
@@ -22,7 +23,7 @@
   }
 
   function init(el) {
-    var max = parseFloat(el.getAttribute('data-max')) || 100;
+    var max = parseFloat(el.getAttribute('data-max')) || DEFAULT_PACK_REFERENCE;
 
     if (!el.querySelector('.vx-tb__track')) {
       el.innerHTML =
@@ -51,6 +52,37 @@
     bars.push({ el: el, max: max });
   }
 
+  function currentLang() {
+    return localStorage.getItem('volynx_lang') || document.documentElement.lang || 'en';
+  }
+
+  function formatNumber(value, lang) {
+    var n = Number(value);
+    if (!Number.isFinite(n)) return String(value);
+    return n.toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-GB', { maximumFractionDigits: 2 });
+  }
+
+  function labelFor(el, lang) {
+    var localized = el.getAttribute(lang === 'pt' ? 'data-label-pt' : 'data-label-en');
+    if (localized) return localized;
+    var legacy = el.getAttribute('data-label');
+    if (legacy) return legacy;
+    return lang === 'pt' ? 'Saldo VX' : 'VX balance';
+  }
+
+  function countFor(value, max, lang) {
+    var balance = formatNumber(value, lang);
+    var reference = formatNumber(max, lang);
+    if (Number(value) > Number(max)) {
+      return lang === 'pt'
+        ? balance + ' VX · acima do pack ' + reference
+        : balance + ' VX · above ' + reference + ' pack';
+    }
+    return lang === 'pt'
+      ? balance + ' VX · referência ' + reference
+      : balance + ' VX · ' + reference + ' pack ref';
+  }
+
   function update(bar, value) {
     var pct = Math.max(0, Math.min(100, (value / bar.max) * 100));
     var c = colorForPct(pct);
@@ -64,10 +96,10 @@
       fill.style.background = 'linear-gradient(90deg, ' + c.fill + ', ' + c.fill + 'dd)';
       fill.style.boxShadow = '0 0 16px ' + c.glow;
     }
-    if (count) count.textContent = value + ' / ' + bar.max;
+    var lang = currentLang();
+    if (count) count.textContent = countFor(value, bar.max, lang);
     if (label) {
-      var lang = localStorage.getItem('volynx_lang') || 'en';
-      label.textContent = bar.el.getAttribute('data-label') || (lang === 'pt' ? 'Saldo de tokens' : 'Token balance');
+      label.textContent = labelFor(bar.el, lang);
     }
   }
 

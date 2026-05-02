@@ -49,6 +49,7 @@ type PropertyFlowOffer = {
   badge?: Record<Locale, string>;
   name: Record<Locale, string>;
   description: Record<Locale, string>;
+  image?: string;
   price: MoneyMap;
   billing: Record<Locale, string>;
   cta: Record<Locale, string>;
@@ -306,6 +307,7 @@ export const sitePricing = {
         pt: 'Catálogo premium com código-fonte completo para lançar a presença imobiliária sem assinatura recorrente.',
         en: 'Premium property catalogue with full source code for launching a real-estate presence without recurring fees.'
       },
+      image: '/assets/flow-starter.webp',
       price: { GBP: '£187', EUR: '€217', BRL: 'R$1.290' },
       billing: { pt: 'pagamento único · 3 templates', en: 'one-time · 3 templates' },
       cta: { pt: 'Ver PropertyFlow', en: 'View PropertyFlow' },
@@ -328,6 +330,7 @@ export const sitePricing = {
         pt: 'Versão para operação real com Supabase, admin, captura de enquiries e licença de entrega para 1 cliente.',
         en: 'Operating tier with Supabase, admin, enquiry capture and a delivery license for 1 client.'
       },
+      image: '/assets/flow-professional.webp',
       price: { GBP: '£447', EUR: '€519', BRL: 'R$3.090' },
       billing: { pt: 'pagamento único · 6 templates', en: 'one-time · 6 templates' },
       cta: { pt: 'Ver PropertyFlow', en: 'View PropertyFlow' },
@@ -348,6 +351,7 @@ export const sitePricing = {
         pt: 'Pacote para revenda, multi-tenant, analytics avançado e remoção total da marca VOLYNX.',
         en: 'Resale-ready package with multi-tenant mode, advanced analytics and full VOLYNX branding removal.'
       },
+      image: '/assets/flow-whitelabel.webp',
       price: { GBP: '£897', EUR: '€1.039', BRL: 'R$6.190' },
       billing: { pt: 'pagamento único · 15 templates', en: 'one-time · 15 templates' },
       cta: { pt: 'Ver PropertyFlow', en: 'View PropertyFlow' },
@@ -465,6 +469,7 @@ export const sitePricing = {
       id: 'pf_starter',
       name: { pt: 'PropertyFlow Starter', en: 'PropertyFlow Starter' },
       description: { pt: '3 grids, código-fonte React, catálogo + filtros, bilíngue, design responsivo.', en: '3 grids, full React source, catalogue + filters, bilingual, responsive design.' },
+      image: '/assets/flow-starter.webp',
       price: { GBP: '£187', EUR: '€219', BRL: 'R$1.290' },
       billing: { pt: 'pagamento único', en: 'one-time' },
       cta: { pt: 'Comprar Starter', en: 'Get Starter' },
@@ -480,6 +485,7 @@ export const sitePricing = {
       featured: true,
       name: { pt: 'PropertyFlow Professional', en: 'PropertyFlow Professional' },
       description: { pt: 'Tudo do Starter, mais 6 templates, integração Supabase, painel admin, captura de leads.', en: 'Everything in Starter, plus 6 templates, Supabase backend, admin dashboard, lead capture.' },
+      image: '/assets/flow-professional.webp',
       price: { GBP: '£447', EUR: '€519', BRL: 'R$3.090' },
       billing: { pt: 'pagamento único', en: 'one-time' },
       cta: { pt: 'Comprar Professional', en: 'Get Professional' },
@@ -493,6 +499,7 @@ export const sitePricing = {
       id: 'pf_white_label',
       name: { pt: 'PropertyFlow White-Label', en: 'PropertyFlow White-Label' },
       description: { pt: '15 templates, branding kit, onboarding prioritário, migração de dados, canal dedicado.', en: '15 templates, branding starter kit, priority onboarding, data migration, dedicated support.' },
+      image: '/assets/flow-whitelabel.webp',
       price: { GBP: '£897', EUR: '€1.039', BRL: 'R$6.190' },
       billing: { pt: 'pagamento único', en: 'one-time' },
       cta: { pt: 'Comprar White-Label', en: 'Get White-Label' },

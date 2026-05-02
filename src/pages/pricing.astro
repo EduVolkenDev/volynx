@@ -310,7 +310,12 @@ const pricingAssistItems = [
       </div>
       <div class="shell pricing-grid pricing-grid--plans" style="max-width:1100px;">
         {sitePricing.propertyFlowPackages.map((plan) => (
-          <article class={`pricing-card ${plan.featured ? 'pricing-card--featured' : ''}`}>
+          <article class={`pricing-card pricing-card--propertyflow ${plan.featured ? 'pricing-card--featured' : ''}`} data-plan={plan.id}>
+            {plan.image && (
+              <div class="pf-card-art" aria-hidden="true">
+                <img src={plan.image} alt="" loading="lazy" decoding="async" />
+              </div>
+            )}
             <div class="pricing-card__head">
               <div>
                 {plan.badge && <span class="pricing-pill"><span class="i18n-en">{plan.badge.en}</span><span class="i18n-pt">{plan.badge.pt}</span></span>}
@@ -681,6 +686,187 @@ const pricingAssistItems = [
       color: rgba(255,255,255,.52);
       font-size: 12px;
       line-height: 1.55;
+    }
+    .pricing-card--propertyflow {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      padding: 24px;
+      border-radius: 26px;
+      border: 1px solid rgba(255,255,255,.08);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(214,179,106,.14), transparent 34%),
+        linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025));
+      box-shadow: 0 28px 72px rgba(0,0,0,.24);
+      overflow: hidden;
+      isolation: isolate;
+      transition: transform .28s ease, border-color .28s ease, box-shadow .28s ease;
+    }
+    .pricing-card--propertyflow::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(135deg, rgba(255,255,255,.08), transparent 34%, rgba(109,94,252,.08));
+      opacity: .52;
+      pointer-events: none;
+    }
+    .pricing-card--propertyflow:hover {
+      transform: translateY(-6px);
+      border-color: rgba(214,179,106,.24);
+      box-shadow: 0 36px 90px rgba(0,0,0,.34), 0 0 0 1px rgba(214,179,106,.08);
+    }
+    .pricing-card--propertyflow.pricing-card--featured {
+      border-color: rgba(214,179,106,.34);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(214,179,106,.2), transparent 36%),
+        linear-gradient(180deg, rgba(214,179,106,.09), rgba(255,255,255,.025));
+    }
+    .pf-card-art {
+      display: grid;
+      place-items: center;
+      min-height: 166px;
+      margin: -6px -6px 16px;
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(255,255,255,.14), transparent 34%),
+        linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.015));
+      border: 1px solid rgba(255,255,255,.07);
+      overflow: hidden;
+    }
+    .pf-card-art img {
+      width: min(220px, 88%);
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 22px 38px rgba(0,0,0,.42));
+      transition: transform .32s ease, filter .32s ease;
+    }
+    .pricing-card--propertyflow:hover .pf-card-art img {
+      transform: translateY(-4px) scale(1.05);
+      filter: drop-shadow(0 28px 48px rgba(0,0,0,.5));
+    }
+    .pricing-card--propertyflow .pricing-card__head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .pricing-card--propertyflow .pricing-pill {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(214,179,106,.14);
+      border: 1px solid rgba(214,179,106,.32);
+      color: #fff2c6;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .pricing-card--propertyflow .pricing-card__name {
+      margin: 0 0 8px;
+      color: #fff;
+      font-size: 1.34rem;
+      letter-spacing: -.02em;
+    }
+    .pricing-card--propertyflow .pricing-card__desc {
+      margin: 0;
+      color: rgba(255,255,255,.58);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .pricing-card--propertyflow .pricing-card__price-block {
+      min-width: 110px;
+      max-width: 150px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .pricing-card--propertyflow .pricing-card__price {
+      display: block;
+      color: #fff;
+      font-size: clamp(1.65rem, 3vw, 2rem);
+      font-weight: 900;
+      letter-spacing: -.05em;
+      line-height: 1;
+      word-break: break-word;
+    }
+    .pricing-card--propertyflow .pricing-card__billing {
+      display: block;
+      margin-top: 6px;
+      color: rgba(255,255,255,.46);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .pricing-card--propertyflow .pricing-card__features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 20px;
+      flex: 1;
+      text-align: left;
+    }
+    .pricing-card--propertyflow .pricing-card__features li {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      color: rgba(255,255,255,.74);
+      font-size: 14px;
+    }
+    .pricing-card--propertyflow .pricing-card__features li::before {
+      content: "✓ ";
+      color: #34D399;
+      font-weight: 800;
+    }
+    .pricing-card--propertyflow .pricing-card__cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.045);
+      color: rgba(255,255,255,.78);
+      text-decoration: none;
+      font-weight: 700;
+      transition: background .2s ease, border-color .2s ease, color .2s ease;
+    }
+    .pricing-card--propertyflow .pricing-card__cta:hover {
+      background: rgba(255,255,255,.09);
+      border-color: rgba(255,255,255,.2);
+      color: #fff;
+    }
+    .pricing-card--propertyflow .pricing-card__cta--primary {
+      background: rgba(214,179,106,.18);
+      border-color: rgba(214,179,106,.38);
+      color: #fff2c6;
+    }
+    .pricing-card--propertyflow .pricing-card__cta--primary:hover {
+      background: rgba(214,179,106,.26);
+      border-color: rgba(214,179,106,.52);
+    }
+    @media (max-width: 767px) {
+      .pricing-card--propertyflow {
+        padding: 22px;
+        text-align: center;
+      }
+      .pf-card-art {
+        min-height: 150px;
+        margin-bottom: 14px;
+      }
+      .pf-card-art img {
+        width: min(200px, 86%);
+      }
+      .pricing-card--propertyflow .pricing-card__head {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      .pricing-card--propertyflow .pricing-card__price-block {
+        text-align: center;
+        max-width: none;
+      }
     }
 
     /* Hero subcopy */
