@@ -1,17 +1,19 @@
 ---
+type AssistText = string | { en: string; pt: string };
+
 interface AssistItem {
   href: string;
-  label: string;
-  title: string;
-  copy: string;
+  label: AssistText;
+  title: AssistText;
+  copy: AssistText;
   emphasized?: boolean;
   iconSrc?: string;
 }
 
 interface Props {
-  eyebrow?: string;
-  title: string;
-  description?: string;
+  eyebrow?: AssistText;
+  title: AssistText;
+  description?: AssistText;
   items: AssistItem[];
 }
 
@@ -21,16 +23,33 @@ const {
   description = "",
   items = [],
 } = Astro.props;
+
+const isBilingual = (v: AssistText): v is { en: string; pt: string } =>
+  typeof v === "object" && v !== null && "en" in v && "pt" in v;
 ---
 
 <section class="platform-assist">
   <div class="shell">
     <div class="platform-assist__frame">
       <div class="platform-assist__head">
-        <span class="platform-assist__eyebrow">{eyebrow}</span>
+        <span class="platform-assist__eyebrow">
+          {isBilingual(eyebrow)
+            ? <Fragment><span class="i18n-en">{eyebrow.en}</span><span class="i18n-pt">{eyebrow.pt}</span></Fragment>
+            : eyebrow}
+        </span>
         <div>
-          <h2>{title}</h2>
-          {description && <p>{description}</p>}
+          <h2>
+            {isBilingual(title)
+              ? <Fragment><span class="i18n-en">{title.en}</span><span class="i18n-pt">{title.pt}</span></Fragment>
+              : title}
+          </h2>
+          {description && (
+            <p>
+              {isBilingual(description)
+                ? <Fragment><span class="i18n-en">{description.en}</span><span class="i18n-pt">{description.pt}</span></Fragment>
+                : description}
+            </p>
+          )}
         </div>
       </div>
 
@@ -43,9 +62,21 @@ const {
               </div>
             )}
             <div class="platform-assist__copy">
-              <span class="platform-assist__label">{item.label}</span>
-              <strong>{item.title}</strong>
-              <p>{item.copy}</p>
+              <span class="platform-assist__label">
+                {isBilingual(item.label)
+                  ? <Fragment><span class="i18n-en">{item.label.en}</span><span class="i18n-pt">{item.label.pt}</span></Fragment>
+                  : item.label}
+              </span>
+              <strong>
+                {isBilingual(item.title)
+                  ? <Fragment><span class="i18n-en">{item.title.en}</span><span class="i18n-pt">{item.title.pt}</span></Fragment>
+                  : item.title}
+              </strong>
+              <p>
+                {isBilingual(item.copy)
+                  ? <Fragment><span class="i18n-en">{item.copy.en}</span><span class="i18n-pt">{item.copy.pt}</span></Fragment>
+                  : item.copy}
+              </p>
             </div>
           </a>
         ))}
