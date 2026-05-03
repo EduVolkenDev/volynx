@@ -88,6 +88,36 @@ const t = {
 const L = t[lang];
 ---
 <FlagshipLayout title="Comprar VX — VOLYNX" description="Adicione VX com Pix instantâneo ou cartão. Bônus exclusivos em cada pack." pageClass="page-recarregar">
+  <script is:inline>
+    /* Sync ?lang= URL param with global volynx_lang in localStorage.
+       This page is SSR'd per-language, so a mismatch must trigger a reload. */
+    (function () {
+      function getStored() {
+        try {
+          var raw = localStorage.getItem('volynx_lang');
+          if (!raw) return null;
+          var v = String(raw).toLowerCase();
+          if (v.indexOf('pt') === 0) return 'pt';
+          if (v.indexOf('en') === 0) return 'en';
+        } catch (_) {}
+        return null;
+      }
+      function syncUrl(lang) {
+        try {
+          var url = new URL(location.href);
+          if (url.searchParams.get('lang') === lang) return;
+          url.searchParams.set('lang', lang);
+          location.replace(url.toString());
+        } catch (_) {}
+      }
+      var pref = getStored();
+      if (pref) syncUrl(pref);
+      window.addEventListener('vx:lang-changed', function (e) {
+        var lang = e && e.detail && e.detail.lang;
+        if (lang === 'pt' || lang === 'en') syncUrl(lang);
+      });
+    })();
+  </script>
   <FlagshipHeader current={ROUTES.pricing} ctaLabel={L.buyCard} />
   <main>
 
