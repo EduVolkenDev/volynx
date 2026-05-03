@@ -3,19 +3,21 @@ import { ROUTES } from "../data/routes";
 interface Props {
   mode?: "default" | "sections";
   primaryCtaLabel?: string;
+  primaryCtaI18n?: string;
   primaryCtaHref?: string;
 }
 const {
   mode = "default",
   primaryCtaLabel,
+  primaryCtaI18n,
   primaryCtaHref = ROUTES.login,
 } = Astro.props;
 
 const mobileDefaultLinks = [
-  { href: ROUTES.products, label: "Products" },
-  { href: ROUTES.delivery, label: "My Products" },
-  { href: ROUTES.support, label: "Support" },
-  { href: ROUTES.daily, label: "Daily" },
+  { href: ROUTES.products, label: "Products", i18n: "vxh.products" },
+  { href: ROUTES.delivery, label: "My Products", i18n: "vxh.my_products" },
+  { href: ROUTES.support, label: "Support", i18n: "vxh.support" },
+  { href: ROUTES.daily, label: "Daily", i18n: "vxh.daily" },
 ];
 ---
 
@@ -38,7 +40,7 @@ const mobileDefaultLinks = [
 
     <div class="vxh__actions">
       {primaryCtaLabel && (
-        <a class="vxh__cta" href={primaryCtaHref}>{primaryCtaLabel}</a>
+        <a class="vxh__cta" href={primaryCtaHref} data-i18n={primaryCtaI18n}>{primaryCtaLabel}</a>
       )}
       <button class="vxh__burger" id="menuBtn" type="button" aria-label="Open menu" data-i18n-aria="aria.open_menu" aria-expanded="false">
         <span></span><span></span><span></span>
@@ -61,12 +63,12 @@ const mobileDefaultLinks = [
       {mode !== "sections" && (
         <nav aria-label="Platform links — mobile" data-i18n-aria="aria.platform_links_mobile">
           {mobileDefaultLinks.map((link) => (
-            <a href={link.href}>{link.label}</a>
+            <a href={link.href} data-i18n={link.i18n}>{link.label}</a>
           ))}
         </nav>
       )}
       {primaryCtaLabel && (
-        <a class="vxh__cta" href={primaryCtaHref}>{primaryCtaLabel}</a>
+        <a class="vxh__cta" href={primaryCtaHref} data-i18n={primaryCtaI18n}>{primaryCtaLabel}</a>
       )}
     </div>
   </div>

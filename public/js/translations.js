@@ -204,6 +204,13 @@ window.VX_TRANS = {
     "vxh.projects":   "Projects",
     "vxh.faq":        "FAQ",
     "vxh.access":     "Access",
+    "vxh.products":     "Products",
+    "vxh.my_products":  "My Products",
+    "vxh.support":      "Support",
+    "vxh.daily":        "Daily",
+    "header.cta_signin":        "Sign in",
+    "header.cta_signup":        "Sign up",
+    "header.cta_signin_create": "Sign in / Create account",
 
     /* === HOME PAGE === */
     "home.slogan":            "Building a Smarter Future.",
@@ -2490,6 +2497,13 @@ window.VX_TRANS = {
     "vxh.projects":   "Projetos",
     "vxh.faq":        "FAQ",
     "vxh.access":     "Acesso",
+    "vxh.products":     "Produtos",
+    "vxh.my_products":  "Meus produtos",
+    "vxh.support":      "Suporte",
+    "vxh.daily":        "Daily",
+    "header.cta_signin":        "Entrar",
+    "header.cta_signup":        "Cadastrar",
+    "header.cta_signin_create": "Entrar / Criar conta",
 
     /* === HOME PAGE === */
     "home.slogan":           "Construindo um Futuro mais Inteligente.",
