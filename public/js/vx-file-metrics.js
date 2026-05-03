@@ -149,9 +149,7 @@ window.VxFileMetrics = (function () {
     assert("not effective", isCompressionEffective(1000, 1500), false);
     assert("equal", isCompressionEffective(1000, 1000), false);
 
-    if (fail === 0) {
-      console.log("[VxFileMetrics] " + pass + " tests passed");
-    } else {
+    if (fail > 0) {
       console.error("[VxFileMetrics] " + fail + " of " + (pass + fail) + " tests FAILED");
     }
   })();
