@@ -837,8 +837,8 @@ const pageDescription = "Premium property management platform for real estate ag
     }
     .audience__card__icon {
       position: relative;
-      width: clamp(86px, 7vw, 112px); height: clamp(78px, 6vw, 98px);
-      border-radius: 22px;
+      width: clamp(132px, 12vw, 184px); height: clamp(116px, 10vw, 158px);
+      border-radius: 28px;
       display: inline-flex; align-items: center; justify-content: center;
       background: linear-gradient(135deg, rgba(89,195,255,.22), rgba(139,92,246,.16));
       border: 1px solid rgba(255,255,255,.10);
@@ -849,7 +849,7 @@ const pageDescription = "Premium property management platform for real estate ag
     .audience__card__icon svg,
     .audience__card__icon img {
       position: relative; z-index: 1;
-      width: 112%; height: 112%;
+      width: 122%; height: 122%;
       object-fit: contain;
       color: var(--gold-soft);
       filter: drop-shadow(0 12px 22px rgba(0,0,0,.42));
@@ -865,6 +865,22 @@ const pageDescription = "Premium property management platform for real estate ag
       opacity: 0;
       z-index: -1;
       transition: opacity .45s ease;
+    }
+    @media (max-width: 560px) {
+      .audience__card__head {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .audience__card__icon {
+        width: min(210px, 78vw);
+        height: 168px;
+        margin: -8px auto 4px;
+      }
+      .audience__card__chevron {
+        position: absolute;
+        top: 26px;
+        right: 24px;
+      }
     }
     .audience__card.is-open .audience__card__icon::before { opacity: 0.32; background: var(--gold); }
     .audience__card.is-open .audience__card__icon svg,
@@ -1193,15 +1209,15 @@ const pageDescription = "Premium property management platform for real estate ag
     .price-card > * { position: relative; z-index: 1; }
     .price-card__tier-icon {
       position: relative;
-      width: 96px; height: 96px;
+      width: clamp(148px, 13vw, 190px); height: clamp(148px, 13vw, 190px);
       display: inline-flex; align-items: center; justify-content: center;
-      margin: 0 auto 18px;
+      margin: -10px auto 16px;
       z-index: 0;
     }
     .price-card__tier-icon img {
       position: relative;
       z-index: 1;
-      width: 100%; height: 100%;
+      width: 118%; height: 118%;
       object-fit: contain;
       filter: drop-shadow(0 8px 22px rgba(0,0,0,.5));
       transition: transform .35s ease, filter .35s ease;
@@ -1209,9 +1225,9 @@ const pageDescription = "Premium property management platform for real estate ag
     .price-card__tier-icon::before {
       content: "";
       position: absolute;
-      width: 90%; height: 90%;
+      width: 96%; height: 96%;
       background: var(--blue);
-      filter: blur(36px);
+      filter: blur(46px);
       opacity: 0.22;
       z-index: -1;
       border-radius: 50%;
@@ -1230,6 +1246,13 @@ const pageDescription = "Premium property management platform for real estate ag
     .price-card--studio   .price-card__tier-icon::before { background: var(--violet); opacity: 0.28; }
     @media (prefers-reduced-motion: reduce) {
       .price-card__tier-icon::before { animation: none; }
+    }
+    @media (max-width: 560px) {
+      .price-card__tier-icon {
+        width: min(220px, 74vw);
+        height: min(220px, 74vw);
+        margin-top: -12px;
+      }
     }
     .price-card__price-row {
       display: flex; align-items: baseline; gap: 10px;
