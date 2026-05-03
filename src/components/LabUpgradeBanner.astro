@@ -3,7 +3,7 @@
 import { ROUTES } from "../data/routes";
 ---
 
-<aside class="lab-upgrade-banner" id="labUpgradeBanner" aria-label="Studio Pro upgrade" data-i18n-aria="aria.studio_upgrade">
+<aside class="lab-upgrade-banner" id="labUpgradeBanner" hidden aria-label="Studio Pro upgrade" data-i18n-aria="aria.studio_upgrade">
   <div class="lab-upgrade-banner__inner">
     <div class="lab-upgrade-banner__left">
       <span class="lab-upgrade-banner__badge" data-i18n="lab_banner.badge">Studio Pro</span>
@@ -18,11 +18,45 @@ import { ROUTES } from "../data/routes";
   </div>
 </aside>
 
+<script is:inline>
+  (function () {
+    var banner = document.getElementById('labUpgradeBanner');
+    if (!banner) return;
+    var RANK = { free: 0, launch: 1, business: 2, pro: 2, diamond: 2, studio: 3, teams: 4, enterprise: 5 };
+    var STUDIO = 3;
+
+    function rankOf(plan) {
+      if (!plan) return 0;
+      var r = RANK[String(plan).toLowerCase()];
+      return r == null ? 0 : r;
+    }
+
+    function apply(plan) {
+      var r = rankOf(plan);
+      banner.hidden = !(r > 0 && r < STUDIO);
+    }
+
+    try {
+      var cached = JSON.parse(localStorage.getItem('volynx_plan_cache') || 'null');
+      if (cached && cached.plan) apply(cached.plan);
+    } catch (_) {}
+
+    if (window.vxPlan) apply(window.vxPlan);
+
+    window.addEventListener('vx:plan-ready', function (e) {
+      apply(e && e.detail && e.detail.plan);
+    });
+  })();
+</script>
+
 <style>
   .lab-upgrade-banner {
     margin: 32px auto 0;
     max-width: 860px;
     padding: 0 clamp(14px, 4vw, 24px);
+  }
+  .lab-upgrade-banner[hidden] {
+    display: none !important;
   }
   .lab-upgrade-banner__inner {
     display: flex;
