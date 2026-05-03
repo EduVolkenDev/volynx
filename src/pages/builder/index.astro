@@ -323,6 +323,16 @@ import PageWidgets from "../../components/PageWidgets.astro";
 <script>
   import { createClient } from "@supabase/supabase-js";
 
+  // Declare globals loaded via external scripts
+  declare const JSZip: any;
+  declare global {
+    interface Window {
+      VxRenderer: any;
+      VxSectionEditor: any;
+      applyTranslations: any;
+    }
+  }
+
   const $ = (id: string) => document.getElementById(id);
   const DEBUG = (() => { try { return new URLSearchParams(location.search).has("debug"); } catch (_) { return false; } })();
   const log = DEBUG ? (msg: string) => console.log(`[builder] ${msg}`) : (_msg: string) => {};
