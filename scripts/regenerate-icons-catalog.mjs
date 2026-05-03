@@ -37,7 +37,7 @@ const FOLDER_MANIFEST = {
   "Day-By-Day-free":       { name: "Day by Day",       category: "simple",     plan: "free" },
   // "Free-Greens":        REMOVED — icons render broken; needs redo
   // "Free-Purples":       REMOVED — icons render broken; needs redo
-  "glow-premium":          { name: "Glow",             category: "futuristic", plan: "premium" },
+  "glow-premium":          { name: "Glow",             category: "futuristic", plan: "standard" },
   "Hyper-Icons-Premium":   { name: "Hyper Icons",      category: "futuristic", plan: "premium" },
   "Icons-Glass-Premium":   { name: "Glass Icons",      category: "futuristic", plan: "premium" },
   // "Icons-Glass-Premium-2": REMOVED — folder deleted from disk
@@ -49,12 +49,12 @@ const FOLDER_MANIFEST = {
   // "Neon-Icons-Free3":   REMOVED — folder deleted from disk
   // "Pink-Abstract-Free": REMOVED — icons render broken; needs redo
   "Poligon-Premium":       { name: "Polygon",          category: "futuristic", plan: "premium" },
-  "purple-icons-premium":  { name: "Purple Icons",     category: "purple",     plan: "premium" },
-  "soft-blue":             { name: "Soft Blue",        category: "blue",       plan: "premium" },
-  "soft-dark-blue":        { name: "Soft Dark Blue",   category: "blue",       plan: "premium" },
-  "soft-green":            { name: "Soft Green",       category: "green",      plan: "premium" },
-  "soft-orange":           { name: "Soft Orange",      category: "draw",       plan: "premium" },
-  "soft-red":              { name: "Soft Red",         category: "pink",       plan: "premium" },
+  "purple-icons-premium":  { name: "Purple Icons",     category: "purple",     plan: "free" },
+  "soft-blue":             { name: "Soft Blue",        category: "blue",       plan: "standard" },
+  "soft-dark-blue":        { name: "Soft Dark Blue",   category: "blue",       plan: "standard" },
+  "soft-green":            { name: "Soft Green",       category: "green",      plan: "standard" },
+  "soft-orange":           { name: "Soft Orange",      category: "draw",       plan: "standard" },
+  "soft-red":              { name: "Soft Red",         category: "pink",       plan: "standard" },
   "vintage-premium":       { name: "Vintage",          category: "futuristic", plan: "premium" },
 };
 
