@@ -159,14 +159,30 @@ const deliveryAssistItems = [
         const status = params.get('payment');
         const successEl = document.getElementById('paymentSuccessBanner');
         const cancelledEl = document.getElementById('paymentCancelledBanner');
+
+        function hideBanner(el) {
+          if (!el) return;
+          el.hidden = true;
+          el.style.display = 'none';
+        }
+
+        function showBanner(el) {
+          if (!el) return;
+          el.style.removeProperty('display');
+          el.hidden = false;
+        }
+
+        hideBanner(successEl);
+        hideBanner(cancelledEl);
+
+        document.querySelectorAll('.payment-banner__close').forEach((button) => {
+          button.addEventListener('click', () => hideBanner(button.closest('.payment-banner')));
+        });
+
         if (status === 'success' && successEl) {
-          successEl.hidden = false;
-          const closeBtn = document.getElementById('paymentBannerClose');
-          if (closeBtn) closeBtn.addEventListener('click', () => { successEl.hidden = true; });
+          showBanner(successEl);
         } else if (status === 'cancelled' && cancelledEl) {
-          cancelledEl.hidden = false;
-          const closeBtn = document.getElementById('paymentCancelledClose');
-          if (closeBtn) closeBtn.addEventListener('click', () => { cancelledEl.hidden = true; });
+          showBanner(cancelledEl);
         }
         if (status) {
           // Strip the param so a refresh doesn't re-show the banner forever.
@@ -896,6 +912,9 @@ const deliveryAssistItems = [
     background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(8px);
     animation: payment-banner-in 0.32s ease;
+  }
+  .payment-banner[hidden] {
+    display: none !important;
   }
   .payment-banner--success {
     border-color: rgba(140, 255, 210, 0.32);
