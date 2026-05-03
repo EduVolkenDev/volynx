@@ -25,10 +25,18 @@ const pageDescription = "Premium property management platform for real estate ag
 
   <script>document.documentElement.classList.add('js');</script>
 
+  <style is:global>
+    /* Dual-span i18n must be global; scoped Astro selectors can expose both languages. */
+    .i18n-pt { display: none !important; }
+    html[lang^="en"] .i18n-en,
+    html:not([lang]) .i18n-en { display: inline !important; }
+    html[lang^="en"] .i18n-pt,
+    html:not([lang]) .i18n-pt { display: none !important; }
+    html[lang^="pt"] .i18n-en { display: none !important; }
+    html[lang^="pt"] .i18n-pt { display: inline !important; }
+  </style>
+
   <style>
-    /* Dual-span i18n — hide non-active language. Mirrors global.css */
-    html[lang="en"] .i18n-pt, html[lang="en-US"] .i18n-pt { display: none; }
-    html[lang="pt"] .i18n-en, html[lang="pt-BR"] .i18n-en { display: none; }
 
     :root {
       --bg: #07070b;

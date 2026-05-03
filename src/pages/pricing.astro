@@ -183,22 +183,30 @@ const pricingAssistItems = [
           </div>
           <div class="guidance-grid">
             <div class="guidance-card">
-              <div class="guidance-card-icon">🎯</div>
+              <div class="guidance-card-icon">
+                <img src="/assets/startfree.webp" alt="" loading="lazy" decoding="async" aria-hidden="true" />
+              </div>
               <h3><span class="i18n-en">Start with Free</span><span class="i18n-pt">Comece no Free</span></h3>
               <p><span class="i18n-en">Test Builder drafts, use all Lab tools, explore Daily basics and build your CV. Upgrade only when you need custom domains, cloud sync or exports.</span><span class="i18n-pt">Teste drafts no Builder, use todas as ferramentas do Lab, explore o Daily básico e monte seu CV. Faça upgrade só quando precisar de domínios customizados, sync na nuvem ou exports.</span></p>
             </div>
             <div class="guidance-card">
-              <div class="guidance-card-icon">⚡</div>
+              <div class="guidance-card-icon">
+                <img src="/assets/updatetopro.webp" alt="" loading="lazy" decoding="async" aria-hidden="true" />
+              </div>
               <h3><span class="i18n-en">Go Pro when ready</span><span class="i18n-pt">Vá de Pro quando estiver pronto</span></h3>
               <p><span class="i18n-en">Builder Pro (£24) for publishing sites. Daily Pro (£14) for smarter daily tools. Or bundle Essential (£35) to save. Pro feels different — faster, cleaner, with real capacity.</span><span class="i18n-pt">Builder Pro (£24) para publicar sites. Daily Pro (£14) para ferramentas diárias mais inteligentes. Ou bundle Essential (£35) para economizar. Pro parece diferente — mais rápido, mais limpo, com capacidade real.</span></p>
             </div>
             <div class="guidance-card">
-              <div class="guidance-card-icon">💎</div>
+              <div class="guidance-card-icon">
+                <img src="/assets/vxsystem.webp" alt="" loading="lazy" decoding="async" aria-hidden="true" />
+              </div>
               <h3><span class="i18n-en">Add VX as needed</span><span class="i18n-pt">Adicione VX conforme necessário</span></h3>
               <p><span class="i18n-en">Your plan unlocks access. VX unlocks premium actions: exports, AI features, heavy processing. Buy packs starting at £8.40 for 12 VX — they never expire.</span><span class="i18n-pt">Seu plano libera acesso. VX libera ações premium: exports, recursos de IA, processamento pesado. Compre packs começando em £8.40 por 12 VX — eles nunca expiram.</span></p>
             </div>
             <div class="guidance-card">
-              <div class="guidance-card-icon">🚀</div>
+              <div class="guidance-card-icon">
+                <img src="/assets/getbundle.webp" alt="" loading="lazy" decoding="async" aria-hidden="true" />
+              </div>
               <h3><span class="i18n-en">Need both? Bundle it</span><span class="i18n-pt">Precisa dos dois? Faça bundle</span></h3>
               <p><span class="i18n-en">Essential (Builder Pro + Daily Pro = £35) or Complete (Builder Studio + Daily Diamond = £82). One subscription, both products, better pricing.</span><span class="i18n-pt">Essential (Builder Pro + Daily Pro = £35) ou Complete (Builder Studio + Daily Diamond = £82). Uma assinatura, ambos produtos, preço melhor.</span></p>
             </div>
@@ -1054,6 +1062,74 @@ const pricingAssistItems = [
       max-width: 58ch;
       color: var(--muted);
       line-height: 1.65;
+    }
+    .guidance-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .guidance-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 0;
+      padding: 22px 18px 24px;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,.08);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.08), transparent 44%),
+        linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.018));
+      text-align: center;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .guidance-card::before {
+      content: "";
+      position: absolute;
+      inset: -28% 6% auto;
+      height: 52%;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(214,179,106,.18), transparent 70%);
+      filter: blur(28px);
+      z-index: -1;
+    }
+    .guidance-card-icon {
+      display: grid;
+      place-items: center;
+      width: clamp(104px, 9vw, 138px);
+      height: clamp(104px, 9vw, 138px);
+      margin: -4px auto 10px;
+      flex-shrink: 0;
+    }
+    .guidance-card-icon img {
+      width: 118%;
+      height: 118%;
+      object-fit: contain;
+      filter: drop-shadow(0 18px 34px rgba(0,0,0,.42));
+    }
+    .guidance-card h3 {
+      margin: 0 0 10px;
+      color: #fff;
+      font-size: clamp(1.05rem, 1.35vw, 1.2rem);
+      line-height: 1.12;
+    }
+    .guidance-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .92rem;
+      line-height: 1.62;
+    }
+    @media (max-width: 980px) {
+      .guidance-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 620px) {
+      .guidance-grid { grid-template-columns: 1fr; }
+      .guidance-card { padding: 24px 20px; }
+      .guidance-card-icon {
+        width: min(170px, 52vw);
+        height: min(170px, 52vw);
+      }
     }
 
     /* VX lead block */
