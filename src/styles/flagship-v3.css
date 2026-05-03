@@ -653,7 +653,8 @@ a, button{ touch-action: manipulation; }
   min-height: 450px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: flex-start;
+  gap: 12px;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -663,9 +664,34 @@ a, button{ touch-action: manipulation; }
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(4,5,10,.12), rgba(4,5,10,.9));
+  background: linear-gradient(180deg,
+    rgba(4,5,10,.66) 0%,
+    rgba(4,5,10,.18) 32%,
+    rgba(4,5,10,.42) 62%,
+    rgba(4,5,10,.92) 100%
+  );
 }
 .gallery-card > *{ position: relative; }
+.gallery-card .label{
+  align-self: flex-start;
+  background: rgba(255,255,255,.14);
+  border-color: rgba(255,255,255,.28);
+  color: rgba(255,255,255,.96);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.gallery-card h3{
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(0,0,0,.45);
+}
+.gallery-card p{
+  margin: auto 0 0;
+  color: rgba(255,255,255,.92);
+  text-shadow: 0 1px 2px rgba(0,0,0,.5);
+}
+.gallery-card .actions{
+  margin-top: 14px;
+}
 
 /* ── Editorial Grid ──────────────────────────────────────────────── */
 .editorial-grid{ grid-template-columns: 1fr; }
