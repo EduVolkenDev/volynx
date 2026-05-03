@@ -307,7 +307,27 @@ const pageDescription = "Premium property management platform for real estate ag
     .price-card__features li::before { content: "✓ "; color: #34D399; font-weight: 700; }
     .price-card__cta { width: 100%; text-align: center; }
 
-    .price-card__badge { position:absolute; top:12px; right:12px; padding:4px 10px; border-radius:999px; font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; background:rgba(214,179,106,.2); border:1px solid rgba(214,179,106,.3); color:var(--gold); }
+    .price-card__badge-row {
+      min-height: 28px;
+      display: flex;
+      align-items: center;
+      margin: 10px 0 8px;
+    }
+    .price-card__badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 132px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      background: rgba(214,179,106,.2);
+      border: 1px solid rgba(214,179,106,.3);
+      color: var(--gold);
+    }
     .price-card--featured { position:relative; }
 
     /* ─── Inside-the-package tier teaser ─── */
@@ -817,8 +837,8 @@ const pageDescription = "Premium property management platform for real estate ag
     }
     .audience__card__icon {
       position: relative;
-      width: 64px; height: 64px;
-      border-radius: 16px;
+      width: clamp(86px, 7vw, 112px); height: clamp(78px, 6vw, 98px);
+      border-radius: 22px;
       display: inline-flex; align-items: center; justify-content: center;
       background: linear-gradient(135deg, rgba(89,195,255,.22), rgba(139,92,246,.16));
       border: 1px solid rgba(255,255,255,.10);
@@ -826,11 +846,13 @@ const pageDescription = "Premium property management platform for real estate ag
       transition: background .35s ease, border-color .35s ease, transform .35s ease;
       z-index: 0;
     }
-    .audience__card__icon svg {
+    .audience__card__icon svg,
+    .audience__card__icon img {
       position: relative; z-index: 1;
-      width: 32px; height: 32px;
+      width: 112%; height: 112%;
+      object-fit: contain;
       color: var(--gold-soft);
-      filter: drop-shadow(0 4px 10px rgba(0,0,0,.4));
+      filter: drop-shadow(0 12px 22px rgba(0,0,0,.42));
       transition: color .35s ease, transform .35s ease;
     }
     .audience__card__icon::before {
@@ -845,7 +867,8 @@ const pageDescription = "Premium property management platform for real estate ag
       transition: opacity .45s ease;
     }
     .audience__card.is-open .audience__card__icon::before { opacity: 0.32; background: var(--gold); }
-    .audience__card.is-open .audience__card__icon svg { transform: scale(1.05); }
+    .audience__card.is-open .audience__card__icon svg,
+    .audience__card.is-open .audience__card__icon img { transform: scale(1.05); }
     .audience__card h3 { margin: 0; transition: color .35s ease; }
     .audience__card__chevron {
       margin-left: auto;
@@ -1541,7 +1564,7 @@ const pageDescription = "Premium property management platform for real estate ag
         <div class="audience__card" data-pf-audience-card>
           <div class="audience__card__head">
             <span class="audience__card__icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 21V10l9-6 9 6v11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 21v-7h6v7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <img src="/assets/realestateagencies.webp" alt="" loading="lazy" decoding="async" />
             </span>
             <h3 data-i18n="pf.aud1_title">Real Estate Agencies</h3>
             <svg class="audience__card__chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1558,7 +1581,7 @@ const pageDescription = "Premium property management platform for real estate ag
         <div class="audience__card" data-pf-audience-card>
           <div class="audience__card__head">
             <span class="audience__card__icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <img src="/assets/independentbrokers.webp" alt="" loading="lazy" decoding="async" />
             </span>
             <h3 data-i18n="pf.aud2_title">Independent Brokers</h3>
             <svg class="audience__card__chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1575,7 +1598,7 @@ const pageDescription = "Premium property management platform for real estate ag
         <div class="audience__card" data-pf-audience-card>
           <div class="audience__card__head">
             <span class="audience__card__icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 21V5l8-2v18M12 21V9l8-2v14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 9h2M7 13h2M7 17h2M15 12h2M15 16h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              <img src="/assets/propertydevelopers.webp" alt="" loading="lazy" decoding="async" />
             </span>
             <h3 data-i18n="pf.aud3_title">Property Developers</h3>
             <svg class="audience__card__chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -2100,6 +2123,7 @@ const pageDescription = "Premium property management platform for real estate ag
             <img src="/assets/flow-starter.webp" alt="" loading="lazy" />
           </span>
           <span class="price-card__name" data-i18n="pf.plan1_name">Starter</span>
+          <div class="price-card__badge-row" aria-hidden="true"></div>
           <div class="price-card__price-row">
             <div class="price-card__price"><span data-price-gbp="£187" data-price-eur="€217" data-price-brl="R$1.290">£187</span></div>
             <img src="/assets/vx-new.webp" alt="" class="price-card__vx" loading="lazy" />
@@ -2120,7 +2144,9 @@ const pageDescription = "Premium property management platform for real estate ag
             <img src="/assets/flow-professional.webp" alt="" loading="lazy" />
           </span>
           <span class="price-card__name" data-i18n="pf.plan2_name">Professional</span>
-          <div class="price-card__badge"><span class="i18n-en">Most popular</span><span class="i18n-pt">Mais popular</span></div>
+          <div class="price-card__badge-row">
+            <div class="price-card__badge"><span class="i18n-en">Most popular</span><span class="i18n-pt">Mais popular</span></div>
+          </div>
           <div class="price-card__price-row">
             <div class="price-card__price"><span data-price-gbp="£447" data-price-eur="€519" data-price-brl="R$3.090">£447</span></div>
             <img src="/assets/vx-new.webp" alt="" class="price-card__vx" loading="lazy" />
@@ -2143,6 +2169,7 @@ const pageDescription = "Premium property management platform for real estate ag
             <img src="/assets/flow-whitelabel.webp" alt="" loading="lazy" />
           </span>
           <span class="price-card__name" data-i18n="pf.plan3_name">White-Label</span>
+          <div class="price-card__badge-row" aria-hidden="true"></div>
           <div class="price-card__price-row">
             <div class="price-card__price"><span data-price-gbp="£897" data-price-eur="€1.039" data-price-brl="R$6.190">£897</span></div>
             <img src="/assets/vx-new.webp" alt="" class="price-card__vx" loading="lazy" />
