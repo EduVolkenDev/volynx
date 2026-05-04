@@ -1,0 +1,607 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import VxHeader from "../../../components/VxHeader.astro";
+import VxFooter from "../../../components/VxFooter.astro";
+import PageWidgets from "../../../components/PageWidgets.astro";
+import { ROUTES } from "../../../data/routes";
+
+const title = "Admin · Vouchers — VOLYNX";
+---
+
+<BaseLayout title={title}>
+  <VxHeader primaryCtaLabel="Sign out" primaryCtaI18n="djs.sign_out" primaryCtaHref="/login/?logout=1" />
+  <PageWidgets />
+
+  <main class="admin-shell">
+    <div class="container">
+      <!-- Loading state -->
+      <section id="adminLoading" class="admin-state">
+        <p class="admin-state__text">Loading admin context...</p>
+      </section>
+
+      <!-- Not logged in -->
+      <section id="adminLoggedOut" class="admin-state" hidden>
+        <h1>Sign in required</h1>
+        <p class="muted">The voucher admin is gated to platform admins.</p>
+        <a class="btn primary" href="/login/?next=/admin/vouchers/">Sign in</a>
+      </section>
+
+      <!-- Not admin -->
+      <section id="adminForbidden" class="admin-state" hidden>
+        <h1>Forbidden</h1>
+        <p class="muted">Your account does not have admin privileges. If this is a mistake, contact support.</p>
+        <a class="btn ghost" href="/">Back to home</a>
+      </section>
+
+      <!-- Admin UI -->
+      <section id="adminUI" class="admin-ui" hidden>
+        <header class="admin-head">
+          <div>
+            <span class="kicker">Admin · Vouchers</span>
+            <h1>Issue invites, discounts, kit unlocks &amp; token grants</h1>
+            <p class="muted">Each voucher is a single record in the <code>vouchers</code> table. Black Diamond invites generate a personalized URL ready to share.</p>
+          </div>
+          <button id="refreshBtn" class="btn ghost" type="button">Refresh list</button>
+        </header>
+
+        <!-- Create form -->
+        <article class="panel admin-create">
+          <h2>Create voucher</h2>
+          <form id="createForm" class="admin-form">
+            <div class="form-row">
+              <label class="field">
+                <span>Type</span>
+                <select id="type" name="type" required>
+                  <option value="black_diamond">Black Diamond invite</option>
+                  <option value="discount">Discount code</option>
+                  <option value="tokens">VX tokens grant</option>
+                  <option value="kit">Kit unlock</option>
+                  <option value="generic">Generic</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Label (internal)</span>
+                <input id="label" name="label" type="text" maxlength="200" placeholder="e.g. Black Diamond — Maria" />
+              </label>
+            </div>
+
+            <div class="form-row">
+              <label class="field">
+                <span>Recipient name <small>(optional, goes into ?to=)</small></span>
+                <input id="recipient_name" name="recipient_name" type="text" maxlength="80" placeholder="Maria Silva" />
+              </label>
+              <label class="field">
+                <span>Target email <small>(optional, gates redemption)</small></span>
+                <input id="target_email" name="target_email" type="email" maxlength="320" placeholder="maria@example.com" />
+              </label>
+            </div>
+
+            <div class="form-row">
+              <label class="field">
+                <span>Max uses</span>
+                <input id="max_uses" name="max_uses" type="number" min="1" max="100000" value="1" required />
+              </label>
+              <label class="field">
+                <span>Expires at <small>(optional)</small></span>
+                <input id="expires_at" name="expires_at" type="datetime-local" />
+              </label>
+              <label class="field field--checkbox">
+                <input id="transferable" name="transferable" type="checkbox" checked />
+                <span>Transferable (anyone with the code can redeem)</span>
+              </label>
+            </div>
+
+            <!-- Grants section — varies by type -->
+            <fieldset class="grants">
+              <legend>Grants</legend>
+
+              <div data-grant-for="black_diamond">
+                <div class="form-row">
+                  <label class="field">
+                    <span>Plan</span>
+                    <select name="grant_plan">
+                      <option value="diamond" selected>diamond</option>
+                      <option value="studio">studio</option>
+                      <option value="pro">pro</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Duration (days)</span>
+                    <input type="number" name="grant_duration_days" min="1" max="3650" value="365" />
+                  </label>
+                </div>
+              </div>
+
+              <div data-grant-for="discount" hidden>
+                <div class="form-row">
+                  <label class="field">
+                    <span>Discount %</span>
+                    <input type="number" name="grant_discount_pct" min="1" max="100" value="20" />
+                  </label>
+                  <label class="field">
+                    <span>Stripe coupon ID <small>(optional, if synced)</small></span>
+                    <input type="text" name="grant_stripe_coupon_id" placeholder="coupon_xxx" />
+                  </label>
+                </div>
+              </div>
+
+              <div data-grant-for="tokens" hidden>
+                <label class="field">
+                  <span>VX tokens</span>
+                  <input type="number" name="grant_tokens" min="1" max="100000" value="50" />
+                </label>
+              </div>
+
+              <div data-grant-for="kit" hidden>
+                <label class="field">
+                  <span>Kit ID</span>
+                  <input type="text" name="grant_kit_id" placeholder="portfolio-pro-kit" />
+                </label>
+              </div>
+
+              <div data-grant-for="generic" hidden>
+                <label class="field">
+                  <span>Custom grants JSON</span>
+                  <textarea name="grant_json" rows="4" placeholder='{"feature":"early_access"}'></textarea>
+                </label>
+              </div>
+            </fieldset>
+
+            <label class="field">
+              <span>Description <small>(internal note)</small></span>
+              <textarea id="description" name="description" rows="2" maxlength="1000" placeholder="What is this for / why it was issued"></textarea>
+            </label>
+
+            <div class="form-actions">
+              <button id="submitBtn" type="submit" class="btn primary">Create voucher</button>
+              <span id="formMsg" class="form-msg" aria-live="polite"></span>
+            </div>
+          </form>
+        </article>
+
+        <!-- Result panel — hidden until a voucher is created -->
+        <article id="resultPanel" class="panel admin-result" hidden>
+          <h2>Voucher created</h2>
+          <div class="result-grid">
+            <div>
+              <h3>Code</h3>
+              <div class="code-row">
+                <code id="resultCode" class="code-badge">—</code>
+                <button class="btn ghost btn-sm" data-copy="code" type="button">Copy</button>
+              </div>
+              <h3>Personalized URL</h3>
+              <div class="code-row">
+                <input id="resultUrl" type="text" readonly />
+                <button class="btn ghost btn-sm" data-copy="url" type="button">Copy</button>
+              </div>
+              <p class="muted" id="resultMeta">—</p>
+            </div>
+            <div class="qr-shell">
+              <h3>QR code</h3>
+              <canvas id="resultQR" width="220" height="220" aria-label="Personalized invite QR"></canvas>
+              <button class="btn ghost btn-sm" id="downloadQR" type="button">Download PNG</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- List -->
+        <article class="panel admin-list">
+          <h2>Recent vouchers</h2>
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Type</th>
+                  <th>Label</th>
+                  <th>Target</th>
+                  <th>Used</th>
+                  <th>Status</th>
+                  <th>Expires</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="vouchersBody">
+                <tr><td colspan="8" class="muted">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </div>
+  </main>
+
+  <VxFooter />
+
+  <script type="module">
+    import QRCode from "https://cdn.jsdelivr.net/npm/qrcode@1.5.3/+esm";
+
+    const FN_URL = "https://zdmpzrderifgqmqivjoy.supabase.co/functions/v1/admin-vouchers";
+    const SITE_URL = location.origin;
+
+    const $ = (id) => document.getElementById(id);
+    const els = {
+      loading: $("adminLoading"),
+      loggedOut: $("adminLoggedOut"),
+      forbidden: $("adminForbidden"),
+      ui: $("adminUI"),
+      typeSelect: $("type"),
+      grantsRoot: document.querySelector(".grants"),
+      form: $("createForm"),
+      submitBtn: $("submitBtn"),
+      formMsg: $("formMsg"),
+      result: $("resultPanel"),
+      resultCode: $("resultCode"),
+      resultUrl: $("resultUrl"),
+      resultMeta: $("resultMeta"),
+      resultQR: $("resultQR"),
+      downloadQR: $("downloadQR"),
+      tbody: $("vouchersBody"),
+      refresh: $("refreshBtn"),
+    };
+
+    function getToken() {
+      try { return localStorage.getItem("volynx_access_token") || ""; } catch (_) { return ""; }
+    }
+
+    function showOnly(el) {
+      [els.loading, els.loggedOut, els.forbidden, els.ui].forEach((e) => { if (e) e.hidden = e !== el; });
+    }
+
+    async function callApi(payload) {
+      const token = getToken();
+      const res = await fetch(FN_URL, {
+        method: "POST",
+        headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const text = await res.text();
+      let data; try { data = JSON.parse(text); } catch (_) { data = { error: "non_json", raw: text }; }
+      return { status: res.status, data };
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return "—";
+      try { return new Date(iso).toLocaleString(); } catch (_) { return iso; }
+    }
+
+    function buildGrants() {
+      const type = els.typeSelect.value;
+      const fd = new FormData(els.form);
+      if (type === "black_diamond") {
+        return { plan: fd.get("grant_plan"), duration_days: Number(fd.get("grant_duration_days")) || 365 };
+      }
+      if (type === "discount") {
+        const out = { discount_pct: Number(fd.get("grant_discount_pct")) || 0 };
+        const couponId = String(fd.get("grant_stripe_coupon_id") || "").trim();
+        if (couponId) out.stripe_coupon_id = couponId;
+        return out;
+      }
+      if (type === "tokens") {
+        return { tokens: Number(fd.get("grant_tokens")) || 0 };
+      }
+      if (type === "kit") {
+        return { kit_id: String(fd.get("grant_kit_id") || "").trim() };
+      }
+      if (type === "generic") {
+        try { return JSON.parse(String(fd.get("grant_json") || "{}")); } catch (_) { return {}; }
+      }
+      return {};
+    }
+
+    function syncGrantBlocks() {
+      const t = els.typeSelect.value;
+      els.grantsRoot.querySelectorAll("[data-grant-for]").forEach((el) => {
+        el.hidden = el.getAttribute("data-grant-for") !== t;
+      });
+    }
+
+    async function loadList() {
+      const { status, data } = await callApi({ action: "list", limit: 100 });
+      if (status === 401) { showOnly(els.loggedOut); return; }
+      if (status === 403) { showOnly(els.forbidden); return; }
+      if (!data?.ok) { els.tbody.innerHTML = `<tr><td colspan="8" class="muted">Error: ${data?.error || status}</td></tr>`; return; }
+      showOnly(els.ui);
+      renderList(data.items || []);
+    }
+
+    function renderList(items) {
+      if (items.length === 0) {
+        els.tbody.innerHTML = `<tr><td colspan="8" class="muted">No vouchers yet. Create one above.</td></tr>`;
+        return;
+      }
+      els.tbody.innerHTML = items.map((v) => {
+        const expired = v.expires_at && new Date(v.expires_at) < new Date();
+        const exhausted = v.times_used >= v.max_uses;
+        const status = !v.active
+          ? `<span class="pill pill--off">revoked</span>`
+          : expired
+          ? `<span class="pill pill--off">expired</span>`
+          : exhausted
+          ? `<span class="pill pill--off">exhausted</span>`
+          : `<span class="pill pill--on">active</span>`;
+        return `<tr>
+          <td><code>${escapeHtml(v.code)}</code></td>
+          <td>${escapeHtml(v.type)}</td>
+          <td>${escapeHtml(v.label || "—")}</td>
+          <td>${escapeHtml(v.target_email || "—")}</td>
+          <td>${v.times_used}/${v.max_uses}</td>
+          <td>${status}</td>
+          <td>${fmtDate(v.expires_at)}</td>
+          <td><button class="btn ghost btn-sm" data-action="revoke" data-id="${escapeHtml(v.id)}" ${!v.active ? "disabled" : ""}>Revoke</button></td>
+        </tr>`;
+      }).join("");
+    }
+
+    function escapeHtml(s) {
+      return String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));
+    }
+
+    async function submitCreate(e) {
+      e.preventDefault();
+      els.submitBtn.disabled = true;
+      els.formMsg.textContent = "Creating…";
+      els.formMsg.className = "form-msg form-msg--info";
+
+      const fd = new FormData(els.form);
+      const payload = {
+        action: "create",
+        type: els.typeSelect.value,
+        label: fd.get("label") || null,
+        description: fd.get("description") || null,
+        recipient_name: fd.get("recipient_name") || null,
+        target_email: fd.get("target_email") || null,
+        max_uses: Number(fd.get("max_uses")) || 1,
+        transferable: fd.get("transferable") === "on",
+        expires_at: fd.get("expires_at") || null,
+        grants: buildGrants(),
+      };
+
+      const { status, data } = await callApi(payload);
+      els.submitBtn.disabled = false;
+
+      if (!data?.ok) {
+        els.formMsg.textContent = `Error: ${data?.error || status} ${data?.detail ? "— " + data.detail : ""}`;
+        els.formMsg.className = "form-msg form-msg--err";
+        return;
+      }
+
+      els.formMsg.textContent = "Created.";
+      els.formMsg.className = "form-msg form-msg--ok";
+
+      const v = data.voucher;
+      const url = data.invite_url || `${SITE_URL}/invite/black-diamond/?code=${encodeURIComponent(v.code)}`;
+      els.resultCode.textContent = v.code;
+      els.resultUrl.value = url;
+      els.resultMeta.textContent = `Type: ${v.type} · max uses: ${v.max_uses} · expires: ${fmtDate(v.expires_at)} · grants: ${JSON.stringify(v.grants)}`;
+      els.result.hidden = false;
+
+      try {
+        await QRCode.toCanvas(els.resultQR, url, {
+          width: 220,
+          margin: 1,
+          color: { dark: "#0a0a14", light: "#ffffff" },
+        });
+      } catch (err) {
+        console.warn("QR render failed:", err);
+      }
+
+      els.result.scrollIntoView({ behavior: "smooth", block: "center" });
+      loadList();
+    }
+
+    async function revokeVoucher(id) {
+      if (!confirm("Revoke this voucher? Existing redemptions are kept; the code stops working.")) return;
+      const { data } = await callApi({ action: "revoke", id });
+      if (data?.ok) loadList();
+      else alert("Revoke failed: " + (data?.error || "unknown"));
+    }
+
+    function copyText(text) {
+      try {
+        navigator.clipboard.writeText(text);
+      } catch (_) {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch (_) {}
+        document.body.removeChild(ta);
+      }
+    }
+
+    // Wire events
+    els.typeSelect.addEventListener("change", syncGrantBlocks);
+    els.form.addEventListener("submit", submitCreate);
+    els.refresh.addEventListener("click", loadList);
+    document.querySelectorAll("[data-copy]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const target = btn.getAttribute("data-copy");
+        const text = target === "code" ? els.resultCode.textContent : els.resultUrl.value;
+        copyText(text);
+        btn.textContent = "Copied";
+        setTimeout(() => { btn.textContent = "Copy"; }, 1400);
+      });
+    });
+    els.tbody.addEventListener("click", (e) => {
+      const btn = e.target.closest('[data-action="revoke"]');
+      if (btn) revokeVoucher(btn.getAttribute("data-id"));
+    });
+    els.downloadQR.addEventListener("click", () => {
+      try {
+        const link = document.createElement("a");
+        link.download = `voucher-${els.resultCode.textContent}.png`;
+        link.href = els.resultQR.toDataURL("image/png");
+        link.click();
+      } catch (err) { console.warn(err); }
+    });
+
+    // Boot
+    if (!getToken()) { showOnly(els.loggedOut); }
+    else { syncGrantBlocks(); loadList(); }
+  </script>
+
+  <style>
+    .admin-shell { padding: 96px 0 64px; min-height: 80vh; }
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 clamp(16px, 3vw, 32px); }
+    .admin-state {
+      max-width: 520px; margin: 0 auto;
+      padding: 48px 32px; text-align: center;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+    }
+    .admin-state h1 { font-size: 22px; margin: 0 0 12px; }
+    .admin-state .muted { margin-bottom: 20px; }
+
+    .admin-head {
+      display: flex; gap: 16px; justify-content: space-between; align-items: flex-start;
+      flex-wrap: wrap; margin-bottom: 24px;
+    }
+    .admin-head h1 { font-size: clamp(22px, 3vw, 30px); margin: 6px 0 8px; }
+    .admin-head .kicker {
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(0, 219, 255, 0.85);
+    }
+    .admin-head code { font-family: 'DM Mono', ui-monospace, monospace; opacity: 0.85; }
+
+    .panel {
+      padding: clamp(20px, 3vw, 28px);
+      margin-bottom: 22px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+    }
+    .panel h2 { font-size: 16px; margin: 0 0 16px; }
+
+    .admin-form { display: flex; flex-direction: column; gap: 14px; }
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .field span { font-size: 12.5px; color: rgba(255,255,255,0.7); }
+    .field span small { color: rgba(255,255,255,0.45); font-size: 11px; }
+    .field input, .field select, .field textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.22);
+      color: inherit;
+      font: inherit;
+      font-family: 'DM Mono', ui-monospace, monospace;
+      font-size: 13px;
+    }
+    .field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible {
+      outline: 2px solid rgba(0, 219, 255, 0.45);
+      outline-offset: 1px;
+    }
+    .field--checkbox {
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      grid-column: 1 / -1;
+    }
+    .field--checkbox span { font-size: 13px; color: rgba(255,255,255,0.78); }
+    .field--checkbox input { width: auto; }
+
+    .grants {
+      border: 1px dashed rgba(0, 219, 255, 0.22);
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .grants legend {
+      padding: 0 8px;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(0, 219, 255, 0.85);
+    }
+
+    .form-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .form-msg { font-size: 13px; }
+    .form-msg--ok { color: rgba(140, 255, 210, 0.95); }
+    .form-msg--err { color: rgba(255, 140, 140, 0.95); }
+    .form-msg--info { color: rgba(255, 255, 255, 0.65); }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: inherit;
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+      text-decoration: none;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn:hover { background: rgba(255,255,255,0.08); }
+    .btn.primary { background: rgba(0, 219, 255, 0.15); border-color: rgba(0, 219, 255, 0.40); color: rgba(220, 245, 255, 0.96); font-weight: 600; }
+    .btn.primary:hover { background: rgba(0, 219, 255, 0.25); }
+    .btn.ghost { background: rgba(255,255,255,0.03); }
+    .btn-sm { padding: 6px 10px; font-size: 12px; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .result-grid { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: start; }
+    @media (max-width: 720px) { .result-grid { grid-template-columns: 1fr; } }
+    .result-grid h3 {
+      font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: rgba(255,255,255,0.55); margin: 0 0 8px;
+    }
+    .code-row { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+    .code-badge {
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(243,225,160,0.10);
+      border: 1px solid rgba(243,225,160,0.32);
+      color: #f3e1a0;
+      font-family: 'DM Mono', ui-monospace, monospace;
+      font-size: 14px; font-weight: 700; letter-spacing: 0.06em;
+    }
+    .code-row input {
+      flex: 1; min-width: 0;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.30);
+      color: inherit;
+      font-family: 'DM Mono', ui-monospace, monospace;
+      font-size: 12.5px;
+    }
+    .qr-shell {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      padding: 14px; border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: #fff;
+    }
+    .qr-shell h3 { color: rgba(0,0,0,0.55); }
+    .qr-shell .btn { background: rgba(0,0,0,0.06); color: #111; border-color: rgba(0,0,0,0.18); }
+    .qr-shell .btn:hover { background: rgba(0,0,0,0.12); }
+
+    .table-wrap { overflow-x: auto; }
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .admin-table th, .admin-table td {
+      text-align: left; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.06);
+      vertical-align: middle;
+    }
+    .admin-table th {
+      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(255,255,255,0.55); font-weight: 600;
+    }
+    .admin-table td code {
+      font-family: 'DM Mono', ui-monospace, monospace;
+      color: #f3e1a0;
+    }
+    .pill {
+      display: inline-block; padding: 2px 9px; border-radius: 99px;
+      font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    }
+    .pill--on { background: rgba(140,255,210,0.10); color: rgba(140,255,210,0.95); border: 1px solid rgba(140,255,210,0.28); }
+    .pill--off { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.55); border: 1px solid rgba(255,255,255,0.12); }
+    .muted { color: rgba(255,255,255,0.55); }
+  </style>
+</BaseLayout>

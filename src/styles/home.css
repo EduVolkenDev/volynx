@@ -997,6 +997,115 @@ a:focus-visible { outline: 2px solid rgba(0, 190, 196, 0.55); outline-offset: 3p
 .nav-links a p { font-weight: 500; } /* sobrescreve seu 420 */
 
 /* ═══════════════════════════════════════════════════════════════
+   REDEEM CODE WIDGET (platform home)
+   Sits between hero and ecosystem. Compact bar that takes a voucher
+   code and calls /redeem-voucher edge.
+   ═══════════════════════════════════════════════════════════════ */
+.redeem-section {
+  padding: clamp(28px, 4vw, 48px) 0 0;
+  position: relative;
+  z-index: 2;
+}
+.redeem-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.4fr);
+  gap: clamp(20px, 3.5vw, 40px);
+  align-items: center;
+  padding: clamp(22px, 3vw, 32px) clamp(22px, 3vw, 36px);
+  background:
+    radial-gradient(circle at 12% 50%, rgba(243, 225, 160, 0.10), transparent 55%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(243, 225, 160, 0.22);
+  border-radius: var(--radius, 22px);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+}
+@media (max-width: 720px) {
+  .redeem-panel { grid-template-columns: 1fr; }
+}
+.redeem-copy { min-width: 0; }
+.redeem-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(243, 225, 160, 0.92);
+}
+.redeem-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(243, 225, 160, 0.95);
+  box-shadow: 0 0 10px rgba(243, 225, 160, 0.6);
+  animation: redeem-pulse 2.4s ease-in-out infinite;
+}
+@keyframes redeem-pulse {
+  0%, 100% { opacity: 0.45; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+.redeem-title {
+  font-size: clamp(20px, 2.2vw, 26px);
+  font-weight: 700;
+  margin: 8px 0 6px;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: #fff;
+}
+.redeem-desc {
+  font-size: 13.5px;
+  color: rgba(232, 238, 248, 0.66);
+  margin: 0;
+  line-height: 1.5;
+}
+.redeem-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  position: relative;
+}
+.redeem-form input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.34);
+  color: #fff;
+  font-family: 'DM Mono', ui-monospace, "Menlo", monospace;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: border-color 0.2s, background 0.2s;
+}
+.redeem-form input:focus-visible {
+  outline: none;
+  border-color: rgba(243, 225, 160, 0.55);
+  background: rgba(0, 0, 0, 0.46);
+}
+.redeem-form .button {
+  white-space: nowrap;
+}
+.redeem-msg {
+  grid-column: 1 / -1;
+  margin: 0;
+  min-height: 18px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.55);
+  transition: color 0.2s;
+}
+.redeem-msg[data-kind="ok"] { color: rgba(140, 255, 210, 0.95); }
+.redeem-msg[data-kind="err"] { color: rgba(255, 140, 140, 0.95); }
+.redeem-msg[data-kind="info"] { color: rgba(243, 225, 160, 0.85); }
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+@media (max-width: 480px) {
+  .redeem-form { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
    DEV JOURNEY MISSION SECTION (home)
    Sits between Lab and Featured. "Free education" beat after "Free tools".
    Single-column copy panel + journey icon floating absolute on the right.

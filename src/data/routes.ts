@@ -74,6 +74,9 @@ export const ROUTES = {
   activate: "/activate/",
   blackDiamond: "/invite/black-diamond/",
 
+  // ── Admin (gated by profiles.is_admin) ───
+  adminVouchers: "/admin/vouchers/",
+
   // ── Other ─────────────────────────────
   devJourney: "/dev-journey/",
   devJourneyStudent: "/dev-journey/student/",

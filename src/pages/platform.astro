@@ -74,6 +74,158 @@ const homeAssistItems = [
       <img src="/assets/ecosystem.webp" alt="" loading="lazy" />
     </div>
 
+    <!-- ═══ REDEEM CODE WIDGET ═══ -->
+    <section class="page-section redeem-section" id="redeem" aria-label="Redeem code">
+      <div class="shell">
+        <article class="panel redeem-panel">
+          <div class="redeem-copy">
+            <span class="redeem-eyebrow">
+              <span class="redeem-dot" aria-hidden="true"></span>
+              <span class="i18n-en">Have a code or invite?</span>
+              <span class="i18n-pt">Tem um código ou convite?</span>
+            </span>
+            <h2 class="redeem-title">
+              <span class="i18n-en">Apply your voucher</span>
+              <span class="i18n-pt">Use seu voucher</span>
+            </h2>
+            <p class="redeem-desc">
+              <span class="i18n-en">Black Diamond invite, discount code, VX grant or kit unlock — paste it below.</span>
+              <span class="i18n-pt">Convite Black Diamond, código de desconto, VX bônus ou unlock de kit — cole aqui.</span>
+            </p>
+          </div>
+          <form class="redeem-form" id="redeemForm" autocomplete="off">
+            <label for="redeemCode" class="visually-hidden">
+              <span class="i18n-en">Voucher code</span>
+              <span class="i18n-pt">Código do voucher</span>
+            </label>
+            <input
+              type="text"
+              id="redeemCode"
+              name="code"
+              placeholder="BD-XXXXXXXX"
+              maxlength="40"
+              autocapitalize="characters"
+              spellcheck="false"
+              required
+            />
+            <button type="submit" id="redeemBtn" class="button button--gold">
+              <span class="i18n-en">Apply</span>
+              <span class="i18n-pt">Aplicar</span>
+            </button>
+            <p class="redeem-msg" id="redeemMsg" aria-live="polite"></p>
+          </form>
+        </article>
+      </div>
+    </section>
+
+    <script is:inline>
+      (function () {
+        var form = document.getElementById("redeemForm");
+        if (!form) return;
+        var input = document.getElementById("redeemCode");
+        var btn = document.getElementById("redeemBtn");
+        var msg = document.getElementById("redeemMsg");
+
+        // Pre-fill from ?code= (handles login redirect flow)
+        try {
+          var params = new URLSearchParams(location.search);
+          var pre = params.get("code");
+          if (pre) input.value = pre.toUpperCase();
+        } catch (_) {}
+
+        function getToken() {
+          try { return localStorage.getItem("volynx_access_token") || ""; } catch (_) { return ""; }
+        }
+
+        async function getApiBase() {
+          try {
+            var cfg = await fetch("/config.json", { cache: "no-store" }).then(function (r) { return r.json(); });
+            return (cfg.functionsUrl || "").replace(/\/$/, "");
+          } catch (_) { return ""; }
+        }
+
+        function setMsg(text, kind) {
+          msg.textContent = text || "";
+          msg.dataset.kind = kind || "";
+        }
+
+        function describeGrants(grants) {
+          if (!grants || typeof grants !== "object") return "";
+          var parts = [];
+          if (grants.tokens) parts.push(grants.tokens + " VX");
+          if (grants.builder_plan) parts.push("Builder " + grants.builder_plan);
+          if (grants.daily_plan) parts.push("Daily " + grants.daily_plan);
+          if (grants.plan) parts.push(String(grants.plan).charAt(0).toUpperCase() + String(grants.plan).slice(1));
+          if (grants.duration_days) parts.push("(" + grants.duration_days + "d)");
+          if (grants.kit_id) parts.push("Kit " + grants.kit_id);
+          if (grants.discount_pct) parts.push(grants.discount_pct + "% off");
+          if (grants.badge) parts.push(grants.badge + " badge");
+          return parts.join(" · ");
+        }
+
+        form.addEventListener("submit", async function (e) {
+          e.preventDefault();
+          var code = (input.value || "").trim().toUpperCase();
+          if (!code) return;
+          input.value = code;
+
+          var token = getToken();
+          if (!token) {
+            // Not logged in: bounce to login, preserve code via query param
+            var next = "/platform/&code=" + encodeURIComponent(code);
+            location.assign("/login/?next=" + encodeURIComponent("/platform/?code=" + code));
+            return;
+          }
+
+          btn.disabled = true;
+          setMsg(document.documentElement.lang.startsWith("pt") ? "Aplicando..." : "Applying...", "info");
+
+          try {
+            var apiBase = await getApiBase();
+            if (!apiBase) {
+              setMsg("API unavailable", "err");
+              btn.disabled = false;
+              return;
+            }
+            var res = await fetch(apiBase + "/redeem-voucher", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+              body: JSON.stringify({ code: code }),
+            });
+            var data = await res.json().catch(function () { return {}; });
+
+            if (data && data.ok) {
+              var grantsTxt = describeGrants(data.grants_applied);
+              var label = document.documentElement.lang.startsWith("pt")
+                ? (grantsTxt ? "Aplicado: " + grantsTxt : "Voucher aplicado!")
+                : (grantsTxt ? "Applied: " + grantsTxt : "Voucher applied!");
+              setMsg(label, "ok");
+              input.value = "";
+            } else {
+              var err = (data && (data.error || data.message)) || ("HTTP " + res.status);
+              var errMap = {
+                voucher_not_found: { en: "Code not found.", pt: "Código não encontrado." },
+                voucher_expired: { en: "Code expired.", pt: "Código expirado." },
+                voucher_exhausted: { en: "Code already used up.", pt: "Código já foi usado." },
+                voucher_inactive: { en: "Code is not active.", pt: "Código não está ativo." },
+                target_email_mismatch: { en: "This code was issued for another email.", pt: "Esse código foi emitido para outro email." },
+                already_redeemed: { en: "You already redeemed this code.", pt: "Você já usou esse código." },
+              };
+              var pt = document.documentElement.lang.startsWith("pt");
+              var msgTxt = errMap[err]
+                ? (pt ? errMap[err].pt : errMap[err].en)
+                : (pt ? "Erro: " + err : "Error: " + err);
+              setMsg(msgTxt, "err");
+            }
+          } catch (err) {
+            setMsg("Network error", "err");
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      })();
+    </script>
+
     <!-- ═══ ECOSYSTEM ═══ -->
     <section id="ecosystem" class="page-section">
       <div class="shell section-head section-head--split">
