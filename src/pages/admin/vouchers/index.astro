@@ -55,7 +55,7 @@ const title = "Admin · Vouchers — VOLYNX";
               <label class="field">
                 <span>Category</span>
                 <select id="type" name="type" required>
-                  <option value="black_diamond">Black Diamond invite — full founder access</option>
+                  <option value="black_diamond">Black Diamond invite — private invitation pack</option>
                   <option value="plan">Plan upgrade — change tier</option>
                   <option value="tokens">VX tokens — credit balance</option>
                   <option value="kit">Kit unlock — Portfolio / Agency / SaaS</option>
@@ -68,14 +68,35 @@ const title = "Admin · Vouchers — VOLYNX";
 
               <!-- BLACK DIAMOND -->
               <div class="grant-block" data-grant-for="black_diamond">
-                <p class="grant-help">Founder-level invite. Sets <code>is_black_diamond=true</code> and upgrades plan in one redemption.</p>
-                <label class="field">
-                  <span>Plan to upgrade to</span>
-                  <select name="grant_plan_bd">
-                    <option value="diamond" selected>diamond</option>
-                    <option value="studio">studio</option>
-                  </select>
-                </label>
+                <p class="grant-help">Private invitation pack. On redemption: sets <code>is_black_diamond=true</code>, grants 80 VX, Daily Diamond for 90 days, and 3 premium icon packs. Builder is not included. Defaults below — override per voucher.</p>
+                <div class="form-row">
+                  <label class="field">
+                    <span>Daily plan</span>
+                    <select name="grant_daily_plan_bd">
+                      <option value="diamond" selected>Daily Diamond</option>
+                      <option value="pro">Daily Pro</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Daily duration (days)</span>
+                    <input type="number" name="grant_daily_expires_days" min="1" max="3650" value="90" />
+                  </label>
+                  <label class="field">
+                    <span>VX tokens</span>
+                    <input type="number" name="grant_bd_tokens" min="0" max="10000" value="80" />
+                  </label>
+                </div>
+                <fieldset class="bd-packs">
+                  <legend>Icon packs (3 by default)</legend>
+                  <label><input type="checkbox" name="bd_pack" value="Hyper-Icons-Premium" checked> Hyper Icons Premium</label>
+                  <label><input type="checkbox" name="bd_pack" value="Poligon-Premium" checked> Poligon Premium</label>
+                  <label><input type="checkbox" name="bd_pack" value="metal-chrome-premium" checked> Metal Chrome Premium</label>
+                  <label><input type="checkbox" name="bd_pack" value="Icons-Glass-Premium"> Icons Glass Premium</label>
+                  <label><input type="checkbox" name="bd_pack" value="Iridescent-Premium"> Iridescent Premium</label>
+                  <label><input type="checkbox" name="bd_pack" value="glow-premium"> Glow Premium</label>
+                  <label><input type="checkbox" name="bd_pack" value="purple-icons-premium"> Purple Icons Premium</label>
+                  <label><input type="checkbox" name="bd_pack" value="vintage-premium"> Vintage Premium</label>
+                </fieldset>
               </div>
 
               <!-- PLAN -->
@@ -386,8 +407,19 @@ const title = "Admin · Vouchers — VOLYNX";
       let grants = {};
 
       if (type === "black_diamond") {
-        // BD must include badge:'black_diamond' to trigger redeem-voucher's BD path
-        grants = { badge: "black_diamond", plan: String(fd.get("grant_plan_bd") || "diamond") };
+        // BD must include badge:'black_diamond' to trigger redeem-voucher's BD path.
+        // Default pack: 80 VX + Daily Diamond 90 days + 3 premium icon packs. Builder NOT included.
+        const dailyPlan = String(fd.get("grant_daily_plan_bd") || "diamond");
+        const days = Number(fd.get("grant_daily_expires_days")) || 90;
+        const tokensBd = Number(fd.get("grant_bd_tokens")) || 0;
+        const packs = Array.from(els.form.querySelectorAll('input[name="bd_pack"]:checked')).map((el) => el.value);
+        grants = {
+          badge: "black_diamond",
+          daily_plan: dailyPlan,
+          daily_plan_expires_in_days: days,
+          icon_pack_grants: packs,
+        };
+        if (tokensBd > 0) grants.tokens = tokensBd;
       } else if (type === "plan") {
         const plan = String(fd.get("grant_plan") || "pro");
         const scope = String(fd.get("grant_plan_scope") || "plan");
@@ -774,6 +806,35 @@ const title = "Admin · Vouchers — VOLYNX";
       margin-top: 4px;
       padding-top: 12px;
       border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .bd-packs {
+      border: 1px dashed rgba(243, 225, 160, 0.25);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 8px;
+      margin: 0;
+    }
+    .bd-packs legend {
+      grid-column: 1 / -1;
+      padding: 0 6px;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(243, 225, 160, 0.85);
+    }
+    .bd-packs label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.78);
+      cursor: pointer;
+      padding: 2px 0;
+    }
+    .bd-packs input[type="checkbox"] {
+      accent-color: #f3e1a0;
     }
 
     .form-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
