@@ -14,11 +14,13 @@ const isProfile = Astro.url.pathname.startsWith("/profile");
     id="vxLangToggle"
     class="vx-widget vx-lang-btn"
     type="button"
-    aria-label="Toggle language"
-    data-i18n-aria="aria.toggle_lang"
     data-vx-lang-toggle
     data-vx-lang-title
   >
+    <span class="vx-sr-only">
+      <span class="i18n-en">Language: </span>
+      <span class="i18n-pt">Idioma: </span>
+    </span>
     <span class="vx-lang-label" data-i18n="widget.lang" data-vx-lang-label>EN</span>
   </button>
   {!isAuth && (
@@ -117,6 +119,12 @@ const isProfile = Astro.url.pathname.startsWith("/profile");
     left: unset;
   }
 
+  .vx-sr-only {
+    position: absolute !important;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+  }
   .vx-lang-btn {
     min-width: 48px;
     padding: 7px 11px;
