@@ -5,6 +5,7 @@ import VxHeader from "../../../components/VxHeader.astro";
 import VxFooter from "../../../components/VxFooter.astro";
 import PageWidgets from "../../../components/PageWidgets.astro";
 import { ROUTES } from "../../../data/routes";
+import { DEVJOURNEY_DELIVERABLES } from "../../../data/devjourney-deliverables.js";
 ---
 
 <!DOCTYPE html>
@@ -84,7 +85,7 @@ import { ROUTES } from "../../../data/routes";
             <span class="djs-quick-cta"><span class="i18n-en">Open checklist →</span><span class="i18n-pt">Abrir checklist →</span></span>
           </a>
 
-          <a class="djs-quick-card djs-quick-card--soon" href="#materials">
+          <a class="djs-quick-card" href="#downloads">
             <div class="djs-quick-badge">02</div>
             <h3><span class="i18n-en">Materials</span><span class="i18n-pt">Materiais</span></h3>
             <p>
@@ -105,6 +106,69 @@ import { ROUTES } from "../../../data/routes";
           </a>
         </div>
 
+        <section id="downloads" class="djs-downloads">
+          <div class="sectionTitle" style="border-top:none; padding-top:0; margin-bottom: 14px;">
+            <div>
+              <h2 style="margin:0 0 8px;">
+                <span class="i18n-en">Download vault</span>
+                <span class="i18n-pt">Vault de downloads</span>
+              </h2>
+              <p class="muted" style="margin:0;">
+                <span class="i18n-en">Each tier unlocks one clean ZIP. Open your pack here, then use the breakdown below as your study map.</span>
+                <span class="i18n-pt">Cada tier libera um ZIP limpo. Abra seu pacote aqui e use o detalhamento abaixo como mapa de estudo.</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="djs-download-grid">
+            {DEVJOURNEY_DELIVERABLES.map((pack) => (
+              <article
+                class:list={[
+                  "djs-download-card",
+                  `djs-download-card--${pack.tier}`,
+                  pack.tier !== "social" && "djs-download-card--locked",
+                ]}
+                data-tier-required={pack.tier !== "social" ? pack.tier : undefined}
+              >
+                <div class="djs-download-head">
+                  <span class:list={["djs-mat-tier-pill", pack.tier]}>
+                    <span class="i18n-en">{pack.badgeEn}</span>
+                    <span class="i18n-pt">{pack.badgePt}</span>
+                  </span>
+                  {pack.tier !== "social" && (
+                    <a class="djs-unlock" href="/dev-journey/#upgrade">
+                      <span class="i18n-en">Unlock with {pack.badgeEn}</span>
+                      <span class="i18n-pt">Desbloquear com {pack.badgePt}</span>
+                    </a>
+                  )}
+                </div>
+
+                <h3>
+                  <span class="i18n-en">{pack.titleEn}</span>
+                  <span class="i18n-pt">{pack.titlePt}</span>
+                </h3>
+
+                <p class="djs-download-copy">
+                  <span class="i18n-en">{pack.summaryEn}</span>
+                  <span class="i18n-pt">{pack.summaryPt}</span>
+                </p>
+
+                <p class="djs-download-note">
+                  <span class="i18n-en">{pack.noteEn}</span>
+                  <span class="i18n-pt">{pack.notePt}</span>
+                </p>
+
+                <div class="djs-download-actions">
+                  <a class="btn primary djs-download-btn" href={pack.href} download={pack.fileName}>
+                    <span class="i18n-en">{pack.ctaEn}</span>
+                    <span class="i18n-pt">{pack.ctaPt}</span>
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
         <!-- Materials list (gated) -->
         <section id="materials" class="djs-materials">
           <h2><span class="i18n-en">Your materials</span><span class="i18n-pt">Seus materiais</span></h2>
@@ -118,8 +182,8 @@ import { ROUTES } from "../../../data/routes";
               <li><span class="djs-mat-icon">📄</span><span class="i18n-en">Universal setup checklist</span><span class="i18n-pt">Checklist universal de setup</span></li>
             </ul>
             <p class="djs-mat-status">
-              <span class="i18n-en">📦 Social ZIP delivery being prepared. We'll email you when it's ready.</span>
-              <span class="i18n-pt">📦 Pacote ZIP do Social em preparação. Você recebe por email quando estiver pronto.</span>
+              <span class="i18n-en">📦 The Social ZIP is live in the download vault above.</span>
+              <span class="i18n-pt">📦 O ZIP Social já está liberado no vault de downloads acima.</span>
             </p>
           </div>
 
@@ -140,9 +204,18 @@ import { ROUTES } from "../../../data/routes";
               <span class="djs-mat-tier-pill pro">Pro</span>
               <a class="djs-unlock" href="/dev-journey/#upgrade"><span class="i18n-en">Unlock with Pro</span><span class="i18n-pt">Desbloquear com Pro</span></a>
             </h3>
+            <ul class="djs-mat-list">
+              <li><span class="djs-mat-icon">📄</span><span class="i18n-en">Block 3 PDF — incremental React app</span><span class="i18n-pt">PDF do Bloco 3 — app React incremental</span></li>
+              <li><span class="djs-mat-icon">⚛️</span><span class="i18n-en">Complete Vite starter with components and sample data</span><span class="i18n-pt">Starter completo em Vite com components e dados de exemplo</span></li>
+              <li><span class="djs-mat-icon">🧭</span><span class="i18n-en">Shared course guides and setup docs bundled together</span><span class="i18n-pt">Guias compartilhados do curso e docs de setup empacotados juntos</span></li>
+            </ul>
             <p class="muted">
               <span class="i18n-en">PDF + complete React starter project (Vite + components). Available with Pro.</span>
               <span class="i18n-pt">PDF + projeto React starter completo (Vite + components). Disponível no Pro.</span>
+            </p>
+            <p class="djs-mat-status">
+              <span class="i18n-en">📦 When unlocked, download the Pro ZIP from the vault above.</span>
+              <span class="i18n-pt">📦 Quando liberar, baixe o ZIP Pro no vault acima.</span>
             </p>
           </div>
 
@@ -152,9 +225,18 @@ import { ROUTES } from "../../../data/routes";
               <span class="djs-mat-tier-pill bundle">Bundle</span>
               <a class="djs-unlock" href="/dev-journey/#upgrade"><span class="i18n-en">Unlock with Bundle</span><span class="i18n-pt">Desbloquear com Bundle</span></a>
             </h3>
+            <ul class="djs-mat-list">
+              <li><span class="djs-mat-icon">📄</span><span class="i18n-en">Blocks 4 + 5 PDFs with API and deploy guidance</span><span class="i18n-pt">PDFs dos Blocos 4 + 5 com orientacao de API e deploy</span></li>
+              <li><span class="djs-mat-icon">🛠</span><span class="i18n-en">Express API starter and GitHub Actions workflow example</span><span class="i18n-pt">Starter de API Express e exemplo de workflow no GitHub Actions</span></li>
+              <li><span class="djs-mat-icon">📦</span><span class="i18n-en">Arsenal Kit with reusable projects and cheatcodes</span><span class="i18n-pt">Arsenal Kit com projetos reutilizaveis e cheatcodes</span></li>
+            </ul>
             <p class="muted">
               <span class="i18n-en">Express API, deploy with GitHub Actions, certification rules, Arsenal Kit (4 reusable projects + Cheatcodes).</span>
               <span class="i18n-pt">API Express, deploy com GitHub Actions, regras de certificação, Arsenal Kit (4 projetos reutilizáveis + Cheatcodes).</span>
+            </p>
+            <p class="djs-mat-status">
+              <span class="i18n-en">📦 When unlocked, download the Bundle ZIP from the vault above.</span>
+              <span class="i18n-pt">📦 Quando liberar, baixe o ZIP Bundle no vault acima.</span>
             </p>
           </div>
         </section>
@@ -226,6 +308,7 @@ import { ROUTES } from "../../../data/routes";
             var req = block.getAttribute('data-tier-required');
             if (rank[req] != null && userRank >= rank[req]) {
               block.classList.remove('djs-mat-locked');
+              block.classList.remove('djs-download-card--locked');
               var unlock = block.querySelector('.djs-unlock');
               if (unlock) unlock.style.display = 'none';
             }
@@ -281,6 +364,60 @@ import { ROUTES } from "../../../data/routes";
 
     .djs-materials { margin-top: 8px; }
     .djs-materials h2 { font-size: 22px; margin: 0 0 18px; }
+    .djs-downloads { margin: 0 0 28px; }
+    .djs-download-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 14px;
+    }
+    .djs-download-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 18px 20px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+    }
+    .djs-download-card--social { border-color: rgba(140,255,210,.18); }
+    .djs-download-card--pro { border-color: rgba(0,219,255,.18); }
+    .djs-download-card--bundle { border-color: rgba(243,225,160,.20); }
+    .djs-download-card--locked { opacity: 0.72; }
+    .djs-download-card--locked .djs-download-btn { display: none; }
+    .djs-download-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .djs-download-card h3 {
+      margin: 0;
+      font-size: 16px;
+      color: #fff;
+    }
+    .djs-download-copy {
+      margin: 0;
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: rgba(255,255,255,.76);
+    }
+    .djs-download-note {
+      margin: 0;
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: rgba(255,255,255,.58);
+    }
+    .djs-download-actions {
+      display: flex;
+      margin-top: auto;
+    }
+    .djs-download-btn {
+      width: 100%;
+      justify-content: center;
+      text-align: center;
+    }
     .djs-mat-block {
       padding: 18px 20px; margin-bottom: 14px;
       border: 1px solid rgba(255,255,255,.10);
@@ -336,6 +473,7 @@ import { ROUTES } from "../../../data/routes";
     @media (max-width: 720px) {
       .container { padding-left: 16px; padding-right: 16px; }
       .sectionTitle { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .djs-download-grid { grid-template-columns: 1fr; }
     }
   </style>
 </body>
