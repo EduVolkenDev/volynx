@@ -422,9 +422,11 @@ const pricingAssistItems = [
         <h2><span class="i18n-en">Extras to boost value</span><span class="i18n-pt">Extras para aumentar valor</span></h2>
       </div>
       <div class="shell grid-3">
-        {sitePricing.builderAddons.map((addon) => (
-          <AddonCard addon={addon} locale={lang} currency={currency} />
-        ))}
+        {sitePricing.builderAddons
+          .filter((addon) => addon.availability !== 'coming_soon')
+          .map((addon) => (
+            <AddonCard addon={addon} locale={lang} currency={currency} />
+          ))}
       </div>
       <div class="shell">
         <div class="checkout-support"><span class="i18n-en"><strong>You are adding an extra to your plan.</strong> This add-on expands your capacity or unlocks an extra feature without requiring an immediate plan change.</span><span class="i18n-pt"><strong>Você está adicionando um extra ao seu plano.</strong> Este add-on amplia sua capacidade ou desbloqueia um recurso complementar sem exigir troca imediata de plano.</span></div>
