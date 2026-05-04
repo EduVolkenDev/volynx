@@ -1,6 +1,57 @@
 ---
-// src/pages/index.astro
-// Página de entrada da Volynx — substitui o index.astro atual
+import { ROUTES } from "../data/routes";
+
+const platformSurfaces = [
+  {
+    num: "01",
+    name: "VOLYNX Builder",
+    desc: "Workspace no-code para criar e publicar sites premium com preview ao vivo, kits prontos e domínio próprio.",
+    tag: "Sites & Publicação",
+    href: ROUTES.builder,
+  },
+  {
+    num: "02",
+    name: "VOLYNX Daily",
+    desc: "A camada operacional do dia a dia: My Day, Scanner, Summary, Vault, Writing e Decision dentro de um único sistema.",
+    tag: "Rotina & Produtividade",
+    href: ROUTES.daily,
+  },
+  {
+    num: "03",
+    name: "CVitae",
+    desc: "Editor de currículo com preview ao vivo. Você monta grátis e exporta com acabamento premium quando precisar.",
+    tag: "Carreira",
+    href: ROUTES.cvitae,
+  },
+  {
+    num: "04",
+    name: "VOLYNX Lab + Studio Pro",
+    desc: "Ferramentas no browser para converter, redimensionar e gerar assets. Lab é grátis; Studio Pro libera ações premium com VX.",
+    tag: "Ferramentas & VX",
+    href: ROUTES.lab,
+  },
+  {
+    num: "05",
+    name: "PropertyFlow",
+    desc: "Plataforma imobiliária bilíngue com catálogo inteligente, filtros ao vivo e apresentação premium para agências e corretores.",
+    tag: "Real Estate",
+    href: ROUTES.propertyflow,
+  },
+  {
+    num: "06",
+    name: "Products",
+    desc: "Catálogo dos kits, assets e do Icon Vault da VOLYNX: portfolio, SaaS, agência e packs prontos para usar.",
+    tag: "Kits & Assets",
+    href: ROUTES.products,
+  },
+  {
+    num: "07",
+    name: "Services",
+    desc: "Projetos sob medida de site + marca, conduzidos por briefing, escopo claro e entrega profissional do início ao deploy.",
+    tag: "Serviços Sob Medida",
+    href: ROUTES.services,
+  },
+];
 ---
 
 <!DOCTYPE html>
@@ -9,7 +60,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Volynx — Bem-vindos</title>
-<meta name="description" content="8 meses de criação. Um ecossistema nascido do coração. Bem-vindos à Volynx.">
+<meta name="description" content="Oito meses sem parar. Muitas horas de trabalho. Um lançamento que apresenta a VOLYNX e abre a plataforma em /platform.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -297,13 +348,18 @@
 
   .tool-card {
     background: var(--black);
+    display: block;
     padding: 36px 32px;
+    text-decoration: none;
+    color: inherit;
     transition: background 0.3s;
-    cursor: default;
+    cursor: pointer;
+    min-height: 100%;
   }
 
   .tool-card:hover { background: rgba(201,168,92,0.04); }
   .tool-card:hover .tool-num { color: var(--gold); }
+  .tool-card:hover .tool-name { color: var(--gold); }
 
   .tool-num {
     font-size: 10px;
@@ -523,13 +579,13 @@
 <section class="hero">
   <div class="hero-bg"></div>
   <div class="hero-lines"></div>
-  <div class="hero-counter">Meses de Criação</div>
+  <div class="hero-counter">8 meses de criação</div>
   <div class="hero-months">8</div>
-  <div class="hero-months-label">oito meses para mudar tudo</div>
+  <div class="hero-months-label">oito meses sem parar</div>
   <h1 class="hero-tagline">
-    Dias que duraram <em>mais de 30 horas.</em><br>
-    Noites que viraram código.<br>
-    Um sonho que virou realidade.
+    Oito meses de trabalho intenso.<br>
+    Dias de <em>mais de 30 horas.</em><br>
+    Uma visão que virou VOLYNX.
   </h1>
   <div class="scroll-hint">
     <span>continuar</span>
@@ -539,14 +595,14 @@
 
 <!-- STORY -->
 <section class="story">
-  <div class="section-label reveal">A História</div>
+  <div class="section-label reveal">O processo</div>
   <div class="story-text reveal">
-    <p>Por <strong>8 meses</strong>, o mundo ao redor continuou girando — e eu também girei, mas ao redor de uma tela, de um editor de código, de uma ideia que não me deixava dormir.</p>
-    <p>Foram <strong>8 meses de criação intensa.</strong> Dias que começavam com café e terminavam com café — porque simplesmente não terminavam. Sessões de <span class="accent">mais de 30 horas programando sem parar</span>, onde o cansaço virava combustível e cada bug resolvido parecia uma pequena vitória existencial.</p>
-    <p>Construí isso <strong>sozinho.</strong> Cada linha de código, cada decisão de arquitetura, cada pixel de interface — fruto de uma única mente que se recusou a desistir. E foi exatamente essa solidão que transformou o projeto em algo mais profundo: não era mais só código. Era uma extensão de quem eu sou.</p>
+    <p>Por <strong>8 meses</strong>, tudo ao redor continuou andando enquanto eu voltava para a mesma tela, para a mesma ideia e para a mesma vontade de construir algo real.</p>
+    <p>Foram <strong>8 meses sem pausa de verdade.</strong> Muitas horas por dia, noites inteiras e sessões de <span class="accent">mais de 30 horas programando sem parar</span>, ajustando arquitetura, interface, lógica e detalhe por detalhe.</p>
+    <p>Construí a VOLYNX <strong>sozinho.</strong> Cada linha de código, cada decisão e cada pixel passaram pela mesma cabeça e pela mesma obsessão de fazer isso existir do jeito certo.</p>
     <span class="break">— — —</span>
-    <p>Desde que me entendo por pessoa, eu quis ser programador. Não apenas alguém que escreve software, mas alguém que <span class="accent">cria algo maior</span> — algo que chegue na vida real das pessoas e deixe uma marca positiva. Esse era o sonho. E por muito tempo, ficou guardado ali, esperando o momento certo.</p>
-    <p>Esses <strong>8 meses foram esse momento.</strong> A oportunidade de finalmente transformar vontade em produto, abstrato em concreto, sonho em ecossistema.</p>
+    <p>Eu sempre quis ser programador não só para escrever software, mas para <span class="accent">criar algo maior</span> — algo que chegasse na vida real das pessoas com utilidade, padrão e impacto.</p>
+    <p>Esses <strong>8 meses foram a travessia entre sonho e produto.</strong> O resultado é esta plataforma: um ecossistema pronto para começar.</p>
   </div>
 </section>
 
@@ -557,7 +613,7 @@
   <h2 class="welcome-title reveal">
     <span class="voly">Bem-vindos à </span><span class="nx">Volynx</span>
   </h2>
-  <p class="welcome-subtitle reveal">Um ecossistema nascido do zero. Do coração. Para o mundo.</p>
+  <p class="welcome-subtitle reveal">Um ecossistema criado do zero, com ambição real e padrão alto.</p>
 </section>
 
 <div class="divider"></div>
@@ -566,46 +622,18 @@
 <section class="about">
   <div class="section-label reveal">O que é a Volynx</div>
   <p class="about-intro reveal">
-    A Volynx não é uma plataforma. É um <strong>ecossistema vivo</strong> — um conjunto integrado de ferramentas pensadas para conectar pessoas, impulsionar negócios e facilitar a vida de quem constrói o futuro.
+    A VOLYNX não é uma ferramenta só. É um <strong>ecossistema conectado</strong>, onde cada área tem uma função real: criar, organizar, vender, entregar e escalar.
   </p>
 
   <div class="tools-grid reveal">
-    <div class="tool-card">
-      <div class="tool-num">01</div>
-      <div class="tool-name">Volynx Core</div>
-      <div class="tool-desc">A espinha dorsal do ecossistema. Tudo se conecta aqui — identidade, dados, permissões e fluxos de trabalho unificados em uma única camada inteligente.</div>
-      <div class="tool-tag">Plataforma Central</div>
-    </div>
-    <div class="tool-card">
-      <div class="tool-num">02</div>
-      <div class="tool-name">Volynx Studio</div>
-      <div class="tool-desc">Criação sem limites. Uma workspace visual para construir, publicar e escalar projetos — desde landing pages até produtos digitais completos.</div>
-      <div class="tool-tag">Criação & Publicação</div>
-    </div>
-    <div class="tool-card">
-      <div class="tool-num">03</div>
-      <div class="tool-name">Volynx Connect</div>
-      <div class="tool-desc">Relacionamentos que importam. Ferramentas de networking e colaboração pensadas para criar pontes entre pessoas com propósitos alinhados.</div>
-      <div class="tool-tag">Comunidade & Rede</div>
-    </div>
-    <div class="tool-card">
-      <div class="tool-num">04</div>
-      <div class="tool-name">Volynx Flow</div>
-      <div class="tool-desc">Automação com personalidade. Fluxos inteligentes que trabalham para você — sem complexidade técnica, com resultados reais.</div>
-      <div class="tool-tag">Automação</div>
-    </div>
-    <div class="tool-card">
-      <div class="tool-num">05</div>
-      <div class="tool-name">Volynx Insight</div>
-      <div class="tool-desc">Dados que falam humano. Dashboards e análises que transformam números em decisões claras e estratégias de impacto.</div>
-      <div class="tool-tag">Analytics</div>
-    </div>
-    <div class="tool-card">
-      <div class="tool-num">06</div>
-      <div class="tool-name">Volynx Market</div>
-      <div class="tool-desc">Um espaço para criar, vender e crescer. Monetize seu trabalho, seu conhecimento, sua criatividade — dentro do ecossistema que já é seu.</div>
-      <div class="tool-tag">Comércio & Monetização</div>
-    </div>
+    {platformSurfaces.map((surface) => (
+      <a class="tool-card" href={surface.href}>
+        <div class="tool-num">{surface.num}</div>
+        <div class="tool-name">{surface.name}</div>
+        <div class="tool-desc">{surface.desc}</div>
+        <div class="tool-tag">{surface.tag}</div>
+      </a>
+    ))}
   </div>
 </section>
 
@@ -613,29 +641,24 @@
 <section class="manifesto">
   <div class="section-label reveal">O Propósito</div>
   <div class="manifesto-text reveal">
-    <p>A Volynx foi construída com uma crença muito simples e muito profunda: <span class="highlight">a tecnologia só tem valor quando toca a vida das pessoas.</span></p>
-    <p>Não construímos ferramentas por construir. Construímos pontes — entre quem tem uma ideia e quem pode se beneficiar dela, entre quem produz e quem precisa, entre o local e o global.</p>
-    <p>O mindset aqui é de <span class="highlight">impacto positivo em escala.</span> Cada funcionalidade foi pensada para resolver algo real. Cada decisão de design foi guiada pela pergunta: isso facilita a vida de alguém? Isso aproxima pessoas? Isso abre uma porta que antes estava fechada?</p>
-    <p>A Volynx é um ecossistema <span class="highlight">humano</span> — porque foi feito por um humano, com um coração, com um sonho. E agora, esse sonho é seu também.</p>
+    <p>A VOLYNX nasceu de uma crença simples: <span class="highlight">tecnologia só vale quando ajuda alguém de verdade.</span></p>
+    <p>Por isso cada área do ecossistema existe para resolver um problema concreto — criar com mais clareza, trabalhar com mais fluidez, vender melhor e apresentar ideias com mais força.</p>
+    <p>No fim, este lançamento não é sobre software por software. É sobre construir ferramentas com intenção, padrão alto e impacto real.</p>
   </div>
 </section>
 
 <!-- CTA ENTER -->
 <section class="cta-section">
-  <div class="cta-label reveal">Você está pronto</div>
+  <div class="cta-label reveal">A próxima etapa</div>
   <h2 class="cta-heading reveal">
-    O ecossistema está esperando<br>
-    <strong>por você.</strong>
+    A apresentação termina aqui.<br>
+    <strong>A plataforma começa agora.</strong>
   </h2>
-  <!-- 
-    Troque o href abaixo pela rota da sua plataforma.
-    Ex: "/app", "/dashboard", "/home" — o que for seu index atual
-  -->
-  <a href="/platform" class="enter-btn reveal">
-    <span>Entrar na Volynx</span>
+  <a href={ROUTES.platform} class="enter-btn reveal">
+    <span>Entrar na plataforma</span>
     <span class="arrow">→</span>
   </a>
-  <p class="cta-sub reveal">volynx.world</p>
+  <p class="cta-sub reveal">volynx.world/platform</p>
 </section>
 
 <!-- SIGN -->
