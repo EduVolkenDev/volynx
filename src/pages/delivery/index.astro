@@ -485,6 +485,33 @@ const deliveryAssistItems = [
       return 'Open account';
     }
 
+    function devJourneyTierLabel(tier) {
+      const normalized = String(tier || '').toLowerCase();
+      if (normalized === 'pro') return 'Pro Track';
+      if (normalized === 'bundle') return 'Bundle';
+      return 'Social Sprint';
+    }
+
+    function buildDevJourneyCard(progress) {
+      const tier = String(progress?.tier || '').toLowerCase();
+      if (tier !== 'pro' && tier !== 'bundle') return '';
+
+      return `
+        <article class="panel delivery-card delivery-card--subscription">
+          <div class="delivery-card__body">
+            <span class="eyebrow delivery-card__eyebrow">Course access</span>
+            <h3 class="delivery-card__name">Dev Journey — ${devJourneyTierLabel(tier)}</h3>
+            <dl class="delivery-card__meta">
+              <div><dt>Tier</dt><dd>${devJourneyTierLabel(tier)}</dd></div>
+              <div><dt>Delivery</dt><dd>ZIPs live in the student area</dd></div>
+            </dl>
+          </div>
+          <div class="delivery-card__actions">
+            <a href="/dev-journey/student/" class="button button--gold delivery-card__cta">Open student area</a>
+          </div>
+        </article>`;
+    }
+
     function buildSubscriptionCard(row) {
       const label = subscriptionLabel(row);
       const created = formatDate(row.created_at);
@@ -763,21 +790,34 @@ const deliveryAssistItems = [
         'Content-Type': 'application/json',
       };
 
+      const functionsUrl = (cfg?.functionsUrl || '').replace(/\/$/, '');
+
       try {
         // Aggregate every revenue-bearing family we can recover from the
         // platform: one-time products, payment events, subscriptions and kit
         // Builder drafts that may exist even when the addon row is missing.
-        const [purchasedRes, eventsRes, subscriptionsRes, projectsRes] = await Promise.all([
+        const [purchasedRes, eventsRes, subscriptionsRes, projectsRes, devJourneyRes] = await Promise.all([
           fetch(`${supabaseUrl}/rest/v1/addons_purchased?select=id,addon_id,price_paid,currency,status,metadata,created_at&user_id=eq.${userId}&order=created_at.desc`, { headers }),
           fetch(`${supabaseUrl}/rest/v1/purchase_events?select=id,lookup_key,product_key,amount_paid,currency,status,metadata,created_at,stripe_session_id&user_id=eq.${userId}&status=eq.completed&order=created_at.desc`, { headers }),
           fetch(`${supabaseUrl}/rest/v1/subscriptions?select=id,product_key,plan_key,lookup_key,status,current_period_end,cancel_at_period_end,created_at&user_id=eq.${userId}&order=created_at.desc`, { headers }),
           fetch(`${supabaseUrl}/rest/v1/projects?select=id,name,slug,status,created_at,metadata&user_id=eq.${userId}&order=created_at.desc`, { headers }),
+          functionsUrl
+            ? fetch(`${functionsUrl}/devjourney-progress`, {
+                method: 'POST',
+                headers: {
+                  Authorization: 'Bearer ' + token,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: 'get' }),
+              })
+            : Promise.resolve(null),
         ]);
 
         let purchased = [];
         let events = [];
         let subscriptions = [];
         let projects = [];
+        let devJourneyProgress = null;
 
         if (purchasedRes.ok) {
           try { purchased = await purchasedRes.json(); } catch {}
@@ -790,6 +830,9 @@ const deliveryAssistItems = [
         }
         if (projectsRes.ok) {
           try { projects = await projectsRes.json(); } catch {}
+        }
+        if (devJourneyRes && devJourneyRes.ok) {
+          try { devJourneyProgress = await devJourneyRes.json(); } catch {}
         }
 
         // Preserve one card per purchased row. `addons_purchased` is the source
@@ -871,6 +914,16 @@ const deliveryAssistItems = [
             console.error('delivery project recovery render failed', {
               project,
               error: err instanceof Error ? err.message : String(err),
+            });
+          }
+        }
+
+        if (devJourneyProgress) {
+          const html = buildDevJourneyCard(devJourneyProgress);
+          if (html) {
+            cardEntries.push({
+              sortAt: 0,
+              html,
             });
           }
         }

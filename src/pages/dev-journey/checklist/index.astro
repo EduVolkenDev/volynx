@@ -15,6 +15,7 @@ const blocks = [
     title_en: "Setup",
     title_pt: "Setup",
     tier: "social",
+    iconSrc: "/assets/devjourneyicon11.webp",
     items: [
       { id: "block0.editor",      en: "Editor + browser + Live Server installed",     pt: "Editor + navegador + Live Server instalados" },
       { id: "block0.checklist",   en: "Validatable checklist understood",              pt: "Checklist validável entendido" },
@@ -27,6 +28,7 @@ const blocks = [
     title_en: "HTML + CSS + basic JS",
     title_pt: "HTML + CSS + JS básico",
     tier: "social",
+    iconSrc: "/assets/devjourneyicon10.webp",
     items: [
       { id: "block1.semantic",    en: "Semantic HTML structure built",                 pt: "Estrutura HTML semântica construída" },
       { id: "block1.responsive",  en: "Simple responsive layout works",                pt: "Layout responsivo simples funcionando" },
@@ -40,6 +42,7 @@ const blocks = [
     title_en: "JavaScript + DOM + JSON",
     title_pt: "JavaScript + DOM + JSON",
     tier: "social",
+    iconSrc: "/assets/devjourneyicon8.webp",
     items: [
       { id: "block2.types",       en: "Types, operators, functions, events",           pt: "Tipos, operadores, funções e eventos" },
       { id: "block2.dom",         en: "DOM: select, change, create elements",          pt: "DOM: selecionar, alterar, criar elementos" },
@@ -52,6 +55,7 @@ const blocks = [
     title_en: "React App incremental",
     title_pt: "React App incremental",
     tier: "pro",
+    iconSrc: "/assets/devjourneyicon9.webp",
     items: [
       { id: "block3.state",       en: "State, simple components, code organisation",   pt: "Estado, componentes simples, organização" },
       { id: "block3.persistence", en: "Basic persistence (localStorage) + UX",         pt: "Persistência básica (localStorage) + UX" },
@@ -64,6 +68,7 @@ const blocks = [
     title_en: "API + Architecture",
     title_pt: "API + Arquitetura",
     tier: "bundle",
+    iconSrc: "/assets/devjourneyicon14.webp",
     items: [
       { id: "block4.refactor",    en: "Guided refactor: clarity from names to scope",  pt: "Refactor guiado: clareza dos nomes ao escopo" },
       { id: "block4.integration", en: "Integrations and data (common market flows)",   pt: "Integrações e dados (fluxos de mercado)" },
@@ -76,6 +81,7 @@ const blocks = [
     title_en: "Deploy + Final delivery",
     title_pt: "Deploy + Entrega final",
     tier: "bundle",
+    iconSrc: "/assets/devjourneyicon13.webp",
     items: [
       { id: "block5.publish",     en: "Publishing + GitHub validation",                pt: "Publicação + validação GitHub" },
       { id: "block5.checklist",   en: "Final checklist (responsive, a11y, working)",   pt: "Checklist final (responsivo, a11y, funcional)" },
@@ -130,12 +136,37 @@ const blocks = [
         </div>
       </header>
 
+      <section class="djc-hero-band">
+        <article class="djc-hero-card">
+          <div class="djc-hero-copy">
+            <span class="kicker">
+              <span class="i18n-en">Checklist flow</span>
+              <span class="i18n-pt">Fluxo do checklist</span>
+            </span>
+            <h2>
+              <span class="i18n-en">Treat every block like a visible shipping lane, not a vague study promise.</span>
+              <span class="i18n-pt">Trate cada bloco como uma faixa visível de entrega, não como uma promessa vaga de estudo.</span>
+            </h2>
+            <p>
+              <span class="i18n-en">Tick the item only when it actually works on screen. This page should feel like your execution board, so the artwork now points at the exact stage you are in.</span>
+              <span class="i18n-pt">Marque o item só quando ele realmente funcionar na tela. Esta página precisa parecer seu board de execução, então a arte agora aponta para a etapa exata em que você está.</span>
+            </p>
+          </div>
+          <div class="djc-hero-art-shell" aria-hidden="true">
+            <img src="/assets/devjourneyicon21.webp" alt="" class="djc-hero-art" loading="lazy" decoding="async" />
+          </div>
+        </article>
+      </section>
+
       <progress class="djc-progress" id="djcProgress" value="0" max="100"></progress>
       <p class="djc-progress-label" id="djcProgressLabel">0%</p>
 
       <div class="djc-blocks">
         {blocks.map((block) => (
           <article class="djc-block" data-block={block.id} data-tier={block.tier} data-locked={block.tier === "social" ? "false" : "true"}>
+            <div class="djc-block-art-shell" aria-hidden="true">
+              <img src={block.iconSrc} alt="" class="djc-block-art" loading="lazy" decoding="async" />
+            </div>
             <header class="djc-block-head">
               <span class="djc-block-num">{block.num}</span>
               <h2>
@@ -321,6 +352,74 @@ const blocks = [
   </script>
 
   <style>
+    .djc-hero-band {
+      margin: 0 0 24px;
+    }
+    .djc-hero-card {
+      display: grid;
+      gap: 18px;
+      padding: 24px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+    .djc-hero-copy {
+      display: grid;
+      gap: 12px;
+    }
+    .djc-hero-copy h2 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 34px);
+      line-height: 1.1;
+    }
+    .djc-hero-copy p {
+      margin: 0;
+      max-width: 62ch;
+      font-size: 14px;
+      line-height: 1.7;
+      color: rgba(255,255,255,.74);
+    }
+    .djc-hero-art-shell,
+    .djc-block-art-shell {
+      position: relative;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.08);
+      background:
+        radial-gradient(circle at 50% 30%, rgba(0,219,255,.14), transparent 58%),
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .djc-hero-art-shell::before,
+    .djc-block-art-shell::before {
+      content: "";
+      position: absolute;
+      inset: auto 14% 8% 14%;
+      height: 32%;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(167,139,250,.18), transparent 72%);
+      filter: blur(20px);
+      z-index: -1;
+    }
+    .djc-hero-art-shell {
+      min-height: 230px;
+    }
+    .djc-block-art-shell {
+      min-height: 186px;
+      margin: 0 0 16px;
+    }
+    .djc-hero-art,
+    .djc-block-art {
+      width: min(100%, 220px);
+      max-height: 210px;
+      object-fit: contain;
+      filter: drop-shadow(0 24px 34px rgba(0,0,0,.36));
+    }
     .djc-meta {
       display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
     }
@@ -449,6 +548,18 @@ const blocks = [
       .container { padding-left: 16px; padding-right: 16px; }
       .sectionTitle { flex-direction: column; align-items: flex-start; gap: 12px; }
       .djc-block-head h2 { font-size: 15px; }
+      .djc-hero-card { padding: 20px; }
+      .djc-hero-art-shell,
+      .djc-block-art-shell {
+        min-height: 166px;
+      }
+    }
+
+    @media (min-width: 860px) {
+      .djc-hero-card {
+        grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.92fr);
+        align-items: center;
+      }
     }
   </style>
 </body>

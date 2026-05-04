@@ -1007,12 +1007,14 @@ a:focus-visible { outline: 2px solid rgba(0, 190, 196, 0.55); outline-offset: 3p
   z-index: 2;
 }
 
-/* Outer panel: glass surface, single-column copy, room for floating asset */
+/* Outer panel: glass surface with a stable copy + art split */
 .dj-mission-panel {
   position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(220px, 28vw, 380px);
+  align-items: center;
+  gap: clamp(20px, 3vw, 40px);
   padding: clamp(36px, 4.8vw, 64px) clamp(28px, 4vw, 56px);
-  /* Reserve right gutter for the floating icon on desktop only */
-  padding-right: clamp(28px, 4vw, 56px);
   background:
     radial-gradient(circle at 14% 24%, rgba(0, 219, 255, 0.12), transparent 52%),
     radial-gradient(circle at 88% 78%, rgba(177, 150, 255, 0.10), transparent 48%),
@@ -1048,21 +1050,13 @@ a:focus-visible { outline: 2px solid rgba(0, 190, 196, 0.55); outline-offset: 3p
   z-index: 0;
 }
 
-/* Reserve right gutter for the floating asset on tablet+ */
-@media (min-width: 721px) {
-  .dj-mission-panel {
-    padding-right: clamp(240px, 30%, 400px);
-  }
-}
-
-/* ── Floating asset (right side, independent of copy flow) ───────── */
+/* ── Floating asset (right column) ───────────────────────────────── */
 .dj-mission-floater {
-  position: absolute;
+  position: relative;
   z-index: 2;
-  right: clamp(-8px, -0.5vw, 16px);
-  top: 50%;
-  transform: translateY(-50%);
-  width: clamp(220px, 28vw, 380px);
+  width: 100%;
+  max-width: 380px;
+  justify-self: end;
   pointer-events: none;
 }
 .dj-mission-floater-glow {
@@ -1095,16 +1089,14 @@ a:focus-visible { outline: 2px solid rgba(0, 190, 196, 0.55); outline-offset: 3p
     drop-shadow(0 0 36px rgba(177, 150, 255, 0.26));
 }
 
-/* Hide on narrow screens — copy stays full width and asset goes inline above */
+/* Keep the art opposite the copy on laptop/tablet widths too */
 @media (max-width: 879px) {
+  .dj-mission-panel {
+    grid-template-columns: minmax(0, 1fr) minmax(180px, 240px);
+    gap: 20px;
+  }
   .dj-mission-floater {
-    position: relative;
-    right: auto;
-    top: auto;
-    transform: none;
-    margin: 0 auto 8px;
-    display: block;
-    width: clamp(180px, 50vw, 260px);
+    max-width: 240px;
   }
 }
 
@@ -1254,19 +1246,17 @@ a:focus-visible { outline: 2px solid rgba(0, 190, 196, 0.55); outline-offset: 3p
   margin-top: 8px;
 }
 
-/* ── Tablet (1024-721): 2-column stats ──────────────────────────── */
-@media (max-width: 1024px) {
-  .dj-mission-panel { padding-right: clamp(28px, 4vw, 56px); }
-}
-
-/* ── Mobile (<=720px): asset goes inline ABOVE copy, vertical stack ─── */
+/* ── Mobile (<=720px): keep the icon visible before the copy ───────── */
 @media (max-width: 720px) {
   .dj-mission-section { padding: 48px 0; }
   .dj-mission-panel {
     padding: 28px 22px 28px;
-    display: flex;
-    flex-direction: column-reverse;
+    grid-template-columns: 1fr;
     gap: 24px;
+  }
+  .dj-mission-floater {
+    justify-self: center;
+    max-width: min(260px, 68vw);
   }
   .dj-mission-stats {
     grid-template-columns: 1fr;
@@ -1292,4 +1282,3 @@ a:focus-visible { outline: 2px solid rgba(0, 190, 196, 0.55); outline-offset: 3p
     transition: none;
   }
 }
-

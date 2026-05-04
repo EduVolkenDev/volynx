@@ -7,6 +7,7 @@ export const DEVJOURNEY_TIER_ORDER = {
 export const DEVJOURNEY_DELIVERABLES = [
   {
     tier: "social",
+    iconSrc: "/assets/devjourneyicon6.webp",
     badgeEn: "Free",
     badgePt: "Grátis",
     tierLabelEn: "Social Sprint",
@@ -24,6 +25,7 @@ export const DEVJOURNEY_DELIVERABLES = [
   },
   {
     tier: "pro",
+    iconSrc: "/assets/devjourneyicon9.webp",
     badgeEn: "Pro",
     badgePt: "Pro",
     tierLabelEn: "Pro Track",
@@ -41,6 +43,7 @@ export const DEVJOURNEY_DELIVERABLES = [
   },
   {
     tier: "bundle",
+    iconSrc: "/assets/devjourneyicon19.webp",
     badgeEn: "Bundle",
     badgePt: "Bundle",
     tierLabelEn: "Bundle",
