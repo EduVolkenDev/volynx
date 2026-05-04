@@ -995,3 +995,148 @@ a:focus-visible { outline: 2px solid rgba(0, 190, 196, 0.55); outline-offset: 3p
 
 /* 4) Remove regras antigas que atrapalham hierarquia (opcional, mas recomendado) */
 .nav-links a p { font-weight: 500; } /* sobrescreve seu 420 */
+
+/* ═══════════════════════════════════════════════════════════════
+   DEV JOURNEY MISSION SECTION (home)
+   Sits between Lab and Featured. "Free education" beat after "Free tools".
+   ═══════════════════════════════════════════════════════════════ */
+.dj-mission-section {
+  padding: clamp(40px, 6vw, 80px) 0;
+  position: relative;
+  z-index: 2;
+}
+.dj-mission-panel {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.85fr) 1.15fr;
+  gap: clamp(24px, 4vw, 48px);
+  align-items: center;
+  padding: clamp(28px, 4vw, 48px);
+  background:
+    radial-gradient(circle at 22% 28%, rgba(0, 219, 255, 0.10), transparent 55%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.025));
+  border: 1px solid rgba(0, 219, 255, 0.18);
+  border-radius: var(--radius, 28px);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.dj-mission-panel::after {
+  content: "";
+  position: absolute;
+  right: -12%;
+  top: -22%;
+  width: 320px;
+  height: 320px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(243, 225, 160, 0.12), transparent 65%);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 0;
+}
+.dj-mission-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 280px;
+  z-index: 1;
+}
+.dj-mission-glow {
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 219, 255, 0.22), transparent 62%);
+  filter: blur(34px);
+  pointer-events: none;
+}
+.dj-mission-eye {
+  position: relative;
+  z-index: 1;
+  max-width: 320px;
+  width: 100%;
+  height: auto;
+  border-radius: 32px;
+  filter: drop-shadow(0 24px 64px rgba(0, 219, 255, 0.22));
+  transition: transform 0.4s ease, filter 0.4s ease;
+}
+.dj-mission-panel:hover .dj-mission-eye {
+  transform: scale(1.02) rotate(-1deg);
+  filter: drop-shadow(0 28px 72px rgba(0, 219, 255, 0.30));
+}
+.dj-mission-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.dj-mission-label {
+  align-self: flex-start;
+}
+.dj-mission-title {
+  font-size: clamp(22px, 2.4vw, 30px);
+  margin: 4px 0 0;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.dj-mission-desc {
+  color: rgba(255, 255, 255, 0.74);
+  margin: 0;
+  line-height: 1.7;
+  font-size: 14.5px;
+  max-width: 60ch;
+}
+.dj-mission-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  padding: 18px 0;
+  margin: 8px 0 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.dj-mission-stats > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.dj-mission-stats strong {
+  font-size: 16px;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.dj-mission-stats span {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.56);
+  line-height: 1.4;
+}
+.dj-mission-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+@media (max-width: 720px) {
+  .dj-mission-panel {
+    grid-template-columns: 1fr;
+    padding: 28px 22px;
+  }
+  .dj-mission-art {
+    min-height: 200px;
+  }
+  .dj-mission-eye {
+    max-width: 220px;
+  }
+  .dj-mission-stats {
+    grid-template-columns: 1fr;
+    padding: 14px 0;
+    gap: 10px;
+  }
+  .dj-mission-actions .button {
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+  }
+}
+
