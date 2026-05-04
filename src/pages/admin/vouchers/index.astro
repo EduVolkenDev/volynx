@@ -48,109 +48,203 @@ const title = "Admin · Vouchers — VOLYNX";
         <article class="panel admin-create">
           <h2>Create voucher</h2>
           <form id="createForm" class="admin-form">
-            <div class="form-row">
+            <!-- 1) WHAT does the voucher unlock? -->
+            <fieldset class="grants">
+              <legend>What does this voucher unlock?</legend>
+
               <label class="field">
-                <span>Type</span>
+                <span>Category</span>
                 <select id="type" name="type" required>
-                  <option value="black_diamond">Black Diamond invite</option>
-                  <option value="discount">Discount code</option>
-                  <option value="tokens">VX tokens grant</option>
-                  <option value="kit">Kit unlock</option>
-                  <option value="generic">Generic</option>
+                  <option value="black_diamond">Black Diamond invite — full founder access</option>
+                  <option value="plan">Plan upgrade — change tier</option>
+                  <option value="tokens">VX tokens — credit balance</option>
+                  <option value="kit">Kit unlock — Portfolio / Agency / SaaS</option>
+                  <option value="icons">Icon pack unlock — premium icon set</option>
+                  <option value="devjourney">Dev Journey tier — Social / Pro / Bundle</option>
+                  <option value="discount">Discount % — Stripe checkout</option>
+                  <option value="generic">Custom grants — raw JSON</option>
                 </select>
               </label>
-              <label class="field">
-                <span>Label (internal)</span>
-                <input id="label" name="label" type="text" maxlength="200" placeholder="e.g. Black Diamond — Maria" />
-              </label>
-            </div>
 
-            <div class="form-row">
-              <label class="field">
-                <span>Recipient name <small>(optional, goes into ?to=)</small></span>
-                <input id="recipient_name" name="recipient_name" type="text" maxlength="80" placeholder="Maria Silva" />
-              </label>
-              <label class="field">
-                <span>Target email <small>(optional, gates redemption)</small></span>
-                <input id="target_email" name="target_email" type="email" maxlength="320" placeholder="maria@example.com" />
-              </label>
-            </div>
+              <!-- BLACK DIAMOND -->
+              <div class="grant-block" data-grant-for="black_diamond">
+                <p class="grant-help">Founder-level invite. Sets <code>is_black_diamond=true</code> and upgrades plan in one redemption.</p>
+                <label class="field">
+                  <span>Plan to upgrade to</span>
+                  <select name="grant_plan_bd">
+                    <option value="diamond" selected>diamond</option>
+                    <option value="studio">studio</option>
+                  </select>
+                </label>
+              </div>
 
-            <div class="form-row">
-              <label class="field">
-                <span>Max uses</span>
-                <input id="max_uses" name="max_uses" type="number" min="1" max="100000" value="1" required />
-              </label>
-              <label class="field">
-                <span>Expires at <small>(optional)</small></span>
-                <input id="expires_at" name="expires_at" type="datetime-local" />
-              </label>
-              <label class="field field--checkbox">
-                <input id="transferable" name="transferable" type="checkbox" checked />
-                <span>Transferable (anyone with the code can redeem)</span>
-              </label>
-            </div>
-
-            <!-- Grants section — varies by type -->
-            <fieldset class="grants">
-              <legend>Grants</legend>
-
-              <div data-grant-for="black_diamond">
+              <!-- PLAN -->
+              <div class="grant-block" data-grant-for="plan" hidden>
+                <p class="grant-help">Upgrades <code>profiles.plan</code> on redemption. Use Black Diamond if you want the BD badge too.</p>
                 <div class="form-row">
                   <label class="field">
                     <span>Plan</span>
                     <select name="grant_plan">
-                      <option value="diamond" selected>diamond</option>
-                      <option value="studio">studio</option>
-                      <option value="pro">pro</option>
+                      <option value="launch">Launch</option>
+                      <option value="business">Business</option>
+                      <option value="pro" selected>Pro</option>
+                      <option value="diamond">Diamond</option>
+                      <option value="studio">Studio</option>
+                      <option value="teams">Teams</option>
                     </select>
                   </label>
                   <label class="field">
-                    <span>Duration (days)</span>
-                    <input type="number" name="grant_duration_days" min="1" max="3650" value="365" />
+                    <span>Affects</span>
+                    <select name="grant_plan_scope">
+                      <option value="plan" selected>profiles.plan (global)</option>
+                      <option value="builder_plan">builder_plan only</option>
+                      <option value="daily_plan">daily_plan only</option>
+                      <option value="both_apps">builder + daily</option>
+                    </select>
                   </label>
                 </div>
               </div>
 
-              <div data-grant-for="discount" hidden>
+              <!-- VX TOKENS -->
+              <div class="grant-block" data-grant-for="tokens" hidden>
+                <p class="grant-help">Credits VX directly to the user balance. Standard packs: 12 / 32 / 80 / 200.</p>
+                <label class="field">
+                  <span>VX amount</span>
+                  <div class="quick-presets">
+                    <input type="number" name="grant_tokens" min="1" max="100000" value="32" />
+                    <button type="button" class="btn ghost btn-sm" data-preset-tokens="12">+12</button>
+                    <button type="button" class="btn ghost btn-sm" data-preset-tokens="32">+32</button>
+                    <button type="button" class="btn ghost btn-sm" data-preset-tokens="80">+80</button>
+                    <button type="button" class="btn ghost btn-sm" data-preset-tokens="200">+200</button>
+                  </div>
+                </label>
+              </div>
+
+              <!-- KIT -->
+              <div class="grant-block" data-grant-for="kit" hidden>
+                <p class="grant-help warn">⚠️ Captured in voucher. Auto-delivery via redeem-voucher ships in Phase 2 — for now, mark the user as kit owner manually after redemption.</p>
+                <label class="field">
+                  <span>Kit</span>
+                  <select name="grant_kit_id">
+                    <option value="portfolio-pro-kit">Portfolio Pro Kit</option>
+                    <option value="agency-launch-kit">Agency Launch Kit</option>
+                    <option value="saas-landing-system">SaaS Landing System</option>
+                  </select>
+                </label>
+              </div>
+
+              <!-- ICON PACK -->
+              <div class="grant-block" data-grant-for="icons" hidden>
+                <p class="grant-help warn">⚠️ Captured in voucher. Auto-delivery via redeem-voucher ships in Phase 2.</p>
+                <label class="field">
+                  <span>Icon pack</span>
+                  <select name="grant_icon_pack_id">
+                    <optgroup label="Premium">
+                      <option value="Hyper-Icons-Premium">Hyper Icons Premium</option>
+                      <option value="Icons-Glass-Premium">Icons Glass Premium</option>
+                      <option value="Iridescent-Premium">Iridescent Premium</option>
+                      <option value="Poligon-Premium">Poligon Premium</option>
+                      <option value="glow-premium">Glow Premium</option>
+                      <option value="metal-chrome-premium">Metal Chrome Premium</option>
+                      <option value="purple-icons-premium">Purple Icons Premium</option>
+                      <option value="vintage-premium">Vintage Premium</option>
+                    </optgroup>
+                    <optgroup label="Free (gift access)">
+                      <option value="Abstract-Free">Abstract Free</option>
+                      <option value="Day-By-Day-free">Day By Day Free</option>
+                      <option value="Neon-Icons-Free">Neon Icons Free</option>
+                    </optgroup>
+                  </select>
+                </label>
+              </div>
+
+              <!-- DEV JOURNEY -->
+              <div class="grant-block" data-grant-for="devjourney" hidden>
+                <p class="grant-help warn">⚠️ Captured in voucher. Auto-enrollment via redeem-voucher ships in Phase 2 (use SQL upsert into <code>devjourney_enrollments</code> manually for now).</p>
+                <label class="field">
+                  <span>Tier</span>
+                  <select name="grant_devjourney_tier">
+                    <option value="social">Social Sprint (free, but explicit grant)</option>
+                    <option value="pro" selected>Pro</option>
+                    <option value="bundle">Bundle</option>
+                  </select>
+                </label>
+              </div>
+
+              <!-- DISCOUNT -->
+              <div class="grant-block" data-grant-for="discount" hidden>
+                <p class="grant-help warn">⚠️ Captured in voucher. Stripe checkout integration ships in Phase 2 — to apply now, also create a matching coupon in Stripe and paste the ID.</p>
                 <div class="form-row">
                   <label class="field">
                     <span>Discount %</span>
                     <input type="number" name="grant_discount_pct" min="1" max="100" value="20" />
                   </label>
                   <label class="field">
-                    <span>Stripe coupon ID <small>(optional, if synced)</small></span>
+                    <span>Stripe coupon ID <small>(optional)</small></span>
                     <input type="text" name="grant_stripe_coupon_id" placeholder="coupon_xxx" />
                   </label>
                 </div>
               </div>
 
-              <div data-grant-for="tokens" hidden>
-                <label class="field">
-                  <span>VX tokens</span>
-                  <input type="number" name="grant_tokens" min="1" max="100000" value="50" />
-                </label>
-              </div>
-
-              <div data-grant-for="kit" hidden>
-                <label class="field">
-                  <span>Kit ID</span>
-                  <input type="text" name="grant_kit_id" placeholder="portfolio-pro-kit" />
-                </label>
-              </div>
-
-              <div data-grant-for="generic" hidden>
+              <!-- CUSTOM JSON -->
+              <div class="grant-block" data-grant-for="generic" hidden>
+                <p class="grant-help">Raw JSON. Use only if you know what redeem-voucher consumes (<code>tokens</code>, <code>plan</code>, <code>builder_plan</code>, <code>daily_plan</code>, <code>badge</code>).</p>
                 <label class="field">
                   <span>Custom grants JSON</span>
                   <textarea name="grant_json" rows="4" placeholder='{"feature":"early_access"}'></textarea>
                 </label>
               </div>
+
+              <!-- Bonus tokens (combo with any category) -->
+              <label class="field field--checkbox grant-bonus-toggle">
+                <input id="grantBonusTokens" type="checkbox" />
+                <span>Include bonus VX tokens with this voucher</span>
+              </label>
+              <div class="grant-block" data-grant-for="bonus_tokens" hidden>
+                <label class="field">
+                  <span>Bonus VX</span>
+                  <input type="number" id="grantBonusAmount" min="1" max="100000" value="20" />
+                </label>
+              </div>
             </fieldset>
 
-            <label class="field">
-              <span>Description <small>(internal note)</small></span>
-              <textarea id="description" name="description" rows="2" maxlength="1000" placeholder="What is this for / why it was issued"></textarea>
-            </label>
+            <!-- 2) WHO is this for? -->
+            <fieldset class="grants">
+              <legend>Who is this for?</legend>
+              <div class="form-row">
+                <label class="field">
+                  <span>Recipient name <small>(goes into the personalized URL ?to=)</small></span>
+                  <input id="recipient_name" name="recipient_name" type="text" maxlength="80" placeholder="Maria Silva" />
+                </label>
+                <label class="field">
+                  <span>Target email <small>(optional gate — locks redemption to this email)</small></span>
+                  <input id="target_email" name="target_email" type="email" maxlength="320" placeholder="maria@example.com" />
+                </label>
+              </div>
+              <label class="field">
+                <span>Label <small>(auto-suggested from selection — edit if needed)</small></span>
+                <input id="label" name="label" type="text" maxlength="200" placeholder="Auto-filled when you pick a category" />
+              </label>
+            </fieldset>
+
+            <!-- 3) WHEN does it work? -->
+            <fieldset class="grants">
+              <legend>When does it work?</legend>
+              <div class="form-row">
+                <label class="field">
+                  <span>Max uses</span>
+                  <input id="max_uses" name="max_uses" type="number" min="1" max="100000" value="1" required />
+                </label>
+                <label class="field">
+                  <span>Expires at <small>(optional)</small></span>
+                  <input id="expires_at" name="expires_at" type="datetime-local" />
+                </label>
+                <label class="field field--checkbox">
+                  <input id="transferable" name="transferable" type="checkbox" checked />
+                  <span>Transferable (anyone with code can redeem)</span>
+                </label>
+              </div>
+            </fieldset>
 
             <div class="form-actions">
               <button id="submitBtn" type="submit" class="btn primary">Create voucher</button>
@@ -265,35 +359,118 @@ const title = "Admin · Vouchers — VOLYNX";
       try { return new Date(iso).toLocaleString(); } catch (_) { return iso; }
     }
 
+    const KIT_NAMES = {
+      "portfolio-pro-kit": "Portfolio Pro Kit",
+      "agency-launch-kit": "Agency Launch Kit",
+      "saas-landing-system": "SaaS Landing System",
+    };
+    const ICON_NAMES = {
+      "Hyper-Icons-Premium": "Hyper Icons Premium",
+      "Icons-Glass-Premium": "Icons Glass Premium",
+      "Iridescent-Premium": "Iridescent Premium",
+      "Poligon-Premium": "Poligon Premium",
+      "glow-premium": "Glow Premium",
+      "metal-chrome-premium": "Metal Chrome Premium",
+      "purple-icons-premium": "Purple Icons Premium",
+      "vintage-premium": "Vintage Premium",
+      "Abstract-Free": "Abstract (free)",
+      "Day-By-Day-free": "Day By Day (free)",
+      "Neon-Icons-Free": "Neon Icons (free)",
+    };
+    const PLAN_NAMES = { launch: "Launch", business: "Business", pro: "Pro", diamond: "Diamond", studio: "Studio", teams: "Teams" };
+    const DJ_NAMES = { social: "Social Sprint", pro: "Pro", bundle: "Bundle" };
+
     function buildGrants() {
       const type = els.typeSelect.value;
       const fd = new FormData(els.form);
+      let grants = {};
+
       if (type === "black_diamond") {
-        return { plan: fd.get("grant_plan"), duration_days: Number(fd.get("grant_duration_days")) || 365 };
+        // BD must include badge:'black_diamond' to trigger redeem-voucher's BD path
+        grants = { badge: "black_diamond", plan: String(fd.get("grant_plan_bd") || "diamond") };
+      } else if (type === "plan") {
+        const plan = String(fd.get("grant_plan") || "pro");
+        const scope = String(fd.get("grant_plan_scope") || "plan");
+        if (scope === "plan") grants.plan = plan;
+        else if (scope === "builder_plan") grants.builder_plan = plan;
+        else if (scope === "daily_plan") grants.daily_plan = plan;
+        else if (scope === "both_apps") { grants.builder_plan = plan; grants.daily_plan = plan; }
+      } else if (type === "tokens") {
+        grants.tokens = Number(fd.get("grant_tokens")) || 0;
+      } else if (type === "kit") {
+        const id = String(fd.get("grant_kit_id") || "").trim();
+        grants.kit_id = id;
+        if (KIT_NAMES[id]) grants.kit_name = KIT_NAMES[id];
+      } else if (type === "icons") {
+        const id = String(fd.get("grant_icon_pack_id") || "").trim();
+        grants.icon_pack_id = id;
+        if (ICON_NAMES[id]) grants.icon_pack_name = ICON_NAMES[id];
+      } else if (type === "devjourney") {
+        grants.devjourney_tier = String(fd.get("grant_devjourney_tier") || "pro");
+      } else if (type === "discount") {
+        grants.discount_pct = Number(fd.get("grant_discount_pct")) || 0;
+        const c = String(fd.get("grant_stripe_coupon_id") || "").trim();
+        if (c) grants.stripe_coupon_id = c;
+      } else if (type === "generic") {
+        try { grants = JSON.parse(String(fd.get("grant_json") || "{}")); } catch (_) { grants = {}; }
       }
-      if (type === "discount") {
-        const out = { discount_pct: Number(fd.get("grant_discount_pct")) || 0 };
-        const couponId = String(fd.get("grant_stripe_coupon_id") || "").trim();
-        if (couponId) out.stripe_coupon_id = couponId;
-        return out;
+
+      // Optional bonus tokens combo
+      const bonusOn = document.getElementById("grantBonusTokens")?.checked;
+      const bonusAmt = Number(document.getElementById("grantBonusAmount")?.value || 0);
+      if (bonusOn && bonusAmt > 0) {
+        grants.tokens = (grants.tokens || 0) + bonusAmt;
       }
-      if (type === "tokens") {
-        return { tokens: Number(fd.get("grant_tokens")) || 0 };
+
+      return grants;
+    }
+
+    function suggestLabel() {
+      const labelInput = document.getElementById("label");
+      if (!labelInput) return;
+      // Don't overwrite if admin already typed something
+      if (labelInput.dataset.userEdited === "1") return;
+
+      const type = els.typeSelect.value;
+      const fd = new FormData(els.form);
+      const recipient = String(fd.get("recipient_name") || "").trim();
+      const recipientSuffix = recipient ? ` — ${recipient}` : "";
+      let base = "";
+
+      if (type === "black_diamond") base = "Black Diamond";
+      else if (type === "plan") {
+        const plan = String(fd.get("grant_plan") || "pro");
+        base = `${PLAN_NAMES[plan] || plan} plan`;
+      } else if (type === "tokens") {
+        const n = Number(fd.get("grant_tokens")) || 0;
+        base = `${n} VX bonus`;
+      } else if (type === "kit") {
+        const id = String(fd.get("grant_kit_id") || "");
+        base = `${KIT_NAMES[id] || "Kit"} unlock`;
+      } else if (type === "icons") {
+        const id = String(fd.get("grant_icon_pack_id") || "");
+        base = `${ICON_NAMES[id] || "Icon pack"}`;
+      } else if (type === "devjourney") {
+        const t = String(fd.get("grant_devjourney_tier") || "pro");
+        base = `Dev Journey ${DJ_NAMES[t] || t}`;
+      } else if (type === "discount") {
+        const pct = Number(fd.get("grant_discount_pct")) || 0;
+        base = `${pct}% discount`;
+      } else if (type === "generic") {
+        base = "Custom voucher";
       }
-      if (type === "kit") {
-        return { kit_id: String(fd.get("grant_kit_id") || "").trim() };
-      }
-      if (type === "generic") {
-        try { return JSON.parse(String(fd.get("grant_json") || "{}")); } catch (_) { return {}; }
-      }
-      return {};
+
+      labelInput.value = base + recipientSuffix;
     }
 
     function syncGrantBlocks() {
       const t = els.typeSelect.value;
       els.grantsRoot.querySelectorAll("[data-grant-for]").forEach((el) => {
-        el.hidden = el.getAttribute("data-grant-for") !== t;
+        const cat = el.getAttribute("data-grant-for");
+        if (cat === "bonus_tokens") return; // handled by checkbox toggle
+        el.hidden = cat !== t;
       });
+      suggestLabel();
     }
 
     async function loadList() {
@@ -348,7 +525,7 @@ const title = "Admin · Vouchers — VOLYNX";
         action: "create",
         type: els.typeSelect.value,
         label: fd.get("label") || null,
-        description: fd.get("description") || null,
+        description: null,
         recipient_name: fd.get("recipient_name") || null,
         target_email: fd.get("target_email") || null,
         max_uses: Number(fd.get("max_uses")) || 1,
@@ -414,6 +591,40 @@ const title = "Admin · Vouchers — VOLYNX";
     els.typeSelect.addEventListener("change", syncGrantBlocks);
     els.form.addEventListener("submit", submitCreate);
     els.refresh.addEventListener("click", loadList);
+
+    // Auto-suggest label whenever recipient or relevant grant fields change
+    document.getElementById("recipient_name")?.addEventListener("input", suggestLabel);
+    els.form.addEventListener("change", (e) => {
+      const t = e.target;
+      if (!t || !t.name) return;
+      if (t.name.startsWith("grant_") || t.id === "type") suggestLabel();
+    });
+
+    // Track manual label edits so suggestion stops overwriting
+    const labelInput = document.getElementById("label");
+    if (labelInput) {
+      labelInput.addEventListener("input", () => {
+        labelInput.dataset.userEdited = "1";
+      });
+    }
+
+    // Bonus tokens toggle
+    const bonusToggle = document.getElementById("grantBonusTokens");
+    const bonusBlock = els.grantsRoot.querySelector('[data-grant-for="bonus_tokens"]');
+    if (bonusToggle && bonusBlock) {
+      bonusToggle.addEventListener("change", () => {
+        bonusBlock.hidden = !bonusToggle.checked;
+      });
+    }
+
+    // VX quick presets
+    document.querySelectorAll("[data-preset-tokens]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const amt = parseInt(btn.getAttribute("data-preset-tokens"), 10);
+        const input = els.form.querySelector('input[name="grant_tokens"]');
+        if (input) { input.value = amt; suggestLabel(); }
+      });
+    });
     document.querySelectorAll("[data-copy]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const target = btn.getAttribute("data-copy");
@@ -510,7 +721,11 @@ const title = "Admin · Vouchers — VOLYNX";
     .grants {
       border: 1px dashed rgba(0, 219, 255, 0.22);
       border-radius: 12px;
-      padding: 14px;
+      padding: 14px 16px;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
     .grants legend {
       padding: 0 8px;
@@ -518,6 +733,47 @@ const title = "Admin · Vouchers — VOLYNX";
       letter-spacing: 0.16em;
       text-transform: uppercase;
       color: rgba(0, 219, 255, 0.85);
+    }
+    .grant-block {
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .grant-help {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+      margin: 0;
+      line-height: 1.55;
+    }
+    .grant-help.warn {
+      color: rgba(243, 225, 160, 0.92);
+    }
+    .grant-help code {
+      font-family: 'DM Mono', ui-monospace, monospace;
+      font-size: 11.5px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: rgba(140, 250, 240, 0.92);
+    }
+    .quick-presets {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .quick-presets input {
+      flex: 1;
+      min-width: 100px;
+    }
+    .grant-bonus-toggle {
+      margin-top: 4px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     .form-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
