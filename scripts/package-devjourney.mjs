@@ -23,15 +23,38 @@
  *   dist-deliverables/devjourney-bundle.zip
  */
 
-import { execSync, spawnSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import { mkdirSync, rmSync, cpSync, readdirSync, statSync, writeFileSync, existsSync } from "node:fs";
-import { join, basename, relative } from "node:path";
+import { join, basename, dirname } from "node:path";
 import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const REPO_ROOT = join(__dirname, "..");
 const HOME = homedir();
+const DJ_PRO_BUNDLE_ROOT = join(HOME, "Downloads/dev-journey-pro-and-bundle");
+const COMMON_TRACK_EXTRAS = [
+  {
+    src: join(DJ_PRO_BUNDLE_ROOT, "02-COMO-USAR-O-CURSO.pdf"),
+    dest: "00_START_HERE/COMO-USAR-O-CURSO.pdf",
+  },
+  {
+    src: join(DJ_PRO_BUNDLE_ROOT, "05-REGRAS-DO-CERTIFICADO-E-CHECKPOINTS.pdf"),
+    dest: "00_START_HERE/CERTIFICADO-E-CHECKPOINTS.pdf",
+  },
+  {
+    src: join(DJ_PRO_BUNDLE_ROOT, "REQUISITOS-E-COMPATIBILIDADE.pdf"),
+    dest: "00_START_HERE/REQUISITOS-E-COMPATIBILIDADE.pdf",
+  },
+  {
+    src: join(DJ_PRO_BUNDLE_ROOT, "glossario_bloco1.pdf"),
+    dest: "01_GLOSSARIOS/GLOSSARIO_BLOCO1.pdf",
+  },
+  {
+    src: join(DJ_PRO_BUNDLE_ROOT, "glossario_bloco2.pdf"),
+    dest: "01_GLOSSARIOS/GLOSSARIO_BLOCO2.pdf",
+  },
+];
 
 // ── Configuration ──────────────────────────────────────────────
 const TIERS = {
@@ -41,23 +64,24 @@ const TIERS = {
       // Best-package source per project memory (audit 2026-05-04)
       join(HOME, "DevJourney-Formated-Final/HOTMART PRODUCT/DevJourney_SOCIAL_Hotmart_Kit_v1"),
     ],
+    extraFiles: [],
     readme: socialReadme(),
   },
   pro: {
     label: "Pro Track",
     sources: [
-      // Phase 2: combine 02-TRACK-PRO/ + shared root PDFs from dev-journey-pro-and-bundle
-      // join(HOME, "Downloads/dev-journey-pro-and-bundle/02-TRACK-PRO"),
+      join(DJ_PRO_BUNDLE_ROOT, "02-TRACK-PRO"),
     ],
-    readme: null,
+    extraFiles: COMMON_TRACK_EXTRAS,
+    readme: proReadme(),
   },
   bundle: {
     label: "Bundle Track",
     sources: [
-      // Phase 2: combine 03-TRACK-BUNDLE/ + shared root PDFs
-      // join(HOME, "Downloads/dev-journey-pro-and-bundle/03-TRACK-BUNDLE"),
+      join(DJ_PRO_BUNDLE_ROOT, "03-TRACK-BUNDLE"),
     ],
-    readme: null,
+    extraFiles: COMMON_TRACK_EXTRAS,
+    readme: bundleReadme(),
   },
 };
 
@@ -138,6 +162,25 @@ function fileCount(rootPath) {
   return count;
 }
 
+function copyExtraFiles(rootPath, extraFiles = []) {
+  let copied = 0;
+  let missing = 0;
+
+  for (const file of extraFiles) {
+    if (!existsSync(file.src)) {
+      missing++;
+      continue;
+    }
+
+    const destPath = join(rootPath, file.dest);
+    mkdirSync(dirname(destPath), { recursive: true });
+    cpSync(file.src, destPath);
+    copied++;
+  }
+
+  return { copied, missing };
+}
+
 function packageTier(tierKey) {
   const tier = TIERS[tierKey];
   if (!tier) {
@@ -155,61 +198,59 @@ function packageTier(tierKey) {
 
   const zipPath = join(OUT_DIR, `devjourney-${tierKey}.zip`);
   const stagingRoot = join(OUT_DIR, `_staging_${tierKey}`);
+  const packageRoot = join(stagingRoot, `devjourney-${tierKey}`);
 
   if (dryRun) {
     log(`  ${c.dim}sources:${c.reset}`);
     validSources.forEach((s) => log(`    - ${s}`));
+    if (tier.extraFiles?.length) {
+      log(`  ${c.dim}shared extras:${c.reset}`);
+      tier.extraFiles.forEach((f) => log(`    - ${f.src} -> ${f.dest}`));
+    }
     log(`  ${c.dim}target:${c.reset} ${zipPath}`);
     return true;
   }
 
   // Reset staging
   rmSync(stagingRoot, { recursive: true, force: true });
-  mkdirSync(stagingRoot, { recursive: true });
+  mkdirSync(packageRoot, { recursive: true });
 
   // Copy each source under a folder named after its basename
   for (const src of validSources) {
-    const dst = join(stagingRoot, `devjourney-${tierKey}`);
-    mkdirSync(dst, { recursive: true });
-    cpSync(src, dst, { recursive: true });
+    cpSync(src, packageRoot, { recursive: true });
   }
 
   // Clean junk
-  const removed = cleanTree(stagingRoot);
+  const removed = cleanTree(packageRoot);
   if (removed > 0) ok(`  removed ${removed} junk entries (.DS_Store, __MACOSX, .odt, hotmart-*)`);
+
+  const extras = copyExtraFiles(packageRoot, tier.extraFiles);
+  if (extras.copied > 0) ok(`  copied ${extras.copied} shared guide file(s)`);
+  if (extras.missing > 0) warn(`  skipped ${extras.missing} missing shared guide file(s)`);
 
   // Inject VOLYNX README
   if (tier.readme) {
-    const readmePath = join(stagingRoot, `devjourney-${tierKey}`, "README.md");
+    const readmePath = join(packageRoot, "README.md");
     writeFileSync(readmePath, tier.readme, "utf8");
     ok(`  wrote VOLYNX README.md`);
   }
 
   // Count + size after cleanup
-  const count = fileCount(stagingRoot);
+  const count = fileCount(packageRoot);
 
   // Remove old ZIP, create new
   rmSync(zipPath, { force: true });
 
   const zipResult = spawnSync(
     "zip",
-    ["-r", "-q", basename(zipPath), basename(stagingRoot)],
-    { cwd: OUT_DIR, stdio: "inherit" }
+    ["-r", "-q", join("..", basename(zipPath)), basename(packageRoot)],
+    { cwd: stagingRoot, stdio: "inherit" }
   );
 
   if (zipResult.status !== 0) {
     err(`  zip failed (exit ${zipResult.status})`);
     return false;
   }
-
-  // Move/rename: zip wrapped the staging dir, move into expected name
-  // Actually we want the inner folder, so re-zip just the inner folder
-  rmSync(zipPath, { force: true });
-  spawnSync(
-    "zip",
-    ["-r", "-q", join("..", basename(zipPath)), `devjourney-${tierKey}`],
-    { cwd: stagingRoot, stdio: "inherit" }
-  );
 
   // Cleanup staging
   rmSync(stagingRoot, { recursive: true, force: true });
@@ -247,6 +288,78 @@ Este pacote contém:
 ## Próximos passos
 
 Ao terminar o Social, você pode subir pra **Pro** (Bloco 3 — React App) ou **Bundle** (Blocos 4-5 + Arsenal Kit). Compare em https://volynx.world/dev-journey/#upgrade
+
+---
+
+VOLYNX • Building a Smarter Future
+`;
+}
+
+function proReadme() {
+  return `# Dev Journey — Pro Track
+
+Bem-vindo ao Dev Journey Pro pela VOLYNX.
+
+Este pacote contém:
+- 00_START_HERE/ — guias de entrada, compatibilidade, uso do curso e certificação
+- 01_GLOSSARIOS/ — glossários dos blocos 1 e 2 para consulta rápida
+- PDFs/ — materiais do Bloco 0 ao Bloco 3
+- Projetos/Start-Projects/ — starters dos blocos iniciais
+- Projetos/Bloco-3-React-App/ — projeto React incremental com Vite
+
+## Como usar
+
+1. Comece por \`00_START_HERE/COMO-USAR-O-CURSO.pdf\`
+2. Passe pelos PDFs do Bloco 0 antes de abrir o React starter
+3. Use os projetos starter como base e evolua até o app React
+4. Quando terminar, submeta repo + URL live pela área do aluno para revisão manual
+
+## Suporte
+
+- Área do aluno: https://volynx.world/dev-journey/student/
+- Checklist: https://volynx.world/dev-journey/checklist/
+- Suporte: https://volynx.world/support/
+
+## Próximos passos
+
+Ao concluir o Pro, o próximo nível é o **Bundle**, que libera Blocos 4-5, deploy/certificação e o Arsenal Kit.
+
+---
+
+VOLYNX • Building a Smarter Future
+`;
+}
+
+function bundleReadme() {
+  return `# Dev Journey — Bundle
+
+Bem-vindo ao Dev Journey Bundle pela VOLYNX.
+
+Este pacote contém:
+- 00_START_HERE/ — guias de entrada, compatibilidade, uso do curso e certificação
+- 01_GLOSSARIOS/ — glossários dos blocos 1 e 2
+- PDFs/ — materiais do Bloco 0 ao Bloco 5 + Arsenal Cheatcodes
+- Projetos/Start-Projects/ — base dos blocos iniciais
+- Projetos/ProBundle-Projects/ — React app, API Express e exemplo de deploy
+- Arsenal/ — projetos reutilizáveis e bônus práticos
+
+## Como usar
+
+1. Comece por \`00_START_HERE/COMO-USAR-O-CURSO.pdf\`
+2. Siga a ordem natural dos PDFs: fundamentos, React, API e deploy
+3. Abra os projetos de \`Projetos/ProBundle-Projects/\` conforme avançar
+4. Use o \`Arsenal/\` como biblioteca prática para acelerar seus entregáveis
+5. Ao finalizar, envie repo + URL live para revisão manual e certificação
+
+## Suporte
+
+- Área do aluno: https://volynx.world/dev-journey/student/
+- Checklist: https://volynx.world/dev-journey/checklist/
+- Suporte: https://volynx.world/support/
+
+## Próximos passos
+
+O Bundle já é a trilha completa. O foco daqui pra frente é publicar, validar e transformar os projetos em portfólio real.
 
 ---
 
