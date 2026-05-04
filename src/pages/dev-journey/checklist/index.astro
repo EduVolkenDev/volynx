@@ -1,0 +1,455 @@
+---
+import "../../../styles/volynx-devjourney.css";
+import FaviconHead from "../../../components/FaviconHead.astro";
+import VxHeader from "../../../components/VxHeader.astro";
+import VxFooter from "../../../components/VxFooter.astro";
+import PageWidgets from "../../../components/PageWidgets.astro";
+import { ROUTES } from "../../../data/routes";
+
+// Item structure: id (kebab.dotted, ≤64 chars, /^[a-z0-9_.-]{1,64}$/i)
+// Phase 1 ships Social blocks (0-2). Pro/Bundle items are listed but locked.
+const blocks = [
+  {
+    id: "block0",
+    num: "Bloco 0",
+    title_en: "Setup",
+    title_pt: "Setup",
+    tier: "social",
+    items: [
+      { id: "block0.editor",      en: "Editor + browser + Live Server installed",     pt: "Editor + navegador + Live Server instalados" },
+      { id: "block0.checklist",   en: "Validatable checklist understood",              pt: "Checklist validável entendido" },
+      { id: "block0.cert_rules",  en: "Read certification rules + checkpoints",        pt: "Leu regras de certificação + checkpoints" },
+    ],
+  },
+  {
+    id: "block1",
+    num: "Bloco 1",
+    title_en: "HTML + CSS + basic JS",
+    title_pt: "HTML + CSS + JS básico",
+    tier: "social",
+    items: [
+      { id: "block1.semantic",    en: "Semantic HTML structure built",                 pt: "Estrutura HTML semântica construída" },
+      { id: "block1.responsive",  en: "Simple responsive layout works",                pt: "Layout responsivo simples funcionando" },
+      { id: "block1.button",      en: "Button + form with visible feedback",           pt: "Botão + form com feedback visível" },
+      { id: "block1.debug",       en: "Console + common errors fixed",                 pt: "Console + erros comuns corrigidos" },
+    ],
+  },
+  {
+    id: "block2",
+    num: "Bloco 2",
+    title_en: "JavaScript + DOM + JSON",
+    title_pt: "JavaScript + DOM + JSON",
+    tier: "social",
+    items: [
+      { id: "block2.types",       en: "Types, operators, functions, events",           pt: "Tipos, operadores, funções e eventos" },
+      { id: "block2.dom",         en: "DOM: select, change, create elements",          pt: "DOM: selecionar, alterar, criar elementos" },
+      { id: "block2.json",        en: "JSON: what it is, why, where you use it",       pt: "JSON: o que é, por quê, onde se usa" },
+    ],
+  },
+  {
+    id: "block3",
+    num: "Bloco 3",
+    title_en: "React App incremental",
+    title_pt: "React App incremental",
+    tier: "pro",
+    items: [
+      { id: "block3.state",       en: "State, simple components, code organisation",   pt: "Estado, componentes simples, organização" },
+      { id: "block3.persistence", en: "Basic persistence (localStorage) + UX",         pt: "Persistência básica (localStorage) + UX" },
+      { id: "block3.publish",     en: "Publishing + quality checklist",                pt: "Publicação + checklist de qualidade" },
+    ],
+  },
+  {
+    id: "block4",
+    num: "Bloco 4",
+    title_en: "API + Architecture",
+    title_pt: "API + Arquitetura",
+    tier: "bundle",
+    items: [
+      { id: "block4.refactor",    en: "Guided refactor: clarity from names to scope",  pt: "Refactor guiado: clareza dos nomes ao escopo" },
+      { id: "block4.integration", en: "Integrations and data (common market flows)",   pt: "Integrações e dados (fluxos de mercado)" },
+      { id: "block4.checklist",   en: "Anti-bug checklist before publishing",          pt: "Checklist anti-bug antes de publicar" },
+    ],
+  },
+  {
+    id: "block5",
+    num: "Bloco 5",
+    title_en: "Deploy + Final delivery",
+    title_pt: "Deploy + Entrega final",
+    tier: "bundle",
+    items: [
+      { id: "block5.publish",     en: "Publishing + GitHub validation",                pt: "Publicação + validação GitHub" },
+      { id: "block5.checklist",   en: "Final checklist (responsive, a11y, working)",   pt: "Checklist final (responsivo, a11y, funcional)" },
+      { id: "block5.submit",      en: "Project submitted for manual review",           pt: "Projeto submetido para revisão manual" },
+    ],
+  },
+];
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <meta content="#080610" name="theme-color" />
+  <title>Checklist • Dev Journey • VOLYNX</title>
+  <meta name="description" content="Checklist do Dev Journey — marque cada item até funcionar na tela." />
+  <meta name="robots" content="noindex,nofollow" />
+  <FaviconHead />
+</head>
+
+<body>
+  <div class="dust" aria-hidden="true"></div>
+  <a class="skip" href="#content"><span class="i18n-en">Skip to content</span><span class="i18n-pt">Pular para o conteúdo</span></a>
+
+  <VxHeader />
+  <PageWidgets />
+
+  <main id="content">
+    <div class="container" style="padding-top: 96px;">
+
+      <header class="sectionTitle" style="border-top:none; padding-top:0;">
+        <div>
+          <h1 style="margin:0 0 8px;">
+            <span class="i18n-en">Dev Journey checklist</span>
+            <span class="i18n-pt">Checklist do Dev Journey</span>
+          </h1>
+          <p class="muted" style="margin:0;">
+            <span class="i18n-en">Tick each item when it works on screen. Logged-in progress saves to your account.</span>
+            <span class="i18n-pt">Marque cada item quando funcionar na tela. Progresso fica salvo na sua conta quando logado.</span>
+          </p>
+        </div>
+        <div class="djc-meta">
+          <span class="djc-status" id="djcStatus" data-state="local">
+            <span class="i18n-en">Saving locally</span>
+            <span class="i18n-pt">Salvando localmente</span>
+          </span>
+          <a class="btn ghost" href={ROUTES.devJourneyStudent}>
+            <span class="i18n-en">← Student area</span>
+            <span class="i18n-pt">← Área do aluno</span>
+          </a>
+        </div>
+      </header>
+
+      <progress class="djc-progress" id="djcProgress" value="0" max="100"></progress>
+      <p class="djc-progress-label" id="djcProgressLabel">0%</p>
+
+      <div class="djc-blocks">
+        {blocks.map((block) => (
+          <article class="djc-block" data-block={block.id} data-tier={block.tier} data-locked={block.tier === "social" ? "false" : "true"}>
+            <header class="djc-block-head">
+              <span class="djc-block-num">{block.num}</span>
+              <h2>
+                <span class="i18n-en">{block.title_en}</span>
+                <span class="i18n-pt">{block.title_pt}</span>
+              </h2>
+              {block.tier !== "social" && (
+                <a class="djc-tier-pill" href="/dev-journey/#upgrade" data-tier={block.tier}>
+                  <span class="i18n-en">Unlock with {block.tier === "pro" ? "Pro" : "Bundle"}</span>
+                  <span class="i18n-pt">Desbloquear com {block.tier === "pro" ? "Pro" : "Bundle"}</span>
+                </a>
+              )}
+            </header>
+            <ul class="djc-items">
+              {block.items.map((item) => (
+                <li>
+                  <label class="djc-item" data-item-id={item.id}>
+                    <input type="checkbox" class="djc-check" data-item-id={item.id} disabled={block.tier !== "social"} />
+                    <span class="djc-box" aria-hidden="true"></span>
+                    <span class="djc-label">
+                      <span class="i18n-en">{item.en}</span>
+                      <span class="i18n-pt">{item.pt}</span>
+                    </span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
+
+      <footer class="djc-footer">
+        <p class="djc-honest-note">
+          <span class="i18n-en">When you finish all Social items, head to <a href="/dev-journey/#upgrade">Pro</a> for Block 3 or to <a href="/dev-journey/#upgrade">Bundle</a> for Blocks 4-5 + Arsenal Kit.</span>
+          <span class="i18n-pt">Quando terminar os itens Social, vá pro <a href="/dev-journey/#upgrade">Pro</a> pro Bloco 3 ou pro <a href="/dev-journey/#upgrade">Bundle</a> pros Blocos 4-5 + Arsenal Kit.</span>
+        </p>
+      </footer>
+
+    </div>
+  </main>
+
+  <VxFooter />
+
+  <script is:inline>
+    (function () {
+      var STORAGE_KEY = 'volynx_devjourney_progress';
+      var FN_URL = 'https://zdmpzrderifgqmqivjoy.supabase.co/functions/v1/devjourney-progress';
+      var statusEl = document.getElementById('djcStatus');
+      var progressEl = document.getElementById('djcProgress');
+      var progressLabel = document.getElementById('djcProgressLabel');
+      var checkboxes = Array.prototype.slice.call(document.querySelectorAll('.djc-check'));
+      var totalUnlocked = checkboxes.filter(function (cb) { return !cb.disabled; }).length;
+
+      function getToken() {
+        try { return localStorage.getItem('volynx_access_token') || ''; } catch (_) { return ''; }
+      }
+
+      function readLocal() {
+        try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+        catch (_) { return []; }
+      }
+      function writeLocal(items) {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch (_) {}
+      }
+
+      function setStatus(state) {
+        if (!statusEl) return;
+        statusEl.dataset.state = state;
+        var en = statusEl.querySelector('.i18n-en');
+        var pt = statusEl.querySelector('.i18n-pt');
+        var labels = {
+          local:    ['Saving locally',  'Salvando localmente'],
+          syncing:  ['Syncing…',        'Sincronizando…'],
+          synced:   ['Synced',          'Sincronizado'],
+          error:    ['Sync failed',     'Falha ao sincronizar'],
+          offline:  ['Offline (local)', 'Offline (local)'],
+        };
+        var pair = labels[state] || labels.local;
+        if (en) en.textContent = pair[0];
+        if (pt) pt.textContent = pair[1];
+      }
+
+      function applyChecks(items) {
+        var set = {};
+        items.forEach(function (id) { set[id] = true; });
+        checkboxes.forEach(function (cb) {
+          var id = cb.getAttribute('data-item-id');
+          cb.checked = !!set[id];
+        });
+        renderProgress();
+      }
+
+      function renderProgress() {
+        var done = checkboxes.filter(function (cb) { return !cb.disabled && cb.checked; }).length;
+        var pct = totalUnlocked === 0 ? 0 : Math.round((done / totalUnlocked) * 100);
+        if (progressEl) progressEl.value = pct;
+        if (progressLabel) progressLabel.textContent = pct + '%';
+      }
+
+      var token = getToken();
+
+      // Initial load: localStorage first (instant), then merge with server if logged in
+      applyChecks(readLocal());
+
+      if (token) {
+        setStatus('syncing');
+        fetch(FN_URL, {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'get' }),
+        })
+          .then(function (r) {
+            if (r.status === 401) { setStatus('local'); return null; }
+            return r.json();
+          })
+          .then(function (data) {
+            if (!data) return;
+            var serverItems = Array.isArray(data.items) ? data.items : [];
+            var localItems = readLocal();
+            // Server is source of truth; merge any local items the server doesn't know yet
+            var merged = serverItems.slice();
+            var seen = {};
+            merged.forEach(function (id) { seen[id] = true; });
+            var pending = [];
+            localItems.forEach(function (id) {
+              if (!seen[id]) {
+                merged.push(id);
+                seen[id] = true;
+                pending.push(id);
+              }
+            });
+            applyChecks(merged);
+            writeLocal(merged);
+            // Push any local-only items that the server didn't have
+            if (pending.length === 0) {
+              setStatus('synced');
+              return;
+            }
+            Promise.all(pending.map(function (id) {
+              return fetch(FN_URL, {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'upsert', item_id: id, completed: true }),
+              });
+            })).then(function () { setStatus('synced'); }, function () { setStatus('error'); });
+          })
+          .catch(function () { setStatus('offline'); });
+      } else {
+        setStatus('local');
+      }
+
+      // Toggle handler
+      checkboxes.forEach(function (cb) {
+        cb.addEventListener('change', function () {
+          var id = cb.getAttribute('data-item-id');
+          var local = readLocal();
+          if (cb.checked) {
+            if (local.indexOf(id) === -1) local.push(id);
+          } else {
+            local = local.filter(function (x) { return x !== id; });
+          }
+          writeLocal(local);
+          renderProgress();
+
+          var t = getToken();
+          if (!t) { setStatus('local'); return; }
+
+          setStatus('syncing');
+          fetch(FN_URL, {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'upsert', item_id: id, completed: cb.checked }),
+          })
+            .then(function (r) {
+              if (r.ok) setStatus('synced');
+              else if (r.status === 401) setStatus('local');
+              else setStatus('error');
+            })
+            .catch(function () { setStatus('offline'); });
+        });
+      });
+    })();
+  </script>
+
+  <style>
+    .djc-meta {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .djc-status {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 99px;
+      font-size: 12px; font-weight: 600;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.75);
+    }
+    .djc-status::before {
+      content: ''; width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(180,180,180,.7);
+    }
+    .djc-status[data-state="syncing"]::before { background: rgba(0,219,255,.85); animation: djc-pulse 1s infinite; }
+    .djc-status[data-state="synced"]::before { background: rgba(140,255,210,.9); }
+    .djc-status[data-state="error"]::before, .djc-status[data-state="offline"]::before { background: rgba(255,180,140,.9); }
+    @keyframes djc-pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+
+    .djc-progress {
+      display: block; width: 100%;
+      height: 8px; border-radius: 99px;
+      margin: 18px 0 6px;
+      appearance: none; -webkit-appearance: none;
+      border: none; background: rgba(255,255,255,.06);
+      overflow: hidden;
+    }
+    .djc-progress::-webkit-progress-bar { background: rgba(255,255,255,.06); border-radius: 99px; }
+    .djc-progress::-webkit-progress-value { background: linear-gradient(90deg, rgba(0,219,255,.85), rgba(140,255,210,.85)); border-radius: 99px; transition: width .3s; }
+    .djc-progress::-moz-progress-bar { background: linear-gradient(90deg, rgba(0,219,255,.85), rgba(140,255,210,.85)); border-radius: 99px; }
+    .djc-progress-label { margin: 0 0 28px; font-size: 12px; color: rgba(255,255,255,.6); font-weight: 600; }
+
+    .djc-blocks { display: grid; gap: 14px; }
+
+    .djc-block {
+      padding: 18px 20px;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      background: rgba(255,255,255,.03);
+    }
+    .djc-block[data-locked="true"] { opacity: 0.62; }
+    .djc-block[data-locked="true"] .djc-check { cursor: not-allowed; }
+
+    .djc-block-head {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      margin: 0 0 14px;
+    }
+    .djc-block-num {
+      font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+      color: rgba(0,219,255,.85);
+      padding: 3px 10px; border-radius: 99px;
+      background: rgba(0,219,255,.08); border: 1px solid rgba(0,219,255,.22);
+    }
+    .djc-block-head h2 { margin: 0; font-size: 16px; font-weight: 700; flex: 1; min-width: 0; }
+    .djc-tier-pill {
+      font-size: 11px; font-weight: 600;
+      padding: 4px 10px; border-radius: 99px;
+      text-decoration: none;
+      border: 1px solid rgba(0,219,255,.35);
+      color: rgba(0,219,255,.85);
+      background: rgba(0,219,255,.07);
+    }
+    .djc-tier-pill[data-tier="bundle"] {
+      border-color: rgba(243,225,160,.4);
+      color: #f3e1a0;
+      background: rgba(243,225,160,.08);
+    }
+    .djc-tier-pill:hover { background: rgba(0,219,255,.14); }
+    .djc-tier-pill[data-tier="bundle"]:hover { background: rgba(243,225,160,.14); }
+
+    .djc-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+    .djc-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .djc-item:hover { background: rgba(255,255,255,.04); }
+    .djc-check {
+      position: absolute; opacity: 0; pointer-events: none;
+    }
+    .djc-box {
+      flex-shrink: 0;
+      width: 20px; height: 20px;
+      border-radius: 6px;
+      border: 1.5px solid rgba(255,255,255,.28);
+      background: rgba(255,255,255,.03);
+      display: grid; place-items: center;
+      transition: border-color .15s, background .15s;
+      margin-top: 1px;
+    }
+    .djc-check:checked + .djc-box {
+      background: linear-gradient(135deg, rgba(0,219,255,.7), rgba(140,255,210,.7));
+      border-color: rgba(140,255,210,.9);
+    }
+    .djc-check:checked + .djc-box::after {
+      content: '✓';
+      font-weight: 800;
+      color: #04050a;
+      font-size: 13px;
+    }
+    .djc-check:focus-visible + .djc-box {
+      outline: 2px solid rgba(0,219,255,.6);
+      outline-offset: 2px;
+    }
+    .djc-label {
+      font-size: 14px; line-height: 1.55;
+      color: rgba(255,255,255,.85);
+    }
+    .djc-check:checked ~ .djc-label { color: rgba(255,255,255,.55); text-decoration: line-through; }
+
+    .djc-footer { margin: 36px 0 64px; }
+    .djc-honest-note {
+      padding: 16px 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(243,225,160,.20);
+      background: rgba(243,225,160,.05);
+      font-size: 13.5px; line-height: 1.6;
+      color: rgba(255,255,255,.78);
+    }
+    .djc-honest-note a { color: #f3e1a0; }
+
+    @media (max-width: 720px) {
+      .container { padding-left: 16px; padding-right: 16px; }
+      .sectionTitle { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .djc-block-head h2 { font-size: 15px; }
+    }
+  </style>
+</body>
+</html>

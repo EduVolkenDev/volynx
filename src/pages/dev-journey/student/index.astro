@@ -1,0 +1,342 @@
+---
+import "../../../styles/volynx-devjourney.css";
+import FaviconHead from "../../../components/FaviconHead.astro";
+import VxHeader from "../../../components/VxHeader.astro";
+import VxFooter from "../../../components/VxFooter.astro";
+import PageWidgets from "../../../components/PageWidgets.astro";
+import { ROUTES } from "../../../data/routes";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <meta content="#080610" name="theme-color" />
+  <title>Área do aluno • Dev Journey • VOLYNX</title>
+  <meta name="description" content="Área do aluno do Dev Journey: materiais, checklist e submissão de projeto." />
+  <meta name="robots" content="noindex,nofollow" />
+  <FaviconHead />
+</head>
+
+<body>
+  <div class="dust" aria-hidden="true"></div>
+  <a class="skip" href="#content"><span class="i18n-en">Skip to content</span><span class="i18n-pt">Pular para o conteúdo</span></a>
+
+  <VxHeader primaryCtaLabel="Sign out" primaryCtaI18n="djs.sign_out" primaryCtaHref="/login/?logout=1" />
+  <PageWidgets />
+
+  <main id="content">
+    <div class="container" style="padding-top: 96px;">
+
+      <!-- Logged-out state -->
+      <section id="djsLoggedOut" class="reveal" hidden>
+        <div class="card" style="padding:32px; text-align:center; max-width: 560px; margin: 0 auto;">
+          <h1 style="margin:0 0 12px; font-size: 28px;">
+            <span class="i18n-en">Sign in to enter the student area</span>
+            <span class="i18n-pt">Entre para acessar a área do aluno</span>
+          </h1>
+          <p class="muted" style="margin: 0 0 22px; line-height:1.6;">
+            <span class="i18n-en">Dev Journey is free, but login is required to track progress, save your checklist and submit your project for validation.</span>
+            <span class="i18n-pt">O Dev Journey é grátis, mas o login é necessário pra acompanhar progresso, salvar o checklist e submeter seu projeto para validação.</span>
+          </p>
+          <div class="ctaRow" style="justify-content:center;">
+            <a class="btn primary" id="djsLoginBtn" href="/login/?next=/dev-journey/student/">
+              <span class="i18n-en">Sign in</span>
+              <span class="i18n-pt">Entrar</span>
+            </a>
+            <a class="btn ghost" id="djsSignupBtn" href="/signup/?next=/dev-journey/student/">
+              <span class="i18n-en">Create account</span>
+              <span class="i18n-pt">Criar conta</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Logged-in state -->
+      <section id="djsLoggedIn" class="reveal" hidden>
+        <header class="sectionTitle" style="border-top:none; padding-top:0;">
+          <div>
+            <h1 style="margin:0 0 8px;">
+              <span class="i18n-en">Welcome to Dev Journey</span>
+              <span class="i18n-pt">Bem-vindo ao Dev Journey</span>
+            </h1>
+            <p class="muted" style="margin:0;">
+              <span class="i18n-en">Pick up where you left off. Materials, checklist and submission for your tier.</span>
+              <span class="i18n-pt">Continue de onde parou. Materiais, checklist e submissão pro seu nível.</span>
+            </p>
+          </div>
+          <div class="djs-tier" id="djsTier" data-tier="social" aria-live="polite">
+            <span class="i18n-en">Tier:</span><span class="i18n-pt">Plano:</span>
+            <strong id="djsTierLabel">Social</strong>
+          </div>
+        </header>
+
+        <!-- Quick actions -->
+        <div class="djs-quick-grid">
+          <a class="djs-quick-card" href={ROUTES.devJourneyChecklist}>
+            <div class="djs-quick-badge">01</div>
+            <h3><span class="i18n-en">Checklist</span><span class="i18n-pt">Checklist</span></h3>
+            <p>
+              <span class="i18n-en">Track each item until it works on screen. Progress saves to your account.</span>
+              <span class="i18n-pt">Marque cada item até funcionar na tela. Progresso salva na sua conta.</span>
+            </p>
+            <span class="djs-quick-cta"><span class="i18n-en">Open checklist →</span><span class="i18n-pt">Abrir checklist →</span></span>
+          </a>
+
+          <a class="djs-quick-card djs-quick-card--soon" href="#materials">
+            <div class="djs-quick-badge">02</div>
+            <h3><span class="i18n-en">Materials</span><span class="i18n-pt">Materiais</span></h3>
+            <p>
+              <span class="i18n-en">PDFs, glossaries and starter projects for your tier.</span>
+              <span class="i18n-pt">PDFs, glossários e projetos starter pro seu nível.</span>
+            </p>
+            <span class="djs-quick-cta"><span class="i18n-en">See materials ↓</span><span class="i18n-pt">Ver materiais ↓</span></span>
+          </a>
+
+          <a class="djs-quick-card djs-quick-card--locked" id="djsSubmitCard" href="#materials" data-locked="false">
+            <div class="djs-quick-badge">03</div>
+            <h3><span class="i18n-en">Submit project</span><span class="i18n-pt">Submeter projeto</span></h3>
+            <p>
+              <span class="i18n-en">Send your repo + live URL for manual review. Available in Phase 2.</span>
+              <span class="i18n-pt">Envie repo + URL live pra revisão manual. Disponível na Phase 2.</span>
+            </p>
+            <span class="djs-quick-cta"><span class="i18n-en">Coming soon</span><span class="i18n-pt">Em breve</span></span>
+          </a>
+        </div>
+
+        <!-- Materials list (gated) -->
+        <section id="materials" class="djs-materials">
+          <h2><span class="i18n-en">Your materials</span><span class="i18n-pt">Seus materiais</span></h2>
+
+          <div class="djs-mat-block">
+            <h3>Bloco 0 — Setup <span class="djs-mat-tier-pill social">Social</span></h3>
+            <ul class="djs-mat-list">
+              <li><span class="djs-mat-icon">📄</span><span class="i18n-en">Welcome guide (Comece-Aqui)</span><span class="i18n-pt">Guia de boas-vindas (Comece-Aqui)</span></li>
+              <li><span class="djs-mat-icon">📄</span><span class="i18n-en">How to use the course</span><span class="i18n-pt">Como usar o curso</span></li>
+              <li><span class="djs-mat-icon">📄</span><span class="i18n-en">Requirements + compatibility</span><span class="i18n-pt">Requisitos e compatibilidade</span></li>
+              <li><span class="djs-mat-icon">📄</span><span class="i18n-en">Universal setup checklist</span><span class="i18n-pt">Checklist universal de setup</span></li>
+            </ul>
+            <p class="djs-mat-status">
+              <span class="i18n-en">📦 Social ZIP delivery being prepared. We'll email you when it's ready.</span>
+              <span class="i18n-pt">📦 Pacote ZIP do Social em preparação. Você recebe por email quando estiver pronto.</span>
+            </p>
+          </div>
+
+          <div class="djs-mat-block">
+            <h3>Bloco 1 + 2 — HTML/CSS/JS + DOM <span class="djs-mat-tier-pill social">Social</span></h3>
+            <ul class="djs-mat-list">
+              <li><span class="djs-mat-icon">📄</span><span class="i18n-en">Block 1 — HTML/CSS/JS Foundations</span><span class="i18n-pt">Bloco 1 — Fundamentos HTML/CSS/JS</span></li>
+              <li><span class="djs-mat-icon">📄</span><span class="i18n-en">Block 2 — JavaScript + DOM + JSON</span><span class="i18n-pt">Bloco 2 — JavaScript + DOM + JSON</span></li>
+              <li><span class="djs-mat-icon">📚</span><span class="i18n-en">Glossary Block 1</span><span class="i18n-pt">Glossário Bloco 1</span></li>
+              <li><span class="djs-mat-icon">📚</span><span class="i18n-en">Glossary Block 2</span><span class="i18n-pt">Glossário Bloco 2</span></li>
+              <li><span class="djs-mat-icon">📁</span><span class="i18n-en">Starter projects (Bloco 1, Bloco 2)</span><span class="i18n-pt">Projetos starter (Bloco 1, Bloco 2)</span></li>
+            </ul>
+          </div>
+
+          <div class="djs-mat-block djs-mat-locked" data-tier-required="pro">
+            <h3>
+              Bloco 3 — React App incremental
+              <span class="djs-mat-tier-pill pro">Pro</span>
+              <a class="djs-unlock" href="/dev-journey/#upgrade"><span class="i18n-en">Unlock with Pro</span><span class="i18n-pt">Desbloquear com Pro</span></a>
+            </h3>
+            <p class="muted">
+              <span class="i18n-en">PDF + complete React starter project (Vite + components). Available with Pro.</span>
+              <span class="i18n-pt">PDF + projeto React starter completo (Vite + components). Disponível no Pro.</span>
+            </p>
+          </div>
+
+          <div class="djs-mat-block djs-mat-locked" data-tier-required="bundle">
+            <h3>
+              Bloco 4 + 5 + Arsenal Kit
+              <span class="djs-mat-tier-pill bundle">Bundle</span>
+              <a class="djs-unlock" href="/dev-journey/#upgrade"><span class="i18n-en">Unlock with Bundle</span><span class="i18n-pt">Desbloquear com Bundle</span></a>
+            </h3>
+            <p class="muted">
+              <span class="i18n-en">Express API, deploy with GitHub Actions, certification rules, Arsenal Kit (4 reusable projects + Cheatcodes).</span>
+              <span class="i18n-pt">API Express, deploy com GitHub Actions, regras de certificação, Arsenal Kit (4 projetos reutilizáveis + Cheatcodes).</span>
+            </p>
+          </div>
+        </section>
+
+        <p class="djs-honest-note">
+          <strong><span class="i18n-en">Honest note:</span><span class="i18n-pt">Nota honesta:</span></strong>
+          <span class="i18n-en"> certification today is by manual review. We're shipping the auto-validation pipeline post-launch. Your submission is queued and you'll receive the certificate by email after review.</span>
+          <span class="i18n-pt"> a certificação hoje é por revisão manual. A pipeline de auto-validação chega pós-launch. Sua submissão fica na fila e você recebe a certificação por email após revisão.</span>
+        </p>
+
+      </section>
+
+    </div>
+  </main>
+
+  <VxFooter />
+
+  <script is:inline>
+    (function () {
+      var loggedIn = document.getElementById('djsLoggedIn');
+      var loggedOut = document.getElementById('djsLoggedOut');
+      var tierEl = document.getElementById('djsTier');
+      var tierLabel = document.getElementById('djsTierLabel');
+
+      function getToken() {
+        try { return localStorage.getItem('volynx_access_token') || ''; } catch (_) { return ''; }
+      }
+
+      function show(el) { if (el) el.hidden = false; }
+      function hide(el) { if (el) el.hidden = true; }
+
+      var token = getToken();
+      if (!token) {
+        show(loggedOut);
+        hide(loggedIn);
+        return;
+      }
+
+      show(loggedIn);
+      hide(loggedOut);
+
+      // Fetch tier + progress
+      fetch('https://zdmpzrderifgqmqivjoy.supabase.co/functions/v1/devjourney-progress', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'get' }),
+      })
+        .then(function (r) {
+          if (r.status === 401) {
+            // Token expired or invalid — kick to login
+            location.replace('/login/?next=/dev-journey/student/');
+            return null;
+          }
+          return r.json();
+        })
+        .then(function (data) {
+          if (!data) return;
+          var tier = (data.tier || 'social').toLowerCase();
+          tierEl.dataset.tier = tier;
+          tierLabel.textContent = tier.charAt(0).toUpperCase() + tier.slice(1);
+
+          // Unlock material blocks based on tier
+          var rank = { social: 0, pro: 1, bundle: 2 };
+          var userRank = rank[tier] != null ? rank[tier] : 0;
+          document.querySelectorAll('[data-tier-required]').forEach(function (block) {
+            var req = block.getAttribute('data-tier-required');
+            if (rank[req] != null && userRank >= rank[req]) {
+              block.classList.remove('djs-mat-locked');
+              var unlock = block.querySelector('.djs-unlock');
+              if (unlock) unlock.style.display = 'none';
+            }
+          });
+        })
+        .catch(function (err) {
+          console.warn('[djs] progress fetch failed:', err);
+        });
+    })();
+  </script>
+
+  <style>
+    .djs-tier {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 14px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      font-size: 13px; color: rgba(255,255,255,.85);
+    }
+    .djs-tier strong { color: #fff; font-weight: 700; }
+    .djs-tier[data-tier="pro"] { border-color: rgba(0,219,255,.35); background: rgba(0,219,255,.08); }
+    .djs-tier[data-tier="bundle"] { border-color: rgba(243,225,160,.4); background: rgba(243,225,160,.10); }
+
+    .djs-quick-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 28px 0 36px;
+    }
+    @media (max-width: 720px) { .djs-quick-grid { grid-template-columns: 1fr; } }
+    .djs-quick-card {
+      display: flex; flex-direction: column; gap: 8px;
+      padding: 22px 20px;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 16px;
+      background: rgba(255,255,255,.04);
+      text-decoration: none;
+      color: inherit;
+      transition: border-color .15s, background .15s, transform .15s;
+    }
+    .djs-quick-card:hover { border-color: rgba(0,219,255,.3); background: rgba(0,219,255,.05); transform: translateY(-2px); }
+    .djs-quick-card--soon, .djs-quick-card--locked { opacity: 0.7; }
+    .djs-quick-badge {
+      display: inline-block; width: fit-content;
+      font-size: 11px; font-weight: 700; letter-spacing: .12em;
+      padding: 3px 10px; border-radius: 99px;
+      background: rgba(0,219,255,.12); color: rgba(0,219,255,.9);
+      border: 1px solid rgba(0,219,255,.24);
+    }
+    .djs-quick-card h3 { font-size: 16px; font-weight: 700; margin: 0; color: #fff; }
+    .djs-quick-card p { font-size: 13px; color: rgba(255,255,255,.6); margin: 0; line-height: 1.55; flex: 1; }
+    .djs-quick-cta { font-size: 13px; font-weight: 600; color: rgba(0,219,255,.8); margin-top: 4px; }
+
+    .djs-materials { margin-top: 8px; }
+    .djs-materials h2 { font-size: 22px; margin: 0 0 18px; }
+    .djs-mat-block {
+      padding: 18px 20px; margin-bottom: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      background: rgba(255,255,255,.03);
+    }
+    .djs-mat-block h3 {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      margin: 0 0 10px; font-size: 15px; font-weight: 700;
+    }
+    .djs-mat-tier-pill {
+      font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+      padding: 3px 9px; border-radius: 99px;
+    }
+    .djs-mat-tier-pill.social { background: rgba(140,255,210,.10); color: rgba(140,255,210,.85); border: 1px solid rgba(140,255,210,.22); }
+    .djs-mat-tier-pill.pro { background: rgba(0,219,255,.10); color: rgba(120,220,255,.95); border: 1px solid rgba(0,219,255,.28); }
+    .djs-mat-tier-pill.bundle { background: rgba(243,225,160,.10); color: #f3e1a0; border: 1px solid rgba(243,225,160,.32); }
+    .djs-mat-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+    .djs-mat-list li {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13.5px; color: rgba(255,255,255,.78);
+    }
+    .djs-mat-icon { font-size: 16px; opacity: .85; }
+    .djs-mat-status {
+      margin: 14px 0 0; font-size: 13px;
+      color: rgba(255,255,255,.55);
+      font-style: italic;
+    }
+    .djs-mat-locked .djs-mat-list { display: none; }
+    .djs-mat-locked p { color: rgba(255,255,255,.55); }
+    .djs-unlock {
+      display: inline-block; font-size: 11px; font-weight: 600;
+      padding: 4px 10px; border-radius: 99px;
+      border: 1px solid rgba(0,219,255,.35);
+      color: rgba(0,219,255,.85);
+      background: rgba(0,219,255,.07);
+      text-decoration: none;
+      margin-left: auto;
+    }
+    .djs-unlock:hover { background: rgba(0,219,255,.14); }
+
+    .djs-honest-note {
+      margin: 32px 0 64px;
+      padding: 16px 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(243,225,160,.20);
+      background: rgba(243,225,160,.05);
+      font-size: 13.5px; line-height: 1.6;
+      color: rgba(255,255,255,.78);
+    }
+    .djs-honest-note strong { color: #f3e1a0; }
+
+    @media (max-width: 720px) {
+      .container { padding-left: 16px; padding-right: 16px; }
+      .sectionTitle { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
+  </style>
+</body>
+</html>
