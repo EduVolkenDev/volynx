@@ -75,6 +75,10 @@ export const ROUTES = {
 
   // ── Other ─────────────────────────────
   devJourney: "/dev-journey/",
+  devJourneyStudent: "/dev-journey/student/",
+  devJourneyChecklist: "/dev-journey/checklist/",
+  devJourneySubmit: "/dev-journey/submit/",
+  devJourneyVerify: "/dev-journey/verify/",
   tools: "/tools/",
 
   // ── Legal ─────────────────────────────
