@@ -43,8 +43,8 @@ export const PRODUCTS: Record<string, {
     key: 'cvitae',
     name: { en: 'CVitae', pt: 'CVitae' },
     tagline: {
-      en: 'Build free, export with premium polish when it matters.',
-      pt: 'Monte grátis, exporte com acabamento premium quando precisar.',
+      en: 'AI-assisted CV building with guided sections, templates, and VX-powered exports.',
+      pt: 'Criação de currículo com IA, seções guiadas, templates e exports com VX.',
     },
     profileField: 'cvitae_plan',
   },
