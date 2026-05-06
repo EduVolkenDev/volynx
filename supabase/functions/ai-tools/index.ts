@@ -1,12 +1,12 @@
 /**
  * VOLYNX — AI Tools (Supabase Edge Function)
  *
- * Routes AI requests for intent, summary, writing, task, and decision tools.
+ * Routes AI requests for intent, summary, writing, task, decision, and CVitae tools.
  * Called by daily.volynx.world after token deduction is handled client-side.
  *
  * Request:
  *   POST /ai-tools
- *   { tool: "intent"|"summary"|"writing"|"task"|"decision", input: {...}, lite: boolean }
+ *   { tool: "intent"|"summary"|"writing"|"task"|"decision"|"cvitae", input: {...}, lite: boolean }
  *
  * Response:
  *   200: { result: string, lite: boolean }
@@ -59,6 +59,12 @@ async function callClaude(system: string, user: string, maxTokens: number): Prom
 
   const data = await res.json();
   return (data as { content?: Array<{ text?: string }> }).content?.[0]?.text || "";
+}
+
+function cvitaeLanguageLabel(language?: string): string {
+  const raw = String(language || "").trim().toLowerCase();
+  if (raw === "pt" || raw === "pt-br" || raw.includes("portuguese")) return "Brazilian Portuguese";
+  return "English";
 }
 
 Deno.serve(async (req: Request) => {
@@ -204,6 +210,94 @@ Rules:
 
 **Key risk:** [one caveat to watch for]`;
         user = `Option A: ${optionA}\nOption B: ${optionB}${criteriaLine}`;
+      }
+
+    // ── CVitae resume copilot ────────────────────────────────
+    } else if (tool === "cvitae") {
+      const { mode, role, name, summary, skills, languages, location, experience, experiences, currentText, language } = input;
+      const outputLanguage = cvitaeLanguageLabel(language);
+
+      if (!mode?.trim()) return json({ error: "Missing mode" }, 400);
+
+      if (mode === "summary_draft") {
+        system = `You are CVitae AI, an expert resume copywriter.
+Write a professional resume summary in ${outputLanguage}.
+
+Rules:
+- Output only the final summary text.
+- Use 2 to 3 concise sentences.
+- Sound credible, modern, and hiring-ready.
+- Focus on value, strengths, and direction.
+- Avoid generic filler like "hard-working", "go-getter", or "team player" unless strongly supported by the input.
+- Do not use markdown, bullets, labels, quotation marks, or preamble.`;
+        user = `Candidate name: ${name || ""}
+Target role: ${role || ""}
+Location: ${location || ""}
+Existing skills: ${skills || ""}
+Languages: ${languages || ""}
+Experience notes:
+${experiences || ""}
+
+Use the available information only. If the background is junior, make it sound promising and specific without inventing seniority.`;
+      } else if (mode === "summary_polish") {
+        if (!summary?.trim()) return json({ error: "Missing summary" }, 400);
+
+        system = `You are CVitae AI, an expert resume copywriter.
+Rewrite the candidate summary in ${outputLanguage}.
+
+Rules:
+- Output only the improved summary text.
+- Keep it to 2 to 3 concise sentences.
+- Make it clearer, more professional, and more compelling.
+- Preserve the candidate's real background and tone.
+- Remove fluff, repetition, and weak phrasing.
+- Do not use markdown, bullets, labels, or quotation marks.`;
+        user = `Target role: ${role || ""}
+Relevant skills: ${skills || ""}
+Relevant experience:
+${experiences || ""}
+
+Current summary:
+${summary}`;
+      } else if (mode === "skills_suggest") {
+        system = `You are CVitae AI, an expert resume strategist.
+Generate resume-ready skills in ${outputLanguage}.
+
+Rules:
+- Output only a comma-separated list.
+- Return 10 to 14 skills.
+- Tailor the list to the target role and evidence provided.
+- Prefer concrete tools, competencies, and job-relevant strengths.
+- Avoid duplicates and vague filler.
+- Do not add bullets, numbering, labels, or commentary.`;
+        user = `Candidate name: ${name || ""}
+Target role: ${role || ""}
+Summary: ${summary || ""}
+Existing skills: ${skills || ""}
+Experience notes:
+${experiences || ""}`;
+      } else if (mode === "experience_improve") {
+        const rawText = currentText || experience || "";
+        if (!rawText?.trim()) return json({ error: "Missing experience text" }, 400);
+
+        system = `You are CVitae AI, an expert resume copywriter.
+Rewrite a work experience description in ${outputLanguage}.
+
+Rules:
+- Output only the improved experience description.
+- Use 1 to 3 concise achievement-driven sentences.
+- Emphasize impact, scope, ownership, and outcomes when supported by the input.
+- Keep it honest: do not invent metrics, tools, or responsibilities.
+- Avoid first-person language.
+- Do not use markdown, bullets, labels, or quotation marks.`;
+        user = `Candidate target role: ${role || ""}
+Job entry details:
+${experience || ""}
+
+Current description:
+${rawText}`;
+      } else {
+        return json({ error: `Unknown CVitae mode: ${mode}` }, 400);
       }
 
     } else {
