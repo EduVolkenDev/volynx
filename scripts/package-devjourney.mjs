@@ -59,26 +59,22 @@ const COMMON_TRACK_EXTRAS = [
 
 const BRAND_ASSETS = [
   {
-    src: join(REPO_ROOT, "public/assets/volynx-new-logo2026.png"),
-    dest: "02_BRAND_ASSETS/volynx-logo-2026.png",
-    label: "VOLYNX 2026 logo",
+    src: join(REPO_ROOT, "public/assets/devjourney/new-devjourney-asset.webp"),
+    dest: "02_BRAND_ASSETS/new-devjourney-asset.webp",
+    label: "Official Dev Journey course asset",
   },
   {
-    src: join(REPO_ROOT, "public/assets/volynx-new-logo2026-dev-journey.png"),
-    dest: "02_BRAND_ASSETS/dev-journey-logo-2026.png",
-    label: "Dev Journey 2026 course mark",
-  },
-  {
-    src: join(REPO_ROOT, "public/assets/new-wordmark.png"),
-    dest: "02_BRAND_ASSETS/volynx-wordmark-2026.png",
-    label: "VOLYNX 2026 wordmark",
-  },
-  {
-    src: join(REPO_ROOT, "public/assets/logo-icon-version.webp"),
-    dest: "02_BRAND_ASSETS/volynx-icon-mark-2026.webp",
-    label: "VOLYNX 2026 lightweight icon mark",
+    src: join(REPO_ROOT, "public/assets/devjourney/digitalpresence.webp"),
+    dest: "02_BRAND_ASSETS/digitalpresence.webp",
+    label: "Digital Presence bonus visual",
   },
 ];
+
+const OPTIONAL_ICON_PACK = {
+  src: join(REPO_ROOT, "public/assets/icons-store/Abstract-Free"),
+  dest: "03_VOLYNX_FREE_ICON_PACK/abstract-free",
+  label: "VOLYNX Abstract Free Icon Pack",
+};
 
 // ── Configuration ──────────────────────────────────────────────
 const TIERS = {
@@ -215,7 +211,7 @@ function brandAssetsReadme(tierKey, copiedAssets) {
 
 Atualizado em ${COURSE_UPDATED_AT}.
 
-Esta pasta substitui os assets antigos do pacote Social e passa a ser a pasta oficial de marca em todos os ZIPs do Dev Journey.
+Esta pasta contém os assets visuais oficiais do Dev Journey aprovados para este pacote.
 
 ## Arquivos inclusos
 
@@ -223,15 +219,13 @@ ${assetsList}
 
 ## Como usar
 
-- Use o logo Dev Journey em capas, README, hero do projeto final e apresentações do curso.
-- Use o logo VOLYNX 2026 quando quiser sinalizar que o projeto faz parte do ecossistema.
-- Use a wordmark em cabeçalhos largos, splash screens ou páginas de apresentação.
-- Use o icon mark quando precisar de algo menor, como favicon, selo, avatar ou detalhe de card.
+- Use o new-devjourney-asset.webp como capa, hero ou imagem de apresentação do curso.
+- Use o digitalpresence.webp como bônus visual para páginas sobre presença digital, serviços ou portfolio.
+- Se precisar de ícones para o próprio site, use o pack opcional em 03_VOLYNX_FREE_ICON_PACK/.
 
 ## Cuidados
 
 - Nao distorça a proporção dos assets.
-- Nao coloque a wordmark sobre fundo claro sem contraste.
 - Nao revenda, redistribua ou empacote esses assets como biblioteca independente.
 - Em projeto de portfólio, mantenha a marca como referência educacional do Dev Journey, não como se a VOLYNX fosse dona do seu projeto.
 `;
@@ -264,6 +258,65 @@ function injectBrandAssets(rootPath, tierKey) {
   );
 
   return { copied: copiedAssets.length, missing };
+}
+
+function iconPackReadme(tierKey, copiedCount) {
+  const tierName = tierDisplayName(tierKey);
+
+  return `# VOLYNX Free Icon Pack — Dev Journey ${tierName}
+
+Atualizado em ${COURSE_UPDATED_AT}.
+
+Este é um bônus opcional para o aluno usar no próprio site, portfolio ou projeto final do Dev Journey.
+
+## O que vem aqui
+
+- Pack: ${OPTIONAL_ICON_PACK.label}
+- Quantidade: ${copiedCount} ícones .webp
+- Pasta: ${OPTIONAL_ICON_PACK.dest}/
+
+## Como usar
+
+1. Copie apenas os ícones que combinam com seu projeto.
+2. Coloque na pasta de assets do seu site.
+3. Use em cards, seções de features, blocos de serviços ou detalhes visuais.
+4. Otimize tamanho/dimensões se o projeto final ficar pesado.
+
+## Licença de uso para alunos
+
+Você pode usar estes ícones em projetos próprios e em portfolio criado durante o Dev Journey.
+
+Você não pode revender, redistribuir como pack independente, publicar como biblioteca de assets ou remover o contexto VOLYNX para vender como coleção própria.
+`;
+}
+
+function injectOptionalIconPack(rootPath, tierKey) {
+  const packRoot = join(rootPath, "03_VOLYNX_FREE_ICON_PACK");
+  rmSync(packRoot, { recursive: true, force: true });
+  mkdirSync(packRoot, { recursive: true });
+
+  if (!existsSync(OPTIONAL_ICON_PACK.src)) {
+    return { copied: 0, missing: 1 };
+  }
+
+  const destRoot = join(rootPath, OPTIONAL_ICON_PACK.dest);
+  mkdirSync(destRoot, { recursive: true });
+
+  const files = readdirSync(OPTIONAL_ICON_PACK.src)
+    .filter((file) => file.toLowerCase().endsWith(".webp"))
+    .sort((a, b) => a.localeCompare(b, "en", { numeric: true }));
+
+  for (const file of files) {
+    cpSync(join(OPTIONAL_ICON_PACK.src, file), join(destRoot, file));
+  }
+
+  writeFileSync(
+    join(packRoot, "README-ICON-PACK.md"),
+    iconPackReadme(tierKey, files.length),
+    "utf8"
+  );
+
+  return { copied: files.length, missing: 0 };
 }
 
 function packageTier(tierKey) {
@@ -331,6 +384,10 @@ function packageTier(tierKey) {
   const brandAssets = injectBrandAssets(packageRoot, tierKey);
   if (brandAssets.copied > 0) ok(`  wrote ${brandAssets.copied} updated brand asset(s)`);
   if (brandAssets.missing > 0) warn(`  skipped ${brandAssets.missing} missing brand asset(s)`);
+
+  const iconPack = injectOptionalIconPack(packageRoot, tierKey);
+  if (iconPack.copied > 0) ok(`  wrote optional icon pack (${iconPack.copied} icon(s))`);
+  if (iconPack.missing > 0) warn(`  skipped optional icon pack source`);
 
   // Count + size after cleanup
   const count = fileCount(packageRoot);
@@ -403,7 +460,8 @@ function tierPackageMap(tierKey) {
 - 00_START_HERE/: comece por aqui. Os arquivos Markdown atualizados valem mais do que qualquer instrução antiga.
 - 01_SOCIAL/DOCS/: PDFs e glossários dos Blocos 1 e 2.
 - 01_SOCIAL/PROJECTS/: starters dos projetos Social.
-- 02_BRAND_ASSETS/: logos VOLYNX/Dev Journey 2026 e guia de uso.
+- 02_BRAND_ASSETS/: new-devjourney-asset, digitalpresence e guia de uso.
+- 03_VOLYNX_FREE_ICON_PACK/: pack opcional de ícones para site/portfólio.
 - TEMPLATES/: modelos de README e entrega.`;
   }
 
@@ -412,7 +470,8 @@ function tierPackageMap(tierKey) {
 
 - 00_START_HERE/: guias atuais de início, setup, entrega e certificação.
 - 01_GLOSSARIOS/: glossários rápidos dos blocos iniciais.
-- 02_BRAND_ASSETS/: logos VOLYNX/Dev Journey 2026 e guia de uso.
+- 02_BRAND_ASSETS/: new-devjourney-asset, digitalpresence e guia de uso.
+- 03_VOLYNX_FREE_ICON_PACK/: pack opcional de ícones para site/portfólio.
 - PDFs/: materiais do Bloco 0 ao Bloco 3.
 - Projetos/Start-Projects/: starters dos blocos iniciais.
 - Projetos/Bloco-3-React-App/: starter React incremental com Vite.`;
@@ -422,7 +481,8 @@ function tierPackageMap(tierKey) {
 
 - 00_START_HERE/: guias atuais de início, setup, entrega e certificação.
 - 01_GLOSSARIOS/: glossários rápidos dos blocos iniciais.
-- 02_BRAND_ASSETS/: logos VOLYNX/Dev Journey 2026 e guia de uso.
+- 02_BRAND_ASSETS/: new-devjourney-asset, digitalpresence e guia de uso.
+- 03_VOLYNX_FREE_ICON_PACK/: pack opcional de ícones para site/portfólio.
 - PDFs/: materiais do Bloco 0 ao Bloco 5 + Arsenal Cheatcodes.
 - Projetos/Start-Projects/: starters dos blocos iniciais.
 - Projetos/ProBundle-Projects/: React, API Express e exemplo de deploy.
@@ -647,7 +707,8 @@ Bem-vindo ao Dev Journey Social Sprint pela VOLYNX.
 Este pacote contém:
 - 00_START_HERE/ — Comece Aqui atualizado, setup, ordem de estudo e regras de certificação
 - 01_SOCIAL/ — Bloco 1 (HTML/CSS/JS), Bloco 2 (DOM/JSON), glossários e projetos starter
-- 02_BRAND_ASSETS/ — logos VOLYNX/Dev Journey 2026 e guia de uso
+- 02_BRAND_ASSETS/ — new-devjourney-asset, digitalpresence e guia de uso
+- 03_VOLYNX_FREE_ICON_PACK/ — pack opcional de ícones para site/portfólio
 - TEMPLATES/ — templates de README de projeto e entrega
 
 ## Como funciona
@@ -681,7 +742,8 @@ Bem-vindo ao Dev Journey Pro pela VOLYNX.
 Este pacote contém:
 - 00_START_HERE/ — Comece Aqui atualizado, compatibilidade, uso do curso e certificação
 - 01_GLOSSARIOS/ — glossários dos blocos 1 e 2 para consulta rápida
-- 02_BRAND_ASSETS/ — logos VOLYNX/Dev Journey 2026 e guia de uso
+- 02_BRAND_ASSETS/ — new-devjourney-asset, digitalpresence e guia de uso
+- 03_VOLYNX_FREE_ICON_PACK/ — pack opcional de ícones para site/portfólio
 - PDFs/ — materiais do Bloco 0 ao Bloco 3
 - Projetos/Start-Projects/ — starters dos blocos iniciais
 - Projetos/Bloco-3-React-App/ — projeto React incremental com Vite
@@ -719,7 +781,8 @@ Bem-vindo ao Dev Journey Bundle pela VOLYNX.
 Este pacote contém:
 - 00_START_HERE/ — Comece Aqui atualizado, compatibilidade, uso do curso e certificação
 - 01_GLOSSARIOS/ — glossários dos blocos 1 e 2
-- 02_BRAND_ASSETS/ — logos VOLYNX/Dev Journey 2026 e guia de uso
+- 02_BRAND_ASSETS/ — new-devjourney-asset, digitalpresence e guia de uso
+- 03_VOLYNX_FREE_ICON_PACK/ — pack opcional de ícones para site/portfólio
 - PDFs/ — materiais do Bloco 0 ao Bloco 5 + Arsenal Cheatcodes
 - Projetos/Start-Projects/ — base dos blocos iniciais
 - Projetos/ProBundle-Projects/ — React app, API Express e exemplo de deploy
