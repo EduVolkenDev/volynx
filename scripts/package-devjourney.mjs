@@ -57,6 +57,29 @@ const COMMON_TRACK_EXTRAS = [
   },
 ];
 
+const BRAND_ASSETS = [
+  {
+    src: join(REPO_ROOT, "public/assets/volynx-new-logo2026.png"),
+    dest: "02_BRAND_ASSETS/volynx-logo-2026.png",
+    label: "VOLYNX 2026 logo",
+  },
+  {
+    src: join(REPO_ROOT, "public/assets/volynx-new-logo2026-dev-journey.png"),
+    dest: "02_BRAND_ASSETS/dev-journey-logo-2026.png",
+    label: "Dev Journey 2026 course mark",
+  },
+  {
+    src: join(REPO_ROOT, "public/assets/new-wordmark.png"),
+    dest: "02_BRAND_ASSETS/volynx-wordmark-2026.png",
+    label: "VOLYNX 2026 wordmark",
+  },
+  {
+    src: join(REPO_ROOT, "public/assets/logo-icon-version.webp"),
+    dest: "02_BRAND_ASSETS/volynx-icon-mark-2026.webp",
+    label: "VOLYNX 2026 lightweight icon mark",
+  },
+];
+
 // ── Configuration ──────────────────────────────────────────────
 const TIERS = {
   social: {
@@ -182,6 +205,67 @@ function copyExtraFiles(rootPath, extraFiles = []) {
   return { copied, missing };
 }
 
+function brandAssetsReadme(tierKey, copiedAssets) {
+  const tierName = tierDisplayName(tierKey);
+  const assetsList = copiedAssets
+    .map((asset) => `- ${asset.dest.replace("02_BRAND_ASSETS/", "")}: ${asset.label}`)
+    .join("\n");
+
+  return `# Brand assets — Dev Journey ${tierName}
+
+Atualizado em ${COURSE_UPDATED_AT}.
+
+Esta pasta substitui os assets antigos do pacote Social e passa a ser a pasta oficial de marca em todos os ZIPs do Dev Journey.
+
+## Arquivos inclusos
+
+${assetsList}
+
+## Como usar
+
+- Use o logo Dev Journey em capas, README, hero do projeto final e apresentações do curso.
+- Use o logo VOLYNX 2026 quando quiser sinalizar que o projeto faz parte do ecossistema.
+- Use a wordmark em cabeçalhos largos, splash screens ou páginas de apresentação.
+- Use o icon mark quando precisar de algo menor, como favicon, selo, avatar ou detalhe de card.
+
+## Cuidados
+
+- Nao distorça a proporção dos assets.
+- Nao coloque a wordmark sobre fundo claro sem contraste.
+- Nao revenda, redistribua ou empacote esses assets como biblioteca independente.
+- Em projeto de portfólio, mantenha a marca como referência educacional do Dev Journey, não como se a VOLYNX fosse dona do seu projeto.
+`;
+}
+
+function injectBrandAssets(rootPath, tierKey) {
+  const brandRoot = join(rootPath, "02_BRAND_ASSETS");
+  rmSync(brandRoot, { recursive: true, force: true });
+  mkdirSync(brandRoot, { recursive: true });
+
+  const copiedAssets = [];
+  let missing = 0;
+
+  for (const asset of BRAND_ASSETS) {
+    if (!existsSync(asset.src)) {
+      missing++;
+      continue;
+    }
+
+    const destPath = join(rootPath, asset.dest);
+    mkdirSync(dirname(destPath), { recursive: true });
+    cpSync(asset.src, destPath);
+    copiedAssets.push(asset);
+  }
+
+  writeFileSync(
+    join(brandRoot, "README-BRAND-ASSETS.md"),
+    brandAssetsReadme(tierKey, copiedAssets),
+    "utf8"
+  );
+
+  return { copied: copiedAssets.length, missing };
+}
+
 function packageTier(tierKey) {
   const tier = TIERS[tierKey];
   if (!tier) {
@@ -243,6 +327,10 @@ function packageTier(tierKey) {
     writeFileSync(guidePath, guide.content, "utf8");
   }
   if (guideFiles.length > 0) ok(`  wrote ${guideFiles.length} updated start-here guide(s)`);
+
+  const brandAssets = injectBrandAssets(packageRoot, tierKey);
+  if (brandAssets.copied > 0) ok(`  wrote ${brandAssets.copied} updated brand asset(s)`);
+  if (brandAssets.missing > 0) warn(`  skipped ${brandAssets.missing} missing brand asset(s)`);
 
   // Count + size after cleanup
   const count = fileCount(packageRoot);
@@ -315,7 +403,7 @@ function tierPackageMap(tierKey) {
 - 00_START_HERE/: comece por aqui. Os arquivos Markdown atualizados valem mais do que qualquer instrução antiga.
 - 01_SOCIAL/DOCS/: PDFs e glossários dos Blocos 1 e 2.
 - 01_SOCIAL/PROJECTS/: starters dos projetos Social.
-- 02_BRAND_ASSETS/: assets oficiais para uso nos projetos.
+- 02_BRAND_ASSETS/: logos VOLYNX/Dev Journey 2026 e guia de uso.
 - TEMPLATES/: modelos de README e entrega.`;
   }
 
@@ -324,6 +412,7 @@ function tierPackageMap(tierKey) {
 
 - 00_START_HERE/: guias atuais de início, setup, entrega e certificação.
 - 01_GLOSSARIOS/: glossários rápidos dos blocos iniciais.
+- 02_BRAND_ASSETS/: logos VOLYNX/Dev Journey 2026 e guia de uso.
 - PDFs/: materiais do Bloco 0 ao Bloco 3.
 - Projetos/Start-Projects/: starters dos blocos iniciais.
 - Projetos/Bloco-3-React-App/: starter React incremental com Vite.`;
@@ -333,6 +422,7 @@ function tierPackageMap(tierKey) {
 
 - 00_START_HERE/: guias atuais de início, setup, entrega e certificação.
 - 01_GLOSSARIOS/: glossários rápidos dos blocos iniciais.
+- 02_BRAND_ASSETS/: logos VOLYNX/Dev Journey 2026 e guia de uso.
 - PDFs/: materiais do Bloco 0 ao Bloco 5 + Arsenal Cheatcodes.
 - Projetos/Start-Projects/: starters dos blocos iniciais.
 - Projetos/ProBundle-Projects/: React, API Express e exemplo de deploy.
@@ -557,7 +647,7 @@ Bem-vindo ao Dev Journey Social Sprint pela VOLYNX.
 Este pacote contém:
 - 00_START_HERE/ — Comece Aqui atualizado, setup, ordem de estudo e regras de certificação
 - 01_SOCIAL/ — Bloco 1 (HTML/CSS/JS), Bloco 2 (DOM/JSON), glossários e projetos starter
-- 02_BRAND_ASSETS/ — arte oficial pra você usar nos seus projetos
+- 02_BRAND_ASSETS/ — logos VOLYNX/Dev Journey 2026 e guia de uso
 - TEMPLATES/ — templates de README de projeto e entrega
 
 ## Como funciona
@@ -591,6 +681,7 @@ Bem-vindo ao Dev Journey Pro pela VOLYNX.
 Este pacote contém:
 - 00_START_HERE/ — Comece Aqui atualizado, compatibilidade, uso do curso e certificação
 - 01_GLOSSARIOS/ — glossários dos blocos 1 e 2 para consulta rápida
+- 02_BRAND_ASSETS/ — logos VOLYNX/Dev Journey 2026 e guia de uso
 - PDFs/ — materiais do Bloco 0 ao Bloco 3
 - Projetos/Start-Projects/ — starters dos blocos iniciais
 - Projetos/Bloco-3-React-App/ — projeto React incremental com Vite
@@ -628,6 +719,7 @@ Bem-vindo ao Dev Journey Bundle pela VOLYNX.
 Este pacote contém:
 - 00_START_HERE/ — Comece Aqui atualizado, compatibilidade, uso do curso e certificação
 - 01_GLOSSARIOS/ — glossários dos blocos 1 e 2
+- 02_BRAND_ASSETS/ — logos VOLYNX/Dev Journey 2026 e guia de uso
 - PDFs/ — materiais do Bloco 0 ao Bloco 5 + Arsenal Cheatcodes
 - Projetos/Start-Projects/ — base dos blocos iniciais
 - Projetos/ProBundle-Projects/ — React app, API Express e exemplo de deploy
