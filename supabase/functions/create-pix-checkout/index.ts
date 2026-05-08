@@ -77,6 +77,26 @@ serve(async (req: Request) => {
       return json({ ok: false, error: "Missing lookup_key" }, 400);
     }
 
+    // ── Admin bypass — simulate Pix purchase ──
+    {
+      const { data: adminProfile } = await supabase
+        .from("profiles")
+        .select("is_admin")
+        .eq("id", userData.user.id)
+        .maybeSingle();
+      if (adminProfile?.is_admin) {
+        const successUrl = `${FRONTEND_ORIGIN}/billing/success/?simulated=admin&lookup_key=${encodeURIComponent(lookupKey)}`;
+        console.log(`[pix-checkout] admin_bypass simulate ${userData.user.email} → ${lookupKey}`);
+        return json({
+          ok: true,
+          simulated: true,
+          admin_bypass: true,
+          url: successUrl,
+          lookup_key: lookupKey,
+        });
+      }
+    }
+
     const prefix = extractPrefix(lookupKey);
     if (!prefix.startsWith("tokens_")) {
       return json({ ok: false, error: "Pix checkout is only available for VX token packs." }, 400);

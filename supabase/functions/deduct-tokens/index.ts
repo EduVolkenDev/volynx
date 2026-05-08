@@ -130,6 +130,32 @@ serve(async (req: Request) => {
       tokensToSpend = customTokens;
     }
 
+    // ── Admin bypass — no deduction, log usage only ──
+    const { data: adminProfile } = await supabase
+      .from("profiles")
+      .select("is_admin, token_balance")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (adminProfile?.is_admin) {
+      // Best-effort audit trail (non-blocking)
+      supabase.from("token_transactions").insert({
+        user_id: userId,
+        type: "admin_bypass",
+        amount: 0,
+        tool_name: tool,
+        description: `[ADMIN] ${description || tool} (would_cost=${tokensToSpend})`,
+        balance_after: adminProfile.token_balance ?? 1000000000,
+      }).then(() => {}, () => {});
+
+      return json({
+        ok: true,
+        balance: adminProfile.token_balance ?? 1000000000,
+        spent: 0,
+        admin_bypass: true,
+      });
+    }
+
     // ── Atomic deduction via Postgres RPC ──
     // deduct_tokens_atomic uses SELECT ... FOR UPDATE — true atomicity
     const { data: result, error: rpcErr } = await supabase.rpc(

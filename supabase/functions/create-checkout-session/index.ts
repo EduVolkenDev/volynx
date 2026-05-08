@@ -117,6 +117,32 @@ Deno.serve(async (req: Request) => {
       return json({ error: "Missing lookup_key" }, 400);
     }
 
+    // ── Admin bypass — simulate purchase, skip Stripe entirely ──
+    // Admin already has all plans + huge balance, so we just return a
+    // success URL with ?simulated=admin so the success page can show a banner.
+    {
+      const { data: adminProfile } = await supabase
+        .from("profiles")
+        .select("is_admin")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (adminProfile?.is_admin) {
+        const baseSuccess = (typeof success_url === "string" && success_url)
+          ? success_url
+          : `${FRONTEND_ORIGIN}/billing/success/`;
+        const sep = baseSuccess.includes("?") ? "&" : "?";
+        const simulatedUrl = `${baseSuccess}${sep}simulated=admin&lookup_key=${encodeURIComponent(lookup_key)}`;
+        console.log(`[checkout] admin_bypass simulate ${user.email} → ${lookup_key}`);
+        return json({
+          simulated: true,
+          admin_bypass: true,
+          url: simulatedUrl,
+          lookup_key,
+        });
+      }
+    }
+
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
       console.error("[checkout] STRIPE_SECRET_KEY not set");

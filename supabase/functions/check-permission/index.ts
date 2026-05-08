@@ -71,7 +71,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: profile, error: profErr } = await supabase
       .from("profiles")
-      .select("plan, builder_plan, daily_plan, cvitae_plan, daily_plan_expires_at, icon_pack_grants, is_black_diamond, avatar_id, token_balance, org_id")
+      .select("plan, builder_plan, daily_plan, cvitae_plan, daily_plan_expires_at, icon_pack_grants, is_black_diamond, avatar_id, token_balance, org_id, is_admin")
       .eq("id", user.id)
       .single();
 
@@ -81,6 +81,37 @@ Deno.serve(async (req: Request) => {
         product: productKey,
         allowed: true, limit: 5, used: 0, remaining: 5,
         useLocalStorage: true, pro_features: [],
+      });
+    }
+
+    // ── Admin bypass — full access to everything ──
+    if ((profile as { is_admin?: boolean }).is_admin) {
+      const adminProFeatures = productKey === "daily"
+        ? ["sync", "export", "cloud", "api", "priority", "shared_vaults", "team_notes", "analytics"]
+        : productKey === "cvitae"
+          ? ["cloud_sync", "templates", "export_included", "premium_templates", "ai_suggestions"]
+          : ["batch", "zip", "commercial", "no-watermark", "api", "priority"];
+      return json({
+        plan: profile.plan || "pro",
+        builder_plan: profile.builder_plan || "studio",
+        daily_plan: profile.daily_plan || "diamond",
+        cvitae_plan: profile.cvitae_plan || "business",
+        daily_plan_expires_at: null,
+        daily_plan_expired: false,
+        icon_pack_grants: Array.isArray(profile.icon_pack_grants) ? profile.icon_pack_grants : [],
+        is_black_diamond: true,
+        is_admin: true,
+        avatar_id: (profile.avatar_id as string | null) || null,
+        effective_tier: "studio",
+        product: productKey,
+        allowed: true,
+        limit: -1,
+        used: 0,
+        remaining: -1,
+        useLocalStorage: false,
+        token_balance: profile.token_balance || 1000000000,
+        pro_features: adminProFeatures,
+        admin_bypass: true,
       });
     }
 
