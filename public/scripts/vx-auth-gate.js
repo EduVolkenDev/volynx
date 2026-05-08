@@ -85,8 +85,17 @@
           ? window.VxPlan.normalize(data.effective_tier || data.builder_plan || data.plan)
           : (data.effective_tier || data.builder_plan || data.plan || 'free');
         proFeatures = data.pro_features || [];
-        // Update plan cache with actual tier, not the binary plan flag
-        if (window.VxPlan) window.VxPlan.cache(plan);
+        // Update plan cache with actual tier + Black Diamond flag (if returned by edge)
+        if (window.VxPlan) {
+          window.VxPlan.cache({
+            plan: plan,
+            isBlackDiamond: data.is_black_diamond === true,
+          });
+        }
+        // Cache avatar choice (PT-2d) — vx-avatar.js renders into [data-vx-avatar-slot]
+        if (window.VxAvatar && data.avatar_id) {
+          window.VxAvatar.cache(data.avatar_id);
+        }
       }
     }
   } catch (_) {
@@ -101,6 +110,9 @@
 
   // ── 4. Apply plan-based UI ─────────────────────────────────────────────────
   document.body.dataset.plan = plan;
+  if (window.VxPlan && typeof window.VxPlan.applyTierAttrs === 'function') {
+    window.VxPlan.applyTierAttrs();
+  }
 
   // Show/hide elements with data-require-plan="pro"
   document.querySelectorAll('[data-require-plan]').forEach(function(el) {

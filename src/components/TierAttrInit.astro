@@ -1,0 +1,46 @@
+---
+/**
+ * TierAttrInit.astro
+ *
+ * Emits a tiny synchronous inline script that reads the cached plan/BD flag
+ * from localStorage and sets <html data-plan|data-tier|data-bd> BEFORE first paint.
+ *
+ * This is the foundation for the premium-tier visual layer:
+ *   - data-plan="diamond" → individual plan id (free, launch, business, pro, diamond, studio, teams, enterprise)
+ *   - data-tier="member"  → 3 visual buckets: free | member | studio
+ *   - data-bd="1"         → Black Diamond overlay (orthogonal to tier)
+ *
+ * vx-plan.js (deferred) refreshes these attrs after auth resolves; this script
+ * just primes the values so paid users don't see a free-styled flash.
+ *
+ * Include in <head> of every layout (BaseLayout / FlagshipLayout / HomeLayout / LegalLayout).
+ */
+---
+<script is:inline>
+  (function () {
+    var TIER = {
+      free: 'free',
+      launch: 'member',
+      business: 'member',
+      pro: 'member',
+      diamond: 'member',
+      studio: 'studio',
+      teams: 'studio',
+      enterprise: 'studio'
+    };
+    var plan = 'free';
+    var bd = '0';
+    try {
+      var raw = localStorage.getItem('volynx_plan_cache');
+      if (raw) {
+        var data = JSON.parse(raw);
+        if (data && typeof data.plan === 'string' && TIER[data.plan]) plan = data.plan;
+        if (data && data.isBlackDiamond === true) bd = '1';
+      }
+    } catch (_) {}
+    var html = document.documentElement;
+    html.setAttribute('data-plan', plan);
+    html.setAttribute('data-tier', TIER[plan] || 'free');
+    html.setAttribute('data-bd', bd);
+  })();
+</script>

@@ -29,6 +29,14 @@ function json(data: Record<string, unknown>, status = 200) {
 
 const FRONTEND_ORIGIN = Deno.env.get("FRONTEND_ORIGIN") || "https://volynx.world";
 
+function isProductionOrigin(origin: string): boolean {
+  return /^https:\/\/(www\.)?volynx\.world\b/i.test(origin);
+}
+
+function shouldBlockTestStripeKey(stripeKey: string): boolean {
+  return isProductionOrigin(FRONTEND_ORIGIN) && stripeKey.startsWith("sk_test_");
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: CORS_HEADERS });
@@ -73,6 +81,10 @@ Deno.serve(async (req: Request) => {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
       return json({ error: "Payment system not configured." }, 500);
+    }
+    if (shouldBlockTestStripeKey(stripeKey)) {
+      console.error("[portal] blocked test Stripe key on production origin");
+      return json({ error: "Live billing portal is not configured." }, 500);
     }
 
     const stripe = new Stripe(stripeKey, {

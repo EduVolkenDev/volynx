@@ -4,7 +4,7 @@
 -- webhook can never end up in a "tokens credited but credited_at NULL"
 -- state. Without this, a network blip between the credit RPC and the
 -- separate `UPDATE pix_payments SET credited_at` would let the next
--- Mercado Pago retry double-credit the same payment.
+-- legacy direct-Pix retry double-credit the same payment.
 
 DO $migration$
 BEGIN

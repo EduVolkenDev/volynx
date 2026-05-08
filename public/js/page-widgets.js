@@ -22,6 +22,7 @@
 
   const token = localStorage.getItem('volynx_access_token');
   if (!token) return;
+  if (!tokenIsFresh(token)) return;
 
   // Try to get name from session metadata first
   let displayName = '';
@@ -38,7 +39,7 @@
   // Show first name, or email prefix as fallback
   const label = displayName
     ? displayName.split(' ')[0]
-    : (email ? email.split('@')[0] : '??');
+    : (email ? email.split('@')[0] : 'ME');
   const initials = label.slice(0, 2).toUpperCase();
 
   loginBtn.href = '/profile/';
@@ -47,6 +48,18 @@
   loginBtn.setAttribute('title', displayName || email || 'My profile');
   loginBtn.classList.add('vx--logged-in');
   loginBtn.removeAttribute('data-i18n');
+
+  function tokenIsFresh(jwt) {
+    try {
+      const payload = jwt.split('.')[1];
+      if (!payload) return false;
+      const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const data = JSON.parse(atob(normalized.padEnd(normalized.length + (4 - normalized.length % 4) % 4, '=')));
+      return !!(data && data.exp && (data.exp * 1000) > (Date.now() + 30000));
+    } catch (_) {
+      return false;
+    }
+  }
 })();
 
 (function initLangToggle() {

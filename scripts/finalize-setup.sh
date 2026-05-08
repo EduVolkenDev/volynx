@@ -24,8 +24,8 @@ if [ ! -f "scripts/.env" ]; then
   echo ""
   echo "  ⚠  scripts/.env not found."
   echo "  Creating from template..."
-  echo 'STRIPE_SECRET_KEY=sk_test_YOUR_KEY_HERE' > scripts/.env
-  echo "  → Please edit scripts/.env with your real Stripe key."
+  echo 'STRIPE_SECRET_KEY=sk_live_YOUR_KEY_HERE' > scripts/.env
+  echo "  → Please edit scripts/.env with your real live Stripe key."
   echo "  → Then run this script again."
   exit 1
 fi
@@ -60,13 +60,13 @@ echo ""
 echo "  1. SET SUPABASE SECRETS"
 echo "     → https://supabase.com/dashboard/project/zdmpzrderifgqmqivjoy/settings/functions"
 echo "     Add these secrets:"
-echo "       STRIPE_SECRET_KEY        = (your sk_test_ key)"
+echo "       STRIPE_SECRET_KEY        = (your sk_live_ key)"
 echo "       STRIPE_WEBHOOK_SECRET    = (from step 2 below)"
 echo "       SUPABASE_SERVICE_ROLE_KEY = (from Project Settings > API)"
 echo "       FRONTEND_ORIGIN          = https://volynx.world"
 echo ""
 echo "  2. REGISTER STRIPE WEBHOOK"
-echo "     → https://dashboard.stripe.com/test/webhooks"
+echo "     → https://dashboard.stripe.com/webhooks"
 echo "     Click 'Add endpoint'"
 echo "     URL: https://zdmpzrderifgqmqivjoy.supabase.co/functions/v1/stripe-webhook"
 echo "     Events: checkout.session.completed"

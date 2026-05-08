@@ -41,6 +41,24 @@ window.VxPlan = (function () {
   var CACHE_KEY = 'volynx_plan_cache';
   var CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
+  // ── Tier groups for premium visual treatment ──────────────────────
+  // Maps individual plans → 3 visual buckets used by [data-tier] CSS layer.
+  // Black Diamond is orthogonal (data-bd="1" overlays any tier).
+  var TIER_GROUP = {
+    free: 'free',
+    launch: 'member',
+    business: 'member',
+    pro: 'member',
+    diamond: 'member',
+    studio: 'studio',
+    teams: 'studio',
+    enterprise: 'studio',
+  };
+
+  function tierGroup(plan) {
+    return TIER_GROUP[normalize(plan)] || 'free';
+  }
+
   /** Normalize any plan string to a valid PlanId, defaulting to 'free' */
   function normalize(raw) {
     if (!raw || typeof raw !== 'string') return 'free';
@@ -73,27 +91,65 @@ window.VxPlan = (function () {
 
   // ── Plan caching ────────────────────────────────────────────────
 
-  /** Cache the current plan in localStorage with a TTL */
-  function cache(plan) {
+  /**
+   * Cache the current plan (and optional BD flag) in localStorage with a TTL.
+   * Accepts either a plain plan string OR an object {plan, isBlackDiamond}.
+   * Preserves any previously-cached isBlackDiamond when called with a string.
+   */
+  function cache(planOrObj) {
     try {
+      var existing = readRawCache();
+      var nextPlan;
+      var nextBd;
+      if (typeof planOrObj === 'object' && planOrObj !== null) {
+        nextPlan = normalize(planOrObj.plan);
+        nextBd = planOrObj.isBlackDiamond === true || planOrObj.is_black_diamond === true;
+      } else {
+        nextPlan = normalize(planOrObj);
+        nextBd = existing ? existing.isBlackDiamond === true : false;
+      }
       localStorage.setItem(CACHE_KEY, JSON.stringify({
-        plan: normalize(plan),
+        plan: nextPlan,
+        isBlackDiamond: nextBd,
         ts: Date.now(),
       }));
     } catch (_) {}
   }
 
-  /** Get cached plan if still valid, otherwise null */
-  function getCached() {
+  function readRawCache() {
     try {
       var raw = localStorage.getItem(CACHE_KEY);
       if (!raw) return null;
-      var data = JSON.parse(raw);
-      if (Date.now() - data.ts > CACHE_TTL) return null;
-      return data;
+      return JSON.parse(raw);
     } catch (_) {
       return null;
     }
+  }
+
+  /**
+   * Get cached plan if still valid, otherwise null.
+   * Returns { plan, isBlackDiamond, ts } — back-compat: callers reading .plan still work.
+   */
+  function getCached() {
+    var data = readRawCache();
+    if (!data) return null;
+    if (Date.now() - data.ts > CACHE_TTL) return null;
+    return data;
+  }
+
+  /**
+   * Get cached BD-aware view, even past TTL — used by tier-attr init for zero-flash.
+   * Returns { plan, isBlackDiamond, stale } or { plan: 'free', isBlackDiamond: false, stale: true }.
+   */
+  function getCachedRelaxed() {
+    var data = readRawCache();
+    if (!data) return { plan: 'free', isBlackDiamond: false, stale: true };
+    var stale = (Date.now() - data.ts) > CACHE_TTL;
+    return {
+      plan: normalize(data.plan),
+      isBlackDiamond: data.isBlackDiamond === true,
+      stale: stale,
+    };
   }
 
   /** Clear the plan cache (call on logout) */
@@ -149,26 +205,65 @@ window.VxPlan = (function () {
     }
   }
 
+  // ── Tier attribute application (premium visual layer) ─────────────
+  /**
+   * Set <html data-plan data-tier data-bd> from current cache.
+   * Runs synchronously — safe to call before paint to avoid flash.
+   * Also sets <body> attrs once body exists (back-compat with vx-auth-gate).
+   */
+  function applyTierAttrs() {
+    try {
+      var view = getCachedRelaxed();
+      var plan = view.plan;
+      var tier = tierGroup(plan);
+      var bd = view.isBlackDiamond ? '1' : '0';
+      var html = document.documentElement;
+      if (html) {
+        html.setAttribute('data-plan', plan);
+        html.setAttribute('data-tier', tier);
+        html.setAttribute('data-bd', bd);
+      }
+      var body = document.body;
+      if (body) {
+        body.setAttribute('data-plan', plan);
+        body.setAttribute('data-tier', tier);
+        body.setAttribute('data-bd', bd);
+      }
+    } catch (_) {}
+  }
+
   // Auto-apply on load
+  applyTierAttrs(); // immediate (zero-flash if cache present)
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', applyPlanGating);
+    document.addEventListener('DOMContentLoaded', function () {
+      applyTierAttrs();
+      applyPlanGating();
+    });
   } else {
     applyPlanGating();
   }
-  window.addEventListener('vx:plan-ready', applyPlanGating);
+  window.addEventListener('vx:plan-ready', function () {
+    applyTierAttrs();
+    applyPlanGating();
+  });
 
   return {
     PLAN_IDS: PLAN_IDS,
     PLAN_RANK: PLAN_RANK,
+    TIER_GROUP: TIER_GROUP,
     normalize: normalize,
     canAccess: canAccess,
     isPaid: isPaid,
     label: label,
     rank: rank,
+    tierGroup: tierGroup,
     cache: cache,
     getCached: getCached,
+    getCachedRelaxed: getCachedRelaxed,
     clearCache: clearCache,
     clearAllUsage: clearAllUsage,
     applyPlanGating: applyPlanGating,
+    applyTierAttrs: applyTierAttrs,
   };
 })();

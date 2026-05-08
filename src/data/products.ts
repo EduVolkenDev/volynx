@@ -43,8 +43,8 @@ export const PRODUCTS: Record<string, {
     key: 'cvitae',
     name: { en: 'CVitae', pt: 'CVitae' },
     tagline: {
-      en: 'AI-assisted CV building with guided sections, templates, and VX-powered exports.',
-      pt: 'Criação de currículo com IA, seções guiadas, templates e exports com VX.',
+      en: 'AI-assisted CV building with guided sections, templates, and VX-enabled exports.',
+      pt: 'Criação de currículo com IA, seções guiadas, templates e exports com VX habilitado.',
     },
     profileField: 'cvitae_plan',
   },

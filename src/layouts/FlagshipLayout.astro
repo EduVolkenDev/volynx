@@ -2,6 +2,7 @@
 import "../styles/flagship-v3.css";
 import FaviconHead from "../components/FaviconHead.astro";
 import PageWidgets from "../components/PageWidgets.astro";
+import TierAttrInit from "../components/TierAttrInit.astro";
 
 interface Props {
   title?: string;
@@ -44,6 +45,7 @@ const canonicalUrl = `https://volynx.world${Astro.url.pathname}`;
     <link rel="preload" as="image" href="/assets/wordmark.webp" />
 
     <FaviconHead />
+    <TierAttrInit />
 
     <script type="application/ld+json">
       {
@@ -83,6 +85,9 @@ const canonicalUrl = `https://volynx.world${Astro.url.pathname}`;
         } catch(e){}
       })();
       // Populate the user badge AFTER DOM is parsed (badge lives in <body>)
+      // For avatar slots (data-vx-avatar-slot), writes initials into the inner
+      // .vx-avatar__initials span and toggles the icon — vx-avatar.js may then
+      // replace with an <img> if the user has a cached avatar choice.
       function vxPopulateUserBadge() {
         try {
           if (!vxAuthTokenIsFresh()) return;
@@ -98,11 +103,23 @@ const canonicalUrl = `https://volynx.world${Astro.url.pathname}`;
           var title = name || email || 'Profile';
           ['vxUserBadge', 'vxLoginBtn', 'vxUserBadgeMobileInitials'].forEach(function(id) {
             var el = document.getElementById(id);
-            if (el) {
+            if (!el) return;
+            var initialsEl = el.classList.contains('vx-avatar__initials')
+              ? el
+              : el.querySelector('.vx-avatar__initials');
+            if (initialsEl) {
+              initialsEl.textContent = initials;
+              initialsEl.hidden = false;
+              // Hide the icon when authed; vx-avatar.js may further hide both
+              // and append <img> if avatar is cached.
+              var icon = el.querySelector('.vx-avatar__icon');
+              if (icon) icon.style.display = 'none';
+            } else {
+              // Legacy element (no inner spans) — keep old behavior.
               el.textContent = initials;
-              el.setAttribute('title', title);
-              el.setAttribute('aria-label', title);
             }
+            el.setAttribute('title', title);
+            el.setAttribute('aria-label', title);
           });
           var mobileLink = document.getElementById('vxUserBadgeMobile');
           if (mobileLink) {

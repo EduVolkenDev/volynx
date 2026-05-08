@@ -3,6 +3,20 @@ import FlagshipLayout from "../layouts/FlagshipLayout.astro";
 import FlagshipHeader from "../components/FlagshipHeader.astro";
 import FlagshipFooter from "../components/FlagshipFooter.astro";
 import { ROUTES } from "../data/routes";
+import { AVATAR_CATALOG } from "../data/avatars";
+
+const PLAN_LABELS: Record<string, string> = {
+	free: "Free",
+	launch: "Launch",
+	business: "Business",
+	pro: "Pro",
+	diamond: "Diamond",
+	studio: "Studio",
+	teams: "Teams",
+	enterprise: "Enterprise",
+};
+const NON_BD_AVATARS = AVATAR_CATALOG.filter((a) => !a.bdOnly);
+const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 ---
 
 <FlagshipLayout
@@ -12,6 +26,7 @@ import { ROUTES } from "../data/routes";
 	pageClass="page-profile"
 >
 	<script is:inline src="/js/vx-plan.js"></script>
+	<script set:html={`window.VX_AVATAR_CATALOG = ${JSON.stringify(AVATAR_CATALOG)};`}></script>
 	<FlagshipHeader current={ROUTES.profile} ctaLabel="Go Pro" ctaHref={ROUTES.pricing} ctaI18n="nav.go_pro" />
 
 	<div class="orb orb-a" aria-hidden="true"></div>
@@ -70,7 +85,7 @@ import { ROUTES } from "../data/routes";
 							<img id="avatarPreview" class="avatar-img" src="/assets/avatar.webp" alt=""
 								style="display:none;"
 								onerror="this.style.display='none';this.nextElementSibling.style.display='grid';" />
-							<div class="avatar-fallback" id="avatarFallback">??</div>
+							<div class="avatar-fallback" id="avatarFallback">ME</div>
 							<div class="avatar-overlay" id="avatarOverlay"><span data-i18n="profile.avatar_change">Change</span></div>
 						</div>
 						<input id="avatarInput" type="file" accept="image/*" hidden />
@@ -83,33 +98,55 @@ import { ROUTES } from "../data/routes";
 							</div>
 
 							<div class="avatar-panel__section">
-								<span class="avatar-panel__label" data-i18n="profile.avatar_free">Free</span>
+								<span class="avatar-panel__label">
+									<span class="i18n-en">Plan avatars</span>
+									<span class="i18n-pt">Avatares por plano</span>
+								</span>
 								<div class="avatar-panel__grid">
-									<button type="button" class="avatar-option" data-avatar="/assets/avatarfree/1.webp">
-										<img src="/assets/avatarfree/1.webp" alt="Avatar 1" />
-									</button>
-									<button type="button" class="avatar-option" data-avatar="/assets/avatarfree/2.webp">
-										<img src="/assets/avatarfree/2.webp" alt="Avatar 2" />
-									</button>
-									<button type="button" class="avatar-option" data-avatar="/assets/avatarfree/avatarfree3.webp">
-										<img src="/assets/avatarfree/avatarfree3.webp" alt="Avatar 3" />
-									</button>
+									{NON_BD_AVATARS.map((a) => (
+										<button
+											type="button"
+											class="avatar-option"
+											data-avatar-id={a.id}
+											data-avatar-plan={a.plan}
+											data-avatar-src={a.src}
+											title={`${a.label} · ${PLAN_LABELS[a.plan]}`}
+											aria-label={`${a.label} · ${PLAN_LABELS[a.plan]}`}
+										>
+											<img src={a.src} alt={a.label} loading="lazy" />
+											<span class="avatar-option__plan">{PLAN_LABELS[a.plan]}</span>
+										</button>
+									))}
 								</div>
 							</div>
 
-							<div class="avatar-panel__section" id="proAvatarSection" hidden>
-								<span class="avatar-panel__label"><span data-i18n="profile.avatar_pro_label">Pro</span> <span class="avatar-pro-tag" data-i18n="profile.pro_badge">PRO</span></span>
-								<div class="avatar-panel__grid" id="proAvatarGrid"></div>
-							</div>
-
-							<div class="avatar-panel__section">
-								<span class="avatar-panel__label" data-i18n="profile.avatar_custom">Custom</span>
+							<div class="avatar-panel__section avatar-panel__section--bd" hidden>
+								<span class="avatar-panel__label">
+									<span class="i18n-en">Black Diamond</span>
+									<span class="i18n-pt">Black Diamond</span>
+									<span class="avatar-bd-tag">BD</span>
+								</span>
 								<div class="avatar-panel__grid">
-									<label class="avatar-option avatar-option--upload" for="avatarInput">
-										<span data-i18n="profile.avatar_upload">+ Upload</span>
-									</label>
+									{BD_AVATARS.map((a) => (
+										<button
+											type="button"
+											class="avatar-option avatar-option--bd"
+											data-avatar-id={a.id}
+											data-avatar-bd-only="1"
+											data-avatar-src={a.src}
+											title={a.label}
+											aria-label={a.label}
+										>
+											<img src={a.src} alt={a.label} loading="lazy" />
+										</button>
+									))}
 								</div>
 							</div>
+
+							<p class="avatar-panel__hint" id="avatarPanelHint" hidden>
+								<span class="i18n-en">Locked avatars require a higher plan.</span>
+								<span class="i18n-pt">Avatares bloqueados exigem um plano superior.</span>
+							</p>
 						</div>
 					</div>
 					<div class="hero-identity">
@@ -176,7 +213,7 @@ import { ROUTES } from "../data/routes";
 						<a href={ROUTES.pricing} class="btn btn--sm btn--ghost" data-i18n="profile.btn_see_plans">See plans</a>
 					</div>
 				</div>
-				<p class="text-muted vx-support" style="font-size:.85rem;margin:12px 0 4px;line-height:1.6;" data-i18n="profile.vx_support">Your VX balance can be used for exports, advanced actions, and on-demand upgrades across the ecosystem.</p>
+				<p class="text-muted vx-support" style="font-size:.85rem;margin:12px 0 4px;line-height:1.6;" data-i18n="profile.vx_support">Your VX balance can be used where a product explicitly supports VX, such as CVitae exports/templates and selected Studio actions.</p>
 				<div id="tokenHistory" class="token-history">
 					<p class="text-muted" style="font-size:.85rem;" data-i18n="profile.loading_history">Loading history...</p>
 				</div>
@@ -323,8 +360,8 @@ import { ROUTES } from "../data/routes";
 		})();
 		</script>
 
-		<script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-		<script is:inline src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+		<script is:inline src="/vendor/supabase.js"></script>
+		<script is:inline src="/vendor/jszip.min.js"></script>
 		<script is:inline>
 			if (typeof supabase === "undefined") {
 				console.error("[profile] FATAL: supabase UMD not loaded");
@@ -386,7 +423,7 @@ import { ROUTES } from "../data/routes";
 						const p = name.trim().split(/\s+/);
 						return (p[0][0] + (p[1]?.[0] || "")).toUpperCase();
 					}
-					return email ? email.slice(0, 2).toUpperCase() : "??";
+					return email ? email.slice(0, 2).toUpperCase() : "ME";
 				}
 
 				function nullIfEmpty(v) {
@@ -513,7 +550,6 @@ import { ROUTES } from "../data/routes";
 				const bio       = profile.bio        || "";
 				const website   = profile.website    || "";
 				const loc       = profile.location   || "";
-				const avatarUrl = profile.avatar_url || "";
 				const createdAt = user.created_at ? new Date(user.created_at) : null;
 				const joinedFmt = createdAt ? createdAt.toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "—";
 				const isFirstTime = !fullName && !username && !bio;
@@ -525,12 +561,26 @@ import { ROUTES } from "../data/routes";
 				$("heroLocation").textContent  = loc || "—";
 				$("heroJoined").textContent    = "Joined " + joinedFmt;
 
+				// Resolve avatar via catalog (PT-2c). Falls back to legacy avatar_url, then initials.
 				const avatarPreview  = $("avatarPreview");
 				const avatarFallback = $("avatarFallback");
-				if (avatarUrl) {
-					avatarPreview.src = avatarUrl;
+				const avatarCatalog = (window).VX_AVATAR_CATALOG || [];
+				const avatarMeta = profile.avatar_id
+					? avatarCatalog.find(a => a.id === profile.avatar_id)
+					: null;
+				const resolvedAvatarSrc = avatarMeta?.src || profile.avatar_url || "";
+				if (resolvedAvatarSrc) {
+					avatarPreview.src = resolvedAvatarSrc;
 					avatarPreview.style.display = "block";
 					avatarFallback.style.display = "none";
+					// Cache for cross-page resolver (PT-2d)
+					try {
+						localStorage.setItem("volynx_avatar_cache", JSON.stringify({
+							id: profile.avatar_id || null,
+							src: resolvedAvatarSrc,
+							ts: Date.now(),
+						}));
+					} catch (_) {}
 				} else {
 					avatarPreview.style.display = "none";
 					avatarFallback.style.display = "grid";
@@ -702,12 +752,12 @@ import { ROUTES } from "../data/routes";
 					: "";
 				const ICON_CHECKOUT_PRICES = {
 					icons_single_budget:   { gbp: 0.8, eur: 0.95, brl: 5.5 },
-					icons_single_standard: { gbp: 1.7, eur: 1.95, brl: 11.9 },
-					icons_single_premium:  { gbp: 2.9, eur: 3.4, brl: 18.9 },
-					icons_single_hyper:    { gbp: 7.5, eur: 8.7, brl: 49 },
-					icons_pack_mixed:      { gbp: 6.4, eur: 7.5, brl: 42 },
-					icons_pack_premium:    { gbp: 14, eur: 16, brl: 92 },
-					icons_pack_hyper:      { gbp: 48, eur: 56, brl: 320 },
+					icons_single_standard: { gbp: 1.4, eur: 1.6, brl: 9.9 },
+					icons_single_premium:  { gbp: 2.2, eur: 2.6, brl: 14.9 },
+					icons_single_hyper:    { gbp: 5.9, eur: 6.9, brl: 39.9 },
+					icons_pack_mixed:      { gbp: 5.2, eur: 6, brl: 34.9 },
+					icons_pack_premium:    { gbp: 11.2, eur: 13, brl: 74.9 },
+					icons_pack_hyper:      { gbp: 37, eur: 43, brl: 249 },
 				};
 
 				function escapeHtml(value) {
@@ -1323,65 +1373,106 @@ import { ROUTES } from "../data/routes";
 					}
 				});
 
-				// Pro avatars
-				const FREE_AVATARS = ["/assets/avatarfree/1.webp", "/assets/avatarfree/2.webp", "/assets/avatarfree/avatarfree3.webp"];
-				const PRO_AVATARS = ["/assets/avatarpro/avatargoldpro.webp"];
-				const DEFAULT_PRO_AVATAR = PRO_AVATARS[0];
-				const userPlan = (profile?.plan || "free").trim().toLowerCase();
-			const isPro = window.VxPlan ? window.VxPlan.isPaid(userPlan) : (userPlan !== "free");
+				// ── Avatar picker (PT-2c) — catalog-driven ──────────────────────
+				// Plan rank mirror (matches src/data/avatars.ts and check-permission edge).
+				const AVATAR_PLAN_RANK = { free: 0, launch: 1, business: 2, pro: 2, diamond: 2, studio: 3, teams: 4, enterprise: 5 };
 
-				// Show pro avatars section if user is pro
-				if (isPro && PRO_AVATARS.length > 0) {
-					const proSection = $("proAvatarSection");
-					const proGrid = $("proAvatarGrid");
-					if (proSection && proGrid) {
-						proSection.hidden = false;
-						proGrid.innerHTML = PRO_AVATARS.map((src, i) =>
-							`<button type="button" class="avatar-option" data-avatar="${src}"><img src="${src}" alt="Pro Avatar ${i+1}" /></button>`
-						).join("");
+				const avatarUserRank = Math.max(
+					AVATAR_PLAN_RANK[(profile?.plan || "free").toLowerCase()] ?? 0,
+					AVATAR_PLAN_RANK[(profile?.builder_plan || "free").toLowerCase()] ?? 0,
+					AVATAR_PLAN_RANK[(profile?.daily_plan || "free").toLowerCase()] ?? 0,
+					AVATAR_PLAN_RANK[(profile?.cvitae_plan || "free").toLowerCase()] ?? 0,
+				);
+				const avatarUserIsBd = !!profile?.is_black_diamond;
+
+				// Lock or unlock each non-BD option based on plan rank
+				document.querySelectorAll('.avatar-option[data-avatar-id]:not([data-avatar-bd-only])').forEach(btn => {
+					const reqPlan = btn.dataset.avatarPlan;
+					const reqRank = AVATAR_PLAN_RANK[reqPlan] ?? 99;
+					if (avatarUserRank < reqRank) {
+						btn.classList.add("avatar-option--locked");
+						btn.setAttribute("aria-disabled", "true");
+						const ptHint = "Faça upgrade para " + (reqPlan?.charAt(0).toUpperCase() + reqPlan?.slice(1)) + " para desbloquear";
+						const enHint = "Upgrade to " + (reqPlan?.charAt(0).toUpperCase() + reqPlan?.slice(1)) + " to unlock";
+						btn.setAttribute("title", document.documentElement.lang === "pt" ? ptHint : enHint);
+					}
+				});
+
+				// Show BD section if user is Black Diamond
+				if (avatarUserIsBd) {
+					const bdSection = document.querySelector(".avatar-panel__section--bd");
+					if (bdSection) bdSection.hidden = false;
+				}
+
+				// Show locked-hint if there are any locked options remaining
+				const anyLocked = !!document.querySelector(".avatar-option--locked");
+				const hintEl = $("avatarPanelHint");
+				if (hintEl) hintEl.hidden = !anyLocked;
+
+				// Mark current avatar as selected
+				if (profile?.avatar_id) {
+					const sel = document.querySelector(`.avatar-option[data-avatar-id="${profile.avatar_id}"]`);
+					if (sel) sel.classList.add("avatar-option--selected");
+				}
+
+				// Click handler — saves immediately via /update-avatar edge fn
+				async function selectAvatar(btn) {
+					if (btn.classList.contains("avatar-option--locked")) {
+						// Wiggle to signal locked
+						try {
+							btn.animate(
+								[{ transform: "translateX(0)" }, { transform: "translateX(-4px)" }, { transform: "translateX(4px)" }, { transform: "translateX(0)" }],
+								{ duration: 280 },
+							);
+						} catch (_) {}
+						return;
+					}
+					const id = btn.dataset.avatarId;
+					const src = btn.dataset.avatarSrc;
+					if (!id || !src) return;
+
+					// Optimistic UI
+					avatarPreview.src = src;
+					avatarPreview.style.display = "block";
+					avatarFallback.style.display = "none";
+					document.querySelectorAll(".avatar-option").forEach(o => o.classList.remove("avatar-option--selected"));
+					btn.classList.add("avatar-option--selected");
+					closeAvatarPanel();
+
+					// Persist
+					const apiBase = (cfg?.functionsUrl || cfg?.apiBaseUrl || "").replace(/\/$/, "");
+					const token = localStorage.getItem("volynx_access_token") || "";
+					if (!apiBase || !token) return;
+					try {
+						const res = await fetch(apiBase + "/update-avatar", {
+							method: "POST",
+							headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+							body: JSON.stringify({ avatar_id: id }),
+						});
+						const data = await res.json().catch(() => ({}));
+						if (!res.ok || !data?.ok) {
+							log("avatar save failed: " + (data?.error || res.status));
+							const status = $("saveStatus");
+							if (status) {
+								const pt = document.documentElement.lang === "pt";
+								status.textContent = pt ? "Falha ao salvar avatar." : "Failed to save avatar.";
+								status.style.color = "var(--danger)";
+							}
+							return;
+						}
+						// Cache for cross-page resolver (PT-2d)
+						try {
+							localStorage.setItem("volynx_avatar_cache", JSON.stringify({ id, src, ts: Date.now() }));
+						} catch (_) {}
+						// Update in-memory profile so subsequent saves don't regress
+						if (profile) profile.avatar_id = id;
+					} catch (err) {
+						log("avatar network error: " + (err?.message || err));
 					}
 				}
 
-				// Auto-upgrade avatar: if user is pro but still has a free avatar, switch to pro
-				const currentAvatarUrl = profile.avatar_url || "";
-				const hasDefaultOrFreeAvatar = !currentAvatarUrl || currentAvatarUrl === "/assets/avatar.webp" || FREE_AVATARS.includes(currentAvatarUrl);
-				if (isPro && hasDefaultOrFreeAvatar && DEFAULT_PRO_AVATAR) {
-					avatarPreview.src = DEFAULT_PRO_AVATAR;
-					avatarPreview.style.display = "block";
-					avatarFallback.style.display = "none";
-					await supabase.from("profiles").update({ avatar_url: DEFAULT_PRO_AVATAR }).eq("id", user.id);
-					log("auto-upgraded avatar to pro: " + DEFAULT_PRO_AVATAR);
-				}
-
-				// Avatar option click (free + pro) — bind AFTER pro avatars are injected
-				function bindAvatarOptions() {
-					document.querySelectorAll(".avatar-option[data-avatar]").forEach(btn => {
-						btn.addEventListener("click", () => {
-							const url = (btn).dataset.avatar;
-							avatarPreview.src = url;
-							avatarPreview.style.display = "block";
-							avatarFallback.style.display = "none";
-							closeAvatarPanel();
-							(avatarPreview)._selectedFreeAvatar = url;
-							(avatarPreview)._pendingFile = null;
-							document.querySelectorAll(".avatar-option").forEach(o => o.classList.remove("avatar-option--selected"));
-							btn.classList.add("avatar-option--selected");
-						});
-					});
-				}
-				bindAvatarOptions();
-
-				// Custom file upload
-				$("avatarInput")?.addEventListener("change", (e) => {
-					const file = (e.target).files?.[0];
-					if (!file) return;
-					if (file.size > 2 * 1024 * 1024) { alert("Max 2MB."); return; }
-					avatarPreview.src = URL.createObjectURL(file);
-					avatarPreview.style.display = "block";
-					avatarFallback.style.display = "none";
-					closeAvatarPanel();
-					(avatarPreview)._selectedFreeAvatar = null;
-					(avatarPreview)._pendingFile = file;
+				document.querySelectorAll(".avatar-option[data-avatar-id]").forEach(btn => {
+					btn.addEventListener("click", () => selectAvatar(btn));
 				});
 
 				function applyToUI(d) {
@@ -1412,8 +1503,8 @@ import { ROUTES } from "../data/routes";
 					status.textContent = "Saving...";
 					status.style.color = "";
 
-					const selectedAvatar = (avatarPreview)._selectedFreeAvatar || null;
-					const pendingFile = (avatarPreview)._pendingFile || null;
+					// Avatar is saved separately via /update-avatar edge fn (PT-2c).
+					// Form only saves text fields here.
 					const updates = {
 						full_name: nullIfEmpty(($("inputName")).value),
 						username:  usernameResult?.value ?? null,
@@ -1421,29 +1512,6 @@ import { ROUTES } from "../data/routes";
 						location:  nullIfEmpty(($("inputLocation")).value),
 						bio:       nullIfEmpty(($("inputBio")).value),
 					};
-
-					// Avatar: free preset OR custom upload
-					if (selectedAvatar) {
-						updates.avatar_url = selectedAvatar;
-					} else if (pendingFile) {
-						status.textContent = "Uploading avatar...";
-						const ext = pendingFile.name.split(".").pop()?.toLowerCase() || "png";
-						const path = `${user.id}/avatar.${ext}`;
-						const { error: uploadErr } = await supabase.storage
-							.from("avatars")
-							.upload(path, pendingFile, { upsert: true, contentType: pendingFile.type });
-						if (uploadErr) {
-							status.textContent = "Avatar upload failed: " + uploadErr.message;
-							status.style.color = "var(--danger)";
-							log("avatar upload failed: " + uploadErr.message);
-							saveBtn.disabled = false;
-							return;
-						}
-						const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
-						updates.avatar_url = urlData?.publicUrl || "";
-						(avatarPreview)._pendingFile = null;
-						log("avatar uploaded: " + updates.avatar_url);
-					}
 
 					const { error } = await supabase.from("profiles").update(updates).eq("id", user.id);
 
@@ -1655,6 +1723,61 @@ import { ROUTES } from "../data/routes";
 		font-family: inherit;
 	}
 	.avatar-option--upload:hover { color: var(--accent); background: rgba(0,232,197,.06); border-color: rgba(0,232,197,.3); }
+
+	/* Catalog-driven avatar picker (PT-2c) */
+	.avatar-option { display: flex; flex-direction: column; align-items: center; padding: 0; }
+	.avatar-option img { flex: 0 0 auto; }
+	.avatar-option__plan {
+		display: block;
+		font-size: 8px;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		color: rgba(255,255,255,.45);
+		font-weight: 700;
+		margin-top: 4px;
+		line-height: 1;
+	}
+	.avatar-option--locked {
+		opacity: 0.32;
+		cursor: not-allowed;
+		filter: grayscale(0.6);
+		position: relative;
+	}
+	.avatar-option--locked::after {
+		content: "🔒";
+		position: absolute; top: 4px; right: 4px;
+		font-size: 11px;
+		filter: grayscale(0);
+	}
+	.avatar-option--locked:hover {
+		border-color: rgba(255,255,255,.1);
+		transform: none;
+		box-shadow: none;
+	}
+	.avatar-bd-tag {
+		display: inline-block;
+		font-size: 9px;
+		padding: 2px 6px;
+		border-radius: 4px;
+		background: linear-gradient(135deg, #c9a85d, #f4d27a);
+		color: #1a1408;
+		font-weight: 800;
+		letter-spacing: 0.08em;
+		margin-left: 6px;
+		vertical-align: middle;
+	}
+	.avatar-option--bd { border-color: rgba(244, 210, 122, 0.32); }
+	.avatar-option--bd:hover {
+		border-color: rgba(244, 210, 122, 0.7);
+		box-shadow: 0 0 16px rgba(244, 210, 122, 0.2);
+	}
+	.avatar-panel__hint {
+		font-size: 11px;
+		color: rgba(255,255,255,.45);
+		margin: 8px 0 0;
+		line-height: 1.4;
+	}
+
 	.hero-identity { flex: 1; min-width: 0; padding-top: 4px; }
 	.hero-name { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800;
 		letter-spacing: -.03em; line-height: 1.1; margin-bottom: 4px; }

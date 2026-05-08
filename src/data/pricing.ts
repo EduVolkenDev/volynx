@@ -83,7 +83,7 @@ export const sitePricing = {
       badge: { pt: 'Starter', en: 'Starter' },
       description: {
         pt: 'Ideal para uso leve e ações pontuais.',
-        en: 'Ideal for light usage and one-off premium actions.'
+        en: 'Ideal for light usage and enabled one-off actions.'
       }
     },
     {
@@ -167,8 +167,8 @@ export const sitePricing = {
       tokens: '12–20 tokens',
       price: { GBP: 'from £5.28–£8.80', EUR: 'from €6.12–€10.20', BRL: 'from R$35.40–R$59' },
       examples: {
-        pt: ['HTML export', 'custom domain setup premium', 'template premium'],
-        en: ['HTML export', 'premium custom domain setup', 'premium template']
+        pt: ['template premium', 'export profissional', 'ação Studio conectada'],
+        en: ['premium template', 'professional export', 'wired Studio action']
       }
     }
   ] satisfies ToolTier[],
@@ -308,7 +308,7 @@ export const sitePricing = {
         en: 'Premium property catalogue with full source code for launching a real-estate presence without recurring fees.'
       },
       image: '/assets/flow-starter.webp',
-      price: { GBP: '£187', EUR: '€217', BRL: 'R$1.290' },
+      price: { GBP: '£187', EUR: '€219', BRL: 'R$1.290' },
       billing: { pt: 'pagamento único · 3 templates', en: 'one-time · 3 templates' },
       cta: { pt: 'Ver PropertyFlow', en: 'View PropertyFlow' },
       href: '/products/propertyflow/#pricing',

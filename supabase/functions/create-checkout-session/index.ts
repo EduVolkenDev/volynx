@@ -21,6 +21,14 @@ function json(data: Record<string, unknown>, status = 200) {
 const FRONTEND_ORIGIN = Deno.env.get("FRONTEND_ORIGIN") || "https://volynx.world";
 const LOOKUP_KEY_CURRENCY_RE = /_(gbp|eur|brl)$/i;
 
+function isProductionOrigin(origin: string): boolean {
+  return /^https:\/\/(www\.)?volynx\.world\b/i.test(origin);
+}
+
+function shouldBlockTestStripeKey(stripeKey: string): boolean {
+  return isProductionOrigin(FRONTEND_ORIGIN) && stripeKey.startsWith("sk_test_");
+}
+
 function getCheckoutMode(prefix: string): "subscription" | "payment" {
   // All plan subscriptions: volynx, daily, bundles, legacy builder_
   if (prefix.startsWith("builder_") || prefix.startsWith("volynx_")) return "subscription";
@@ -113,6 +121,10 @@ Deno.serve(async (req: Request) => {
     if (!stripeKey) {
       console.error("[checkout] STRIPE_SECRET_KEY not set");
       return json({ error: "Payment system not configured. Contact support." }, 500);
+    }
+    if (shouldBlockTestStripeKey(stripeKey)) {
+      console.error("[checkout] blocked test Stripe key on production origin");
+      return json({ error: "Live checkout is not configured. Contact support." }, 500);
     }
 
     const stripe = new Stripe(stripeKey, {

@@ -168,6 +168,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
           <span class="single-icons-currency-label" data-i18n="icons.currency_label">Currency</span>
           <div class="vx-currency-bar" aria-label="Currency selector"></div>
           <span class="single-icons-currency-note" data-i18n="icons.currency_note">BRL checkout supports PIX via Stripe.</span>
+          <span class="single-icons-currency-note" id="singlePricingNote" aria-live="polite"></span>
         </div>
 
         <div class="single-icons-grid" id="singleIconsGrid">
@@ -1053,16 +1054,16 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     const ICON_PRICE_TIERS = {
       free: { vx: "0 VX", money: "", lookup: "", label: "Free" },
       budget: { vx: "9 VX", money: "£0.80", lookup: "icons_single_budget", label: "Budget single" },
-      standard: { vx: "24 VX", money: "£1.70", lookup: "icons_single_standard", label: "Standard single" },
-      premium: { vx: "45 VX", money: "£2.90", lookup: "icons_single_premium", label: "Premium single" },
-      hyper: { vx: "120 VX", money: "£7.50", lookup: "icons_single_hyper", label: "Hyper 5000px single" },
+      standard: { vx: "16 VX", money: "£1.40", lookup: "icons_single_standard", label: "Standard single" },
+      premium: { vx: "28 VX", money: "£2.20", lookup: "icons_single_premium", label: "Premium single" },
+      hyper: { vx: "80 VX", money: "£5.90", lookup: "icons_single_hyper", label: "Hyper 5000px single" },
     } as const;
 
     const ICON_PACK_PRICES = {
       free: { label: "Free with signup", lookup: "", display: "", vx: "" },
-      mixed: { label: "90 VX · £6.40", lookup: "icons_pack_mixed", display: "90 VX · £6.40", vx: "90 VX" },
-      premium: { label: "260 VX · £14", lookup: "icons_pack_premium", display: "260 VX · £14", vx: "260 VX" },
-      hyper: { label: "5000px Hyper pack · £48", lookup: "icons_pack_hyper", display: "820 VX · £48", vx: "820 VX" },
+      mixed: { label: "£5.20", lookup: "icons_pack_mixed", display: "£5.20", vx: "60 VX" },
+      premium: { label: "£11.20", lookup: "icons_pack_premium", display: "£11.20", vx: "140 VX" },
+      hyper: { label: "5000px Hyper pack · £37", lookup: "icons_pack_hyper", display: "£37", vx: "480 VX" },
     } as const;
 
     const FEATURED_PREMIUM_LABELS = new Set([
@@ -1153,12 +1154,12 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     // Mirrors scripts/stripe-catalog-setup.ts (amounts in cents)
     const ICON_MONEY_CENTS: Record<string, { gbp: number; eur: number; brl: number }> = {
       icons_single_budget:   { gbp: 80,   eur: 95,   brl: 550   },
-      icons_single_standard: { gbp: 170,  eur: 195,  brl: 1190  },
-      icons_single_premium:  { gbp: 290,  eur: 340,  brl: 1890  },
-      icons_single_hyper:    { gbp: 750,  eur: 870,  brl: 4900  },
-      icons_pack_mixed:      { gbp: 640,  eur: 750,  brl: 4200  },
-      icons_pack_premium:    { gbp: 1400, eur: 1600, brl: 9200  },
-      icons_pack_hyper:      { gbp: 4800, eur: 5600, brl: 32000 },
+      icons_single_standard: { gbp: 140,  eur: 160,  brl: 990   },
+      icons_single_premium:  { gbp: 220,  eur: 260,  brl: 1490  },
+      icons_single_hyper:    { gbp: 590,  eur: 690,  brl: 3990  },
+      icons_pack_mixed:      { gbp: 520,  eur: 600,  brl: 3490  },
+      icons_pack_premium:    { gbp: 1120, eur: 1300, brl: 7490  },
+      icons_pack_hyper:      { gbp: 3700, eur: 4300, brl: 24900 },
     };
 
     function localizedMoney(lookup: string | undefined | null) {
@@ -1170,6 +1171,28 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       if (cur === "brl") return "R$" + amount.toFixed(2).replace(".", ",");
       if (cur === "eur") return "€" + amount.toFixed(2);
       return "£" + amount.toFixed(2);
+    }
+
+    function singleDisplayPrice(item: any) {
+      if (!item || item.checkoutLookup === "") return storeLang() === "pt" ? "Grátis" : "Free";
+      return localizedMoney(item.checkoutLookup) || item.money || item.priceVX || "";
+    }
+
+    function singlePriceSupportLabel(item: any) {
+      if (!item?.checkoutLookup) return "";
+      const tier = String(item?.priceTier || "").replace(/\s+single$/i, "");
+      if (!tier) return "";
+      return storeLang() === "pt" ? `${tier} · licença comercial` : `${tier} · commercial license`;
+    }
+
+    function updateSinglePricingNote() {
+      const note = document.getElementById("singlePricingNote");
+      if (!note) return;
+      const entry = localizedMoney("icons_single_budget") || ICON_PRICE_TIERS.budget.money;
+      const premium = localizedMoney("icons_single_premium") || ICON_PRICE_TIERS.premium.money;
+      note.textContent = storeLang() === "pt"
+        ? `Singles a partir de ${entry}. Premium agora fica em ${premium}.`
+        : `Singles from ${entry}. Premium now sits at ${premium}.`;
     }
 
     function storeLang() {
@@ -1259,7 +1282,6 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         return storeLang() === "pt" ? "Grátis com cadastro" : packPrice.label;
       }
       const money = localizedMoney(packPrice.lookup);
-      if (packPrice.vx && money) return `${packPrice.vx} · ${money}`;
       return money || packPrice.display || packPrice.label;
     }
 
@@ -1746,14 +1768,15 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       const visual = isSvg
         ? `<span class="single-icon-visual single-icon-visual--svg">${item.svg || ""}</span>`
         : `<span class="single-icon-visual"><img src="${escHtml(item.path)}" alt="" loading="lazy" /></span>`;
-      const money = localizedMoney(item.checkoutLookup) || item.money || "";
+      const price = singleDisplayPrice(item);
+      const support = singlePriceSupportLabel(item);
       return `
         <button type="button" class="single-icon-card single-icon-card--${isSvg ? "svg" : "png"}" style="${collectionStyle(item.collection)}" data-single-index="${index}">
           <span class="single-icon-format">${isSvg ? "SVG" : "PNG"}</span>
           ${visual}
           <span class="single-icon-name">${escHtml(item.label)}</span>
           <span class="single-icon-collection">${escHtml(item.collection)}</span>
-          <span class="single-icon-price">${escHtml(item.priceVX)}${money ? ` · ${escHtml(money)}` : ""}</span>
+          <span class="single-icon-price">${escHtml(price)}${support ? ` · ${escHtml(support)}` : ""}</span>
         </button>
       `;
     }
@@ -1762,6 +1785,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       const grid = document.getElementById("singleIconsGrid");
       if (!grid) return;
       const items = getSingleIconItems();
+      updateSinglePricingNote();
       if (!items.length) {
         grid.innerHTML = `
           <article class="soon-panel">
@@ -2136,7 +2160,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       const requestLabel = L === "pt" ? "Comprar este ícone" : "Buy this icon";
       const closeLabel = L === "pt" ? "Fechar" : "Close";
       const money = localizedMoney(price.lookup) || price.money;
-      const buyLine = money ? `${price.vx} · ${money}` : price.vx;
+      const buyLine = money || price.vx;
 
       openModal(`
         <div style="display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 20% 20%,rgba(124,77,255,.45),transparent 35%),radial-gradient(circle at 80% 25%,rgba(79,195,247,.35),transparent 32%),linear-gradient(145deg,#0d1117,#152035);border:1px solid rgba(124,77,255,.22);border-radius:18px;padding:32px;margin-bottom:1rem;min-height:220px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 18px 40px rgba(0,0,0,.28);">
@@ -2188,7 +2212,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         ? "Ícone novo carregado direto do HTML de assets da Icons Store."
         : "New icon loaded directly from the Icons Store asset HTML.";
       const money = localizedMoney(ICON_PRICE_TIERS.budget.lookup) || ICON_PRICE_TIERS.budget.money;
-      const buyLine = money ? `${ICON_PRICE_TIERS.budget.vx} · ${money}` : ICON_PRICE_TIERS.budget.vx;
+      const buyLine = money || ICON_PRICE_TIERS.budget.vx;
 
       openModal(`
         <div style="display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 20% 20%,rgba(120,220,255,.18),transparent 34%),radial-gradient(circle at 80% 20%,rgba(176,132,255,.18),transparent 30%),linear-gradient(145deg,#10131f,#090b14);border:1px solid rgba(120,220,255,.16);border-radius:18px;padding:32px;margin-bottom:1rem;min-height:220px;">
@@ -2252,8 +2276,8 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
           ? "Este ícone está na curadoria gratuita da VOLYNX. Entre para baixar e manter a licença vinculada à sua conta."
           : "This icon is part of the free VOLYNX curation. Sign in to download and keep the license attached to your account.")
         : L === "pt"
-        ? "Licencie este ícone sozinho com VX ou checkout Stripe. Se ele fizer parte de um pack, você também pode abrir a coleção completa sem sair da página."
-        : "License this icon by itself with VX or Stripe checkout. If it belongs to a pack, you can also open the full collection without leaving this page.";
+        ? "Licencie este ícone sozinho via checkout Stripe. Se ele fizer parte de um pack, você também pode abrir a coleção completa sem sair da página."
+        : "License this icon by itself via Stripe checkout. If it belongs to a pack, you can also open the full collection without leaving this page.";
 
       openModal(`
         <div class="single-modal-shell">
@@ -2263,8 +2287,8 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
             <h3 class="single-modal-title">${escHtml(label)}</h3>
             <p class="single-modal-text">${bodyCopy}</p>
             <div class="single-modal-price-row">
-              <span class="single-modal-price"><strong>${escHtml(item.priceVX || "24 VX")}</strong><small>VX</small></span>
-              ${(() => { const m = localizedMoney(item.checkoutLookup) || item.money; return m ? `<span class="single-modal-price single-modal-price--cash"><strong>${escHtml(m)}</strong><small>${L === "pt" ? "dinheiro" : "cash"}</small></span>` : ""; })()}
+              <span class="single-modal-price single-modal-price--cash"><strong>${escHtml(singleDisplayPrice(item))}</strong> <small>${L === "pt" ? "licença" : "license"}</small></span>
+              ${singlePriceSupportLabel(item) ? `<span class="single-modal-price"><strong>${escHtml(singlePriceSupportLabel(item))}</strong> <small>${L === "pt" ? "tipo" : "tier"}</small></span>` : ""}
             </div>
             <div class="single-modal-actions">
               <button class="modal-btn modal-btn--primary" type="button" id="singleCheckoutBtn">${buyCopy}</button>
@@ -2562,7 +2586,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       const strategy = collectionStrategy(collectionName, collectionIcons.length ? collectionIcons : [icon]);
       const packPrice = strategy.packPrice;
       const collectionMoney = localizedMoney(packPrice.lookup) || packPrice.display || packPrice.label;
-      const hyperMoney = localizedMoney("icons_pack_hyper") || "£48";
+      const hyperMoney = localizedMoney("icons_pack_hyper") || "£37";
       const kicker = strategy.band === "flagship"
         ? (L === "pt" ? "Coleção flagship" : "Flagship collection")
         : strategy.band === "premium"

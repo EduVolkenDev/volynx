@@ -1,5 +1,5 @@
 -- ============================================================
--- VOLYNX — Pix Payments (Mercado Pago) tracking table
+-- VOLYNX — Legacy direct Pix tracking table
 -- Stores QR code references, payment status, and reconciliation
 -- ============================================================
 
@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS public.pix_payments (
   user_id           UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   user_email        TEXT,
 
-  -- Mercado Pago identifiers
-  mp_payment_id     TEXT UNIQUE,          -- Mercado Pago payment.id (from webhook)
+  -- Legacy external payment identifiers
+  mp_payment_id     TEXT UNIQUE,          -- legacy external payment id (from webhook)
   mp_preference_id  TEXT,                 -- preference ID (from checkout creation)
   external_reference TEXT NOT NULL,       -- our internal ref: "vx_pix_{uuid}"
 
@@ -24,14 +24,14 @@ CREATE TABLE IF NOT EXISTS public.pix_payments (
   status            TEXT NOT NULL DEFAULT 'pending',
   -- status: pending | approved | rejected | cancelled | refunded | expired
 
-  -- Pix QR data (returned by MP API)
+  -- Legacy Pix QR data (returned by the old direct API)
   pix_qr_code       TEXT,                -- base64 QR image
   pix_qr_code_base64 TEXT,               -- raw base64 for rendering
   pix_copy_paste     TEXT,               -- copia-e-cola string
   pix_expiration     TIMESTAMPTZ,        -- when QR expires
 
   -- Metadata
-  mp_raw_webhook    JSONB DEFAULT '{}'::JSONB,   -- full webhook payload for audit
+  mp_raw_webhook    JSONB DEFAULT '{}'::JSONB,   -- full legacy webhook payload for audit
   credited_at       TIMESTAMPTZ,                  -- when tokens were actually credited
   created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()

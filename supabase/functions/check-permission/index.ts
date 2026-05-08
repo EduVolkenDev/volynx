@@ -8,22 +8,17 @@ const CORS_HEADERS = {
 };
 
 // Plan hierarchy — higher rank = more access.
-// business (CVitae) and diamond (Daily) share rank 2 with pro because any
-// paid product subscription also flips the global profiles.plan to 'pro'.
 const PLAN_RANK: Record<string, number> = {
-  free: 0, launch: 1, business: 2, pro: 2, diamond: 2, studio: 3, teams: 4,
+  free: 0, launch: 1, business: 2, pro: 2, diamond: 2, studio: 3, teams: 4, enterprise: 5,
 };
 
-// Daily free limits per tool (volynxlab tools — free plan only)
 const FREE_LIMITS: Record<string, number> = {
   converter: 5,
   "image-scaler": 5,
-  "image-suite": 0, // Pro-only
-  "bg-remove": 0, // Studio Pro-only mode inside Image Suite
+  "image-suite": 0,
   "qr-gen": 5,
 };
 
-// Daily OS free limits per tool
 const DAILY_FREE_LIMITS: Record<string, number> = {
   intent: 20,
   scanner: 5,
@@ -34,7 +29,6 @@ const DAILY_FREE_LIMITS: Record<string, number> = {
   decision: 3,
 };
 
-// Daily OS tools list (for product detection)
 const DAILY_TOOLS = new Set(["intent", "scanner", "summary", "task", "vault", "writing", "decision", "my-day"]);
 
 Deno.serve(async (req: Request) => {
@@ -49,7 +43,6 @@ Deno.serve(async (req: Request) => {
     const { tool, product } = await req.json().catch(() => ({ tool: "converter", product: undefined }));
     const toolName = (tool || "converter").toLowerCase().trim();
 
-    // Auto-detect product from tool name if not specified
     const productKey = product || (DAILY_TOOLS.has(toolName) ? "daily" : "volynxlab");
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
@@ -60,7 +53,6 @@ Deno.serve(async (req: Request) => {
 
     const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
     if (authErr || !user) {
-      // Anonymous — return free tier with localStorage fallback
       const limits = productKey === "daily" ? DAILY_FREE_LIMITS : FREE_LIMITS;
       return json({
         plan: "free",
@@ -77,10 +69,9 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    // Fetch user profile (includes daily_plan and cvitae_plan)
     const { data: profile, error: profErr } = await supabase
       .from("profiles")
-      .select("plan, builder_plan, daily_plan, cvitae_plan, token_balance, org_id")
+      .select("plan, builder_plan, daily_plan, cvitae_plan, daily_plan_expires_at, icon_pack_grants, is_black_diamond, avatar_id, token_balance, org_id")
       .eq("id", user.id)
       .single();
 
@@ -95,29 +86,37 @@ Deno.serve(async (req: Request) => {
 
     const globalPlan = (profile.plan || "free").toLowerCase();
     const builderPlan = (profile.builder_plan || "free").toLowerCase();
-    const dailyPlan = (profile.daily_plan || "free").toLowerCase();
+    let dailyPlan = (profile.daily_plan || "free").toLowerCase();
     const cvitaePlan = (profile.cvitae_plan || "free").toLowerCase();
 
-    // Determine the relevant plan based on product
-    let activePlan: string;
-    if (productKey === "daily") {
-      activePlan = dailyPlan;
-    } else if (productKey === "cvitae") {
-      activePlan = cvitaePlan;
-    } else {
-      activePlan = globalPlan; // volynxlab uses profiles.plan
+    // ── LAZY EXPIRATION CHECK ──────────────────────────────────────────
+    // If daily_plan is paid and the timestamp is in the past, degrade to 'free'
+    // for THIS request. The DB row stays for audit/history; a future cron or
+    // background job can flip it physically.
+    let dailyPlanExpired = false;
+    const expiresAt = profile.daily_plan_expires_at as string | null;
+    if (dailyPlan !== "free" && expiresAt) {
+      try {
+        if (new Date(expiresAt).getTime() < Date.now()) {
+          dailyPlanExpired = true;
+          dailyPlan = "free";
+        }
+      } catch (_) { /* malformed timestamp — leave plan as-is */ }
     }
+
+    let activePlan: string;
+    if (productKey === "daily") activePlan = dailyPlan;
+    else if (productKey === "cvitae") activePlan = cvitaePlan;
+    else activePlan = globalPlan;
 
     const rank = PLAN_RANK[activePlan] ?? 0;
     const isPaid = rank >= 1;
 
-    // Compute highest effective tier across all products (for badge/cache)
     const allPlans = [globalPlan, builderPlan, dailyPlan, cvitaePlan];
     const effectiveTier = allPlans.reduce((best, p) =>
       (PLAN_RANK[p] ?? 0) > (PLAN_RANK[best] ?? 0) ? p : best, "free"
     );
 
-    // For paid users: unlimited daily usage
     if (isPaid) {
       const today = new Date().toISOString().slice(0, 10);
       const usageTable = productKey === "daily" ? "daily_usage_logs" : "usage_logs";
@@ -141,6 +140,11 @@ Deno.serve(async (req: Request) => {
         builder_plan: builderPlan,
         daily_plan: dailyPlan,
         cvitae_plan: cvitaePlan,
+        daily_plan_expires_at: expiresAt,
+        daily_plan_expired: dailyPlanExpired,
+        icon_pack_grants: Array.isArray(profile.icon_pack_grants) ? profile.icon_pack_grants : [],
+        is_black_diamond: !!profile.is_black_diamond,
+        avatar_id: (profile.avatar_id as string | null) || null,
         effective_tier: effectiveTier,
         product: productKey,
         allowed: true,
@@ -153,17 +157,20 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    // Free user: check daily limit
     const limits = productKey === "daily" ? DAILY_FREE_LIMITS : FREE_LIMITS;
     const limit = limits[toolName] ?? 5;
 
-    // Check if tool is pro-only
     if (limit === 0) {
       return json({
         plan: globalPlan,
         builder_plan: builderPlan,
         daily_plan: dailyPlan,
         cvitae_plan: cvitaePlan,
+        daily_plan_expires_at: expiresAt,
+        daily_plan_expired: dailyPlanExpired,
+        icon_pack_grants: Array.isArray(profile.icon_pack_grants) ? profile.icon_pack_grants : [],
+        is_black_diamond: !!profile.is_black_diamond,
+        avatar_id: (profile.avatar_id as string | null) || null,
         product: productKey,
         allowed: false,
         limit: 0,
@@ -194,6 +201,11 @@ Deno.serve(async (req: Request) => {
       builder_plan: builderPlan,
       daily_plan: dailyPlan,
       cvitae_plan: cvitaePlan,
+      daily_plan_expires_at: expiresAt,
+      daily_plan_expired: dailyPlanExpired,
+      icon_pack_grants: Array.isArray(profile.icon_pack_grants) ? profile.icon_pack_grants : [],
+      is_black_diamond: !!profile.is_black_diamond,
+      avatar_id: (profile.avatar_id as string | null) || null,
       effective_tier: effectiveTier,
       product: productKey,
       allowed: remaining > 0,

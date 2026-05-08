@@ -1,12 +1,12 @@
 /**
  * VOLYNX — Stripe Catalog Setup Script
  *
- * Creates all products and prices in Stripe (test mode first).
+ * Creates all products and prices in Stripe.
  * Secrets are read ONLY from environment variables — never logged, committed, or printed.
  *
  * Usage:
  *   1. cp scripts/.env.example scripts/.env
- *   2. Paste your sk_test_ key in scripts/.env
+ *   2. Paste your sk_live_ key in scripts/.env for production
  *   3. npx tsx scripts/stripe-catalog-setup.ts
  *
  * Output: scripts/stripe-catalog-output.json (gitignored)
@@ -29,7 +29,7 @@ const STRIPE_KEY = process.env.STRIPE_SECRET_KEY || "";
 if (!STRIPE_KEY || (!STRIPE_KEY.startsWith("sk_test_") && !STRIPE_KEY.startsWith("sk_live_"))) {
   console.error("ERROR: STRIPE_SECRET_KEY not set or invalid.");
   console.error("  1. cp scripts/.env.example scripts/.env");
-  console.error("  2. Add your sk_test_ key to scripts/.env");
+  console.error("  2. Add your sk_live_ key to scripts/.env for production");
   console.error("  3. npx tsx scripts/stripe-catalog-setup.ts");
   process.exit(1);
 }
@@ -374,7 +374,7 @@ const ADDONS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 170, eur: 195, brl: 1190 } },
+    prices: { amounts: { gbp: 140, eur: 160, brl: 990 } },
   },
   {
     name: "Icons Store Single - Premium",
@@ -390,7 +390,7 @@ const ADDONS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 290, eur: 340, brl: 1890 } },
+    prices: { amounts: { gbp: 220, eur: 260, brl: 1490 } },
   },
   {
     name: "Icons Store Single - Hyper 5000px",
@@ -406,7 +406,7 @@ const ADDONS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 750, eur: 870, brl: 4900 } },
+    prices: { amounts: { gbp: 590, eur: 690, brl: 3990 } },
   },
   {
     name: "Icons Store Pack - Mixed",
@@ -422,7 +422,7 @@ const ADDONS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 640, eur: 750, brl: 4200 } },
+    prices: { amounts: { gbp: 520, eur: 600, brl: 3490 } },
   },
   {
     name: "Icons Store Pack - Premium",
@@ -438,7 +438,7 @@ const ADDONS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 1400, eur: 1600, brl: 9200 } },
+    prices: { amounts: { gbp: 1120, eur: 1300, brl: 7490 } },
   },
   {
     name: "Icons Store Pack - Hyper 5000px",
@@ -454,7 +454,7 @@ const ADDONS: ProductDef[] = [
       builder_sites_limit: "0",
       is_addon: "false",
     },
-    prices: { amounts: { gbp: 4800, eur: 5600, brl: 32000 } },
+    prices: { amounts: { gbp: 3700, eur: 4300, brl: 24900 } },
   },
 ];
 

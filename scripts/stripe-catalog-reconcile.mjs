@@ -242,7 +242,7 @@ const catalog = [
     lookupPrefix: "icons_single_standard",
     family: "icons_store",
     tier: "single_standard",
-    amounts: { gbp: 170, eur: 195, brl: 1190 },
+    amounts: { gbp: 140, eur: 160, brl: 990 },
   },
   {
     name: "Icons Store Single - Premium",
@@ -250,7 +250,7 @@ const catalog = [
     lookupPrefix: "icons_single_premium",
     family: "icons_store",
     tier: "single_premium",
-    amounts: { gbp: 290, eur: 340, brl: 1890 },
+    amounts: { gbp: 220, eur: 260, brl: 1490 },
   },
   {
     name: "Icons Store Single - Hyper 5000px",
@@ -258,7 +258,7 @@ const catalog = [
     lookupPrefix: "icons_single_hyper",
     family: "icons_store",
     tier: "single_hyper",
-    amounts: { gbp: 750, eur: 870, brl: 4900 },
+    amounts: { gbp: 590, eur: 690, brl: 3990 },
   },
   {
     name: "Icons Store Pack - Mixed",
@@ -266,7 +266,7 @@ const catalog = [
     lookupPrefix: "icons_pack_mixed",
     family: "icons_store",
     tier: "pack_mixed",
-    amounts: { gbp: 640, eur: 750, brl: 4200 },
+    amounts: { gbp: 520, eur: 600, brl: 3490 },
   },
   {
     name: "Icons Store Pack - Premium",
@@ -274,7 +274,7 @@ const catalog = [
     lookupPrefix: "icons_pack_premium",
     family: "icons_store",
     tier: "pack_premium",
-    amounts: { gbp: 1400, eur: 1600, brl: 9200 },
+    amounts: { gbp: 1120, eur: 1300, brl: 7490 },
   },
   {
     name: "Icons Store Pack - Hyper 5000px",
@@ -282,7 +282,7 @@ const catalog = [
     lookupPrefix: "icons_pack_hyper",
     family: "icons_store",
     tier: "pack_hyper",
-    amounts: { gbp: 4800, eur: 5600, brl: 32000 },
+    amounts: { gbp: 3700, eur: 4300, brl: 24900 },
   },
   {
     name: "Portfolio Pro Kit - Personal",

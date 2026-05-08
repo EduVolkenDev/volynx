@@ -1,32 +1,24 @@
 /**
- * VOLYNX — Create Pix Checkout (Mercado Pago)
+ * VOLYNX — Create Pix Checkout (Stripe)
  *
- * Generates a Pix QR code for token pack purchases.
- * Returns QR image (base64), copia-e-cola string, and expiration.
- *
- * Required secrets:
- *   MERCADOPAGO_ACCESS_TOKEN  — Production or sandbox access token
- *   SUPABASE_SERVICE_ROLE_KEY
- *
- * Auth: Bearer token (Supabase JWT) in Authorization header
- *
- * Request body:
- *   { lookup_key: "tokens_starter_brl" | "tokens_core_brl" | ... }
- *
- * Response:
- *   200: { ok, payment_id, external_reference, pix_qr_code_base64, pix_copy_paste, expires_at, amount, tokens }
- *   400/401/500: { ok: false, error }
+ * Legacy endpoint kept for older clients. It now creates a Stripe Checkout
+ * Session with Pix as the payment method. Fulfillment is handled exclusively
+ * by stripe-webhook.
  */
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import Stripe from "https://esm.sh/stripe@14.14.0?target=deno";
+
+const STRIPE_API_VERSION = "2026-02-25.clover";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
+
+const FRONTEND_ORIGIN = Deno.env.get("FRONTEND_ORIGIN") || "https://volynx.world";
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -35,18 +27,14 @@ function json(data: unknown, status = 200) {
   });
 }
 
-// Token pack definitions — BRL prices in reais (not centavos)
-const TOKEN_PACKS: Record<
-  string,
-  { tokens: number; amount: number; label: string }
-> = {
-  tokens_starter: { tokens: 12, amount: 69.0, label: "Starter — 12 VX" },
-  tokens_core: { tokens: 32, amount: 149.0, label: "Core — 32 VX" },
-  tokens_pro: { tokens: 80, amount: 289.0, label: "Pro — 80 VX" },
-  tokens_scale: { tokens: 200, amount: 579.0, label: "Elite — 200 VX" },
-};
+function isProductionOrigin(origin: string): boolean {
+  return /^https:\/\/(www\.)?volynx\.world\b/i.test(origin);
+}
 
-// Strip currency suffix from lookup_key
+function shouldBlockTestStripeKey(stripeKey: string): boolean {
+  return isProductionOrigin(FRONTEND_ORIGIN) && stripeKey.startsWith("sk_test_");
+}
+
 function extractPrefix(key: string): string {
   const parts = key.split("_");
   const currencies = ["gbp", "eur", "brl"];
@@ -66,7 +54,6 @@ serve(async (req: Request) => {
   }
 
   try {
-    // ── Auth ──
     const authHeader = req.headers.get("authorization") || "";
     const token = authHeader.replace("Bearer ", "");
     if (!token) {
@@ -76,117 +63,113 @@ serve(async (req: Request) => {
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-      { auth: { persistSession: false } }
+      { auth: { persistSession: false } },
     );
 
-    const { data: userData, error: authError } =
-      await supabase.auth.getUser(token);
+    const { data: userData, error: authError } = await supabase.auth.getUser(token);
     if (authError || !userData?.user) {
       return json({ ok: false, error: "Invalid or expired token" }, 401);
     }
 
-    const userId = userData.user.id;
-    const userEmail = userData.user.email || "";
-
-    // ── Parse request ──
-    const body = await req.json();
-    const { lookup_key } = body;
-
-    if (!lookup_key || typeof lookup_key !== "string") {
+    const body = await req.json().catch(() => ({}));
+    const lookupKey = typeof body.lookup_key === "string" ? body.lookup_key : "";
+    if (!lookupKey) {
       return json({ ok: false, error: "Missing lookup_key" }, 400);
     }
 
-    const prefix = extractPrefix(lookup_key);
-    const pack = TOKEN_PACKS[prefix];
-
-    if (!pack) {
-      return json(
-        {
-          ok: false,
-          error: `Unknown token pack: ${prefix}. Available: ${Object.keys(TOKEN_PACKS).join(", ")}`,
-        },
-        400
-      );
+    const prefix = extractPrefix(lookupKey);
+    if (!prefix.startsWith("tokens_")) {
+      return json({ ok: false, error: "Pix checkout is only available for VX token packs." }, 400);
+    }
+    if (!/_brl$/i.test(lookupKey)) {
+      return json({ ok: false, error: "Pix checkout requires a BRL lookup key." }, 400);
     }
 
-    // ── Mercado Pago API ──
-    const mpToken = Deno.env.get("MERCADOPAGO_ACCESS_TOKEN");
-    if (!mpToken) {
-      console.error("[pix-checkout] MERCADOPAGO_ACCESS_TOKEN not set");
-      return json(
-        { ok: false, error: "Pix payment system not configured." },
-        500
-      );
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
+    if (!stripeKey) {
+      console.error("[pix-checkout] STRIPE_SECRET_KEY not set");
+      return json({ ok: false, error: "Payment system not configured." }, 500);
+    }
+    if (shouldBlockTestStripeKey(stripeKey)) {
+      console.error("[pix-checkout] blocked test Stripe key on production origin");
+      return json({ ok: false, error: "Live Pix checkout is not configured." }, 500);
     }
 
-    const externalRef = `vx_pix_${crypto.randomUUID()}`;
-    const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString(); // 30 min
+    const stripe = new Stripe(stripeKey, {
+      apiVersion: STRIPE_API_VERSION as any,
+      httpClient: Stripe.createFetchHttpClient(),
+    });
 
-    // Create payment via Mercado Pago Payments API (Pix)
-    const mpRes = await fetch("https://api.mercadopago.com/v1/payments", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${mpToken}`,
-        "Content-Type": "application/json",
-        "X-Idempotency-Key": externalRef,
+    const prices = await stripe.prices.list({
+      lookup_keys: [lookupKey],
+      limit: 1,
+      expand: ["data.product"],
+    });
+    const price = prices.data[0];
+    if (!price) {
+      return json({ ok: false, error: `Price not found for: ${lookupKey}` }, 404);
+    }
+    if (price.currency.toLowerCase() !== "brl") {
+      return json({ ok: false, error: "Pix checkout requires a BRL price." }, 400);
+    }
+
+    const user = userData.user;
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("stripe_customer_id")
+      .eq("id", user.id)
+      .single();
+
+    let customerId = profile?.stripe_customer_id;
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: user.email,
+        metadata: { supabase_user_id: user.id },
+      });
+      customerId = customer.id;
+      await supabase.from("profiles").update({ stripe_customer_id: customerId }).eq("id", user.id);
+    }
+
+    const successUrl = typeof body.success_url === "string"
+      ? body.success_url
+      : `${FRONTEND_ORIGIN}/account/?payment=pix_success`;
+    const cancelUrl = typeof body.cancel_url === "string"
+      ? body.cancel_url
+      : `${FRONTEND_ORIGIN}/recarregar/?payment=cancelled`;
+
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      mode: "payment",
+      line_items: [{ price: price.id, quantity: 1 }],
+      payment_method_types: ["pix"],
+      payment_method_options: {
+        pix: { expires_after_seconds: 1800 },
       },
-      body: JSON.stringify({
-        transaction_amount: pack.amount,
-        description: `VOLYNX ${pack.label}`,
-        payment_method_id: "pix",
-        payer: {
-          email: userEmail,
+      locale: "pt-BR",
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      allow_promotion_codes: true,
+      metadata: {
+        user_id: user.id,
+        lookup_key: lookupKey,
+        requested_lookup_key: lookupKey,
+        stripe_lookup_key: lookupKey,
+        product_family: prefix,
+        product_prefix: prefix,
+        payment_method: "pix",
+      },
+      payment_intent_data: {
+        metadata: {
+          user_id: user.id,
+          lookup_key: lookupKey,
+          requested_lookup_key: lookupKey,
+          stripe_lookup_key: lookupKey,
+          payment_method: "pix",
         },
-        external_reference: externalRef,
-        date_of_expiration: expiresAt,
-        notification_url: `${Deno.env.get("SUPABASE_URL")}/functions/v1/pix-webhook`,
-      }),
-    });
+      },
+    } as any);
 
-    if (!mpRes.ok) {
-      const errBody = await mpRes.text();
-      console.error("[pix-checkout] MP API error:", mpRes.status, errBody);
-      return json({ ok: false, error: "Failed to generate Pix QR code" }, 502);
-    }
-
-    const mpData = await mpRes.json();
-
-    const pixInfo =
-      mpData.point_of_interaction?.transaction_data || {};
-
-    // ── Save to database ──
-    await supabase.from("pix_payments").insert({
-      user_id: userId,
-      user_email: userEmail,
-      mp_payment_id: String(mpData.id),
-      external_reference: externalRef,
-      product_type: "token_pack",
-      product_key: prefix,
-      tokens_amount: pack.tokens,
-      amount: pack.amount,
-      currency: "BRL",
-      status: "pending",
-      pix_qr_code: pixInfo.qr_code || null,
-      pix_qr_code_base64: pixInfo.qr_code_base64 || null,
-      pix_copy_paste: pixInfo.qr_code || null,
-      pix_expiration: expiresAt,
-    });
-
-    console.log(
-      `Pix checkout created: ${externalRef} for ${userEmail}, ${pack.tokens} tokens, R$${pack.amount}`
-    );
-
-    return json({
-      ok: true,
-      payment_id: String(mpData.id),
-      external_reference: externalRef,
-      pix_qr_code_base64: pixInfo.qr_code_base64 || null,
-      pix_copy_paste: pixInfo.qr_code || null,
-      expires_at: expiresAt,
-      amount: pack.amount,
-      tokens: pack.tokens,
-      label: pack.label,
-    });
+    return json({ ok: true, url: session.url });
   } catch (err) {
     console.error("[pix-checkout] error:", (err as Error).message);
     return json({ ok: false, error: "Server error" }, 500);

@@ -173,6 +173,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
             <img id="preview" class="preview" alt="Result preview" />
             <p class="preview-empty">Process the first file to see the preview here.</p>
           </div>
+          <p id="resultHint" class="result-hint" hidden></p>
         </div>
       </div>
     </div>
@@ -248,7 +249,19 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
               limit: perm.limit,
               source: 'server',
             };
-            if (!perm.useLocalStorage || !allowLocalFallback || perm.limit === 0) return normalized;
+            // Anonymous/free Image Suite usage still relies on the local daily
+            // counter. Some deployments return limit=0 until a user token is
+            // present, which made the compressor look broken because "Process"
+            // immediately hit a confirm instead of falling back to the local
+            // free allowance.
+            const shouldUseAnonymousFallback =
+              allowLocalFallback &&
+              !token &&
+              perm.limit === 0 &&
+              (!perm.plan || perm.plan === 'free');
+            if (!perm.useLocalStorage || !allowLocalFallback || (perm.limit === 0 && !shouldUseAnonymousFallback)) {
+              return normalized;
+            }
           }
         } catch (_) {}
       }
@@ -313,6 +326,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
     const origMeta = $("origMeta");
     const outMeta = $("outMeta");
     const proStatus = $("proStatus");
+    const resultHint = $("resultHint");
 
     // isPro determined by server-side plan check, not localStorage
     let isPro = false;
@@ -324,6 +338,64 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
     function t(key, fallback) {
       const lang = ((localStorage.getItem("volynx_lang") || "en").toLowerCase().startsWith("pt")) ? "pt" : "en";
       return window.VX_TRANS?.[lang]?.[key] || fallback;
+    }
+
+    function copy(key, fallback, replacements = {}) {
+      return String(t(key, fallback)).replace(/\{(\w+)\}/g, (_, token) => {
+        return Object.prototype.hasOwnProperty.call(replacements, token) ? replacements[token] : `{${token}}`;
+      });
+    }
+
+    function fileCountLabel(count) {
+      const noun = t(count === 1 ? "suite.file_one" : "suite.file_other", count === 1 ? "file" : "files");
+      return `${count} ${noun}`;
+    }
+
+    function formatBytesLabel(bytes) {
+      const M = window.VxFileMetrics;
+      return M ? M.formatBytes(bytes) : `${(bytes / 1024 / 1024).toFixed(2)}MB`;
+    }
+
+    function formatDeltaLabel(inputBytes, outputBytes) {
+      const M = window.VxFileMetrics;
+      if (!M) return "";
+      const delta = M.calcDelta(inputBytes, outputBytes);
+      if (delta.direction === "smaller") {
+        return copy("suite.delta_smaller", "{pct}% smaller", { pct: delta.absPct });
+      }
+      if (delta.direction === "larger") {
+        return copy("suite.delta_larger", "{pct}% larger", { pct: delta.absPct });
+      }
+      return copy("suite.delta_same", "no change");
+    }
+
+    function formatSingleResultMeta(result) {
+      const M = window.VxFileMetrics;
+      const parts = [];
+      if (result.width && result.height) {
+        parts.push(M ? M.formatDimensions(result.width, result.height) : `${result.width} × ${result.height}`);
+      }
+      parts.push(formatBytesLabel(result.blob.size));
+      if (result.keptOriginal) {
+        parts.push(t("suite.meta_original_preserved", "original preserved"));
+      } else {
+        const deltaLabel = formatDeltaLabel(result.inputBytes, result.blob.size);
+        if (deltaLabel) parts.push(deltaLabel);
+      }
+      return parts.join(" • ");
+    }
+
+    function setResultHint(message, tone = "warning") {
+      if (!resultHint) return;
+      if (!message) {
+        resultHint.hidden = true;
+        resultHint.textContent = "";
+        delete resultHint.dataset.tone;
+        return;
+      }
+      resultHint.hidden = false;
+      resultHint.dataset.tone = tone;
+      resultHint.textContent = message;
     }
 
     function fileExtFromName(name) {
@@ -583,7 +655,10 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       const isCompress = toolEl.value === "compress";
       const isPng = fmtEl.value === "image/png";
       if (isCompress && isPng) {
-        fmtHint.textContent = "Tip: PNG is lossless — switch to WebP or JPG for smaller files.";
+        fmtHint.textContent = t(
+          "suite.fmt_hint_compress_png",
+          "Tip: PNG is lossless — switch to WebP or JPG for smaller files."
+        );
         fmtHint.hidden = false;
       } else {
         fmtHint.hidden = true;
@@ -664,6 +739,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       if (downloadBtn) downloadBtn.disabled = true;
       processedResults = [];
       singleOutBlob = null;
+      setResultHint("");
       setBgProgressHidden(true);
     }
 
@@ -699,12 +775,14 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       resetPreview();
 
       if (!validFiles.length) {
-        alert("No valid images found.");
+        alert(t("suite.alert_no_valid", "No valid images found."));
         return;
       }
 
       runBtn.disabled = true;
-      setDropMessage(`Loading ${validFiles.length} file(s)...`);
+      setDropMessage(copy("suite.drop_loading", "Loading {files}...", {
+        files: fileCountLabel(validFiles.length),
+      }));
 
       for (const file of validFiles) {
         const img = await fileToImage(file);
@@ -716,9 +794,10 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       }
 
       const totalBytes = validFiles.reduce((sum, file) => sum + file.size, 0);
-      const M = window.VxFileMetrics;
-      origMeta.textContent = `${validFiles.length} file(s) • ${M ? M.formatBytes(totalBytes) : (totalBytes / 1024 / 1024).toFixed(2) + "MB"}`;
-      setDropMessage(`${validFiles.length} file(s) ready to process`);
+      origMeta.textContent = `${fileCountLabel(validFiles.length)} • ${formatBytesLabel(totalBytes)}`;
+      setDropMessage(copy("suite.drop_ready", "{files} ready to process", {
+        files: fileCountLabel(validFiles.length),
+      }));
       syncRunAvailability();
     }
 
@@ -1001,7 +1080,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         if (!perm.allowed) {
           const isFreeUser = window.VxPlan ? !window.VxPlan.isPaid(perm.plan) : (perm.plan === 'free');
           
-          // Show upgrade/purchase options with VX option
+          // Show only paths that are actually wired for this tool.
           if (tool === "bg-remove") {
             const confirmMsg = t("suite.bg_upgrade_alert", "Remove BG is available on paid plans. Upgrade to unlock it.");
             const goPricing = confirm(confirmMsg + "\n\nClick OK to see pricing options.");
@@ -1009,15 +1088,16 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
             return;
           }
           
-          // For daily limit - offer VX purchase or upgrade
+          // Daily limits are plan-gated here; VX is not a bypass unless the
+          // action explicitly calls the token spending helper.
           const limitMsg = `Daily limit reached (${perm.limit}).`;
           const upgradeMsg = isFreeUser 
-            ? "\n\nYou can:\n• Upgrade to Pro for unlimited access\n• Buy VX for immediate use\n\nClick OK to see options."
-            : "\n\nYou've used your daily allowance. Try again tomorrow or add VX for immediate access.\n\nClick OK to add VX.";
+            ? "\n\nUpgrade to Pro for higher limits and Studio access.\n\nClick OK to see options."
+            : "\n\nYou've used your daily allowance. Try again tomorrow or manage your plan.\n\nClick OK to see options.";
           
           const showOptions = confirm(limitMsg + upgradeMsg);
           if (showOptions) {
-            window.location.href = isFreeUser ? "/pricing/" : "/recarregar";
+            window.location.href = "/pricing/";
           }
           return;
         }
@@ -1030,7 +1110,10 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
 
       try {
         for (let i = 0; i < loadedImages.length; i++) {
-          setDropMessage(`Processing ${i + 1}/${loadedImages.length}...`);
+          setDropMessage(copy("suite.drop_processing", "Processing {current}/{total}...", {
+            current: i + 1,
+            total: loadedImages.length,
+          }));
 
           const result = await processOne(loadedImages[i], tool, scale, mime, quality);
           processedResults.push(result);
@@ -1043,19 +1126,79 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         const totalOutBytes = processedResults.reduce((sum, result) => sum + result.blob.size, 0);
         const totalInBytes = processedResults.reduce((sum, result) => sum + result.inputBytes, 0);
         const M = window.VxFileMetrics;
-        if (M) {
-          const delta = M.calcDelta(totalInBytes, totalOutBytes);
-          const keptCount = processedResults.filter(r => r.keptOriginal).length;
-          let metaText = `${processedResults.length} file(s) • ${M.formatBytes(totalOutBytes)}`;
-          if (delta.direction !== "same") metaText += ` • ${delta.label}`;
-          if (keptCount > 0) metaText += ` • ${keptCount} kept original`;
-          outMeta.textContent = metaText;
+        const keptCount = processedResults.filter((result) => result.keptOriginal).length;
+        if (processedResults.length === 1) {
+          outMeta.textContent = formatSingleResultMeta(processedResults[0]);
         } else {
-          outMeta.textContent = `${processedResults.length} file(s) • ${(totalOutBytes / 1024 / 1024).toFixed(2)}MB`;
+          let metaText = `${fileCountLabel(processedResults.length)} • ${formatBytesLabel(totalOutBytes)}`;
+          if (M) {
+            const delta = M.calcDelta(totalInBytes, totalOutBytes);
+            if (delta.direction !== "same") {
+              metaText += ` • ${formatDeltaLabel(totalInBytes, totalOutBytes)}`;
+            }
+          }
+          if (keptCount > 0) {
+            metaText += ` • ${copy(
+              keptCount === 1 ? "suite.meta_kept_one" : "suite.meta_kept_many",
+              keptCount === 1 ? "1 kept original" : "{count} kept original",
+              { count: keptCount }
+            )}`;
+          }
+          outMeta.textContent = metaText;
         }
 
         if (processedResults.length === 1) {
           singleOutBlob = processedResults[0].blob;
+        }
+
+        if (tool === "compress" && keptCount > 0) {
+          if (keptCount === processedResults.length) {
+            setResultHint(
+              keptCount === 1
+                ? t(
+                    "suite.compress_notice_all_kept_one",
+                    "Original file kept because the compressed version was larger. Try lower quality or switch format."
+                  )
+                : copy(
+                    "suite.compress_notice_all_kept_many",
+                    "{count} files kept the original because the compressed version was larger. Try lower quality or switch format.",
+                    { count: keptCount }
+                  )
+            );
+            setDropMessage(
+              keptCount === 1
+                ? t("suite.compress_drop_all_kept_one", "No smaller version found, so the original file was kept.")
+                : copy(
+                    "suite.compress_drop_all_kept_many",
+                    "No smaller versions found, so {count} original files were kept.",
+                    { count: keptCount }
+                  )
+            );
+          } else {
+            setResultHint(
+              copy(
+                keptCount === 1 ? "suite.compress_notice_some_one" : "suite.compress_notice_some_many",
+                keptCount === 1
+                  ? "1 file kept the original because recompression was larger. Try lower quality or switch format."
+                  : "{count} files kept the original because recompression was larger. Try lower quality or switch format.",
+                { count: keptCount }
+              )
+            );
+            setDropMessage(
+              copy(
+                keptCount === 1 ? "suite.compress_drop_some_one" : "suite.compress_drop_some_many",
+                keptCount === 1
+                  ? "Processed with 1 original file preserved."
+                  : "Processed with {count} original files preserved.",
+                { count: keptCount }
+              )
+            );
+          }
+        } else {
+          setResultHint("");
+          setDropMessage(copy("suite.drop_done", "{files} processed successfully", {
+            files: fileCountLabel(processedResults.length),
+          }));
         }
 
         // Log ALL users (free + pro) — pro just doesn't get a quota check.
@@ -1090,12 +1233,12 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
           }
         }
 
-        setDropMessage(`${processedResults.length} file(s) processed successfully`);
         downloadBtn.disabled = false;
       } catch (error) {
         console.error(error);
-        alert("An error occurred while processing images.");
-        setDropMessage("Error processing files");
+        alert(t("suite.alert_process_error", "An error occurred while processing images."));
+        setDropMessage(t("suite.drop_error", "Error processing files"));
+        setResultHint("");
       } finally {
         runBtn.disabled = false;
         // Always release the progress widget — without this, errors mid-

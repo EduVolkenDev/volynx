@@ -5,8 +5,8 @@
  * Must be deployed with verify_jwt: false (Stripe doesn't send JWTs).
  *
  * Required secrets (set via Supabase Dashboard > Edge Functions > Secrets):
- *   STRIPE_SECRET_KEY        — sk_test_ or sk_live_
- *   STRIPE_WEBHOOK_SECRET    — whsec_ from Stripe Dashboard
+ *   STRIPE_SECRET_KEY        — sk_live_ in production
+ *   STRIPE_WEBHOOK_SECRET    — live whsec_ from Stripe Dashboard in production
  *   SUPABASE_SERVICE_ROLE_KEY — service_role key from Supabase
  *
  * Handles:
@@ -25,7 +25,18 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 // ── Config ──────────────────────────────────────────────────
 
-const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
+const FRONTEND_ORIGIN = Deno.env.get("FRONTEND_ORIGIN") || "https://volynx.world";
+const STRIPE_KEY = Deno.env.get("STRIPE_SECRET_KEY")!;
+
+function isProductionOrigin(origin: string): boolean {
+  return /^https:\/\/(www\.)?volynx\.world\b/i.test(origin);
+}
+
+function shouldBlockTestStripeKey(stripeKey: string): boolean {
+  return isProductionOrigin(FRONTEND_ORIGIN) && stripeKey.startsWith("sk_test_");
+}
+
+const stripe = new Stripe(STRIPE_KEY, {
   apiVersion: "2026-02-25.clover" as any,
   httpClient: Stripe.createFetchHttpClient(),
 });
@@ -1118,6 +1129,11 @@ serve(async (req: Request) => {
 
   if (req.method !== "POST") {
     return new Response("Method not allowed", { status: 405 });
+  }
+
+  if (!STRIPE_KEY || shouldBlockTestStripeKey(STRIPE_KEY)) {
+    console.error("[stripe-webhook] blocked non-live Stripe key on production origin");
+    return new Response("Live Stripe webhook is not configured", { status: 500 });
   }
 
   const signature = req.headers.get("stripe-signature");

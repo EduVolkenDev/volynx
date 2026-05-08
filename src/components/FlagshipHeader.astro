@@ -67,9 +67,10 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
       <a href={ROUTES.login} class="vx-login" data-i18n="nav.login">Login</a>
       <a href={ctaHref} class="vx-cta" data-vx-hide-if-plan="pro" data-i18n={ctaI18n}>{ctaLabel}</a>
 
-      <!-- Avatar (authed only) -->
-      <a href={ROUTES.profile} class="vx-avatar" id="vxUserBadge" aria-label="Profile" data-i18n-aria="aria.profile">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <!-- Avatar (authed only) — renders <img> via vx-avatar.js when avatar cached -->
+      <a href={ROUTES.profile} class="vx-avatar" id="vxUserBadge" aria-label="Profile" data-i18n-aria="aria.profile" data-vx-avatar-slot>
+        <svg class="vx-avatar__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="vx-avatar__initials" hidden></span>
       </a>
 
       <!-- Mobile menu btn -->
@@ -100,8 +101,8 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
     </button>
     <a href={ROUTES.login} class="vx-mobile__link" data-auth="out" data-i18n="nav.login">Login</a>
     <a href={ctaHref} class="vx-mobile__cta" data-auth="out" data-i18n={ctaI18n}>{ctaLabel}</a>
-    <a href={ROUTES.profile} class="vx-mobile__profile" data-auth="in">
-      <span class="vx-mobile__avatar" id="vxUserBadgeMobileInitials"></span>
+    <a href={ROUTES.profile} class="vx-mobile__profile" data-auth="in" data-vx-avatar-slot>
+      <span class="vx-mobile__avatar vx-avatar__initials" id="vxUserBadgeMobileInitials"></span>
       <span data-i18n="nav.profile">Profile</span>
     </a>
   </nav>
@@ -345,6 +346,28 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
   :global(.vx-authed) .vx-avatar:hover {
     border-color: rgba(45, 212, 191, 0.5);
     box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.15);
+  }
+  /* Avatar inner slots: SVG icon (guests) / initials (authed fallback) / img (cached choice) */
+  .vx-avatar__icon { display: inline-block; }
+  .vx-avatar__initials {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+  .vx-avatar__img {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+    display: block;
+  }
+  /* Tier-aware ring (PT-2d) — extended in premium-tier.css */
+  :global(html[data-tier="member"]) .vx-avatar { border-color: rgba(244, 210, 122, 0.3); }
+  :global(html[data-tier="studio"]) .vx-avatar { border-color: rgba(220, 220, 230, 0.4); }
+  :global(html[data-bd="1"]) .vx-avatar {
+    border-color: rgba(244, 210, 122, 0.7);
+    box-shadow: 0 0 0 1px rgba(244, 210, 122, 0.35);
   }
 
   /* Burger */

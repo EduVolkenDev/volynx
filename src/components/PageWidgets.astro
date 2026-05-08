@@ -44,6 +44,13 @@ const isProfile = Astro.url.pathname.startsWith("/profile");
 <CookieBanner />
 
 <style>
+  :global(html[lang="en"] .i18n-pt),
+  :global(html[lang="en-US"] .i18n-pt),
+  :global(html[lang="pt"] .i18n-en),
+  :global(html[lang="pt-BR"] .i18n-en) {
+    display: none;
+  }
+
   .vx-widget {
     position: fixed;
     z-index: 9990;
@@ -169,6 +176,7 @@ const isProfile = Astro.url.pathname.startsWith("/profile");
 
 <script src="/js/vx-token-refresh.js" defer></script>
 <script src="/js/vx-plan.js" defer></script>
+<script src="/js/vx-avatar.js" defer></script>
 <script src="/js/translations.js?v=20260504-devjourney" defer></script>
 <script src="/js/i18n.js" defer></script>
 <script src="/js/recording-mode.js?v=20260506" defer></script>

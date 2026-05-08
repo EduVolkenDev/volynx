@@ -201,6 +201,26 @@ const homeAssistItems = [
                 : (grantsTxt ? "Applied: " + grantsTxt : "Voucher applied!");
               setMsg(label, "ok");
               input.value = "";
+
+              // Update tier cache immediately so premium attrs flip without
+              // waiting for next check-permission cycle (zero-flash upgrade UX).
+              try {
+                if (window.VxPlan) {
+                  var existing = window.VxPlan.getCachedRelaxed
+                    ? window.VxPlan.getCachedRelaxed()
+                    : { plan: 'free', isBlackDiamond: false };
+                  var ga = data.grants_applied || {};
+                  var nextPlan = ga.builder_plan || ga.daily_plan || ga.plan || existing.plan;
+                  var becameBD = ga.badge === 'black_diamond';
+                  window.VxPlan.cache({
+                    plan: nextPlan,
+                    isBlackDiamond: becameBD || existing.isBlackDiamond,
+                  });
+                  if (typeof window.VxPlan.applyTierAttrs === 'function') {
+                    window.VxPlan.applyTierAttrs();
+                  }
+                }
+              } catch (_) {}
             } else {
               var err = (data && (data.error || data.message)) || ("HTTP " + res.status);
               var errMap = {
