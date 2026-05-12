@@ -454,6 +454,148 @@ import { ROUTES } from "../../../data/routes";
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-8px); }
     }
+
+    /* === Mode toggle (Static | Dynamic) === */
+    .qr-mode-toggle {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px;
+      margin: 0 auto 22px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+    }
+    .qr-mode-btn {
+      width: auto !important;
+      padding: 8px 22px !important;
+      border: none !important;
+      border-radius: 999px !important;
+      background: transparent !important;
+      color: rgba(255,255,255,.55) !important;
+      font-size: .82em !important;
+      font-weight: 500 !important;
+      letter-spacing: .3px !important;
+      text-transform: none !important;
+      cursor: pointer;
+      transition: all .2s ease;
+      box-shadow: none !important;
+      margin: 0 !important;
+    }
+    .qr-mode-btn:hover { color: rgba(255,255,255,.85) !important; transform: none !important; }
+    .qr-mode-btn::before { content: none !important; }
+    .qr-mode-btn.is-active {
+      background: linear-gradient(135deg, #6c0ae4, #210df7) !important;
+      color: #fff !important;
+      box-shadow: 0 4px 14px rgba(108,10,228,.35) !important;
+    }
+
+    /* === Dynamic section === */
+    .qr-dyn-section {
+      background: rgba(89,198,232,.06);
+      border: 1px solid rgba(89,198,232,.18);
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 26px;
+      text-align: left;
+    }
+    .qr-dyn-intro {
+      font-size: .9em;
+      color: rgba(255,255,255,.7);
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+    .qr-dyn-login-cta {
+      text-align: center;
+      padding: 24px 12px;
+    }
+    .qr-dyn-login-cta p {
+      color: rgba(255,255,255,.75);
+      margin-bottom: 16px;
+    }
+    .qr-dyn-login-cta a {
+      display: inline-block;
+      padding: 12px 28px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #6c0ae4, #59c6e8);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: 0 6px 18px rgba(108,10,228,.35);
+    }
+    .qr-dyn-quota {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      font-size: .78em;
+      color: rgba(255,255,255,.7);
+      margin-bottom: 16px;
+    }
+    .qr-dyn-quota .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #4ade80;
+    }
+    .qr-dyn-quota.is-full .dot { background: #f87171; }
+    .qr-dyn-section input[type="text"],
+    .qr-dyn-section input[type="url"] {
+      margin-bottom: 14px;
+    }
+    .qr-dyn-label {
+      display: block;
+      font-size: .8em;
+      font-weight: 500;
+      color: rgba(255,255,255,.55);
+      margin-bottom: 6px;
+      letter-spacing: .3px;
+    }
+    .qr-dyn-success {
+      margin-top: 16px;
+      padding: 14px 16px;
+      background: rgba(74,222,128,.08);
+      border: 1px solid rgba(74,222,128,.25);
+      border-radius: 12px;
+      font-size: .9em;
+      color: rgba(255,255,255,.85);
+    }
+    .qr-dyn-success code {
+      display: inline-block;
+      padding: 2px 8px;
+      background: rgba(0,0,0,.3);
+      border-radius: 6px;
+      font-family: 'SF Mono', Menlo, monospace;
+      font-size: .9em;
+      color: #59c6e8;
+      user-select: all;
+    }
+    .qr-dyn-success a {
+      display: inline-block;
+      margin-top: 8px;
+      color: #59c6e8;
+      text-decoration: none;
+      font-size: .85em;
+    }
+    .qr-dyn-error {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: rgba(248,113,113,.08);
+      border: 1px solid rgba(248,113,113,.25);
+      border-radius: 10px;
+      font-size: .88em;
+      color: #fca5a5;
+    }
+    .qr-dyn-free-warning {
+      margin-top: 14px;
+      font-size: .78em;
+      color: rgba(255,200,80,.75);
+      text-align: center;
+    }
+    .is-dynamic-mode .qr-static-input { display: none; }
+    .is-dynamic-mode #generateBtn { display: none; }
+    .is-static-mode .qr-dyn-section { display: none; }
   </style>
 </head>
 
@@ -477,7 +619,45 @@ import { ROUTES } from "../../../data/routes";
         <img src="/assets/wordmark.webp" alt="VOLYNX" />
       </div>
 
-      <div class="input-wrapper">
+      <div class="qr-mode-toggle" role="tablist" aria-label="QR mode">
+        <button type="button" class="qr-mode-btn is-active" data-mode="static" role="tab" data-i18n="qr.toggle_static">Static</button>
+        <button type="button" class="qr-mode-btn" data-mode="dynamic" role="tab" data-i18n="qr.toggle_dynamic">Dynamic</button>
+      </div>
+
+      <div class="qr-dyn-section" id="qr-dyn-section" hidden>
+        <p class="qr-dyn-intro" data-i18n="qr.dynamic_intro">
+          Dynamic QRs let you change the destination URL anytime, even after printing.
+        </p>
+
+        <div class="qr-dyn-login-cta" id="qr-dyn-login-cta" hidden>
+          <p data-i18n="qr.dynamic_login_required">Sign in to create dynamic QRs that you can edit later.</p>
+          <a href={ROUTES.login}>Sign in</a>
+        </div>
+
+        <div id="qr-dyn-form" hidden>
+          <div class="qr-dyn-quota" id="qr-dyn-quota" aria-live="polite">
+            <span class="dot"></span>
+            <span id="qr-dyn-quota-text">— / —</span>
+          </div>
+
+          <label class="qr-dyn-label" for="qr-dyn-target" data-i18n="qr.dynamic_target_label">Destination URL</label>
+          <input type="url" id="qr-dyn-target" placeholder="https://example.com" data-i18n-placeholder="qr.dynamic_target_placeholder" autocomplete="url" />
+
+          <label class="qr-dyn-label" for="qr-dyn-label-input" data-i18n="qr.dynamic_label_label">Internal label (optional)</label>
+          <input type="text" id="qr-dyn-label-input" placeholder="Vitrine janeiro, cartão de visita..." data-i18n-placeholder="qr.dynamic_label_placeholder" maxlength="100" />
+
+          <div class="qr-dyn-success" id="qr-dyn-success" hidden>
+            <span data-i18n="qr.dynamic_success">Dynamic QR created. Short URL:</span>
+            <code id="qr-dyn-short-url"></code>
+            <br />
+            <a href={ROUTES.profileQrCodes} data-i18n="qr.dynamic_manage">Manage in /profile/qr-codes/</a>
+          </div>
+          <div class="qr-dyn-error" id="qr-dyn-error" hidden></div>
+          <p class="qr-dyn-free-warning" id="qr-dyn-free-warning" hidden data-i18n="qr.free_expiry_warning">Free plan QRs expire after 30 days.</p>
+        </div>
+      </div>
+
+      <div class="input-wrapper qr-static-input">
         <input type="text" id="text" placeholder="Enter text or URL to generate QR" data-i18n-placeholder="qr.input_placeholder" />
       </div>
 
@@ -553,6 +733,7 @@ import { ROUTES } from "../../../data/routes";
       </div>
 
       <button id="generateBtn" data-i18n="qr.btn_generate">Gerar QR Code</button>
+      <button id="qr-dyn-create-btn" hidden data-i18n="qr.dynamic_btn_create">Create dynamic QR</button>
       <div id="qr-container"></div>
       <button id="downloadBtn" style="display:none;" data-i18n="qr.btn_download">📥 Baixar QR Code</button>
 
@@ -569,5 +750,6 @@ import { ROUTES } from "../../../data/routes";
 
   <script is:inline src="https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
   <script is:inline src="/scripts/qr-gen.js"></script>
+  <script is:inline src="/scripts/qr-gen-dynamic.js?v=20260512-qr-dynamic"></script>
 </body>
 </html>

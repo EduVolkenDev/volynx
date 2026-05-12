@@ -241,3 +241,9 @@ function bind() {
 document.addEventListener("DOMContentLoaded", () => {
   bind();
 });
+
+window.VxQRGen = {
+  generateQR,
+  buildConfig,
+  getQRCode: () => qrCode,
+};

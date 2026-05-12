@@ -161,3 +161,117 @@ button {
 /* Intensity variants — for hero-level icons that need to dominate. */
 .vx-glow-container--strong { --vx-glow-opacity: 0.32; --vx-glow-blur: 56px; }
 .vx-glow-container--xl     { --vx-glow-spread: 110%; --vx-glow-blur: 64px; }
+
+/* ============================================================
+   VX ANIMATIONS — reusable global tokens
+   The platform must always feel alive: no element should sit
+   100% static when it conveys an interactive surface.
+   All keyframes here have a prefers-reduced-motion fallback.
+   ============================================================ */
+
+/* Slow ambient breath — for empty states, drop zones, idle pills */
+@keyframes vx-breath {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+
+/* Drop zone & idle border — opacity oscillation on the border colour */
+@keyframes vx-border-pulse {
+  0%, 100% { border-color: rgba(255, 255, 255, 0.18); }
+  50%      { border-color: rgba(255, 255, 255, 0.42); }
+}
+
+/* Subtle vertical drift — for icons inside drop zones, hero glyphs */
+@keyframes vx-icon-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+
+/* Linear gradient shimmer for premium gold/cream text */
+@keyframes vx-text-shimmer {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Featured-card border pulse (purple/violet) */
+@keyframes vx-featured-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(139, 123, 255, 0.35), 0 0 24px rgba(139, 123, 255, 0.10); }
+  50%      { box-shadow: 0 0 0 1px rgba(139, 123, 255, 0.65), 0 0 36px rgba(139, 123, 255, 0.22); }
+}
+
+/* One-shot cyan flash — fired on .vx-flash class via JS */
+@keyframes vx-flash-cyan {
+  0%   { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0); border-color: inherit; }
+  20%  { box-shadow: 0 0 0 6px rgba(45, 212, 191, 0.35); border-color: rgba(45, 212, 191, 0.85); }
+  100% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0); border-color: inherit; }
+}
+
+/* 404 / hero color drift — slow cyan→violet→gold drop-shadow rotation */
+@keyframes vx-color-drift {
+  0%   { filter: drop-shadow(0 0 18px rgba(139, 252, 240, 0.42)); }
+  33%  { filter: drop-shadow(0 0 22px rgba(177, 150, 255, 0.40)); }
+  66%  { filter: drop-shadow(0 0 22px rgba(243, 225, 160, 0.38)); }
+  100% { filter: drop-shadow(0 0 18px rgba(139, 252, 240, 0.42)); }
+}
+
+/* Drop zone "magnetic" cue — subtle scale heartbeat on idle */
+@keyframes vx-heartbeat {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.012); }
+}
+
+/* Tactile button press — applies via :active state, opt-in via .vx-pressable
+   or globally to all interactive controls (see rules below). */
+button:not(:disabled):active,
+.btn:not(:disabled):active,
+.button:not(:disabled):active,
+[role="button"]:not([aria-disabled="true"]):active,
+input[type="button"]:not(:disabled):active,
+input[type="submit"]:not(:disabled):active {
+  transform: scale(0.97);
+  transition: transform 0.06s ease-out;
+}
+
+/* JS-triggered one-shot effects (e.g. balance update flash) */
+.vx-flash-cyan {
+  animation: vx-flash-cyan 0.9s ease-out 1;
+}
+
+/* Premium gradient shimmer for hero headlines.
+   Applied via class — keeps the text readable but adds a subtle living glow. */
+.vx-hero-shimmer {
+  background-image: linear-gradient(
+    100deg,
+    var(--vx-shimmer-a, #f3e1a0) 0%,
+    var(--vx-shimmer-b, #fff7df) 28%,
+    var(--vx-shimmer-c, #b196ff) 50%,
+    var(--vx-shimmer-b, #fff7df) 72%,
+    var(--vx-shimmer-a, #f3e1a0) 100%
+  );
+  background-size: 220% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: vx-text-shimmer 8s ease-in-out infinite;
+}
+.vx-hero-shimmer--cyan {
+  --vx-shimmer-a: #8bfaf0;
+  --vx-shimmer-b: #ffffff;
+  --vx-shimmer-c: #b196ff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vx-hero-shimmer { animation: none; background-position: 50% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Disable every vx animation token, but keep tactile press feedback. */
+  .vx-glow-container::before,
+  [class*="vx-anim-"],
+  .vx-flash-cyan {
+    animation: none !important;
+  }
+}

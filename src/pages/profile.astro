@@ -230,7 +230,7 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 						<a href={ROUTES.pricing} class="sub-card__link" id="subBuilderCta" data-i18n="profile.sub_upgrade">Upgrade</a>
 					</div>
 					<div class="sub-card">
-						<div class="sub-card__icon"><img src="/assets/daily-icon.webp" alt="" class="profile-card__art" loading="lazy" /></div>
+						<div class="sub-card__icon"><img id="subDailyArt" src="/assets/daily-icon.webp" alt="" class="profile-card__art" loading="lazy" /></div>
 						<div class="sub-card__label">VOLYNX Daily</div>
 						<div class="sub-card__plan" id="subDailyPlan">Free</div>
 						<a href="https://daily.volynx.world/pricing/" class="sub-card__link" id="subDailyCta" data-i18n="profile.sub_upgrade">Upgrade</a>
@@ -242,7 +242,7 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 						<a href="https://cvitae.volynx.world/profile/" class="sub-card__link" id="subCvitaeCta" data-i18n="profile.sub_upgrade">Upgrade</a>
 					</div>
 					<div class="sub-card">
-						<div class="sub-card__icon"><img src="/assets/V.webp" alt="" class="profile-card__art profile-card__art--mark" loading="lazy" /></div>
+						<div class="sub-card__icon"><img src="/assets/VX4.webp" alt="" class="profile-card__art profile-card__art--mark" loading="lazy" /></div>
 						<div class="sub-card__label" data-i18n="profile.sub_tokens_label">VX</div>
 						<div class="sub-card__plan" id="subTokens">0</div>
 						<a href={ROUTES.recarregar} class="sub-card__link" data-i18n="profile.sub_buy_tokens">Get VX</a>
@@ -708,9 +708,15 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 				const subDailyEl = $("subDailyPlan");
 				const subCvitaeEl = $("subCvitaePlan");
 				const subTokensEl = $("subTokens");
+				const subDailyArt = $("subDailyArt");
 				const subBuilderCta = $("subBuilderCta");
 				const subDailyCta = $("subDailyCta");
 				const subCvitaeCta = $("subCvitaeCta");
+				const dailyPlanAssets = {
+					free: "/assets/daily-icon.webp",
+					pro: "/assets/dailypro.webp",
+					diamond: "/assets/daily-diamond.webp",
+				};
 
 				if (subBuilderEl) {
 					subBuilderEl.textContent = builderTier.charAt(0).toUpperCase() + builderTier.slice(1);
@@ -723,6 +729,9 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 				if (subDailyEl) {
 					subDailyEl.textContent = dailyTier.charAt(0).toUpperCase() + dailyTier.slice(1);
 					subDailyEl.setAttribute("data-tier", dailyTier);
+					if (subDailyArt) {
+						subDailyArt.src = dailyPlanAssets[dailyTier] || dailyPlanAssets.free;
+					}
 					if (dailyTier !== "free" && subDailyCta) {
 						subDailyCta.textContent = "Manage";
 					}

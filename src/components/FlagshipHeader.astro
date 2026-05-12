@@ -26,7 +26,7 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
     <a href={ROUTES.home} class="vx-brand" aria-label="VOLYNX Ecosystem home" data-i18n-aria="aria.ecosystem_home">
       <img src="/assets/V.webp" alt="" class="vx-brand__mark" width="44" height="44" aria-hidden="true" loading="eager" decoding="async" />
       <span class="vx-brand__text">
-        <img src="/assets/wordmark.webp" alt="VOLYNX" class="vx-brand__wordmark" width="132" height="72" loading="eager" decoding="async" />
+        <img src="/assets/wordmark-dark.webp" alt="VOLYNX" class="vx-brand__wordmark" width="132" height="72" loading="eager" decoding="async" />
       </span>
     </a>
 
@@ -184,6 +184,21 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
     max-height: 38px;
     object-fit: contain;
     object-position: left center;
+    filter: drop-shadow(0 0 0 rgba(255,255,255,0));
+    animation: vxBrandSheen 7s ease-in-out infinite;
+    transition: filter .35s ease, transform .35s ease;
+  }
+  .vx-brand:hover .vx-brand__wordmark {
+    animation-play-state: paused;
+    filter: drop-shadow(0 0 14px rgba(255,255,255,0.18));
+    transform: translateY(-1px);
+  }
+  @keyframes vxBrandSheen {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(255,255,255,0)); }
+    50%      { filter: drop-shadow(0 0 10px rgba(255,255,255,0.10)); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .vx-brand__wordmark { animation: none; }
   }
   @media (max-width: 520px) {
     .vx-brand__text { display: none; }
@@ -239,13 +254,45 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
     font-size: 14px;
     font-weight: 600;
     text-decoration: none;
-    transition: all .15s;
+    transition: background .15s, border-color .15s, transform .15s, box-shadow .35s;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
+    box-shadow: inset 0 0 0 0 rgba(45, 212, 191, 0);
+    animation: vxPillBreath 5.6s ease-in-out infinite;
   }
   :global(.vx-authed) .vx-token-pill:hover {
     background: #27272a;
     border-color: var(--topbar-accent);
+    transform: translateY(-1px);
+    animation-play-state: paused;
+  }
+  /* Fired by JS on vx:balance-changed — momentary cyan ring */
+  :global(.vx-authed) .vx-token-pill.vx-pill-flash {
+    animation: vxPillFlash 0.9s ease-out 1;
+    border-color: rgba(45, 212, 191, 0.85);
+  }
+  /* Low-balance warning — subtle amber pulse on icon when < 10 VX */
+  :global(.vx-authed) .vx-token-pill.vx-pill-low svg {
+    animation: vxPillLow 1.6s ease-in-out infinite;
+    color: #f4a261;
+  }
+  @keyframes vxPillBreath {
+    0%, 100% { box-shadow: inset 0 0 10px rgba(45, 212, 191, 0.04); }
+    50%      { box-shadow: inset 0 0 14px rgba(45, 212, 191, 0.12); }
+  }
+  @keyframes vxPillFlash {
+    0%   { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0); }
+    20%  { box-shadow: 0 0 0 6px rgba(45, 212, 191, 0.35); }
+    100% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0); }
+  }
+  @keyframes vxPillLow {
+    0%, 100% { opacity: 0.65; transform: scale(1); }
+    50%      { opacity: 1;    transform: scale(1.12); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.vx-authed) .vx-token-pill,
+    :global(.vx-authed) .vx-token-pill.vx-pill-flash,
+    :global(.vx-authed) .vx-token-pill.vx-pill-low svg { animation: none; }
   }
   .vx-token-pill svg { color: var(--topbar-accent); flex-shrink: 0; }
   .vx-token-pill .vx-token-label {
@@ -633,14 +680,24 @@ const { current = "", ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "
     }
     tryVxTokens();
 
+    function applyBalanceCues(n: number) {
+      const pill = document.getElementById("vxTokenPill");
+      if (!pill) return;
+      // Low balance: <10 VX → amber pulsing icon. Skip for admin (∞).
+      if (!(window as any).VX_IS_ADMIN && n < 10) pill.classList.add("vx-pill-low");
+      else pill.classList.remove("vx-pill-low");
+      // One-shot flash — restart animation cleanly.
+      pill.classList.remove("vx-pill-flash");
+      // Force reflow so re-adding the class re-triggers the keyframes.
+      void pill.offsetWidth;
+      pill.classList.add("vx-pill-flash");
+      window.setTimeout(() => pill.classList.remove("vx-pill-flash"), 950);
+    }
+
     window.addEventListener("vx:balance-changed", (e: any) => {
       if (e.detail && typeof e.detail.balance === "number") {
         setCount(e.detail.balance);
-        const pill = document.getElementById("vxTokenPill");
-        if (pill) {
-          pill.style.borderColor = "rgba(45, 212, 191, 0.6)";
-          setTimeout(() => { pill.style.borderColor = ""; }, 800);
-        }
+        applyBalanceCues(e.detail.balance);
       }
     });
   })();

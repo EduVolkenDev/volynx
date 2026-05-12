@@ -1,0 +1,369 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import VxHeader from "../../components/VxHeader.astro";
+import VxFooter from "../../components/VxFooter.astro";
+import PageWidgets from "../../components/PageWidgets.astro";
+import { ROUTES } from "../../data/routes";
+
+const title = "Your QR Codes — VOLYNX";
+const description = "Manage your dynamic QR codes: edit destinations, pause, renew, view scans.";
+---
+
+<BaseLayout title={title} description={description}>
+  <VxHeader primaryCtaLabel="Sign out" primaryCtaI18n="header.signout" primaryCtaHref="/login/?logout=1" primaryCtaAuth="in" />
+  <PageWidgets hideUtilBar />
+
+  <main class="qrp-shell">
+    <div class="qrp-container">
+
+      <header class="qrp-head">
+        <div>
+          <span class="qrp-kicker" data-i18n="qrp.kicker">QR Manager</span>
+          <h1 data-i18n="qrp.title">Your dynamic QR Codes</h1>
+          <p class="qrp-sub" data-i18n="qrp.subtitle">Edit destinations anytime, pause when needed, see live scan counts.</p>
+        </div>
+        <a href={ROUTES.labQrGen} class="qrp-cta" data-i18n="qrp.create_new">+ Create new</a>
+      </header>
+
+      <section id="qrpLoading" class="qrp-state">
+        <div class="qrp-spinner"></div>
+        <p data-i18n="qrp.loading">Loading your QR codes…</p>
+      </section>
+
+      <section id="qrpLoggedOut" class="qrp-state" hidden>
+        <h2 data-i18n="qrp.login_required">Sign in required</h2>
+        <p data-i18n="qrp.login_msg">You need to sign in to view and manage your QR codes.</p>
+        <a class="qrp-cta" href={`${ROUTES.login}?next=${ROUTES.profileQrCodes}`} data-i18n="qrp.btn_signin">Sign in</a>
+      </section>
+
+      <section id="qrpEmpty" class="qrp-state" hidden>
+        <div class="qrp-empty-icon">📭</div>
+        <h2 data-i18n="qrp.empty_title">No dynamic QRs yet</h2>
+        <p data-i18n="qrp.empty_msg">Create your first dynamic QR code from the Lab. You can change its destination URL anytime.</p>
+        <a class="qrp-cta" href={ROUTES.labQrGen} data-i18n="qrp.btn_create_first">Create my first QR</a>
+      </section>
+
+      <section id="qrpList" hidden>
+        <div class="qrp-quota-bar">
+          <span class="qrp-quota-text" id="qrpQuotaText">— / —</span>
+          <a href={ROUTES.pricing} class="qrp-quota-upgrade" data-i18n="qrp.upgrade">Upgrade plan →</a>
+        </div>
+
+        <div id="qrpItems" class="qrp-items"></div>
+      </section>
+
+      <!-- Edit modal -->
+      <div id="qrpEditModal" class="qrp-modal" hidden>
+        <div class="qrp-modal-backdrop" data-close></div>
+        <div class="qrp-modal-card">
+          <h3 data-i18n="qrp.edit_title">Edit QR destination</h3>
+          <p class="qrp-modal-desc" data-i18n="qrp.edit_desc">The short URL stays the same. Only the destination changes.</p>
+          <label data-i18n="qrp.edit_target_label">New destination URL</label>
+          <input type="url" id="qrpEditTarget" placeholder="https://exemplo.com" autocomplete="url" />
+          <label data-i18n="qrp.edit_label_label">Label (optional)</label>
+          <input type="text" id="qrpEditLabel" maxlength="100" />
+          <div id="qrpEditError" class="qrp-modal-error" hidden></div>
+          <div class="qrp-modal-actions">
+            <button type="button" class="qrp-btn ghost" data-close data-i18n="qrp.btn_cancel">Cancel</button>
+            <button type="button" id="qrpEditSave" class="qrp-btn primary" data-i18n="qrp.btn_save">Save</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <VxFooter />
+
+  <style>
+    body { background: #0a0a0a; color: #e8e8e8; }
+
+    .qrp-shell {
+      min-height: calc(100vh - 200px);
+      padding: 100px 20px 80px;
+      position: relative;
+    }
+    .qrp-container { max-width: 980px; margin: 0 auto; }
+
+    .qrp-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+    }
+    .qrp-kicker {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(89,198,232,.85);
+      margin-bottom: 8px;
+    }
+    .qrp-head h1 {
+      font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: -.01em;
+      margin-bottom: 8px;
+    }
+    .qrp-sub {
+      color: rgba(255,255,255,.6);
+      max-width: 520px;
+      line-height: 1.5;
+    }
+
+    .qrp-cta {
+      display: inline-flex;
+      align-items: center;
+      padding: 11px 20px;
+      background: linear-gradient(135deg, #6c0ae4, #210df7);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: .92rem;
+      box-shadow: 0 6px 18px rgba(108,10,228,.3);
+      transition: transform .15s ease;
+    }
+    .qrp-cta:hover { transform: translateY(-1px); }
+
+    .qrp-state {
+      text-align: center;
+      padding: 64px 24px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 18px;
+    }
+    .qrp-state h2 { font-size: 1.3rem; margin-bottom: 10px; }
+    .qrp-state p { color: rgba(255,255,255,.6); margin-bottom: 18px; max-width: 420px; margin-inline: auto; line-height: 1.5; }
+    .qrp-empty-icon { font-size: 48px; margin-bottom: 18px; opacity: .85; }
+
+    .qrp-spinner {
+      width: 32px; height: 32px;
+      border: 3px solid rgba(255,255,255,.12);
+      border-top-color: rgba(89,198,232,.7);
+      border-radius: 50%;
+      margin: 0 auto 18px;
+      animation: qrp-spin .8s linear infinite;
+    }
+    @keyframes qrp-spin { to { transform: rotate(360deg); } }
+
+    .qrp-quota-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 12px;
+      margin-bottom: 24px;
+      font-size: .88rem;
+    }
+    .qrp-quota-text { color: rgba(255,255,255,.75); }
+    .qrp-quota-upgrade {
+      color: rgba(89,198,232,.85);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: .82rem;
+    }
+    .qrp-quota-upgrade:hover { text-decoration: underline; }
+
+    .qrp-items { display: flex; flex-direction: column; gap: 12px; }
+
+    .qrp-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 16px;
+      padding: 18px 20px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 14px;
+      align-items: center;
+      transition: border-color .15s;
+    }
+    .qrp-item:hover { border-color: rgba(255,255,255,.12); }
+    .qrp-item--paused { opacity: .65; }
+    .qrp-item--grace { border-color: rgba(255,200,80,.3); }
+    .qrp-item--expired,
+    .qrp-item--admin_blocked { opacity: .55; }
+
+    .qrp-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+    }
+    .qrp-status--active { background: rgba(74,222,128,.12); color: #6ee7b7; }
+    .qrp-status--paused { background: rgba(255,255,255,.08); color: rgba(255,255,255,.6); }
+    .qrp-status--grace { background: rgba(255,200,80,.12); color: #fbbf24; }
+    .qrp-status--expired,
+    .qrp-status--admin_blocked { background: rgba(248,113,113,.12); color: #f87171; }
+
+    .qrp-item-body { min-width: 0; }
+    .qrp-item-title {
+      font-size: .98rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .qrp-item-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: .78rem;
+      color: rgba(255,255,255,.55);
+    }
+    .qrp-item-meta .copy-btn {
+      background: none;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      padding: 2px 4px;
+      font-size: inherit;
+      font-family: 'SF Mono', Menlo, monospace;
+      border-radius: 4px;
+      transition: background .15s;
+    }
+    .qrp-item-meta .copy-btn:hover { background: rgba(255,255,255,.08); color: rgba(89,198,232,.85); }
+    .qrp-target {
+      max-width: 320px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .qrp-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .qrp-action {
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 8px;
+      color: rgba(255,255,255,.7);
+      cursor: pointer;
+      transition: all .15s;
+      font-size: .85rem;
+    }
+    .qrp-action:hover {
+      background: rgba(255,255,255,.08);
+      color: #fff;
+      border-color: rgba(255,255,255,.16);
+    }
+    .qrp-action--danger:hover {
+      background: rgba(248,113,113,.15);
+      border-color: rgba(248,113,113,.4);
+      color: #fca5a5;
+    }
+
+    /* Modal */
+    .qrp-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .qrp-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,.7);
+      backdrop-filter: blur(8px);
+    }
+    .qrp-modal-card {
+      position: relative;
+      background: #1a1a2e;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      padding: 28px;
+      max-width: 460px;
+      width: 100%;
+    }
+    .qrp-modal-card h3 { font-size: 1.15rem; margin-bottom: 6px; }
+    .qrp-modal-desc { color: rgba(255,255,255,.6); font-size: .85rem; margin-bottom: 18px; }
+    .qrp-modal-card label {
+      display: block;
+      font-size: .78rem;
+      color: rgba(255,255,255,.55);
+      margin-bottom: 6px;
+      margin-top: 14px;
+    }
+    .qrp-modal-card input {
+      width: 100%;
+      padding: 11px 14px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      color: #fff;
+      font-size: .92rem;
+      outline: none;
+    }
+    .qrp-modal-card input:focus { border-color: rgba(89,198,232,.4); }
+    .qrp-modal-error {
+      margin-top: 14px;
+      padding: 10px 12px;
+      background: rgba(248,113,113,.1);
+      border: 1px solid rgba(248,113,113,.25);
+      border-radius: 8px;
+      font-size: .85rem;
+      color: #fca5a5;
+    }
+    .qrp-modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 22px;
+    }
+    .qrp-btn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-size: .88rem;
+      font-weight: 500;
+      transition: all .15s;
+    }
+    .qrp-btn.ghost {
+      background: transparent;
+      color: rgba(255,255,255,.6);
+      border-color: rgba(255,255,255,.12);
+    }
+    .qrp-btn.ghost:hover { color: #fff; border-color: rgba(255,255,255,.2); }
+    .qrp-btn.primary {
+      background: linear-gradient(135deg, #6c0ae4, #210df7);
+      color: #fff;
+    }
+    .qrp-btn.primary:hover { transform: translateY(-1px); }
+    .qrp-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    @media (max-width: 640px) {
+      .qrp-item {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .qrp-actions { flex-wrap: wrap; }
+      .qrp-target { max-width: 100%; }
+    }
+  </style>
+
+  <script is:inline src="/scripts/qr-profile.js?v=20260512-qr-dynamic"></script>
+</BaseLayout>

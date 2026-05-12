@@ -26,6 +26,7 @@ export const ROUTES = {
   // ── Account ───────────────────────────
   account: "/account/",
   profile: "/profile/",
+  profileQrCodes: "/profile/qr-codes/",
   recarregar: "/recarregar/",
   delivery: "/delivery/",
   checkout: "/checkout/",
@@ -76,8 +77,10 @@ export const ROUTES = {
 
   // ── Admin (gated by profiles.is_admin) ───
   adminVouchers: "/admin/vouchers/",
+  adminQrCodes: "/admin/qr-codes/",
 
   // ── Other ─────────────────────────────
+  launch2026: "/launch-2026/",
   devJourney: "/dev-journey/",
   devJourneyStudent: "/dev-journey/student/",
   devJourneyChecklist: "/dev-journey/checklist/",
@@ -95,7 +98,7 @@ export const ROUTES = {
   daily: "https://daily.volynx.world",
 
   // ── External ──────────────────────────
-  whatsapp: "https://wa.me/447438656769",
+  whatsapp: "https://wa.me/447577991080",
   email: "mailto:hello@volynx.world",
 } as const;
 

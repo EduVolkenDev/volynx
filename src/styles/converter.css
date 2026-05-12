@@ -319,6 +319,19 @@ body {
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(10px);
+  animation: vx-border-pulse 4.4s ease-in-out infinite;
+  transition: transform 0.18s ease;
+}
+
+.drop:hover {
+  animation-play-state: paused;
+  transform: translateY(-1px);
+}
+
+.drop.drag { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .drop { animation: none; }
 }
 
 .drop input {

@@ -282,10 +282,20 @@ import { ROUTES } from "../data/routes";
     line-height: 1.05;
   }
   .accent {
-    background: linear-gradient(90deg, #6d5efc, #82dcff);
+    background: linear-gradient(90deg, #6d5efc, #82dcff, #b196ff, #6d5efc);
+    background-size: 220% 100%;
+    background-position: 0% 50%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    animation: e404AccentDrift 6s ease-in-out infinite;
+  }
+  @keyframes e404AccentDrift {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .accent { animation: none; background-position: 50% 50%; }
   }
 
   /* SUB */

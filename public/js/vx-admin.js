@@ -1,28 +1,42 @@
 /**
  * vx-admin.js — VOLYNX Platform Admin Mode
  *
- * For founder/staff with profiles.is_admin=true:
- *   • Sets window.VX_IS_ADMIN = true
- *   • Renders "∞" instead of the real token balance in the topbar pill
- *   • Injects a red "ADMIN" badge into the topbar so the mode is always visible
- *   • Overrides VxTokens.spend / canAfford → no-op success
- *   • Overrides VxGate.require / requireAuth → always allow
+ * Activates when the logged-in user is a platform admin. Detection (fast→slow):
+ *   1) JWT email matches an allowlist (founder accounts) — zero round-trips
+ *   2) JWT app_metadata.is_admin — zero round-trips
+ *   3) Supabase REST: profiles?select=is_admin — one fetch, cached 5 min
  *
- * Detection order (fail-open is safe; backend still enforces is_admin):
- *   1) JWT app_metadata.is_admin (zero round-trips)
- *   2) Supabase REST: profiles?select=is_admin (one fetch, cached for 5min)
- *
- * Load via PageWidgets.astro on every page that includes the topbar.
+ * Effects:
+ *   • window.VX_IS_ADMIN = true, <html>/<body>.classList += 'vx-admin'
+ *   • Topbar pill renders "∞" (MutationObserver)
+ *   • Injects a red "ADMIN" badge near the pill (or fixed top-right fallback)
+ *   • VxTokens.spend / canAfford → no-op success
+ *   • VxGate.require / requireAuth → always allow
+ *   • Console banner so you can confirm activation in DevTools
  */
 (function () {
   'use strict';
-
   if (typeof window === 'undefined') return;
+
+  // ── Founder allowlist (email-based, defensive) ─────────────────────
+  // Any account here is treated as admin even if the JWT hasn't been
+  // refreshed since the DB sync. Backend RLS / edge fns are still the
+  // real source of truth — this is a UX hint only.
+  var ADMIN_EMAIL_ALLOWLIST = [
+    'edupelomundo13@gmail.com',
+  ];
 
   var ADMIN_CACHE_KEY = 'volynx_is_admin';
   var ADMIN_CACHE_TS_KEY = 'volynx_is_admin_ts';
   var ADMIN_CACHE_TTL_MS = 5 * 60 * 1000;
   var INF = '∞';
+  var LOG_PREFIX = '[vx-admin]';
+
+  function log() {
+    try { console.log.apply(console, [LOG_PREFIX].concat([].slice.call(arguments))); } catch (_) {}
+  }
+
+  log('script loaded');
 
   function getJwt() {
     try { return localStorage.getItem('volynx_access_token') || ''; } catch (_) { return ''; }
@@ -62,7 +76,6 @@
     } catch (_) {}
   }
 
-  // Fallback: fetch profiles.is_admin via Supabase REST.
   async function fetchAdminViaRest(jwt) {
     try {
       var payload = decodeJwtPayload(jwt);
@@ -85,15 +98,23 @@
           },
         }
       );
-      if (!res.ok) return false;
+      if (!res.ok) {
+        log('REST fetch failed', res.status);
+        return false;
+      }
       var rows = await res.json();
       var row = Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
-      return !!(row && row.is_admin);
-    } catch (_) { return false; }
+      var isAdmin = !!(row && row.is_admin);
+      log('REST result', { isAdmin: isAdmin, row: row });
+      return isAdmin;
+    } catch (e) {
+      log('REST error', e);
+      return false;
+    }
   }
 
   function activateAdminMode() {
-    if (window.VX_IS_ADMIN) return; // already activated
+    if (window.VX_IS_ADMIN) return;
     window.VX_IS_ADMIN = true;
 
     var html = document.documentElement;
@@ -114,11 +135,11 @@
     } catch (_) {}
 
     try {
-      console.log('%c[VOLYNX] ADMIN MODE ACTIVE — all gates bypassed', 'color:#fff;background:#dc2626;padding:4px 8px;border-radius:4px;font-weight:bold;');
+      console.log('%c VOLYNX ADMIN ', 'color:#fff;background:#dc2626;padding:4px 10px;border-radius:4px;font-weight:bold;letter-spacing:1px;', 'mode active — gates bypassed, purchases simulated');
     } catch (_) {}
   }
 
-  // ── Force "∞" inside #vxTokenCount via MutationObserver ──
+  // ── Force "∞" in #vxTokenCount ──
   function forceInfinityInPill() {
     var observer = null;
     function patch() {
@@ -138,61 +159,114 @@
       observer.observe(el, { childList: true, characterData: true, subtree: true });
       patch();
     }
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', start);
-    } else {
-      start();
-    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+    else start();
   }
 
-  // ── Inject ADMIN badge near the token pill ──
-  function injectAdminBadge() {
-    function inject() {
-      if (document.getElementById('vxAdminBadge')) return;
-      var anchor = document.getElementById('vxTokenPill') || document.querySelector('.vx-token-pill') || document.querySelector('header');
-      if (!anchor) { setTimeout(inject, 300); return; }
+  // ── Inject ADMIN badge — Syne display, gold shimmer, ◆ Black-Diamond glyph ──
+  function ensureBadgeStyles() {
+    if (document.getElementById('vxAdminBadgeStyles')) return;
+    var fontLink = 'https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap';
+    if (!document.querySelector('link[data-vx-admin-font]')) {
+      var l = document.createElement('link');
+      l.rel = 'stylesheet';
+      l.href = fontLink;
+      l.setAttribute('data-vx-admin-font', '1');
+      document.head.appendChild(l);
+    }
+    var css = [
+      '#vxAdminBadge{',
+        'display:inline-flex;align-items:center;gap:6px;',
+        'padding:6px 13px 6px 11px;',
+        "font-family:'Syne',-apple-system,'Helvetica Neue',sans-serif;",
+        'font-weight:800;font-size:10.5px;line-height:1;',
+        'letter-spacing:.22em;text-transform:uppercase;',
+        'color:transparent;-webkit-background-clip:text;background-clip:text;',
+        'background-image:linear-gradient(110deg,#c9a85c 0%,#f3e1a0 30%,#fff7df 50%,#f3e1a0 70%,#c9a85c 100%);',
+        'background-size:220% 100%;background-position:0 0;',
+        'animation:vxAdminShimmer 4.2s ease-in-out infinite;',
+        'border-radius:999px;border:1px solid rgba(201,168,92,.35);',
+        // Layered glass + inner gold sheen
+        'box-shadow:',
+          '0 0 0 1px rgba(0,0,0,.4) inset,',
+          '0 1px 0 rgba(255,255,255,.06) inset,',
+          '0 8px 24px rgba(201,168,92,.18),',
+          '0 0 18px rgba(201,168,92,.22);',
+        'cursor:default;user-select:none;flex-shrink:0;',
+        'backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);',
+        'background-color:rgba(8,8,12,.72);',
+      '}',
+      // The ◆ symbol — separate gradient + slow rotate-shimmer
+      '#vxAdminBadge::before{',
+        'content:"\\25C6";',
+        '-webkit-text-fill-color:#f3e1a0;',
+        'color:#f3e1a0;',
+        'font-size:9px;letter-spacing:0;',
+        'text-shadow:0 0 8px rgba(243,225,160,.7),0 0 14px rgba(201,168,92,.45);',
+        'animation:vxAdminDiamondPulse 2.6s ease-in-out infinite;',
+        'transform-origin:center;',
+      '}',
+      '#vxAdminBadge.vx-admin-fixed{',
+        'position:fixed;top:14px;right:14px;z-index:99999;pointer-events:auto;',
+      '}',
+      '#vxAdminBadge:not(.vx-admin-fixed){',
+        'margin-right:8px;vertical-align:middle;',
+      '}',
+      '@keyframes vxAdminShimmer{',
+        '0%{background-position:0% 0;}',
+        '50%{background-position:100% 0;}',
+        '100%{background-position:0% 0;}',
+      '}',
+      '@keyframes vxAdminDiamondPulse{',
+        '0%,100%{opacity:.7;transform:scale(1) rotate(0deg);}',
+        '50%{opacity:1;transform:scale(1.18) rotate(45deg);}',
+      '}',
+      '@media (prefers-reduced-motion:reduce){',
+        '#vxAdminBadge{animation:none;background-position:50% 0;}',
+        '#vxAdminBadge::before{animation:none;opacity:.9;}',
+      '}',
+    ].join('');
+    var style = document.createElement('style');
+    style.id = 'vxAdminBadgeStyles';
+    style.textContent = css;
+    document.head.appendChild(style);
+  }
 
+  function injectAdminBadge() {
+    function buildBadge(fixed) {
       var badge = document.createElement('span');
       badge.id = 'vxAdminBadge';
+      if (fixed) badge.classList.add('vx-admin-fixed');
       badge.setAttribute('role', 'status');
       badge.setAttribute('aria-label', 'Platform admin mode active');
       badge.title = 'Platform admin — all gates bypassed, purchases simulated';
-      badge.textContent = 'ADMIN';
-      badge.style.cssText = [
-        'display:inline-flex',
-        'align-items:center',
-        'padding:4px 9px',
-        'margin-right:8px',
-        'font-family:system-ui,-apple-system,sans-serif',
-        'font-weight:700',
-        'font-size:10px',
-        'line-height:1',
-        'letter-spacing:.1em',
-        'color:#fff',
-        'background:linear-gradient(135deg,#dc2626 0%,#7f1d1d 100%)',
-        'border-radius:999px',
-        'border:1px solid rgba(255,255,255,.18)',
-        'box-shadow:0 2px 10px rgba(220,38,38,.35),inset 0 1px 0 rgba(255,255,255,.15)',
-        'cursor:default',
-        'user-select:none',
-        'flex-shrink:0',
-        'vertical-align:middle',
-      ].join(';');
+      badge.textContent = 'Admin';
+      return badge;
+    }
 
-      if (anchor.id === 'vxTokenPill' || anchor.classList.contains('vx-token-pill')) {
-        anchor.parentNode && anchor.parentNode.insertBefore(badge, anchor);
+    function inject() {
+      ensureBadgeStyles();
+      if (document.getElementById('vxAdminBadge')) return;
+
+      var pill = document.getElementById('vxTokenPill') || document.querySelector('.vx-token-pill');
+      if (pill && pill.parentNode) {
+        pill.parentNode.insertBefore(buildBadge(false), pill);
+        log('badge injected next to token pill');
+        return;
+      }
+
+      if (document.body) {
+        document.body.appendChild(buildBadge(true));
+        log('badge injected fixed top-right (no pill found)');
       } else {
-        anchor.appendChild(badge);
+        setTimeout(inject, 200);
       }
     }
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', inject);
-    } else {
-      inject();
-    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', inject);
+    else inject();
   }
 
-  // ── Override VxTokens — never deduct, never block ──
   function overrideVxTokens() {
     var attempts = 0;
     function patch() {
@@ -201,23 +275,19 @@
         setTimeout(patch, 100);
         return;
       }
-      var origSpend = window.VxTokens.spend;
       window.VxTokens.spend = function (tool, actionClass) {
-        try { console.debug('[vx-admin] spend bypassed', tool, actionClass); } catch (_) {}
+        log('spend bypassed', tool, actionClass);
         return Promise.resolve({ ok: true, balance: Infinity, spent: 0, admin_bypass: true });
       };
       window.VxTokens.canAfford = function () {
         return Promise.resolve({ enough: true, balance: Infinity, cost: 0, admin_bypass: true });
       };
-      // keep getBalance/cached working so the realtime channel doesn't blow up;
-      // the pill is already overridden at the DOM level.
       window.VxTokens._adminBypassActive = true;
-      window.VxTokens._origSpend = origSpend;
+      log('VxTokens patched');
     }
     patch();
   }
 
-  // ── Override VxGate — every plan check passes ──
   function overrideVxGate() {
     var attempts = 0;
     function patch() {
@@ -229,59 +299,84 @@
       window.VxGate.require = function () { return Promise.resolve(true); };
       window.VxGate.requireAuth = function () { return Promise.resolve(true); };
       window.VxGate._adminBypassActive = true;
+      log('VxGate patched');
     }
     patch();
   }
 
-  // ── Public API: explicit re-detect (e.g., after fresh login) ──
   window.VxAdmin = {
     isAdmin: function () { return !!window.VX_IS_ADMIN; },
-    refresh: function () {
-      clearAdminCache();
-      return detectAndActivate();
+    refresh: function () { clearAdminCache(); window.VX_IS_ADMIN = false; return detectAndActivate(); },
+    forceOn: function () { activateAdminMode(); writeCachedAdmin(true); },
+    forceOff: function () {
+      writeCachedAdmin(false);
+      window.VX_IS_ADMIN = false;
+      var b = document.getElementById('vxAdminBadge');
+      if (b && b.parentNode) b.parentNode.removeChild(b);
     },
   };
 
   async function detectAndActivate() {
     var jwt = getJwt();
-    if (!jwt) return false;
+    if (!jwt) {
+      log('no JWT — user not logged in, admin mode requires auth');
+      return false;
+    }
 
-    // Path 1: JWT app_metadata
     var payload = decodeJwtPayload(jwt);
-    if (payload && payload.app_metadata && payload.app_metadata.is_admin === true) {
+    var email = payload && payload.email ? String(payload.email).toLowerCase() : '';
+
+    // Path 1 — email allowlist (fastest, JWT-only)
+    if (email && ADMIN_EMAIL_ALLOWLIST.indexOf(email) !== -1) {
+      log('detected via email allowlist:', email);
       writeCachedAdmin(true);
       activateAdminMode();
       return true;
     }
 
-    // Path 2: cached
-    var cached = readCachedAdmin();
-    if (cached === true) {
+    // Path 2 — JWT app_metadata.is_admin
+    if (payload && payload.app_metadata && payload.app_metadata.is_admin === true) {
+      log('detected via JWT app_metadata.is_admin');
+      writeCachedAdmin(true);
       activateAdminMode();
-      // still verify in background to catch revoked admin
-      fetchAdminViaRest(jwt).then(function (fresh) { writeCachedAdmin(!!fresh); });
       return true;
     }
-    if (cached === false) return false;
 
-    // Path 3: REST fetch
+    // Path 3 — cached
+    var cached = readCachedAdmin();
+    if (cached === true) {
+      log('detected via cache');
+      activateAdminMode();
+      fetchAdminViaRest(jwt).then(function (fresh) {
+        writeCachedAdmin(!!fresh);
+        if (!fresh) log('cache stale — admin status revoked, will deactivate next reload');
+      });
+      return true;
+    }
+    if (cached === false) {
+      log('cached non-admin — re-checking REST anyway since DB may have changed');
+    }
+
+    // Path 4 — REST fetch
     var fresh = await fetchAdminViaRest(jwt);
     writeCachedAdmin(!!fresh);
     if (fresh) {
       activateAdminMode();
       return true;
     }
+    log('not admin');
     return false;
   }
 
-  // Run as soon as possible
-  detectAndActivate().catch(function () {});
+  detectAndActivate().catch(function (e) { log('detect failed', e); });
 
-  // Re-detect on storage changes (cross-tab login/logout)
   window.addEventListener('storage', function (e) {
     if (e.key === 'volynx_access_token') {
+      log('access token changed — re-detecting');
       clearAdminCache();
       window.VX_IS_ADMIN = false;
+      var b = document.getElementById('vxAdminBadge');
+      if (b && b.parentNode) b.parentNode.removeChild(b);
       detectAndActivate().catch(function () {});
     }
   });

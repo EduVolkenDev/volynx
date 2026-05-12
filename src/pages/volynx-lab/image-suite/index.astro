@@ -423,7 +423,15 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
 
       const safePct = Math.max(0, Math.min(100, Number.isFinite(pct) ? pct : 0));
       bgProgress.hidden = false;
+      bgProgress.dataset.active = "true";
       bgProgressFill.style.width = `${safePct}%`;
+
+      // While we have no real progress yet (pct≤0) show an indeterminate
+      // shimmer on the bar so the UI never reads as frozen.
+      const bar = bgProgressFill.parentElement;
+      if (bar) {
+        bar.dataset.indeterminate = safePct <= 0 ? "true" : "false";
+      }
 
       // 100% always wins regardless of key — fixes the bug where the label
       // got stuck on "Loading AI model..." after the image was already
@@ -431,6 +439,8 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       // the wrong branch.
       if (safePct >= 100) {
         bgProgressLabel.textContent = t("suite.bg_done", "Done!");
+        if (bar) bar.dataset.indeterminate = "false";
+        bgProgress.dataset.active = "false";
         window.setTimeout(() => {
           if (bgProgress) bgProgress.hidden = true;
         }, 900);
@@ -438,9 +448,23 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       }
 
       if (key?.startsWith("fetch")) {
-        bgProgressLabel.textContent = `${t("suite.bg_downloading", "Downloading model...")} ${safePct}%`;
+        bgProgressLabel.textContent = safePct > 0
+          ? `${t("suite.bg_downloading", "Downloading model...")} ${safePct}%`
+          : t("suite.bg_downloading", "Downloading model...");
       } else if (key === "compute:inference" || key === "process" || key === "compute") {
-        bgProgressLabel.textContent = `${t("suite.bg_removing", "Removing background...")} ${safePct}%`;
+        bgProgressLabel.textContent = safePct > 0
+          ? `${t("suite.bg_removing", "Removing background...")} ${safePct}%`
+          : t("suite.bg_removing", "Removing background...");
+      } else if (key === "upscale") {
+        bgProgressLabel.textContent = safePct > 0
+          ? `${t("suite.upscaling", "AI upscaling...")} ${safePct}%`
+          : t("suite.upscaling", "AI upscaling...");
+      } else if (key === "encode") {
+        bgProgressLabel.textContent = t("suite.encoding", "Encoding...");
+      } else if (key === "compress") {
+        bgProgressLabel.textContent = t("suite.compressing", "Compressing...");
+      } else if (key === "scale") {
+        bgProgressLabel.textContent = t("suite.scaling", "Resizing...");
       } else {
         bgProgressLabel.textContent = t("suite.bg_progress", "Loading AI model...");
       }
@@ -831,11 +855,16 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       try {
         const upscaler = await initAIUpscaler();
         setDropMessage('AI upscaling… 0%');
+        updateProgressUI(0, 'upscale');
         const base64 = await upscaler.upscale(img, {
           output: 'base64',
           patchSize: 64,
           padding: 4,
-          progress: (pct) => { setDropMessage(`AI upscaling… ${Math.round(pct * 100)}%`); }
+          progress: (pct) => {
+            const p = Math.round(pct * 100);
+            setDropMessage(`AI upscaling… ${p}%`);
+            updateProgressUI(p, 'upscale');
+          }
         });
         const upscaledImg = new Image();
         upscaledImg.src = base64;
@@ -927,6 +956,10 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         throw new Error("Failed to create canvas context.");
       }
 
+      // Surface activity for non-AI tools too — even sub-second ops need feedback.
+      if (tool === "compress") updateProgressUI(0, "compress");
+      else if (tool !== "upscale") updateProgressUI(0, "scale");
+
       if (tool === "upscale") {
         const aiCanvas = await aiUpscaleToCanvas(img, scale);
         if (aiCanvas) {
@@ -947,11 +980,13 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         ctx.drawImage(img, 0, 0);
       }
 
+      updateProgressUI(70, "encode");
       const blob = await canvasToBlob(
         canvas,
         mime,
         tool === "compress" ? quality : 0.95
       );
+      updateProgressUI(100, "done");
 
       // Compress protection: if output grew, preserve original
       const M = window.VxFileMetrics;

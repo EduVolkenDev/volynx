@@ -384,23 +384,32 @@ body {
   text-align: center;
   cursor: pointer;
   background: rgba(255, 255, 255, .02);
-  transition: border-color 0.18s ease, background 0.18s ease;
+  transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+  animation: vx-border-pulse 4s ease-in-out infinite;
 }
 
 .drop:hover {
   border-color: rgba(255, 255, 255, .5);
   background: rgba(255, 255, 255, .04);
+  animation-play-state: paused;
+  transform: translateY(-1px);
 }
 
 .drop.drag {
   border-color: rgba(255, 255, 255, .55);
   background: rgba(255, 255, 255, .08);
+  animation-play-state: paused;
 }
 
 .drop .icon {
   display: block;
   font-size: 24px;
   margin-bottom: 8px;
+  animation: vx-icon-float 3.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drop, .drop .icon { animation: none; }
 }
 
 .drop p {
@@ -474,6 +483,7 @@ body {
   background: rgba(255, 255, 255, .08);
   border-radius: 999px;
   overflow: hidden;
+  position: relative;
 }
 
 .bg-progress__fill {
@@ -481,6 +491,54 @@ body {
   background: linear-gradient(90deg, rgba(92, 146, 255, .95), rgba(217, 92, 255, .92));
   border-radius: 999px;
   transition: width 0.2s ease;
+  position: relative;
+}
+
+/* Indeterminate state — when width=0 we still show motion so it never feels frozen.
+   The pseudo-element scrolls a translucent stripe across the bar background. */
+.bg-progress__bar[data-indeterminate="true"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(92, 146, 255, .55) 35%,
+    rgba(217, 92, 255, .55) 65%,
+    transparent 100%
+  );
+  background-size: 40% 100%;
+  background-repeat: no-repeat;
+  animation: bgIndeterminateScroll 1.4s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes bgIndeterminateScroll {
+  0%   { background-position: -40% 0; }
+  100% { background-position: 140% 0; }
+}
+
+/* Label gently breathes while loading so the page reads as "alive". */
+.bg-progress[data-active="true"] .bg-progress__label {
+  animation: bgLabelBreath 1.8s ease-in-out infinite;
+}
+
+@keyframes bgLabelBreath {
+  0%, 100% { opacity: 0.65; }
+  50%      { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-progress__bar[data-indeterminate="true"]::before {
+    animation: none;
+    opacity: 0.45;
+    background-position: 50% 0;
+  }
+  .bg-progress[data-active="true"] .bg-progress__label {
+    animation: none;
+    opacity: 0.85;
+  }
 }
 
 select,
@@ -560,6 +618,25 @@ input[type="range"] {
   justify-content: center;
   overflow: hidden;
   position: relative;
+}
+
+/* Empty preview gets a slow ambient glow so the surface never reads dead. */
+.preview-shell[data-state="empty"]::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 12px;
+  background: radial-gradient(circle at 50% 40%, rgba(92,146,255,0.10), transparent 65%);
+  opacity: 0.4;
+  animation: vxPreviewGlow 4.6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes vxPreviewGlow {
+  0%, 100% { opacity: 0.30; }
+  50%      { opacity: 0.65; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .preview-shell[data-state="empty"]::before { animation: none; opacity: 0.4; }
 }
 
 .preview-shell[data-state="empty"] .preview {

@@ -377,6 +377,11 @@ body {
 }
 
 /* ===== DROP ZONE ===== */
+@keyframes vx-cyan-border-pulse {
+  0%, 100% { border-color: rgba(9, 255, 243, 0.45); box-shadow: 0 0 0 0 rgba(9, 255, 243, 0); }
+  50%      { border-color: rgba(9, 255, 243, 0.85); box-shadow: 0 0 18px rgba(9, 255, 243, 0.18); }
+}
+
 .drop {
   border: 2px dashed rgba(9, 255, 243, 0.6);
   border-radius: 18px;
@@ -389,17 +394,29 @@ body {
   justify-content: center;
   cursor: pointer;
   padding: 16px;
-  transition: border-color 0.18s ease, background 0.18s ease;
+  transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+  animation: vx-cyan-border-pulse 4.2s ease-in-out infinite;
+}
+
+.drop:hover {
+  animation-play-state: paused;
+  transform: translateY(-1px);
 }
 
 .drop.drag {
   border-color: rgba(255, 255, 255, .5);
   background: rgba(80, 120, 255, .10);
+  animation-play-state: paused;
 }
 
 .drop .icon {
   font-size: 36px;
   opacity: .9;
+  animation: vx-icon-float 3.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drop, .drop .icon { animation: none; }
 }
 
 .drop p {
