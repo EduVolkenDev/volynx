@@ -1037,6 +1037,16 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       updateProUI();
       updateFieldVisibility(toolEl?.value || "upscale");
     }
+    function applyInitialToolFromUrl() {
+      try {
+        const requestedTool = new URLSearchParams(window.location.search).get("tool");
+        if (!requestedTool || !toolEl) return;
+        const hasOption = Array.from(toolEl.options).some((option) => option.value === requestedTool);
+        if (hasOption) toolEl.value = requestedTool;
+      } catch {}
+    }
+
+    applyInitialToolFromUrl();
     const proReady = detectPro();
 
     qualityEl.addEventListener("input", () => {

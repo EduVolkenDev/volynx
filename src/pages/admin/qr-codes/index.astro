@@ -1,0 +1,300 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import VxHeader from "../../../components/VxHeader.astro";
+import VxFooter from "../../../components/VxFooter.astro";
+import PageWidgets from "../../../components/PageWidgets.astro";
+import { ROUTES } from "../../../data/routes";
+
+const title = "Admin · QR Codes — VOLYNX";
+const description = "Admin controls for dynamic QR code validity, expiry and blocking.";
+---
+
+<BaseLayout title={title} description={description}>
+  <VxHeader primaryCtaLabel="Sign out" primaryCtaI18n="djs.sign_out" primaryCtaHref="/login/?logout=1" primaryCtaAuth="in" />
+  <PageWidgets hideUtilBar />
+
+  <main class="qra-shell">
+    <div class="qra-container">
+      <section id="qraLoading" class="qra-state">
+        <p>Loading admin context...</p>
+      </section>
+
+      <section id="qraLoggedOut" class="qra-state" hidden>
+        <h1>Sign in required</h1>
+        <p>The QR admin is gated to platform admins.</p>
+        <a class="qra-btn primary" href={`${ROUTES.login}?next=${ROUTES.adminQrCodes}`}>Sign in</a>
+      </section>
+
+      <section id="qraForbidden" class="qra-state" hidden>
+        <h1>Forbidden</h1>
+        <p>Your account does not have admin privileges.</p>
+        <a class="qra-btn ghost" href={ROUTES.home}>Back to home</a>
+      </section>
+
+      <section id="qraAdmin" class="qra-admin" hidden>
+        <header class="qra-head">
+          <div>
+            <span class="qra-kicker">Admin · QR Codes</span>
+            <h1>Control dynamic QR validity</h1>
+            <p>Expire, renew, pause or block dynamic QR links without touching the user's destination URL.</p>
+          </div>
+          <div class="qra-head-actions">
+            <a class="qra-btn ghost" href={ROUTES.profileQrCodes}>User manager</a>
+            <a class="qra-btn ghost" href={ROUTES.labQrGen}>Create QR</a>
+          </div>
+        </header>
+
+        <form id="qraFilters" class="qra-filters">
+          <label>
+            <span>Status</span>
+            <select id="qraStatus">
+              <option value="">All</option>
+              <option value="active">Active</option>
+              <option value="paused">Paused</option>
+              <option value="grace">Grace</option>
+              <option value="expired">Expired</option>
+              <option value="admin_blocked">Blocked</option>
+            </select>
+          </label>
+          <label>
+            <span>Search</span>
+            <input id="qraSearch" type="search" placeholder="slug, email, label or URL" />
+          </label>
+          <label>
+            <span>Limit</span>
+            <input id="qraLimit" type="number" min="1" max="500" value="100" />
+          </label>
+          <button class="qra-btn primary" type="submit">Refresh</button>
+        </form>
+
+        <p id="qraMessage" class="qra-message" aria-live="polite"></p>
+        <div id="qraList" class="qra-list"></div>
+      </section>
+    </div>
+  </main>
+
+  <VxFooter />
+
+  <style>
+    body { background: #070911; color: rgba(255,255,255,.9); }
+
+    .qra-shell {
+      min-height: calc(100vh - 180px);
+      padding: 96px 20px 72px;
+    }
+
+    .qra-container {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .qra-state {
+      padding: 56px 20px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.035);
+      border-radius: 8px;
+    }
+
+    .qra-state h1 { margin: 0 0 10px; }
+    .qra-state p { color: rgba(255,255,255,.62); }
+
+    .qra-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    .qra-kicker {
+      display: inline-block;
+      margin-bottom: 8px;
+      color: rgba(124,244,255,.8);
+      font-size: 12px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .qra-head h1 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 5vw, 48px);
+      letter-spacing: 0;
+      line-height: 1.05;
+    }
+
+    .qra-head p {
+      max-width: 650px;
+      margin: 0;
+      color: rgba(255,255,255,.62);
+      line-height: 1.55;
+    }
+
+    .qra-head-actions,
+    .qra-filters {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .qra-filters {
+      padding: 14px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      border-radius: 8px;
+    }
+
+    .qra-filters label,
+    .qra-control label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      color: rgba(255,255,255,.58);
+      font-size: 12px;
+    }
+
+    .qra-filters input,
+    .qra-filters select,
+    .qra-control input,
+    .qra-control select {
+      min-height: 40px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(0,0,0,.28);
+      color: #fff;
+      padding: 8px 10px;
+    }
+
+    .qra-filters input[type="search"] { width: min(340px, 70vw); }
+    .qra-filters input[type="number"] { width: 92px; }
+
+    .qra-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 9px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.12);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      background: rgba(255,255,255,.05);
+    }
+
+    .qra-btn.primary {
+      background: linear-gradient(135deg, #6d5efc, #7cf4ff);
+      border-color: transparent;
+      color: #050710;
+    }
+
+    .qra-btn.danger:hover { border-color: rgba(255,110,110,.45); color: #ffb4b4; }
+    .qra-btn:disabled { opacity: .55; cursor: not-allowed; }
+
+    .qra-message {
+      min-height: 22px;
+      margin: 0 0 12px;
+      color: rgba(255,255,255,.65);
+      font-size: 13px;
+    }
+
+    .qra-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .qra-row {
+      display: grid;
+      grid-template-columns: minmax(260px, 1.35fr) minmax(430px, 1.8fr);
+      gap: 18px;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      border-radius: 8px;
+    }
+
+    .qra-row-main { min-width: 0; }
+    .qra-titleline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .qra-label {
+      font-weight: 800;
+      color: rgba(255,255,255,.94);
+    }
+
+    .qra-status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      background: rgba(255,255,255,.08);
+    }
+
+    .qra-status--active { color: #6ee7b7; background: rgba(110,231,183,.12); }
+    .qra-status--paused { color: rgba(255,255,255,.68); }
+    .qra-status--grace { color: #facc15; background: rgba(250,204,21,.12); }
+    .qra-status--expired,
+    .qra-status--admin_blocked { color: #fca5a5; background: rgba(248,113,113,.12); }
+
+    .qra-meta {
+      display: grid;
+      gap: 6px;
+      color: rgba(255,255,255,.58);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .qra-meta code {
+      color: #8fefff;
+      background: rgba(124,244,255,.08);
+      border-radius: 6px;
+      padding: 2px 6px;
+      user-select: all;
+    }
+
+    .qra-meta a { color: rgba(124,244,255,.86); overflow-wrap: anywhere; }
+
+    .qra-control {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(130px, 1fr));
+      gap: 10px;
+      align-items: end;
+    }
+
+    .qra-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    @media (max-width: 860px) {
+      .qra-row { grid-template-columns: 1fr; }
+      .qra-control { grid-template-columns: 1fr; }
+      .qra-filters { align-items: stretch; }
+      .qra-filters label,
+      .qra-filters input,
+      .qra-filters select,
+      .qra-filters button { width: 100%; }
+    }
+  </style>
+
+  <script is:inline src="/scripts/qr-admin.js?v=20260512-validity"></script>
+</BaseLayout>
