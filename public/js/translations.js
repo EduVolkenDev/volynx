@@ -2469,6 +2469,25 @@ window.VX_TRANS = {
     "delivery.kit.tier_pro":         "Pro license",
     "delivery.kit.tier_studio":      "Studio license",
 
+    /* === TIKTOK LANDING === */
+    "tt.eyebrow":      "From TikTok",
+    "tt.hook":         "Why your photo shouldn't go to a server.",
+    "tt.subhook":      "Remove backgrounds in your browser. The image never leaves your computer. Free to try, no signup.",
+    "tt.cta_primary":  "Try the background remover",
+    "tt.cta_note":     "No signup. Works offline after first load.",
+    "tt.proof_1_title": "Zero upload",
+    "tt.proof_1_desc":  "U²-Net model runs in your browser via WebAssembly. No server processes your file.",
+    "tt.proof_2_title": "Zero per-use cost",
+    "tt.proof_2_desc":  "Loads once, ~170MB cached. Run on as many images as you want, online or offline.",
+    "tt.proof_3_title": "Apache 2.0",
+    "tt.proof_3_desc":  "Open-source model. No vendor lock-in. Same engine you'd find in research papers.",
+    "tt.how_title":    "How it works",
+    "tt.how_1":        "Drop your image",
+    "tt.how_2":        "Wait ~4 seconds (first time loads the model)",
+    "tt.how_3":        "Download the cutout — transparent PNG",
+    "tt.cta_secondary": "Open the tool",
+    "tt.explore":      "Or explore the full VOLYNX platform →",
+
   },
 
   pt: {
@@ -4936,6 +4955,25 @@ window.VX_TRANS = {
     "delivery.kit.tier_starter":     "Licença Starter",
     "delivery.kit.tier_pro":         "Licença Pro",
     "delivery.kit.tier_studio":      "Licença Studio",
+
+    /* === TIKTOK LANDING === */
+    "tt.eyebrow":      "Do TikTok",
+    "tt.hook":         "Por que sua foto NÃO devia ir pra servidor.",
+    "tt.subhook":      "Remove fundos no seu navegador. A imagem nunca sai do seu computador. Grátis pra testar, sem cadastro.",
+    "tt.cta_primary":  "Testar o removedor de fundo",
+    "tt.cta_note":     "Sem cadastro. Funciona offline depois do primeiro uso.",
+    "tt.proof_1_title": "Zero upload",
+    "tt.proof_1_desc":  "Modelo U²-Net roda no seu navegador via WebAssembly. Nenhum servidor processa seu arquivo.",
+    "tt.proof_2_title": "Zero custo por uso",
+    "tt.proof_2_desc":  "Carrega uma vez, ~170MB em cache. Processa quantas imagens quiser, online ou offline.",
+    "tt.proof_3_title": "Apache 2.0",
+    "tt.proof_3_desc":  "Modelo open-source. Sem aprisionamento. Mesma engine que você acha em papers de pesquisa.",
+    "tt.how_title":    "Como funciona",
+    "tt.how_1":        "Solta sua imagem",
+    "tt.how_2":        "Espera ~4 segundos (primeira vez carrega o modelo)",
+    "tt.how_3":        "Baixa o recorte — PNG transparente",
+    "tt.cta_secondary": "Abrir a ferramenta",
+    "tt.explore":      "Ou explore a plataforma VOLYNX completa →",
 
   }
 };
