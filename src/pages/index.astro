@@ -2,543 +2,1379 @@
 import FlagshipLayout from "../layouts/FlagshipLayout.astro";
 import FlagshipHeader from "../components/FlagshipHeader.astro";
 import FlagshipFooter from "../components/FlagshipFooter.astro";
-import "../styles/home-premium.css";
+import PlatformAssistStrip from "../components/PlatformAssistStrip.astro";
 import { ROUTES } from "../data/routes";
 
-const title = "VOLYNX — Build faster. Launch smarter.";
-const description = "AI-assisted web creation, designed for premium output. From idea to live page without losing design quality. One ecosystem for design, automation, publishing and growth.";
-
-// Marquee items — short tokens that compose the platform identity
-const marqueeItems = [
-  "Builder", "Daily", "CVitae", "Lab", "Studio Pro",
-  "AI assist", "Premium kits", "Live preview", "Custom domains", "Black Diamond",
+const homeAssistItems = [
+  { href: ROUTES.products, label: { en: "Explore", pt: "Explorar" }, title: { en: "Browse products", pt: "Ver produtos" }, copy: { en: "Jump straight into kits, tools, PropertyFlow and the Icons Store.", pt: "Vá direto para kits, ferramentas, PropertyFlow e Icons Store." }, emphasized: true, iconSrc: "/assets/allproducts.webp" },
+  { href: ROUTES.daily, label: { en: "Workspace", pt: "Workspace" }, title: { en: "Open Daily", pt: "Abrir Daily" }, copy: { en: "Go back to My Day, Vault, Summary, Writing and the rest of the daily system.", pt: "Volte para My Day, Vault, Summary, Writing e o resto do sistema diário." }, iconSrc: "/assets/daily-icon.webp" },
+  { href: ROUTES.delivery, label: { en: "Post-purchase", pt: "Pós-compra" }, title: { en: "My products", pt: "Meus produtos" }, copy: { en: "Recover downloads, check access and reopen purchased product paths.", pt: "Recupere downloads, verifique acessos e reabra os produtos comprados." }, iconSrc: "/assets/mybox.webp" },
+  { href: ROUTES.support, label: { en: "Help", pt: "Ajuda" }, title: { en: "Open support", pt: "Abrir suporte" }, copy: { en: "Route launch, billing and access issues without losing context.", pt: "Direcione questões de lançamento, cobrança e acesso sem perder contexto." }, iconSrc: "/assets/support-gold.webp" },
 ];
-// Doubled for seamless loop
-const marqueeLoop = [...marqueeItems, ...marqueeItems];
 ---
-
-<FlagshipLayout title={title} description={description} pageClass="page-home-premium">
-  <FlagshipHeader current="/" ctaLabel="Open Builder" ctaI18n="homevx.hero_cta_primary" ctaHref={ROUTES.builder} />
-
+<FlagshipLayout title="VOLYNX — Building a Smarter Future" pageClass="page-home">
+  <FlagshipHeader current={ROUTES.home} ctaLabel="Open Builder" ctaI18n="nav.open_builder" ctaHref={ROUTES.builder} />
   <main>
-    <!-- ════════════════════════════════════════════════════════════
-         1) HERO — animated gradient mesh, floating particles,
-                   scramble headline, magnetic CTA, lynx-eye chrome ring
-         ════════════════════════════════════════════════════════════ -->
-    <section class="hp-section hp-hero">
-      <div class="hp-mesh" aria-hidden="true">
-        <div class="hp-mesh__layer hp-mesh__layer--a"></div>
-        <div class="hp-mesh__layer hp-mesh__layer--b"></div>
-        <div class="hp-mesh__layer hp-mesh__layer--c"></div>
-        <div class="hp-mesh__layer hp-mesh__layer--d"></div>
-      </div>
-      <div class="hp-particles" aria-hidden="true">
-        <span class="hp-particle"></span><span class="hp-particle"></span><span class="hp-particle"></span>
-        <span class="hp-particle"></span><span class="hp-particle"></span><span class="hp-particle"></span>
-        <span class="hp-particle"></span><span class="hp-particle"></span><span class="hp-particle"></span>
-        <span class="hp-particle"></span><span class="hp-particle"></span><span class="hp-particle"></span>
-      </div>
 
-      <div class="hp-shell">
-        <div class="hp-hero__grid">
-          <div class="hp-hero__copy">
-            <span class="hp-eyebrow hp-reveal" data-i18n="homevx.hero_eyebrow">VOLYNX</span>
-            <h1 class="hp-h1 hp-scramble hp-reveal hp-reveal--delay-1" data-i18n="homevx.hero_title">Build faster. Launch smarter.</h1>
-            <p class="hp-lead hp-reveal hp-reveal--delay-2" data-i18n="homevx.hero_sub">
-              AI-assisted web creation, designed for premium output. From idea to live page without losing design quality.
-            </p>
-            <div class="hp-hero__cta-row hp-reveal hp-reveal--delay-3">
-              <a href={ROUTES.builder} class="hp-btn hp-btn--primary hp-magnetic">
-                <span data-i18n="homevx.hero_cta_primary">Build with VOLYNX</span>
-                <span class="hp-btn__arrow" aria-hidden="true">→</span>
-              </a>
-              <a href={ROUTES.platform} class="hp-btn hp-btn--ghost">
-                <span data-i18n="homevx.hero_cta_secondary">Explore the ecosystem</span>
-              </a>
-            </div>
+    <!-- ═══ HERO (v2 — premium emotional) ═══ -->
+    <section class="hero-v2">
+      <div class="hero-v2__bg" aria-hidden="true"></div>
+      <div class="shell hero-v2__inner">
+        <div class="hero-v2__copy">
+          <div class="hero-v2__pill">
+            <span class="hero-v2__pill-dot" aria-hidden="true"></span>
+            <span data-i18n="home2.kicker_flagship">Ecossistema Premium</span>
           </div>
 
-          <div class="hp-hero__visual hp-reveal hp-reveal--delay-2" aria-hidden="true">
-            <div class="hp-hero__chrome-ring"></div>
-            <img src="/assets/dark-icon-light.webp" alt="" width="560" height="560" loading="eager" decoding="async" fetchpriority="high" />
+          <h1 class="hero-v2__title" data-i18n-html="home2.hero_title_html">
+            Crie sites, ferramentas e ativos digitais premium<br />
+            <span class="gradient-text">com uma única conta VOLYNX</span>
+          </h1>
+
+          <p class="hero-v2__desc" data-i18n-html="home2.hero_subtitle_html">
+            Comece grátis com Daily, CVitae e Lab — ou lance um site profissional com Builder e serviços sob medida.
+          </p>
+
+          <div class="hero-v2__actions">
+            <a href="#ecosystem" class="hero-v2__cta-main" data-i18n="home2.btn_start_free">Começar grátis agora</a>
+            <a href={ROUTES.products} class="hero-v2__cta-ghost" data-i18n="home2.btn_view_kits">Ver os produtos</a>
+          </div>
+
+          <div class="hero-v2__trust">
+            <span><span class="check">✓</span> <span data-i18n="home2.trust_free">Free generoso</span></span>
+            <span><span class="check">✓</span> <span data-i18n="home2.trust_no_card">Sem cartão até precisar</span></span>
+            <span><span class="check">✓</span> <span data-i18n="home2.trust_pt">Suporte em português</span></span>
+          </div>
+        </div>
+
+        <div class="hero-v2__visual">
+          <div class="hero-v2__mockup">
+            <div class="hero-v2__mockup-glow" aria-hidden="true"></div>
+            <a href="https://daily.volynx.world/" class="hero-v2__mockup-chip" aria-label="Open VOLYNX Daily" data-i18n-aria="home2.mockup_daily_aria">
+              <img src="/assets/volynx-daily.webp" alt="VOLYNX Daily" />
+            </a>
+            <p class="hero-v2__mockup-title" data-i18n="home2.mockup_title">Seu dia mais inteligente e organizado começa aqui</p>
+            <div class="hero-v2__mockup-grid">
+              <a href="https://daily.volynx.world/tools/my-day/"   class="hero-v2__mockup-tag"><img src="/assets/myday.webp"    alt="">My Day</a>
+              <a href="https://daily.volynx.world/tools/scanner/"  class="hero-v2__mockup-tag"><img src="/assets/scanner.webp"  alt="">Smart Scanner</a>
+              <a href="https://daily.volynx.world/tools/summary/"  class="hero-v2__mockup-tag"><img src="/assets/summary.webp"  alt="">Universal Summary</a>
+              <a href="https://daily.volynx.world/tools/vault/"    class="hero-v2__mockup-tag"><img src="/assets/vault.webp"    alt="">Smart Vault</a>
+              <a href="https://daily.volynx.world/tools/writing/"  class="hero-v2__mockup-tag"><img src="/assets/writing.webp"  alt="">Writing Studio</a>
+              <a href="https://daily.volynx.world/tools/decision/" class="hero-v2__mockup-tag"><img src="/assets/decision.webp" alt="">Decision Desk</a>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ════════════════════════════════════════════════════════════
-         MARQUEE — what lives inside the platform
-         ════════════════════════════════════════════════════════════ -->
-    <div class="hp-marquee" aria-hidden="true">
-      <div class="hp-marquee__track">
-        {marqueeLoop.map((item) => (
-          <span class="hp-marquee__item">{item}</span>
-        ))}
-      </div>
+    <PlatformAssistStrip eyebrow={{ en: "Platform flow", pt: "Fluxo da plataforma" }} title={{ en: "Already inside VOLYNX?", pt: "Já dentro do VOLYNX?" }} description={{ en: "Move between discovery, daily work, purchases and support without hunting through the navigation.", pt: "Navegue entre descoberta, trabalho diário, compras e suporte sem caçar na navegação." }} items={homeAssistItems} />
+
+    <!-- floating: Ecosystem -->
+    <div class="section-float section-float--right" aria-hidden="true">
+      <img src="/assets/ecosystem.webp" alt="" loading="lazy" />
     </div>
 
-    <!-- ════════════════════════════════════════════════════════════
-         2) PLATFORM VALUE — 4 large blocks, not cards
-         ════════════════════════════════════════════════════════════ -->
-    <section class="hp-section">
-      <div class="hp-orb hp-orb--lilac hp-orb--anim-1" style="top:10%;right:-20%;opacity:0.5;" aria-hidden="true"></div>
-
-      <div class="hp-shell">
-        <div class="hp-value__head">
-          <span class="hp-eyebrow hp-reveal" data-i18n="homevx.value_eyebrow">What is VOLYNX</span>
-          <h2 class="hp-h2 hp-reveal hp-reveal--delay-1" data-i18n="homevx.value_title">
-            One ecosystem for design, automation, publishing and growth.
-          </h2>
-          <p class="hp-lead hp-reveal hp-reveal--delay-2" data-i18n="homevx.value_sub">
-            We build the layer between AI capability and premium output. Design quality stays. Speed compounds.
-          </p>
-        </div>
-
-        <div class="hp-value__grid">
-          <article class="hp-value__block hp-value__block--gold hp-reveal">
-            <div class="hp-value__num">01</div>
-            <h3 class="hp-h3" data-i18n="homevx.value_b1_t">Design quality, end to end.</h3>
-            <p class="hp-body" data-i18n="homevx.value_b1_d">
-              Premium output by default — kits, sections and components engineered for taste, not templates.
-            </p>
-          </article>
-          <article class="hp-value__block hp-value__block--lilac hp-reveal hp-reveal--delay-1">
-            <div class="hp-value__num">02</div>
-            <h3 class="hp-h3" data-i18n="homevx.value_b2_t">AI-assisted, not AI-replaced.</h3>
-            <p class="hp-body" data-i18n="homevx.value_b2_d">
-              Smart drafts you actually ship. AI accelerates the work; you stay in control of the result.
-            </p>
-          </article>
-          <article class="hp-value__block hp-value__block--cyan hp-reveal hp-reveal--delay-2">
-            <div class="hp-value__num">03</div>
-            <h3 class="hp-h3" data-i18n="homevx.value_b3_t">Workflows that don't fight you.</h3>
-            <p class="hp-body" data-i18n="homevx.value_b3_d">
-              Tools, tokens, automations and publishing in one place. No tab graveyard.
-            </p>
-          </article>
-          <article class="hp-value__block hp-value__block--chrome hp-reveal hp-reveal--delay-3">
-            <div class="hp-value__num">04</div>
-            <h3 class="hp-h3" data-i18n="homevx.value_b4_t">Live in minutes, not weeks.</h3>
-            <p class="hp-body" data-i18n="homevx.value_b4_d">
-              Static-first publishing on your domain. From draft to deploy in a single confident motion.
-            </p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- ════════════════════════════════════════════════════════════
-         2b) STATS STRIP — counters animate up on first view
-         ════════════════════════════════════════════════════════════ -->
-    <section class="hp-stats-section">
-      <div class="hp-shell">
-        <div class="hp-stats hp-reveal">
-          <div class="hp-stats__cell">
-            <div class="hp-stats__num"><span class="hp-counter" data-target="8">0</span></div>
-            <p class="hp-stats__label" data-i18n="homevx.stats_1">Months in motion</p>
-          </div>
-          <div class="hp-stats__cell">
-            <div class="hp-stats__num"><span class="hp-counter" data-target="5">0</span></div>
-            <p class="hp-stats__label" data-i18n="homevx.stats_2">Live products</p>
-          </div>
-          <div class="hp-stats__cell">
-            <div class="hp-stats__num"><span class="hp-counter" data-target="100">0</span><span class="hp-stats__suffix">%</span></div>
-            <p class="hp-stats__label" data-i18n="homevx.stats_3">Static delivery</p>
-          </div>
-          <div class="hp-stats__cell">
-            <div class="hp-stats__num"><span class="hp-counter" data-target="inf">∞</span></div>
-            <p class="hp-stats__label" data-i18n="homevx.stats_4">Possibilities</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ════════════════════════════════════════════════════════════
-         3) BUILDER SPOTLIGHT — strategic dark moment, conversion-focused
-         ════════════════════════════════════════════════════════════ -->
-    <section class="hp-section hp-builder">
-      <div class="hp-shell">
-        <div class="hp-builder__grid">
-          <div class="hp-builder__copy">
-            <span class="hp-eyebrow hp-reveal" data-i18n="homevx.builder_eyebrow">VOLYNX Builder</span>
-            <h2 class="hp-h2 hp-reveal hp-reveal--delay-1" data-i18n="homevx.builder_title">
-              From idea to live page — without losing design quality.
+    <!-- ═══ REDEEM CODE WIDGET ═══ -->
+    <section class="page-section redeem-section" id="redeem" aria-label="Redeem code">
+      <div class="shell">
+        <article class="panel redeem-panel">
+          <div class="redeem-copy">
+            <span class="redeem-eyebrow">
+              <span class="redeem-dot" aria-hidden="true"></span>
+              <span class="i18n-en">Have a code or invite?</span>
+              <span class="i18n-pt">Tem um código ou convite?</span>
+            </span>
+            <h2 class="redeem-title">
+              <span class="i18n-en">Apply your voucher</span>
+              <span class="i18n-pt">Use seu voucher</span>
             </h2>
-            <p class="hp-lead hp-reveal hp-reveal--delay-2" data-i18n="homevx.builder_sub">
-              Pick a kit. Compose with sections. Publish to your domain. AI assists at every step. Designers stay in control.
+            <p class="redeem-desc">
+              <span class="i18n-en">Black Diamond invite, discount code, VX grant or kit unlock — paste it below.</span>
+              <span class="i18n-pt">Convite Black Diamond, código de desconto, VX bônus ou unlock de kit — cole aqui.</span>
+            </p>
+          </div>
+          <form class="redeem-form" id="redeemForm" autocomplete="off">
+            <label for="redeemCode" class="visually-hidden">
+              <span class="i18n-en">Voucher code</span>
+              <span class="i18n-pt">Código do voucher</span>
+            </label>
+            <input
+              type="text"
+              id="redeemCode"
+              name="code"
+              placeholder="BD-XXXXXXXX"
+              maxlength="40"
+              autocapitalize="characters"
+              spellcheck="false"
+              required
+            />
+            <button type="submit" id="redeemBtn" class="button button--gold">
+              <span class="i18n-en">Apply</span>
+              <span class="i18n-pt">Aplicar</span>
+            </button>
+            <p class="redeem-msg" id="redeemMsg" aria-live="polite"></p>
+          </form>
+        </article>
+      </div>
+    </section>
+
+    <script is:inline>
+      (function () {
+        var form = document.getElementById("redeemForm");
+        if (!form) return;
+        var input = document.getElementById("redeemCode");
+        var btn = document.getElementById("redeemBtn");
+        var msg = document.getElementById("redeemMsg");
+
+        // Pre-fill from ?code= (handles login redirect flow)
+        try {
+          var params = new URLSearchParams(location.search);
+          var pre = params.get("code");
+          if (pre) input.value = pre.toUpperCase();
+        } catch (_) {}
+
+        function getToken() {
+          try { return localStorage.getItem("volynx_access_token") || ""; } catch (_) { return ""; }
+        }
+
+        async function getApiBase() {
+          try {
+            var cfg = await fetch("/config.json", { cache: "no-store" }).then(function (r) { return r.json(); });
+            return (cfg.functionsUrl || "").replace(/\/$/, "");
+          } catch (_) { return ""; }
+        }
+
+        function setMsg(text, kind) {
+          msg.textContent = text || "";
+          msg.dataset.kind = kind || "";
+        }
+
+        function describeGrants(grants) {
+          if (!grants || typeof grants !== "object") return "";
+          var parts = [];
+          if (grants.tokens) parts.push(grants.tokens + " VX");
+          if (grants.builder_plan) parts.push("Builder " + grants.builder_plan);
+          if (grants.daily_plan) parts.push("Daily " + grants.daily_plan);
+          if (grants.plan) parts.push(String(grants.plan).charAt(0).toUpperCase() + String(grants.plan).slice(1));
+          if (grants.duration_days) parts.push("(" + grants.duration_days + "d)");
+          if (grants.kit_id) parts.push("Kit " + grants.kit_id);
+          if (grants.discount_pct) parts.push(grants.discount_pct + "% off");
+          if (grants.badge) parts.push(grants.badge + " badge");
+          return parts.join(" · ");
+        }
+
+        form.addEventListener("submit", async function (e) {
+          e.preventDefault();
+          var code = (input.value || "").trim().toUpperCase();
+          if (!code) return;
+          input.value = code;
+
+          var token = getToken();
+          if (!token) {
+            // Not logged in: bounce to login, preserve code via query param
+            var next = "/platform/&code=" + encodeURIComponent(code);
+            location.assign("/login/?next=" + encodeURIComponent("/platform/?code=" + code));
+            return;
+          }
+
+          btn.disabled = true;
+          setMsg(document.documentElement.lang.startsWith("pt") ? "Aplicando..." : "Applying...", "info");
+
+          try {
+            var apiBase = await getApiBase();
+            if (!apiBase) {
+              setMsg("API unavailable", "err");
+              btn.disabled = false;
+              return;
+            }
+            var res = await fetch(apiBase + "/redeem-voucher", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+              body: JSON.stringify({ code: code }),
+            });
+            var data = await res.json().catch(function () { return {}; });
+
+            if (data && data.ok) {
+              var grantsTxt = describeGrants(data.grants_applied);
+              var label = document.documentElement.lang.startsWith("pt")
+                ? (grantsTxt ? "Aplicado: " + grantsTxt : "Voucher aplicado!")
+                : (grantsTxt ? "Applied: " + grantsTxt : "Voucher applied!");
+              setMsg(label, "ok");
+              input.value = "";
+
+              // Update tier cache immediately so premium attrs flip without
+              // waiting for next check-permission cycle (zero-flash upgrade UX).
+              try {
+                if (window.VxPlan) {
+                  var existing = window.VxPlan.getCachedRelaxed
+                    ? window.VxPlan.getCachedRelaxed()
+                    : { plan: 'free', isBlackDiamond: false };
+                  var ga = data.grants_applied || {};
+                  var nextPlan = ga.builder_plan || ga.daily_plan || ga.plan || existing.plan;
+                  var becameBD = ga.badge === 'black_diamond';
+                  window.VxPlan.cache({
+                    plan: nextPlan,
+                    isBlackDiamond: becameBD || existing.isBlackDiamond,
+                  });
+                  if (typeof window.VxPlan.applyTierAttrs === 'function') {
+                    window.VxPlan.applyTierAttrs();
+                  }
+                }
+              } catch (_) {}
+            } else {
+              var err = (data && (data.error || data.message)) || ("HTTP " + res.status);
+              var errMap = {
+                voucher_not_found: { en: "Code not found.", pt: "Código não encontrado." },
+                voucher_expired: { en: "Code expired.", pt: "Código expirado." },
+                voucher_exhausted: { en: "Code already used up.", pt: "Código já foi usado." },
+                voucher_inactive: { en: "Code is not active.", pt: "Código não está ativo." },
+                target_email_mismatch: { en: "This code was issued for another email.", pt: "Esse código foi emitido para outro email." },
+                already_redeemed: { en: "You already redeemed this code.", pt: "Você já usou esse código." },
+              };
+              var pt = document.documentElement.lang.startsWith("pt");
+              var msgTxt = errMap[err]
+                ? (pt ? errMap[err].pt : errMap[err].en)
+                : (pt ? "Erro: " + err : "Error: " + err);
+              setMsg(msgTxt, "err");
+            }
+          } catch (err) {
+            setMsg("Network error", "err");
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      })();
+    </script>
+
+    <!-- ═══ ECOSYSTEM ═══ -->
+    <section id="ecosystem" class="page-section">
+      <div class="shell section-head section-head--split">
+        <div>
+          <span class="eyebrow" data-i18n="home2.eyebrow_ecosystem">What Volynx is</span>
+          <h2 data-i18n="home2.section_ecosystem_title">An ecosystem, not a pile of pages.</h2>
+        </div>
+        <p data-i18n="home2.section_ecosystem_desc">Four products with one account, one token system, and a shared commitment to premium quality.</p>
+      </div>
+      <div class="shell grid-3">
+        <article class="panel feature-card premium-frame panel--pro has-card-asset">
+          <img src="/assets/builder.webp" alt="" class="card-asset" loading="lazy" />
+          <a href={ROUTES.builder} class="label label--pro" data-i18n="home2.card_builder_label">Flagship</a>
+          <h3 data-i18n="home2.card_builder_title">VOLYNX Builder</h3>
+          <p data-i18n="home2.card_builder_desc">Create and publish premium sites with no-code. Premium kits, custom domains, and a production workspace that ships real results.</p>
+          <ul class="detail-list">
+            <li data-i18n="home2.card_builder_item1">No-code site builder with live preview</li>
+            <li data-i18n="home2.card_builder_item2">Premium kits for portfolios, agencies, SaaS</li>
+            <li data-i18n="home2.card_builder_item3">Publish to subdomain or custom domain</li>
+          </ul>
+        </article>
+        <article class="panel feature-card premium-frame has-card-asset">
+          <img src="/assets/daily-icon.webp" alt="" class="card-asset" loading="lazy" />
+          <a href={ROUTES.daily} class="label" data-i18n="home2.card_daily_label">Daily tools</a>
+          <h3 data-i18n="home2.card_daily_title">VOLYNX Daily</h3>
+          <p data-i18n="home2.card_daily_desc">Six tools for your real routine. Scan documents, summarize texts, save references, write better and make clearer decisions — every day.</p>
+          <ul class="detail-list">
+            <li data-i18n="home2.card_daily_item1">Scanner, Summary, Vault, Writing, Decision</li>
+            <li data-i18n="home2.card_daily_item2">Cloud sync on Pro, unlimited on Diamond</li>
+            <li data-i18n="home2.card_daily_item3">Broader audience: not just devs</li>
+          </ul>
+        </article>
+        <article class="panel feature-card premium-frame has-card-asset">
+          <img src="/assets/cvitae.webp" alt="" class="card-asset" loading="lazy" />
+          <a href={ROUTES.cvitae} class="label" data-i18n="home2.card_cvitae_label">Career & AI</a>
+          <h3 data-i18n="home2.card_cvitae_title">CVitae by VOLYNX</h3>
+          <p data-i18n="home2.card_cvitae_desc">Create a sharper CV with guided sections, live preview, CVitae AI, and premium templates. Build for free, then use VX for exports or Business for unlimited use.</p>
+          <ul class="detail-list">
+            <li data-i18n="home2.card_cvitae_item1">Free editor with guided CV structure</li>
+            <li data-i18n="home2.card_cvitae_item2">CVitae AI, live preview and premium templates</li>
+            <li data-i18n="home2.card_cvitae_item3">2 VX exports or Business unlimited</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- ═══ FREE VALUE STRIP ═══ -->
+    <section class="page-section free-strip-section">
+      <div class="shell">
+        <div class="panel free-strip free-strip--with-visual">
+          <div class="free-strip__visual" aria-hidden="true">
+            <img src="/assets/freeforever.webp" alt="" class="free-strip__hero-art" loading="lazy" />
+          </div>
+          <div class="free-strip__body">
+            <div class="free-strip__head">
+              <span class="label label--free" data-i18n="home2.free_kicker">Free forever</span>
+              <h2 data-i18n="home2.free_title">Premium things you can use without paying a cent.</h2>
+            </div>
+            <div class="free-strip__grid">
+              <a href={ROUTES.lab} class="free-strip__item">
+                <div class="free-strip__item-top">
+                  <img src="/assets/lab-free.webp" alt="" class="free-strip__item-art" loading="lazy" />
+                  <span class="free-strip__icon" aria-hidden="true">&#10003;</span>
+                </div>
+                <strong data-i18n="home2.free_1_title">All Lab tools, free</strong>
+                <p data-i18n="home2.free_1_desc">Converter, Image Scaler, Image Suite, QR Generator — full power, zero paywall.</p>
+              </a>
+              <a href={ROUTES.iconsStore} class="free-strip__item">
+                <div class="free-strip__item-top">
+                  <img src="/assets/freeicons.webp" alt="" class="free-strip__item-art" loading="lazy" />
+                  <span class="free-strip__icon" aria-hidden="true">&#10003;</span>
+                </div>
+                <strong data-i18n="home2.free_2_title">Free icon packs after signup</strong>
+                <p data-i18n="home2.free_2_desc">Hundreds of curated icons unlocked the moment you create your account.</p>
+              </a>
+              <a href={ROUTES.cvitae} class="free-strip__item">
+                <div class="free-strip__item-top">
+                  <img src="/assets/cvitae.webp" alt="" class="free-strip__item-art" loading="lazy" />
+                  <span class="free-strip__icon" aria-hidden="true">&#10003;</span>
+                </div>
+                <strong data-i18n="home2.free_3_title">CVitae — free to build</strong>
+                <p data-i18n="home2.free_3_desc">Write and preview your CV for free with guided sections and AI help. VX is only needed for premium exports or templates.</p>
+              </a>
+              <a href={ROUTES.daily} class="free-strip__item">
+                <div class="free-strip__item-top">
+                  <img src="/assets/daily-icon.webp" alt="" class="free-strip__item-art" loading="lazy" />
+                  <span class="free-strip__icon" aria-hidden="true">&#10003;</span>
+                </div>
+                <strong data-i18n="home2.free_4_title">Daily lite — free daily use</strong>
+                <p data-i18n="home2.free_4_desc">Scan, summarize, write, decide — the VOLYNX Daily basics stay free for everyone.</p>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ LAB — Free Tools ═══ -->
+    <section class="page-section lab-section">
+      <div class="shell section-head section-head--split">
+        <div>
+          <span class="eyebrow" data-i18n="home2.lab_eyebrow">VOLYNX Lab · always free</span>
+          <h2 data-i18n="home2.lab_title">Free tools that earn trust before asking for anything.</h2>
+        </div>
+        <p data-i18n="home2.lab_desc">Convert, resize, generate and optimise assets — all processed locally in your browser. No account needed. No upload. No catch.</p>
+      </div>
+      <div class="shell lab-tools-grid">
+        <a href={ROUTES.labConverter} class="panel feature-card lab-tool-card">
+          <img src="/assets/converterbig.webp" alt="" class="lab-tool-card__icon" loading="lazy" />
+          <span class="label label--free" data-i18n="home2.lab_free_chip">Free</span>
+          <h3 data-i18n="home2.lab_tool_converter_title">Converter</h3>
+          <p data-i18n="home2.lab_tool_converter_desc">Convert images across formats — WebP, PNG, JPG, AVIF — in-browser.</p>
+        </a>
+        <a href={ROUTES.labImageScaler} class="panel feature-card lab-tool-card">
+          <img src="/assets/newimagescaler.webp" alt="" class="lab-tool-card__icon" loading="lazy" />
+          <span class="label label--free" data-i18n="home2.lab_free_chip">Free</span>
+          <h3 data-i18n="home2.lab_tool_scaler_title">Image Scaler</h3>
+          <p data-i18n="home2.lab_tool_scaler_desc">Resize images at scale with precise presets and a clean batch pipeline.</p>
+        </a>
+        <a href={ROUTES.labImageSuite} class="panel feature-card lab-tool-card">
+          <img src="/assets/newimagesuite.webp" alt="" class="lab-tool-card__icon" loading="lazy" />
+          <span class="label label--free" data-i18n="home2.lab_free_chip">Free</span>
+          <h3 data-i18n="home2.lab_tool_suite_title">Image Suite</h3>
+          <p data-i18n="home2.lab_tool_suite_desc">Cleanup, crop and export in one flow — designed for creators who ship.</p>
+        </a>
+        <a href={ROUTES.labQrGen} class="panel feature-card lab-tool-card">
+          <img src="/assets/newqrgen.webp" alt="" class="lab-tool-card__icon" loading="lazy" />
+          <span class="label label--free" data-i18n="home2.lab_free_chip">Free</span>
+          <h3 data-i18n="home2.lab_tool_qr_title">QR Generator</h3>
+          <p data-i18n="home2.lab_tool_qr_desc">Premium branded QR codes with logo, palette and download-ready exports.</p>
+        </a>
+      </div>
+      <div class="shell lab-section-cta">
+        <a href={ROUTES.lab} class="button button--gold" data-i18n="home2.lab_btn_try">Open VOLYNX Lab</a>
+        <a href={ROUTES.iconsStore} class="button button--ghost" data-i18n="home2.lab_btn_icons">Browse Icons Store</a>
+      </div>
+    </section>
+
+<!-- ═══ DEV JOURNEY MISSION ═══ -->
+    <section class="page-section dj-mission-section reveal" id="dev-journey-mission" style="--d:5;" aria-label="Dev Journey">
+      <div class="shell">
+        <article class="panel dj-mission-panel">
+          <div class="dj-mission-copy">
+            <span class="label label--free dj-mission-label">
+              <span class="dj-mission-label-dot" aria-hidden="true"></span>
+              <span class="i18n-en">VOLYNX.Lab Education · always free</span>
+              <span class="i18n-pt">VOLYNX.Lab Education · sempre grátis</span>
+            </span>
+
+            <h2 class="dj-mission-title">
+              <span class="i18n-en">Dev Journey: real code, no fluff. <span class="dj-mission-accent">Free to start.</span></span>
+              <span class="i18n-pt">Dev Journey: código real, sem encheção. <span class="dj-mission-accent">Grátis pra começar.</span></span>
+            </h2>
+
+            <p class="dj-mission-desc">
+              <span class="i18n-en">VOLYNX exists to make tech and knowledge accessible. Dev Journey is the curriculum the founder wished he had — a self-guided, project-based track that turns <em>"I understood"</em> into <em>"I shipped"</em>. Social Sprint is free, with login.</span>
+              <span class="i18n-pt">A VOLYNX existe pra tornar tecnologia e conhecimento acessíveis. O Dev Journey é o currículo que o fundador queria ter tido — uma trilha autoguiada, baseada em projetos, que troca <em>"eu entendi"</em> por <em>"eu entreguei"</em>. O Social Sprint é grátis, com login.</span>
             </p>
 
-            <div class="hp-steps hp-reveal hp-reveal--delay-3">
-              <div class="hp-steps__item">
-                <span class="hp-steps__num" data-i18n="homevx.builder_step1_n">01</span>
-                <h4 class="hp-steps__title" data-i18n="homevx.builder_step1_t">Idea</h4>
-                <p class="hp-steps__desc" data-i18n="homevx.builder_step1_d">Describe what you need or pick a starting kit.</p>
+            <blockquote class="dj-mission-quote">
+              <span class="i18n-en">This is the curriculum I wished I had when I started. Now it's free for whoever needs it.</span>
+              <span class="i18n-pt">Esse é o currículo que eu queria ter tido quando comecei. Agora é grátis pra quem precisar.</span>
+              <cite>— Eduardo Volken</cite>
+            </blockquote>
+
+            <div class="dj-mission-stats" role="list">
+              <div class="dj-mission-stat" role="listitem">
+                <span class="dj-mission-stat__icon" aria-hidden="true">📚</span>
+                <strong>Bloco 0–2</strong>
+                <span class="i18n-en">Free with login</span>
+                <span class="i18n-pt">Grátis com login</span>
               </div>
-              <div class="hp-steps__item">
-                <span class="hp-steps__num" data-i18n="homevx.builder_step2_n">02</span>
-                <h4 class="hp-steps__title" data-i18n="homevx.builder_step2_t">Structure</h4>
-                <p class="hp-steps__desc" data-i18n="homevx.builder_step2_d">Premium kits ready to compose, no design from scratch.</p>
+              <div class="dj-mission-stat" role="listitem">
+                <span class="dj-mission-stat__icon" aria-hidden="true">💸</span>
+                <strong>£0</strong>
+                <span class="i18n-en">To start. Always.</span>
+                <span class="i18n-pt">Pra começar. Sempre.</span>
               </div>
-              <div class="hp-steps__item">
-                <span class="hp-steps__num" data-i18n="homevx.builder_step3_n">03</span>
-                <h4 class="hp-steps__title" data-i18n="homevx.builder_step3_t">Sections</h4>
-                <p class="hp-steps__desc" data-i18n="homevx.builder_step3_d">Drag, edit, refine. Live preview, every change.</p>
-              </div>
-              <div class="hp-steps__item">
-                <span class="hp-steps__num" data-i18n="homevx.builder_step4_n">04</span>
-                <h4 class="hp-steps__title" data-i18n="homevx.builder_step4_t">Publish</h4>
-                <p class="hp-steps__desc" data-i18n="homevx.builder_step4_d">Push to your domain. Static, fast, indexed.</p>
+              <div class="dj-mission-stat" role="listitem">
+                <span class="dj-mission-stat__icon" aria-hidden="true">👁</span>
+                <strong>
+                  <span class="i18n-en">Manual review</span>
+                  <span class="i18n-pt">Revisão manual</span>
+                </strong>
+                <span class="i18n-en">Honest cert, no fake automation</span>
+                <span class="i18n-pt">Cert honesta, sem automação fajuta</span>
               </div>
             </div>
 
-            <a href={ROUTES.builder} class="hp-btn hp-btn--gold hp-magnetic hp-reveal hp-reveal--delay-4">
-              <span data-i18n="homevx.builder_cta">Open Builder</span>
-              <span class="hp-btn__arrow" aria-hidden="true">→</span>
-            </a>
-          </div>
-
-          <div class="hp-builder__visual hp-reveal hp-reveal--delay-2">
-            <img src="/assets/hero-builder.webp" alt="VOLYNX Builder interface preview" width="900" height="675" loading="lazy" decoding="async" />
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ════════════════════════════════════════════════════════════
-         4) ECOSYSTEM — Builder featured, others compose around
-         ════════════════════════════════════════════════════════════ -->
-    <section class="hp-section">
-      <div class="hp-orb hp-orb--gold hp-orb--anim-2" style="top:5%;left:-15%;opacity:0.45;" aria-hidden="true"></div>
-      <div class="hp-orb hp-orb--cyan" style="bottom:-10%;right:-15%;opacity:0.55;" aria-hidden="true"></div>
-
-      <div class="hp-shell">
-        <div class="hp-eco__head">
-          <span class="hp-eyebrow hp-reveal" data-i18n="homevx.eco_eyebrow">Inside the platform</span>
-          <h2 class="hp-h2 hp-reveal hp-reveal--delay-1" data-i18n="homevx.eco_title">
-            Four products. One ecosystem.
-          </h2>
-          <p class="hp-lead hp-reveal hp-reveal--delay-2" data-i18n="homevx.eco_sub">
-            Each product solves one moment of the journey. Together, they compound.
-          </p>
-        </div>
-
-        <div class="hp-eco__grid">
-          <a href={ROUTES.builder} class="hp-eco__panel hp-eco__panel--featured hp-tilt hp-reveal">
-            <img src="/assets/builder.webp" alt="" class="hp-eco__art" width="320" height="320" loading="lazy" decoding="async" />
-            <span class="hp-eco__panel-tag">FLAGSHIP</span>
-            <h3 class="hp-h3" data-i18n="homevx.eco_builder_t">VOLYNX Builder</h3>
-            <p class="hp-body" data-i18n="homevx.eco_builder_d">Sites, kits and publishing — the main commercial product.</p>
-            <span class="hp-eco__panel-link" data-i18n="homevx.eco_explore">Explore product</span>
-          </a>
-
-          <a href={ROUTES.daily} class="hp-eco__panel hp-tilt hp-reveal hp-reveal--delay-1">
-            <img src="/assets/daily-icon.webp" alt="" class="hp-eco__art" width="240" height="240" loading="lazy" decoding="async" />
-            <h3 class="hp-h3" data-i18n="homevx.eco_daily_t">VOLYNX Daily</h3>
-            <p class="hp-body" data-i18n="homevx.eco_daily_d">The operational layer for daily work. Scanner, summary, vault, decisions.</p>
-            <span class="hp-eco__panel-link" data-i18n="homevx.eco_explore">Explore product</span>
-          </a>
-
-          <a href={ROUTES.cvitae} class="hp-eco__panel hp-tilt hp-reveal hp-reveal--delay-2">
-            <img src="/assets/cvitae.webp" alt="" class="hp-eco__art" width="240" height="240" loading="lazy" decoding="async" />
-            <h3 class="hp-h3" data-i18n="homevx.eco_cvitae_t">CVitae</h3>
-            <p class="hp-body" data-i18n="homevx.eco_cvitae_d">AI-assisted CV builder with guided sections, live preview and premium templates.</p>
-            <span class="hp-eco__panel-link" data-i18n="homevx.eco_explore">Explore product</span>
-          </a>
-
-          <a href={ROUTES.studio} class="hp-eco__panel hp-tilt hp-reveal hp-reveal--delay-3">
-            <img src="/assets/studio-logo.webp" alt="" class="hp-eco__art" width="240" height="240" loading="lazy" decoding="async" />
-            <h3 class="hp-h3" data-i18n="homevx.eco_studio_t">Studio Pro</h3>
-            <p class="hp-body" data-i18n="homevx.eco_studio_d">Premium custom work. When DIY isn't enough, the studio takes over.</p>
-            <span class="hp-eco__panel-link" data-i18n="homevx.eco_explore">Explore product</span>
-          </a>
-
-          <a href={ROUTES.lab} class="hp-eco__panel hp-tilt hp-reveal hp-reveal--delay-4">
-            <img src="/assets/lab.webp" alt="" class="hp-eco__art" width="240" height="240" loading="lazy" decoding="async" />
-            <h3 class="hp-h3" data-i18n="homevx.eco_lab_t">VOLYNX Lab</h3>
-            <p class="hp-body" data-i18n="homevx.eco_lab_d">Free experimental tools — converters, generators, AI image suite.</p>
-            <span class="hp-eco__panel-link" data-i18n="homevx.eco_explore">Explore product</span>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ════════════════════════════════════════════════════════════
-         4b) LAB TOOLS — free, browser-based, your premium icons
-         ════════════════════════════════════════════════════════════ -->
-    <section class="hp-section">
-      <div class="hp-shell">
-        <div class="hp-tools__head">
-          <div class="hp-tools__head-text">
-            <span class="hp-eyebrow hp-reveal" data-i18n="homevx.tools_eyebrow">VOLYNX Lab · always free</span>
-            <h2 class="hp-h2 hp-reveal hp-reveal--delay-1" data-i18n="homevx.tools_title">Free tools that earn trust before asking for anything.</h2>
-          </div>
-          <p class="hp-lead hp-reveal hp-reveal--delay-2" data-i18n="homevx.tools_sub">Convert, resize, generate and optimise assets — all processed locally in your browser. No account needed.</p>
-        </div>
-
-        <div class="hp-tools__grid">
-          <a href={ROUTES.labConverter} class="hp-tools__card hp-tilt hp-reveal">
-            <img src="/assets/converterbig.webp" alt="" class="hp-tools__card-art" width="200" height="200" loading="lazy" decoding="async" />
-            <span class="hp-tools__card-tag" data-i18n="homevx.tools_chip_free">Free</span>
-            <h3 class="hp-tools__card-title" data-i18n="homevx.tools_conv_t">Converter</h3>
-            <p class="hp-tools__card-desc" data-i18n="homevx.tools_conv_d">WebP, PNG, JPG, AVIF — convert in-browser, no upload.</p>
-          </a>
-          <a href={ROUTES.labImageScaler} class="hp-tools__card hp-tilt hp-reveal hp-reveal--delay-1">
-            <img src="/assets/newimagescaler.webp" alt="" class="hp-tools__card-art" width="200" height="200" loading="lazy" decoding="async" />
-            <span class="hp-tools__card-tag" data-i18n="homevx.tools_chip_free">Free</span>
-            <h3 class="hp-tools__card-title" data-i18n="homevx.tools_scaler_t">Image Scaler</h3>
-            <p class="hp-tools__card-desc" data-i18n="homevx.tools_scaler_d">Batch resize with precise presets and clean export.</p>
-          </a>
-          <a href={ROUTES.labImageSuite} class="hp-tools__card hp-tilt hp-reveal hp-reveal--delay-2">
-            <img src="/assets/newimagesuite.webp" alt="" class="hp-tools__card-art" width="200" height="200" loading="lazy" decoding="async" />
-            <span class="hp-tools__card-tag" data-i18n="homevx.tools_chip_free">Free</span>
-            <h3 class="hp-tools__card-title" data-i18n="homevx.tools_suite_t">Image Suite</h3>
-            <p class="hp-tools__card-desc" data-i18n="homevx.tools_suite_d">Cleanup, crop, AI background-remove and export in one flow.</p>
-          </a>
-          <a href={ROUTES.labQrGen} class="hp-tools__card hp-tilt hp-reveal hp-reveal--delay-3">
-            <img src="/assets/newqrgen.webp" alt="" class="hp-tools__card-art" width="200" height="200" loading="lazy" decoding="async" />
-            <span class="hp-tools__card-tag" data-i18n="homevx.tools_chip_free">Free</span>
-            <h3 class="hp-tools__card-title" data-i18n="homevx.tools_qr_t">QR Generator</h3>
-            <p class="hp-tools__card-desc" data-i18n="homevx.tools_qr_d">Premium branded QR codes with logo, palette, and ready exports.</p>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ════════════════════════════════════════════════════════════
-         4c) FREE FOREVER STRIP — trust signal, premium icons
-         ════════════════════════════════════════════════════════════ -->
-    <section class="hp-section" style="padding-top:0;">
-      <div class="hp-shell">
-        <div class="hp-free hp-reveal">
-          <div class="hp-free__visual" aria-hidden="true">
-            <img src="/assets/freeforever.webp" alt="" width="380" height="380" loading="lazy" decoding="async" />
-          </div>
-          <div class="hp-free__body">
-            <div class="hp-free__head">
-              <span class="hp-free__chip" data-i18n="homevx.free_chip">Free forever</span>
-              <h2 class="hp-free__title" data-i18n="homevx.free_title">Premium things you can use without paying a cent.</h2>
-            </div>
-            <div class="hp-free__grid">
-              <a href={ROUTES.lab} class="hp-free__item">
-                <img src="/assets/lab-free.webp" alt="" class="hp-free__item-art" width="52" height="52" loading="lazy" />
-                <div class="hp-free__item-text">
-                  <strong data-i18n="homevx.free_1_t">All Lab tools, free</strong>
-                  <p data-i18n="homevx.free_1_d">Converter, Image Scaler, Image Suite, QR Generator — full power, zero paywall.</p>
-                </div>
+            <div class="dj-mission-actions">
+              <a class="button button--gold" href={ROUTES.devJourney}>
+                <span class="i18n-en">See curriculum</span>
+                <span class="i18n-pt">Ver currículo</span>
               </a>
-              <a href={ROUTES.iconsStore || "/icons-store/"} class="hp-free__item">
-                <img src="/assets/freeicons.webp" alt="" class="hp-free__item-art" width="52" height="52" loading="lazy" />
-                <div class="hp-free__item-text">
-                  <strong data-i18n="homevx.free_2_t">Free icon packs after signup</strong>
-                  <p data-i18n="homevx.free_2_d">Hundreds of curated icons unlocked the moment you create your account.</p>
-                </div>
-              </a>
-              <a href={ROUTES.cvitae} class="hp-free__item">
-                <img src="/assets/cvitae.webp" alt="" class="hp-free__item-art" width="52" height="52" loading="lazy" />
-                <div class="hp-free__item-text">
-                  <strong data-i18n="homevx.free_3_t">CVitae — free to build</strong>
-                  <p data-i18n="homevx.free_3_d">Write, preview and export your CV with guided sections and AI help.</p>
-                </div>
-              </a>
-              <a href={ROUTES.daily} class="hp-free__item">
-                <img src="/assets/daily-icon.webp" alt="" class="hp-free__item-art" width="52" height="52" loading="lazy" />
-                <div class="hp-free__item-text">
-                  <strong data-i18n="homevx.free_4_t">Daily lite — free daily use</strong>
-                  <p data-i18n="homevx.free_4_d">Scan, summarize, write, decide — VOLYNX Daily basics stay free for everyone.</p>
-                </div>
+              <a class="button button--ghost" href={ROUTES.devJourneyStudent}>
+                <span class="i18n-en">Enter student area →</span>
+                <span class="i18n-pt">Entrar na área do aluno →</span>
               </a>
             </div>
           </div>
+
+          <aside class="dj-mission-floater" aria-hidden="true">
+            <span class="dj-mission-floater-glow"></span>
+            <img src="/assets/journeyicon.webp" alt="" class="dj-mission-floater-img" loading="lazy" width="440" height="440" decoding="async" />
+          </aside>
+        </article>
+      </div>
+    </section>
+
+    <!-- floating: Premium Value -->
+    <div class="section-float section-float--right section-float--products section-float--astronaut" aria-hidden="true">
+      <img src="/assets/astronaut1.webp" alt="" loading="lazy" width="300" height="300" />
+    </div>
+
+    <!-- ═══ FEATURED PRODUCTS (editorial) ═══ -->
+    <section class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow" data-i18n="home2.eyebrow_featured">Featured now</span>
+        <h2 data-i18n="home2.section_featured_title">Commercial products first. Vision immediately after.</h2>
+        <p data-i18n="home2.section_featured_desc">Premium tools and kits ready to use today. Tomorrow's innovations already in development.</p>
+      </div>
+      <div class="shell editorial-grid">
+        <article class="panel gallery-card gallery-card--xl" style="background-image:url('/assets/newportfolio.webp')">
+          <span class="label" data-i18n="home2.featured_portfolio_label">Flagship kit</span>
+          <h3 data-i18n="home2.featured_portfolio_title">Portfolio Pro Kit</h3>
+          <p data-i18n="home2.featured_portfolio_desc">Launch fast, look expensive and give your personal brand a real operating system.</p>
+          <div class="actions">
+            <a href={ROUTES.portfolioKit} class="button button--ghost" data-i18n="home2.featured_portfolio_btn">Open kit</a>
+            <a href={ROUTES.portfolioKitPreview} class="button button--gold">Preview unlocks</a>
+          </div>
+        </article>
+        <article class="panel gallery-card" style="background-image:url('/assets/newlaunch.webp')">
+          <span class="label" data-i18n="home2.featured_agency_label">For agencies</span>
+          <h3 data-i18n="home2.featured_agency_title">Agency Launch Kit</h3>
+          <p data-i18n="home2.featured_agency_desc">Proposal, SOW and premium website structure built to close with less friction.</p>
+          <div class="actions">
+            <a href={ROUTES.agencyKit} class="button button--ghost" data-i18n="home2.featured_agency_btn">Open kit</a>
+            <a href={ROUTES.agencyKitPreview} class="button button--gold">Preview unlocks</a>
+          </div>
+        </article>
+        <article class="panel gallery-card" style="background-image:url('/assets/saasbig.webp')">
+          <span class="label" data-i18n="home2.featured_saas_label">For SaaS</span>
+          <h3 data-i18n="home2.featured_saas_title">SaaS Landing System</h3>
+          <p data-i18n="home2.featured_saas_desc">Section-first, speed-aware and ready to turn product value into conviction.</p>
+          <div class="actions">
+            <a href={ROUTES.saasSystem} class="button button--ghost" data-i18n="home2.featured_saas_btn">Open kit</a>
+            <a href={ROUTES.saasSystemPreview} class="button button--gold">Preview unlocks</a>
+          </div>
+        </article>
+      </div>
+      <div class="shell spotlight-row">
+        <article class="panel spotlight-card panel--pro">
+          <div>
+            <span class="label label--pro" data-i18n="home2.spotlight_pf_label">New · Real estate SaaS</span>
+            <h3 data-i18n="home2.spotlight_pf_title">PropertyFlow deserves its own stage.</h3>
+            <p data-i18n="home2.spotlight_pf_desc">A bilingual property platform with stronger catalog logic, polished filtering and a visual language that already feels like a product line, not just a listing page.</p>
+          </div>
+          <img src="/assets/newproperty.webp" alt="PropertyFlow preview" class="spotlight-img" />
+          <div class="hero-actions">
+            <a href={ROUTES.propertyflow} class="button button--gold" data-i18n="home2.spotlight_pf_btn">View PropertyFlow</a>
+            <a href={`${ROUTES.docs}#propertyflow`} class="button button--ghost">Preview buyer flow</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ═══ ICONS STORE (featured product) ═══ -->
+    <section class="page-section">
+      <div class="shell">
+        <article class="panel panel--pro icons-store-showcase">
+          <div class="icons-store-copy">
+            <span class="label label--pro" data-i18n="home2.icons_store_label">Premium Asset Vault</span>
+            <h2 data-i18n="home2.icons_store_title">1,000+ premium icons. Now live.</h2>
+            <p data-i18n="home2.icons_store_desc">Nineteen curated icon packs, quality-gated one by one. Browse every collection, preview each pack, and pick the one that fits your product.</p>
+            <div class="icons-store-stats">
+              <div><strong>1,000+</strong><span data-i18n="home2.icons_store_stat1">Icons</span></div>
+              <div><strong>19</strong><span data-i18n="home2.icons_store_stat2">Packs</span></div>
+              <div><strong>8</strong><span data-i18n="home2.icons_store_stat3">Styles</span></div>
+            </div>
+            <div class="hero-actions">
+              <a href={ROUTES.iconsStore} class="button button--gold" data-i18n="home2.icons_store_btn">Open Icon Vault</a>
+              <a href={`${ROUTES.docs}#icons-store`} class="button button--ghost">Preview buyer flow</a>
+            </div>
+          </div>
+          <div class="icons-store-preview">
+            <div class="icons-store-scene" aria-hidden="true">
+              <div class="icons-store-scene__halo"></div>
+              <div class="icons-store-scene__card icons-store-scene__card--center">
+                <img src="/assets/icons-store/Hyper-Icons-Premium/premium.webp" alt="" loading="lazy" />
+              </div>
+              <div class="icons-store-scene__card icons-store-scene__card--top">
+                <img src="/assets/icons-store/Hyper-Icons-Premium/diamond.webp" alt="" loading="lazy" />
+              </div>
+              <div class="icons-store-scene__card icons-store-scene__card--left">
+                <img src="/assets/icons-store/Hyper-Icons-Premium/infinity.webp" alt="" loading="lazy" />
+              </div>
+              <div class="icons-store-scene__card icons-store-scene__card--right">
+                <img src="/assets/icons-store/Hyper-Icons-Premium/lightning.webp" alt="" loading="lazy" />
+              </div>
+              <div class="icons-store-scene__pills">
+                <span>Hyper</span>
+                <span>Glass</span>
+                <span>Glow</span>
+                <span>Neon</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- floating: Shipping -->
+    <div class="section-float section-float--right" aria-hidden="true">
+      <img src="/assets/float-principles.webp" alt="" loading="lazy" />
+    </div>
+
+    <!-- ═══ PRINCIPLES ═══ -->
+    <section class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow" data-i18n="home2.eyebrow_principles">Operating philosophy</span>
+        <h2 data-i18n="home2.section_principles_title">Premium direction needs principles, not decoration.</h2>
+      </div>
+      <div class="shell grid-2 principles-grid-v3">
+        <article class="panel principle-panel principle-panel--iconic principle-panel--clarity">
+          <div class="principle-panel__art-shell">
+            <img src="/assets/clearbydefault.webp" alt="" class="principle-panel__art" loading="lazy" />
+          </div>
+          <div class="principle-panel__copy">
+            <h3 data-i18n="home2.principle_1_title">Clear by default</h3>
+            <p data-i18n="home2.principle_1_desc">If users cannot understand the value in seconds, the page is still unfinished.</p>
+          </div>
+        </article>
+        <article class="panel principle-panel principle-panel--iconic principle-panel--systems">
+          <div class="principle-panel__art-shell">
+            <img src="/assets/volynxOS1_07.webp" alt="" class="principle-panel__art" loading="lazy" />
+          </div>
+          <div class="principle-panel__copy">
+            <h3 data-i18n="home2.principle_2_title">Built as systems</h3>
+            <p data-i18n="home2.principle_2_desc">Layouts, tools and products need to scale without feeling random or stitched together.</p>
+          </div>
+        </article>
+        <article class="panel principle-panel principle-panel--iconic principle-panel--shipped">
+          <div class="principle-panel__art-shell">
+            <img src="/assets/volynxOS5_04.webp" alt="" class="principle-panel__art" loading="lazy" />
+          </div>
+          <div class="principle-panel__copy">
+            <h3 data-i18n="home2.principle_3_title">Shipped for real use</h3>
+            <p data-i18n="home2.principle_3_desc">Real publishing, real workflows and real delivery matter more than aspirational mockups alone.</p>
+          </div>
+        </article>
+        <article class="panel principle-panel principle-panel--iconic principle-panel--performance">
+          <div class="principle-panel__art-shell">
+            <img src="/assets/bignewicons_03.webp" alt="" class="principle-panel__art" loading="lazy" />
+          </div>
+          <div class="principle-panel__copy">
+            <h3 data-i18n="home2.principle_4_title">Fast enough to feel expensive</h3>
+            <p data-i18n="home2.principle_4_desc">Performance is part of luxury. Slowness cheapens the whole product experience.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- floating: Engineering -->
+    <div class="section-float section-float--left" aria-hidden="true">
+      <img src="/assets/float-rnd.webp" alt="" loading="lazy" />
+    </div>
+
+    <!-- ═══ R&D PORTFOLIO ═══ -->
+    <section class="page-section">
+      <div class="shell section-head section-head--split">
+        <div>
+          <span class="eyebrow" data-i18n="home2.eyebrow_rnd">VOLYNX Vision</span>
+          <h2 data-i18n="home2.section_rnd_title">Building toward a smarter future.</h2>
+        </div>
+        <p data-i18n="home2.section_rnd_desc">The same engineering rigor behind Builder, Daily, and our free tools is directed at harder, longer-term problems. These are active research projects — not products you can buy today, but signals of where we believe technology should go.</p>
+      </div>
+      <div class="shell grid-3">
+        <article class="panel product-vision has-card-asset">
+          <img src="/assets/carbontracker.webp" alt="" class="card-asset" loading="lazy" />
+          <span class="label" data-i18n="home2.rnd_carbon_label">Impact · In Research</span>
+          <h3 data-i18n="home2.rnd_carbon_title">Carbon Tracker</h3>
+          <p data-i18n="home2.rnd_carbon_desc">Real-time tracking of personal and business carbon impact with premium visualization.</p>
+        </article>
+        <article class="panel product-vision has-card-asset">
+          <img src="/assets/safetyguardian.webp" alt="" class="card-asset" loading="lazy" />
+          <span class="label" data-i18n="home2.rnd_safety_label">Safety · In Research</span>
+          <h3 data-i18n="home2.rnd_safety_title">Safety Guardian</h3>
+          <p data-i18n="home2.rnd_safety_desc">Smart systems for routing, triaging and responding to critical abuse reports.</p>
+        </article>
+        <article class="panel product-vision has-card-asset">
+          <img src="/assets/precisionhealth.webp" alt="" class="card-asset" loading="lazy" />
+          <span class="label" data-i18n="home2.rnd_health_label">Health · In Research</span>
+          <h3 data-i18n="home2.rnd_health_title">Precision Health</h3>
+          <p data-i18n="home2.rnd_health_desc">AI tools for disease prevention, early detection and research operations.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- floating: Craft -->
+    <div class="section-float section-float--right" aria-hidden="true">
+      <img src="/assets/float-cta.webp" alt="" loading="lazy" />
+    </div>
+
+    <!-- ═══ FINAL CTA ═══ -->
+    <section class="page-section page-section--last">
+      <div class="shell callout callout--heroic panel panel--pro">
+        <div>
+          <span class="label label--pro" data-i18n="home2.cta_label">From free to pro</span>
+          <strong data-i18n="home2.cta_tagline">Free should feel generous. Pro should feel inevitable.</strong>
+          <p data-i18n="home2.cta_desc">That rule now shapes the entire platform: home, pricing, tools, builder and account surfaces.</p>
+        </div>
+        <div class="hero-actions">
+          <a href={ROUTES.pricing} class="button button--gold" data-i18n="home2.cta_pricing_btn">See the pricing logic</a>
+          <a href={ROUTES.profile} class="button button--ghost" data-i18n="home2.cta_profile_btn">Open Pro Command Center</a>
         </div>
       </div>
     </section>
 
-    <!-- ════════════════════════════════════════════════════════════
-         4d) ESSENCE / MANIFESTO — cinematic dark signature moment.
-              Lynx-eye pulses inside a rotating gold/lilac halo.
-              This is where the platform's soul lives.
-         ════════════════════════════════════════════════════════════ -->
-    <section class="hp-section hp-essence">
-      <div class="hp-shell hp-essence__shell">
-        <div class="hp-essence__visual hp-reveal" aria-hidden="true">
-          <div class="hp-essence__halo"></div>
-          <div class="hp-essence__halo hp-essence__halo--inner"></div>
-          <img src="/assets/lynx-eye.webp" alt="" class="hp-essence__eye" width="380" height="380" loading="lazy" decoding="async" />
-        </div>
-
-        <div class="hp-essence__copy">
-          <span class="hp-eyebrow hp-reveal" data-i18n="homevx.essence_eyebrow">The purpose</span>
-          <h2 class="hp-h2 hp-reveal hp-reveal--delay-1" data-i18n="homevx.essence_title">
-            Technology only matters when it truly helps someone.
-          </h2>
-          <p class="hp-reveal hp-reveal--delay-2" data-i18n-html="homevx.essence_p1">
-            VOLYNX was built on a simple belief: <strong>premium output should be a default, not a luxury</strong>. Every part of the ecosystem exists to solve a concrete problem — create with clarity, work with flow, ship with confidence.
-          </p>
-          <p class="hp-reveal hp-reveal--delay-3" data-i18n-html="homevx.essence_p2">
-            Eight months in motion. Five products. One belief: build with intention, high standards, and real impact.
-          </p>
-          <a href={ROUTES.blackDiamond} class="hp-essence__diamond hp-reveal hp-reveal--delay-4" data-i18n="homevx.essence_diamond">
-            Black Diamond — by invitation
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ════════════════════════════════════════════════════════════
-         5) WHY DIFFERENT — strategic positioning, not feature list
-         ════════════════════════════════════════════════════════════ -->
-    <section class="hp-section">
-      <div class="hp-shell">
-        <div class="hp-why__head">
-          <span class="hp-eyebrow hp-reveal" data-i18n="homevx.diff_eyebrow">Strategic difference</span>
-          <h2 class="hp-h2 hp-reveal hp-reveal--delay-1" data-i18n="homevx.diff_title">
-            Performance is a brand decision.
-          </h2>
-          <p class="hp-lead hp-reveal hp-reveal--delay-2" data-i18n="homevx.diff_sub">
-            We don't ship features. We ship advantages — measurable ones.
-          </p>
-        </div>
-
-        <div class="hp-why__grid">
-          <div class="hp-why__block hp-reveal">
-            <span class="hp-why__num">01</span>
-            <h3 class="hp-h3" data-i18n="homevx.diff_b1_t">Built for speed.</h3>
-            <p class="hp-body" data-i18n="homevx.diff_b1_d">
-              Static-first delivery, lightweight runtime, optimized assets. Lighthouse green by design.
-            </p>
-          </div>
-          <div class="hp-why__block hp-reveal hp-reveal--delay-1">
-            <span class="hp-why__num">02</span>
-            <h3 class="hp-h3" data-i18n="homevx.diff_b2_t">Designed for trust.</h3>
-            <p class="hp-body" data-i18n="homevx.diff_b2_d">
-              Real auth, real billing, real domains. No dummy demos. Production from day one.
-            </p>
-          </div>
-          <div class="hp-why__block hp-reveal hp-reveal--delay-2">
-            <span class="hp-why__num">03</span>
-            <h3 class="hp-h3" data-i18n="homevx.diff_b3_t">Ready to scale.</h3>
-            <p class="hp-body" data-i18n="homevx.diff_b3_d">
-              Reusable components, AI that respects your aesthetic, infrastructure that grows with you.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ════════════════════════════════════════════════════════════
-         6) PRICING PREVIEW
-         ════════════════════════════════════════════════════════════ -->
-    <section class="hp-section">
-      <div class="hp-orb hp-orb--gold hp-orb--anim-1" style="top:20%;right:-10%;opacity:0.35;" aria-hidden="true"></div>
-
-      <div class="hp-shell">
-        <div class="hp-pricing__head">
-          <span class="hp-eyebrow hp-reveal" data-i18n="homevx.pricing_eyebrow">Simple pricing</span>
-          <h2 class="hp-h2 hp-reveal hp-reveal--delay-1" data-i18n="homevx.pricing_title">
-            Start free. Upgrade when you ship.
-          </h2>
-          <p class="hp-lead hp-reveal hp-reveal--delay-2" data-i18n="homevx.pricing_sub">
-            No hidden tier walls. Pay for capacity when it earns its keep.
-          </p>
-        </div>
-
-        <div class="hp-pricing__grid">
-          <div class="hp-pricing__tier hp-reveal">
-            <h3 class="hp-pricing__tier-name" data-i18n="homevx.pricing_free_t">Free</h3>
-            <p class="hp-pricing__tier-desc" data-i18n="homevx.pricing_free_d">
-              Builder access, free tools, daily basics — forever.
-            </p>
-          </div>
-          <div class="hp-pricing__tier hp-pricing__tier--featured hp-reveal hp-reveal--delay-1">
-            <h3 class="hp-pricing__tier-name" data-i18n="homevx.pricing_pro_t">Pro</h3>
-            <p class="hp-pricing__tier-desc" data-i18n="homevx.pricing_pro_d">
-              Premium kits, unlimited exports, AI assistance, priority publishing.
-            </p>
-          </div>
-          <div class="hp-pricing__tier hp-reveal hp-reveal--delay-2">
-            <h3 class="hp-pricing__tier-name" data-i18n="homevx.pricing_studio_t">Studio</h3>
-            <p class="hp-pricing__tier-desc" data-i18n="homevx.pricing_studio_d">
-              Custom work, white-label delivery, hands-on production.
-            </p>
-          </div>
-        </div>
-
-        <div class="hp-pricing__cta-row hp-reveal hp-reveal--delay-3">
-          <a href={ROUTES.pricing} class="hp-btn hp-btn--ghost">
-            <span data-i18n="homevx.pricing_cta">See full pricing</span>
-            <span class="hp-btn__arrow" aria-hidden="true">→</span>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ════════════════════════════════════════════════════════════
-         7) FINAL CTA — cinematic dark moment
-         ════════════════════════════════════════════════════════════ -->
-    <section class="hp-section hp-final">
-      <div class="hp-shell hp-shell--narrow">
-        <img src="/assets/V.webp" alt="" class="hp-final__visual hp-reveal" width="200" height="200" loading="lazy" decoding="async" />
-        <span class="hp-eyebrow hp-reveal" data-i18n="homevx.final_eyebrow">The next move</span>
-        <h2 class="hp-h2 hp-reveal hp-reveal--delay-1" data-i18n="homevx.final_title">
-          Ready to build something premium?
-        </h2>
-        <p class="hp-lead hp-reveal hp-reveal--delay-2" data-i18n="homevx.final_sub">
-          Start with the Builder, or talk to the Studio. Either way, you ship something you're proud of.
-        </p>
-        <div class="hp-final__cta-row hp-reveal hp-reveal--delay-3">
-          <a href={ROUTES.builder} class="hp-btn hp-btn--gold hp-magnetic">
-            <span data-i18n="homevx.final_cta_primary">Open Builder</span>
-            <span class="hp-btn__arrow" aria-hidden="true">→</span>
-          </a>
-          <a href={`${ROUTES.contact}?ref=studio`} class="hp-btn hp-btn--ghost">
-            <span data-i18n="homevx.final_cta_secondary">Talk to Studio</span>
-          </a>
-        </div>
-      </div>
-    </section>
   </main>
-
   <FlagshipFooter />
 </FlagshipLayout>
 
-<script src="/js/home-premium.js?v=20260510-essence" defer></script>
+<style>
+  /* ═══ HERO V2 — Premium Emotional ═══ */
+  .hero-v2 {
+    position: relative;
+    min-height: calc(100vh - 74px);
+    display: flex;
+    align-items: center;
+    padding: clamp(48px, 8vh, 96px) 0 clamp(40px, 6vh, 80px);
+    overflow: hidden;
+  }
+  .hero-v2__bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 50% 40%, rgba(20, 184, 166, 0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 90% 90%, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .hero-v2__inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  @media (min-width: 980px) {
+    .hero-v2__inner { grid-template-columns: 1.3fr 1fr; gap: 56px; }
+  }
 
-<script is:inline>
-  // ── Scroll-aware header (light → solid on scroll) ──────────────
-  (function () {
-    const body = document.body;
-    if (!body || !body.classList.contains('page-home-premium')) return;
-    let ticking = false;
-    function update() {
-      const scrolled = window.scrollY > 40;
-      body.classList.toggle('is-scrolled', scrolled);
-      ticking = false;
-    }
-    window.addEventListener('scroll', function () {
-      if (!ticking) {
-        window.requestAnimationFrame(update);
-        ticking = true;
-      }
-    }, { passive: true });
-    update();
-  })();
+  .hero-v2__copy { max-width: 720px; }
 
-  // ── Reveal-on-scroll (lightweight IntersectionObserver) ────────
-  (function () {
-    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const targets = document.querySelectorAll('.hp-reveal');
-    if (reduce || !('IntersectionObserver' in window)) {
-      targets.forEach(function (el) { el.classList.add('is-visible'); });
-      return;
+  .hero-v2__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 16px;
+    border-radius: 999px;
+    background: rgba(45, 212, 191, 0.08);
+    border: 1px solid rgba(45, 212, 191, 0.25);
+    margin-bottom: 24px;
+    font-size: .82rem;
+    font-weight: 600;
+    color: #5eead4;
+    letter-spacing: .02em;
+  }
+  .hero-v2__pill-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #2dd4bf;
+    box-shadow: 0 0 8px #2dd4bf;
+    animation: heroV2Pulse 2s ease-in-out infinite;
+  }
+  @keyframes heroV2Pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .4; transform: scale(.85); }
+  }
+
+  .hero-v2__title {
+    font-family: var(--display);
+    font-size: clamp(2.2rem, 6vw, 4.2rem);
+    font-weight: 700;
+    letter-spacing: -.035em;
+    line-height: 1.02;
+    margin: 0 0 24px;
+    color: #fff;
+  }
+  .hero-v2__title .gradient-text {
+    background: linear-gradient(135deg, #2dd4bf, #22d3ee, #3b82f6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    display: inline-block;
+  }
+
+  .hero-v2__desc {
+    font-size: clamp(1rem, 1.7vw, 1.18rem);
+    line-height: 1.65;
+    color: rgba(209, 215, 230, 0.78);
+    margin: 0 0 36px;
+    max-width: min(100%, 54ch);
+    overflow-wrap: anywhere;
+    text-wrap: pretty;
+  }
+
+  .hero-v2__actions {
+    display: flex;
+    gap: 14px;
+    flex-direction: column;
+  }
+  @media (min-width: 640px) {
+    .hero-v2__actions { flex-direction: row; }
+  }
+
+  .hero-v2__cta-main {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 36px;
+    border-radius: 999px;
+    background: #fff;
+    color: #09090b;
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 6px 16px rgba(45, 212, 191, 0.1);
+    transition: transform .2s ease, box-shadow .25s ease, background .2s;
+  }
+  .hero-v2__cta-main:hover {
+    transform: scale(1.03);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55), 0 10px 28px rgba(45, 212, 191, 0.25);
+  }
+  .hero-v2__cta-main:active { transform: scale(.97); }
+
+  .hero-v2__cta-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 34px;
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    transition: all .2s ease;
+  }
+  .hero-v2__cta-ghost:hover {
+    border-color: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .hero-v2__trust {
+    margin-top: 44px;
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    font-size: .88rem;
+    color: rgba(200, 205, 255, 0.48);
+  }
+  .hero-v2__trust span { display: inline-flex; align-items: center; gap: 6px; }
+  .hero-v2__trust .check { color: #2dd4bf; font-weight: 800; }
+
+  /* ── Visual mockup card ── */
+  .hero-v2__visual {
+    display: none;
+    justify-content: center;
+    align-items: center;
+  }
+  @media (min-width: 980px) {
+    .hero-v2__visual { display: flex; }
+  }
+  .hero-v2__mockup {
+    position: relative;
+  width: 100%;
+  max-width: 500px;
+  aspect-ratio: 4 / 5;
+  border-radius: 32px;
+  border: 1px solid rgba(244,244,245,0.1);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.05);
+  overflow: hidden;
+  }
+  .hero-v2__mockup-glow {
+    position: absolute;
+    inset: -40%;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(45, 212, 191, 0.3), transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.2), transparent 50%);
+    pointer-events: none;
+    animation: heroV2Float 8s ease-in-out infinite;
+  }
+  @keyframes heroV2Float {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-10px, 10px); }
+  }
+  .hero-v2__mockup-chip {
+    max-width: 100%;
+    display: block;
+    width: 400px;
+    height: auto;
+    margin: 0 auto;
+    padding: 0;
+    text-decoration: none;
+    transition: transform .25s ease, filter .25s ease;
+  }
+  .hero-v2__mockup-chip img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+  .hero-v2__mockup-chip:hover {
+    transform: translateY(-2px) scale(1.02);
+    filter: drop-shadow(0 8px 24px rgba(4, 255, 231, 0.25));
+  }
+
+ 
+  .hero-v2__mockup-title {
+   position: relative;
+  z-index: 2;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #04ffe7;
+  line-height: 1.25;
+  margin: -20px auto 55px auto;
+  }
+
+  .hero-v2__mockup-grid {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .hero-v2__mockup-tag {
+    padding: 15px 30px;
+    border-radius: 14px;
+    background: rgba(244,244,245,0.04);
+    border: 1px solid rgba(244,244,245,0.08);
+    color: rgba(244,244,245,0.85);
+    font-size: 1.1rem;
+    font-weight: 800;
+    backdrop-filter: blur(10px);
+    display: inline-flex;
+    position: relative;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform .2s ease, background .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
+  }
+  .hero-v2__mockup-tag:hover {
+    transform: translateY(-2px);
+    background: rgba(4, 255, 231, 0.08);
+    border-color: rgba(4, 255, 231, 0.35);
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(4, 255, 231, 0.14);
+  }
+  .hero-v2__mockup-tag:focus-visible {
+    outline: 2px solid #04ffe7;
+    outline-offset: 2px;
+  }
+  .hero-v2__mockup-tag img {
+    max-width: 70px;
+  }
+
+  /* ── Free value strip ── */
+  .free-strip {
+    padding: clamp(20px, 3vw, 32px);
+    display: grid;
+    gap: clamp(16px, 3vw, 28px);
+  }
+  .free-strip--with-visual {
+    align-items: center;
+  }
+  .free-strip__visual {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 220px;
+    padding: 8px;
+    isolation: isolate;
+  }
+  .free-strip__visual::before {
+    content: "";
+    position: absolute;
+    inset: 10% 12%;
+    border-radius: 36px;
+    background:
+      radial-gradient(circle at 20% 25%, rgba(250, 204, 21, 0.18), transparent 34%),
+      radial-gradient(circle at 80% 25%, rgba(96, 165, 250, 0.22), transparent 38%),
+      radial-gradient(circle at 50% 80%, rgba(244, 114, 182, 0.18), transparent 34%);
+    filter: blur(20px);
+    z-index: -1;
+  }
+  .free-strip__hero-art {
+    width: min(100%, 400px);
+    height: auto;
+    filter: drop-shadow(0 26px 60px rgba(0, 0, 0, 0.46));
+    animation: float 5.2s ease-in-out infinite;
+  }
+  .free-strip__body {
+    display: grid;
+    gap: clamp(16px, 3vw, 24px);
+  }
+  .free-strip__head {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .free-strip__head h2 {
+    margin: 0;
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    letter-spacing: -0.02em;
+  }
+  .free-strip__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .free-strip__item {
+    position: relative;
+    display: grid;
+    gap: 14px;
+    padding: 26px 22px 22px;
+    border-radius: 22px;
+    background:
+      linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.015)),
+      rgba(4, 10, 24, 0.72);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    color: inherit;
+    text-decoration: none;
+    overflow: hidden;
+    transition: transform .35s cubic-bezier(.2,.7,.2,1), border-color .35s ease, box-shadow .35s ease, background .35s ease;
+  }
+  .free-strip__item::before {
+    content: "";
+    position: absolute;
+    inset: -30%;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(0, 240, 255, 0.16), transparent 55%),
+      radial-gradient(circle at 75% 80%, rgba(124, 77, 255, 0.14), transparent 55%);
+    opacity: 0;
+    transition: opacity .4s ease;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .free-strip__item > * { position: relative; z-index: 1; }
+  a.free-strip__item { cursor: pointer; }
+  a.free-strip__item:hover {
+    transform: translateY(-6px);
+    border-color: rgba(0, 240, 255, .42);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      0 22px 50px rgba(0, 240, 255, .22),
+      0 8px 20px rgba(124, 77, 255, .12);
+  }
+  a.free-strip__item:hover::before { opacity: 1; }
+  a.free-strip__item:hover .free-strip__item-art {
+    transform: translateY(-6px) scale(1.06);
+    filter:
+      drop-shadow(0 0 14px rgba(0, 240, 255, 0.55))
+      drop-shadow(0 24px 48px rgba(0, 240, 255, 0.32))
+      drop-shadow(0 8px 18px rgba(124, 77, 255, 0.22));
+  }
+  a.free-strip__item:focus-visible {
+    outline: 2px solid rgba(0, 240, 255, .6);
+    outline-offset: 3px;
+  }
+  .free-strip__item-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .free-strip__item-art {
+    width: 220px;
+    height: 220px;
+    object-fit: contain;
+    filter:
+      drop-shadow(0 0 8px rgba(0, 240, 255, 0.32))
+      drop-shadow(0 18px 36px rgba(0, 240, 255, 0.22));
+    transition: transform .45s cubic-bezier(.2,.7,.2,1), filter .45s ease;
+    animation: freeStripFloat 5.5s ease-in-out infinite;
+  }
+  .free-strip__item:nth-child(2) .free-strip__item-art { animation-delay: -1.2s; }
+  .free-strip__item:nth-child(3) .free-strip__item-art { animation-delay: -2.4s; }
+  .free-strip__item:nth-child(4) .free-strip__item-art { animation-delay: -3.6s; }
+  @keyframes freeStripFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .free-strip__item strong {
+    display: grid;
+    font-size: 1.05rem;
+    color: var(--text, #fff);
+    letter-spacing: -0.01em;
+    align-content: end;
+  }
+  .free-strip__item p {
+    margin: 0;
+    color: var(--muted, rgba(255,255,255,.6));
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+  .free-strip__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(0,240,255,.26), rgba(124,77,255,.22));
+    border: 1px solid rgba(0,240,255,.34);
+    color: #00f0ff;
+    font-weight: 800;
+    flex-shrink: 0;
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.28);
+  }
+  @media (min-width: 760px) {
+    .free-strip__grid { grid-template-columns: repeat(2, 1fr); }
+    .free-strip__item-art {
+      width: 300px;
+      height: 300px;
     }
-    const io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          io.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-    targets.forEach(function (el) { io.observe(el); });
-  })();
-</script>
+  }
+  @media (min-width: 1040px) {
+    .free-strip--with-visual {
+      grid-template-columns: minmax(280px, 0.95fr) minmax(0, 1.25fr);
+      gap: 28px;
+    }
+    .free-strip__visual {
+      min-height: 100%;
+    }
+  }
+
+  /* ── Lab tools grid (T2) ── */
+  .lab-section { padding-top: clamp(40px, 6vw, 80px); }
+  .lab-tools-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: clamp(16px, 2.5vw, 24px);
+    align-items: stretch;
+  }
+  .lab-tool-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    padding: 20px 20px 22px;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+  }
+  .lab-tool-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(0,240,255,.35);
+    box-shadow: 0 12px 32px rgba(0,240,255,.15);
+  }
+  .lab-tool-card__icon {
+    width: 100%;
+    height: clamp(150px, 17vw, 200px);
+    object-fit: contain;
+    object-position: center bottom;
+    margin: 0 auto 4px;
+    filter: drop-shadow(0 0 7px rgba(0,240,255,.22)) drop-shadow(0 14px 28px rgba(0,0,0,.35));
+    display: block;
+  }
+  .lab-tool-card .label--free {
+    margin-top: 2px;
+  }
+  .lab-tool-card h3 {
+    margin: 2px 0 0;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+  }
+  .lab-tool-card p {
+    margin: 0;
+    color: var(--muted, rgba(255,255,255,.6));
+    font-size: 0.88rem;
+    line-height: 1.55;
+    max-width: 32ch;
+    margin-top: auto;
+    padding-top: 6px;
+  }
+  .lab-section-cta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: clamp(24px, 3vw, 36px);
+  }
+  @media (min-width: 720px) {
+    .lab-tools-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 1040px) {
+    .lab-tools-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  .section-float--astronaut img {
+    width: clamp(220px, 20vw, 320px) !important;
+    opacity: 0.94;
+    filter: drop-shadow(0 22px 48px rgba(0, 0, 0, 0.42));
+  }
+
+  .icons-store-showcase {
+    align-items: center;
+  }
+  .icons-store-preview {
+    min-height: 320px;
+  }
+  .icons-store-scene {
+    position: relative;
+    width: min(100%, 430px);
+    aspect-ratio: 1 / 1;
+    margin-inline: auto;
+  }
+  .icons-store-scene__halo {
+    position: absolute;
+    inset: 14% 12%;
+    border-radius: 999px;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(109, 94, 252, 0.24), transparent 52%),
+      radial-gradient(circle at 32% 30%, rgba(139, 250, 240, 0.2), transparent 36%),
+      radial-gradient(circle at 74% 72%, rgba(244, 114, 182, 0.16), transparent 32%);
+    filter: blur(14px);
+  }
+  .icons-store-scene__card {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    border-radius: 28px;
+    background:
+      linear-gradient(150deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02)),
+      rgba(7, 10, 24, 0.84);
+    border: 1px solid rgba(177,150,255,.24);
+    box-shadow:
+      0 24px 60px rgba(8, 10, 24, 0.5),
+      inset 0 1px 0 rgba(255,255,255,0.08);
+    backdrop-filter: blur(16px);
+    padding: 18px;
+    animation: iconsVaultFloat 6s ease-in-out infinite;
+  }
+  .icons-store-scene__card img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 14px 26px rgba(0, 0, 0, 0.28));
+  }
+  .icons-store-scene__card--center {
+    inset: auto;
+    width: 210px;
+    height: 210px;
+    left: 50%;
+    top: 48%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+  }
+  .icons-store-scene__card--top {
+    width: 128px;
+    height: 128px;
+    top: 4%;
+    right: 12%;
+    animation-delay: -1s;
+  }
+  .icons-store-scene__card--left {
+    width: 146px;
+    height: 146px;
+    left: 0;
+    top: 36%;
+    animation-delay: -2s;
+  }
+  .icons-store-scene__card--right {
+    width: 138px;
+    height: 138px;
+    right: 2%;
+    bottom: 16%;
+    animation-delay: -3s;
+  }
+  .icons-store-scene__pills {
+    position: absolute;
+    left: 50%;
+    bottom: 2%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    width: min(100%, 320px);
+    z-index: 4;
+  }
+  .icons-store-scene__pills span {
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.09);
+    color: rgba(232, 236, 245, 0.88);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  @keyframes iconsVaultFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  .icons-store-scene__card--center {
+    animation-name: iconsVaultCenterFloat;
+  }
+  @keyframes iconsVaultCenterFloat {
+    0%, 100% { transform: translate(-50%, -50%); }
+    50% { transform: translate(-50%, calc(-50% - 8px)); }
+  }
+
+  .principle-panel--iconic {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    overflow: hidden;
+    min-height: 100%;
+  }
+  .principle-panel__art-shell {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 220px;
+    padding: 18px;
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.08);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .principle-panel__art-shell::before {
+    content: "";
+    position: absolute;
+    inset: 8%;
+    border-radius: 999px;
+    filter: blur(16px);
+    opacity: 0.8;
+    z-index: -1;
+  }
+  .principle-panel--clarity .principle-panel__art-shell {
+    background: linear-gradient(160deg, rgba(7, 26, 48, 0.86), rgba(10, 14, 26, 0.72));
+  }
+  .principle-panel--clarity .principle-panel__art-shell::before {
+    background: radial-gradient(circle, rgba(34, 211, 238, 0.22), transparent 62%);
+  }
+  .principle-panel--systems .principle-panel__art-shell {
+    background: linear-gradient(160deg, rgba(48, 12, 35, 0.84), rgba(20, 11, 33, 0.72));
+  }
+  .principle-panel--systems .principle-panel__art-shell::before {
+    background: radial-gradient(circle, rgba(244, 114, 182, 0.2), transparent 62%);
+  }
+  .principle-panel--shipped .principle-panel__art-shell {
+    background: linear-gradient(160deg, rgba(20, 16, 52, 0.84), rgba(9, 11, 28, 0.74));
+  }
+  .principle-panel--shipped .principle-panel__art-shell::before {
+    background: radial-gradient(circle, rgba(96, 165, 250, 0.2), transparent 62%);
+  }
+  .principle-panel--performance .principle-panel__art-shell {
+    background: linear-gradient(160deg, rgba(12, 28, 42, 0.84), rgba(9, 12, 28, 0.74));
+  }
+  .principle-panel--performance .principle-panel__art-shell::before {
+    background: radial-gradient(circle, rgba(74, 222, 128, 0.22), transparent 62%);
+  }
+  .principle-panel__art {
+    width: min(100%, 220px);
+    max-height: 220px;
+    object-fit: contain;
+    filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.34));
+    transition: transform .35s ease, filter .35s ease;
+  }
+  .principle-panel__copy {
+    display: grid;
+    gap: 10px;
+  }
+  .principle-panel__copy h3,
+  .principle-panel__copy p {
+    margin: 0;
+  }
+  .principle-panel--iconic:hover .principle-panel__art {
+    transform: translateY(-4px) scale(1.03);
+    filter: drop-shadow(0 22px 42px rgba(0, 0, 0, 0.4));
+  }
+
+  /* ── Mobile adjustments ── */
+  @media (max-width: 639px) {
+    .hero-v2__desc {
+      max-width: 100%;
+      font-size: .96rem;
+    }
+    .hero-v2__desc br { display: none; }
+    .hero-v2__trust { gap: 16px; font-size: .8rem; }
+    .hero-v2__cta-main, .hero-v2__cta-ghost {
+      padding: 16px 28px;
+      font-size: 1rem;
+    }
+    .icons-store-scene__card--center {
+      width: 176px;
+      height: 176px;
+    }
+    .icons-store-scene__card--top,
+    .icons-store-scene__card--right {
+      width: 110px;
+      height: 110px;
+    }
+    .icons-store-scene__card--left {
+      width: 120px;
+      height: 120px;
+    }
+    .principle-panel__art-shell {
+      min-height: 190px;
+    }
+    .principle-panel__art {
+      width: min(100%, 180px);
+      max-height: 180px;
+    }
+  }
+</style>
