@@ -4,7 +4,12 @@ import VxFooter from "../../../components/VxFooter.astro";
 import FaviconHead from "../../../components/FaviconHead.astro";
 import PageWidgets from "../../../components/PageWidgets.astro";
 import LabUpgradeBanner from "../../../components/LabUpgradeBanner.astro";
-import { ROUTES } from "../../../data/routes";
+import { ROUTES, checkoutHref } from "../../../data/routes";
+
+const qrConciergeHref = `${ROUTES.whatsapp}?text=${encodeURIComponent("Hi VOLYNX, I need a banner-safe dynamic QR for a client. Please help me create and keep it online.")}`;
+const launchCheckoutHref = checkoutHref("volynx_launch", { currency: "gbp", next: ROUTES.labQrGen });
+const proCheckoutHref = checkoutHref("volynx_pro", { currency: "gbp", next: ROUTES.labQrGen });
+const studioCheckoutHref = checkoutHref("volynx_studio", { currency: "gbp", next: ROUTES.labQrGen });
 ---
 
 <!DOCTYPE html>
@@ -63,11 +68,75 @@ import { ROUTES } from "../../../data/routes";
     .qr-main {
       flex: 1;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 32px 20px;
+      gap: 22px;
+      padding: 32px 20px 76px;
       position: relative;
       z-index: 1;
+    }
+
+    .lab-tool-rail {
+      width: min(1120px, 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      background: rgba(4,8,18,.62);
+      box-shadow: 0 18px 50px rgba(0,0,0,.24);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      margin-top: 18px;
+    }
+
+    .lab-tool-rail__label {
+      flex: 0 0 auto;
+      padding: 0 10px;
+      color: rgba(255,255,255,.54);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .lab-tool-rail__links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .lab-tool-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.09);
+      background: rgba(255,255,255,.045);
+      color: rgba(255,255,255,.76);
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: transform .2s ease, border-color .2s ease, color .2s ease;
+    }
+
+    .lab-tool-link:hover {
+      transform: translateY(-1px);
+      border-color: rgba(125,249,255,.4);
+      color: #fff;
+    }
+
+    .lab-tool-link.is-active {
+      color: #061016;
+      border-color: transparent;
+      background: linear-gradient(135deg, #7df9ff, #c6ff8f);
     }
 
     .container {
@@ -83,6 +152,168 @@ import { ROUTES } from "../../../data/routes";
       position: relative;
       animation: glow 4s ease-in-out infinite;
       margin: 80px auto;
+    }
+
+    .qr-commerce {
+      width: min(1120px, 100%);
+      display: grid;
+      gap: 18px;
+    }
+
+    .qr-commerce-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: end;
+      padding: 24px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.1);
+      background:
+        linear-gradient(135deg, rgba(125,249,255,.09), rgba(198,255,143,.055)),
+        rgba(4,8,18,.68);
+      box-shadow: 0 24px 80px rgba(0,0,0,.26);
+      backdrop-filter: blur(16px);
+    }
+
+    .qr-commerce-kicker {
+      display: inline-block;
+      margin-bottom: 8px;
+      color: rgba(198,255,143,.9);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .qr-commerce h2 {
+      margin: 0 0 8px;
+      color: #fff;
+      font-size: clamp(28px, 5vw, 54px);
+      line-height: .98;
+      letter-spacing: 0;
+    }
+
+    .qr-commerce p {
+      margin: 0;
+      color: rgba(255,255,255,.66);
+      line-height: 1.55;
+    }
+
+    .qr-commerce-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .qr-commerce-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .qr-commerce-btn.primary {
+      color: #061016;
+      border-color: transparent;
+      background: linear-gradient(135deg, #7df9ff, #c6ff8f);
+    }
+
+    .qr-price-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .qr-price-card {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-height: 100%;
+      padding: 22px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(4,8,18,.68);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 20px 70px rgba(0,0,0,.22);
+    }
+
+    .qr-price-card.featured {
+      border-color: rgba(125,249,255,.42);
+      background:
+        linear-gradient(180deg, rgba(125,249,255,.11), rgba(4,8,18,.72)),
+        rgba(4,8,18,.72);
+    }
+
+    .qr-price-card small {
+      color: rgba(255,255,255,.5);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .qr-price-card strong {
+      color: #fff;
+      font-size: 21px;
+      letter-spacing: 0;
+    }
+
+    .qr-price {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      color: #fff;
+      font-size: 34px;
+      font-weight: 950;
+      letter-spacing: 0;
+    }
+
+    .qr-price span {
+      color: rgba(255,255,255,.56);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .qr-price-card ul {
+      display: grid;
+      gap: 9px;
+      padding: 0;
+      margin: 0 0 4px;
+      list-style: none;
+      color: rgba(255,255,255,.68);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .qr-price-card li {
+      position: relative;
+      padding-left: 16px;
+    }
+
+    .qr-price-card li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: .68em;
+      width: 5px;
+      height: 5px;
+      border-radius: 999px;
+      background: #7df9ff;
+    }
+
+    .qr-price-card .qr-commerce-btn {
+      margin-top: auto;
+      width: 100%;
     }
 
     .tool-hero-title {
@@ -412,6 +643,23 @@ import { ROUTES } from "../../../data/routes";
     #logoImg { max-width: 100px; max-height: 100px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,.3); height: auto; display: block; margin: 0 auto; }
 
     @media (max-width: 768px) {
+      .lab-tool-rail,
+      .qr-commerce-head {
+        align-items: stretch;
+        grid-template-columns: 1fr;
+        flex-direction: column;
+      }
+      .lab-tool-rail__links,
+      .qr-commerce-actions {
+        justify-content: stretch;
+      }
+      .lab-tool-link,
+      .qr-commerce-btn {
+        flex: 1 1 auto;
+      }
+      .qr-price-grid {
+        grid-template-columns: 1fr;
+      }
       .container { padding: 30px 16px; margin: 20px auto; }
       .tool-hero-stage {
         width: 100%;
@@ -607,6 +855,17 @@ import { ROUTES } from "../../../data/routes";
   <VxHeader primaryCtaLabel="Sign in" primaryCtaI18n="header.cta_signin" primaryCtaHref={`${ROUTES.login}?next=${ROUTES.labQrGen}`} primaryCtaAuth="out" />
 
   <main class="qr-main">
+    <nav class="lab-tool-rail" aria-label="VOLYNX Lab tools">
+      <span class="lab-tool-rail__label">Lab tools</span>
+      <div class="lab-tool-rail__links">
+        <a class="lab-tool-link" href={ROUTES.lab}>Lab home</a>
+        <a class="lab-tool-link" href={ROUTES.labConverter}>Converter</a>
+        <a class="lab-tool-link" href={ROUTES.labImageScaler}>Image Scaler</a>
+        <a class="lab-tool-link" href={ROUTES.labImageSuite}>Image Suite</a>
+        <a class="lab-tool-link is-active" href={ROUTES.labQrGen}>QR Generator</a>
+      </div>
+    </nav>
+
     <div class="container">
       <h1 class="tool-hero-title" aria-label="QR Generator">
         <span class="tool-hero-stage" aria-hidden="true">
@@ -746,6 +1005,96 @@ import { ROUTES } from "../../../data/routes";
         <a href={`${ROUTES.login}?next=${ROUTES.labQrGen}`}>Sign in</a> or <a href={`${ROUTES.signup}?next=${ROUTES.labQrGen}`}>create a free account</a>.
       </p>
     </div>
+
+    <section id="qr-pricing" class="qr-commerce" aria-label="QR pricing">
+      <div class="qr-commerce-head">
+        <div>
+          <span class="qr-commerce-kicker">Banner-safe QR</span>
+          <h2>Do not print a QR that can disappear.</h2>
+          <p>Static QR is fine for quick assets. For banners, buildings and paid media, use a dynamic VOLYNX short link so the destination can be edited and kept online after print.</p>
+        </div>
+        <div class="qr-commerce-actions">
+          <a class="qr-commerce-btn" href={ROUTES.profileQrCodes}>Manage existing QRs</a>
+          <a class="qr-commerce-btn primary" href={qrConciergeHref}>Ask for banner setup</a>
+        </div>
+      </div>
+
+      <div class="qr-price-grid">
+        <article class="qr-price-card">
+          <small>Per unit</small>
+          <strong>Static branded QR</strong>
+          <div class="qr-price">£12 <span>/ QR</span></div>
+          <ul>
+            <li>One finished PNG/SVG-style export for print</li>
+            <li>Logo, colors and high error correction</li>
+            <li>Destination is fixed inside the QR image</li>
+          </ul>
+          <a class="qr-commerce-btn" href="#text">Create static QR</a>
+        </article>
+
+        <article class="qr-price-card featured">
+          <small>Best for banners</small>
+          <strong>Dynamic QR setup</strong>
+          <div class="qr-price">£29 <span>/ QR</span></div>
+          <ul>
+            <li>VOLYNX short link on qr.volynx.world</li>
+            <li>Editable destination after the banner is printed</li>
+            <li>Includes first 30 days online on free accounts</li>
+          </ul>
+          <a class="qr-commerce-btn primary" href="#qr-dyn-section">Create dynamic QR</a>
+        </article>
+
+        <article class="qr-price-card">
+          <small>Keep online</small>
+          <strong>Monthly QR hosting</strong>
+          <div class="qr-price">from £11 <span>/ month</span></div>
+          <ul>
+            <li>Launch: 5 active dynamic QRs</li>
+            <li>Pro: 20 active dynamic QRs</li>
+            <li>Studio: 50 active dynamic QRs</li>
+          </ul>
+          <a class="qr-commerce-btn" href={launchCheckoutHref}>Start Launch</a>
+        </article>
+      </div>
+
+      <div class="qr-price-grid">
+        <article class="qr-price-card">
+          <small>Launch</small>
+          <strong>Small campaigns</strong>
+          <div class="qr-price">£11 <span>/ month</span></div>
+          <ul>
+            <li>5 active dynamic QRs</li>
+            <li>No automatic expiry while plan is active</li>
+            <li>Good for menus, flyers and a first client</li>
+          </ul>
+          <a class="qr-commerce-btn" href={launchCheckoutHref}>Activate Launch</a>
+        </article>
+
+        <article class="qr-price-card featured">
+          <small>Pro</small>
+          <strong>Client work</strong>
+          <div class="qr-price">£24 <span>/ month</span></div>
+          <ul>
+            <li>20 active dynamic QRs</li>
+            <li>Better fit for agencies and recurring campaigns</li>
+            <li>Includes broader VOLYNX Pro access</li>
+          </ul>
+          <a class="qr-commerce-btn primary" href={proCheckoutHref}>Activate Pro</a>
+        </article>
+
+        <article class="qr-price-card">
+          <small>Studio</small>
+          <strong>Production volume</strong>
+          <div class="qr-price">£54 <span>/ month</span></div>
+          <ul>
+            <li>50 active dynamic QRs</li>
+            <li>For multiple clients, locations or campaigns</li>
+            <li>Designed for ongoing studio operations</li>
+          </ul>
+          <a class="qr-commerce-btn" href={studioCheckoutHref}>Activate Studio</a>
+        </article>
+      </div>
+    </section>
   </main>
 
   <LabUpgradeBanner />
