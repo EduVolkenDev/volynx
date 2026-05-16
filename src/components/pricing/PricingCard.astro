@@ -1,6 +1,21 @@
 ---
+import { ROUTES, checkoutHref } from "../../data/routes";
+
 const { plan, locale, currency } = Astro.props;
 const currencies = ['GBP', 'EUR', 'BRL'] as const;
+const planLookupPrefix = ({
+  launch: 'builder_launch',
+  pro: 'builder_pro',
+  studio: 'builder_studio',
+  teams: 'builder_teams',
+  daily_pro: 'daily_pro',
+  daily_diamond: 'daily_diamond',
+} as Record<string, string>)[plan.id];
+const freePlanHref = ({
+  free: ROUTES.builder,
+  daily_free: ROUTES.daily,
+} as Record<string, string>)[plan.id];
+const ctaHref = freePlanHref || (planLookupPrefix ? checkoutHref(planLookupPrefix, { next: ROUTES.pricing }) : ROUTES.support);
 ---
 <article class={`pricing-card ${plan.featured ? 'pricing-card--featured' : ''}${plan.image ? ' has-card-asset' : ''}`} data-plan={plan.id}>
   {plan.image && <img src={plan.image} alt="" class="card-asset" loading="lazy" />}
@@ -22,7 +37,7 @@ const currencies = ['GBP', 'EUR', 'BRL'] as const;
       <li><span class="i18n-en">{f}</span><span class="i18n-pt">{plan.features.pt[i] || f}</span></li>
     ))}
   </ul>
-  <button type="button" class={`pricing-card__cta ${plan.featured ? 'pricing-card__cta--primary' : ''}`}><span class="i18n-en">{plan.cta.en}</span><span class="i18n-pt">{plan.cta.pt}</span></button>
+  <a href={ctaHref} class={`pricing-card__cta ${plan.featured ? 'pricing-card__cta--primary' : ''}`} data-lookup={planLookupPrefix || undefined}><span class="i18n-en">{plan.cta.en}</span><span class="i18n-pt">{plan.cta.pt}</span></a>
 </article>
 
 <style>

@@ -8,7 +8,7 @@ import ToolUsageCard from "../components/pricing/ToolUsageCard.astro";
 import AddonCard from "../components/pricing/AddonCard.astro";
 import PlatformAssistStrip from "../components/PlatformAssistStrip.astro";
 import { sitePricing } from "../data/pricing";
-import { ROUTES } from "../data/routes";
+import { ROUTES, checkoutHref } from "../data/routes";
 
 const lang = Astro.url.searchParams.get('lang') === 'pt' ? 'pt' : 'en';
 const currencyParam = Astro.url.searchParams.get('currency') || '';
@@ -306,7 +306,7 @@ const pricingAssistItems = [
         <div class="cvitae-actions">
           <a class="button button--ghost" href={`${ROUTES.cvitae}/editor/`}><span class="i18n-en">Open CVitae</span><span class="i18n-pt">Abrir CVitae</span></a>
           <a class="button button--ghost" href={ROUTES.recarregar}><span class="i18n-en">Get VX</span><span class="i18n-pt">Comprar VX</span></a>
-          <button type="button" class="button button--gold" id="cvitaeBusinessBtn"><span class="i18n-en">Activate Business</span><span class="i18n-pt">Ativar Business</span></button>
+          <a class="button button--gold" id="cvitaeBusinessBtn" href={checkoutHref("cvitae_business", { next: `${ROUTES.pricing}#cvitae` })}><span class="i18n-en">Activate Business</span><span class="i18n-pt">Ativar Business</span></a>
         </div>
       </div>
     </section>
@@ -374,9 +374,9 @@ const pricingAssistItems = [
             </div>
             <p style="margin:0 0 12px;color:var(--muted);font-size:12px;"><span class="i18n-en">{b.savings.en}</span><span class="i18n-pt">{b.savings.pt}</span></p>
             <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.5;"><span class="i18n-en">{b.description.en}</span><span class="i18n-pt">{b.description.pt}</span></p>
-            <button type="button" class="bundle-card__cta" data-bundle-key={bundleLookupById[b.id]}>
+            <a href={checkoutHref(bundleLookupById[b.id], { next: `${ROUTES.pricing}#bundles` })} class="bundle-card__cta" data-bundle-key={bundleLookupById[b.id]}>
               <span class="i18n-en">{b.cta.en}</span><span class="i18n-pt">{b.cta.pt}</span>
-            </button>
+            </a>
           </div>
         ))}
       </div>
@@ -1309,6 +1309,295 @@ const pricingAssistItems = [
 
   <!-- Pix checkout helper -->
   <script is:inline src="/js/vx-pix.js"></script>
+
+  <!-- Immediate checkout bridge: every money CTA gets a response even if later modules lag. -->
+  <script is:inline>
+    (function() {
+      if (window.__vxPricingCheckoutBridge) return;
+      window.__vxPricingCheckoutBridge = true;
+
+      var PLAN_LOOKUP_PREFIX = {
+        launch: 'builder_launch',
+        pro: 'builder_pro',
+        studio: 'builder_studio',
+        teams: 'builder_teams',
+        daily_pro: 'daily_pro',
+        daily_diamond: 'daily_diamond'
+      };
+      var TOKEN_PACK_LOOKUP_PREFIX = {
+        starter: 'tokens_starter',
+        core: 'tokens_core',
+        pro: 'tokens_pro',
+        scale: 'tokens_scale'
+      };
+      var FREE_PLAN_HREFS = {
+        free: '/builder/',
+        daily_free: 'https://daily.volynx.world/'
+      };
+      var UI_TEXT = {
+        en: {
+          signIn: 'Sign in to continue to checkout...',
+          checkoutNotConfigured: 'Checkout is not configured. Contact support.',
+          checkoutFailed: 'Checkout failed. Please try again.',
+          connectionError: 'Connection error. Please try again.',
+          redirecting: 'Redirecting...',
+          tryAgain: 'Try again'
+        },
+        pt: {
+          signIn: 'Entre para continuar para o checkout...',
+          checkoutNotConfigured: 'Checkout não configurado. Fale com o suporte.',
+          checkoutFailed: 'O checkout falhou. Tente novamente.',
+          connectionError: 'Erro de conexão. Tente novamente.',
+          redirecting: 'Redirecionando...',
+          tryAgain: 'Tentar novamente'
+        }
+      };
+
+      var configPromise = null;
+
+      function activeLang() {
+        return String(localStorage.getItem('volynx_lang') || document.documentElement.lang || 'en').toLowerCase().startsWith('pt') ? 'pt' : 'en';
+      }
+
+      function t(key) {
+        var lang = activeLang();
+        return (UI_TEXT[lang] && UI_TEXT[lang][key]) || UI_TEXT.en[key] || key;
+      }
+
+      function toast(message, options) {
+        if (typeof window.vxToast === 'function') {
+          window.vxToast(message, options || {});
+          return;
+        }
+        var el = document.getElementById('vxCheckoutToast');
+        if (!el) {
+          el = document.createElement('div');
+          el.id = 'vxCheckoutToast';
+          el.setAttribute('role', 'status');
+          el.setAttribute('aria-live', 'polite');
+          el.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%);max-width:min(560px,calc(100% - 32px));padding:14px 20px;border-radius:14px;border:1px solid rgba(45,212,191,.45);background:rgba(15,16,28,.96);color:#fff;font-size:14px;line-height:1.5;z-index:99999;box-shadow:0 22px 56px rgba(0,0,0,.5);';
+          document.body.appendChild(el);
+        }
+        el.textContent = message;
+        clearTimeout(el._t);
+        el._t = setTimeout(function(){ el.remove(); }, (options && options.duration) || 4500);
+      }
+
+      function normalizeCurrency(value) {
+        var code = String(value || 'GBP').toLowerCase();
+        return ['gbp', 'eur', 'brl'].includes(code) ? code : 'gbp';
+      }
+
+      function getCheckoutCurrency() {
+        var active = document.querySelector('[data-switch-currency].lcbar__pill--active');
+        return normalizeCurrency(
+          (active && active.dataset.switchCurrency) ||
+          new URLSearchParams(window.location.search).get('currency') ||
+          localStorage.getItem('volynx_currency') ||
+          'GBP'
+        );
+      }
+
+      function pricingUrl(options) {
+        var url = new URL(window.location.href);
+        if (options && 'payment' in options) {
+          if (options.payment) url.searchParams.set('payment', options.payment);
+          else url.searchParams.delete('payment');
+        }
+        if (options && 'hash' in options) {
+          url.hash = options.hash ? '#' + String(options.hash).replace(/^#/, '') : '';
+        }
+        return url.toString();
+      }
+
+      function getConfig() {
+        if (!configPromise) {
+          configPromise = fetch('/config.json', { cache: 'no-store' })
+            .then(function(r) { return r.ok ? r.json() : {}; })
+            .catch(function() { return {}; });
+        }
+        return configPromise;
+      }
+
+      async function getFreshToken(cfg) {
+        var token = localStorage.getItem('volynx_access_token') || '';
+        var refreshToken = localStorage.getItem('volynx_refresh_token') || '';
+        if (!token || !refreshToken || !cfg.supabaseUrl || !cfg.supabaseAnonKey) return token;
+        try {
+          var res = await fetch(cfg.supabaseUrl + '/auth/v1/token?grant_type=refresh_token', {
+            method: 'POST',
+            headers: { apikey: cfg.supabaseAnonKey, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh_token: refreshToken })
+          });
+          if (!res.ok) return token;
+          var session = await res.json();
+          if (session.access_token) {
+            localStorage.setItem('volynx_access_token', session.access_token);
+            if (session.refresh_token) localStorage.setItem('volynx_refresh_token', session.refresh_token);
+            return session.access_token;
+          }
+        } catch (_) {}
+        return token;
+      }
+
+      function rememberButton(btn) {
+        if (!btn.dataset.vxOriginalHtml) btn.dataset.vxOriginalHtml = btn.innerHTML;
+      }
+
+      function setBusy(btn) {
+        rememberButton(btn);
+        btn.innerHTML = t('redirecting');
+        btn.setAttribute('aria-busy', 'true');
+        btn.style.pointerEvents = 'none';
+        if ('disabled' in btn) btn.disabled = true;
+      }
+
+      function resetButton(btn) {
+        btn.innerHTML = btn.dataset.vxOriginalHtml || t('tryAgain');
+        btn.removeAttribute('aria-busy');
+        btn.style.pointerEvents = '';
+        if ('disabled' in btn) btn.disabled = false;
+      }
+
+      function loginNext() {
+        return '/login/?next=' + encodeURIComponent('/pricing/' + (window.location.hash || ''));
+      }
+
+      function resolveCheckout(target) {
+        if (!target) return null;
+
+        if (target.id === 'cvitaeBusinessBtn') {
+          return {
+            lookupKey: 'cvitae_business_' + getCheckoutCurrency(),
+            successUrl: window.location.origin + '/profile/?payment=success&product=cvitae_business',
+            cancelUrl: pricingUrl({ payment: 'cancelled', hash: 'cvitae' })
+          };
+        }
+
+        if (target.classList.contains('bundle-card__cta')) {
+          var bundleKey = target.getAttribute('data-bundle-key');
+          if (!bundleKey) return null;
+          return {
+            lookupKey: bundleKey + '_' + getCheckoutCurrency(),
+            successUrl: window.location.origin + '/profile/?payment=success&product=bundle',
+            cancelUrl: pricingUrl({ payment: 'cancelled', hash: 'bundles' })
+          };
+        }
+
+        if (target.classList.contains('token-card__pix')) {
+          var pixLookup = target.getAttribute('data-pix-pack');
+          if (!pixLookup) return null;
+          return {
+            lookupKey: pixLookup,
+            paymentMethod: 'pix',
+            successUrl: window.location.origin + '/account/?payment=pix_success',
+            cancelUrl: pricingUrl({ payment: 'cancelled', hash: 'vx' })
+          };
+        }
+
+        if (target.classList.contains('token-card__cta')) {
+          var tokenCard = target.closest('.token-card');
+          var packId = tokenCard && tokenCard.getAttribute('data-pack-id');
+          var packKey = TOKEN_PACK_LOOKUP_PREFIX[packId];
+          if (!packKey) return null;
+          return {
+            lookupKey: packKey + '_' + getCheckoutCurrency(),
+            successUrl: window.location.origin + '/profile/?payment=success&product=vx',
+            cancelUrl: pricingUrl({ payment: 'cancelled', hash: 'vx' })
+          };
+        }
+
+        if (target.matches('.addon-card__cta[data-addon-key]')) {
+          var addonKey = target.getAttribute('data-addon-key');
+          if (!addonKey) return null;
+          return {
+            lookupKey: addonKey + '_' + getCheckoutCurrency(),
+            successUrl: window.location.origin + '/profile/?payment=success&product=addon',
+            cancelUrl: pricingUrl({ payment: 'cancelled', hash: 'addons' })
+          };
+        }
+
+        if (target.classList.contains('pricing-card__cta')) {
+          var planCard = target.closest('.pricing-card');
+          var planId = planCard && planCard.getAttribute('data-plan');
+          var freeHref = FREE_PLAN_HREFS[planId];
+          if (freeHref) return { href: freeHref };
+          var prefix = PLAN_LOOKUP_PREFIX[planId];
+          if (!prefix) return null;
+          return {
+            lookupKey: prefix + '_' + getCheckoutCurrency(),
+            successUrl: window.location.origin + '/profile/?payment=success&product=' + encodeURIComponent(planId),
+            cancelUrl: pricingUrl({ payment: 'cancelled', hash: planId && planId.startsWith('daily_') ? 'daily-plans' : 'plans' })
+          };
+        }
+
+        return null;
+      }
+
+      async function startCheckout(target, checkout) {
+        if (checkout.href) {
+          window.location.href = checkout.href;
+          return;
+        }
+
+        var cfg = await getConfig();
+        var apiBase = String((cfg.functionsUrl || cfg.apiBaseUrl || '')).replace(/\/$/, '');
+        var token = await getFreshToken(cfg);
+
+        if (!token) {
+          toast(t('signIn'), { type: 'success', duration: 1600 });
+          setTimeout(function() { window.location.href = loginNext(); }, 550);
+          return;
+        }
+        if (!apiBase) {
+          toast(t('checkoutNotConfigured'));
+          return;
+        }
+
+        setBusy(target);
+        try {
+          var body = {
+            lookup_key: checkout.lookupKey,
+            success_url: checkout.successUrl || window.location.origin + '/profile/?payment=success',
+            cancel_url: checkout.cancelUrl || pricingUrl({ payment: 'cancelled' })
+          };
+          if (checkout.paymentMethod) body.payment_method = checkout.paymentMethod;
+
+          var res = await fetch(apiBase + '/create-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+            body: JSON.stringify(body)
+          });
+          var data = await res.json().catch(function() { return {}; });
+          if (res.status === 401) {
+            toast(data.error || data.message || t('signIn'));
+            setTimeout(function() { window.location.href = loginNext(); }, 700);
+            return;
+          }
+          if (data.url) {
+            window.location.href = data.url;
+            return;
+          }
+          toast(data.error || data.msg || data.message || t('checkoutFailed'));
+          resetButton(target);
+        } catch (_) {
+          toast(t('connectionError'));
+          resetButton(target);
+        }
+      }
+
+      document.addEventListener('click', function(event) {
+        var target = event.target && event.target.closest
+          ? event.target.closest('.pricing-card__cta, .bundle-card__cta, .token-card__cta, .token-card__pix, .addon-card__cta[data-addon-key], #cvitaeBusinessBtn')
+          : null;
+        var checkout = resolveCheckout(target);
+        if (!checkout) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        startCheckout(target, checkout);
+      }, true);
+    })();
+  </script>
 
   <!-- Checkout + Plan detection -->
   <script is:inline type="module">

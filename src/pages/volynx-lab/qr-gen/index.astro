@@ -600,7 +600,7 @@ import { ROUTES } from "../../../data/routes";
 </head>
 
 <body>
-  <VxHeader primaryCtaLabel="Sign in" primaryCtaI18n="header.cta_signin" primaryCtaHref={ROUTES.login} primaryCtaAuth="out" />
+  <VxHeader primaryCtaLabel="Sign in" primaryCtaI18n="header.cta_signin" primaryCtaHref={`${ROUTES.login}?next=${ROUTES.labQrGen}`} primaryCtaAuth="out" />
 
   <main class="qr-main">
     <div class="container">
@@ -631,7 +631,7 @@ import { ROUTES } from "../../../data/routes";
 
         <div class="qr-dyn-login-cta" id="qr-dyn-login-cta" hidden>
           <p data-i18n="qr.dynamic_login_required">Sign in to create dynamic QRs that you can edit later.</p>
-          <a href={ROUTES.login}>Sign in</a>
+          <a href={`${ROUTES.login}?next=${ROUTES.labQrGen}`}>Sign in</a>
         </div>
 
         <div id="qr-dyn-form" hidden>
@@ -739,7 +739,7 @@ import { ROUTES } from "../../../data/routes";
 
       <p class="login-hint" data-i18n="qr.login_hint">
         Want to save your QR Codes?
-        <a href={ROUTES.login}>Sign in</a> or <a href={ROUTES.signup}>create a free account</a>.
+        <a href={`${ROUTES.login}?next=${ROUTES.labQrGen}`}>Sign in</a> or <a href={`${ROUTES.signup}?next=${ROUTES.labQrGen}`}>create a free account</a>.
       </p>
     </div>
   </main>
@@ -748,8 +748,10 @@ import { ROUTES } from "../../../data/routes";
   <VxFooter />
   <PageWidgets hideUtilBar />
 
+  <script is:inline src="/js/vx-auth-bridge.js"></script>
+  <script is:inline src="/js/vx-token-refresh.js?v=20260515-qr-dynamic-auth"></script>
   <script is:inline src="https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
   <script is:inline src="/scripts/qr-gen.js"></script>
-  <script is:inline src="/scripts/qr-gen-dynamic.js?v=20260512-qr-dynamic"></script>
+  <script is:inline src="/scripts/qr-gen-dynamic.js?v=20260515-qr-dynamic-auth"></script>
 </body>
 </html>

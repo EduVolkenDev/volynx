@@ -54,6 +54,7 @@
     try {
       localStorage.removeItem(ACCESS_KEY);
       localStorage.removeItem(REFRESH_KEY);
+      localStorage.removeItem("volynx_session");
     } catch (_) {}
     try {
       document.documentElement.classList.remove("vx-authed");
@@ -105,6 +106,14 @@
           if (data.user && data.user.email) {
             localStorage.setItem("volynx_user_email", data.user.email);
           }
+          localStorage.setItem("volynx_session", JSON.stringify({
+            access_token: data.access_token,
+            refresh_token: data.refresh_token || refreshToken,
+            expires_at: data.expires_at || null,
+            expires_in: data.expires_in || null,
+            user: data.user || null
+          }));
+          if (window.VxAuthBridge) window.VxAuthBridge.sync();
           document.documentElement.classList.add("vx-authed");
         } catch (_) {}
         try {

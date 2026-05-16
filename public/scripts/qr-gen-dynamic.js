@@ -33,6 +33,17 @@
 
   function $(id) { return document.getElementById(id); }
 
+  function decodeJwtPayload(jwt) {
+    try {
+      const part = String(jwt || "").split(".")[1];
+      if (!part) return null;
+      const norm = part.replace(/-/g, "+").replace(/_/g, "/");
+      return JSON.parse(atob(norm.padEnd(norm.length + (4 - norm.length % 4) % 4, "=")));
+    } catch {
+      return null;
+    }
+  }
+
   function t(key, fallback, vars) {
     const lang = localStorage.getItem("volynx_lang") || "en";
     const dict = window.VX_TRANS && window.VX_TRANS[lang];
@@ -75,13 +86,37 @@
   function getSession() {
     try {
       const raw = localStorage.getItem("volynx_session");
-      if (!raw) return null;
-      const session = JSON.parse(raw);
-      if (!session?.access_token || !session?.user?.id) return null;
-      return session;
+      const stored = raw ? JSON.parse(raw) : {};
+      const accessToken = localStorage.getItem("volynx_access_token") || stored.access_token || "";
+      if (!accessToken) return null;
+
+      const payload = decodeJwtPayload(accessToken);
+      const userId = stored?.user?.id || payload?.sub || "";
+      if (!userId) return null;
+
+      return {
+        ...stored,
+        access_token: accessToken,
+        refresh_token: localStorage.getItem("volynx_refresh_token") || stored.refresh_token || "",
+        user: {
+          ...(stored.user || {}),
+          id: userId,
+          email: stored?.user?.email || localStorage.getItem("volynx_user_email") || payload?.email || "",
+        },
+      };
     } catch {
       return null;
     }
+  }
+
+  async function ensureSession() {
+    if (window.VxAuthBridge?.hydrate) {
+      window.VxAuthBridge.hydrate();
+    }
+    if (window.vxEnsureFreshToken) {
+      await window.vxEnsureFreshToken().catch(() => null);
+    }
+    return getSession();
   }
 
   async function fetchUserPlan(cfg, session) {
@@ -143,9 +178,29 @@
     if (el) el.hidden = true;
   }
 
+  function loginUrl() {
+    const next = window.location.pathname + window.location.search;
+    return `/login/?next=${encodeURIComponent(next || "/volynx-lab/qr-gen/")}`;
+  }
+
+  function showLoginRequired() {
+    const loginCta = $("qr-dyn-login-cta");
+    const form = $("qr-dyn-form");
+    if (loginCta) {
+      const link = loginCta.querySelector("a");
+      if (link) link.href = loginUrl();
+      loginCta.hidden = false;
+    }
+    if (form) form.hidden = true;
+    showError("qr.dynamic_login_required", "Sign in to create dynamic QRs that you can edit later.");
+    try {
+      localStorage.setItem("volynx_post_login_next", window.location.pathname + window.location.search);
+    } catch (_) {}
+  }
+
   async function refreshQuota() {
     const cfg = await loadConfig();
-    const session = getSession();
+    const session = await ensureSession();
     if (!cfg || !session) return;
     const profile = await fetchUserPlan(cfg, session);
     const count = await fetchActiveQrCount(cfg, session);
@@ -156,9 +211,9 @@
 
   async function createQrCode(targetUrl, label) {
     const cfg = await loadConfig();
-    const session = getSession();
+    const session = await ensureSession();
     if (!cfg || !session) {
-      showError("qr.dynamic_err_generic", "Could not create QR. Try again.");
+      showLoginRequired();
       return null;
     }
 
@@ -246,18 +301,23 @@
   }
 
   function checkAuthAndRender() {
-    const session = getSession();
+    ensureSession().then((session) => {
     const loginCta = $("qr-dyn-login-cta");
     const form = $("qr-dyn-form");
 
     if (!session) {
-      if (loginCta) loginCta.hidden = false;
+      if (loginCta) {
+        const link = loginCta.querySelector("a");
+        if (link) link.href = loginUrl();
+        loginCta.hidden = false;
+      }
       if (form) form.hidden = true;
     } else {
       if (loginCta) loginCta.hidden = true;
       if (form) form.hidden = false;
       refreshQuota();
     }
+    });
   }
 
   async function handleCreate() {
@@ -284,6 +344,11 @@
     }
 
     try {
+      const session = await ensureSession();
+      if (!session) {
+        showLoginRequired();
+        return;
+      }
       const created = await createQrCode(target, label);
       if (!created) return;
 

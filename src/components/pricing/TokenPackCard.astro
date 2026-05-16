@@ -1,6 +1,15 @@
 ---
+import { ROUTES, checkoutHref } from "../../data/routes";
+
 const { pack, locale, currency } = Astro.props;
 const currencies = ['GBP', 'EUR', 'BRL'] as const;
+const tokenLookupPrefix = ({
+  starter: 'tokens_starter',
+  core: 'tokens_core',
+  pro: 'tokens_pro',
+  scale: 'tokens_scale',
+} as Record<string, string>)[pack.id];
+const checkoutUrl = tokenLookupPrefix ? checkoutHref(tokenLookupPrefix, { next: `${ROUTES.pricing}#vx-packs` }) : ROUTES.recarregar;
 ---
 <div class="token-card" data-pack-id={pack.id}>
   <img src={pack.icon || "/assets/vx-new.webp"} alt="" class="token-card__icon" loading="lazy" decoding="async" />
@@ -14,7 +23,7 @@ const currencies = ['GBP', 'EUR', 'BRL'] as const;
     : <p class="token-card__desc"><span class="i18n-en">One-time pack. Flexible capacity across the ecosystem.</span><span class="i18n-pt">Pacote avulso. Capacidade flexível em todo o ecossistema.</span></p>
   }
   <div class="token-card__buttons">
-    <button type="button" class="token-card__cta"><span class="i18n-en">Buy</span><span class="i18n-pt">Comprar</span></button>
+    <a href={checkoutUrl} class="token-card__cta" data-lookup={tokenLookupPrefix || undefined}><span class="i18n-en">Buy</span><span class="i18n-pt">Comprar</span></a>
     <button type="button" class="token-card__pix" data-pix-pack={`tokens_${pack.id}_brl`}>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:4px;">
         <path d="M17.7 6.3c-1.2-1.2-2.8-1.8-4.5-1.8s-3.3.6-4.5 1.8L5.4 9.6l2.1 2.1 3.3-3.3c.6-.6 1.4-.9 2.4-.9s1.8.3 2.4.9l3.3 3.3 2.1-2.1-3.3-3.3z" fill="currentColor"/>

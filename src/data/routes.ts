@@ -76,6 +76,7 @@ export const ROUTES = {
   blackDiamond: "/invite/black-diamond/",
 
   // ── Admin (gated by profiles.is_admin) ───
+  adminCodes: "/admin/codes/",
   adminVouchers: "/admin/vouchers/",
   adminQrCodes: "/admin/qr-codes/",
 

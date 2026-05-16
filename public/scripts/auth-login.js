@@ -22,6 +22,8 @@ function resolveRedirect() {
       const next = decodeURIComponent(raw);
       if (next.startsWith("/") && !next.startsWith("//")) return next;
     }
+    const stored = localStorage.getItem("volynx_post_login_next") || "";
+    if (stored.startsWith("/") && !stored.startsWith("//")) return stored;
   } catch {}
   return DEFAULT_REDIRECT;
 }

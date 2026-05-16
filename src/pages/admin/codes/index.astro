@@ -1,0 +1,1155 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import VxHeader from "../../../components/VxHeader.astro";
+import VxFooter from "../../../components/VxFooter.astro";
+import PageWidgets from "../../../components/PageWidgets.astro";
+import { ROUTES } from "../../../data/routes";
+
+const title = "Admin · Codes — VOLYNX";
+const description = "Unified admin console for dynamic QR codes, voucher links and access codes.";
+---
+
+<BaseLayout title={title} description={description}>
+  <VxHeader primaryCtaLabel="Sign out" primaryCtaI18n="djs.sign_out" primaryCtaHref="/login/?logout=1" primaryCtaAuth="in" />
+  <PageWidgets hideUtilBar />
+
+  <main class="codes-shell">
+    <section id="codesLoading" class="codes-state">
+      <p>Loading access console...</p>
+    </section>
+
+    <section id="codesLoggedOut" class="codes-state" hidden>
+      <h1>Sign in required</h1>
+      <p>The access console is gated to platform admins.</p>
+      <a class="codes-btn primary" href={`${ROUTES.login}?next=${ROUTES.adminCodes}`}>Sign in</a>
+    </section>
+
+    <section id="codesForbidden" class="codes-state" hidden>
+      <h1>Forbidden</h1>
+      <p>Your account does not have admin privileges.</p>
+      <a class="codes-btn ghost" href={ROUTES.home}>Back to home</a>
+    </section>
+
+    <section id="codesConsole" class="codes-console" hidden>
+      <header class="codes-hero">
+        <div>
+          <span class="codes-kicker">Admin · Codes</span>
+          <h1>Access Console</h1>
+          <p>QR links, vouchers and client handoff codes in one operational surface.</p>
+        </div>
+        <div class="codes-hero-actions">
+          <a class="codes-btn ghost" href={ROUTES.labQrGen}>Styled QR designer</a>
+          <a class="codes-btn ghost" href={ROUTES.adminQrCodes}>Old QR admin</a>
+          <a class="codes-btn ghost" href={ROUTES.adminVouchers}>Old voucher admin</a>
+        </div>
+      </header>
+
+      <nav class="codes-tabs" aria-label="Code admin sections">
+        <button class="codes-tab is-active" type="button" data-tab="qr">QR Codes</button>
+        <button class="codes-tab" type="button" data-tab="vouchers">Vouchers</button>
+        <button class="codes-tab" type="button" data-tab="recent">Recent</button>
+      </nav>
+
+      <section class="codes-panel is-active" data-panel="qr">
+        <div class="codes-grid codes-grid--primary">
+          <article class="codes-card codes-card--create">
+            <div class="codes-card-head">
+              <span>Dynamic QR</span>
+              <strong>Print-safe link</strong>
+            </div>
+            <form id="qrCreateForm" class="codes-form">
+              <label>
+                <span>Destination URL</span>
+                <input id="qrTarget" type="url" placeholder="https://client-site.com" autocomplete="url" required />
+              </label>
+              <div class="codes-form-row">
+                <label>
+                  <span>Label</span>
+                  <input id="qrLabel" type="text" maxlength="100" placeholder="Client banner" />
+                </label>
+                <label>
+                  <span>Custom slug</span>
+                  <input id="qrSlug" type="text" maxlength="32" placeholder="optional" />
+                </label>
+              </div>
+              <label class="codes-check">
+                <input id="qrNeverExpires" type="checkbox" checked />
+                <span>Never expires</span>
+              </label>
+              <button id="qrCreateBtn" class="codes-btn primary" type="submit">Create QR</button>
+              <p id="qrCreateMsg" class="codes-msg" aria-live="polite"></p>
+            </form>
+          </article>
+
+          <article id="qrResult" class="codes-card codes-card--result" hidden>
+            <div class="codes-card-head">
+              <span>Ready</span>
+              <strong>Test before print</strong>
+            </div>
+            <div class="codes-result-url">
+              <input id="qrShortUrl" type="text" readonly />
+              <button class="codes-btn ghost" type="button" data-copy-target="qrShortUrl">Copy</button>
+            </div>
+            <div class="codes-preview">
+              <canvas id="qrCanvas" width="360" height="360" aria-label="Generated QR code"></canvas>
+            </div>
+            <div class="codes-result-actions">
+              <a id="qrOpenLink" class="codes-btn ghost" href="#" target="_blank" rel="noopener">Open</a>
+              <button id="qrDownloadPng" class="codes-btn ghost" type="button">Download PNG</button>
+              <button id="qrRefreshList" class="codes-btn ghost" type="button">Refresh list</button>
+            </div>
+          </article>
+        </div>
+
+        <article class="codes-card">
+          <div class="codes-list-head">
+            <div>
+              <span class="codes-kicker">QR Inventory</span>
+              <h2>Live QR codes</h2>
+            </div>
+            <div class="codes-filter">
+              <select id="qrStatusFilter">
+                <option value="">All</option>
+                <option value="active">Active</option>
+                <option value="paused">Paused</option>
+                <option value="grace">Grace</option>
+                <option value="expired">Expired</option>
+                <option value="admin_blocked">Blocked</option>
+              </select>
+              <input id="qrSearch" type="search" placeholder="slug, label, URL or owner" />
+              <button id="qrLoadBtn" class="codes-btn ghost" type="button">Refresh</button>
+            </div>
+          </div>
+          <div id="qrRows" class="codes-rows"></div>
+        </article>
+      </section>
+
+      <section class="codes-panel" data-panel="vouchers">
+        <div class="codes-grid">
+          <article class="codes-card">
+            <div class="codes-card-head">
+              <span>Voucher</span>
+              <strong>Quick issue</strong>
+            </div>
+            <form id="voucherForm" class="codes-form">
+              <label>
+                <span>Preset</span>
+                <select id="voucherPreset">
+                  <option value="black_diamond">Black Diamond pack</option>
+                  <option value="vx_80">80 VX bonus</option>
+                  <option value="pro_perm">Pro plan permanent</option>
+                  <option value="diamond_90">Daily Diamond 90d</option>
+                </select>
+              </label>
+              <div class="codes-form-row">
+                <label>
+                  <span>Recipient</span>
+                  <input id="voucherRecipient" type="text" maxlength="80" placeholder="Client name" />
+                </label>
+                <label>
+                  <span>Email gate</span>
+                  <input id="voucherEmail" type="email" maxlength="320" placeholder="optional" />
+                </label>
+              </div>
+              <label>
+                <span>Label</span>
+                <input id="voucherLabel" type="text" maxlength="200" placeholder="Auto-generated if empty" />
+              </label>
+              <button id="voucherCreateBtn" class="codes-btn primary" type="submit">Create voucher</button>
+              <p id="voucherMsg" class="codes-msg" aria-live="polite"></p>
+            </form>
+          </article>
+
+          <article id="voucherResult" class="codes-card codes-card--result" hidden>
+            <div class="codes-card-head">
+              <span>Voucher created</span>
+              <strong>Share link</strong>
+            </div>
+            <div class="codes-result-url">
+              <input id="voucherUrl" type="text" readonly />
+              <button class="codes-btn ghost" type="button" data-copy-target="voucherUrl">Copy</button>
+            </div>
+            <div class="codes-preview">
+              <canvas id="voucherCanvas" width="320" height="320" aria-label="Voucher QR code"></canvas>
+            </div>
+            <div class="codes-result-actions">
+              <code id="voucherCode" class="codes-code">-</code>
+              <button id="voucherDownloadPng" class="codes-btn ghost" type="button">Download PNG</button>
+            </div>
+          </article>
+        </div>
+
+        <article class="codes-card">
+          <div class="codes-list-head">
+            <div>
+              <span class="codes-kicker">Voucher Inventory</span>
+              <h2>Recent vouchers</h2>
+            </div>
+            <button id="voucherLoadBtn" class="codes-btn ghost" type="button">Refresh</button>
+          </div>
+          <div id="voucherRows" class="codes-rows"></div>
+        </article>
+      </section>
+
+      <section class="codes-panel" data-panel="recent">
+        <article class="codes-card">
+          <div class="codes-list-head">
+            <div>
+              <span class="codes-kicker">Recent</span>
+              <h2>Operational snapshot</h2>
+            </div>
+            <button id="recentRefresh" class="codes-btn ghost" type="button">Refresh all</button>
+          </div>
+          <div id="recentRows" class="codes-rows"></div>
+        </article>
+      </section>
+    </section>
+  </main>
+
+  <VxFooter />
+
+  <script is:inline src="/js/vx-auth-bridge.js"></script>
+  <script is:inline src="/js/vx-token-refresh.js?v=20260515-codes-console"></script>
+  <script type="module">
+    import QRCode from "https://cdn.jsdelivr.net/npm/qrcode@1.5.3/+esm";
+
+    const QR_HOST = "https://qr.volynx.world";
+    const VOUCHER_FN_URL = "https://zdmpzrderifgqmqivjoy.supabase.co/functions/v1/admin-vouchers";
+    const SLUG_ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const $ = (id) => document.getElementById(id);
+
+    let cfg = null;
+    let currentUser = null;
+    let isAdmin = false;
+    let lastQrRows = [];
+    let lastVoucherRows = [];
+
+    const el = {
+      loading: $("codesLoading"),
+      loggedOut: $("codesLoggedOut"),
+      forbidden: $("codesForbidden"),
+      console: $("codesConsole"),
+      qrCreateForm: $("qrCreateForm"),
+      qrTarget: $("qrTarget"),
+      qrLabel: $("qrLabel"),
+      qrSlug: $("qrSlug"),
+      qrNeverExpires: $("qrNeverExpires"),
+      qrCreateBtn: $("qrCreateBtn"),
+      qrCreateMsg: $("qrCreateMsg"),
+      qrResult: $("qrResult"),
+      qrShortUrl: $("qrShortUrl"),
+      qrCanvas: $("qrCanvas"),
+      qrOpenLink: $("qrOpenLink"),
+      qrDownloadPng: $("qrDownloadPng"),
+      qrLoadBtn: $("qrLoadBtn"),
+      qrRefreshList: $("qrRefreshList"),
+      qrRows: $("qrRows"),
+      qrStatusFilter: $("qrStatusFilter"),
+      qrSearch: $("qrSearch"),
+      voucherForm: $("voucherForm"),
+      voucherPreset: $("voucherPreset"),
+      voucherRecipient: $("voucherRecipient"),
+      voucherEmail: $("voucherEmail"),
+      voucherLabel: $("voucherLabel"),
+      voucherCreateBtn: $("voucherCreateBtn"),
+      voucherMsg: $("voucherMsg"),
+      voucherResult: $("voucherResult"),
+      voucherUrl: $("voucherUrl"),
+      voucherCode: $("voucherCode"),
+      voucherCanvas: $("voucherCanvas"),
+      voucherDownloadPng: $("voucherDownloadPng"),
+      voucherLoadBtn: $("voucherLoadBtn"),
+      voucherRows: $("voucherRows"),
+      recentRows: $("recentRows"),
+      recentRefresh: $("recentRefresh"),
+    };
+
+    function showOnly(node) {
+      [el.loading, el.loggedOut, el.forbidden, el.console].forEach((item) => {
+        if (item) item.hidden = item !== node;
+      });
+    }
+
+    function setMsg(node, message, tone = "") {
+      if (!node) return;
+      node.textContent = message || "";
+      node.dataset.tone = tone;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+      }[c]));
+    }
+
+    function decodeJwtPayload(jwt) {
+      try {
+        const part = String(jwt || "").split(".")[1];
+        if (!part) return null;
+        const norm = part.replace(/-/g, "+").replace(/_/g, "/");
+        return JSON.parse(atob(norm.padEnd(norm.length + (4 - norm.length % 4) % 4, "=")));
+      } catch {
+        return null;
+      }
+    }
+
+    async function loadConfig() {
+      if (cfg) return cfg;
+      const res = await fetch("/config.json", { cache: "no-store" });
+      const json = await res.json();
+      cfg = {
+        url: (json.supabaseUrl || json.supabase_url || "").replace(/\/$/, ""),
+        anon: json.supabaseAnonKey || json.anonKey || "",
+      };
+      return cfg;
+    }
+
+    async function getSession() {
+      if (window.VxAuthBridge?.hydrate) window.VxAuthBridge.hydrate();
+      if (window.vxEnsureFreshToken) await window.vxEnsureFreshToken().catch(() => null);
+
+      const raw = localStorage.getItem("volynx_session");
+      const stored = raw ? JSON.parse(raw) : {};
+      const accessToken = localStorage.getItem("volynx_access_token") || stored.access_token || "";
+      if (!accessToken) return null;
+
+      const payload = decodeJwtPayload(accessToken);
+      const userId = stored?.user?.id || payload?.sub || "";
+      if (!userId) return null;
+
+      return {
+        ...stored,
+        access_token: accessToken,
+        refresh_token: localStorage.getItem("volynx_refresh_token") || stored.refresh_token || "",
+        user: {
+          ...(stored.user || {}),
+          id: userId,
+          email: stored?.user?.email || localStorage.getItem("volynx_user_email") || payload?.email || "",
+        },
+      };
+    }
+
+    async function authHeaders() {
+      const session = await getSession();
+      const c = await loadConfig();
+      if (!session) throw new Error("Not signed in");
+      return {
+        apikey: c.anon,
+        Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json",
+      };
+    }
+
+    function generateSlug() {
+      const buf = new Uint8Array(7);
+      crypto.getRandomValues(buf);
+      let out = "";
+      for (let i = 0; i < buf.length; i++) out += SLUG_ALPHABET[buf[i] % SLUG_ALPHABET.length];
+      return out;
+    }
+
+    function normalizeSlug(value) {
+      return String(value || "").trim().replace(/[^a-zA-Z0-9_-]/g, "");
+    }
+
+    async function postgrest(path, options = {}) {
+      const c = await loadConfig();
+      const headers = await authHeaders();
+      const res = await fetch(`${c.url}/rest/v1/${path}`, {
+        ...options,
+        headers: { ...headers, ...(options.headers || {}) },
+      });
+      const text = await res.text();
+      let data = null;
+      try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text }; }
+      if (!res.ok) {
+        const err = new Error((data && (data.message || data.error || data.code || data.raw)) || `HTTP ${res.status}`);
+        err.status = res.status;
+        err.data = data;
+        throw err;
+      }
+      return data;
+    }
+
+    async function rpc(name, body) {
+      return await postgrest(`rpc/${name}`, {
+        method: "POST",
+        body: JSON.stringify(body || {}),
+      });
+    }
+
+    async function checkAdmin() {
+      const session = await getSession();
+      if (!session) return "logged_out";
+      const c = await loadConfig();
+      const res = await fetch(`${c.url}/rest/v1/profiles?id=eq.${encodeURIComponent(session.user.id)}&select=is_admin,email,plan`, {
+        headers: {
+          apikey: c.anon,
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+      if (!res.ok) return "forbidden";
+      const rows = await res.json();
+      currentUser = { ...session.user, ...(rows?.[0] || {}) };
+      isAdmin = !!rows?.[0]?.is_admin;
+      return isAdmin ? "admin" : "forbidden";
+    }
+
+    async function createQr(event) {
+      event.preventDefault();
+      setMsg(el.qrCreateMsg, "");
+      el.qrCreateBtn.disabled = true;
+      el.qrCreateBtn.textContent = "Creating...";
+      try {
+        const session = await getSession();
+        if (!session) throw new Error("Sign in again before creating a QR.");
+
+        const target = el.qrTarget.value.trim();
+        const label = el.qrLabel.value.trim();
+        const requestedSlug = normalizeSlug(el.qrSlug.value);
+        if (!/^https?:\/\//i.test(target)) {
+          throw new Error("Destination URL must start with http:// or https://");
+        }
+        if (requestedSlug && (requestedSlug.length < 4 || requestedSlug.length > 32)) {
+          throw new Error("Custom slug must be 4 to 32 characters.");
+        }
+
+        let created = null;
+        for (let attempt = 0; attempt < 4; attempt++) {
+          const slug = requestedSlug || generateSlug();
+          try {
+            const rows = await postgrest("qr_codes", {
+              method: "POST",
+              headers: { Prefer: "return=representation" },
+              body: JSON.stringify({
+                owner_id: session.user.id,
+                slug,
+                target_url: target,
+                label: label || null,
+                ...(el.qrNeverExpires.checked ? { expires_at: null, grace_until: null } : {}),
+              }),
+            });
+            created = rows?.[0] || null;
+            break;
+          } catch (err) {
+            const raw = JSON.stringify(err.data || {});
+            if (!requestedSlug && (raw.includes("23505") || raw.includes("qr_codes_slug_key"))) continue;
+            throw err;
+          }
+        }
+        if (!created) throw new Error("Could not create QR.");
+
+        if (el.qrNeverExpires.checked && isAdmin) {
+          await rpc("admin_update_qr_validity", {
+            p_qr_id: created.id,
+            p_status: "active",
+            p_clear_expiry: true,
+            p_clear_grace: true,
+          }).catch(() => null);
+        }
+
+        const shortUrl = `${QR_HOST}/${created.slug}`;
+        el.qrShortUrl.value = shortUrl;
+        el.qrOpenLink.href = shortUrl;
+        el.qrResult.hidden = false;
+        await QRCode.toCanvas(el.qrCanvas, shortUrl, {
+          width: 360,
+          margin: 2,
+          errorCorrectionLevel: "H",
+          color: { dark: "#05060a", light: "#ffffff" },
+        });
+        setMsg(el.qrCreateMsg, "QR created. Test the link before sending to print.", "ok");
+        el.qrTarget.value = "";
+        el.qrLabel.value = "";
+        el.qrSlug.value = "";
+        await loadQrs();
+        renderRecent();
+      } catch (err) {
+        setMsg(el.qrCreateMsg, err.message || String(err), "error");
+      } finally {
+        el.qrCreateBtn.disabled = false;
+        el.qrCreateBtn.textContent = "Create QR";
+      }
+    }
+
+    async function loadQrs() {
+      el.qrRows.innerHTML = `<div class="codes-empty">Loading QR codes...</div>`;
+      try {
+        const rows = await rpc("admin_list_qr_codes", {
+          p_limit: 100,
+          p_status: el.qrStatusFilter.value || null,
+          p_search: el.qrSearch.value.trim() || null,
+        });
+        lastQrRows = rows || [];
+        renderQrs(lastQrRows);
+      } catch (err) {
+        el.qrRows.innerHTML = `<div class="codes-empty is-error">Could not load QR codes: ${escapeHtml(err.message || err)}</div>`;
+      }
+    }
+
+    function renderQrs(rows) {
+      if (!rows.length) {
+        el.qrRows.innerHTML = `<div class="codes-empty">No QR codes found.</div>`;
+        return;
+      }
+      el.qrRows.innerHTML = rows.map((qr) => {
+        const shortUrl = `${QR_HOST}/${qr.slug}`;
+        return `
+          <article class="codes-row" data-qr-id="${escapeHtml(qr.id)}">
+            <div class="codes-row-main">
+              <span class="codes-pill codes-pill--${escapeHtml(qr.status)}">${escapeHtml(qr.status.replace("_", " "))}</span>
+              <strong>${escapeHtml(qr.label || qr.slug)}</strong>
+              <code>${escapeHtml(shortUrl)}</code>
+              <a href="${escapeHtml(qr.target_url)}" target="_blank" rel="noopener">${escapeHtml(qr.target_url)}</a>
+            </div>
+            <div class="codes-row-meta">
+              <span>${Number(qr.scan_count || 0)} scans</span>
+              <span>${qr.expires_at ? "Expires " + escapeHtml(new Date(qr.expires_at).toLocaleDateString()) : "Never expires"}</span>
+            </div>
+            <div class="codes-row-actions">
+              <button class="codes-btn ghost" type="button" data-copy-value="${escapeHtml(shortUrl)}">Copy</button>
+              <button class="codes-btn ghost" type="button" data-qr-action="never">Never</button>
+              <button class="codes-btn ghost" type="button" data-qr-action="pause">${qr.status === "paused" ? "Resume" : "Pause"}</button>
+            </div>
+          </article>`;
+      }).join("");
+    }
+
+    async function handleQrAction(event) {
+      const copyButton = event.target.closest("[data-copy-value]");
+      if (copyButton) {
+        await copyText(copyButton.dataset.copyValue || "");
+        return;
+      }
+      const button = event.target.closest("[data-qr-action]");
+      if (!button) return;
+      const row = button.closest("[data-qr-id]");
+      const id = row?.dataset.qrId;
+      if (!id) return;
+      const qr = lastQrRows.find((item) => item.id === id);
+      if (!qr) return;
+      button.disabled = true;
+      try {
+        if (button.dataset.qrAction === "never") {
+          await rpc("admin_update_qr_validity", {
+            p_qr_id: id,
+            p_status: "active",
+            p_clear_expiry: true,
+            p_clear_grace: true,
+          });
+        } else if (button.dataset.qrAction === "pause") {
+          await rpc("admin_update_qr_validity", {
+            p_qr_id: id,
+            p_status: qr.status === "paused" ? "active" : "paused",
+          });
+        }
+        await loadQrs();
+        renderRecent();
+      } catch (err) {
+        alert(err.message || String(err));
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    function grantsForPreset(preset) {
+      if (preset === "black_diamond") {
+        return {
+          type: "black_diamond",
+          grants: {
+            badge: "black_diamond",
+            daily_plan: "diamond",
+            daily_plan_expires_in_days: 90,
+            tokens: 80,
+            icon_pack_grants: ["Hyper-Icons-Premium", "Poligon-Premium", "metal-chrome-premium"],
+          },
+          label: "Black Diamond pack",
+        };
+      }
+      if (preset === "vx_80") return { type: "tokens", grants: { tokens: 80 }, label: "80 VX bonus" };
+      if (preset === "pro_perm") return { type: "plan", grants: { plan: "pro" }, label: "Pro plan permanent" };
+      return { type: "plan", grants: { daily_plan: "diamond", daily_plan_expires_in_days: 90 }, label: "Daily Diamond 90d" };
+    }
+
+    async function voucherApi(payload) {
+      const session = await getSession();
+      if (!session) throw new Error("Sign in again before creating a voucher.");
+      const res = await fetch(VOUCHER_FN_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      const text = await res.text();
+      let data = null;
+      try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text }; }
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.detail || data?.error || `Voucher API ${res.status}`);
+      }
+      return data;
+    }
+
+    async function createVoucher(event) {
+      event.preventDefault();
+      setMsg(el.voucherMsg, "");
+      el.voucherCreateBtn.disabled = true;
+      el.voucherCreateBtn.textContent = "Creating...";
+      try {
+        const preset = grantsForPreset(el.voucherPreset.value);
+        const recipient = el.voucherRecipient.value.trim();
+        const label = el.voucherLabel.value.trim() || (recipient ? `${preset.label} - ${recipient}` : preset.label);
+        const data = await voucherApi({
+          action: "create",
+          type: preset.type,
+          label,
+          description: null,
+          recipient_name: recipient || null,
+          target_email: el.voucherEmail.value.trim() || null,
+          max_uses: 1,
+          transferable: !el.voucherEmail.value.trim(),
+          expires_at: null,
+          grants: preset.grants,
+        });
+        const voucher = data.voucher;
+        const url = data.invite_url || `${location.origin}/invite/black-diamond/?code=${encodeURIComponent(voucher.code)}`;
+        el.voucherUrl.value = url;
+        el.voucherCode.textContent = voucher.code;
+        el.voucherResult.hidden = false;
+        await QRCode.toCanvas(el.voucherCanvas, url, {
+          width: 320,
+          margin: 2,
+          errorCorrectionLevel: "H",
+          color: { dark: "#05060a", light: "#ffffff" },
+        });
+        setMsg(el.voucherMsg, "Voucher created.", "ok");
+        await loadVouchers();
+        renderRecent();
+      } catch (err) {
+        setMsg(el.voucherMsg, err.message || String(err), "error");
+      } finally {
+        el.voucherCreateBtn.disabled = false;
+        el.voucherCreateBtn.textContent = "Create voucher";
+      }
+    }
+
+    async function loadVouchers() {
+      el.voucherRows.innerHTML = `<div class="codes-empty">Loading vouchers...</div>`;
+      try {
+        const data = await voucherApi({ action: "list", limit: 100 });
+        lastVoucherRows = data.items || [];
+        renderVouchers(lastVoucherRows);
+      } catch (err) {
+        el.voucherRows.innerHTML = `<div class="codes-empty is-error">Could not load vouchers: ${escapeHtml(err.message || err)}</div>`;
+      }
+    }
+
+    function renderVouchers(rows) {
+      if (!rows.length) {
+        el.voucherRows.innerHTML = `<div class="codes-empty">No vouchers found.</div>`;
+        return;
+      }
+      el.voucherRows.innerHTML = rows.map((voucher) => {
+        const active = voucher.active && (!voucher.expires_at || new Date(voucher.expires_at) > new Date()) && Number(voucher.times_used || 0) < Number(voucher.max_uses || 1);
+        return `
+          <article class="codes-row">
+            <div class="codes-row-main">
+              <span class="codes-pill ${active ? "codes-pill--active" : "codes-pill--expired"}">${active ? "active" : "inactive"}</span>
+              <strong>${escapeHtml(voucher.label || voucher.type)}</strong>
+              <code>${escapeHtml(voucher.code)}</code>
+              <span>${escapeHtml(voucher.target_email || "transferable")}</span>
+            </div>
+            <div class="codes-row-meta">
+              <span>${Number(voucher.times_used || 0)}/${Number(voucher.max_uses || 1)} used</span>
+              <span>${voucher.expires_at ? "Expires " + escapeHtml(new Date(voucher.expires_at).toLocaleDateString()) : "No expiry"}</span>
+            </div>
+            <div class="codes-row-actions">
+              <button class="codes-btn ghost" type="button" data-copy-value="${escapeHtml(voucher.code)}">Copy</button>
+            </div>
+          </article>`;
+      }).join("");
+    }
+
+    function renderRecent() {
+      const entries = [
+        ...lastQrRows.slice(0, 5).map((qr) => ({ kind: "QR", label: qr.label || qr.slug, detail: `${QR_HOST}/${qr.slug}`, status: qr.status })),
+        ...lastVoucherRows.slice(0, 5).map((voucher) => ({ kind: "Voucher", label: voucher.label || voucher.type, detail: voucher.code, status: voucher.active ? "active" : "inactive" })),
+      ].slice(0, 10);
+      if (!entries.length) {
+        el.recentRows.innerHTML = `<div class="codes-empty">No recent codes loaded yet.</div>`;
+        return;
+      }
+      el.recentRows.innerHTML = entries.map((item) => `
+        <article class="codes-row">
+          <div class="codes-row-main">
+            <span class="codes-pill codes-pill--neutral">${escapeHtml(item.kind)}</span>
+            <strong>${escapeHtml(item.label)}</strong>
+            <code>${escapeHtml(item.detail)}</code>
+          </div>
+          <div class="codes-row-meta">
+            <span>${escapeHtml(item.status)}</span>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    async function copyText(value) {
+      try {
+        await navigator.clipboard.writeText(value);
+      } catch {
+        const textarea = document.createElement("textarea");
+        textarea.value = value;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+      }
+    }
+
+    function downloadCanvas(canvas, name) {
+      const link = document.createElement("a");
+      link.download = name;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }
+
+    function bindTabs() {
+      document.querySelectorAll("[data-tab]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const tab = button.dataset.tab;
+          document.querySelectorAll("[data-tab]").forEach((item) => item.classList.toggle("is-active", item === button));
+          document.querySelectorAll("[data-panel]").forEach((panel) => panel.classList.toggle("is-active", panel.dataset.panel === tab));
+        });
+      });
+    }
+
+    function bindEvents() {
+      bindTabs();
+      el.qrCreateForm.addEventListener("submit", createQr);
+      el.qrLoadBtn.addEventListener("click", loadQrs);
+      el.qrRefreshList.addEventListener("click", loadQrs);
+      el.qrRows.addEventListener("click", handleQrAction);
+      el.qrStatusFilter.addEventListener("change", loadQrs);
+      el.qrSearch.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") loadQrs();
+      });
+      el.qrDownloadPng.addEventListener("click", () => downloadCanvas(el.qrCanvas, `volynx-qr-${Date.now()}.png`));
+      el.voucherForm.addEventListener("submit", createVoucher);
+      el.voucherLoadBtn.addEventListener("click", loadVouchers);
+      el.voucherRows.addEventListener("click", async (event) => {
+        const button = event.target.closest("[data-copy-value]");
+        if (button) await copyText(button.dataset.copyValue || "");
+      });
+      document.addEventListener("click", async (event) => {
+        const targetId = event.target.closest("[data-copy-target]")?.dataset.copyTarget;
+        const value = targetId ? $(targetId)?.value : "";
+        if (value) await copyText(value);
+        const raw = event.target.closest("[data-copy-value]")?.dataset.copyValue;
+        if (raw) await copyText(raw);
+      });
+      el.voucherDownloadPng.addEventListener("click", () => downloadCanvas(el.voucherCanvas, `voucher-${el.voucherCode.textContent}.png`));
+      el.recentRefresh.addEventListener("click", async () => {
+        await Promise.allSettled([loadQrs(), loadVouchers()]);
+        renderRecent();
+      });
+    }
+
+    async function init() {
+      bindEvents();
+      const role = await checkAdmin();
+      if (role === "logged_out") {
+        showOnly(el.loggedOut);
+        return;
+      }
+      if (role !== "admin") {
+        showOnly(el.forbidden);
+        return;
+      }
+      showOnly(el.console);
+      await Promise.allSettled([loadQrs(), loadVouchers()]);
+      renderRecent();
+    }
+
+    init().catch((err) => {
+      console.error("[codes-console]", err);
+      showOnly(el.forbidden);
+    });
+  </script>
+
+  <style>
+    body { background: #07080c; color: rgba(255,255,255,.9); }
+
+    .codes-shell {
+      min-height: calc(100vh - 180px);
+      padding: 92px 20px 72px;
+      background:
+        radial-gradient(circle at 18% 0%, rgba(34, 211, 238, .12), transparent 34%),
+        radial-gradient(circle at 86% 16%, rgba(244, 114, 182, .1), transparent 30%),
+        linear-gradient(180deg, #080910 0%, #0b0d14 42%, #07080c 100%);
+    }
+
+    .codes-state,
+    .codes-console {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .codes-state {
+      padding: 48px 24px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.035);
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .codes-state h1 { margin: 0 0 10px; font-size: 28px; }
+    .codes-state p { color: rgba(255,255,255,.62); }
+
+    .codes-hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
+
+    .codes-kicker {
+      display: inline-block;
+      color: rgba(125, 249, 255, .82);
+      font-size: 11px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .codes-hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(38px, 7vw, 76px);
+      letter-spacing: 0;
+      line-height: .92;
+    }
+
+    .codes-hero p {
+      max-width: 650px;
+      margin: 0;
+      color: rgba(255,255,255,.62);
+      line-height: 1.55;
+    }
+
+    .codes-hero-actions,
+    .codes-result-actions,
+    .codes-row-actions,
+    .codes-filter {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .codes-tabs {
+      display: flex;
+      gap: 6px;
+      padding: 6px;
+      margin-bottom: 18px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.035);
+      border-radius: 8px;
+      width: fit-content;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    .codes-tab {
+      min-height: 38px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: rgba(255,255,255,.64);
+      padding: 8px 16px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .codes-tab.is-active {
+      color: #061016;
+      background: linear-gradient(135deg, #7df9ff, #c6ff8f);
+    }
+
+    .codes-panel { display: none; }
+    .codes-panel.is-active { display: block; }
+
+    .codes-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, .82fr);
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .codes-grid--primary {
+      grid-template-columns: minmax(0, .92fr) minmax(340px, .78fr);
+    }
+
+    .codes-card {
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.045);
+      border-radius: 8px;
+      padding: clamp(16px, 2.4vw, 24px);
+      box-shadow: 0 24px 80px rgba(0,0,0,.18);
+    }
+
+    .codes-card--create {
+      background: linear-gradient(180deg, rgba(125,249,255,.075), rgba(255,255,255,.035));
+    }
+
+    .codes-card--result {
+      background: linear-gradient(180deg, rgba(198,255,143,.08), rgba(255,255,255,.035));
+    }
+
+    .codes-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .codes-card-head span {
+      color: rgba(255,255,255,.52);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+
+    .codes-card-head strong,
+    .codes-list-head h2 {
+      font-size: 19px;
+      letter-spacing: 0;
+    }
+
+    .codes-list-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .codes-list-head h2 {
+      margin: 0;
+    }
+
+    .codes-form,
+    .codes-form label {
+      display: grid;
+      gap: 8px;
+    }
+
+    .codes-form {
+      gap: 14px;
+    }
+
+    .codes-form-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .codes-form span,
+    .codes-check span {
+      color: rgba(255,255,255,.62);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .codes-check {
+      display: inline-flex !important;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      width: fit-content;
+    }
+
+    .codes-check input {
+      accent-color: #7df9ff;
+    }
+
+    .codes-form input,
+    .codes-form select,
+    .codes-filter input,
+    .codes-filter select,
+    .codes-result-url input {
+      width: 100%;
+      min-height: 42px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.11);
+      background: rgba(0,0,0,.28);
+      color: #fff;
+      padding: 10px 12px;
+      font: inherit;
+    }
+
+    .codes-result-url {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .codes-preview {
+      display: grid;
+      place-items: center;
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+
+    .codes-preview canvas {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .codes-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 9px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.12);
+      color: #fff;
+      background: rgba(255,255,255,.05);
+      text-decoration: none;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .codes-btn.primary {
+      border-color: transparent;
+      color: #061016;
+      background: linear-gradient(135deg, #7df9ff, #c6ff8f);
+    }
+
+    .codes-btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .codes-msg {
+      min-height: 20px;
+      margin: 0;
+      font-size: 13px;
+      color: rgba(255,255,255,.62);
+    }
+
+    .codes-msg[data-tone="ok"] { color: #a7f3d0; }
+    .codes-msg[data-tone="error"] { color: #fca5a5; }
+
+    .codes-rows {
+      display: grid;
+      gap: 10px;
+    }
+
+    .codes-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) auto auto;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.075);
+      background: rgba(0,0,0,.18);
+    }
+
+    .codes-row-main {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .codes-row-main strong {
+      color: rgba(255,255,255,.94);
+      overflow-wrap: anywhere;
+    }
+
+    .codes-row-main code,
+    .codes-code {
+      color: #8ff8ff;
+      background: rgba(125,249,255,.09);
+      border-radius: 6px;
+      padding: 2px 7px;
+      width: fit-content;
+      overflow-wrap: anywhere;
+    }
+
+    .codes-row-main a,
+    .codes-row-main span {
+      color: rgba(255,255,255,.58);
+      overflow-wrap: anywhere;
+      text-decoration: none;
+    }
+
+    .codes-row-meta {
+      display: grid;
+      gap: 5px;
+      color: rgba(255,255,255,.52);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .codes-pill {
+      display: inline-flex;
+      width: fit-content;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.7);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 900;
+    }
+
+    .codes-pill--active { color: #6ee7b7; background: rgba(110,231,183,.12); }
+    .codes-pill--paused,
+    .codes-pill--neutral { color: rgba(255,255,255,.68); }
+    .codes-pill--grace { color: #facc15; background: rgba(250,204,21,.12); }
+    .codes-pill--expired,
+    .codes-pill--admin_blocked { color: #fca5a5; background: rgba(248,113,113,.12); }
+
+    .codes-empty {
+      padding: 22px;
+      border: 1px dashed rgba(255,255,255,.12);
+      border-radius: 8px;
+      color: rgba(255,255,255,.56);
+    }
+
+    .codes-empty.is-error {
+      color: #fca5a5;
+      border-color: rgba(248,113,113,.28);
+    }
+
+    @media (max-width: 920px) {
+      .codes-grid,
+      .codes-grid--primary,
+      .codes-row {
+        grid-template-columns: 1fr;
+      }
+      .codes-row-meta {
+        white-space: normal;
+      }
+      .codes-form-row {
+        grid-template-columns: 1fr;
+      }
+      .codes-tabs {
+        width: 100%;
+      }
+    }
+  </style>
+</BaseLayout>

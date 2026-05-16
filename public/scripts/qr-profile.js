@@ -19,6 +19,17 @@
 
   function $(id) { return document.getElementById(id); }
 
+  function decodeJwtPayload(jwt) {
+    try {
+      const part = String(jwt || "").split(".")[1];
+      if (!part) return null;
+      const norm = part.replace(/-/g, "+").replace(/_/g, "/");
+      return JSON.parse(atob(norm.padEnd(norm.length + (4 - norm.length % 4) % 4, "=")));
+    } catch {
+      return null;
+    }
+  }
+
   function t(key, fallback, vars) {
     const lang = localStorage.getItem("volynx_lang") || "en";
     const dict = window.VX_TRANS && window.VX_TRANS[lang];
@@ -58,14 +69,40 @@
   function getSession() {
     try {
       const raw = localStorage.getItem("volynx_session");
-      if (!raw) return null;
-      const s = JSON.parse(raw);
-      if (!s?.access_token || !s?.user?.id) return null;
-      return s;
+      const stored = raw ? JSON.parse(raw) : {};
+      const accessToken = localStorage.getItem("volynx_access_token") || stored.access_token || "";
+      if (!accessToken) return null;
+
+      const payload = decodeJwtPayload(accessToken);
+      const userId = stored?.user?.id || payload?.sub || "";
+      if (!userId) return null;
+
+      return {
+        ...stored,
+        access_token: accessToken,
+        refresh_token: localStorage.getItem("volynx_refresh_token") || stored.refresh_token || "",
+        user: {
+          ...(stored.user || {}),
+          id: userId,
+          email: stored?.user?.email || localStorage.getItem("volynx_user_email") || payload?.email || "",
+        },
+      };
     } catch { return null; }
   }
 
+  async function ensureSession() {
+    if (window.VxAuthBridge?.hydrate) {
+      window.VxAuthBridge.hydrate();
+    }
+    if (window.vxEnsureFreshToken) {
+      await window.vxEnsureFreshToken().catch(() => null);
+    }
+    session = getSession();
+    return session;
+  }
+
   async function authHeaders() {
+    await ensureSession();
     const cfg = await loadConfig();
     return {
       apikey: cfg.anon,
@@ -275,6 +312,10 @@
   }
 
   async function refresh() {
+    if (!await ensureSession()) {
+      showOnly("qrpLoggedOut");
+      return;
+    }
     const profile = await fetchProfile();
     const qrs = await fetchQRCodes();
     if (qrs.length === 0) {
@@ -286,8 +327,7 @@
   }
 
   async function init() {
-    session = getSession();
-    if (!session) {
+    if (!await ensureSession()) {
       showOnly("qrpLoggedOut");
       return;
     }

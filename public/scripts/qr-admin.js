@@ -37,8 +37,16 @@
     });
   }
 
-  function getToken() {
-    try { return localStorage.getItem("volynx_access_token") || ""; } catch (_) { return ""; }
+  async function getToken() {
+    try {
+      if (window.VxAuthBridge?.hydrate) {
+        window.VxAuthBridge.hydrate();
+      }
+      if (window.vxEnsureFreshToken) {
+        await window.vxEnsureFreshToken().catch(() => null);
+      }
+      return localStorage.getItem("volynx_access_token") || "";
+    } catch (_) { return ""; }
   }
 
   function decodeJwtPayload(jwt) {
@@ -64,7 +72,7 @@
   }
 
   async function authHeaders() {
-    const token = getToken();
+    const token = await getToken();
     const c = await loadConfig();
     return {
       apikey: c.anon,
@@ -93,7 +101,7 @@
   }
 
   async function checkAdmin() {
-    const token = getToken();
+    const token = await getToken();
     if (!token) return "logged_out";
     const payload = decodeJwtPayload(token);
     const uid = payload && payload.sub;
@@ -161,6 +169,14 @@
           </div>
         </div>
         <div class="qra-control">
+          <label class="qra-field-wide">
+            <span>Destination URL</span>
+            <input data-field="target_url" type="url" value="${escapeHtml(qr.target_url)}" />
+          </label>
+          <label class="qra-field-wide">
+            <span>Label</span>
+            <input data-field="label" type="text" maxlength="100" value="${escapeHtml(qr.label || "")}" />
+          </label>
           <label>
             <span>Status</span>
             <select data-field="status">${optionList(qr.status)}</select>
@@ -174,6 +190,7 @@
             <input data-field="grace_until" type="datetime-local" value="${escapeHtml(toInputValue(qr.grace_until))}" />
           </label>
           <div class="qra-actions">
+            <button class="qra-btn primary" type="button" data-action="saveDestination">Save destination</button>
             <button class="qra-btn primary" type="button" data-action="save">Save</button>
             <button class="qra-btn ghost" type="button" data-action="renew30">Renew 30d</button>
             <button class="qra-btn ghost" type="button" data-action="never">Never expires</button>
@@ -208,6 +225,24 @@
     await loadRows();
   }
 
+  async function updateDestination(id, patch) {
+    const c = await loadConfig();
+    const res = await fetch(`${c.url}/rest/v1/qr_codes?id=eq.${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      headers: await authHeaders(),
+      body: JSON.stringify(patch),
+    });
+    const text = await res.text();
+    if (!res.ok) {
+      let data = null;
+      try { data = text ? JSON.parse(text) : null; } catch (_) { data = { raw: text }; }
+      const err = new Error((data && (data.message || data.error || data.code || data.raw)) || `HTTP ${res.status}`);
+      err.status = res.status;
+      throw err;
+    }
+    await loadRows();
+  }
+
   function getRowPatch(row) {
     const status = row.querySelector('[data-field="status"]')?.value || null;
     const expiresValue = row.querySelector('[data-field="expires_at"]')?.value || "";
@@ -218,6 +253,18 @@
       p_grace_until: inputToIso(graceValue),
       p_clear_expiry: !expiresValue,
       p_clear_grace: !graceValue,
+    };
+  }
+
+  function getDestinationPatch(row) {
+    const target = (row.querySelector('[data-field="target_url"]')?.value || "").trim();
+    const label = (row.querySelector('[data-field="label"]')?.value || "").trim();
+    if (!/^https?:\/\//i.test(target)) {
+      throw new Error("Destination URL must start with http:// or https://");
+    }
+    return {
+      target_url: target,
+      label: label || null,
     };
   }
 
@@ -243,7 +290,9 @@
         return;
       }
 
-      if (action === "save") {
+      if (action === "saveDestination") {
+        await updateDestination(id, getDestinationPatch(row));
+      } else if (action === "save") {
         await updateValidity(id, getRowPatch(row));
       } else if (action === "renew30") {
         await updateValidity(id, {
@@ -272,7 +321,7 @@
         if (!ok) return;
         await updateValidity(id, { p_status: "admin_blocked" });
       }
-      setMessage("QR validity updated.");
+      setMessage(action === "saveDestination" ? "QR destination updated." : "QR validity updated.");
     } catch (err) {
       console.error("[qr-admin]", err);
       setMessage(`Could not update QR: ${err.message || err}`, "error");
