@@ -39,8 +39,8 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
         </div>
         <div class="codes-hero-actions">
           <a class="codes-btn ghost" href={ROUTES.labQrGen}>Styled QR designer</a>
-          <a class="codes-btn ghost" href={ROUTES.adminQrCodes}>Old QR admin</a>
-          <a class="codes-btn ghost" href={ROUTES.adminVouchers}>Old voucher admin</a>
+          <button class="codes-btn ghost" type="button" data-tab-jump="qr">QR workspace</button>
+          <button class="codes-btn ghost" type="button" data-tab-jump="vouchers">Voucher workspace</button>
         </div>
       </header>
 
@@ -714,14 +714,26 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       link.click();
     }
 
+    function activateTab(tab, updateUrl = true) {
+      const allowed = new Set(["qr", "vouchers", "recent"]);
+      const nextTab = allowed.has(tab) ? tab : "qr";
+      document.querySelectorAll("[data-tab]").forEach((item) => item.classList.toggle("is-active", item.dataset.tab === nextTab));
+      document.querySelectorAll("[data-panel]").forEach((panel) => panel.classList.toggle("is-active", panel.dataset.panel === nextTab));
+      if (updateUrl) {
+        const url = new URL(location.href);
+        url.searchParams.set("tab", nextTab);
+        history.replaceState(null, "", url);
+      }
+    }
+
     function bindTabs() {
-      document.querySelectorAll("[data-tab]").forEach((button) => {
+      document.querySelectorAll("[data-tab], [data-tab-jump]").forEach((button) => {
         button.addEventListener("click", () => {
-          const tab = button.dataset.tab;
-          document.querySelectorAll("[data-tab]").forEach((item) => item.classList.toggle("is-active", item === button));
-          document.querySelectorAll("[data-panel]").forEach((panel) => panel.classList.toggle("is-active", panel.dataset.panel === tab));
+          activateTab(button.dataset.tab || button.dataset.tabJump || "qr");
         });
       });
+      const initialTab = new URLSearchParams(location.search).get("tab") || (location.hash || "").replace("#", "");
+      activateTab(initialTab, false);
     }
 
     function bindEvents() {

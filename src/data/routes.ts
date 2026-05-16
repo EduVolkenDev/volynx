@@ -77,8 +77,8 @@ export const ROUTES = {
 
   // ── Admin (gated by profiles.is_admin) ───
   adminCodes: "/admin/codes/",
-  adminVouchers: "/admin/vouchers/",
-  adminQrCodes: "/admin/qr-codes/",
+  adminVouchers: "/admin/codes/?tab=vouchers",
+  adminQrCodes: "/admin/codes/?tab=qr",
 
   // ── Campaign landings ─────────────────
   tiktokLanding: "/tiktok/",
