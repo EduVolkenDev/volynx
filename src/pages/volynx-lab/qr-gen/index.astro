@@ -386,6 +386,10 @@ import { ROUTES } from "../../../data/routes";
     #downloadBtn:hover::before { left: 100%; }
     #downloadBtn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(255,107,107,.5); }
 
+    :global(.vx-authed .login-hint[data-auth="out"]) {
+      display: none;
+    }
+
     .login-hint {
       margin-top: 24px;
       font-size: .82em;
@@ -737,7 +741,7 @@ import { ROUTES } from "../../../data/routes";
       <div id="qr-container"></div>
       <button id="downloadBtn" style="display:none;" data-i18n="qr.btn_download">📥 Baixar QR Code</button>
 
-      <p class="login-hint" data-i18n="qr.login_hint">
+      <p class="login-hint" data-auth="out" data-i18n="qr.login_hint">
         Want to save your QR Codes?
         <a href={`${ROUTES.login}?next=${ROUTES.labQrGen}`}>Sign in</a> or <a href={`${ROUTES.signup}?next=${ROUTES.labQrGen}`}>create a free account</a>.
       </p>
