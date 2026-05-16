@@ -4,6 +4,7 @@ import VxFooter from "../../../components/VxFooter.astro";
 import FaviconHead from "../../../components/FaviconHead.astro";
 import PageWidgets from "../../../components/PageWidgets.astro";
 import LabUpgradeBanner from "../../../components/LabUpgradeBanner.astro";
+import LabToolSwitcher from "../../../components/LabToolSwitcher.astro";
 import { ROUTES, checkoutHref } from "../../../data/routes";
 
 const qrConciergeHref = `${ROUTES.whatsapp}?text=${encodeURIComponent("Hi VOLYNX, I need a banner-safe dynamic QR for a client. Please help me create and keep it online.")}`;
@@ -76,120 +77,6 @@ const studioCheckoutHref = checkoutHref("volynx_studio", { currency: "gbp", next
       position: relative;
       z-index: 1;
       margin-top: 84px;
-    }
-
-    .lab-tool-rail {
-      width: min(1120px, 100%);
-      display: grid;
-      grid-template-columns: minmax(180px, .7fr) minmax(0, 1.8fr);
-      align-items: center;
-      gap: 14px;
-      padding: 12px;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 8px;
-      background:
-        linear-gradient(135deg, rgba(125,249,255,.09), rgba(198,255,143,.045)),
-        rgba(4,8,18,.74);
-      box-shadow: 0 20px 70px rgba(0,0,0,.28);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      margin-top: 0;
-    }
-
-    .lab-tool-rail__brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-      padding: 8px 10px;
-      border-radius: 8px;
-      background: rgba(255,255,255,.045);
-      border: 1px solid rgba(255,255,255,.08);
-    }
-
-    .lab-tool-rail__brand img {
-      width: 48px;
-      height: 48px;
-      object-fit: contain;
-      border-radius: 8px;
-      filter: drop-shadow(0 0 14px rgba(125,249,255,.26));
-      flex: 0 0 auto;
-    }
-
-    .lab-tool-rail__eyebrow {
-      display: block;
-      color: rgba(125,249,255,.82);
-      font-size: 10px;
-      font-weight: 900;
-      letter-spacing: .16em;
-      text-transform: uppercase;
-      margin-bottom: 3px;
-    }
-
-    .lab-tool-rail__title {
-      display: block;
-      color: #fff;
-      font-size: 15px;
-      font-weight: 900;
-      letter-spacing: 0;
-      line-height: 1.1;
-    }
-
-    .lab-tool-rail__links {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    .lab-tool-link {
-      display: grid;
-      grid-template-columns: 34px minmax(0, 1fr);
-      align-items: center;
-      gap: 8px;
-      min-height: 54px;
-      padding: 8px;
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,.09);
-      background: rgba(255,255,255,.045);
-      color: rgba(255,255,255,.82);
-      text-decoration: none;
-      overflow: hidden;
-      transition: transform .2s ease, border-color .2s ease, color .2s ease, background .2s ease;
-    }
-
-    .lab-tool-link img {
-      width: 34px;
-      height: 34px;
-      object-fit: contain;
-      border-radius: 7px;
-      filter: drop-shadow(0 0 10px rgba(255,255,255,.16));
-    }
-
-    .lab-tool-link span {
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: 0;
-      line-height: 1.1;
-    }
-
-    .lab-tool-link:hover {
-      transform: translateY(-2px);
-      border-color: rgba(125,249,255,.4);
-      color: #fff;
-      background: rgba(125,249,255,.08);
-    }
-
-    .lab-tool-link.is-active {
-      color: #fff;
-      border-color: rgba(125,249,255,.55);
-      background:
-        linear-gradient(135deg, rgba(125,249,255,.22), rgba(198,255,143,.12)),
-        rgba(255,255,255,.06);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 0 24px rgba(125,249,255,.12);
     }
 
     .container {
@@ -696,16 +583,13 @@ const studioCheckoutHref = checkoutHref("volynx_studio", { currency: "gbp", next
     #logoImg { max-width: 100px; max-height: 100px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,.3); height: auto; display: block; margin: 0 auto; }
 
     @media (max-width: 768px) {
-      .lab-tool-rail,
       .qr-commerce-head {
         align-items: stretch;
         grid-template-columns: 1fr;
       }
-      .lab-tool-rail__links,
       .qr-commerce-actions {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
-      .lab-tool-link,
       .qr-commerce-btn {
         flex: 1 1 auto;
       }
@@ -907,37 +791,7 @@ const studioCheckoutHref = checkoutHref("volynx_studio", { currency: "gbp", next
   <VxHeader primaryCtaLabel="Sign in" primaryCtaI18n="header.cta_signin" primaryCtaHref={`${ROUTES.login}?next=${ROUTES.labQrGen}`} primaryCtaAuth="out" />
 
   <main class="qr-main">
-    <nav class="lab-tool-rail" aria-label="VOLYNX Lab tools">
-      <a class="lab-tool-rail__brand" href={ROUTES.lab} aria-label="Open VOLYNX Lab home">
-        <img src="/assets/labicon.webp" alt="" loading="eager" decoding="async" />
-        <span>
-          <span class="lab-tool-rail__eyebrow">VOLYNX Lab</span>
-          <span class="lab-tool-rail__title">Tool switcher</span>
-        </span>
-      </a>
-      <div class="lab-tool-rail__links">
-        <a class="lab-tool-link" href={ROUTES.lab}>
-          <img src="/assets/labicon.webp" alt="" loading="lazy" decoding="async" />
-          <span>Lab Home</span>
-        </a>
-        <a class="lab-tool-link" href={ROUTES.labConverter}>
-          <img src="/assets/converterbig.webp" alt="" loading="lazy" decoding="async" />
-          <span>Converter</span>
-        </a>
-        <a class="lab-tool-link" href={ROUTES.labImageScaler}>
-          <img src="/assets/newimagescaler.webp" alt="" loading="lazy" decoding="async" />
-          <span>Image Scaler</span>
-        </a>
-        <a class="lab-tool-link" href={ROUTES.labImageSuite}>
-          <img src="/assets/newimagesuite.webp" alt="" loading="lazy" decoding="async" />
-          <span>Image Suite</span>
-        </a>
-        <a class="lab-tool-link is-active" href={ROUTES.labQrGen} aria-current="page">
-          <img src="/assets/newqrgen.webp" alt="" loading="lazy" decoding="async" />
-          <span>QR Generator</span>
-        </a>
-      </div>
-    </nav>
+    <LabToolSwitcher active="qr" />
 
     <div class="container">
       <h1 class="tool-hero-title" aria-label="QR Generator">

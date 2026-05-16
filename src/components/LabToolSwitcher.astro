@@ -1,0 +1,171 @@
+---
+import { ROUTES } from "../data/routes";
+
+type ToolKey = "home" | "converter" | "scaler" | "suite" | "qr";
+
+interface Props {
+  active?: ToolKey;
+}
+
+const { active = "home" } = Astro.props;
+
+const tools: Array<{ key: ToolKey; href: string; label: string; icon: string }> = [
+  { key: "home", href: ROUTES.lab, label: "Lab Home", icon: "/assets/labicon.webp" },
+  { key: "converter", href: ROUTES.labConverter, label: "Converter", icon: "/assets/converterbig.webp" },
+  { key: "scaler", href: ROUTES.labImageScaler, label: "Image Scaler", icon: "/assets/newimagescaler.webp" },
+  { key: "suite", href: ROUTES.labImageSuite, label: "Image Suite", icon: "/assets/newimagesuite.webp" },
+  { key: "qr", href: ROUTES.labQrGen, label: "QR Generator", icon: "/assets/newqrgen.webp" },
+];
+---
+
+<nav class="vx-lab-switcher" aria-label="VOLYNX Lab tools">
+  <a class="vx-lab-switcher__brand" href={ROUTES.lab} aria-label="Open VOLYNX Lab home">
+    <img src="/assets/labicon.webp" alt="" loading="eager" decoding="async" />
+    <span>
+      <span class="vx-lab-switcher__eyebrow">VOLYNX Lab</span>
+      <span class="vx-lab-switcher__title">Tool switcher</span>
+    </span>
+  </a>
+  <div class="vx-lab-switcher__links">
+    {tools.map((tool) => (
+      <a
+        class:list={["vx-lab-switcher__link", { "is-active": active === tool.key }]}
+        href={tool.href}
+        aria-current={active === tool.key ? "page" : undefined}
+      >
+        <img src={tool.icon} alt="" loading="lazy" decoding="async" />
+        <span>{tool.label}</span>
+      </a>
+    ))}
+  </div>
+</nav>
+
+<style>
+  .vx-lab-switcher {
+    width: min(1120px, calc(100% - 40px));
+    display: grid;
+    grid-template-columns: minmax(180px, .7fr) minmax(0, 1.8fr);
+    align-items: center;
+    gap: 14px;
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 8px;
+    background:
+      linear-gradient(135deg, rgba(125,249,255,.09), rgba(198,255,143,.045)),
+      rgba(4,8,18,.74);
+    box-shadow: 0 20px 70px rgba(0,0,0,.28);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    margin: 18px auto 10px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .vx-lab-switcher__brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.045);
+    border: 1px solid rgba(255,255,255,.08);
+    text-decoration: none;
+  }
+
+  .vx-lab-switcher__brand img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    border-radius: 8px;
+    filter: drop-shadow(0 0 14px rgba(125,249,255,.26));
+    flex: 0 0 auto;
+  }
+
+  .vx-lab-switcher__eyebrow {
+    display: block;
+    color: rgba(125,249,255,.82);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+
+  .vx-lab-switcher__title {
+    display: block;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: 0;
+    line-height: 1.1;
+  }
+
+  .vx-lab-switcher__links {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .vx-lab-switcher__link {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    min-height: 54px;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.09);
+    background: rgba(255,255,255,.045);
+    color: rgba(255,255,255,.82);
+    text-decoration: none;
+    overflow: hidden;
+    transition: transform .2s ease, border-color .2s ease, color .2s ease, background .2s ease;
+  }
+
+  .vx-lab-switcher__link img {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    border-radius: 7px;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,.16));
+  }
+
+  .vx-lab-switcher__link span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0;
+    line-height: 1.1;
+  }
+
+  .vx-lab-switcher__link:hover {
+    transform: translateY(-2px);
+    border-color: rgba(125,249,255,.4);
+    color: #fff;
+    background: rgba(125,249,255,.08);
+  }
+
+  .vx-lab-switcher__link.is-active {
+    color: #fff;
+    border-color: rgba(125,249,255,.55);
+    background:
+      linear-gradient(135deg, rgba(125,249,255,.22), rgba(198,255,143,.12)),
+      rgba(255,255,255,.06);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 0 24px rgba(125,249,255,.12);
+  }
+
+  @media (max-width: 768px) {
+    .vx-lab-switcher {
+      grid-template-columns: 1fr;
+      align-items: stretch;
+    }
+
+    .vx-lab-switcher__links {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>
