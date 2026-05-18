@@ -46,6 +46,7 @@ export const ROUTES = {
   // ── Services ──────────────────────────
   services: "/services/",
   maintenance: "/maintenance/",
+  designStudio: "/design-studio/",
 
   // ── Dev Hub ───────────────────────────
   devHub: "/dev-hub/",
