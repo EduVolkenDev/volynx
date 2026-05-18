@@ -32,10 +32,13 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
 
     <section id="codesConsole" class="codes-console" hidden>
       <header class="codes-hero">
-        <div>
-          <span class="codes-kicker">Admin · Codes</span>
-          <h1>Access Console</h1>
-          <p>QR links, vouchers and client handoff codes in one operational surface.</p>
+        <div class="codes-hero-main">
+          <span class="codes-appmark" aria-hidden="true">AC</span>
+          <div>
+            <span class="codes-kicker">Admin · Codes</span>
+            <h1>Access Console</h1>
+            <p>QR links, vouchers and client handoff codes in one operational surface.</p>
+          </div>
         </div>
         <div class="codes-hero-actions">
           <a class="codes-btn ghost" href={ROUTES.labQrGen}>Styled QR designer</a>
@@ -45,10 +48,38 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       </header>
 
       <nav class="codes-tabs" aria-label="Code admin sections">
-        <button class="codes-tab is-active" type="button" data-tab="qr">QR Codes</button>
-        <button class="codes-tab" type="button" data-tab="vouchers">Vouchers</button>
-        <button class="codes-tab" type="button" data-tab="recent">Recent</button>
+        <button class="codes-tab is-active" type="button" data-tab="qr">
+          <span class="codes-tab__icon" aria-hidden="true">QR</span>
+          <span><strong>QR Codes</strong><small data-count-for="qr">Dynamic links</small></span>
+        </button>
+        <button class="codes-tab" type="button" data-tab="vouchers">
+          <span class="codes-tab__icon" aria-hidden="true">GR</span>
+          <span><strong>Vouchers</strong><small data-count-for="vouchers">Invites & grants</small></span>
+        </button>
+        <button class="codes-tab" type="button" data-tab="recent">
+          <span class="codes-tab__icon" aria-hidden="true">IN</span>
+          <span><strong>Recent</strong><small data-count-for="recent">Snapshot</small></span>
+        </button>
       </nav>
+
+      <section class="codes-status-grid" aria-label="Access console status">
+        <div class="codes-status-card">
+          <span>Admin</span>
+          <strong id="codesAdminName">Checking...</strong>
+        </div>
+        <div class="codes-status-card">
+          <span>QR state</span>
+          <strong id="codesQrState">Idle</strong>
+        </div>
+        <div class="codes-status-card">
+          <span>Voucher state</span>
+          <strong id="codesVoucherState">Idle</strong>
+        </div>
+        <div class="codes-status-card">
+          <span>Last refresh</span>
+          <strong id="codesLastRefresh">Not loaded</strong>
+        </div>
+      </section>
 
       <section class="codes-panel is-active" data-panel="qr">
         <div class="codes-grid codes-grid--primary">
@@ -262,6 +293,10 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       voucherRows: $("voucherRows"),
       recentRows: $("recentRows"),
       recentRefresh: $("recentRefresh"),
+      codesAdminName: $("codesAdminName"),
+      codesQrState: $("codesQrState"),
+      codesVoucherState: $("codesVoucherState"),
+      codesLastRefresh: $("codesLastRefresh"),
     };
 
     function showOnly(node) {
@@ -274,6 +309,23 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       if (!node) return;
       node.textContent = message || "";
       node.dataset.tone = tone;
+    }
+
+    function setState(node, message) {
+      if (node) node.textContent = message;
+    }
+
+    function markRefresh() {
+      setState(el.codesLastRefresh, new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+    }
+
+    function updateTabCounts() {
+      const qrCount = document.querySelector('[data-count-for="qr"]');
+      const voucherCount = document.querySelector('[data-count-for="vouchers"]');
+      const recentCount = document.querySelector('[data-count-for="recent"]');
+      if (qrCount) qrCount.textContent = `${lastQrRows.length} dynamic link${lastQrRows.length === 1 ? "" : "s"}`;
+      if (voucherCount) voucherCount.textContent = `${lastVoucherRows.length} voucher${lastVoucherRows.length === 1 ? "" : "s"}`;
+      if (recentCount) recentCount.textContent = `${Math.min(lastQrRows.length + lastVoucherRows.length, 10)} loaded`;
     }
 
     function escapeHtml(value) {
@@ -392,6 +444,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       const rows = await res.json();
       currentUser = { ...session.user, ...(rows?.[0] || {}) };
       isAdmin = !!rows?.[0]?.is_admin;
+      setState(el.codesAdminName, currentUser.email || currentUser.id || "Admin");
       return isAdmin ? "admin" : "forbidden";
     }
 
@@ -473,6 +526,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     }
 
     async function loadQrs() {
+      setState(el.codesQrState, "Loading");
       el.qrRows.innerHTML = `<div class="codes-empty">Loading QR codes...</div>`;
       try {
         const rows = await rpc("admin_list_qr_codes", {
@@ -482,8 +536,13 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
         });
         lastQrRows = rows || [];
         renderQrs(lastQrRows);
+        setState(el.codesQrState, `${lastQrRows.length} loaded`);
+        updateTabCounts();
+        markRefresh();
       } catch (err) {
         el.qrRows.innerHTML = `<div class="codes-empty is-error">Could not load QR codes: ${escapeHtml(err.message || err)}</div>`;
+        setState(el.codesQrState, "Error");
+        updateTabCounts();
       }
     }
 
@@ -635,13 +694,19 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     }
 
     async function loadVouchers() {
+      setState(el.codesVoucherState, "Loading");
       el.voucherRows.innerHTML = `<div class="codes-empty">Loading vouchers...</div>`;
       try {
         const data = await voucherApi({ action: "list", limit: 100 });
         lastVoucherRows = data.items || [];
         renderVouchers(lastVoucherRows);
+        setState(el.codesVoucherState, `${lastVoucherRows.length} loaded`);
+        updateTabCounts();
+        markRefresh();
       } catch (err) {
         el.voucherRows.innerHTML = `<div class="codes-empty is-error">Could not load vouchers: ${escapeHtml(err.message || err)}</div>`;
+        setState(el.codesVoucherState, "Error");
+        updateTabCounts();
       }
     }
 
@@ -678,6 +743,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       ].slice(0, 10);
       if (!entries.length) {
         el.recentRows.innerHTML = `<div class="codes-empty">No recent codes loaded yet.</div>`;
+        updateTabCounts();
         return;
       }
       el.recentRows.innerHTML = entries.map((item) => `
@@ -692,6 +758,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
           </div>
         </article>
       `).join("");
+      updateTabCounts();
     }
 
     async function copyText(value) {
@@ -738,13 +805,21 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
 
     function bindEvents() {
       bindTabs();
+      let searchTimer = null;
       el.qrCreateForm.addEventListener("submit", createQr);
       el.qrLoadBtn.addEventListener("click", loadQrs);
       el.qrRefreshList.addEventListener("click", loadQrs);
       el.qrRows.addEventListener("click", handleQrAction);
       el.qrStatusFilter.addEventListener("change", loadQrs);
+      el.qrSearch.addEventListener("input", () => {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(loadQrs, 350);
+      });
       el.qrSearch.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") loadQrs();
+        if (event.key === "Enter") {
+          clearTimeout(searchTimer);
+          loadQrs();
+        }
       });
       el.qrDownloadPng.addEventListener("click", () => downloadCanvas(el.qrCanvas, `volynx-qr-${Date.now()}.png`));
       el.voucherForm.addEventListener("submit", createVoucher);
@@ -790,46 +865,103 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
   </script>
 
   <style>
-    body { background: #07080c; color: rgba(255,255,255,.9); }
+    body { background: #050609; color: rgba(255,255,255,.9); }
 
     .codes-shell {
       min-height: calc(100vh - 180px);
-      padding: 92px 20px 72px;
+      padding: 104px 20px 80px;
       background:
-        radial-gradient(circle at 18% 0%, rgba(34, 211, 238, .12), transparent 34%),
-        radial-gradient(circle at 86% 16%, rgba(244, 114, 182, .1), transparent 30%),
-        linear-gradient(180deg, #080910 0%, #0b0d14 42%, #07080c 100%);
+        radial-gradient(circle at 16% 0%, rgba(116, 199, 255, .18), transparent 31%),
+        radial-gradient(circle at 84% 8%, rgba(171, 255, 145, .11), transparent 30%),
+        linear-gradient(180deg, #0b0d12 0%, #07080c 44%, #050609 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .codes-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,.7), transparent 70%);
     }
 
     .codes-state,
     .codes-console {
       width: min(1180px, 100%);
       margin: 0 auto;
+      position: relative;
+      z-index: 1;
     }
 
     .codes-state {
-      padding: 48px 24px;
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.035);
+      padding: 54px 24px;
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(10,12,18,.78);
       border-radius: 8px;
       text-align: center;
+      box-shadow: 0 24px 90px rgba(0,0,0,.36);
     }
 
     .codes-state h1 { margin: 0 0 10px; font-size: 28px; }
     .codes-state p { color: rgba(255,255,255,.62); }
 
+    .codes-console {
+      padding: clamp(14px, 2vw, 18px);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.025)),
+        rgba(8,10,15,.82);
+      box-shadow: 0 28px 120px rgba(0,0,0,.44);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
     .codes-hero {
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       justify-content: space-between;
-      align-items: flex-end;
-      gap: 24px;
-      margin-bottom: 22px;
-      flex-wrap: wrap;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 14px;
+      padding: clamp(18px, 3vw, 28px);
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 14% 10%, rgba(125,249,255,.16), transparent 38%),
+        linear-gradient(135deg, rgba(255,255,255,.075), rgba(255,255,255,.03));
+    }
+
+    .codes-hero-main {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .codes-appmark {
+      display: grid;
+      place-items: center;
+      width: 62px;
+      height: 62px;
+      border-radius: 8px;
+      color: #061016;
+      font-size: 18px;
+      font-weight: 950;
+      letter-spacing: 0;
+      background: linear-gradient(135deg, #7df9ff, #c6ff8f);
+      box-shadow: 0 0 40px rgba(125,249,255,.2), inset 0 1px 0 rgba(255,255,255,.55);
     }
 
     .codes-kicker {
       display: inline-block;
-      color: rgba(125, 249, 255, .82);
+      color: rgba(198,255,143,.86);
       font-size: 11px;
       letter-spacing: .18em;
       text-transform: uppercase;
@@ -838,9 +970,9 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
 
     .codes-hero h1 {
       margin: 0 0 8px;
-      font-size: clamp(38px, 7vw, 76px);
+      font-size: clamp(36px, 6vw, 66px);
       letter-spacing: 0;
-      line-height: .92;
+      line-height: .94;
     }
 
     .codes-hero p {
@@ -861,64 +993,154 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     }
 
     .codes-tabs {
-      display: flex;
-      gap: 6px;
-      padding: 6px;
-      margin-bottom: 18px;
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.035);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      padding: 0;
+      margin-bottom: 14px;
+      border: 0;
+      background: transparent;
       border-radius: 8px;
-      width: fit-content;
-      max-width: 100%;
-      overflow-x: auto;
+      width: 100%;
     }
 
     .codes-tab {
-      min-height: 38px;
-      border: 0;
-      border-radius: 6px;
-      background: transparent;
-      color: rgba(255,255,255,.64);
-      padding: 8px 16px;
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+      min-height: 68px;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 8px;
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.68);
+      padding: 10px;
       cursor: pointer;
       font: inherit;
-      font-weight: 800;
-      white-space: nowrap;
+      text-align: left;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease, color .18s ease;
+    }
+
+    .codes-tab:hover {
+      transform: translateY(-2px);
+      border-color: rgba(125,249,255,.24);
+      background: rgba(125,249,255,.065);
+      color: #fff;
     }
 
     .codes-tab.is-active {
+      color: #fff;
+      border-color: rgba(125,249,255,.45);
+      background:
+        linear-gradient(135deg, rgba(125,249,255,.16), rgba(198,255,143,.09)),
+        rgba(255,255,255,.055);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 16px 50px rgba(0,0,0,.18);
+    }
+
+    .codes-tab__icon {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
       color: #061016;
       background: linear-gradient(135deg, #7df9ff, #c6ff8f);
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: 0;
+    }
+
+    .codes-tab strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0;
+      margin-bottom: 2px;
+    }
+
+    .codes-tab small {
+      display: block;
+      color: rgba(255,255,255,.48);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .codes-panel { display: none; }
     .codes-panel.is-active { display: block; }
 
-    .codes-grid {
+    .codes-status-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(320px, .82fr);
-      gap: 14px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
       margin-bottom: 14px;
     }
 
+    .codes-status-card {
+      min-width: 0;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.024)),
+        rgba(0,0,0,.22);
+    }
+
+    .codes-status-card span {
+      display: block;
+      margin-bottom: 7px;
+      color: rgba(255,255,255,.5);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .codes-status-card strong {
+      display: block;
+      color: rgba(255,255,255,.9);
+      font-size: 14px;
+      font-weight: 900;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .codes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(430px, 100%), 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
     .codes-grid--primary {
-      grid-template-columns: minmax(0, .92fr) minmax(340px, .78fr);
+      grid-template-columns: repeat(auto-fit, minmax(min(430px, 100%), 1fr));
     }
 
     .codes-card {
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.045);
+      border: 1px solid rgba(255,255,255,.09);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.062), rgba(255,255,255,.028)),
+        rgba(8,10,15,.74);
       border-radius: 8px;
       padding: clamp(16px, 2.4vw, 24px);
-      box-shadow: 0 24px 80px rgba(0,0,0,.18);
+      box-shadow: 0 20px 70px rgba(0,0,0,.24);
     }
 
     .codes-card--create {
-      background: linear-gradient(180deg, rgba(125,249,255,.075), rgba(255,255,255,.035));
+      background:
+        radial-gradient(circle at top left, rgba(125,249,255,.13), transparent 42%),
+        linear-gradient(180deg, rgba(255,255,255,.068), rgba(255,255,255,.03)),
+        rgba(8,10,15,.78);
     }
 
     .codes-card--result {
-      background: linear-gradient(180deg, rgba(198,255,143,.08), rgba(255,255,255,.035));
+      background:
+        radial-gradient(circle at top, rgba(198,255,143,.14), transparent 42%),
+        linear-gradient(180deg, rgba(255,255,255,.068), rgba(255,255,255,.03)),
+        rgba(8,10,15,.78);
     }
 
     .codes-card-head {
@@ -930,15 +1152,17 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     }
 
     .codes-card-head span {
-      color: rgba(255,255,255,.52);
-      font-size: 12px;
+      color: rgba(125,249,255,.72);
+      font-size: 11px;
+      font-weight: 900;
       text-transform: uppercase;
       letter-spacing: .12em;
     }
 
     .codes-card-head strong,
     .codes-list-head h2 {
-      font-size: 19px;
+      color: rgba(255,255,255,.94);
+      font-size: 20px;
       letter-spacing: 0;
     }
 
@@ -962,7 +1186,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     }
 
     .codes-form {
-      gap: 14px;
+      gap: 12px;
     }
 
     .codes-form-row {
@@ -995,13 +1219,25 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     .codes-filter select,
     .codes-result-url input {
       width: 100%;
-      min-height: 42px;
+      min-height: 48px;
       border-radius: 8px;
-      border: 1px solid rgba(255,255,255,.11);
-      background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.34);
       color: #fff;
-      padding: 10px 12px;
+      padding: 11px 13px;
       font: inherit;
+      outline: none;
+      transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+
+    .codes-form input:focus,
+    .codes-form select:focus,
+    .codes-filter input:focus,
+    .codes-filter select:focus,
+    .codes-result-url input:focus {
+      border-color: rgba(125,249,255,.5);
+      box-shadow: 0 0 0 3px rgba(125,249,255,.08);
+      background: rgba(0,0,0,.42);
     }
 
     .codes-result-url {
@@ -1014,10 +1250,12 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     .codes-preview {
       display: grid;
       place-items: center;
-      background: #fff;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.98), rgba(240,247,255,.92));
       border-radius: 8px;
       padding: 12px;
       margin-bottom: 14px;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
     }
 
     .codes-preview canvas {
@@ -1032,14 +1270,21 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       min-height: 40px;
       padding: 9px 14px;
       border-radius: 8px;
-      border: 1px solid rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.13);
       color: #fff;
-      background: rgba(255,255,255,.05);
+      background: rgba(255,255,255,.06);
       text-decoration: none;
       font: inherit;
       font-size: 13px;
       font-weight: 800;
       cursor: pointer;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease, color .16s ease;
+    }
+
+    .codes-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(125,249,255,.3);
+      background: rgba(125,249,255,.08);
     }
 
     .codes-btn.primary {
@@ -1065,7 +1310,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
 
     .codes-rows {
       display: grid;
-      gap: 10px;
+      gap: 8px;
     }
 
     .codes-row {
@@ -1073,10 +1318,17 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       grid-template-columns: minmax(0, 1.4fr) auto auto;
       gap: 12px;
       align-items: center;
-      padding: 14px;
+      padding: 14px 16px;
       border-radius: 8px;
-      border: 1px solid rgba(255,255,255,.075);
-      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.24);
+      transition: border-color .16s ease, background .16s ease, transform .16s ease;
+    }
+
+    .codes-row:hover {
+      border-color: rgba(125,249,255,.22);
+      background: rgba(125,249,255,.045);
+      transform: translateY(-1px);
     }
 
     .codes-row-main {
@@ -1092,10 +1344,10 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
 
     .codes-row-main code,
     .codes-code {
-      color: #8ff8ff;
-      background: rgba(125,249,255,.09);
+      color: #9bf8ff;
+      background: rgba(125,249,255,.1);
       border-radius: 6px;
-      padding: 2px 7px;
+      padding: 4px 8px;
       width: fit-content;
       overflow-wrap: anywhere;
     }
@@ -1136,10 +1388,11 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     .codes-pill--admin_blocked { color: #fca5a5; background: rgba(248,113,113,.12); }
 
     .codes-empty {
-      padding: 22px;
-      border: 1px dashed rgba(255,255,255,.12);
+      padding: 26px;
+      border: 1px dashed rgba(125,249,255,.18);
       border-radius: 8px;
-      color: rgba(255,255,255,.56);
+      color: rgba(255,255,255,.62);
+      background: rgba(125,249,255,.035);
     }
 
     .codes-empty.is-error {
@@ -1148,6 +1401,34 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     }
 
     @media (max-width: 920px) {
+      .codes-shell {
+        padding-inline: 14px;
+      }
+      .codes-console {
+        padding: 10px;
+      }
+      .codes-hero {
+        grid-template-columns: 1fr;
+      }
+      .codes-hero-main {
+        grid-template-columns: 1fr;
+      }
+      .codes-hero-actions,
+      .codes-filter {
+        width: 100%;
+      }
+      .codes-hero-actions .codes-btn,
+      .codes-filter input,
+      .codes-filter select,
+      .codes-filter .codes-btn {
+        flex: 1 1 100%;
+      }
+      .codes-tabs {
+        grid-template-columns: 1fr;
+      }
+      .codes-status-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
       .codes-grid,
       .codes-grid--primary,
       .codes-row {
@@ -1161,6 +1442,15 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       }
       .codes-tabs {
         width: 100%;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .codes-status-grid {
+        grid-template-columns: 1fr;
+      }
+      .codes-result-url {
+        grid-template-columns: 1fr;
       }
     }
   </style>
