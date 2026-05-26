@@ -41,7 +41,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
           </div>
         </div>
         <div class="codes-hero-actions">
-          <a class="codes-btn ghost" href={ROUTES.labQrGen}>Styled QR designer</a>
+          <a class="codes-btn ghost" href={ROUTES.qrgen}>Styled QR designer</a>
           <button class="codes-btn ghost" type="button" data-tab-jump="qr">QR workspace</button>
           <button class="codes-btn ghost" type="button" data-tab-jump="vouchers">Voucher workspace</button>
         </div>
@@ -91,7 +91,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
             <form id="qrCreateForm" class="codes-form">
               <label>
                 <span>Destination URL</span>
-                <input id="qrTarget" type="url" placeholder="https://client-site.com" autocomplete="url" required />
+                <input id="qrTarget" type="text" placeholder="client-site.com" autocomplete="url" inputmode="url" required />
               </label>
               <div class="codes-form-row">
                 <label>
@@ -254,6 +254,14 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     let isAdmin = false;
     let lastQrRows = [];
     let lastVoucherRows = [];
+    let lastGeneratedQrUrl = "";
+
+    const QR_CANVAS_OPTIONS = {
+      width: 360,
+      margin: 2,
+      errorCorrectionLevel: "H",
+      color: { dark: "#05060a", light: "#ffffff" },
+    };
 
     const el = {
       loading: $("codesLoading"),
@@ -404,6 +412,22 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       return String(value || "").trim().replace(/[^a-zA-Z0-9_-]/g, "");
     }
 
+    function normalizeTargetUrl(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return "";
+      if (/^[a-z][a-z0-9+.-]*:\/\//i.test(raw)) return raw;
+      return `https://${raw}`;
+    }
+
+    function isValidHttpUrl(value) {
+      try {
+        const url = new URL(value);
+        return url.protocol === "http:" || url.protocol === "https:";
+      } catch {
+        return false;
+      }
+    }
+
     async function postgrest(path, options = {}) {
       const c = await loadConfig();
       const headers = await authHeaders();
@@ -457,11 +481,13 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
         const session = await getSession();
         if (!session) throw new Error("Sign in again before creating a QR.");
 
-        const target = el.qrTarget.value.trim();
+        const target = normalizeTargetUrl(el.qrTarget.value);
         const label = el.qrLabel.value.trim();
         const requestedSlug = normalizeSlug(el.qrSlug.value);
-        if (!/^https?:\/\//i.test(target)) {
-          throw new Error("Destination URL must start with http:// or https://");
+        el.qrTarget.value = target;
+        if (!isValidHttpUrl(target)) {
+          el.qrTarget.focus({ preventScroll: true });
+          throw new Error("Enter a valid destination URL.");
         }
         if (requestedSlug && (requestedSlug.length < 4 || requestedSlug.length > 32)) {
           throw new Error("Custom slug must be 4 to 32 characters.");
@@ -502,15 +528,12 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
         }
 
         const shortUrl = `${QR_HOST}/${created.slug}`;
+        lastGeneratedQrUrl = shortUrl;
         el.qrShortUrl.value = shortUrl;
         el.qrOpenLink.href = shortUrl;
+        el.qrCanvas.dataset.qrUrl = shortUrl;
         el.qrResult.hidden = false;
-        await QRCode.toCanvas(el.qrCanvas, shortUrl, {
-          width: 360,
-          margin: 2,
-          errorCorrectionLevel: "H",
-          color: { dark: "#05060a", light: "#ffffff" },
-        });
+        await QRCode.toCanvas(el.qrCanvas, shortUrl, QR_CANVAS_OPTIONS);
         setMsg(el.qrCreateMsg, "QR created. Test the link before sending to print.", "ok");
         el.qrTarget.value = "";
         el.qrLabel.value = "";
@@ -781,6 +804,13 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       link.click();
     }
 
+    async function downloadCreatedQr() {
+      const shortUrl = el.qrCanvas.dataset.qrUrl || el.qrShortUrl.value || lastGeneratedQrUrl;
+      if (!shortUrl) return;
+      await QRCode.toCanvas(el.qrCanvas, shortUrl, QR_CANVAS_OPTIONS);
+      downloadCanvas(el.qrCanvas, `volynx-qr-${Date.now()}.png`);
+    }
+
     function activateTab(tab, updateUrl = true) {
       const allowed = new Set(["qr", "vouchers", "recent"]);
       const nextTab = allowed.has(tab) ? tab : "qr";
@@ -821,7 +851,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
           loadQrs();
         }
       });
-      el.qrDownloadPng.addEventListener("click", () => downloadCanvas(el.qrCanvas, `volynx-qr-${Date.now()}.png`));
+      el.qrDownloadPng.addEventListener("click", downloadCreatedQr);
       el.voucherForm.addEventListener("submit", createVoucher);
       el.voucherLoadBtn.addEventListener("click", loadVouchers);
       el.voucherRows.addEventListener("click", async (event) => {

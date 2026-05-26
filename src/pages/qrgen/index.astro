@@ -1,0 +1,1318 @@
+---
+import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "../../components/FlagshipHeader.astro";
+import FlagshipFooter from "../../components/FlagshipFooter.astro";
+import { sitePricing } from "../../data/pricing";
+import { ROUTES } from "../../data/routes";
+
+const currencyParam = Astro.url.searchParams.get("currency") || "";
+const currentCurrency = (["GBP", "EUR", "BRL"] as const).includes(currencyParam as any)
+  ? currencyParam as "GBP" | "EUR" | "BRL"
+  : "GBP";
+const qrgenPlanPayload = sitePricing.qrgenPlans.map((plan) => ({
+  id: plan.id,
+  name: plan.name.en,
+  price: plan.price,
+  copy: plan.description.en,
+  features: plan.features.en,
+}));
+---
+
+<FlagshipLayout title="VOLYNX QRGen - Premium QR Code Editor" pageClass="page-qrgen">
+  <FlagshipHeader current="/qrgen/" ctaLabel="Open Lab" ctaI18n="nav.open_lab" ctaHref={ROUTES.lab} />
+
+  <nav class="qrgen-accountbar" aria-label="QRGen account actions" data-qg-accountbar>
+    <div class="qrgen-accountbar__inner">
+      <div class="qrgen-accountbar__status">
+        <span data-qg-i18n="account.product">QRGen workspace</span>
+        <strong id="qgAccountStatus" data-qg-i18n="account.guest">Not signed in</strong>
+      </div>
+
+      <div class="qrgen-accountbar__actions">
+        <a href={ROUTES.login} class="qrgen-accountbar__button" data-qg-auth="out" data-qg-i18n="account.login">Login</a>
+        <a href={ROUTES.signup} class="qrgen-accountbar__button is-primary" data-qg-auth="out" data-qg-i18n="account.signup">Create account</a>
+        <a href={ROUTES.profile} class="qrgen-accountbar__button is-primary" data-qg-auth="in" data-qg-role-link="profile" data-qg-i18n="account.profile" hidden>Profile</a>
+        <a href={ROUTES.profileQrCodes} class="qrgen-accountbar__button" data-qg-auth="in" data-qg-role-link="codes" data-qg-i18n="account.codes" hidden>My QRs</a>
+        <button type="button" id="qgLogoutBtn" class="qrgen-accountbar__button" data-qg-auth="in" data-qg-i18n="account.logout" hidden>Sign out</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="qrgen-shell" data-qrgen-root>
+    <section class="qrgen-hero" aria-labelledby="qrgen-title">
+      <div class="qrgen-hero__copy">
+        <span class="qrgen-kicker" data-qg-i18n="hero.kicker">VOLYNX QRGen</span>
+        <h1 id="qrgen-title" data-qg-i18n="hero.title">Design a QR Code that matches your brand.</h1>
+        <p data-qg-i18n="hero.subtitle">
+          Create clean, branded and print-ready QR Codes with live preview, smart export controls and a product path for dynamic campaigns.
+        </p>
+      </div>
+
+      <aside class="qrgen-plan" aria-label="QRGen plan status">
+        <span class="qrgen-plan__eyebrow" data-qg-i18n="plan.status">Current QRGen plan</span>
+        <strong id="qgPlanLabel">Free</strong>
+        <p id="qgPlanCopy" data-qg-i18n="plan.free_copy">Live preview and standard PNG export.</p>
+        <a href={ROUTES.pricing} class="qrgen-link-button" data-qg-i18n="plan.cta">Compare plans</a>
+      </aside>
+    </section>
+
+    <section class="qrgen-workbench" aria-label="QRGen editor">
+      <form class="qrgen-panel qrgen-config" id="qgEditor" autocomplete="off">
+        <div class="qrgen-panel__head">
+          <span class="qrgen-panel__eyebrow" data-qg-i18n="editor.kicker">Editor</span>
+          <h2 data-qg-i18n="editor.title">Content and brand controls</h2>
+        </div>
+
+        <fieldset class="qrgen-group">
+          <legend data-qg-i18n="content.legend">Project</legend>
+
+          <label class="qrgen-field" for="qgProjectName">
+            <span data-qg-i18n="content.name">QR name</span>
+            <input id="qgProjectName" name="projectName" type="text" value="Campaign QR" maxlength="80" />
+          </label>
+
+          <div class="qrgen-segment" role="radiogroup" aria-label="QR type">
+            <label>
+              <input type="radio" name="qrMode" value="static" checked />
+              <span data-qg-i18n="content.static">Static QR</span>
+            </label>
+            <label title="Dynamic QR Codes create a managed VOLYNX short link.">
+              <input type="radio" name="qrMode" value="dynamic" />
+              <span data-qg-i18n="content.dynamic">Dynamic QR</span>
+              <em>Managed</em>
+            </label>
+          </div>
+
+          <label class="qrgen-field qg-static-field" for="qgContent">
+            <span data-qg-i18n="content.value">Link, text or campaign destination</span>
+            <textarea id="qgContent" name="content" rows="4" placeholder="https://volynx.world"></textarea>
+          </label>
+
+          <div class="qrgen-dynamic-form" id="qgDynamicForm" hidden>
+            <div class="qrgen-dynamic-form__head">
+              <strong data-qg-i18n="dynamic.create_title">Create a managed dynamic QR</strong>
+              <span id="qgDynamicQuota">-- / --</span>
+            </div>
+
+            <div class="qrgen-dynamic-login" id="qgDynamicLogin" hidden>
+              <p data-qg-i18n="dynamic.login_required">Sign in to create dynamic QRs that you can edit later.</p>
+              <a href={`${ROUTES.login}?next=/qrgen/`} class="qrgen-link-button" data-qg-i18n="account.login">Login</a>
+            </div>
+
+            <div id="qgDynamicFields">
+              <label class="qrgen-field" for="qgDynamicTarget">
+                <span data-qg-i18n="dynamic.target">Final destination</span>
+                <input id="qgDynamicTarget" type="text" inputmode="url" autocomplete="url" placeholder="example.com/campaign" />
+              </label>
+
+              <label class="qrgen-field" for="qgDynamicLabel">
+                <span data-qg-i18n="dynamic.label">Internal label</span>
+                <input id="qgDynamicLabel" type="text" maxlength="100" placeholder="Client, campaign or placement" />
+              </label>
+
+              <button type="button" id="qgCreateDynamicBtn" class="qrgen-secondary" data-qg-i18n="dynamic.create_button">Create managed QR</button>
+              <input id="qgDynamicShortUrl" type="hidden" />
+              <p class="qrgen-dynamic-message" id="qgDynamicMessage" aria-live="polite"></p>
+            </div>
+          </div>
+
+          <p class="qrgen-help" id="qgExampleNotice" data-qg-i18n="content.example">
+            Preview de exemplo - digite seu conteúdo para personalizar.
+          </p>
+        </fieldset>
+
+        <fieldset class="qrgen-group">
+          <legend data-qg-i18n="style.legend">Visual style</legend>
+
+          <div class="qrgen-grid qrgen-grid--two">
+            <label class="qrgen-field" for="qgDotsType">
+              <span data-qg-i18n="style.dots">Dot style</span>
+              <select id="qgDotsType" name="dotsType">
+                <option value="rounded" data-qg-i18n="style.dots_rounded">Rounded</option>
+                <option value="dots" data-qg-i18n="style.dots_dots">Dots</option>
+                <option value="square" data-qg-i18n="style.dots_square">Square</option>
+                <option value="classy" data-plan-required="launch">Classy - Launch</option>
+                <option value="extra-rounded" data-plan-required="pro">Extra rounded - Pro</option>
+              </select>
+            </label>
+
+            <label class="qrgen-field" for="qgCornerStyle">
+              <span data-qg-i18n="style.corners">Corner style</span>
+              <select id="qgCornerStyle" name="cornerStyle">
+                <option value="extra-rounded">Extra rounded</option>
+                <option value="square">Square</option>
+                <option value="dot" data-plan-required="pro">Dot - Pro</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="qrgen-grid qrgen-grid--two">
+            <label class="qrgen-field" for="qgColorMode">
+              <span data-qg-i18n="style.color_mode">Color mode</span>
+              <select id="qgColorMode" name="colorMode">
+                <option value="solid" data-qg-i18n="style.color_solid">Solid</option>
+                <option value="gradient" data-plan-required="launch" data-qg-i18n="style.color_gradient">Gradient - Launch</option>
+                <option value="metallic" data-qg-i18n="style.color_metallic">Metallic</option>
+              </select>
+            </label>
+
+            <label class="qrgen-field" for="qgErrorCorrection">
+              <span data-qg-i18n="style.error">Error correction</span>
+              <select id="qgErrorCorrection" name="errorCorrection">
+                <option value="M">Balanced</option>
+                <option value="Q">High</option>
+                <option value="H" selected>Brand-safe</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="qrgen-grid qrgen-grid--three">
+            <label class="qrgen-field qg-solid-only" for="qgDotColor">
+              <span data-qg-i18n="style.dot_color">QR color</span>
+              <input id="qgDotColor" name="dotColor" type="color" value="#111827" />
+            </label>
+
+            <label class="qrgen-field qg-gradient-only" for="qgDotColor2">
+              <span data-qg-i18n="style.dot_color_2">Gradient end</span>
+              <input id="qgDotColor2" name="dotColor2" type="color" value="#20e3b2" />
+            </label>
+
+            <label class="qrgen-field qg-metallic-only" for="qgMetallicPreset">
+              <span data-qg-i18n="style.metallic_preset">Metallic finish</span>
+              <select id="qgMetallicPreset" name="metallicPreset">
+                <option value="chrome" data-qg-i18n="style.metallic_chrome">Chrome</option>
+                <option value="gold" data-qg-i18n="style.metallic_gold">Gold</option>
+                <option value="rose" data-qg-i18n="style.metallic_rose">Rose metal</option>
+                <option value="volynx" data-qg-i18n="style.metallic_volynx">VOLYNX teal</option>
+              </select>
+            </label>
+
+            <label class="qrgen-field" for="qgBgColor">
+              <span data-qg-i18n="style.bg">Background</span>
+              <input id="qgBgColor" name="bgColor" type="color" value="#ffffff" />
+            </label>
+          </div>
+
+          <div class="qrgen-grid qrgen-grid--two">
+            <label class="qrgen-field" for="qgPreviewSize">
+              <span data-qg-i18n="style.preview_size">Preview size</span>
+              <input id="qgPreviewSize" name="previewSize" type="range" min="240" max="360" step="20" value="320" />
+            </label>
+
+            <label class="qrgen-field" for="qgMargin">
+              <span data-qg-i18n="style.margin">Safe margin</span>
+              <input id="qgMargin" name="margin" type="range" min="0" max="36" step="2" value="12" />
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="qrgen-group">
+          <legend data-qg-i18n="brand.legend">Brand and print safety</legend>
+
+          <label class="qrgen-field" for="qgLogo">
+            <span data-qg-i18n="brand.logo">Center logo</span>
+            <input id="qgLogo" name="logo" type="file" accept="image/*" />
+            <small data-qg-i18n="brand.logo_note">Logo export is a QRGen Pro feature. You can preview it here.</small>
+          </label>
+
+          <div class="qrgen-grid qrgen-grid--two">
+            <label class="qrgen-field" for="qgLogoSize">
+              <span data-qg-i18n="brand.logo_size">Logo size</span>
+              <input id="qgLogoSize" name="logoSize" type="range" min="0.12" max="0.40" step="0.02" value="0.22" />
+            </label>
+
+            <label class="qrgen-field" for="qgLogoMargin">
+              <span data-qg-i18n="brand.logo_margin">Logo margin</span>
+              <input id="qgLogoMargin" name="logoMargin" type="range" min="4" max="24" step="1" value="10" />
+            </label>
+          </div>
+        </fieldset>
+      </form>
+
+      <section class="qrgen-panel qrgen-preview" aria-label="Live QR preview">
+        <div class="qrgen-preview__head">
+          <div>
+            <span class="qrgen-panel__eyebrow" data-qg-i18n="preview.kicker">Live preview</span>
+            <h2 data-qg-i18n="preview.title">Every change updates instantly.</h2>
+          </div>
+          <span class="qrgen-health" id="qgHealthBadge">Ready</span>
+        </div>
+
+        <div class="qrgen-stage" aria-live="polite">
+          <div id="qgPreview" class="qrgen-preview-box"></div>
+        </div>
+
+        <p class="qrgen-preview__note" id="qgPreviewNote" data-qg-i18n="preview.note">
+          Preview de exemplo - digite seu conteúdo para personalizar.
+        </p>
+
+        <div class="qrgen-warnings" id="qgWarnings" aria-live="polite"></div>
+
+        <div class="qrgen-export">
+          <div class="qrgen-export__head">
+            <span class="qrgen-panel__eyebrow" data-qg-i18n="export.kicker">Export</span>
+            <p data-qg-i18n="export.note">For large-format printing, prefer SVG or high-resolution PNG.</p>
+          </div>
+
+          <div class="qrgen-grid qrgen-grid--two">
+            <label class="qrgen-field" for="qgExportFormat">
+              <span data-qg-i18n="export.format">Format</span>
+              <select id="qgExportFormat" name="exportFormat">
+                <option value="png">PNG standard</option>
+                <option value="png-hd" data-plan-required="launch">PNG HD - Launch</option>
+                <option value="svg" data-plan-required="pro">SVG vector - Pro</option>
+              </select>
+            </label>
+
+            <label class="qrgen-field" for="qgExportSize">
+              <span data-qg-i18n="export.size">Export size</span>
+              <select id="qgExportSize" name="exportSize">
+                <option value="1024">1024 px</option>
+                <option value="2048" data-plan-required="launch">2048 px - Launch</option>
+                <option value="4096" data-plan-required="pro">4096 px - Pro</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="qrgen-check">
+            <input id="qgTransparent" type="checkbox" data-plan-required="pro" />
+            <span data-qg-i18n="export.transparent">Transparent background</span>
+            <em>Pro</em>
+          </label>
+
+          <div class="qrgen-actions">
+            <button type="button" id="qgExportBtn" class="qrgen-primary" data-qg-i18n="export.button">Export final QR</button>
+            <button type="button" id="qgSaveBtn" class="qrgen-secondary" data-qg-i18n="project.save">Save project</button>
+          </div>
+
+          <p id="qgMessage" class="qrgen-message" aria-live="polite"></p>
+        </div>
+      </section>
+    </section>
+
+    <section class="qrgen-dashboard" aria-label="QRGen project dashboard">
+      <article class="qrgen-panel">
+        <div class="qrgen-panel__head">
+          <span class="qrgen-panel__eyebrow" data-qg-i18n="projects.kicker">Projects</span>
+          <h2 data-qg-i18n="projects.title">Saved QR workspace</h2>
+          <p data-qg-i18n="projects.copy">Drafts are saved in this browser. Managed dynamic QRs live in your QR manager.</p>
+        </div>
+        <div class="qrgen-projects" id="qgProjects"></div>
+      </article>
+
+      <article class="qrgen-panel qrgen-dynamic">
+        <div class="qrgen-panel__head">
+          <span class="qrgen-panel__eyebrow">Studio</span>
+          <h2 data-qg-i18n="dynamic.title">Dynamic QR Codes and campaigns</h2>
+          <p data-qg-i18n="dynamic.copy">Dynamic redirects already have a VOLYNX path. Analytics and campaigns should stay tied to dynamic QR records only.</p>
+        </div>
+        <div class="qrgen-roadmap">
+          <span data-qg-i18n="dynamic.item1">Editable destination after print</span>
+          <span data-qg-i18n="dynamic.item2">Scan analytics without fake data</span>
+          <span data-qg-i18n="dynamic.item3">Campaign and client organization</span>
+        </div>
+        <a href={ROUTES.profileQrCodes} class="qrgen-link-button" data-qg-role-link="dynamic-manager" data-qg-i18n="dynamic.manage">Open dynamic QR manager</a>
+      </article>
+    </section>
+
+    <section class="qrgen-plans" aria-label="QRGen plans">
+      <div class="qrgen-section-head">
+        <span class="qrgen-kicker" data-qg-i18n="plans.kicker">QRGen plans</span>
+        <h2 data-qg-i18n="plans.title">A product path beyond a free QR form.</h2>
+      </div>
+      <div class="qrgen-currency" aria-label="QRGen plan currency">
+        {(["GBP", "EUR", "BRL"] as const).map((c) => (
+          <button type="button" class={`qrgen-currency__button ${c === currentCurrency ? "is-active" : ""}`} data-qg-currency={c} aria-pressed={c === currentCurrency ? "true" : "false"}>
+            <span>{c === "GBP" ? "£" : c === "EUR" ? "€" : "R$"}</span>
+            <strong>{c}</strong>
+          </button>
+        ))}
+      </div>
+      <div class="qrgen-plan-grid" id="qgPlanGrid"></div>
+    </section>
+  </main>
+
+  <FlagshipFooter />
+
+  <script is:inline src="https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  <script is:inline src="/js/vx-plan.js"></script>
+  <script is:inline src="/js/vx-auth-bridge.js"></script>
+  <script is:inline set:html={`window.VOLYNX_QRGEN_PLANS = ${JSON.stringify(qrgenPlanPayload)};`}></script>
+  <script is:inline src="/scripts/qrgen-editor.js?v=20260525-qrgen-production"></script>
+</FlagshipLayout>
+
+<style>
+  :global(html) {
+    scroll-behavior: smooth;
+  }
+
+  :global(body.page-qrgen) {
+    background:
+      linear-gradient(135deg, #0a0a1f 0%, #1a1a3e 25%, #0f0f2e 50%, #1e1e4f 75%, #0a0a1f 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    color: #f8fafc;
+    isolation: isolate;
+    overflow-x: hidden;
+  }
+
+  :global(body.page-qrgen .backdrop),
+  :global(body.page-qrgen .noise),
+  :global(body.page-qrgen #vxHomeBtn) {
+    display: none !important;
+  }
+
+  :global(body.page-qrgen::before) {
+    content: "";
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, #148ea9 -355px, #003768a6 250px);
+    background-size: 210px 200px;
+    animation: float 30s ease-in-out infinite;
+    animation-delay: -30s;
+    pointer-events: none;
+    opacity: .78;
+    z-index: 0;
+    will-change: transform;
+  }
+
+  :global(body.page-qrgen .vx-topbar),
+  .qrgen-accountbar,
+  .qrgen-shell {
+    position: relative;
+    z-index: 1;
+  }
+
+  @keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+    50% {
+      transform: translate3d(3.2%, -2.6%, 0) rotate(.45deg);
+    }
+  }
+
+  .qrgen-accountbar {
+    width: min(1440px, calc(100% - 32px));
+    margin: 14px auto 0;
+    border: 1px solid rgba(125,249,255,.16);
+    border-radius: 26px;
+    background:
+      linear-gradient(135deg, rgba(125,249,255,.10), rgba(255,255,255,.035)),
+      rgba(5, 10, 18, .76);
+    box-shadow: 0 18px 60px rgba(0,0,0,.26);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  .qrgen-accountbar__inner {
+    min-height: 58px;
+    padding: 8px 12px 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .qrgen-accountbar__status {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .qrgen-accountbar__status span {
+    color: #7df9ff;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+
+  .qrgen-accountbar__status strong {
+    color: rgba(248,250,252,.9);
+    font-size: 13px;
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .qrgen-accountbar__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .qrgen-accountbar__button {
+    min-height: 38px;
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 999px;
+    background: rgba(255,255,255,.055);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 13px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform .2s ease, border-color .2s ease, background .2s ease;
+  }
+
+  .qrgen-accountbar__button:hover {
+    transform: translateY(-1px);
+    border-color: rgba(125,249,255,.58);
+  }
+
+  .qrgen-accountbar__button.is-primary {
+    background: linear-gradient(135deg, #20e3b2, #7df9ff);
+    border-color: rgba(125,249,255,.58);
+    color: #071017;
+  }
+
+  .qrgen-accountbar [hidden] {
+    display: none !important;
+  }
+
+  .qrgen-shell {
+    width: min(1440px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 38px 0 72px;
+  }
+
+  .qrgen-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(280px, .6fr);
+    gap: 18px;
+    align-items: stretch;
+    margin: 12px 0 22px;
+  }
+
+  .qrgen-hero__copy,
+  .qrgen-plan,
+  .qrgen-panel {
+    border: 1px solid rgba(255,255,255,.12);
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.075), rgba(255,255,255,.035)),
+      rgba(5, 10, 18, .78);
+    box-shadow: 0 24px 80px rgba(0,0,0,.28);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-radius: 28px;
+  }
+
+  .qrgen-hero__copy {
+    min-height: 260px;
+    padding: clamp(24px, 4vw, 48px);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .qrgen-hero__copy::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(120deg, rgba(125,249,255,.10), transparent 42%),
+      url("/assets/qrgen.webp") right 28px center / min(36vw, 360px) auto no-repeat;
+    opacity: .72;
+    pointer-events: none;
+  }
+
+  .qrgen-hero__copy > * {
+    position: relative;
+    max-width: 760px;
+  }
+
+  .qrgen-kicker,
+  .qrgen-panel__eyebrow,
+  .qrgen-plan__eyebrow {
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    gap: 8px;
+    color: #7df9ff;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+  }
+
+  .qrgen-kicker::before,
+  .qrgen-panel__eyebrow::before,
+  .qrgen-plan__eyebrow::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: #20e3b2;
+    box-shadow: 0 0 14px rgba(32,227,178,.7);
+  }
+
+  .qrgen-hero h1,
+  .qrgen-section-head h2 {
+    margin: 14px 0 12px;
+    font-size: clamp(38px, 6vw, 78px);
+    line-height: .94;
+    letter-spacing: 0;
+    color: #fff;
+  }
+
+  .qrgen-hero p,
+  .qrgen-section-head p,
+  .qrgen-panel__head p,
+  .qrgen-export__head p {
+    margin: 0;
+    color: rgba(226,232,240,.72);
+    line-height: 1.6;
+  }
+
+  .qrgen-plan {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .qrgen-plan strong {
+    font-size: 40px;
+    line-height: 1;
+    color: #fff;
+  }
+
+  .qrgen-link-button,
+  .qrgen-primary,
+  .qrgen-secondary,
+  .qrgen-mini {
+    min-height: 44px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.14);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 16px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0;
+    cursor: pointer;
+    transition: transform .2s ease, border-color .2s ease, background .2s ease, color .2s ease;
+  }
+
+  .qrgen-link-button,
+  .qrgen-secondary,
+  .qrgen-mini {
+    background: rgba(255,255,255,.055);
+  }
+
+  .qrgen-primary {
+    background: linear-gradient(135deg, #20e3b2, #7df9ff);
+    color: #071017;
+    border-color: rgba(125,249,255,.55);
+  }
+
+  .qrgen-link-button:hover,
+  .qrgen-primary:hover,
+  .qrgen-secondary:hover,
+  .qrgen-mini:hover {
+    transform: translateY(-2px);
+    border-color: rgba(125,249,255,.58);
+  }
+
+  .qrgen-workbench {
+    display: grid;
+    grid-template-columns: minmax(320px, .86fr) minmax(380px, 1.14fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  .qrgen-panel {
+    padding: 20px;
+  }
+
+  .qrgen-config {
+    display: grid;
+    gap: 16px;
+  }
+
+  .qrgen-panel__head {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .qrgen-panel__head h2,
+  .qrgen-preview__head h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 22px;
+    letter-spacing: 0;
+  }
+
+  .qrgen-group {
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 22px;
+    padding: 16px;
+    margin: 0;
+    display: grid;
+    gap: 14px;
+    background: rgba(255,255,255,.035);
+  }
+
+  .qrgen-group legend {
+    padding: 0 8px;
+    color: rgba(255,255,255,.78);
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+  }
+
+  .qrgen-field {
+    display: grid;
+    gap: 8px;
+    color: rgba(255,255,255,.74);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .qrgen-field input,
+  .qrgen-field textarea,
+  .qrgen-field select {
+    width: 100%;
+    min-height: 42px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,.14);
+    background: rgba(0,0,0,.28);
+    color: #f8fafc;
+    padding: 10px 12px;
+    outline: none;
+    font: inherit;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .qrgen-field textarea {
+    resize: vertical;
+    min-height: 104px;
+    line-height: 1.5;
+  }
+
+  .qrgen-field input[type="color"] {
+    padding: 4px;
+    min-height: 48px;
+  }
+
+  .qrgen-field input[type="range"] {
+    padding: 0;
+    min-height: 28px;
+    accent-color: #20e3b2;
+  }
+
+  .qrgen-field input:focus,
+  .qrgen-field textarea:focus,
+  .qrgen-field select:focus {
+    border-color: rgba(125,249,255,.7);
+    box-shadow: 0 0 0 3px rgba(125,249,255,.10);
+  }
+
+  .qrgen-field small,
+  .qrgen-help {
+    color: rgba(226,232,240,.55);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.45;
+  }
+
+  .qrgen-grid {
+    display: grid;
+    gap: 12px;
+  }
+
+  .qrgen-grid--two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .qrgen-grid--three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .qrgen-segment {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .qrgen-segment label,
+  .qrgen-check {
+    min-height: 46px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 18px;
+    background: rgba(255,255,255,.045);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    color: rgba(255,255,255,.82);
+    font-size: 13px;
+    font-weight: 900;
+  }
+
+  .qrgen-segment input,
+  .qrgen-check input {
+    accent-color: #20e3b2;
+  }
+
+  .qrgen-segment em,
+  .qrgen-check em {
+    margin-left: auto;
+    font-size: 10px;
+    font-style: normal;
+    color: #071017;
+    background: #f5c451;
+    border-radius: 999px;
+    padding: 3px 7px;
+  }
+
+  .qrgen-segment .is-locked {
+    opacity: .82;
+  }
+
+  .qrgen-dynamic-form {
+    display: grid;
+    gap: 12px;
+    border: 1px solid rgba(32,227,178,.20);
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(32,227,178,.08), rgba(89,198,232,.04));
+    padding: 14px;
+  }
+
+  .qrgen-dynamic-form[hidden],
+  .qg-static-field[hidden] {
+    display: none !important;
+  }
+
+  .qrgen-dynamic-form__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: rgba(255,255,255,.86);
+    font-size: 13px;
+  }
+
+  .qrgen-dynamic-form__head span {
+    flex: 0 0 auto;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 999px;
+    background: rgba(0,0,0,.24);
+    padding: 5px 9px;
+    color: rgba(226,232,240,.72);
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .qrgen-dynamic-form__head span[data-state="full"] {
+    color: #fecaca;
+    border-color: rgba(248,113,113,.32);
+  }
+
+  .qrgen-dynamic-login {
+    border: 1px solid rgba(245,196,81,.22);
+    border-radius: 16px;
+    background: rgba(245,196,81,.07);
+    padding: 12px;
+    color: rgba(255,255,255,.78);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .qrgen-dynamic-login[hidden],
+  #qgDynamicFields[hidden] {
+    display: none !important;
+  }
+
+  .qrgen-dynamic-message {
+    min-height: 18px;
+    margin: 0;
+    color: rgba(226,232,240,.72);
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  .qrgen-dynamic-message[data-kind="ok"] {
+    color: #86efac;
+  }
+
+  .qrgen-dynamic-message[data-kind="warn"] {
+    color: #fde68a;
+  }
+
+  .qrgen-dynamic-message[data-kind="err"] {
+    color: #fca5a5;
+  }
+
+  .qrgen-preview {
+    position: sticky;
+    top: 18px;
+  }
+
+  .qrgen-preview__head {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    align-items: start;
+    margin-bottom: 18px;
+  }
+
+  .qrgen-health {
+    min-height: 30px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0 10px;
+    color: #071017;
+    background: #20e3b2;
+    font-size: 12px;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  .qrgen-health[data-state="warn"] {
+    background: #f5c451;
+  }
+
+  .qrgen-health[data-state="locked"] {
+    color: #fff;
+    background: #ef4444;
+  }
+
+  .qrgen-stage {
+    min-height: 420px;
+    display: grid;
+    place-items: center;
+    border-radius: 28px;
+    background:
+      linear-gradient(45deg, rgba(255,255,255,.045) 25%, transparent 25%),
+      linear-gradient(-45deg, rgba(255,255,255,.045) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, rgba(255,255,255,.045) 75%),
+      linear-gradient(-45deg, transparent 75%, rgba(255,255,255,.045) 75%),
+      #0b1018;
+    background-size: 22px 22px;
+    background-position: 0 0, 0 11px, 11px -11px, -11px 0;
+    border: 1px solid rgba(255,255,255,.10);
+    overflow: hidden;
+  }
+
+  .qrgen-preview-box {
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    border-radius: 24px;
+    background: rgba(255,255,255,.94);
+    box-shadow: 0 22px 70px rgba(0,0,0,.36);
+    transition: transform .2s ease;
+  }
+
+  .qrgen-preview-box.is-updating {
+    transform: scale(.985);
+  }
+
+  .qrgen-preview__note {
+    margin: 14px 0;
+    color: rgba(226,232,240,.66);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .qrgen-warnings {
+    display: grid;
+    gap: 8px;
+    margin: 12px 0 18px;
+  }
+
+  .qrgen-warning {
+    border: 1px solid rgba(245,196,81,.30);
+    background: rgba(245,196,81,.10);
+    color: #fde68a;
+    border-radius: 18px;
+    padding: 10px 12px;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.45;
+  }
+
+  .qrgen-export {
+    border-top: 1px solid rgba(255,255,255,.10);
+    padding-top: 18px;
+    display: grid;
+    gap: 14px;
+  }
+
+  .qrgen-export__head {
+    display: grid;
+    gap: 6px;
+  }
+
+  .qrgen-check {
+    width: fit-content;
+  }
+
+  .qrgen-actions {
+    display: grid;
+    grid-template-columns: 1.1fr .9fr;
+    gap: 10px;
+  }
+
+  .qrgen-message {
+    min-height: 20px;
+    margin: 0;
+    color: rgba(226,232,240,.72);
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.45;
+  }
+
+  .qrgen-message[data-kind="ok"] {
+    color: #86efac;
+  }
+
+  .qrgen-message[data-kind="warn"] {
+    color: #fde68a;
+  }
+
+  .qrgen-message[data-kind="err"] {
+    color: #fca5a5;
+  }
+
+  .qrgen-dashboard {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(300px, .9fr);
+    gap: 18px;
+    margin-top: 18px;
+  }
+
+  .qrgen-projects {
+    display: grid;
+    gap: 10px;
+  }
+
+  .qrgen-empty,
+  .qrgen-project {
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 22px;
+    padding: 12px;
+    background: rgba(255,255,255,.045);
+  }
+
+  .qrgen-project {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    background:
+      linear-gradient(135deg, rgba(125,249,255,.085), rgba(255,255,255,.035)),
+      rgba(255,255,255,.045);
+    transition: transform .22s ease, border-color .22s ease, background .22s ease;
+  }
+
+  .qrgen-project::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: linear-gradient(180deg, #20e3b2, #7df9ff);
+    opacity: .85;
+  }
+
+  .qrgen-project:hover {
+    transform: translateY(-2px);
+    border-color: rgba(125,249,255,.34);
+  }
+
+  .qrgen-project strong {
+    display: block;
+    color: #fff;
+    font-size: 14px;
+  }
+
+  .qrgen-project span,
+  .qrgen-empty {
+    color: rgba(226,232,240,.62);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .qrgen-project__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  .qrgen-project-action {
+    min-height: 36px;
+    border-radius: 999px;
+    border: 1px solid rgba(125,249,255,.18);
+    background: rgba(125,249,255,.07);
+    color: #eaffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 12px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0;
+    cursor: pointer;
+    transition: transform .2s ease, background .2s ease, border-color .2s ease;
+  }
+
+  .qrgen-project-action:hover {
+    transform: translateY(-1px);
+    background: rgba(125,249,255,.13);
+    border-color: rgba(125,249,255,.42);
+  }
+
+  .qrgen-project-action.is-danger {
+    color: #fecaca;
+    border-color: rgba(248,113,113,.18);
+    background: rgba(248,113,113,.07);
+  }
+
+  .qrgen-roadmap {
+    display: grid;
+    gap: 10px;
+    margin: 14px 0 18px;
+  }
+
+  .qrgen-roadmap span {
+    border: 1px solid rgba(125,249,255,.14);
+    background: rgba(125,249,255,.055);
+    color: rgba(226,232,240,.80);
+    border-radius: 18px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .qrgen-plans {
+    margin-top: 42px;
+  }
+
+  .qrgen-section-head {
+    margin-bottom: 18px;
+  }
+
+  .qrgen-section-head h2 {
+    font-size: clamp(30px, 4vw, 56px);
+  }
+
+  .qrgen-currency {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 6px;
+    margin: 0 0 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.28);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  }
+
+  .qrgen-currency__button {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: rgba(226,232,240,.60);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: background .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease;
+  }
+
+  .qrgen-currency__button span {
+    font-size: 15px;
+    line-height: 1;
+  }
+
+  .qrgen-currency__button strong {
+    font-size: 11px;
+    letter-spacing: .08em;
+  }
+
+  .qrgen-currency__button:hover,
+  .qrgen-currency__button.is-active {
+    color: #fff;
+    background: linear-gradient(135deg, rgba(32,227,178,.16), rgba(125,249,255,.13));
+    border-color: rgba(125,249,255,.28);
+  }
+
+  .qrgen-currency__button.is-active {
+    box-shadow: 0 0 0 3px rgba(32,227,178,.10), 0 14px 30px rgba(32,227,178,.12);
+  }
+
+  .qrgen-plan-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .qrgen-plan-card {
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 24px;
+    padding: 16px;
+    background: rgba(255,255,255,.05);
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .qrgen-plan-card.is-current {
+    border-color: rgba(32,227,178,.65);
+    box-shadow: 0 0 0 1px rgba(32,227,178,.24), 0 20px 60px rgba(32,227,178,.08);
+  }
+
+  .qrgen-plan-card h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 20px;
+  }
+
+  .qrgen-plan-card strong {
+    color: #7df9ff;
+    font-size: 26px;
+  }
+
+  .qrgen-plan-card p,
+  .qrgen-plan-card li {
+    color: rgba(226,232,240,.70);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .qrgen-plan-card ul {
+    margin: 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 7px;
+  }
+
+  @media (max-width: 1100px) {
+    .qrgen-hero,
+    .qrgen-workbench,
+    .qrgen-dashboard {
+      grid-template-columns: 1fr;
+    }
+
+    .qrgen-preview {
+      position: static;
+      order: -1;
+    }
+
+    .qrgen-plan-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 680px) {
+    .qrgen-accountbar {
+      width: min(100% - 20px, 1440px);
+      margin-top: 10px;
+    }
+
+    .qrgen-accountbar__inner {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .qrgen-accountbar__actions {
+      justify-content: stretch;
+    }
+
+    .qrgen-accountbar__button {
+      flex: 1 1 120px;
+    }
+
+    .qrgen-shell {
+      width: min(100% - 20px, 1440px);
+      padding-top: 18px;
+    }
+
+    .qrgen-hero__copy {
+      min-height: 360px;
+    }
+
+    .qrgen-hero__copy::before {
+      background-position: center top 24px;
+      background-size: min(72vw, 300px) auto;
+      opacity: .48;
+    }
+
+    .qrgen-hero__copy {
+      justify-content: flex-end;
+    }
+
+    .qrgen-grid--two,
+    .qrgen-grid--three,
+    .qrgen-actions,
+    .qrgen-plan-grid,
+    .qrgen-segment {
+      grid-template-columns: 1fr;
+    }
+
+    .qrgen-stage {
+      min-height: 360px;
+    }
+
+    .qrgen-preview__head {
+      flex-direction: column;
+    }
+
+    .qrgen-check {
+      width: 100%;
+    }
+
+    .qrgen-project {
+      grid-template-columns: 1fr;
+    }
+
+    .qrgen-project__actions {
+      justify-content: flex-start;
+    }
+  }
+</style>

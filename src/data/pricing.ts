@@ -19,6 +19,7 @@ type Plan = {
   price: MoneyMap;
   billing: Record<Locale, string>;
   cta: Record<Locale, string>;
+  href?: string;
   featured?: boolean;
   features: Record<Locale, string[]>;
   image?: string;
@@ -253,6 +254,75 @@ export const sitePricing = {
       features: {
         pt: ['25 sites', 'workspace', 'billing central', 'shared assets', 'shared icons pool', 'suporte prioritário'],
         en: ['25 sites', 'workspace', 'central billing', 'shared assets', 'shared icons pool', 'priority support']
+      }
+    }
+  ] satisfies Plan[],
+  qrgenPlans: [
+    {
+      id: 'free',
+      image: '/assets/qrgen.webp',
+      name: { pt: 'QRGen Free', en: 'QRGen Free' },
+      description: {
+        pt: 'Para criar QR estático rápido, validar layout e exportar PNG padrão sem fricção.',
+        en: 'For fast static QR creation, layout validation, and standard PNG export without friction.'
+      },
+      price: { GBP: '£0', EUR: '€0', BRL: 'R$0' },
+      billing: { pt: 'sem custo', en: 'no cost' },
+      cta: { pt: 'Abrir QRGen', en: 'Open QRGen' },
+      href: '/qrgen/',
+      features: {
+        pt: ['preview ao vivo', 'QR estático', 'cores básicas', '2 exports grátis/dia'],
+        en: ['live preview', 'static QR', 'basic colors', '2 free exports/day']
+      }
+    },
+    {
+      id: 'launch',
+      image: '/assets/newqrgen.webp',
+      name: { pt: 'QRGen Launch', en: 'QRGen Launch' },
+      description: {
+        pt: 'Para campanhas reais que precisam de PNG em alta resolução e fluxo de rascunhos mais prático.',
+        en: 'For real campaigns that need high-resolution PNGs and a smoother saved-draft workflow.'
+      },
+      price: { GBP: '£11', EUR: '€13', BRL: 'R$69' },
+      billing: { pt: '/mês', en: '/month' },
+      cta: { pt: 'Assinar Launch', en: 'Get Launch' },
+      features: {
+        pt: ['PNG HD', 'mais rascunhos salvos', 'estilos em gradiente', 'fluxo pronto para campanha'],
+        en: ['HD PNG', 'more saved drafts', 'gradient styles', 'campaign-ready workflow']
+      }
+    },
+    {
+      id: 'pro',
+      image: '/assets/newqrgen.webp',
+      badge: { pt: 'SVG premium', en: 'Premium SVG' },
+      featured: true,
+      name: { pt: 'QRGen Pro', en: 'QRGen Pro' },
+      description: {
+        pt: 'Para quem paga por qualidade de marca: SVG vetorial, fundo transparente, logo e arquivos prontos para impressão.',
+        en: 'For paid users who need brand quality: vector SVG, transparent background, logo export, and print-ready files.'
+      },
+      price: { GBP: '£24', EUR: '€28', BRL: 'R$149' },
+      billing: { pt: '/mês', en: '/month' },
+      cta: { pt: 'Ir de Pro', en: 'Go Pro' },
+      features: {
+        pt: ['SVG vetorial', 'fundo transparente', 'logo central no export', 'PNG 4096px'],
+        en: ['vector SVG', 'transparent background', 'center logo export', '4096px PNG']
+      }
+    },
+    {
+      id: 'studio',
+      image: '/assets/newqrgen.webp',
+      name: { pt: 'QRGen Studio', en: 'QRGen Studio' },
+      description: {
+        pt: 'Para trabalho com clientes, QR dinâmico gerenciado, organização de campanhas e caminho de analytics.',
+        en: 'For client work, managed dynamic QR codes, campaign organization, and the analytics path.'
+      },
+      price: { GBP: '£54', EUR: '€63', BRL: 'R$349' },
+      billing: { pt: '/mês', en: '/month' },
+      cta: { pt: 'Assinar Studio', en: 'Get Studio' },
+      features: {
+        pt: ['QR dinâmico gerenciado', 'organização por cliente/campanha', 'limite maior de QRs ativos', 'fluxo premium de entrega'],
+        en: ['managed dynamic QR', 'client/campaign organization', 'higher active QR limit', 'premium delivery workflow']
       }
     }
   ] satisfies Plan[],

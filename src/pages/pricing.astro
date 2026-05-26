@@ -236,6 +236,35 @@ const pricingAssistItems = [
       </div>
     </section>
 
+    <!-- ═══ QRGEN PLANS ═══ -->
+    <section id="qrgen-plans" class="page-section qrgen-pricing-section">
+      <div class="shell section-head">
+        <span class="eyebrow">VOLYNX QRGen</span>
+        <h2><span class="i18n-en">Premium QR exports follow the same VOLYNX plan logic.</span><span class="i18n-pt">Exports premium de QR seguem a mesma lógica de planos da VOLYNX.</span></h2>
+        <p><span class="i18n-en">Static QR creation stays generous. Paid tiers unlock HD output, SVG vector export, transparent backgrounds, logo export and managed dynamic QR workflows.</span><span class="i18n-pt">Criar QR estático continua generoso. Tiers pagos liberam saída HD, SVG vetorial, fundo transparente, export com logo e fluxo de QR dinâmico gerenciado.</span></p>
+      </div>
+      <div class="shell qrgen-pricing-hero">
+        <div class="qrgen-pricing-hero__copy">
+          <span class="qrgen-pricing-hero__pill"><span class="i18n-en">New canonical product</span><span class="i18n-pt">Novo produto canônico</span></span>
+          <strong>QRGen Pro</strong>
+          <p><span class="i18n-en">For buyers who need crisp print quality, editable campaign links and brand-safe files instead of disposable QR screenshots.</span><span class="i18n-pt">Para compradores que precisam de qualidade de impressão, links editáveis de campanha e arquivos seguros para marca em vez de prints descartáveis.</span></p>
+          <div class="qrgen-pricing-hero__actions">
+            <a href={ROUTES.qrgen} class="button button--gold"><span class="i18n-en">Open QRGen</span><span class="i18n-pt">Abrir QRGen</span></a>
+            <a href={ROUTES.profileQrCodes} class="button button--ghost"><span class="i18n-en">Manage dynamic QRs</span><span class="i18n-pt">Gerenciar QRs dinâmicos</span></a>
+          </div>
+        </div>
+        <img src="/assets/newqrgen.webp" alt="" class="qrgen-pricing-hero__art" loading="lazy" decoding="async" />
+      </div>
+      <div class="shell pricing-grid pricing-grid--plans qrgen-pricing-grid">
+        {sitePricing.qrgenPlans.map((plan) => (
+          <PricingCard plan={plan} locale={lang} currency={currency} />
+        ))}
+      </div>
+      <div class="shell">
+        <div class="checkout-support"><span class="i18n-en"><strong>QRGen uses the same plan economy.</strong> Launch, Pro and Studio are VOLYNX plan tiers, so currency, checkout and access stay aligned with the rest of the platform.</span><span class="i18n-pt"><strong>QRGen usa a mesma economia de planos.</strong> Launch, Pro e Studio são tiers VOLYNX, então moeda, checkout e acesso ficam alinhados com o resto da plataforma.</span></div>
+      </div>
+    </section>
+
     <!-- ═══ WHAT PRO FEELS LIKE ═══ -->
     <section class="page-section">
       <div class="shell section-head">
@@ -879,6 +908,96 @@ const pricingAssistItems = [
       background: rgba(214,179,106,.26);
       border-color: rgba(214,179,106,.52);
     }
+    .qrgen-pricing-section {
+      position: relative;
+      overflow: hidden;
+      border-block: 1px solid rgba(125,249,255,.10);
+      background: linear-gradient(180deg, rgba(5,9,16,0), rgba(6,18,22,.36) 48%, rgba(5,9,16,0));
+    }
+    .qrgen-pricing-hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(220px, 360px);
+      align-items: center;
+      gap: clamp(18px, 3vw, 44px);
+      margin-bottom: 24px;
+      padding: clamp(24px, 4vw, 44px);
+      border-radius: 8px;
+      border: 1px solid rgba(125,249,255,.16);
+      background:
+        linear-gradient(135deg, rgba(125,249,255,.09), rgba(32,227,178,.035)),
+        rgba(255,255,255,.025);
+      box-shadow: 0 28px 78px rgba(0,0,0,.28);
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .qrgen-pricing-hero__copy {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 14px;
+      max-width: 680px;
+    }
+    .qrgen-pricing-hero__pill {
+      width: max-content;
+      max-width: 100%;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(32,227,178,.26);
+      background: rgba(32,227,178,.10);
+      color: #7df9ff;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .qrgen-pricing-hero__copy strong {
+      color: #fff;
+      font-size: clamp(2rem, 5vw, 4.6rem);
+      line-height: .94;
+      letter-spacing: 0;
+    }
+    .qrgen-pricing-hero__copy p {
+      margin: 0;
+      color: rgba(226,232,240,.70);
+      font-size: clamp(1rem, 1.4vw, 1.12rem);
+      line-height: 1.65;
+    }
+    .qrgen-pricing-hero__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .qrgen-pricing-hero__art {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 330px);
+      justify-self: center;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 28px 58px rgba(0,0,0,.48));
+      transform: rotate(2deg);
+    }
+    .qrgen-pricing-grid {
+      position: relative;
+    }
+    :global(.qrgen-pricing-grid .pricing-card > .card-asset) {
+      top: 12px;
+      right: 12px;
+      width: min(126px, 30%);
+      opacity: .34;
+    }
+    :global(.qrgen-pricing-grid .pricing-card__head) {
+      display: grid;
+      gap: 18px;
+      padding-right: min(132px, 32%);
+    }
+    :global(.qrgen-pricing-grid .pricing-card__price-block) {
+      align-items: flex-start;
+      max-width: none;
+      text-align: left;
+    }
     @media (max-width: 1120px) and (min-width: 768px) {
       .pricing-grid--propertyflow {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -911,6 +1030,30 @@ const pricingAssistItems = [
       .pricing-card--propertyflow .pricing-pill {
         top: 16px;
         right: 16px;
+      }
+      .qrgen-pricing-hero {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: 26px 20px 28px;
+      }
+      .qrgen-pricing-hero__copy,
+      .qrgen-pricing-hero__pill {
+        justify-items: center;
+        margin-inline: auto;
+      }
+      .qrgen-pricing-hero__actions {
+        justify-content: center;
+      }
+      .qrgen-pricing-hero__art {
+        width: min(230px, 72vw);
+        transform: none;
+      }
+      :global(.qrgen-pricing-grid .pricing-card__head) {
+        padding-right: 0;
+      }
+      :global(.qrgen-pricing-grid .pricing-card > .card-asset) {
+        width: min(112px, 34%);
+        opacity: .22;
       }
     }
 
@@ -1283,26 +1426,47 @@ const pricingAssistItems = [
     }
 
     // Currency switcher
+    function normalizePricingCurrency(value) {
+      value = String(value || '').toUpperCase();
+      return /^(GBP|EUR|BRL)$/.test(value) ? value : 'GBP';
+    }
+
+    function applyPricingCurrency(target, updateUrl) {
+      target = normalizePricingCurrency(target);
+      document.querySelectorAll('[data-switch-currency]').forEach(function(p) {
+        var active = p.dataset.switchCurrency === target;
+        p.classList.toggle('lcbar__pill--active', active);
+        p.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      document.querySelectorAll('[data-currency]').forEach(function(el) {
+        var curr = el.dataset.currency;
+        el.classList.toggle('vx-price--hidden', curr !== target);
+        el.classList.toggle('pricing-card__price--hidden', curr !== target);
+      });
+      document.querySelectorAll('.token-card__pix').forEach(function(el) {
+        el.style.display = target === 'BRL' ? 'flex' : 'none';
+      });
+      if (updateUrl) {
+        var url = new URL(window.location.href);
+        url.searchParams.set('currency', target);
+        history.replaceState(null, '', url.toString());
+      }
+      try { localStorage.setItem('volynx_currency', target); } catch {}
+      try {
+        window.dispatchEvent(new CustomEvent('vx:currency-changed', {
+          detail: { code: target, currency: target.toLowerCase() }
+        }));
+      } catch {}
+    }
+
     document.querySelectorAll('[data-switch-currency]').forEach(function(btn) {
       btn.addEventListener('click', function() {
         var target = btn.dataset.switchCurrency;
         if (!target) return;
-        document.querySelectorAll('[data-switch-currency]').forEach(function(p) { p.classList.remove('lcbar__pill--active'); });
-        btn.classList.add('lcbar__pill--active');
-        document.querySelectorAll('[data-currency]').forEach(function(el) {
-          var curr = el.dataset.currency;
-          el.classList.toggle('vx-price--hidden', curr !== target);
-          el.classList.toggle('pricing-card__price--hidden', curr !== target);
-        });
-        document.querySelectorAll('.token-card__pix').forEach(function(el) {
-          el.style.display = target === 'BRL' ? 'flex' : 'none';
-        });
-        var url = new URL(window.location.href);
-        url.searchParams.set('currency', target);
-        history.replaceState(null, '', url.toString());
-        try { localStorage.setItem('volynx_currency', target); } catch {}
+        applyPricingCurrency(target, true);
       });
     });
+    applyPricingCurrency(new URLSearchParams(window.location.search).get('currency') || localStorage.getItem('volynx_currency') || 'GBP', false);
   </script>
 
   <FlagshipFooter />

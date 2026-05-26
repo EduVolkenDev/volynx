@@ -3,7 +3,14 @@ import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
 import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import FlagshipFooter from "../../components/FlagshipFooter.astro";
 import PlatformAssistStrip from "../../components/PlatformAssistStrip.astro";
+import { sitePricing } from "../../data/pricing";
 import { ROUTES } from "../../data/routes";
+
+const currencyParam = Astro.url.searchParams.get('currency') || '';
+const currentCurrency = (['GBP', 'EUR', 'BRL'] as const).includes(currencyParam as any) ? currencyParam as 'GBP'|'EUR'|'BRL' : 'GBP';
+const qrgenPlans = sitePricing.qrgenPlans.filter((plan) => plan.id !== 'free');
+const qrgenFreePlan = sitePricing.qrgenPlans.find((plan) => plan.id === 'free');
+const qrgenProPlan = sitePricing.qrgenPlans.find((plan) => plan.id === 'pro') || qrgenPlans[0];
 
 const productAssistItems = [
   { href: ROUTES.pricing, label: { en: "Compare", pt: "Comparar" }, title: { en: "See pricing", pt: "Ver pricing" }, copy: { en: "Compare Builder, Daily, bundles and VX without leaving the platform flow.", pt: "Compare Builder, Daily, bundles e VX sem sair do fluxo da plataforma." }, emphasized: true, iconSrc: "/assets/newpricing1.webp" },
@@ -89,6 +96,72 @@ const productAssistItems = [
             <a href={`${ROUTES.docs}#propertyflow`} class="button button--ghost">Preview buyer flow</a>
           </div>
         </article>
+      </div>
+    </section>
+
+    <!-- ═══ QRGEN SPOTLIGHT ═══ -->
+    <section class="page-section qr-product-section" id="qrgen">
+      <div class="shell section-head qr-product-head">
+        <span class="eyebrow"><span class="i18n-en">QR product line</span><span class="i18n-pt">Linha QR</span></span>
+        <h2><span class="i18n-en">QRGen is now a real VOLYNX product, priced like the platform.</span><span class="i18n-pt">QRGen agora é um produto VOLYNX real, com preço no padrão da plataforma.</span></h2>
+        <p><span class="i18n-en">Static creation stays accessible. Premium plans unlock HD output, SVG vector export, transparent backgrounds, logo export and managed dynamic QR workflows.</span><span class="i18n-pt">A criação estática continua acessível. Os planos premium liberam saída HD, SVG vetorial, fundo transparente, export com logo e fluxo de QR dinâmico gerenciado.</span></p>
+      </div>
+
+      <div class="shell qr-product-grid">
+        <div class="qr-product-copy">
+          <span class="qr-product-badge"><span class="i18n-en">Canonical QRGen</span><span class="i18n-pt">QRGen canônico</span></span>
+          <h3>QRGen Pro</h3>
+          <p><span class="i18n-en">Brand-ready QR output for paid users who need files that survive print, campaigns and client delivery.</span><span class="i18n-pt">Saída de QR pronta para marca, feita para quem paga e precisa de arquivos bons para impressão, campanhas e entrega a clientes.</span></p>
+          <div class="qr-product-price">
+            <span class="qr-product-price__label"><span class="i18n-en">Pro from</span><span class="i18n-pt">Pro a partir de</span></span>
+            <strong
+              data-price-gbp={qrgenProPlan.price.GBP}
+              data-price-eur={qrgenProPlan.price.EUR}
+              data-price-brl={qrgenProPlan.price.BRL}
+            >{qrgenProPlan.price[currentCurrency]}</strong>
+            <span><span class="i18n-en">{qrgenProPlan.billing.en}</span><span class="i18n-pt">{qrgenProPlan.billing.pt}</span></span>
+          </div>
+          <div class="qr-product-actions">
+            <a href={ROUTES.qrgen} class="button button--gold"><span class="i18n-en">Open QRGen</span><span class="i18n-pt">Abrir QRGen</span></a>
+            <a href={`${ROUTES.pricing}#qrgen-plans`} class="button button--ghost"><span class="i18n-en">Compare QR plans</span><span class="i18n-pt">Comparar planos QR</span></a>
+          </div>
+          {qrgenFreePlan && (
+            <p class="qr-product-free">
+              <span class="i18n-en">Free starts at <strong data-price-gbp={qrgenFreePlan.price.GBP} data-price-eur={qrgenFreePlan.price.EUR} data-price-brl={qrgenFreePlan.price.BRL}>{qrgenFreePlan.price[currentCurrency]}</strong> for static QR and standard PNG exports.</span>
+              <span class="i18n-pt">O Free começa em <strong data-price-gbp={qrgenFreePlan.price.GBP} data-price-eur={qrgenFreePlan.price.EUR} data-price-brl={qrgenFreePlan.price.BRL}>{qrgenFreePlan.price[currentCurrency]}</strong> para QR estático e exports PNG padrão.</span>
+            </p>
+          )}
+        </div>
+
+        <div class="qr-product-media" aria-hidden="true">
+          <img src="/assets/newqrgen.webp" alt="" loading="lazy" decoding="async" />
+        </div>
+      </div>
+
+      <div class="shell qr-product-pricing">
+        <div class="vx-currency-bar" aria-label="QRGen currency"></div>
+        <div class="qr-product-plan-grid">
+          {qrgenPlans.map((plan) => (
+            <article class={`qr-product-plan ${plan.featured ? 'qr-product-plan--featured' : ''}`}>
+              <span class="qr-product-plan__tag"><span class="i18n-en">{plan.badge?.en || 'QRGen tier'}</span><span class="i18n-pt">{plan.badge?.pt || 'Tier QRGen'}</span></span>
+              <h4><span class="i18n-en">{plan.name.en}</span><span class="i18n-pt">{plan.name.pt}</span></h4>
+              <div class="qr-product-plan__price">
+                <strong
+                  data-price-gbp={plan.price.GBP}
+                  data-price-eur={plan.price.EUR}
+                  data-price-brl={plan.price.BRL}
+                >{plan.price[currentCurrency]}</strong>
+                <span><span class="i18n-en">{plan.billing.en}</span><span class="i18n-pt">{plan.billing.pt}</span></span>
+              </div>
+              <p><span class="i18n-en">{plan.description.en}</span><span class="i18n-pt">{plan.description.pt}</span></p>
+              <ul>
+                {plan.features.en.slice(0, 3).map((feature, index) => (
+                  <li><span class="i18n-en">{feature}</span><span class="i18n-pt">{plan.features.pt[index] || feature}</span></li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
 
@@ -182,5 +255,271 @@ const productAssistItems = [
     </section>
 
   </main>
+  <style>
+    .qr-product-section {
+      position: relative;
+      border-block: 1px solid rgba(125, 211, 252, .12);
+      background:
+        linear-gradient(180deg, rgba(5, 9, 16, 0), rgba(5, 16, 18, .44) 48%, rgba(5, 9, 16, 0));
+    }
+
+    .qr-product-head {
+      max-width: 920px;
+    }
+
+    .qr-product-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.02fr) minmax(280px, .98fr);
+      align-items: center;
+      gap: clamp(24px, 5vw, 64px);
+      margin-top: 18px;
+    }
+
+    .qr-product-copy,
+    .qr-product-media,
+    .qr-product-plan {
+      min-width: 0;
+    }
+
+    .qr-product-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .qr-product-badge,
+    .qr-product-plan__tag {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(125, 211, 252, .28);
+      background: rgba(125, 211, 252, .08);
+      color: #9ee7ff;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .qr-product-copy h3 {
+      margin: 0;
+      font-size: clamp(36px, 6vw, 74px);
+      line-height: .96;
+      letter-spacing: 0;
+      color: #fff;
+    }
+
+    .qr-product-copy p {
+      margin: 0;
+      max-width: 640px;
+      color: rgba(255, 255, 255, .68);
+      line-height: 1.72;
+    }
+
+    .qr-product-price {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      padding: 18px 0 2px;
+    }
+
+    .qr-product-price__label {
+      width: 100%;
+      color: rgba(255, 255, 255, .52);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .qr-product-price strong {
+      font-size: clamp(40px, 7vw, 78px);
+      line-height: .9;
+      color: #fff;
+      overflow-wrap: anywhere;
+    }
+
+    .qr-product-price span:last-child {
+      color: rgba(255, 255, 255, .55);
+      font-weight: 700;
+    }
+
+    .qr-product-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 2px;
+    }
+
+    .qr-product-free {
+      padding-left: 14px;
+      border-left: 2px solid rgba(125, 211, 252, .34);
+      font-size: 13px;
+    }
+
+    .qr-product-free strong {
+      color: #fff;
+    }
+
+    .qr-product-media {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: clamp(320px, 34vw, 520px);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, .08);
+      background:
+        linear-gradient(135deg, rgba(125, 211, 252, .10), rgba(45, 212, 191, .06)),
+        rgba(255, 255, 255, .025);
+      overflow: hidden;
+      box-shadow: 0 28px 90px rgba(0, 0, 0, .32);
+    }
+
+    .qr-product-media::before {
+      content: "";
+      position: absolute;
+      inset: 16px;
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 8px;
+      pointer-events: none;
+    }
+
+    .qr-product-media img {
+      width: min(82%, 460px);
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 28px 58px rgba(0, 0, 0, .48));
+      transform: rotate(-3deg);
+    }
+
+    .qr-product-pricing {
+      margin-top: clamp(28px, 5vw, 52px);
+    }
+
+    .qr-product-section .vx-currency-bar {
+      justify-content: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .qr-product-plan-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .qr-product-plan {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 22px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, .08);
+      background: rgba(255, 255, 255, .035);
+      box-shadow: 0 18px 46px rgba(0, 0, 0, .18);
+      overflow: hidden;
+    }
+
+    .qr-product-plan--featured {
+      border-color: rgba(125, 211, 252, .42);
+      background:
+        linear-gradient(180deg, rgba(125, 211, 252, .10), rgba(45, 212, 191, .035)),
+        rgba(255, 255, 255, .04);
+    }
+
+    .qr-product-plan h4 {
+      margin: 0;
+      color: #fff;
+      font-size: clamp(20px, 2vw, 26px);
+      letter-spacing: 0;
+    }
+
+    .qr-product-plan__price {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .qr-product-plan__price strong {
+      font-size: clamp(30px, 4vw, 44px);
+      line-height: .95;
+      color: #fff;
+      overflow-wrap: anywhere;
+    }
+
+    .qr-product-plan__price span {
+      color: rgba(255, 255, 255, .52);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .qr-product-plan p,
+    .qr-product-plan li {
+      color: rgba(255, 255, 255, .62);
+      font-size: 13px;
+      line-height: 1.58;
+    }
+
+    .qr-product-plan p {
+      margin: 0;
+    }
+
+    .qr-product-plan ul {
+      display: grid;
+      gap: 8px;
+      padding: 0;
+      margin: auto 0 0;
+      list-style: none;
+    }
+
+    .qr-product-plan li {
+      position: relative;
+      padding-left: 18px;
+    }
+
+    .qr-product-plan li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: .65em;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #7dd3fc;
+      box-shadow: 0 0 12px rgba(125, 211, 252, .42);
+    }
+
+    @media (max-width: 980px) {
+      .qr-product-grid,
+      .qr-product-plan-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .qr-product-media {
+        min-height: 300px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .qr-product-copy h3 {
+        font-size: clamp(34px, 13vw, 54px);
+      }
+
+      .qr-product-actions .button {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .qr-product-section .vx-currency-bar {
+        justify-content: stretch;
+      }
+    }
+  </style>
+  <script is:inline src="/js/vx-currency.js"></script>
   <FlagshipFooter />
 </FlagshipLayout>
