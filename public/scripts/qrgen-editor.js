@@ -21,6 +21,7 @@
   const PLAN_ORDER = { free: 0, launch: 1, pro: 2, studio: 3 };
   const PLAN_LABELS = { free: "Free", launch: "Launch", pro: "Pro", studio: "Studio" };
   const PLAN_LIMITS = { free: 1, launch: 5, pro: 20, studio: 50, teams: 200, enterprise: -1 };
+  const CURRENCIES = ["GBP", "EUR", "BRL"];
   const PLAN_COPY = {
     free: "Live preview, basic static QR and standard PNG export.",
     launch: "More static exports, HD PNG and saved project workflow.",
@@ -28,36 +29,66 @@
     studio: "Dynamic QR path, campaigns, analytics and client organization."
   };
 
-  const PLANS = [
+  const FALLBACK_PLANS = [
     {
       id: "free",
       name: "QRGen Free",
-      price: "£0",
+      price: { GBP: "£0", EUR: "€0", BRL: "R$0" },
       copy: "For fast static QR drafts and standard PNGs.",
       features: ["Live preview", "Static QR", "Basic colors", "2 free exports/day"]
     },
     {
       id: "launch",
       name: "QRGen Launch",
-      price: "£11/mo",
+      price: { GBP: "£11", EUR: "€13", BRL: "R$69" },
       copy: "For real campaigns that need HD assets.",
       features: ["HD PNG", "More saved projects", "Gradient styles", "No friction for launch work"]
     },
     {
       id: "pro",
       name: "QRGen Pro",
-      price: "£24/mo",
+      price: { GBP: "£24", EUR: "€28", BRL: "R$149" },
       copy: "For brand-safe and print-ready exports.",
       features: ["SVG vector", "Transparent background", "Logo export", "4096px PNG"]
     },
     {
       id: "studio",
       name: "QRGen Studio",
-      price: "£54/mo",
+      price: { GBP: "£54", EUR: "€63", BRL: "R$349" },
       copy: "For dynamic QR campaigns and client work.",
       features: ["Dynamic QR direction", "Campaign organization", "Analytics path", "Client/project workflow"]
     }
   ];
+
+  function normalizeCurrency(value) {
+    const code = String(value || "").toUpperCase();
+    return CURRENCIES.includes(code) ? code : "GBP";
+  }
+
+  function currentCurrencyFromPage() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      return normalizeCurrency(params.get("currency") || localStorage.getItem("volynx_currency") || "GBP");
+    } catch (_) {
+      return "GBP";
+    }
+  }
+
+  function normalizePlans(rows) {
+    const source = Array.isArray(rows) && rows.length ? rows : FALLBACK_PLANS;
+    return source.map((plan, index) => {
+      const fallback = FALLBACK_PLANS[index] || FALLBACK_PLANS[0];
+      return {
+        ...fallback,
+        ...plan,
+        price: plan?.price && typeof plan.price === "object" ? plan.price : fallback.price,
+        features: Array.isArray(plan?.features) && plan.features.length ? plan.features : fallback.features,
+      };
+    });
+  }
+
+  const PLANS = normalizePlans(window.VOLYNX_QRGEN_PLANS);
+  let currentCurrency = currentCurrencyFromPage();
 
   const I18N = {
     pt: {
@@ -1248,11 +1279,31 @@
     wrap.innerHTML = PLANS.map((plan) => `
       <article class="qrgen-plan-card ${plan.id === currentPlan ? "is-current" : ""}">
         <h3>${escapeHtml(plan.name)}</h3>
-        <strong>${escapeHtml(plan.price)}</strong>
+        <strong>${escapeHtml(plan.price?.[currentCurrency] || plan.price?.GBP || "")}</strong>
         <p>${escapeHtml(tq(`plans.${plan.id}.copy`, plan.copy))}</p>
         <ul>${plan.features.map((feature, index) => `<li>${escapeHtml(tq(`plans.${plan.id}.f${index + 1}`, feature))}</li>`).join("")}</ul>
       </article>
     `).join("");
+  }
+
+  function syncCurrencyButtons() {
+    qa("[data-qg-currency]").forEach((btn) => {
+      const active = normalizeCurrency(btn.getAttribute("data-qg-currency")) === currentCurrency;
+      btn.classList.toggle("is-active", active);
+      btn.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+  }
+
+  function setQrGenCurrency(value) {
+    currentCurrency = normalizeCurrency(value);
+    try { localStorage.setItem("volynx_currency", currentCurrency); } catch (_) {}
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set("currency", currentCurrency);
+      history.replaceState(null, "", url.toString());
+    } catch (_) {}
+    syncCurrencyButtons();
+    renderPlans();
   }
 
   function updateConditionalControls() {
@@ -1329,6 +1380,9 @@
     $("qgLogoutBtn")?.addEventListener("click", signOutQrGen);
     $("qgCreateDynamicBtn")?.addEventListener("click", createDynamicQr);
     $("qgProjects")?.addEventListener("click", handleProjectAction);
+    qa("[data-qg-currency]").forEach((btn) => {
+      btn.addEventListener("click", () => setQrGenCurrency(btn.getAttribute("data-qg-currency")));
+    });
 
     window.addEventListener("storage", (event) => {
       if (["volynx_plan_cache", "volynx_access_token", "volynx_session", "volynx_user_email"].includes(event.key)) {
@@ -1336,6 +1390,11 @@
         renderPlans();
         syncAccountBar();
         schedulePreview();
+      }
+      if (event.key === "volynx_currency") {
+        currentCurrency = normalizeCurrency(event.newValue || "GBP");
+        syncCurrencyButtons();
+        renderPlans();
       }
     });
 
@@ -1363,12 +1422,19 @@
       syncAccountBar();
       updateNotices(getState());
     });
+
+    window.addEventListener("vx:currency-changed", (event) => {
+      currentCurrency = normalizeCurrency(event.detail?.code || event.detail?.currency || currentCurrency);
+      syncCurrencyButtons();
+      renderPlans();
+    });
   }
 
   function init() {
     applyLocalI18n();
     refreshPlan();
     syncAccountBar();
+    syncCurrencyButtons();
     renderPlans();
     renderProjects();
     updateConditionalControls();

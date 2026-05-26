@@ -2,7 +2,20 @@
 import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
 import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import FlagshipFooter from "../../components/FlagshipFooter.astro";
+import { sitePricing } from "../../data/pricing";
 import { ROUTES } from "../../data/routes";
+
+const currencyParam = Astro.url.searchParams.get("currency") || "";
+const currentCurrency = (["GBP", "EUR", "BRL"] as const).includes(currencyParam as any)
+  ? currencyParam as "GBP" | "EUR" | "BRL"
+  : "GBP";
+const qrgenPlanPayload = sitePricing.qrgenPlans.map((plan) => ({
+  id: plan.id,
+  name: plan.name.en,
+  price: plan.price,
+  copy: plan.description.en,
+  features: plan.features.en,
+}));
 ---
 
 <FlagshipLayout title="VOLYNX QRGen - Premium QR Code Editor" pageClass="page-qrgen">
@@ -307,6 +320,14 @@ import { ROUTES } from "../../data/routes";
         <span class="qrgen-kicker" data-qg-i18n="plans.kicker">QRGen plans</span>
         <h2 data-qg-i18n="plans.title">A product path beyond a free QR form.</h2>
       </div>
+      <div class="qrgen-currency" aria-label="QRGen plan currency">
+        {(["GBP", "EUR", "BRL"] as const).map((c) => (
+          <button type="button" class={`qrgen-currency__button ${c === currentCurrency ? "is-active" : ""}`} data-qg-currency={c} aria-pressed={c === currentCurrency ? "true" : "false"}>
+            <span>{c === "GBP" ? "£" : c === "EUR" ? "€" : "R$"}</span>
+            <strong>{c}</strong>
+          </button>
+        ))}
+      </div>
       <div class="qrgen-plan-grid" id="qgPlanGrid"></div>
     </section>
   </main>
@@ -316,6 +337,7 @@ import { ROUTES } from "../../data/routes";
   <script is:inline src="https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
   <script is:inline src="/js/vx-plan.js"></script>
   <script is:inline src="/js/vx-auth-bridge.js"></script>
+  <script is:inline set:html={`window.VOLYNX_QRGEN_PLANS = ${JSON.stringify(qrgenPlanPayload)};`}></script>
   <script is:inline src="/scripts/qrgen-editor.js?v=20260525-qrgen-production"></script>
 </FlagshipLayout>
 
@@ -1110,6 +1132,57 @@ import { ROUTES } from "../../data/routes";
 
   .qrgen-section-head h2 {
     font-size: clamp(30px, 4vw, 56px);
+  }
+
+  .qrgen-currency {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 6px;
+    margin: 0 0 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.28);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  }
+
+  .qrgen-currency__button {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: rgba(226,232,240,.60);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: background .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease;
+  }
+
+  .qrgen-currency__button span {
+    font-size: 15px;
+    line-height: 1;
+  }
+
+  .qrgen-currency__button strong {
+    font-size: 11px;
+    letter-spacing: .08em;
+  }
+
+  .qrgen-currency__button:hover,
+  .qrgen-currency__button.is-active {
+    color: #fff;
+    background: linear-gradient(135deg, rgba(32,227,178,.16), rgba(125,249,255,.13));
+    border-color: rgba(125,249,255,.28);
+  }
+
+  .qrgen-currency__button.is-active {
+    box-shadow: 0 0 0 3px rgba(32,227,178,.10), 0 14px 30px rgba(32,227,178,.12);
   }
 
   .qrgen-plan-grid {

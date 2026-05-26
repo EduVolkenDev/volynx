@@ -15,7 +15,7 @@ const freePlanHref = ({
   free: ROUTES.builder,
   daily_free: ROUTES.daily,
 } as Record<string, string>)[plan.id];
-const ctaHref = freePlanHref || (planLookupPrefix ? checkoutHref(planLookupPrefix, { next: ROUTES.pricing }) : ROUTES.support);
+const ctaHref = plan.href || freePlanHref || (planLookupPrefix ? checkoutHref(planLookupPrefix, { next: ROUTES.pricing }) : ROUTES.support);
 ---
 <article class={`pricing-card ${plan.featured ? 'pricing-card--featured' : ''}${plan.image ? ' has-card-asset' : ''}`} data-plan={plan.id}>
   {plan.image && <img src={plan.image} alt="" class="card-asset" loading="lazy" />}

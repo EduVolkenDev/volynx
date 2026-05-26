@@ -23,15 +23,37 @@
 
   var STORAGE_KEY = "volynx_currency";
 
+  function normalize(code) {
+    code = String(code || "").toUpperCase();
+    return /^(GBP|EUR|BRL)$/.test(code) ? code : "";
+  }
+
+  function getUrlCurrency() {
+    try {
+      return normalize(new URLSearchParams(window.location.search).get("currency"));
+    } catch (_) {
+      return "";
+    }
+  }
+
   function getStored() {
-    try { return localStorage.getItem(STORAGE_KEY) || "GBP"; } catch (_) { return "GBP"; }
+    var urlCurrency = getUrlCurrency();
+    if (urlCurrency) return urlCurrency;
+    try { return normalize(localStorage.getItem(STORAGE_KEY)) || "GBP"; } catch (_) { return "GBP"; }
   }
 
   function setStored(code) {
+    code = normalize(code) || "GBP";
     try { localStorage.setItem(STORAGE_KEY, code); } catch (_) { /* noop */ }
+    try {
+      var url = new URL(window.location.href);
+      url.searchParams.set("currency", code);
+      history.replaceState(null, "", url.toString());
+    } catch (_) { /* noop */ }
   }
 
   function apply(code) {
+    code = normalize(code) || "GBP";
     // Update all price elements
     var els = document.querySelectorAll("[data-price-gbp], [data-price-eur], [data-price-brl]");
     for (var i = 0; i < els.length; i++) {
