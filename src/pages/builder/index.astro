@@ -13,7 +13,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>VOLYNX Builder — Create & Manage Sites</title>
-  <meta name="description" content="Create and manage mini-sites with a JSON editor, magic link auth and one-click publish." />
+  <meta name="description" content="Create and publish websites with a guided editor, live preview and one-click publishing." />
   <meta name="robots" content="noindex, nofollow" />
   <FaviconHead />
   <TierAttrInit />
@@ -111,7 +111,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
                 <input id="pname" class="field" placeholder="My landing page" data-i18n-placeholder="builder.ph_pname" />
               </div>
               <div class="field-group">
-                <label class="label" for="pslug">Slug</label>
+                <label class="label" for="pslug">Site address</label>
                 <input id="pslug" class="field" placeholder="my-landing-page" data-i18n-placeholder="builder.ph_pslug" />
               </div>
             </div>
@@ -213,7 +213,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
               <button class="btn btn--primary" id="create" style="flex:2">Create project →</button>
             </div>
             <p class="hint" style="margin-top:10px;text-align:center">
-              Will publish at <code style="color:var(--accent)">https://<span id="slugPreview">slug</span>.volynx.world</code>
+              Will publish at <code style="color:var(--accent)">https://<span id="slugPreview">your-name</span>.volynx.world</code>
             </p>
           </div>
         </div>
@@ -243,67 +243,91 @@ import PageWidgets from "../../components/PageWidgets.astro";
 
         <!-- EDITOR WORKSPACE -->
         <div class="card card--editor">
+          <div class="editor-guide" aria-label="Builder workflow">
+            <div class="editor-guide__copy">
+              <span class="editor-guide__eyebrow"><span class="i18n-en">Your site editor</span><span class="i18n-pt">Seu editor de site</span></span>
+              <strong><span class="i18n-en">Change a block on the left. See the site on the right.</span><span class="i18n-pt">Altere um bloco à esquerda. Veja o site à direita.</span></strong>
+            </div>
+            <div class="editor-guide__steps">
+              <span><b>1</b> <span class="i18n-en">Edit</span><span class="i18n-pt">Editar</span></span>
+              <span><b>2</b> <span class="i18n-en">Save</span><span class="i18n-pt">Salvar</span></span>
+              <span><b>3</b> <span class="i18n-en">Publish</span><span class="i18n-pt">Publicar</span></span>
+            </div>
+          </div>
           <div class="editor-header">
             <div class="editor-tabs">
               <button class="editor-tab editor-tab--active" id="tabSections" data-tab="sections" title="Edit each section of your site visually">
                 <span class="editor-tab__icon" aria-hidden="true">▦</span>
-                <span class="editor-tab__label"><span class="i18n-en">Edit sections</span><span class="i18n-pt">Editar seções</span></span>
+                <span class="editor-tab__label"><span class="i18n-en">Edit content</span><span class="i18n-pt">Editar conteúdo</span></span>
               </button>
               <button class="editor-tab" id="tabPreview" data-tab="preview" title="See your site live as visitors will">
                 <span class="editor-tab__icon" aria-hidden="true">◉</span>
-                <span class="editor-tab__label"><span class="i18n-en">Preview</span><span class="i18n-pt">Preview</span></span>
+                <span class="editor-tab__label"><span class="i18n-en">See preview</span><span class="i18n-pt">Ver preview</span></span>
               </button>
               <button class="editor-tab editor-tab--ai" id="tabAI" data-tab="ai" title="Let AI generate or refine your site">
                 <span class="editor-tab__icon" aria-hidden="true">✦</span>
-                <span class="editor-tab__label"><span class="i18n-en">AI</span><span class="i18n-pt">IA</span></span>
+                <span class="editor-tab__label"><span class="i18n-en">AI helper</span><span class="i18n-pt">Ajuda IA</span></span>
               </button>
               <button class="editor-tab editor-tab--advanced" id="tabJson" data-tab="json" title="Advanced — raw JSON editor">
                 <span class="editor-tab__icon" aria-hidden="true">{ }</span>
-                <span class="editor-tab__label"><span class="i18n-en">JSON</span><span class="i18n-pt">JSON</span></span>
+                <span class="editor-tab__label"><span class="i18n-en">Advanced</span><span class="i18n-pt">Avançado</span></span>
               </button>
             </div>
             <div class="editor-actions">
-              <button class="btn btn--ghost btn--sm" id="copy"><span class="i18n-en">Copy</span><span class="i18n-pt">Copiar</span></button>
-              <button class="btn btn--ghost btn--sm" id="save"><span class="i18n-en">Save</span><span class="i18n-pt">Salvar</span></button>
-              <button class="btn btn--primary btn--sm" id="publish"><span class="i18n-en">Publish →</span><span class="i18n-pt">Publicar →</span></button>
+              <button class="btn btn--ghost btn--sm editor-action-advanced" id="copy"><span class="i18n-en">Copy JSON</span><span class="i18n-pt">Copiar JSON</span></button>
+              <button class="btn btn--ghost btn--sm" id="save"><span class="i18n-en">Save changes</span><span class="i18n-pt">Salvar mudanças</span></button>
+              <button class="btn btn--primary btn--sm" id="publish"><span class="i18n-en">Publish site →</span><span class="i18n-pt">Publicar site →</span></button>
             </div>
           </div>
 
-          <!-- TAB: Section Editor -->
-          <div class="editor-panel" id="panelSections">
-            <div id="sectionEditor" class="section-editor-root">
-              <div class="se-empty">
-                <div class="se-empty__icon" aria-hidden="true">📋</div>
-                <strong class="se-empty__title"><span class="i18n-en">No project open yet</span><span class="i18n-pt">Nenhum projeto aberto</span></strong>
-                <p class="se-empty__hint"><span class="i18n-en">Pick a project from "My projects" on the left, or create a new one with the wizard above.</span><span class="i18n-pt">Escolha um projeto em "Meus projetos" à esquerda, ou crie um novo no wizard acima.</span></p>
+          <div class="editor-workbench">
+            <div class="editor-main">
+              <!-- TAB: Section Editor -->
+              <div class="editor-panel" id="panelSections">
+                <div id="sectionEditor" class="section-editor-root">
+                  <div class="se-empty">
+                    <div class="se-empty__icon" aria-hidden="true">📋</div>
+                    <strong class="se-empty__title"><span class="i18n-en">No project open yet</span><span class="i18n-pt">Nenhum projeto aberto</span></strong>
+                    <p class="se-empty__hint"><span class="i18n-en">Choose a project from "My projects", or create a new one above. Once a project opens, this area becomes the simple content editor.</span><span class="i18n-pt">Escolha um projeto em "Meus projetos", ou crie um novo acima. Quando o projeto abrir, esta área vira o editor simples de conteúdo.</span></p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB: JSON -->
+              <div class="editor-panel" id="panelJson" hidden>
+                <textarea id="json" class="json-editor" placeholder="Select a project to edit…" data-i18n-placeholder="builder.ph_json" spellcheck="false"></textarea>
+              </div>
+
+              <!-- TAB: AI Generate / Refine -->
+              <div class="editor-panel ai-panel" id="panelAI" hidden>
+                <div class="ai-panel-inner">
+                  <div class="ai-panel-header">
+                    <span class="ai-panel-badge">✦ AI Builder</span>
+                    <p class="ai-panel-sub">Describe the site you want — AI will generate valid VxOS sections for you.</p>
+                  </div>
+                  <textarea id="aiPrompt" class="ai-textarea" rows="5" placeholder="Ex: A SaaS landing page for a project management tool for remote teams. Include pricing with 3 tiers, a workflow section showing 3 steps, and a FAQ." data-i18n-placeholder="builder.ph_ai"></textarea>
+                  <div class="ai-actions">
+                    <button class="btn btn--primary" id="aiGenerate">✦ Generate site</button>
+                    <button class="btn btn--ghost" id="aiRefine" disabled title="Select a project first to refine it">Refine current</button>
+                  </div>
+                  <div id="aiStatus" class="ai-status" hidden></div>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- TAB: JSON -->
-          <div class="editor-panel" id="panelJson" hidden>
-            <textarea id="json" class="json-editor" placeholder="Select a project to edit…" data-i18n-placeholder="builder.ph_json" spellcheck="false"></textarea>
-          </div>
-
-          <!-- TAB: Preview -->
-          <div class="editor-panel" id="panelPreview" hidden>
-            <iframe id="previewFrame" class="preview-frame" sandbox="allow-same-origin" title="Live preview"></iframe>
-          </div>
-
-          <!-- TAB: AI Generate / Refine -->
-          <div class="editor-panel ai-panel" id="panelAI" hidden>
-            <div class="ai-panel-inner">
-              <div class="ai-panel-header">
-                <span class="ai-panel-badge">✦ AI Builder</span>
-                <p class="ai-panel-sub">Describe the site you want — AI will generate valid VxOS sections for you.</p>
+            <!-- TAB: Preview on mobile; persistent side preview on desktop -->
+            <aside class="editor-panel editor-preview-panel" id="panelPreview" hidden>
+              <div class="preview-shell">
+                <div class="preview-shell__bar">
+                  <div>
+                    <span class="preview-shell__eyebrow"><span class="i18n-en">Live preview</span><span class="i18n-pt">Preview ao vivo</span></span>
+                    <strong><span class="i18n-en">What visitors will see</span><span class="i18n-pt">O que visitantes vao ver</span></strong>
+                  </div>
+                  <span class="preview-shell__status"><span class="i18n-en">Updates as you edit</span><span class="i18n-pt">Atualiza ao editar</span></span>
+                </div>
+                <iframe id="previewFrame" class="preview-frame" sandbox="allow-same-origin" title="Live preview"></iframe>
               </div>
-              <textarea id="aiPrompt" class="ai-textarea" rows="5" placeholder="Ex: A SaaS landing page for a project management tool for remote teams. Include pricing with 3 tiers, a workflow section showing 3 steps, and a FAQ." data-i18n-placeholder="builder.ph_ai"></textarea>
-              <div class="ai-actions">
-                <button class="btn btn--primary" id="aiGenerate">✦ Generate site</button>
-                <button class="btn btn--ghost" id="aiRefine" disabled title="Select a project first to refine it">Refine current</button>
-              </div>
-              <div id="aiStatus" class="ai-status" hidden></div>
-            </div>
+            </aside>
           </div>
 
           <div class="editor-footer">
@@ -518,26 +542,41 @@ import PageWidgets from "../../components/PageWidgets.astro";
 
   const setStatus = (t: string) => { const el = $("status"); if (el) el.textContent = t || ""; };
 
+  const isDesktopEditor = () => {
+    try { return window.matchMedia("(min-width: 960px)").matches; }
+    catch { return false; }
+  };
+
+  function renderPreviewFromJson() {
+    const frame = $("previewFrame") as HTMLIFrameElement;
+    if (!frame) return;
+    try {
+      const raw = ($("json") as HTMLTextAreaElement)?.value || "{}";
+      const data = JSON.parse(raw);
+      if ((window as any).VxRenderer && data.sections) {
+        frame.srcdoc = (window as any).VxRenderer.renderPage(data);
+      }
+    } catch (_) {
+      // Keep the last valid preview while the advanced JSON editor is invalid.
+    }
+  }
+
   // ── Tab switching ────────────────────────────────────────
   function switchTab(tab: string) {
-    const panels: Record<string, string> = { sections: "panelSections", json: "panelJson", preview: "panelPreview", ai: "panelAI" };
+    const desktop = isDesktopEditor();
+    const panels: Record<string, string> = { sections: "panelSections", json: "panelJson", ai: "panelAI" };
     Object.entries(panels).forEach(([t, id]) => {
       const panel = $(id) as HTMLElement;
       if (panel) panel.hidden = t !== tab;
     });
+    const previewPanel = $("panelPreview") as HTMLElement;
+    if (previewPanel) previewPanel.hidden = desktop ? false : tab !== "preview";
     document.querySelectorAll(".editor-tab").forEach(el => {
-      el.classList.toggle("editor-tab--active", (el as HTMLElement).dataset.tab === tab);
+      const tabName = (el as HTMLElement).dataset.tab;
+      el.classList.toggle("editor-tab--active", tabName === tab || (desktop && tabName === "preview"));
     });
-    if (tab === "preview") {
-      try {
-        const raw = ($("json") as HTMLTextAreaElement)?.value || "{}";
-        const data = JSON.parse(raw);
-        const frame = $("previewFrame") as HTMLIFrameElement;
-        if (frame && (window as any).VxRenderer && data.sections) {
-          frame.srcdoc = (window as any).VxRenderer.renderPage(data);
-        }
-      } catch {}
-    }
+    document.querySelector(".card--editor")?.classList.toggle("is-advanced", tab === "json");
+    renderPreviewFromJson();
   }
 
   // ── Button loading helper ────────────────────────────────
@@ -559,6 +598,69 @@ import PageWidgets from "../../components/PageWidgets.astro";
     (s || "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
   const rand4 = () => Math.random().toString(16).slice(2, 6);
+
+  async function slugExists(slug: string, currentProjectId?: string): Promise<boolean> {
+    const clean = slugify(slug);
+    if (!clean || !supa) return false;
+    let query = supa
+      .from("projects")
+      .select("id")
+      .eq("slug", clean)
+      .is("deleted_at", null)
+      .limit(1);
+    if (currentProjectId) query = query.neq("id", currentProjectId);
+    const { data, error } = await query;
+    if (error) {
+      log("slug availability check failed: " + error.message);
+      return false;
+    }
+    return Array.isArray(data) && data.length > 0;
+  }
+
+  async function makeCleanProjectSlug(base: string, currentProjectId?: string): Promise<string> {
+    const root = (slugify(base) || "site").slice(0, 48).replace(/-$/g, "") || "site";
+    if (!(await slugExists(root, currentProjectId))) return root;
+
+    for (let i = 2; i <= 50; i++) {
+      const suffix = `-${i}`;
+      const candidate = root.slice(0, 63 - suffix.length).replace(/-$/g, "") + suffix;
+      if (!(await slugExists(candidate, currentProjectId))) return candidate;
+    }
+
+    return `${root.slice(0, 58).replace(/-$/g, "")}-${rand4()}`;
+  }
+
+  function slugCandidate(base: string, attempt: number): string {
+    const root = (slugify(base) || "site").slice(0, 48).replace(/-$/g, "") || "site";
+    if (attempt <= 1) return root;
+    const suffix = `-${attempt}`;
+    return root.slice(0, 63 - suffix.length).replace(/-$/g, "") + suffix;
+  }
+
+  function isSlugConflict(error: any): boolean {
+    const msg = String(error?.message || "").toLowerCase();
+    return error?.code === "23505" || (msg.includes("duplicate") && msg.includes("slug"));
+  }
+
+  async function createDraftProject(userId: string, name: string, baseSlug: string, builder_data: any) {
+    const preferred = await makeCleanProjectSlug(baseSlug || name);
+    const firstAttempt = preferred === slugCandidate(baseSlug || name, 1) ? 1 : 2;
+
+    for (let attempt = firstAttempt; attempt <= 50; attempt++) {
+      const slug = attempt === firstAttempt ? preferred : slugCandidate(baseSlug || name, attempt);
+      const { data, error } = await supa
+        .from("projects")
+        .insert({ user_id: userId, name, slug, domain_type: "subdomain", builder_data, status: "draft" })
+        .select("id,name,slug,builder_data,status,created_at")
+        .single();
+
+      if (!error) return { data, error: null, slug };
+      if (!isSlugConflict(error)) return { data: null, error, slug };
+    }
+
+    const fallbackSlug = slugCandidate(baseSlug || name, 51);
+    return { data: null, error: new Error(`Could not reserve ${fallbackSlug}.volynx.world.`), slug: fallbackSlug };
+  }
 
   // ── Wizard navigation ──────────────────────────────────────
   function showWizardStep(step: number) {
@@ -582,7 +684,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
     if (step === 3) {
       const slug = slugify(($("pname") as HTMLInputElement)?.value || "") || "slug";
       const preview = $("slugPreview");
-      if (preview) preview.textContent = `${slug}-${rand4()}`;
+      if (preview) preview.textContent = slug;
     }
   }
 
@@ -754,7 +856,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
               <input id="exCta" class="field" placeholder="Get started" data-i18n-placeholder="builder.ph_ex_cta" />
             </div>
             <div class="field-group">
-              <label class="label" for="exSlug">Slug</label>
+              <label class="label" for="exSlug">Site address</label>
               <input id="exSlug" class="field" placeholder="my-brand" data-i18n-placeholder="builder.ph_ex_slug" />
             </div>
           </div>
@@ -853,18 +955,14 @@ import PageWidgets from "../../components/PageWidgets.astro";
       w.goal = exGoal;
 
       const projectName = brand;
-      const projectSlug = slug + "-" + Math.random().toString(36).slice(2, 6);
       const builder_data = buildProjectData();
 
       setStatus("Creating your landing page...");
-      const { data, error } = await supa.from("projects")
-        .insert({ user_id: user.id, name: projectName, slug: projectSlug, domain_type: "subdomain", builder_data, status: "draft" })
-        .select("id,name,slug,builder_data,status,created_at")
-        .single();
+      const { data, error, slug: projectSlug } = await createDraftProject(user.id, projectName, slug || brand, builder_data);
 
       if (error) { setStatus(error.message); return; }
       await logUsage("builder_create");
-      setStatus("Landing page created!");
+      setStatus(`Landing page created at ${projectSlug}.volynx.world`);
       await listProjects(user.id);
       openProject(data);
 
@@ -1385,7 +1483,8 @@ import PageWidgets from "../../components/PageWidgets.astro";
     const VxSectionEditor = (window as any).VxSectionEditor;
     if (sectionEditor && VxSectionEditor && p.builder_data) {
       try {
-        VxSectionEditor.render(sectionEditor, p.builder_data, (newData: any) => {
+        VxSectionEditor.render(sectionEditor, p.builder_data, (path: string, value: any) => {
+          const newData = VxSectionEditor.applyChange(p.builder_data, path, value);
           // Sync changes from the form back into the JSON textarea so save/
           // publish work seamlessly across both editing surfaces.
           if (json) json.value = JSON.stringify(newData, null, 2);
@@ -1526,6 +1625,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
     const who = $("who");
     if (who) who.textContent = user.email || "";
     showAuth(false);
+    switchTab("sections");
 
     // Fetch user profile (plan, org_id, tokens, builder_plan)
     userProfile = await fetchUserProfile(user.id);
@@ -1725,21 +1825,15 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
 
       btnLoading(btn, true, "Creating...");
       const w = getWizardInputs();
-      const baseSlug = slugify((($("pslug") as HTMLInputElement)?.value || "").trim() || w.name) || "site";
-      const slug = `${baseSlug}-${rand4()}`;
-
+      const baseSlug = (($("pslug") as HTMLInputElement)?.value || "").trim() || w.name;
       const builder_data = buildProjectData();
 
-      const { data, error } = await supa
-        .from("projects")
-        .insert({ user_id: user.id, name: w.name, slug, domain_type: "subdomain", builder_data, status: "draft" })
-        .select("id,name,slug,builder_data,status,created_at")
-        .single();
+      const { data, error, slug } = await createDraftProject(user.id, w.name, baseSlug, builder_data);
 
       btnLoading(btn, false);
       if (error) return setStatus(error.message);
       await logUsage("builder_create");
-      setStatus("Project created!");
+      setStatus(`Project created at ${slug}.volynx.world`);
       showWizardStep(1); // reset wizard
       await listProjects(user.id);
       openProject(data);
@@ -1760,7 +1854,7 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
 
     $("publish")?.addEventListener("click", async () => {
       if (!currentProject) return setStatus("Select a project.");
-      if (!currentProject.slug) return setStatus("Project has no slug. Edit JSON to add one.");
+      if (!currentProject.slug) return setStatus("Project has no site address yet. Create a new project address before publishing.");
 
       // Check publish limit based on builder_plan
       const counts = await countActiveProjects(user.id);
@@ -1843,39 +1937,15 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
       }
     });
 
-    // ── Preview Toggle + Live Render ──
-    const previewToggle = $("previewToggle") as HTMLButtonElement;
-    const previewPane = $("previewPane") as HTMLElement;
-    const previewFrame = $("previewFrame") as HTMLIFrameElement;
-    const editorSplit = $("editorSplit") as HTMLElement;
-    let previewActive = false;
-
-    function updatePreview() {
-      if (!previewActive || !previewFrame) return;
-      try {
-        const raw = ($("json") as HTMLTextAreaElement)?.value || "{}";
-        const data = JSON.parse(raw);
-        if (window.VxRenderer && data.sections) {
-          previewFrame.srcdoc = window.VxRenderer.renderPage(data);
-        }
-      } catch (_) {
-        // Invalid JSON — don't update preview
-      }
-    }
-
-    previewToggle?.addEventListener("click", () => {
-      previewActive = !previewActive;
-      previewToggle.classList.toggle("is-active", previewActive);
-      previewPane.hidden = !previewActive;
-      editorSplit.classList.toggle("is-split", previewActive);
-      if (previewActive) updatePreview();
-    });
-
-    // Debounced preview on JSON edit
+    // Debounced live preview on content/JSON edit.
     let previewTimer: ReturnType<typeof setTimeout>;
     ($("json") as HTMLTextAreaElement)?.addEventListener("input", () => {
       clearTimeout(previewTimer);
-      previewTimer = setTimeout(updatePreview, 400);
+      previewTimer = setTimeout(renderPreviewFromJson, 250);
+    });
+    window.addEventListener("resize", () => {
+      const active = document.querySelector('.editor-tab--active:not([data-tab="preview"])') as HTMLElement | null;
+      switchTab(active?.dataset.tab || "sections");
     });
 
     // ── AI Generate / Refine ──────────────────────────────────
@@ -1955,7 +2025,6 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
           switchTab("sections");
         } else {
           // Create a new draft project with AI-generated data
-          const slug = "ai-" + (prompt.slice(0, 20).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "site") + "-" + rand4();
           const name = prompt.slice(0, 40).replace(/[^\w\s-]/g, "").trim() || "AI Generated Site";
           const counts = await countActiveProjects(user.id);
           const check = canCreate(counts);
@@ -1963,11 +2032,7 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
             setAIStatus(check.msg, "error");
             return;
           }
-          const { data, error } = await supa
-            .from("projects")
-            .insert({ user_id: user.id, name, slug, domain_type: "subdomain", builder_data: builderData, status: "draft" })
-            .select("id,name,slug,builder_data,status,created_at")
-            .single();
+          const { data, error } = await createDraftProject(user.id, name, name, builderData);
 
           if (error) { setAIStatus(error.message, "error"); return; }
           await logUsage("builder_ai");
@@ -2125,7 +2190,7 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
 
   /* APP */
   .app {
-    max-width: 1100px;
+    max-width: 1420px;
     margin: 0 auto;
     padding: 0 20px 80px;
   }
@@ -2203,6 +2268,11 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
 
   .card--editor {
     grid-column: 1 / -1;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    backdrop-filter: none;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
 
   @media (max-width: 800px) {
@@ -2612,12 +2682,85 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
   }
 
   /* EDITOR */
+  .editor-guide {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(125, 211, 252, .18);
+    background:
+      linear-gradient(135deg, rgba(125,211,252,.10), rgba(52,211,153,.045)),
+      rgba(7,10,18,.72);
+    box-shadow: 0 18px 42px rgba(0,0,0,.18);
+  }
+
+  .editor-guide__copy {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .editor-guide__eyebrow {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--accent);
+  }
+
+  .editor-guide__copy strong {
+    font-size: 16px;
+    line-height: 1.35;
+    color: var(--fg);
+  }
+
+  .editor-guide__steps {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .editor-guide__steps span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    padding: 6px 11px;
+    border-radius: 8px;
+    background: rgba(7,10,18,.36);
+    border: 1px solid rgba(231,238,247,.08);
+    color: var(--mut);
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .editor-guide__steps b {
+    display: inline-grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 6px;
+    background: rgba(125,211,252,.14);
+    color: var(--accent);
+    font-size: 10px;
+  }
+
   .editor-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
     margin-bottom: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(231,238,247,.08);
+    background: rgba(7,10,18,.46);
     flex-wrap: wrap;
   }
 
@@ -2626,7 +2769,12 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
   .editor-actions {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
+
+  .editor-action-advanced { display: none !important; }
+  .card--editor.is-advanced .editor-action-advanced { display: inline-flex !important; }
 
   .json-editor {
     width: 100%;
@@ -2646,14 +2794,80 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
 
   .json-editor:focus { border-color: rgba(125, 211, 252, .35); }
 
-  /* Editor/Preview split */
-  .editor-split { display: flex; gap: 0; }
-  .editor-split .json-editor { flex: 1; min-width: 0; }
-  .editor-split.is-split { gap: 12px; }
-  .editor-split.is-split .json-editor { flex: 1; min-height: 500px; resize: none; }
-  .preview-pane { flex: 1; min-width: 0; border-radius: 12px; border: 1px solid rgba(231,238,247,.14); overflow: hidden; background: #070A12; }
-  .preview-frame { width: 100%; height: 100%; min-height: 500px; border: none; background: #070A12; }
-  #previewToggle.is-active { background: rgba(125,211,252,.12); color: var(--accent); border-color: rgba(125,211,252,.25); }
+  .editor-workbench {
+    display: grid;
+    grid-template-columns: minmax(420px, .88fr) minmax(460px, 1.12fr);
+    gap: 18px;
+    align-items: stretch;
+  }
+
+  .editor-main,
+  .editor-preview-panel {
+    min-width: 0;
+  }
+
+  .editor-preview-panel {
+    position: sticky;
+    top: 84px;
+    align-self: start;
+    min-height: 620px;
+  }
+
+  .preview-shell {
+    display: flex;
+    flex-direction: column;
+    height: min(80vh, 820px);
+    min-height: 620px;
+    border-radius: 10px;
+    border: 1px solid rgba(125,211,252,.20);
+    overflow: hidden;
+    background: #050812;
+    box-shadow: 0 24px 60px rgba(0,0,0,.38);
+  }
+
+  .preview-shell__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(231,238,247,.08);
+    background: rgba(7,10,18,.92);
+  }
+
+  .preview-shell__bar > div {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .preview-shell__eyebrow,
+  .preview-shell__status {
+    color: var(--mut);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .preview-shell__bar strong {
+    color: var(--fg);
+    font-size: 13px;
+    line-height: 1.25;
+  }
+
+  .preview-shell__status {
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .preview-frame {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    border: none;
+    background: #070A12;
+  }
 
   .editor-footer {
     margin-top: 8px;
@@ -2761,6 +2975,27 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     .builder-hero-visual { display: grid; }
   }
 
+  @media (min-width: 960px) {
+    #tabPreview { display: none; }
+  }
+
+  @media (max-width: 959px) {
+    .editor-workbench {
+      grid-template-columns: 1fr;
+    }
+    .editor-preview-panel {
+      position: static;
+      min-height: 0;
+    }
+    .preview-shell {
+      height: auto;
+      min-height: 520px;
+    }
+    .preview-frame {
+      min-height: 460px;
+    }
+  }
+
   /* Mobile */
   @media (max-width: 680px) {
     .hero { padding: 40px 16px 28px; }
@@ -2795,22 +3030,23 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
   .editor-tabs {
     display: flex;
     gap: 4px;
-    background: rgba(231,238,247,.04);
+    background: transparent;
     border-radius: 10px;
-    padding: 3px;
+    padding: 0;
   }
 
   .editor-tab {
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    padding: 8px 14px;
+    min-height: 40px;
+    padding: 9px 14px;
     border-radius: 8px;
-    border: none;
-    background: transparent;
+    border: 1px solid transparent;
+    background: rgba(231,238,247,.035);
     color: var(--mut);
     font-family: inherit;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all .15s;
@@ -2824,14 +3060,15 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
   .editor-tab__label { line-height: 1; }
 
   .editor-tab:hover {
-    background: rgba(231,238,247,.08);
+    background: rgba(231,238,247,.075);
     color: var(--fg);
   }
 
   .editor-tab--active {
-    background: rgba(125,211,252,.14);
+    border-color: rgba(125,211,252,.28);
+    background: rgba(125,211,252,.11);
     color: var(--accent);
-    box-shadow: 0 0 12px rgba(125,211,252,.06);
+    box-shadow: 0 8px 24px rgba(125,211,252,.06);
   }
   .editor-tab--active .editor-tab__icon { opacity: 1; }
 
@@ -2850,8 +3087,8 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
   .editor-tab--advanced {
     margin-left: auto;
     opacity: .55;
-    font-family: ui-monospace, "Menlo", monospace;
-    font-size: 11.5px;
+    font-family: inherit;
+    font-size: 13px;
   }
   .editor-tab--advanced:hover { opacity: 1; }
   .editor-tab--advanced.editor-tab--active { opacity: 1; }
@@ -2887,7 +3124,11 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
   .ai-status--success { background: rgba(34,197,94,.06); color: #4ade80; border: 1px solid rgba(34,197,94,.15); }
 
   /* EDITOR PANELS */
-  .editor-panel { min-height: 300px; }
+  .editor-panel {
+    min-height: 300px;
+    border-radius: 10px;
+    background: rgba(7,10,18,.36);
+  }
 
   /* EXPRESS FLOW */
   .express-flow { display: flex; flex-direction: column; gap: 20px; }
@@ -2915,7 +3156,15 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
   }
 
   /* SECTION EDITOR */
-  .section-editor-root { display: flex; flex-direction: column; gap: 2px; }
+  .section-editor-root {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid rgba(231,238,247,.08);
+    border-radius: 10px;
+    background: rgba(7,10,18,.44);
+  }
 
   .se-empty {
     text-align: center; padding: 56px 28px; color: var(--mut);
@@ -2933,34 +3182,69 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     margin: 0; max-width: 42ch; line-height: 1.65; font-size: 13px;
   }
 
+  .se-brand-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid rgba(231,238,247,.08);
+    border-radius: 8px;
+    background: rgba(231,238,247,.025);
+  }
+  .se-brand-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    flex: 0 0 34px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.22);
+  }
+  .se-brand-name {
+    color: var(--fg);
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+  .se-brand-tagline {
+    color: rgba(231,238,247,.52);
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
   /* Editor intro — explains how to edit. Without this buyers landed on a list
      of "section CTAs" and didn't know what to do. */
   .se-intro {
-    margin: 0 0 14px;
+    margin: 0 0 4px;
     padding: 14px 16px;
-    border-radius: 12px;
-    border: 1px solid rgba(125,211,252,.18);
-    background: linear-gradient(180deg, rgba(125,211,252,.06), rgba(125,211,252,.02));
+    border-radius: 8px;
+    border: 1px solid rgba(52,211,153,.18);
+    background: linear-gradient(180deg, rgba(52,211,153,.07), rgba(125,211,252,.025));
     display: grid;
     gap: 6px;
   }
   .se-intro__kicker {
-    font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+    font-size: 11px; font-weight: 800; letter-spacing: 0; text-transform: none;
     color: var(--accent);
   }
   .se-intro__title { font-size: 14px; color: var(--fg); }
   .se-intro__help { margin: 0; font-size: 12.5px; color: var(--mut); line-height: 1.55; }
 
   .se-section {
-    border: 1px solid var(--line); border-radius: 14px;
-    background: rgba(231,238,247,.02); overflow: hidden; transition: border-color .15s, box-shadow .15s;
+    border: 1px solid rgba(231,238,247,.08);
+    border-radius: 8px;
+    background: rgba(231,238,247,.018);
+    overflow: hidden;
+    transition: border-color .15s, box-shadow .15s, background .15s;
   }
-  .se-section:hover { border-color: rgba(125,211,252,.18); box-shadow: 0 4px 18px rgba(125,211,252,.06); }
+  .se-section:hover {
+    border-color: rgba(125,211,252,.20);
+    background: rgba(231,238,247,.025);
+    box-shadow: 0 10px 28px rgba(0,0,0,.14);
+  }
 
   .se-section-header {
     display: flex; align-items: center; gap: 12px; padding: 14px 16px;
     cursor: pointer; user-select: none;
-    background: rgba(231,238,247,.03);
+    background: rgba(7,10,18,.12);
     border: 0;
     width: 100%;
     text-align: left;
@@ -2972,16 +3256,45 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
   .se-section-header:hover { background: rgba(125,211,252,.06); }
   .se-section--open .se-section-header,
   .se-section.is-open .se-section-header {
-    border-bottom-color: var(--line);
-    background: rgba(125,211,252,.07);
+    border-bottom-color: rgba(231,238,247,.08);
+    background: rgba(125,211,252,.075);
   }
 
-  .se-section-icon { font-size: 22px; flex-shrink: 0; line-height: 1; }
+  .se-section-number {
+    display: grid;
+    place-items: center;
+    gap: 1px;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    border-radius: 8px;
+    border: 1px solid rgba(231,238,247,.10);
+    background: rgba(231,238,247,.045);
+    color: var(--fg);
+  }
+  .se-section-number small {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: none;
+    color: rgba(231,238,247,.46);
+    line-height: 1;
+  }
+  .se-section-number b {
+    font-size: 15px;
+    line-height: 1;
+  }
+  .se-section--open .se-section-number,
+  .se-section.is-open .se-section-number {
+    border-color: rgba(125,211,252,.32);
+    background: rgba(125,211,252,.12);
+    color: var(--accent);
+  }
   .se-section-titleblock { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
-  .se-section-title { font-size: 14px; font-weight: 700; color: var(--fg); }
-  .se-section-desc { font-size: 11.5px; color: var(--mut); line-height: 1.4; }
+  .se-section-title { font-size: 15px; font-weight: 750; color: var(--fg); }
+  .se-section-desc { font-size: 12px; color: rgba(231,238,247,.56); line-height: 1.45; }
   .se-section-edit-hint {
-    font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    font-size: 12px; font-weight: 700; letter-spacing: 0; text-transform: none;
     color: var(--accent); opacity: 0; transition: opacity .15s;
     flex-shrink: 0;
   }
@@ -2998,17 +3311,23 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
   .se-section--open .se-section-chevron,
   .se-section.is-open .se-section-chevron { transform: rotate(180deg); color: var(--accent); }
 
-  .se-section-body { padding: 16px; }
+  .se-section-body { padding: 16px 16px 18px 70px; }
   .se-section-body[hidden] { display: none; }
 
   .se-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .se-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+  .se-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
   .se-field--full { grid-column: 1 / -1; }
-  .se-label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); }
+  .se-label { font-size: 12px; font-weight: 700; letter-spacing: 0; text-transform: none; color: rgba(231,238,247,.68); }
+  .se-help {
+    margin: -2px 0 0;
+    font-size: 11px;
+    line-height: 1.45;
+    color: rgba(231,238,247,.42);
+  }
 
   .se-input, .se-textarea, .se-select {
-    width: 100%; padding: 9px 12px; border-radius: 10px;
-    border: 1px solid rgba(231,238,247,.14); background: rgba(7,10,18,.65);
+    width: 100%; padding: 10px 12px; border-radius: 8px;
+    border: 1px solid rgba(231,238,247,.13); background: rgba(3,6,12,.62);
     color: var(--fg); font-family: inherit; font-size: 13px; outline: none; transition: border-color .15s;
   }
   .se-input:focus, .se-textarea:focus, .se-select:focus { border-color: rgba(125,211,252,.4); }
@@ -3017,6 +3336,35 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     appearance: none; cursor: pointer;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;
+  }
+
+  .se-card-group {
+    padding: 12px;
+    margin: 0 0 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(231,238,247,.075);
+    background: rgba(231,238,247,.026);
+  }
+  .se-tier-header,
+  .se-items-label {
+    margin: 6px 0 10px;
+    color: rgba(231,238,247,.68);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .se-tag {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 6px;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: rgba(52,211,153,.12);
+    color: #34D399;
+    font-size: 10px;
+    letter-spacing: 0;
+    text-transform: none;
   }
 
   .se-list-item { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; padding: 8px 0; border-bottom: 1px solid rgba(231,238,247,.06); }
@@ -3037,7 +3385,13 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
 
   @media (max-width: 520px) {
     .se-row { grid-template-columns: 1fr; }
+    .se-section-body { padding: 14px; }
+    .se-section-number { width: 38px; height: 38px; flex-basis: 38px; }
     .express-options { grid-template-columns: 1fr; }
+    .editor-guide { align-items: flex-start; flex-direction: column; }
+    .editor-guide__steps { justify-content: flex-start; }
+    .editor-actions { width: 100%; justify-content: flex-start; }
+    .editor-action-advanced { order: 3; opacity: .72; }
   }
 
   @media (prefers-reduced-motion: reduce) {

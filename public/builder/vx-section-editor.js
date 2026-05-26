@@ -22,36 +22,110 @@ window.VxSectionEditor = (function () {
 
   // ── Section type metadata — bilingual EN/PT-BR ──
   var SECTION_META = {
-    hero:             { label: { en: 'Hero',            pt: 'Hero (topo)' },        icon: '🏠', desc: { en: 'Main headline and call to action',          pt: 'Headline principal e CTA' } },
-    logoCloud:        { label: { en: 'Logo Cloud',      pt: 'Logos de clientes' },  icon: '🏢', desc: { en: 'Trusted-by company logos',                 pt: 'Logos de quem já confia em você' } },
-    metrics:          { label: { en: 'Metrics',         pt: 'Métricas' },           icon: '📊', desc: { en: 'Key numbers and stats',                    pt: 'Números e estatísticas-chave' } },
-    valueGrid:        { label: { en: 'Value Grid',      pt: 'Grid de valor' },      icon: '✦',  desc: { en: 'Feature cards in a grid',                  pt: 'Cards de features em grid' } },
-    featureSplit:     { label: { en: 'Feature List',    pt: 'Lista de features' },  icon: '📋', desc: { en: 'Features with optional CTA',               pt: 'Features com CTA opcional' } },
-    pricing:          { label: { en: 'Pricing',         pt: 'Preços' },             icon: '💰', desc: { en: 'Plan comparison cards',                    pt: 'Cards de comparação de planos' } },
-    faq:              { label: { en: 'FAQ',             pt: 'Perguntas frequentes' },icon: '❓',desc: { en: 'Questions and answers',                    pt: 'Perguntas e respostas' } },
-    workflow:         { label: { en: 'Process',         pt: 'Processo' },           icon: '⚙️', desc: { en: 'Step-by-step workflow',                    pt: 'Workflow passo a passo' } },
-    cta:              { label: { en: 'Call to Action',  pt: 'Call to Action' },     icon: '🎯', desc: { en: 'Final conversion block',                   pt: 'Bloco final de conversão' } },
-    contactForm:      { label: { en: 'Contact Form',    pt: 'Formulário de contato' },icon: '✉️',desc: { en: 'Inline contact form',                     pt: 'Formulário de contato inline' } },
-    problemStatement: { label: { en: 'Problem',         pt: 'Problema' },           icon: '⚠️', desc: { en: 'Pain points and challenges',               pt: 'Dores e desafios do público' } },
-    scopeGrid:        { label: { en: 'Scope',           pt: 'Escopo' },             icon: '📦', desc: { en: 'Deliverables overview',                    pt: 'Visão geral das entregas' } },
-    testimonial:      { label: { en: 'Testimonial',     pt: 'Depoimento' },         icon: '💬', desc: { en: 'Client quote',                             pt: 'Citação de cliente' } },
+    hero:             { label: { en: 'Top of page',       pt: 'Topo da página' },      desc: { en: 'First message people see',                 pt: 'Primeira mensagem que as pessoas veem' } },
+    logoCloud:        { label: { en: 'Trusted by',         pt: 'Quem confia' },         desc: { en: 'Names or logos that build trust',          pt: 'Nomes ou logos que passam confiança' } },
+    metrics:          { label: { en: 'Results',            pt: 'Resultados' },          desc: { en: 'Important numbers and proof',              pt: 'Números importantes e prova' } },
+    valueGrid:        { label: { en: 'Benefits',           pt: 'Benefícios' },          desc: { en: 'Cards explaining what you offer',          pt: 'Cards explicando o que você oferece' } },
+    featureSplit:     { label: { en: 'Details',            pt: 'Detalhes' },            desc: { en: 'A deeper explanation of your offer',       pt: 'Uma explicação mais completa da oferta' } },
+    pricing:          { label: { en: 'Plans and prices',   pt: 'Planos e preços' },     desc: { en: 'What people can buy or choose',            pt: 'O que as pessoas podem comprar ou escolher' } },
+    faq:              { label: { en: 'Common questions',   pt: 'Dúvidas comuns' },      desc: { en: 'Answers that remove hesitation',           pt: 'Respostas que removem dúvidas' } },
+    workflow:         { label: { en: 'How it works',       pt: 'Como funciona' },       desc: { en: 'Steps in your process',                    pt: 'Passos do seu processo' } },
+    cta:              { label: { en: 'Final invitation',   pt: 'Convite final' },       desc: { en: 'The last push to take action',             pt: 'O último convite para agir' } },
+    contactForm:      { label: { en: 'Contact form',       pt: 'Formulário' },          desc: { en: 'A form for messages or leads',             pt: 'Um formulário para mensagens ou leads' } },
+    problemStatement: { label: { en: 'The problem',        pt: 'O problema' },          desc: { en: 'The pain your offer solves',               pt: 'A dor que sua oferta resolve' } },
+    scopeGrid:        { label: { en: 'What is included',   pt: 'O que está incluído' }, desc: { en: 'Deliverables or package details',           pt: 'Entregas ou detalhes do pacote' } },
+    testimonial:      { label: { en: 'Customer quote',     pt: 'Depoimento' },          desc: { en: 'A quote from a person or client',          pt: 'Uma fala de uma pessoa ou cliente' } },
   };
 
   // UI strings used by the editor surface itself (intro, hints, action buttons)
   var UI = {
     en: {
-      intro_kicker: 'How to edit',
-      intro_title: 'Click any block below to edit its content.',
-      intro_help:  'Edit the copy inline, swap colors and assets, then hit Save above. Click Publish when ready to push it live.',
-      tap_hint:    'Tap to edit',
+      intro_kicker: 'Start here',
+      intro_title: 'Your page is split into simple blocks.',
+      intro_help:  'Open a block, change only what matters, and watch the preview beside it.',
+      tap_hint:    'Edit',
+      block:       'Block',
     },
     pt: {
-      intro_kicker: 'Como editar',
-      intro_title: 'Clique em qualquer bloco abaixo para editar o conteúdo.',
-      intro_help:  'Edite a copy inline, troque cores e assets, depois clique em Salvar acima. Clique em Publicar quando estiver pronto para colocar no ar.',
-      tap_hint:    'Toque para editar',
+      intro_kicker: 'Comece aqui',
+      intro_title: 'Sua pagina esta dividida em blocos simples.',
+      intro_help:  'Abra um bloco, mude so o que importa e acompanhe no preview ao lado.',
+      tap_hint:    'Editar',
+      block:       'Bloco',
     },
   };
+
+  var COPY = {
+    en: {
+      badge: 'Small label',
+      badge_help: 'Short text above the main headline, like "Now open" or "Premium service".',
+      layout: 'Layout style',
+      layout_help: 'Changes the shape of this block without changing the words.',
+      headline: 'Main headline',
+      headline_help: 'The strongest sentence on this part of the page.',
+      subtitle: 'Supporting text',
+      subtitle_help: 'A short explanation below the headline.',
+      button_label: 'Main button text',
+      button_link: 'Main button link',
+      secondary_label: 'Second button text',
+      secondary_link: 'Second button link',
+      section_title: 'Block title',
+      names_list: 'Names',
+      names_help: 'Separate each name with a comma.',
+      value: 'Number or result',
+      label: 'Short label',
+      cards: 'Cards',
+      title: 'Title',
+      description: 'Description',
+      features: 'List items',
+      features_help: 'Write one item per line.',
+      price: 'Price',
+      period: 'Period',
+      plan_name: 'Plan name',
+      answer: 'Answer',
+      question: 'Question',
+      step: 'Step',
+      submit: 'Submit button text',
+      featured: 'Featured',
+    },
+    pt: {
+      badge: 'Etiqueta pequena',
+      badge_help: 'Texto curto acima do titulo, como "Aberto agora" ou "Servico premium".',
+      layout: 'Estilo do bloco',
+      layout_help: 'Muda o formato deste bloco sem mudar os textos.',
+      headline: 'Titulo principal',
+      headline_help: 'A frase mais forte desta parte da pagina.',
+      subtitle: 'Texto de apoio',
+      subtitle_help: 'Uma explicacao curta abaixo do titulo.',
+      button_label: 'Texto do botao principal',
+      button_link: 'Link do botao principal',
+      secondary_label: 'Texto do segundo botao',
+      secondary_link: 'Link do segundo botao',
+      section_title: 'Titulo do bloco',
+      names_list: 'Nomes',
+      names_help: 'Separe cada nome com virgula.',
+      value: 'Numero ou resultado',
+      label: 'Legenda curta',
+      cards: 'Cards',
+      title: 'Titulo',
+      description: 'Descricao',
+      features: 'Itens da lista',
+      features_help: 'Escreva um item por linha.',
+      price: 'Preco',
+      period: 'Periodo',
+      plan_name: 'Nome do plano',
+      answer: 'Resposta',
+      question: 'Pergunta',
+      step: 'Passo',
+      submit: 'Texto do botao de envio',
+      featured: 'Destaque',
+    },
+  };
+
+  function tx(key) {
+    var lang = getLang();
+    return (COPY[lang] && COPY[lang][key]) || COPY.en[key] || key;
+  }
 
   // ── Field Builders ──
 
@@ -62,6 +136,7 @@ window.VxSectionEditor = (function () {
     return '<div class="se-field">' +
       '<label class="se-label" for="' + id + '">' + esc(label) + '</label>' +
       '<input class="se-input" id="' + id + '" type="text" value="' + esc(value) + '" placeholder="' + esc(ph) + '" data-path="' + esc(path) + '" />' +
+      (opts.help ? '<p class="se-help">' + esc(opts.help) + '</p>' : '') +
     '</div>';
   }
 
@@ -71,19 +146,22 @@ window.VxSectionEditor = (function () {
     return '<div class="se-field se-field--full">' +
       '<label class="se-label" for="' + id + '">' + esc(label) + '</label>' +
       '<textarea class="se-textarea" id="' + id + '" rows="' + (opts.rows || 3) + '" data-path="' + esc(path) + '">' + esc(value) + '</textarea>' +
+      (opts.help ? '<p class="se-help">' + esc(opts.help) + '</p>' : '') +
     '</div>';
   }
 
-  function fieldSelect(label, value, options, path) {
+  function fieldSelect(label, value, options, path, opts) {
+    opts = opts || {};
     var id = 'vxf_' + path.replace(/\./g, '_');
-    var opts = options.map(function (o) {
+    var selectOptions = options.map(function (o) {
       var val = typeof o === 'string' ? o : o.value;
       var lbl = typeof o === 'string' ? o : o.label;
       return '<option value="' + esc(val) + '"' + (val === value ? ' selected' : '') + '>' + esc(lbl) + '</option>';
     }).join('');
     return '<div class="se-field">' +
       '<label class="se-label" for="' + id + '">' + esc(label) + '</label>' +
-      '<select class="se-select" id="' + id + '" data-path="' + esc(path) + '">' + opts + '</select>' +
+      '<select class="se-select" id="' + id + '" data-path="' + esc(path) + '">' + selectOptions + '</select>' +
+      (opts.help ? '<p class="se-help">' + esc(opts.help) + '</p>' : '') +
     '</div>';
   }
 
@@ -93,23 +171,23 @@ window.VxSectionEditor = (function () {
     var c = s.content || {};
     var p = idx + '.content.';
     var h = '<div class="se-row">';
-    h += fieldText('Badge', c.badge, p + 'badge', null, { placeholder: 'e.g. Now in beta' });
-    h += fieldSelect('Variant', s.variant || 'centered', [
+    h += fieldText(tx('badge'), c.badge, p + 'badge', null, { placeholder: 'e.g. Now in beta', help: tx('badge_help') });
+    h += fieldSelect(tx('layout'), s.variant || 'centered', [
       { value: 'centered', label: 'Centered' },
       { value: 'split', label: 'Split' },
       { value: 'minimal', label: 'Minimal' },
       { value: 'product', label: 'Product' },
-    ], idx + '.variant');
+    ], idx + '.variant', { help: tx('layout_help') });
     h += '</div>';
-    h += fieldText('Headline', c.title, p + 'title', null, { placeholder: 'Your main headline' });
-    h += fieldTextarea('Subtitle', c.subtitle, p + 'subtitle');
+    h += fieldText(tx('headline'), c.title, p + 'title', null, { placeholder: 'Your main headline', help: tx('headline_help') });
+    h += fieldTextarea(tx('subtitle'), c.subtitle, p + 'subtitle', { help: tx('subtitle_help') });
     h += '<div class="se-row">';
-    h += fieldText('Button label', (c.primaryCta || {}).label, p + 'primaryCta.label', null, { placeholder: 'Get started' });
-    h += fieldText('Button link', (c.primaryCta || {}).href, p + 'primaryCta.href', null, { placeholder: '#pricing' });
+    h += fieldText(tx('button_label'), (c.primaryCta || {}).label, p + 'primaryCta.label', null, { placeholder: 'Get started' });
+    h += fieldText(tx('button_link'), (c.primaryCta || {}).href, p + 'primaryCta.href', null, { placeholder: '#pricing' });
     h += '</div>';
     h += '<div class="se-row">';
-    h += fieldText('Secondary label', (c.secondaryCta || {}).label, p + 'secondaryCta.label', null, { placeholder: 'Learn more' });
-    h += fieldText('Secondary link', (c.secondaryCta || {}).href, p + 'secondaryCta.href', null, { placeholder: '#' });
+    h += fieldText(tx('secondary_label'), (c.secondaryCta || {}).label, p + 'secondaryCta.label', null, { placeholder: 'Learn more' });
+    h += fieldText(tx('secondary_link'), (c.secondaryCta || {}).href, p + 'secondaryCta.href', null, { placeholder: '#' });
     h += '</div>';
     return h;
   }
@@ -117,22 +195,21 @@ window.VxSectionEditor = (function () {
   function formLogoCloud(s, idx) {
     var c = s.content || {};
     var p = idx + '.content.';
-    var h = fieldText('Section title', c.title, p + 'title', null, { placeholder: 'Trusted by' });
-    h += fieldTextarea('Company names', (c.items || []).join(', '), p + 'items', { rows: 2 });
-    h += '<p class="se-hint">Separate names with commas</p>';
+    var h = fieldText(tx('section_title'), c.title, p + 'title', null, { placeholder: 'Trusted by' });
+    h += fieldTextarea(tx('names_list'), (c.items || []).join(', '), p + 'items', { rows: 2, help: tx('names_help') });
     return h;
   }
 
   function formMetrics(s, idx) {
     var c = s.content || {};
     var p = idx + '.content.';
-    var h = fieldText('Section title', c.title, p + 'title', null, { placeholder: 'By the numbers' });
+    var h = fieldText(tx('section_title'), c.title, p + 'title', null, { placeholder: 'By the numbers' });
     var items = c.items || [];
-    h += '<div class="se-items-label">Metrics</div>';
+    h += '<div class="se-items-label">' + esc(tx('value')) + '</div>';
     items.forEach(function (item, i) {
       h += '<div class="se-row se-row--tight">';
-      h += fieldText('Value', item.value, p + 'items.' + i + '.value', null, { placeholder: '99.9%' });
-      h += fieldText('Label', item.label, p + 'items.' + i + '.label', null, { placeholder: 'Uptime' });
+      h += fieldText(tx('value'), item.value, p + 'items.' + i + '.value', null, { placeholder: '99.9%' });
+      h += fieldText(tx('label'), item.label, p + 'items.' + i + '.label', null, { placeholder: 'Uptime' });
       h += '</div>';
     });
     return h;
@@ -141,14 +218,14 @@ window.VxSectionEditor = (function () {
   function formValueGrid(s, idx) {
     var c = s.content || {};
     var p = idx + '.content.';
-    var h = fieldText('Section title', c.title, p + 'title');
-    h += fieldText('Subtitle', c.subtitle, p + 'subtitle');
+    var h = fieldText(tx('section_title'), c.title, p + 'title');
+    h += fieldText(tx('subtitle'), c.subtitle, p + 'subtitle');
     var cards = c.cards || [];
-    h += '<div class="se-items-label">Cards (' + cards.length + ')</div>';
+    h += '<div class="se-items-label">' + esc(tx('cards')) + ' (' + cards.length + ')</div>';
     cards.forEach(function (card, i) {
       h += '<div class="se-card-group">';
-      h += fieldText('Title', card.title, p + 'cards.' + i + '.title');
-      h += fieldTextarea('Description', card.description, p + 'cards.' + i + '.description', { rows: 2 });
+      h += fieldText(tx('title'), card.title, p + 'cards.' + i + '.title');
+      h += fieldTextarea(tx('description'), card.description, p + 'cards.' + i + '.description', { rows: 2 });
       h += '</div>';
     });
     return h;
@@ -157,15 +234,14 @@ window.VxSectionEditor = (function () {
   function formFeatureSplit(s, idx) {
     var c = s.content || {};
     var p = idx + '.content.';
-    var h = fieldText('Title', c.title, p + 'title');
-    h += fieldText('Subtitle', c.subtitle, p + 'subtitle');
+    var h = fieldText(tx('title'), c.title, p + 'title');
+    h += fieldText(tx('subtitle'), c.subtitle, p + 'subtitle');
     var feats = (c.features || []).map(function (f) { return f.text || f; }).join('\n');
-    h += fieldTextarea('Features', feats, p + 'features', { rows: 5 });
-    h += '<p class="se-hint">One feature per line</p>';
+    h += fieldTextarea(tx('features'), feats, p + 'features', { rows: 5, help: tx('features_help') });
     if (c.primaryCta) {
       h += '<div class="se-row">';
-      h += fieldText('CTA label', c.primaryCta.label, p + 'primaryCta.label');
-      h += fieldText('CTA link', c.primaryCta.href, p + 'primaryCta.href');
+      h += fieldText(tx('button_label'), c.primaryCta.label, p + 'primaryCta.label');
+      h += fieldText(tx('button_link'), c.primaryCta.href, p + 'primaryCta.href');
       h += '</div>';
     }
     return h;
@@ -174,29 +250,28 @@ window.VxSectionEditor = (function () {
   function formPricing(s, idx) {
     var c = s.content || {};
     var p = idx + '.content.';
-    var h = fieldText('Title', c.title, p + 'title');
-    h += fieldText('Subtitle', c.subtitle, p + 'subtitle');
-    h += fieldSelect('Layout', s.variant || 'tiered', [
+    var h = fieldText(tx('title'), c.title, p + 'title');
+    h += fieldText(tx('subtitle'), c.subtitle, p + 'subtitle');
+    h += fieldSelect(tx('layout'), s.variant || 'tiered', [
       { value: 'tiered', label: 'Tiered' },
       { value: 'single', label: 'Single' },
       { value: 'comparison', label: 'Table' },
-    ], idx + '.variant');
+    ], idx + '.variant', { help: tx('layout_help') });
     var tiers = c.tiers || [];
     tiers.forEach(function (t, i) {
       var tp = p + 'tiers.' + i + '.';
       h += '<div class="se-card-group">';
-      h += '<div class="se-tier-header">' + esc(t.name || 'Tier ' + (i + 1)) + (t.highlight ? ' <span class="se-tag">Featured</span>' : '') + '</div>';
+      h += '<div class="se-tier-header">' + esc(t.name || 'Tier ' + (i + 1)) + (t.highlight ? ' <span class="se-tag">' + esc(tx('featured')) + '</span>' : '') + '</div>';
       h += '<div class="se-row">';
-      h += fieldText('Name', t.name, tp + 'name');
-      h += fieldText('Price', t.price, tp + 'price');
-      h += fieldText('Period', t.period, tp + 'period', null, { placeholder: '/month' });
+      h += fieldText(tx('plan_name'), t.name, tp + 'name');
+      h += fieldText(tx('price'), t.price, tp + 'price');
+      h += fieldText(tx('period'), t.period, tp + 'period', null, { placeholder: '/month' });
       h += '</div>';
-      h += fieldText('Description', t.description, tp + 'description');
-      h += fieldTextarea('Features', (t.features || []).join('\n'), tp + 'features', { rows: 3 });
-      h += '<p class="se-hint">One feature per line</p>';
+      h += fieldText(tx('description'), t.description, tp + 'description');
+      h += fieldTextarea(tx('features'), (t.features || []).join('\n'), tp + 'features', { rows: 3, help: tx('features_help') });
       h += '<div class="se-row">';
-      h += fieldText('CTA label', (t.cta || {}).label, tp + 'cta.label');
-      h += fieldText('CTA link', (t.cta || {}).href, tp + 'cta.href');
+      h += fieldText(tx('button_label'), (t.cta || {}).label, tp + 'cta.label');
+      h += fieldText(tx('button_link'), (t.cta || {}).href, tp + 'cta.href');
       h += '</div>';
       h += '</div>';
     });
@@ -206,12 +281,12 @@ window.VxSectionEditor = (function () {
   function formFaq(s, idx) {
     var c = s.content || {};
     var p = idx + '.content.';
-    var h = fieldText('Section title', c.title, p + 'title');
+    var h = fieldText(tx('section_title'), c.title, p + 'title');
     var items = c.items || [];
     items.forEach(function (item, i) {
       h += '<div class="se-card-group">';
-      h += fieldText('Question', item.question, p + 'items.' + i + '.question');
-      h += fieldTextarea('Answer', item.answer, p + 'items.' + i + '.answer', { rows: 2 });
+      h += fieldText(tx('question'), item.question, p + 'items.' + i + '.question');
+      h += fieldTextarea(tx('answer'), item.answer, p + 'items.' + i + '.answer', { rows: 2 });
       h += '</div>';
     });
     return h;
@@ -220,14 +295,14 @@ window.VxSectionEditor = (function () {
   function formWorkflow(s, idx) {
     var c = s.content || {};
     var p = idx + '.content.';
-    var h = fieldText('Title', c.title, p + 'title');
-    h += fieldText('Subtitle', c.subtitle, p + 'subtitle');
+    var h = fieldText(tx('title'), c.title, p + 'title');
+    h += fieldText(tx('subtitle'), c.subtitle, p + 'subtitle');
     var steps = c.steps || [];
     steps.forEach(function (step, i) {
       h += '<div class="se-card-group">';
-      h += '<div class="se-tier-header">Step ' + esc(step.step || (i + 1)) + '</div>';
-      h += fieldText('Title', step.title, p + 'steps.' + i + '.title');
-      h += fieldTextarea('Description', step.description, p + 'steps.' + i + '.description', { rows: 2 });
+      h += '<div class="se-tier-header">' + esc(tx('step')) + ' ' + esc(step.step || (i + 1)) + '</div>';
+      h += fieldText(tx('title'), step.title, p + 'steps.' + i + '.title');
+      h += fieldTextarea(tx('description'), step.description, p + 'steps.' + i + '.description', { rows: 2 });
       h += '</div>';
     });
     return h;
@@ -236,15 +311,15 @@ window.VxSectionEditor = (function () {
   function formCta(s, idx) {
     var c = s.content || {};
     var p = idx + '.content.';
-    var h = fieldText('Headline', c.title, p + 'title');
-    h += fieldText('Subtitle', c.subtitle, p + 'subtitle');
+    var h = fieldText(tx('headline'), c.title, p + 'title');
+    h += fieldText(tx('subtitle'), c.subtitle, p + 'subtitle');
     h += '<div class="se-row">';
-    h += fieldText('Button label', (c.primaryCta || {}).label, p + 'primaryCta.label');
-    h += fieldText('Button link', (c.primaryCta || {}).href, p + 'primaryCta.href');
+    h += fieldText(tx('button_label'), (c.primaryCta || {}).label, p + 'primaryCta.label');
+    h += fieldText(tx('button_link'), (c.primaryCta || {}).href, p + 'primaryCta.href');
     h += '</div>';
     h += '<div class="se-row">';
-    h += fieldText('Secondary label', (c.secondaryCta || {}).label, p + 'secondaryCta.label');
-    h += fieldText('Secondary link', (c.secondaryCta || {}).href, p + 'secondaryCta.href');
+    h += fieldText(tx('secondary_label'), (c.secondaryCta || {}).label, p + 'secondaryCta.label');
+    h += fieldText(tx('secondary_link'), (c.secondaryCta || {}).href, p + 'secondaryCta.href');
     h += '</div>';
     return h;
   }
@@ -252,18 +327,18 @@ window.VxSectionEditor = (function () {
   function formContactForm(s, idx) {
     var c = s.content || {};
     var p = idx + '.content.';
-    var h = fieldText('Title', c.title, p + 'title');
-    h += fieldText('Subtitle', c.subtitle, p + 'subtitle');
-    h += fieldText('Submit button text', c.submitLabel || 'Send message', p + 'submitLabel');
+    var h = fieldText(tx('title'), c.title, p + 'title');
+    h += fieldText(tx('subtitle'), c.subtitle, p + 'subtitle');
+    h += fieldText(tx('submit'), c.submitLabel || 'Send message', p + 'submitLabel');
     return h;
   }
 
   function formGeneric(s, idx) {
     var c = s.content || {};
     var p = idx + '.content.';
-    var h = fieldText('Title', c.title, p + 'title');
-    if (c.subtitle !== undefined) h += fieldText('Subtitle', c.subtitle, p + 'subtitle');
-    if (c.description !== undefined) h += fieldTextarea('Description', c.description, p + 'description');
+    var h = fieldText(tx('title'), c.title, p + 'title');
+    if (c.subtitle !== undefined) h += fieldText(tx('subtitle'), c.subtitle, p + 'subtitle');
+    if (c.description !== undefined) h += fieldTextarea(tx('description'), c.description, p + 'description');
     return h;
   }
 
@@ -313,7 +388,7 @@ window.VxSectionEditor = (function () {
     // Section list — first section open by default so the user immediately
     // sees the editable form fields and the affordance becomes obvious.
     sections.forEach(function (s, i) {
-      var rawMeta = SECTION_META[s.type] || { label: { en: s.type, pt: s.type }, icon: '📄', desc: { en: '', pt: '' } };
+      var rawMeta = SECTION_META[s.type] || { label: { en: s.type, pt: s.type }, desc: { en: '', pt: '' } };
       // Backward-compat: if label is a string (old data), normalize to {en,pt}
       var label = (typeof rawMeta.label === 'string') ? rawMeta.label : (rawMeta.label[lang] || rawMeta.label.en || s.type);
       var desc  = (typeof rawMeta.desc  === 'string') ? rawMeta.desc  : (rawMeta.desc[lang]  || rawMeta.desc.en  || '');
@@ -322,7 +397,7 @@ window.VxSectionEditor = (function () {
 
       h += '<div class="se-section' + (isFirst ? ' se-section--open' : '') + '" data-section-index="' + i + '">';
       h += '<button class="se-section-header" type="button" data-toggle="' + i + '" aria-expanded="' + (isFirst ? 'true' : 'false') + '">';
-      h += '<span class="se-section-icon">' + rawMeta.icon + '</span>';
+      h += '<span class="se-section-number"><small>' + esc(t.block) + '</small><b>' + (i + 1) + '</b></span>';
       h += '<span class="se-section-titleblock">';
       h += '<span class="se-section-title">' + esc(label) + '</span>';
       h += '<span class="se-section-desc">' + esc(desc) + '</span>';

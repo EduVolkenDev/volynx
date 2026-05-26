@@ -49,6 +49,46 @@ const supabase = createClient(
   { auth: { persistSession: false } }
 );
 
+function slugify(input: string): string {
+  return String(input || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+async function builderSlugExists(slug: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .from("projects")
+    .select("id")
+    .eq("slug", slug)
+    .is("deleted_at", null)
+    .limit(1);
+  if (error) {
+    console.warn(`Builder slug availability check failed for '${slug}': ${error.message}`);
+    return false;
+  }
+  return Array.isArray(data) && data.length > 0;
+}
+
+async function nextBuilderSlug(base: string): Promise<string> {
+  const root = (slugify(base) || "site").slice(0, 48).replace(/-$/g, "") || "site";
+  if (!(await builderSlugExists(root))) return root;
+
+  for (let i = 2; i <= 50; i++) {
+    const suffix = `-${i}`;
+    const candidate = root.slice(0, 63 - suffix.length).replace(/-$/g, "") + suffix;
+    if (!(await builderSlugExists(candidate))) return candidate;
+  }
+
+  return `${root.slice(0, 58).replace(/-$/g, "")}-${crypto.randomUUID().slice(0, 4)}`;
+}
+
+function isBuilderSlugConflict(error: any): boolean {
+  const message = String(error?.message || "").toLowerCase();
+  return error?.code === "23505" || (message.includes("duplicate") && message.includes("slug"));
+}
+
 // ── Multi-product plan mapping ──────────────────────────────
 // Maps lookup_key prefix → profile column updates
 // This mirrors src/data/products.ts getProfileUpdates() for the Deno runtime
@@ -767,33 +807,48 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             if (!preset?.data) {
               presetFetchError = `preset '${presetId}' not found in presets.json`;
             } else {
-              projectSlug = `${presetId}-${Date.now().toString(36)}`;
               const projectName = tierLabel
                 ? `${preset.name} Kit — ${tierLabel}`
                 : `${preset.name} Kit — ${new Date().toLocaleDateString("en-GB")}`;
-              const { data: insertedProject } = await supabase
-                .from("projects")
-                .insert({
-                  user_id: userId,
-                  name: projectName,
-                  slug: projectSlug,
-                  builder_data: preset.data,
-                  status: "draft",
-                  domain_type: "subdomain",
-                  metadata: {
-                    source_kit: addonId,
-                    preset_id: presetId,
-                    tier,
-                    tier_label: tierLabel,
-                    stripe_session_id: session.id,
-                  },
-                })
-                .select("id")
-                .single();
+              const baseProjectSlug = presetId;
+              let insertedProject: any = null;
+              for (let attempt = 1; attempt <= 5; attempt++) {
+                projectSlug = await nextBuilderSlug(attempt === 1 ? baseProjectSlug : `${baseProjectSlug}-${attempt}`);
+                const { data, error } = await supabase
+                  .from("projects")
+                  .insert({
+                    user_id: userId,
+                    name: projectName,
+                    slug: projectSlug,
+                    builder_data: preset.data,
+                    status: "draft",
+                    domain_type: "subdomain",
+                    metadata: {
+                      source_kit: addonId,
+                      preset_id: presetId,
+                      tier,
+                      tier_label: tierLabel,
+                      stripe_session_id: session.id,
+                    },
+                  })
+                  .select("id")
+                  .single();
+
+                if (!error) {
+                  insertedProject = data;
+                  break;
+                }
+                if (!isBuilderSlugConflict(error)) throw error;
+              }
               // Capture the project UUID so the email CTA can deep-link directly
               // into /builder/?project={uuid} and skip the empty-editor confusion.
               projectIdCreated = insertedProject?.id || null;
-              console.log(`Auto-created Builder project '${projectSlug}' (${tierLabel || "unknown tier"}) for ${userId} from kit ${prefix}`);
+              if (!projectIdCreated) {
+                presetFetchError = `could not reserve a clean Builder slug for '${presetId}'`;
+                projectSlug = null;
+              } else {
+                console.log(`Auto-created Builder project '${projectSlug}' (${tierLabel || "unknown tier"}) for ${userId} from kit ${prefix}`);
+              }
             }
           }
         } catch (e) {

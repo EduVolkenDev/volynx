@@ -538,8 +538,8 @@ window.VX_TRANS = {
     "products.landing.desc":        "A serious Landing Page that turns visitors into buyers. Delivered in 48–72h.",
     "products.devtools.meta":       "Convert • Scale • Ship",
     "products.devtools.desc":       "Production-grade tools for developers: image processing, QR generation, converters and more.",
-    "products.builder.meta":        "Sites • JSON • Deploy",
-    "products.builder.desc":        "Create and manage mini-sites with a JSON editor, magic link auth and one-click publish.",
+    "products.builder.meta":        "Sites • Guided • Deploy",
+    "products.builder.desc":        "Create and publish premium sites with guided setup, simple content editing and one-click publishing.",
     "products.propertyflow.meta":   "Listings • Filters • CMS",
     "products.propertyflow.desc":   "Premium property management platform for real estate agencies. Smart catalogue, bilingual interface, and Supabase-ready backend.",
 
@@ -996,7 +996,7 @@ window.VX_TRANS = {
     "devhub.ppk.for":       "For: Freelancers · Agencies · Creators",
     "devhub.sls.for":       "For: SaaS · Creators · Freelancers",
     "devhub.icons.for":     "For: Designers · Devs · Agencies",
-    "devhub.builder.desc":  "Create and manage mini-sites with a JSON editor, magic link auth and one-click publish",
+    "devhub.builder.desc":  "Create and publish premium sites with guided setup, simple content editing and one-click publishing",
     "devhub.all_products":  "See all Products catalog",
 
     /* === ABOUT PAGE === */
@@ -1286,7 +1286,7 @@ window.VX_TRANS = {
     /* === BUILDER PAGE === */
     "builder.badge":         "VOLYNX Builder",
     "builder.title":         "Build & Deploy Sites",
-    "builder.subtitle":      "Create mini-sites with JSON, manage them in one place, and publish to your own subdomain.",
+    "builder.subtitle":      "Create and publish premium sites with guided steps, simple content editing and live preview.",
     "builder.auth.title":    "Sign in to Builder",
     "builder.auth.subtitle": "Enter your email — we'll send a magic link. No password needed.",
     "builder.auth.cta":      "Get magic link",
@@ -1544,7 +1544,7 @@ window.VX_TRANS = {
     "devhub2.all_products": "All products",
     "devhub2.browse_icons": "Browse Icons",
     "devhub2.browse_resources": "Browse resources",
-    "devhub2.builder_desc": "Create and manage premium mini-sites with a JSON editor, magic link auth and one-click publish. Custom domains on Pro plans.",
+    "devhub2.builder_desc": "Create and publish premium mini-sites with guided setup, simple content editing and one-click publishing. Custom domains on Pro plans.",
     "devhub2.builder_label": "Builder",
     "devhub2.builder_title": "VOLYNX Builder lives here too.",
     "devhub2.collections_title": "Curated collections for serious builders",
@@ -2022,7 +2022,7 @@ window.VX_TRANS = {
     "prod.spotlight_pf_label": "New · Real Estate SaaS",
     "prod.spotlight_pf_title": "PropertyFlow",
     "prod.tool_builder_btn": "Open Builder",
-    "prod.tool_builder_desc": "Create and manage premium mini-sites with JSON editor, magic link auth and one-click publish. Custom domains on Pro.",
+    "prod.tool_builder_desc": "Create and publish premium mini-sites with guided setup, simple content editing and one-click publishing. Custom domains on Pro.",
     "prod.tool_builder_label": "Builder",
     "prod.tool_builder_title": "VOLYNX Builder",
     "prod.tool_cvitae_label": "Free + AI",
@@ -3056,8 +3056,8 @@ window.VX_TRANS = {
     "products.landing.desc":        "Uma Landing Page séria que transforma visitantes em compradores. Entregue em 48–72h.",
     "products.devtools.meta":       "Converter • Escalar • Publicar",
     "products.devtools.desc":       "Ferramentas de nível produção para devs: processamento de imagem, geração de QR e mais.",
-    "products.builder.meta":        "Sites • JSON • Deploy",
-    "products.builder.desc":        "Crie e gerencie mini-sites com editor JSON, autenticação por magic link e publicação com um clique.",
+    "products.builder.meta":        "Sites • Guiado • Deploy",
+    "products.builder.desc":        "Crie e publique sites premium com configuração guiada, edição simples de conteúdo e publicação com um clique.",
     "products.propertyflow.meta":   "Listagens • Filtros • CMS",
     "products.propertyflow.desc":   "Plataforma premium de gestão imobiliária para agências. Catálogo inteligente, interface bilíngue e backend pronto para Supabase.",
 
@@ -3514,7 +3514,7 @@ window.VX_TRANS = {
     "devhub.ppk.for":       "Para: Freelancers · Agências · Criadores",
     "devhub.sls.for":       "Para: SaaS · Criadores · Freelancers",
     "devhub.icons.for":     "Para: Designers · Devs · Agências",
-    "devhub.builder.desc":  "Crie e gerencie mini-sites com editor JSON, autenticação por magic link e publicação com um clique",
+    "devhub.builder.desc":  "Crie e publique sites premium com configuração guiada, edição simples de conteúdo e publicação com um clique",
     "devhub.all_products":  "Ver catálogo completo de produtos",
 
     /* === ABOUT PAGE === */
@@ -3804,7 +3804,7 @@ window.VX_TRANS = {
     /* === BUILDER PAGE === */
     "builder.badge":         "VOLYNX Builder",
     "builder.title":         "Construa & Publique Sites",
-    "builder.subtitle":      "Crie mini-sites com JSON, gerencie em um único lugar e publique no seu subdomínio.",
+    "builder.subtitle":      "Crie e publique sites premium com passos guiados, edição simples de conteúdo e preview ao vivo.",
     "builder.auth.title":    "Entre no Builder",
     "builder.auth.subtitle": "Digite seu e-mail — enviaremos um magic link. Sem senha necessária.",
     "builder.auth.cta":      "Obter magic link",
@@ -4022,7 +4022,7 @@ window.VX_TRANS = {
     "devhub2.all_products": "Todos os produtos",
     "devhub2.browse_icons": "Explorar Ícones",
     "devhub2.browse_resources": "Explorar recursos",
-    "devhub2.builder_desc": "Crie e gerencie mini-sites premium com editor JSON, autenticação por link mágico e publicação em um clique. Domínios customizados em planos Pro.",
+    "devhub2.builder_desc": "Crie e publique mini-sites premium com configuração guiada, edição simples de conteúdo e publicação em um clique. Domínios customizados em planos Pro.",
     "devhub2.builder_label": "Builder",
     "devhub2.builder_title": "VOLYNX Builder também fica por aqui.",
     "devhub2.collections_title": "Coleções selecionadas para quem constrói de verdade",
@@ -4509,7 +4509,7 @@ window.VX_TRANS = {
     "prod.spotlight_pf_label": "Novo · SaaS Imobiliário",
     "prod.spotlight_pf_title": "PropertyFlow",
     "prod.tool_builder_btn": "Abrir Builder",
-    "prod.tool_builder_desc": "Crie e gerencie mini-sites premium com editor JSON, autenticação por link mágico e publicação com um clique. Domínios customizados em Pro.",
+    "prod.tool_builder_desc": "Crie e publique mini-sites premium com configuração guiada, edição simples de conteúdo e publicação com um clique. Domínios customizados em Pro.",
     "prod.tool_builder_label": "Builder",
     "prod.tool_builder_title": "VOLYNX Builder",
     "prod.tool_cvitae_label": "Grátis + IA",
