@@ -24,7 +24,7 @@ export default {
     const url = new URL(request.url);
     const slug = url.pathname.slice(1).split("/")[0];
 
-    // Root or empty → send to QR generator
+    // Root or empty -> send to QR generator.
     if (!slug) {
       return Response.redirect(FALLBACK_HOME, 302);
     }

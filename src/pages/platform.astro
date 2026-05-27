@@ -10,6 +10,7 @@ const homeAssistItems = [
   { href: ROUTES.daily, label: { en: "Workspace", pt: "Workspace" }, title: { en: "Open Daily", pt: "Abrir Daily" }, copy: { en: "Go back to My Day, Vault, Summary, Writing and the rest of the daily system.", pt: "Volte para My Day, Vault, Summary, Writing e o resto do sistema diário." }, iconSrc: "/assets/daily-icon.webp" },
   { href: ROUTES.delivery, label: { en: "Post-purchase", pt: "Pós-compra" }, title: { en: "My products", pt: "Meus produtos" }, copy: { en: "Recover downloads, check access and reopen purchased product paths.", pt: "Recupere downloads, verifique acessos e reabra os produtos comprados." }, iconSrc: "/assets/mybox.webp" },
   { href: ROUTES.support, label: { en: "Help", pt: "Ajuda" }, title: { en: "Open support", pt: "Abrir suporte" }, copy: { en: "Route launch, billing and access issues without losing context.", pt: "Direcione questões de lançamento, cobrança e acesso sem perder contexto." }, iconSrc: "/assets/support-gold.webp" },
+  { href: ROUTES.launch2026, label: { en: "Launch", pt: "Lançamento" }, title: { en: "Replay launch page", pt: "Rever o lançamento" }, copy: { en: "Revisit the original cinematic launch page without making it the default platform path.", pt: "Reveja a página cinematográfica de lançamento sem transformar isso no caminho padrão da plataforma." }, iconSrc: "/assets/V.webp" },
 ];
 ---
 <FlagshipLayout title="VOLYNX — Building a Smarter Future" pageClass="page-home">
@@ -55,12 +56,48 @@ const homeAssistItems = [
             </a>
             <p class="hero-v2__mockup-title" data-i18n="home2.mockup_title">Seu dia mais inteligente e organizado começa aqui</p>
             <div class="hero-v2__mockup-grid">
-              <a href="https://daily.volynx.world/tools/my-day/"   class="hero-v2__mockup-tag"><img src="/assets/myday.webp"    alt="">My Day</a>
-              <a href="https://daily.volynx.world/tools/scanner/"  class="hero-v2__mockup-tag"><img src="/assets/scanner.webp"  alt="">Smart Scanner</a>
-              <a href="https://daily.volynx.world/tools/summary/"  class="hero-v2__mockup-tag"><img src="/assets/summary.webp"  alt="">Universal Summary</a>
-              <a href="https://daily.volynx.world/tools/vault/"    class="hero-v2__mockup-tag"><img src="/assets/vault.webp"    alt="">Smart Vault</a>
-              <a href="https://daily.volynx.world/tools/writing/"  class="hero-v2__mockup-tag"><img src="/assets/writing.webp"  alt="">Writing Studio</a>
-              <a href="https://daily.volynx.world/tools/decision/" class="hero-v2__mockup-tag"><img src="/assets/decision.webp" alt="">Decision Desk</a>
+              <a href="https://daily.volynx.world/tools/my-day/" class="hero-v2__mockup-tag">
+                <img src="/assets/myday.webp" alt="">
+                <span class="hero-v2__tag-copy">
+                  <strong>My Day</strong>
+                  <span data-i18n="home2.mockup_myday_desc">Planeje prioridades e acompanhe seu foco do dia.</span>
+                </span>
+              </a>
+              <a href="https://daily.volynx.world/tools/scanner/" class="hero-v2__mockup-tag">
+                <img src="/assets/scanner.webp" alt="">
+                <span class="hero-v2__tag-copy">
+                  <strong>Smart Scanner</strong>
+                  <span data-i18n="home2.mockup_scanner_desc">Leia arquivos, imagens e notas sem perder contexto.</span>
+                </span>
+              </a>
+              <a href="https://daily.volynx.world/tools/summary/" class="hero-v2__mockup-tag">
+                <img src="/assets/summary.webp" alt="">
+                <span class="hero-v2__tag-copy">
+                  <strong>Universal Summary</strong>
+                  <span data-i18n="home2.mockup_summary_desc">Transforme textos longos em resumo claro e acionável.</span>
+                </span>
+              </a>
+              <a href="https://daily.volynx.world/tools/vault/" class="hero-v2__mockup-tag">
+                <img src="/assets/vault.webp" alt="">
+                <span class="hero-v2__tag-copy">
+                  <strong>Smart Vault</strong>
+                  <span data-i18n="home2.mockup_vault_desc">Guarde ideias e informações importantes em um só lugar.</span>
+                </span>
+              </a>
+              <a href="https://daily.volynx.world/tools/writing/" class="hero-v2__mockup-tag">
+                <img src="/assets/writing.webp" alt="">
+                <span class="hero-v2__tag-copy">
+                  <strong>Writing Studio</strong>
+                  <span data-i18n="home2.mockup_writing_desc">Escreva, revise e refine mensagens com mais rapidez.</span>
+                </span>
+              </a>
+              <a href="https://daily.volynx.world/tools/decision/" class="hero-v2__mockup-tag">
+                <img src="/assets/decision.webp" alt="">
+                <span class="hero-v2__tag-copy">
+                  <strong>Decision Desk</strong>
+                  <span data-i18n="home2.mockup_decision_desc">Compare opções e tome decisões com mais clareza.</span>
+                </span>
+              </a>
             </div>
           </div>
         </div>
@@ -371,7 +408,7 @@ const homeAssistItems = [
           <h3 data-i18n="home2.lab_tool_suite_title">Image Suite</h3>
           <p data-i18n="home2.lab_tool_suite_desc">Cleanup, crop and export in one flow — designed for creators who ship.</p>
         </a>
-        <a href={ROUTES.labQrGen} class="panel feature-card lab-tool-card">
+        <a href={ROUTES.qrgen} class="panel feature-card lab-tool-card">
           <img src="/assets/newqrgen.webp" alt="" class="lab-tool-card__icon" loading="lazy" />
           <span class="label label--free" data-i18n="home2.lab_free_chip">Free</span>
           <h3 data-i18n="home2.lab_tool_qr_title">QR Generator</h3>
@@ -889,18 +926,17 @@ const homeAssistItems = [
     gap: 10px;
   }
   .hero-v2__mockup-tag {
-    padding: 15px 30px;
+    min-width: 0;
+    padding: 12px 14px;
     border-radius: 14px;
     background: rgba(244,244,245,0.04);
     border: 1px solid rgba(244,244,245,0.08);
     color: rgba(244,244,245,0.85);
-    font-size: 1.1rem;
-    font-weight: 800;
     backdrop-filter: blur(10px);
-    display: inline-flex;
+    display: flex;
     position: relative;
-    align-items: center;
-    gap: 10px;
+    align-items: flex-start;
+    gap: 9px;
     text-decoration: none;
     cursor: pointer;
     transition: transform .2s ease, background .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
@@ -917,7 +953,27 @@ const homeAssistItems = [
     outline-offset: 2px;
   }
   .hero-v2__mockup-tag img {
-    max-width: 70px;
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
+    object-fit: contain;
+  }
+  .hero-v2__tag-copy {
+    min-width: 0;
+    display: grid;
+    gap: 4px;
+  }
+  .hero-v2__tag-copy strong {
+    color: rgba(244,244,245,0.92);
+    font-size: .94rem;
+    font-weight: 850;
+    line-height: 1.05;
+  }
+  .hero-v2__tag-copy span {
+    color: rgba(220, 230, 255, 0.58);
+    font-size: .72rem;
+    font-weight: 600;
+    line-height: 1.25;
   }
 
   /* ── Free value strip ── */

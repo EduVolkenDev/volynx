@@ -33,10 +33,10 @@ CREATE TABLE IF NOT EXISTS public.qr_codes (
   CONSTRAINT qr_codes_target_url_http CHECK (target_url ~* '^https?://')
 );
 
-CREATE INDEX qr_codes_owner_idx     ON public.qr_codes(owner_id, status);
-CREATE INDEX qr_codes_expiry_idx    ON public.qr_codes(status, expires_at)
+CREATE INDEX IF NOT EXISTS qr_codes_owner_idx ON public.qr_codes(owner_id, status);
+CREATE INDEX IF NOT EXISTS qr_codes_expiry_idx ON public.qr_codes(status, expires_at)
   WHERE status IN ('active','grace');
-CREATE INDEX qr_codes_grace_idx     ON public.qr_codes(status, grace_until)
+CREATE INDEX IF NOT EXISTS qr_codes_grace_idx ON public.qr_codes(status, grace_until)
   WHERE status IN ('active','grace');
 
 -- =======================================================================
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS public.qr_scans (
   referer       text
 );
 
-CREATE INDEX qr_scans_code_time_idx ON public.qr_scans(qr_code_id, scanned_at DESC);
+CREATE INDEX IF NOT EXISTS qr_scans_code_time_idx ON public.qr_scans(qr_code_id, scanned_at DESC);
 
 -- =======================================================================
 -- 4. TRIGGER: updated_at
@@ -67,6 +67,7 @@ BEGIN
 END;
 $$;
 
+DROP TRIGGER IF EXISTS qr_codes_updated_at_trigger ON public.qr_codes;
 CREATE TRIGGER qr_codes_updated_at_trigger
 BEFORE UPDATE ON public.qr_codes
 FOR EACH ROW
@@ -138,6 +139,7 @@ BEGIN
 END;
 $$;
 
+DROP TRIGGER IF EXISTS qr_codes_enforce_quota_trigger ON public.qr_codes;
 CREATE TRIGGER qr_codes_enforce_quota_trigger
 BEFORE INSERT ON public.qr_codes
 FOR EACH ROW
@@ -184,14 +186,17 @@ GRANT EXECUTE ON FUNCTION public.extend_qr_expiry_for_user(uuid) TO service_role
 -- =======================================================================
 ALTER TABLE public.qr_codes ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS qr_codes_owner_select ON public.qr_codes;
 CREATE POLICY qr_codes_owner_select ON public.qr_codes
   FOR SELECT TO authenticated
   USING (owner_id = (SELECT auth.uid()));
 
+DROP POLICY IF EXISTS qr_codes_owner_insert ON public.qr_codes;
 CREATE POLICY qr_codes_owner_insert ON public.qr_codes
   FOR INSERT TO authenticated
   WITH CHECK (owner_id = (SELECT auth.uid()));
 
+DROP POLICY IF EXISTS qr_codes_owner_update ON public.qr_codes;
 CREATE POLICY qr_codes_owner_update ON public.qr_codes
   FOR UPDATE TO authenticated
   USING (owner_id = (SELECT auth.uid()))
@@ -200,10 +205,12 @@ CREATE POLICY qr_codes_owner_update ON public.qr_codes
     AND status <> 'admin_blocked'
   );
 
+DROP POLICY IF EXISTS qr_codes_owner_delete ON public.qr_codes;
 CREATE POLICY qr_codes_owner_delete ON public.qr_codes
   FOR DELETE TO authenticated
   USING (owner_id = (SELECT auth.uid()));
 
+DROP POLICY IF EXISTS qr_codes_admin_all ON public.qr_codes;
 CREATE POLICY qr_codes_admin_all ON public.qr_codes
   FOR ALL TO authenticated
   USING (
@@ -224,6 +231,7 @@ CREATE POLICY qr_codes_admin_all ON public.qr_codes
 -- =======================================================================
 ALTER TABLE public.qr_scans ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS qr_scans_owner_select ON public.qr_scans;
 CREATE POLICY qr_scans_owner_select ON public.qr_scans
   FOR SELECT TO authenticated
   USING (
@@ -234,6 +242,7 @@ CREATE POLICY qr_scans_owner_select ON public.qr_scans
     )
   );
 
+DROP POLICY IF EXISTS qr_scans_admin_all ON public.qr_scans;
 CREATE POLICY qr_scans_admin_all ON public.qr_scans
   FOR ALL TO authenticated
   USING (
@@ -252,6 +261,20 @@ CREATE POLICY qr_scans_admin_all ON public.qr_scans
 -- =======================================================================
 -- 9. CRON — flip de status active→grace→expired (UTC)
 -- =======================================================================
+DO $$
+BEGIN
+  PERFORM cron.unschedule('qr_codes_expire_to_grace');
+EXCEPTION WHEN OTHERS THEN
+  NULL;
+END $$;
+
+DO $$
+BEGIN
+  PERFORM cron.unschedule('qr_codes_grace_to_expired');
+EXCEPTION WHEN OTHERS THEN
+  NULL;
+END $$;
+
 SELECT cron.schedule(
   'qr_codes_expire_to_grace',
   '0 3 * * *',

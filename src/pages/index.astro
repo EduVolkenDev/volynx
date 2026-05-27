@@ -58,9 +58,17 @@ const platformSurfaces = [
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
-<script>
+<script is:inline>
   (function () {
     try {
+      var seenKey = 'volynx_launch_seen_v1';
+      var params = new URLSearchParams(window.location.search);
+      if (localStorage.getItem(seenKey) === '1' && params.get('replay') !== '1') {
+        window.location.replace('/platform/');
+        return;
+      }
+      localStorage.setItem(seenKey, '1');
+
       var raw = localStorage.getItem('volynx_lang') || navigator.language || 'pt-BR';
       var next = String(raw).toLowerCase().startsWith('pt') ? 'pt-BR' : 'en';
       document.documentElement.lang = next;
@@ -1123,6 +1131,7 @@ const platformSurfaces = [
   };
 </script>
 <script is:inline src="/js/i18n.js"></script>
+<script src="/js/vx-touch-links.js?v=20260525" defer></script>
 <script src="/js/recording-mode.js?v=20260506" defer></script>
 <script>
   const observer = new IntersectionObserver((entries) => {
@@ -1131,7 +1140,6 @@ const platformSurfaces = [
     });
   }, { threshold: 0.12 });
 
-<script src="/js/vx-touch-links.js?v=20260525" defer></script>
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
   function syncIntroMeta(lang) {

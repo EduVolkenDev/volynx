@@ -8,6 +8,8 @@
   "use strict";
 
   const QR_HOST = "https://qr.volynx.world";
+  const ADMIN_QR_MANAGER_PATH = "/admin/codes/?tab=qr";
+  const ADMIN_EMAIL_ALLOWLIST = ["edupelomundo13@gmail.com"];
 
   const PLAN_LIMITS = {
     free: 1, launch: 5, pro: 20, studio: 50, teams: 200, enterprise: -1,
@@ -90,6 +92,21 @@
     } catch { return null; }
   }
 
+  function detectAdminHint() {
+    try {
+      if (window.VX_IS_ADMIN === true) return true;
+      if (document.documentElement.classList.contains("vx-admin")) return true;
+      if (document.body?.classList.contains("vx-admin")) return true;
+      if (localStorage.getItem("volynx_is_admin") === "1") return true;
+      const payload = decodeJwtPayload(localStorage.getItem("volynx_access_token") || "");
+      const email = String(payload?.email || localStorage.getItem("volynx_user_email") || "").toLowerCase();
+      if (email && ADMIN_EMAIL_ALLOWLIST.includes(email)) return true;
+      return payload?.app_metadata?.is_admin === true;
+    } catch {
+      return false;
+    }
+  }
+
   async function ensureSession() {
     if (window.VxAuthBridge?.hydrate) {
       window.VxAuthBridge.hydrate();
@@ -119,6 +136,13 @@
     if (!res.ok) return { plan: "free", is_admin: false };
     const rows = await res.json();
     return rows[0] || { plan: "free", is_admin: false };
+  }
+
+  function redirectAdminToAdminQr(profile) {
+    if (!profile?.is_admin) return false;
+    if (location.pathname.startsWith("/admin/")) return false;
+    location.replace(ADMIN_QR_MANAGER_PATH);
+    return true;
   }
 
   async function fetchQRCodes() {
@@ -316,7 +340,12 @@
       showOnly("qrpLoggedOut");
       return;
     }
+    if (detectAdminHint()) {
+      location.replace(ADMIN_QR_MANAGER_PATH);
+      return;
+    }
     const profile = await fetchProfile();
+    if (redirectAdminToAdminQr(profile)) return;
     const qrs = await fetchQRCodes();
     if (qrs.length === 0) {
       showOnly("qrpEmpty");

@@ -2,6 +2,7 @@
 import { ROUTES } from "../data/routes";
 interface Props {
   mode?: "default" | "sections";
+  brandHref?: string;
   primaryCtaLabel?: string;
   primaryCtaI18n?: string;
   primaryCtaHref?: string;
@@ -10,6 +11,7 @@ interface Props {
 }
 const {
   mode = "default",
+  brandHref = ROUTES.platform,
   primaryCtaLabel,
   primaryCtaI18n,
   primaryCtaHref = ROUTES.login,
@@ -53,7 +55,7 @@ const mobileDefaultLinks = [
 
 <header class="vxh" role="banner">
   <div class="vxh__inner">
-    <a class="vxh__brand" href={ROUTES.home} aria-label="VOLYNX — go to home" data-i18n-aria="aria.go_home">
+    <a class="vxh__brand" href={brandHref} aria-label="VOLYNX — go to platform" data-i18n-aria="aria.platform_home">
       <img src="/assets/V.webp" alt="" class="vxh__icon" width="44" height="44" loading="eager" decoding="async" />
       <img src="/assets/wordmark.webp" alt="" class="vxh__wordmark" width="160" height="32" loading="eager" decoding="async" />
     </a>

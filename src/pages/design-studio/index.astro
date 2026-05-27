@@ -4,28 +4,20 @@ import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import FlagshipFooter from "../../components/FlagshipFooter.astro";
 import { ROUTES } from "../../data/routes";
 
-const whatsappBriefing = `${ROUTES.whatsapp}?text=Olá%20VOLYNX%2C%20gostaria%20de%20solicitar%20um%20orçamento%20para%20o%20Design%20Studio.`;
+const whatsappBriefing = `${ROUTES.whatsapp}?text=Ol%C3%A1%20VOLYNX%2C%20quero%20come%C3%A7ar%20um%20diagn%C3%B3stico%20de%20marca%20no%20Design%20Studio.`;
 ---
 
 <FlagshipLayout
-  title="VOLYNX Design Studio — Identidade Visual e Branding Premium"
-  description="Logotipos, sistemas visuais, ícones e assets premium. Marcas construídas para parecerem prontas para vender desde o primeiro dia."
+  title="VOLYNX Design Studio — Brand Systems, Logos e Identidade Premium"
+  description="Crie uma identidade de marca completa, nao apenas um logotipo. Diagnostico, direcao visual, aplicacoes reais, Brand Score e arquivos prontos para web e impressao."
   ogImage="/assets/volynxstudio.webp"
   pageClass="page-design-studio"
 >
   <FlagshipHeader current={ROUTES.designStudio} />
 
   <main class="ds-main">
-
-    <!-- ═══════════════════════════════════════════════════
-         HERO — vídeo central + copy + CTAs
-    ════════════════════════════════════════════════════ -->
-    <section class="ds-hero" aria-label="Hero VOLYNX Design Studio">
-      <!-- Camada de luz ambiente -->
-      <div class="ds-hero__glow" aria-hidden="true"></div>
-
-      <!-- Vídeo central -->
-      <div class="ds-hero__cinema" aria-hidden="true">
+    <section class="ds-hero" id="topo" aria-label="VOLYNX Design Studio">
+      <div class="ds-hero__media" aria-hidden="true">
         <video
           class="ds-hero__video"
           src="/assets/design-studio-catalog-open.mp4"
@@ -34,1005 +26,1689 @@ const whatsappBriefing = `${ROUTES.whatsapp}?text=Olá%20VOLYNX%2C%20gostaria%20
           loop
           playsinline
           preload="auto"
-          aria-hidden="true"
         ></video>
-        <!-- Fallback se o vídeo não carregar -->
-        <div class="ds-hero__video-fallback" aria-hidden="true">
-          <img src="/assets/volynxstudio.webp" alt="" loading="eager" width="720" height="480" />
-        </div>
-        <div class="ds-hero__video-vignette" aria-hidden="true"></div>
       </div>
 
-      <!-- Copy principal -->
-      <div class="ds-hero__content shell">
-        <div class="ds-hero__copy">
-          <span class="ds-eyebrow">VOLYNX Design Studio</span>
-          <h1 class="ds-hero__headline">
-            Sua marca<br />
-            <em>pronta para vender</em>
-          </h1>
-          <p class="ds-hero__sub">
-            Logotipos, sistemas visuais, ícones grandes e assets premium para negócios que precisam parecer sérios desde o primeiro contato.
-          </p>
-          <div class="ds-hero__actions">
-            <a
-              href={whatsappBriefing}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="ds-btn ds-btn--primary"
-            >
-              Solicitar orçamento
-            </a>
-            <a href="#signa" class="ds-btn ds-btn--ghost">
-              Conhecer Signa
-            </a>
-          </div>
+      <div class="shell ds-hero__content">
+        <span class="ds-eyebrow" data-reveal>Brand Studio by VOLYNX</span>
+        <h1 class="ds-hero__title" data-reveal aria-label="VOLYNX Design Studio">
+          <img
+            class="ds-hero__wordmark"
+            src="/assets/design-studio/volynx-wordmark-gold.webp"
+            alt="VOLYNX"
+            width="1800"
+            height="836"
+            decoding="async"
+            fetchpriority="high"
+          />
+          <span class="ds-hero__title-text">Design Studio</span>
+        </h1>
+        <p class="ds-hero__lead" data-reveal>
+          Crie uma identidade de marca completa, nao apenas um logotipo.
+          Diagnostico, direcao visual, aplicacoes reais e arquivos prontos para vender desde o primeiro contato.
+        </p>
+
+        <div class="ds-hero__actions" data-reveal>
+          <a href="#diagnostico" class="ds-btn ds-btn--primary">Iniciar diagnostico</a>
+          <a href="#brand-score" class="ds-btn ds-btn--ghost">Ver Brand Score</a>
+        </div>
+
+        <div class="ds-hero__signal" data-reveal aria-label="Diferenciais do Design Studio">
+          <span>Logo</span>
+          <span>Brand Kit</span>
+          <span>Mockups</span>
+          <span>Score</span>
+          <span>Arquivos finais</span>
         </div>
       </div>
 
-      <!-- Linha decorativa inferior -->
-      <div class="ds-hero__rule" aria-hidden="true"></div>
-    </section>
-
-    <!-- ═══════════════════════════════════════════════════
-         POSICIONAMENTO — strip de atributos
-    ════════════════════════════════════════════════════ -->
-    <section class="ds-attributes" aria-label="Atributos do estúdio">
-      <div class="shell ds-attributes__grid">
-        <div class="ds-attr" data-reveal>
-          <span class="ds-attr__symbol" aria-hidden="true">◈</span>
-          <strong>Identidade visual completa</strong>
-          <span>Logotipo, paleta, tipografia, sistema.</span>
-        </div>
-        <div class="ds-attr" data-reveal>
-          <span class="ds-attr__symbol" aria-hidden="true">◇</span>
-          <strong>Ícones grandes para seções</strong>
-          <span>Assets únicos pensados para cada contexto.</span>
-        </div>
-        <div class="ds-attr" data-reveal>
-          <span class="ds-attr__symbol" aria-hidden="true">◆</span>
-          <strong>Entrega estruturada</strong>
-          <span>Brief, aprovação, criação, refinamento, entrega.</span>
-        </div>
-        <div class="ds-attr" data-reveal>
-          <span class="ds-attr__symbol" aria-hidden="true">◉</span>
-          <strong>Pronto para uso imediato</strong>
-          <span>Arquivos organizados, formatos corretos.</span>
-        </div>
+      <div class="ds-scroll-cue" aria-hidden="true">
+        <span></span>
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════
-         SERVIÇOS PREMIUM
-    ════════════════════════════════════════════════════ -->
-    <section class="ds-services page-section" id="servicos" aria-labelledby="ds-svc-title">
-      <div class="shell">
-        <div class="ds-section-head" data-reveal>
-          <span class="ds-eyebrow">O que fazemos</span>
-          <h2 id="ds-svc-title">Serviços premium</h2>
-          <p>Cada projeto é construído com intenção, rigor visual e alinhamento com o que você vende.</p>
-        </div>
-
-        <div class="ds-services__grid">
-
-          <article class="ds-svc-card" data-reveal>
-            <div class="ds-svc-card__icon" aria-hidden="true">
-              <img src="/assets/studio-logo.webp" alt="" loading="lazy" width="64" height="64" />
-            </div>
-            <h3>Logotipo e identidade visual</h3>
-            <p>Sistema completo de marca: símbolo, logotipo, variações, paleta, tipografia e guia de uso. Não é um logo isolado — é o início de um sistema.</p>
-          </article>
-
-          <article class="ds-svc-card" data-reveal>
-            <div class="ds-svc-card__icon" aria-hidden="true">
-              <img src="/assets/bignewicons_03.webp" alt="" loading="lazy" width="64" height="64" />
-            </div>
-            <h3>Ícones grandes para seções</h3>
-            <p>Ilustrações e ícones oversized criados para landing pages e seções de produto — peças únicas que diferenciam seu produto visualmente.</p>
-          </article>
-
-          <article class="ds-svc-card" data-reveal>
-            <div class="ds-svc-card__icon" aria-hidden="true">
-              <img src="/assets/builderstudio.webp" alt="" loading="lazy" width="64" height="64" />
-            </div>
-            <h3>Assets para landing pages</h3>
-            <p>Elementos visuais premium — heroes, mockups, banners, imagens de seção — projetados para converter e comunicar qualidade.</p>
-          </article>
-
-          <article class="ds-svc-card" data-reveal>
-            <div class="ds-svc-card__icon" aria-hidden="true">
-              <img src="/assets/api.webp" alt="" loading="lazy" width="64" height="64" />
-            </div>
-            <h3>Direção visual para produtos digitais</h3>
-            <p>Para apps, SaaS e ferramentas: definição visual da interface — linguagem gráfica, tom, hierarquia, paleta e identidade de produto.</p>
-          </article>
-
-          <article class="ds-svc-card" data-reveal>
-            <div class="ds-svc-card__icon" aria-hidden="true">
-              <img src="/assets/allproducts.webp" alt="" loading="lazy" width="64" height="64" />
-            </div>
-            <h3>Kits visuais completos</h3>
-            <p>Pacotes de assets organizados para marcas, apps e negócios — entregue pronto para usar em qualquer plataforma ou campanha.</p>
-          </article>
-
-        </div>
+    <nav class="ds-subnav" aria-label="Navegacao do Design Studio">
+      <div class="shell ds-subnav__inner">
+        <a href="#diagnostico">Diagnostico</a>
+        <a href="#arquitetura">Brand Architect</a>
+        <a href="#aplicacoes">Aplicacoes</a>
+        <a href="#brand-score">Score</a>
+        <a href="#entrega">Entrega</a>
       </div>
-    </section>
+    </nav>
 
-    <!-- ═══════════════════════════════════════════════════
-         SIGNA BY VOLYNX
-    ════════════════════════════════════════════════════ -->
-    <section class="ds-signa" id="signa" aria-labelledby="ds-signa-title">
-      <div class="ds-signa__bg" aria-hidden="true">
-        <div class="ds-signa__bg-glow" aria-hidden="true"></div>
-      </div>
-
-      <div class="shell ds-signa__inner">
-
-        <div class="ds-signa__badge" data-reveal aria-hidden="true">
-          <img src="/assets/volynxstudio.webp" alt="" loading="lazy" width="120" height="120" />
-        </div>
-
-        <div class="ds-signa__copy" data-reveal>
-          <span class="ds-eyebrow ds-eyebrow--gold">Signa by VOLYNX</span>
-          <h2 id="ds-signa-title">Primeiro passo. Com presença.</h2>
-          <p class="ds-signa__lead">
-            Para projetos em fase inicial, Signa oferece uma primeira direção visual com tecnologia assistida: mais acessível que um projeto completo, mas ainda pensado para começar com presença, clareza e qualidade.
-          </p>
+    <section class="ds-intro page-section" aria-labelledby="ds-intro-title">
+      <div class="shell ds-intro__grid">
+        <div class="ds-section-copy" data-reveal>
+          <span class="ds-eyebrow">Oportunidade real</span>
+          <h2 id="ds-intro-title">A maioria cria um logo bonito. A VOLYNX constrói uma marca aplicavel.</h2>
           <p>
-            Não é um rascunho ou um ponto de partida improvisado. É uma base visual construída com método — para que você já entre no mercado com consistência e intenção.
+            O Design Studio nasce como um produto de identidade: entende o negocio, define a direcao, testa a marca em contexto real e entrega um sistema visual que pode virar site, campanha, placa, QR, social e material impresso.
           </p>
+        </div>
 
-          <div class="ds-signa__deliverables">
-            <div class="ds-signa__item">
-              <span class="ds-signa__dot" aria-hidden="true"></span>
-              <div>
-                <strong>Briefing guiado</strong>
-                <span>Perguntas certas para revelar o que sua marca precisa comunicar.</span>
-              </div>
+        <div class="ds-principles" data-reveal>
+          <article>
+            <strong>Menos opcoes aleatorias</strong>
+            <span>Mais criterio, mais contexto e menos ruido para o cliente decidir.</span>
+          </article>
+          <article>
+            <strong>Marca em uso real</strong>
+            <span>Preview em site, avatar, favicon, cartao, banner e assinatura.</span>
+          </article>
+          <article>
+            <strong>Qualidade mensuravel</strong>
+            <span>Score de legibilidade, versatilidade, memorabilidade e preparo para impressao.</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="ds-diagnostic page-section" id="diagnostico" aria-labelledby="ds-diagnostic-title">
+      <div class="shell ds-diagnostic__grid">
+        <div class="ds-studio-panel ds-diagnostic__form" data-reveal>
+          <div class="ds-panel-head">
+            <span class="ds-kicker">01 / Diagnostico guiado</span>
+            <h2 id="ds-diagnostic-title">Comece pelo negocio, nao pelo desenho.</h2>
+            <p>Digite um nome de teste e veja a pagina adaptar as aplicacoes em tempo real.</p>
+          </div>
+
+          <label class="ds-field">
+            <span>Nome da marca</span>
+            <input data-brand-input type="text" value="Aurora Clinic" maxlength="34" autocomplete="off" />
+          </label>
+
+          <div class="ds-choice-grid" aria-label="Pontos avaliados no briefing">
+            <button class="ds-choice is-active" type="button">Publico</button>
+            <button class="ds-choice" type="button">Mercado</button>
+            <button class="ds-choice" type="button">Tom</button>
+            <button class="ds-choice" type="button">Uso</button>
+          </div>
+
+          <div class="ds-brief-list" aria-label="Perguntas do diagnostico">
+            <div>
+              <strong>Onde essa marca precisa funcionar?</strong>
+              <span>Site, placa, app icon, avatar, banner, embalagem ou material impresso.</span>
             </div>
-            <div class="ds-signa__item">
-              <span class="ds-signa__dot" aria-hidden="true"></span>
-              <div>
-                <strong>Conceito visual</strong>
-                <span>Direção de linguagem: tom, estilo, referências e posicionamento visual.</span>
-              </div>
+            <div>
+              <strong>Qual faixa de percepcao?</strong>
+              <span>Acessivel, premium, tecnico, autoral, institucional ou experimental.</span>
             </div>
-            <div class="ds-signa__item">
-              <span class="ds-signa__dot" aria-hidden="true"></span>
-              <div>
-                <strong>Símbolo e marca</strong>
-                <span>Um logotipo gerado com direção — pensado para a sua categoria.</span>
-              </div>
+            <div>
+              <strong>O que deve ser evitado?</strong>
+              <span>Visual generico, simbolo fraco, baixa leitura, excesso de tendencia.</span>
             </div>
-            <div class="ds-signa__item">
-              <span class="ds-signa__dot" aria-hidden="true"></span>
-              <div>
-                <strong>Paleta inicial</strong>
-                <span>Cores com lógica — primária, secundária, neutros e estado de marca.</span>
-              </div>
+          </div>
+        </div>
+
+        <div class="ds-live-stage" data-reveal aria-label="Preview de identidade">
+          <div class="ds-live-stage__top">
+            <span>Live brand canvas</span>
+            <strong data-brand-output>Aurora Clinic</strong>
+          </div>
+
+          <div class="ds-brand-canvas">
+            <div class="ds-brand-mark" aria-hidden="true">
+              <span></span>
             </div>
-            <div class="ds-signa__item">
-              <span class="ds-signa__dot" aria-hidden="true"></span>
-              <div>
-                <strong>Pode evoluir</strong>
-                <span>Signa é a entrada para o Design Studio completo quando você estiver pronto.</span>
-              </div>
+            <div>
+              <p class="ds-brand-name" data-brand-output>Aurora Clinic</p>
+              <p class="ds-brand-line">Calm precision for modern care</p>
             </div>
           </div>
 
-          <div class="ds-signa__actions">
-            <a
-              href={whatsappBriefing}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="ds-btn ds-btn--gold"
-            >
-              Solicitar Signa
-            </a>
+          <div class="ds-mini-system" aria-label="Componentes do sistema visual">
+            <span class="ds-swatch ds-swatch--a"></span>
+            <span class="ds-swatch ds-swatch--b"></span>
+            <span class="ds-swatch ds-swatch--c"></span>
+            <span class="ds-font-sample">Aa</span>
+            <span class="ds-file-pill">SVG</span>
+            <span class="ds-file-pill">PDF</span>
+          </div>
+
+          <div class="ds-live-note">
+            <strong>Preview conceitual</strong>
+            <span>A experiencia final deve gerar direcoes, aplicacoes e pacotes de entrega a partir do briefing.</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════
-         PROCESSO
-    ════════════════════════════════════════════════════ -->
-    <section class="ds-process page-section" id="processo" aria-labelledby="ds-process-title">
+    <section class="ds-architect page-section" id="arquitetura" aria-labelledby="ds-architect-title">
       <div class="shell">
         <div class="ds-section-head" data-reveal>
-          <span class="ds-eyebrow">Como acontece</span>
-          <h2 id="ds-process-title">Um processo claro, do início ao arquivo final</h2>
-          <p>Sem suposições. Cada etapa tem um resultado concreto e você sabe exatamente onde está.</p>
+          <span class="ds-eyebrow">Brand Architect</span>
+          <h2 id="ds-architect-title">Um fluxo mais inteligente que um logo maker comum.</h2>
+          <p>Looka, Canva, Adobe Express, Brandmark e Wix mostram caminhos bons. A oportunidade da VOLYNX e juntar facilidade com criterio de marca e aplicacao real.</p>
         </div>
 
-        <ol class="ds-steps" aria-label="Etapas do processo">
-          <li class="ds-step" data-reveal>
-            <div class="ds-step__num" aria-hidden="true">01</div>
-            <div class="ds-step__body">
-              <h3>Briefing</h3>
-              <p>Você preenche ou responde perguntas sobre seu negócio, público, tom e objetivos. Quanto mais contexto, melhor o resultado.</p>
-            </div>
-          </li>
-          <li class="ds-step" data-reveal>
-            <div class="ds-step__num" aria-hidden="true">02</div>
-            <div class="ds-step__body">
-              <h3>Direção visual</h3>
-              <p>Antes de criar qualquer arquivo, definimos juntos a linguagem visual: referências, estilo, paleta base e posicionamento da marca.</p>
-            </div>
-          </li>
-          <li class="ds-step" data-reveal>
-            <div class="ds-step__num" aria-hidden="true">03</div>
-            <div class="ds-step__body">
-              <h3>Criação</h3>
-              <p>O projeto entra em produção com a direção aprovada. Logotipo, sistema, ícones ou assets — de acordo com o escopo definido.</p>
-            </div>
-          </li>
-          <li class="ds-step" data-reveal>
-            <div class="ds-step__num" aria-hidden="true">04</div>
-            <div class="ds-step__body">
-              <h3>Refinamento</h3>
-              <p>Rodada de revisão estruturada. Ajustes dentro do escopo aprovado — sem retrabalho aberto, sem escopo inflado.</p>
-            </div>
-          </li>
-          <li class="ds-step" data-reveal>
-            <div class="ds-step__num" aria-hidden="true">05</div>
-            <div class="ds-step__body">
-              <h3>Entrega</h3>
-              <p>Arquivos organizados, em todos os formatos necessários. SVG, PNG, PDF, formatos de uso web e impresso — prontos para usar.</p>
-            </div>
-          </li>
-        </ol>
+        <div class="ds-flow" aria-label="Fluxo do Brand Architect">
+          <article data-reveal>
+            <img class="ds-flow__asset" src="/assets/design-studio/diagnosis.webp" alt="" width="128" height="128" loading="lazy" decoding="async" />
+            <span>01</span>
+            <h3>Diagnosticar</h3>
+            <p>Negocio, publico, posicionamento, tom, concorrentes e canais de uso.</p>
+          </article>
+          <article data-reveal>
+            <img class="ds-flow__asset" src="/assets/design-studio/direction.webp" alt="" width="128" height="128" loading="lazy" decoding="async" />
+            <span>02</span>
+            <h3>Direcionar</h3>
+            <p>Paleta, linguagem, ritmo, referencias e riscos visuais antes de gerar.</p>
+          </article>
+          <article data-reveal>
+            <img class="ds-flow__asset" src="/assets/design-studio/creation.webp" alt="" width="128" height="128" loading="lazy" decoding="async" />
+            <span>03</span>
+            <h3>Criar</h3>
+            <p>Simbolo, wordmark, versoes horizontal e vertical, favicon e avatar.</p>
+          </article>
+          <article data-reveal>
+            <img class="ds-flow__asset" src="/assets/design-studio/applying.webp" alt="" width="128" height="128" loading="lazy" decoding="async" />
+            <span>04</span>
+            <h3>Aplicar</h3>
+            <p>Mockups em site, social, cartao, placa, banner, app e assinatura.</p>
+          </article>
+          <article data-reveal>
+            <img class="ds-flow__asset" src="/assets/design-studio/evaluate.webp" alt="" width="128" height="128" loading="lazy" decoding="async" />
+            <span>05</span>
+            <h3>Avaliar</h3>
+            <p>Brand Score para leitura, versatilidade, originalidade e impressao.</p>
+          </article>
+          <article data-reveal>
+            <img class="ds-flow__asset" src="/assets/design-studio/delivery.webp" alt="" width="128" height="128" loading="lazy" decoding="async" />
+            <span>06</span>
+            <h3>Entregar</h3>
+            <p>Arquivos organizados, guia rapido e formatos prontos para web e print.</p>
+          </article>
+        </div>
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════
-         CTA FINAL
-    ════════════════════════════════════════════════════ -->
+    <section class="ds-applications page-section" id="aplicacoes" aria-labelledby="ds-applications-title">
+      <div class="shell">
+        <div class="ds-section-head" data-reveal>
+          <span class="ds-eyebrow">Preview em contexto</span>
+          <h2 id="ds-applications-title">A marca precisa sobreviver fora do arquivo.</h2>
+          <p>O cliente decide melhor quando ve a identidade funcionando em situacoes reais, nao perdida em uma tela branca.</p>
+        </div>
+
+        <div class="ds-application-grid">
+          <article class="ds-application ds-application--wide" data-reveal>
+            <div class="ds-browser-frame">
+              <div class="ds-browser-bar" aria-hidden="true"><span></span><span></span><span></span></div>
+              <div class="ds-site-preview">
+                <header>
+                  <strong data-brand-output>Aurora Clinic</strong>
+                  <nav><span>Services</span><span>Booking</span><span>Contact</span></nav>
+                </header>
+                <div>
+                  <p>Modern brand system</p>
+                  <h3>Identity built for the first click.</h3>
+                  <span>Book consultation</span>
+                </div>
+              </div>
+            </div>
+            <h3>Header de site e landing</h3>
+            <p>Wordmark, contraste, tom e hierarquia testados onde a venda realmente acontece.</p>
+          </article>
+
+          <article class="ds-application" data-reveal>
+            <div class="ds-social-preview">
+              <div class="ds-avatar"><span></span></div>
+              <strong data-brand-output>Aurora Clinic</strong>
+              <p>@brand.system</p>
+              <div class="ds-social-lines" aria-hidden="true"><span></span><span></span><span></span></div>
+            </div>
+            <h3>Avatar social</h3>
+            <p>Leitura rapida em tamanho pequeno, com simbolo preparado para perfil.</p>
+          </article>
+
+          <article class="ds-application" data-reveal>
+            <div class="ds-card-preview">
+              <span class="ds-card-mark"></span>
+              <strong data-brand-output>Aurora Clinic</strong>
+              <small>strategy / identity / launch</small>
+            </div>
+            <h3>Cartao e assinatura</h3>
+            <p>Aplicacoes comerciais que revelam se a identidade parece confiavel.</p>
+          </article>
+
+          <article class="ds-application ds-application--tall" data-reveal>
+            <div class="ds-sign-preview">
+              <span data-brand-output>Aurora Clinic</span>
+            </div>
+            <h3>Placa, banner e impressao</h3>
+            <p>Teste de escala para evitar logos bonitos na tela e fracos no mundo real.</p>
+          </article>
+
+          <article class="ds-application" data-reveal>
+            <div class="ds-favicon-row">
+              <span class="ds-favicon ds-favicon--one"></span>
+              <span class="ds-favicon ds-favicon--two"></span>
+              <span class="ds-favicon ds-favicon--three"></span>
+            </div>
+            <h3>Favicon e app icon</h3>
+            <p>Versoes simplificadas para navegador, app, dashboard e atalhos.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="ds-score page-section" id="brand-score" aria-labelledby="ds-score-title">
+      <div class="shell ds-score__grid">
+        <div class="ds-section-copy" data-reveal>
+          <span class="ds-eyebrow">Brand Score</span>
+          <h2 id="ds-score-title">Um logo pode ser bonito e ainda falhar.</h2>
+          <p>
+            A camada de score ajuda a explicar, com criterio visual, onde a marca esta forte e onde precisa ser refinada. Nao promete validacao juridica, mas evita escolhas fracas, genericas ou pouco versateis.
+          </p>
+          <a href={whatsappBriefing} target="_blank" rel="noopener noreferrer" class="ds-btn ds-btn--ghost">Pedir analise de marca</a>
+        </div>
+
+        <div class="ds-score-board" data-reveal>
+          <div class="ds-score-board__head">
+            <span>Prototype score</span>
+            <strong>86</strong>
+          </div>
+
+          <div class="ds-score-list">
+            <div class="ds-score-row" style="--score: 91%">
+              <span>Versatilidade</span>
+              <i></i>
+              <strong>91</strong>
+            </div>
+            <div class="ds-score-row" style="--score: 88%">
+              <span>Leitura</span>
+              <i></i>
+              <strong>88</strong>
+            </div>
+            <div class="ds-score-row" style="--score: 82%">
+              <span>Memorabilidade</span>
+              <i></i>
+              <strong>82</strong>
+            </div>
+            <div class="ds-score-row" style="--score: 76%">
+              <span>Originalidade</span>
+              <i></i>
+              <strong>76</strong>
+            </div>
+            <div class="ds-score-row" style="--score: 69%">
+              <span>Favicon readiness</span>
+              <i></i>
+              <strong>69</strong>
+            </div>
+            <div class="ds-score-row" style="--score: 94%">
+              <span>Print readiness</span>
+              <i></i>
+              <strong>94</strong>
+            </div>
+          </div>
+
+          <div class="ds-score-warning">
+            <strong>Insight exemplo</strong>
+            <span>Funciona bem em aplicacoes grandes; a versao favicon deve ser simplificada para ganhar forca em 16px.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ds-delivery page-section" id="entrega" aria-labelledby="ds-delivery-title">
+      <div class="shell">
+        <div class="ds-section-head" data-reveal>
+          <span class="ds-eyebrow">Sistema de entrega</span>
+          <h2 id="ds-delivery-title">Nao termina no logo. Comeca no pacote de marca.</h2>
+          <p>A entrega precisa dar ao cliente seguranca para usar a identidade sem depender de adivinhacao.</p>
+        </div>
+
+        <div class="ds-delivery-grid">
+          <article class="ds-delivery-card" data-reveal>
+            <img src="/assets/studio-logo.webp" alt="" width="80" height="80" loading="lazy" />
+            <span>Signa</span>
+            <h3>Primeira direcao visual</h3>
+            <p>Briefing, conceito, logo inicial, paleta base e orientacao de uso para projetos que precisam sair do zero com presenca.</p>
+          </article>
+
+          <article class="ds-delivery-card ds-delivery-card--featured" data-reveal>
+            <img src="/assets/volynxstudio.webp" alt="" width="80" height="80" loading="lazy" />
+            <span>Brand System</span>
+            <h3>Identidade completa</h3>
+            <p>Simbolo, wordmark, variacoes, favicon, avatar, paleta, tipografia, mini brand guide, mockups e arquivos finais.</p>
+          </article>
+
+          <article class="ds-delivery-card" data-reveal>
+            <img src="/assets/builderstudio.webp" alt="" width="80" height="80" loading="lazy" />
+            <span>Launch Kit</span>
+            <h3>Marca aplicada para vender</h3>
+            <p>Identidade conectada a landing, banners, social, QR, apresentacao e assets digitais para lancamento.</p>
+          </article>
+        </div>
+
+        <div class="ds-export-strip" data-reveal aria-label="Formatos de entrega">
+          <span>SVG</span>
+          <span>PNG transparente</span>
+          <span>PDF print-ready</span>
+          <span>Favicon</span>
+          <span>Avatar social</span>
+          <span>Mini brand guide</span>
+        </div>
+      </div>
+    </section>
+
     <section class="ds-cta-section" aria-labelledby="ds-cta-title">
-      <div class="ds-cta__glow" aria-hidden="true"></div>
       <div class="shell ds-cta__inner" data-reveal>
-        <div class="ds-cta__wordmark" aria-hidden="true">
-          <img src="/assets/wordmark-dark.webp" alt="VOLYNX" loading="lazy" width="160" height="auto" />
-        </div>
-        <h2 id="ds-cta-title">Pronto para começar?</h2>
-        <p>Compartilhe o que você está construindo. VOLYNX cuida da identidade visual.</p>
+        <img src="/assets/wordmark-dark.webp" alt="VOLYNX" width="160" height="42" loading="lazy" />
+        <span class="ds-eyebrow">Proxima marca</span>
+        <h2 id="ds-cta-title">Vamos construir uma identidade que pareca pronta para existir.</h2>
+        <p>Comece pelo diagnostico. A partir dele, a VOLYNX define o melhor caminho: Signa, Brand System ou Launch Kit.</p>
         <div class="ds-cta__actions">
-          <a
-            href={whatsappBriefing}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="ds-btn ds-btn--primary ds-btn--large"
-          >
-            Solicitar orçamento
+          <a href={whatsappBriefing} target="_blank" rel="noopener noreferrer" class="ds-btn ds-btn--primary ds-btn--large">
+            Comecar pelo WhatsApp
           </a>
-          <a href="#signa" class="ds-btn ds-btn--ghost">
-            Conhecer Signa
-          </a>
+          <a href="#diagnostico" class="ds-btn ds-btn--ghost">Rever diagnostico</a>
         </div>
       </div>
     </section>
-
   </main>
 
   <FlagshipFooter />
 </FlagshipLayout>
 
-<!-- ═══════════════════════════════════════════════════════════
-     ESTILOS DA PÁGINA
-════════════════════════════════════════════════════════════ -->
 <style>
-  /* ── Tokens locais ──────────────────────────────────────── */
-  .page-design-studio {
-    --ds-gold:        #f3d97a;
-    --ds-gold-dim:    rgba(243, 217, 122, 0.15);
-    --ds-chrome:      #d0d8e8;
-    --ds-chrome-dim:  rgba(208, 216, 232, 0.12);
-    --ds-bg:          #03040a;
-    --ds-bg-2:        #060810;
-    --ds-panel:       rgba(255, 255, 255, 0.045);
-    --ds-panel-hover: rgba(255, 255, 255, 0.07);
-    --ds-line:        rgba(255, 255, 255, 0.08);
-    --ds-text:        rgba(235, 238, 252, 0.92);
-    --ds-muted:       rgba(200, 205, 230, 0.68);
-    --ds-radius:      8px;
-    --ds-transition:  0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  :global(html) {
+    scroll-behavior: smooth;
   }
 
-  /* ── Main wrapper ───────────────────────────────────────── */
+  .page-design-studio {
+    --ds-bg: #02050a;
+    --ds-bg-soft: #06111a;
+    --ds-ink: rgba(246, 249, 255, 0.96);
+    --ds-muted: rgba(218, 227, 239, 0.68);
+    --ds-soft: rgba(246, 249, 255, 0.08);
+    --ds-softer: rgba(246, 249, 255, 0.045);
+    --ds-line: rgba(246, 249, 255, 0.12);
+    --ds-line-strong: rgba(246, 249, 255, 0.22);
+    --ds-cyan: #73f1ff;
+    --ds-teal: #28d0b5;
+    --ds-gold: #f5d06f;
+    --ds-rose: #f08fb2;
+    --ds-violet: #9ea7ff;
+    --ds-shadow: 0 28px 90px rgba(0, 0, 0, 0.42);
+    --ds-radius: 26px;
+    --ds-radius-lg: 38px;
+    --ds-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    color: var(--ds-ink);
+    background: var(--ds-bg);
+  }
+
   .ds-main {
     position: relative;
-    z-index: 2;
-    overflow: hidden;
+    z-index: 1;
+    overflow: clip;
+    min-height: 100vh;
+    background:
+      linear-gradient(130deg, rgba(115, 241, 255, 0.11), transparent 28%),
+      linear-gradient(220deg, rgba(245, 208, 111, 0.09), transparent 26%),
+      linear-gradient(180deg, #02050a 0%, #071019 48%, #02050a 100%);
   }
 
-  /* ── Shell ──────────────────────────────────────────────── */
+  .ds-main::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 72px 72px;
+    mask-image: linear-gradient(to bottom, transparent, black 18%, black 78%, transparent);
+  }
+
+  .ds-main::after {
+    content: "";
+    position: fixed;
+    inset: -20%;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.5;
+    background:
+      conic-gradient(from 160deg at 18% 28%, rgba(115, 241, 255, 0.16), transparent 18%, rgba(245, 208, 111, 0.10), transparent 44%, rgba(240, 143, 178, 0.12), transparent 70%, rgba(115, 241, 255, 0.16)),
+      linear-gradient(120deg, transparent, rgba(255,255,255,0.035), transparent);
+    filter: blur(36px);
+    animation: dsAmbient 18s var(--ds-ease) infinite alternate;
+  }
+
   .shell {
-    width: min(1200px, calc(100% - 40px));
+    width: min(1180px, calc(100% - 40px));
     margin-inline: auto;
     position: relative;
     z-index: 2;
   }
 
-  /* ── Eyebrow / kicker ───────────────────────────────────── */
-  .ds-eyebrow {
-    display: inline-block;
-    font-family: var(--font-display, "Orbitron", monospace);
-    font-size: clamp(10px, 1.5vw, 12px);
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--ds-chrome);
-    opacity: 0.7;
-    margin-bottom: 12px;
-  }
-  .ds-eyebrow--gold {
-    color: var(--ds-gold);
-    opacity: 0.85;
-  }
-
-  /* ── Section head ───────────────────────────────────────── */
-  .ds-section-head {
-    text-align: center;
-    max-width: 640px;
-    margin-inline: auto;
-    margin-bottom: clamp(48px, 6vw, 80px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .ds-section-head h2 {
-    font-family: var(--font-display, "Orbitron", monospace);
-    font-size: clamp(24px, 3.6vw, 40px);
-    font-weight: 800;
-    line-height: 1.12;
-    color: var(--ds-text);
-    margin: 0 0 16px;
-  }
-  .ds-section-head p {
-    font-size: clamp(14px, 1.6vw, 16px);
-    color: var(--ds-muted);
-    line-height: 1.7;
-    margin: 0;
-  }
-
-  /* ── Page section spacing ───────────────────────────────── */
   .page-section {
-    padding: clamp(80px, 10vw, 140px) 0;
     position: relative;
+    padding: clamp(74px, 10vw, 144px) 0;
   }
 
-  /* ══════════════════════════════════════════════════════════
-     HERO
-  ═══════════════════════════════════════════════════════════ */
-  .ds-hero {
-    position: relative;
-    min-height: clamp(640px, 90vh, 860px);
-    display: flex;
-    flex-direction: column;
+  .ds-eyebrow,
+  .ds-kicker {
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    padding-top: 80px;
-    padding-bottom: 60px;
+    gap: 10px;
+    margin: 0 0 14px;
+    color: rgba(222, 246, 255, 0.78);
+    font-family: var(--font-display, "Orbitron", sans-serif);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
   }
 
-  /* Luz ambiente hero */
-  .ds-hero__glow {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 60% 40% at 50% 30%, rgba(208, 216, 232, 0.06), transparent 60%),
-      radial-gradient(ellipse 80% 60% at 50% 100%, rgba(243, 217, 122, 0.04), transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Moldura de vídeo */
-  .ds-hero__cinema {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-  }
-  .ds-hero__video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.28;
-    transition: opacity 1.2s ease;
-  }
-  .ds-hero__video-fallback {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .ds-hero__video-fallback img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.12;
-  }
-  /* Quando o vídeo carrega, esconde o fallback */
-  .ds-hero__video:not([error]) ~ .ds-hero__video-fallback {
-    opacity: 0;
-  }
-  /* Vinheta nas bordas */
-  .ds-hero__video-vignette {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 100% 100% at 50% 50%,
-        transparent 30%,
-        rgba(3, 4, 10, 0.6) 70%,
-        rgba(3, 4, 10, 0.95) 100%);
-    pointer-events: none;
-  }
-
-  /* Copy do hero */
-  .ds-hero__content {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-    padding: 0 20px;
-  }
-  .ds-hero__copy {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: 780px;
-    margin-inline: auto;
-  }
-  .ds-hero__headline {
-    font-family: var(--font-display, "Orbitron", monospace);
-    font-size: clamp(36px, 6vw, 76px);
-    font-weight: 900;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    color: var(--ds-text);
-    margin: 0 0 24px;
-    text-shadow: 0 0 60px rgba(208, 216, 232, 0.12);
-  }
-  .ds-hero__headline em {
-    font-style: normal;
-    background: linear-gradient(135deg, var(--ds-chrome) 0%, var(--ds-gold) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .ds-hero__sub {
-    font-size: clamp(15px, 1.8vw, 18px);
-    color: var(--ds-muted);
-    line-height: 1.7;
-    margin: 0 0 36px;
-    max-width: 580px;
-  }
-
-  /* Hero actions */
-  .ds-hero__actions {
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  /* Linha inferior do hero */
-  .ds-hero__rule {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: min(600px, 80%);
+  .ds-eyebrow::before,
+  .ds-kicker::before {
+    content: "";
+    width: 24px;
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--ds-line) 30%, var(--ds-line) 70%, transparent);
-    z-index: 2;
+    background: linear-gradient(90deg, var(--ds-cyan), transparent);
   }
 
-  /* ══════════════════════════════════════════════════════════
-     BOTÕES
-  ═══════════════════════════════════════════════════════════ */
+  .ds-section-head,
+  .ds-section-copy {
+    max-width: 720px;
+  }
+
+  .ds-section-head {
+    margin: 0 auto clamp(38px, 6vw, 72px);
+    text-align: center;
+  }
+
+  .ds-section-head .ds-eyebrow {
+    justify-content: center;
+  }
+
+  .ds-section-head .ds-eyebrow::after {
+    content: "";
+    width: 24px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--ds-cyan));
+  }
+
+  .ds-section-head h2,
+  .ds-section-copy h2 {
+    margin: 0;
+    color: var(--ds-ink);
+    font-family: var(--font-display, "Orbitron", sans-serif);
+    font-size: clamp(28px, 4.5vw, 56px);
+    line-height: 1.02;
+    letter-spacing: 0;
+  }
+
+  .ds-section-head p,
+  .ds-section-copy p {
+    margin: 18px 0 0;
+    color: var(--ds-muted);
+    font-size: clamp(15px, 1.6vw, 18px);
+    line-height: 1.75;
+  }
+
   .ds-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 14px 28px;
-    border-radius: var(--ds-radius);
-    font-family: var(--font-body, "Manrope", sans-serif);
+    min-height: 50px;
+    padding: 14px 24px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    color: var(--ds-ink);
     font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    text-decoration: none;
-    white-space: nowrap;
-    transition: all var(--ds-transition);
-    cursor: pointer;
-    border: none;
-    min-height: 48px;
-  }
-  .ds-btn--primary {
-    background: linear-gradient(135deg, #c8d4e8 0%, #e8edf8 50%, #c0ccdc 100%);
-    color: #04050a;
-    box-shadow: 0 4px 24px rgba(208, 216, 232, 0.22), 0 1px 0 rgba(255,255,255,0.3) inset;
-  }
-  .ds-btn--primary:hover {
-    background: linear-gradient(135deg, #d8e4f8 0%, #f0f5ff 50%, #d0dcec 100%);
-    box-shadow: 0 8px 32px rgba(208, 216, 232, 0.38), 0 1px 0 rgba(255,255,255,0.4) inset;
-    transform: translateY(-2px);
-  }
-  .ds-btn--primary:active { transform: translateY(0); }
-  .ds-btn--ghost {
-    background: var(--ds-panel);
-    border: 1px solid var(--ds-line);
-    color: var(--ds-chrome);
-  }
-  .ds-btn--ghost:hover {
-    background: var(--ds-panel-hover);
-    border-color: rgba(255,255,255,0.18);
-    color: #fff;
-    transform: translateY(-1px);
-  }
-  .ds-btn--gold {
-    background: linear-gradient(135deg, #c8a830 0%, #f3d97a 50%, #c8a830 100%);
-    color: #04050a;
-    box-shadow: 0 4px 24px rgba(243, 217, 122, 0.28);
-  }
-  .ds-btn--gold:hover {
-    box-shadow: 0 8px 32px rgba(243, 217, 122, 0.42);
-    transform: translateY(-2px);
-    filter: brightness(1.06);
-  }
-  .ds-btn--large {
-    padding: 18px 40px;
-    font-size: 16px;
-    min-height: 56px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .ds-btn:hover { transform: none; }
-  }
-
-  /* ══════════════════════════════════════════════════════════
-     ATRIBUTOS
-  ═══════════════════════════════════════════════════════════ */
-  .ds-attributes {
-    padding: clamp(40px, 5vw, 64px) 0;
-    border-top: 1px solid var(--ds-line);
-    border-bottom: 1px solid var(--ds-line);
-    position: relative;
-    z-index: 2;
-  }
-  .ds-attributes__grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1px;
-    background: var(--ds-line);
-    border: 1px solid var(--ds-line);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-  @media (min-width: 768px) {
-    .ds-attributes__grid { grid-template-columns: repeat(4, 1fr); }
-  }
-  .ds-attr {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 28px 24px;
-    background: var(--ds-bg-2);
-    transition: background var(--ds-transition);
-  }
-  .ds-attr:hover { background: var(--ds-panel-hover); }
-  .ds-attr__symbol {
-    font-size: 20px;
-    color: var(--ds-gold);
-    opacity: 0.7;
+    font-weight: 800;
     line-height: 1;
-    margin-bottom: 4px;
-  }
-  .ds-attr strong {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--ds-text);
-    line-height: 1.3;
-  }
-  .ds-attr span {
-    font-size: 13px;
-    color: var(--ds-muted);
-    line-height: 1.5;
+    text-decoration: none;
+    transition:
+      transform 260ms var(--ds-ease),
+      border-color 260ms var(--ds-ease),
+      background 260ms var(--ds-ease),
+      box-shadow 260ms var(--ds-ease);
   }
 
-  /* ══════════════════════════════════════════════════════════
-     SERVIÇOS
-  ═══════════════════════════════════════════════════════════ */
-  .ds-services {
-    background:
-      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(208, 216, 232, 0.03), transparent 60%);
+  .ds-btn--primary {
+    color: #031015;
+    background: linear-gradient(135deg, #f7ffff 0%, #8bf7ff 42%, #f6d778 100%);
+    box-shadow: 0 16px 46px rgba(115, 241, 255, 0.18);
   }
-  .ds-services__grid {
+
+  .ds-btn--ghost {
+    color: rgba(235, 249, 255, 0.88);
+    background: rgba(255, 255, 255, 0.065);
+    border-color: var(--ds-line);
+    backdrop-filter: blur(18px);
+  }
+
+  .ds-btn--large {
+    min-height: 56px;
+    padding-inline: 30px;
+    font-size: 15px;
+  }
+
+  .ds-btn:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.28);
+  }
+
+  .ds-btn--primary:hover {
+    box-shadow: 0 24px 70px rgba(115, 241, 255, 0.26);
+  }
+
+  .ds-hero {
+    position: relative;
+    min-height: min(920px, 92vh);
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 2px;
-    background: var(--ds-line);
-    border: 1px solid var(--ds-line);
-    border-radius: 16px;
-    overflow: hidden;
-  }
-  @media (min-width: 640px) {
-    .ds-services__grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (min-width: 1024px) {
-    .ds-services__grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-    /* 5 cards: últimos 2 centrados */
-    .ds-svc-card:nth-child(4),
-    .ds-svc-card:nth-child(5) {
-      grid-column: span 1;
-    }
-    /* Linha 2 com 2 cards: centraliza com offset */
-    .ds-services__grid {
-      grid-template-columns: repeat(6, 1fr);
-    }
-    .ds-svc-card:nth-child(1) { grid-column: 1 / 3; }
-    .ds-svc-card:nth-child(2) { grid-column: 3 / 5; }
-    .ds-svc-card:nth-child(3) { grid-column: 5 / 7; }
-    .ds-svc-card:nth-child(4) { grid-column: 2 / 4; }
-    .ds-svc-card:nth-child(5) { grid-column: 4 / 6; }
+    place-items: center;
+    padding: clamp(100px, 12vw, 154px) 0 clamp(82px, 10vw, 132px);
+    isolation: isolate;
   }
 
-  .ds-svc-card {
-    background: var(--ds-bg-2);
-    padding: clamp(28px, 4vw, 48px) clamp(24px, 3.2vw, 40px);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    transition: background var(--ds-transition);
-    position: relative;
-  }
-  .ds-svc-card::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 24px;
-    right: 24px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--ds-line), transparent);
-    opacity: 0;
-    transition: opacity var(--ds-transition);
-  }
-  .ds-svc-card:hover { background: var(--ds-panel-hover); }
-  .ds-svc-card:hover::after { opacity: 1; }
-  .ds-svc-card__icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 12px;
-    overflow: hidden;
-    background: var(--ds-panel);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .ds-svc-card__icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: grayscale(0.2) brightness(0.9);
-  }
-  .ds-svc-card h3 {
-    font-family: var(--font-display, "Orbitron", monospace);
-    font-size: clamp(13px, 1.4vw, 15px);
-    font-weight: 700;
-    line-height: 1.3;
-    color: var(--ds-text);
-    margin: 0;
-  }
-  .ds-svc-card p {
-    font-size: 14px;
-    color: var(--ds-muted);
-    line-height: 1.65;
-    margin: 0;
-  }
-
-  /* ══════════════════════════════════════════════════════════
-     SIGNA
-  ═══════════════════════════════════════════════════════════ */
-  .ds-signa {
-    padding: clamp(80px, 10vw, 140px) 0;
-    position: relative;
-    overflow: hidden;
-  }
-  .ds-signa__bg {
+  .ds-hero__media {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, transparent, rgba(243, 217, 122, 0.03) 40%, transparent);
-    pointer-events: none;
-    z-index: 0;
-  }
-  .ds-signa__bg-glow {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 800px;
-    height: 400px;
-    background: radial-gradient(ellipse, rgba(243, 217, 122, 0.06), transparent 70%);
-    pointer-events: none;
-  }
-  .ds-signa::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--ds-gold-dim), transparent);
-  }
-  .ds-signa::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--ds-gold-dim), transparent);
-  }
-
-  .ds-signa__inner {
-    display: flex;
-    flex-direction: column;
-    gap: 48px;
-    align-items: flex-start;
-  }
-  @media (min-width: 768px) {
-    .ds-signa__inner {
-      flex-direction: row;
-      gap: 80px;
-      align-items: flex-start;
-    }
-  }
-
-  .ds-signa__badge {
-    flex-shrink: 0;
-    width: 120px;
-    height: 120px;
-    border-radius: 24px;
+    z-index: -3;
     overflow: hidden;
-    background: linear-gradient(135deg, rgba(243,217,122,0.1), rgba(3,4,10,0.6));
-    border: 1px solid rgba(243, 217, 122, 0.2);
-    box-shadow: 0 0 40px rgba(243, 217, 122, 0.08);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: #02050a;
   }
-  .ds-signa__badge img {
+
+  .ds-hero__video {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: saturate(0.8) brightness(0.9);
   }
 
-  .ds-signa__copy {
-    flex: 1;
-    min-width: 0;
-  }
-  .ds-signa__copy h2 {
-    font-family: var(--font-display, "Orbitron", monospace);
-    font-size: clamp(22px, 3.2vw, 38px);
-    font-weight: 800;
-    color: var(--ds-text);
-    margin: 0 0 20px;
-    line-height: 1.15;
-  }
-  .ds-signa__lead {
-    font-size: clamp(15px, 1.7vw, 17px);
-    color: var(--ds-chrome);
-    line-height: 1.7;
-    margin: 0 0 16px;
-  }
-  .ds-signa__copy > p:not(.ds-signa__lead) {
-    font-size: 15px;
-    color: var(--ds-muted);
-    line-height: 1.7;
-    margin: 0 0 32px;
+  .ds-hero__video {
+    position: absolute;
+    inset: 0;
+    opacity: 0.82;
+    transform: scale(1.02);
+    filter: saturate(1.28) contrast(1.12) brightness(1.14);
   }
 
-  /* Deliverables Signa */
-  .ds-signa__deliverables {
+  .ds-hero__media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background:
+      linear-gradient(180deg, rgba(2,5,10,0.18) 0%, rgba(2,5,10,0.06) 34%, rgba(2,5,10,0.7) 100%),
+      radial-gradient(ellipse at 50% 48%, transparent 0%, transparent 48%, rgba(2,5,10,0.58) 100%);
+  }
+
+  .ds-hero__media::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.42;
+    background:
+      linear-gradient(115deg, transparent 0%, rgba(115,241,255,0.16) 38%, transparent 54%),
+      linear-gradient(245deg, transparent 0%, rgba(245,208,111,0.12) 42%, transparent 60%);
+    mix-blend-mode: screen;
+    animation: dsHeroLight 8s var(--ds-ease) infinite alternate;
+  }
+
+  .ds-hero__content {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    margin-bottom: 36px;
+    align-items: center;
+    text-align: center;
+    padding: clamp(30px, 5vw, 50px);
+    border-radius: clamp(34px, 5vw, 60px);
+    background: rgba(3, 8, 14, 0.18);
+    backdrop-filter: blur(8px);
   }
-  .ds-signa__item {
+
+  .ds-hero h1 {
+    max-width: 980px;
+    margin: 0;
+    color: var(--ds-ink);
+    font-family: var(--font-display, "Orbitron", sans-serif);
+    font-size: clamp(48px, 9vw, 116px);
+    font-weight: 950;
+    line-height: 0.92;
+    letter-spacing: 0;
+    text-wrap: balance;
+    text-shadow: 0 26px 90px rgba(0, 0, 0, 0.45);
+  }
+
+  .ds-hero__title {
     display: flex;
-    gap: 16px;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(2px, 1vw, 12px);
   }
-  .ds-signa__dot {
-    flex-shrink: 0;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--ds-gold);
-    box-shadow: 0 0 8px rgba(243, 217, 122, 0.5);
-    margin-top: 6px;
-  }
-  .ds-signa__item strong {
+
+  .ds-hero__wordmark {
     display: block;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--ds-text);
-    margin-bottom: 2px;
+    width: min(86vw, 760px);
+    height: auto;
+    margin: 0 auto clamp(-34px, -3.2vw, -18px);
+    object-fit: contain;
+    filter:
+      drop-shadow(0 22px 42px rgba(0, 0, 0, 0.5))
+      drop-shadow(0 0 30px rgba(232, 166, 48, 0.2));
   }
-  .ds-signa__item span {
+
+  .ds-hero__title-text {
+    display: block;
+  }
+
+  .ds-hero__lead {
+    max-width: 760px;
+    margin: 26px auto 0;
+    color: rgba(236, 247, 255, 0.78);
+    font-size: clamp(17px, 2vw, 22px);
+    line-height: 1.65;
+    text-wrap: balance;
+  }
+
+  .ds-hero__actions,
+  .ds-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 34px;
+  }
+
+  .ds-hero__signal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: clamp(34px, 7vw, 72px);
+  }
+
+  .ds-hero__signal span {
+    display: inline-flex;
+    min-height: 34px;
+    align-items: center;
+    padding: 8px 14px;
+    border: 1px solid rgba(255,255,255,0.13);
+    border-radius: 999px;
+    color: rgba(240, 249, 255, 0.8);
+    background: rgba(4, 12, 18, 0.42);
+    backdrop-filter: blur(18px);
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .ds-scroll-cue {
+    position: absolute;
+    left: 50%;
+    bottom: 28px;
+    width: 1px;
+    height: 46px;
+    transform: translateX(-50%);
+    overflow: hidden;
+    background: rgba(255,255,255,0.12);
+  }
+
+  .ds-scroll-cue span {
+    display: block;
+    width: 100%;
+    height: 18px;
+    background: linear-gradient(var(--ds-cyan), transparent);
+    animation: dsScrollCue 1.8s var(--ds-ease) infinite;
+  }
+
+  .ds-subnav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    border-block: 1px solid rgba(255,255,255,0.09);
+    background: rgba(2, 5, 10, 0.62);
+    backdrop-filter: blur(24px);
+  }
+
+  .ds-subnav__inner {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-block: 12px;
+    scrollbar-width: none;
+  }
+
+  .ds-subnav__inner::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ds-subnav a {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    color: rgba(236, 247, 255, 0.74);
+    font-size: 12px;
+    font-weight: 850;
+    text-decoration: none;
+    transition: background 220ms var(--ds-ease), color 220ms var(--ds-ease);
+  }
+
+  .ds-subnav a:hover {
+    color: var(--ds-ink);
+    background: rgba(255,255,255,0.08);
+  }
+
+  .ds-intro__grid,
+  .ds-diagnostic__grid,
+  .ds-score__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(340px, 1.05fr);
+    gap: clamp(28px, 5vw, 74px);
+    align-items: center;
+  }
+
+  .ds-principles {
+    display: grid;
+    gap: 14px;
+  }
+
+  .ds-principles article,
+  .ds-studio-panel,
+  .ds-live-stage,
+  .ds-application,
+  .ds-score-board,
+  .ds-delivery-card {
+    position: relative;
+    border: 1px solid var(--ds-line);
+    background:
+      linear-gradient(145deg, rgba(255,255,255,0.105), rgba(255,255,255,0.035)),
+      rgba(3, 10, 16, 0.66);
+    box-shadow: var(--ds-shadow);
+    backdrop-filter: blur(24px);
+  }
+
+  .ds-principles article {
+    padding: 24px;
+    border-radius: var(--ds-radius);
+  }
+
+  .ds-principles strong,
+  .ds-brief-list strong,
+  .ds-live-note strong,
+  .ds-application h3,
+  .ds-delivery-card h3 {
+    display: block;
+    color: var(--ds-ink);
+    font-size: 15px;
+    line-height: 1.3;
+  }
+
+  .ds-principles span,
+  .ds-brief-list span,
+  .ds-live-note span,
+  .ds-application p,
+  .ds-delivery-card p {
+    display: block;
+    margin-top: 8px;
+    color: var(--ds-muted);
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .ds-studio-panel,
+  .ds-live-stage,
+  .ds-score-board {
+    border-radius: var(--ds-radius-lg);
+    overflow: hidden;
+  }
+
+  .ds-diagnostic__form {
+    padding: clamp(24px, 4vw, 38px);
+  }
+
+  .ds-panel-head h2 {
+    margin: 0;
+    color: var(--ds-ink);
+    font-family: var(--font-display, "Orbitron", sans-serif);
+    font-size: clamp(24px, 3vw, 38px);
+    line-height: 1.05;
+  }
+
+  .ds-panel-head p {
+    margin: 14px 0 0;
+    color: var(--ds-muted);
+    line-height: 1.65;
+  }
+
+  .ds-field {
+    display: grid;
+    gap: 10px;
+    margin-top: 28px;
+  }
+
+  .ds-field span {
+    color: rgba(236, 247, 255, 0.72);
+    font-size: 12px;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .ds-field input {
+    width: 100%;
+    min-height: 58px;
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 18px;
+    color: var(--ds-ink);
+    background: rgba(255,255,255,0.07);
+    padding: 0 18px;
+    font: inherit;
+    font-size: 18px;
+    outline: none;
+    transition: border-color 220ms var(--ds-ease), box-shadow 220ms var(--ds-ease);
+  }
+
+  .ds-field input:focus {
+    border-color: rgba(115, 241, 255, 0.65);
+    box-shadow: 0 0 0 4px rgba(115, 241, 255, 0.12);
+  }
+
+  .ds-choice-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .ds-choice {
+    min-height: 42px;
+    border: 1px solid var(--ds-line);
+    border-radius: 999px;
+    color: rgba(236, 247, 255, 0.75);
+    background: rgba(255,255,255,0.055);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 850;
+    cursor: pointer;
+  }
+
+  .ds-choice.is-active,
+  .ds-choice:hover {
+    color: #031015;
+    background: linear-gradient(135deg, #9bf9ff, #f2d77d);
+  }
+
+  .ds-brief-list {
+    display: grid;
+    gap: 14px;
+    margin-top: 24px;
+  }
+
+  .ds-brief-list div {
+    padding-left: 18px;
+    border-left: 1px solid rgba(115, 241, 255, 0.35);
+  }
+
+  .ds-live-stage {
+    padding: clamp(22px, 4vw, 34px);
+    overflow: hidden;
+    min-height: 540px;
+  }
+
+  .ds-live-stage::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: inherit;
+    background:
+      linear-gradient(140deg, rgba(115,241,255,0.16), transparent 32%),
+      linear-gradient(320deg, rgba(245,208,111,0.14), transparent 36%);
+    pointer-events: none;
+  }
+
+  .ds-live-stage__top,
+  .ds-brand-canvas,
+  .ds-mini-system,
+  .ds-live-note {
+    position: relative;
+    z-index: 1;
+  }
+
+  .ds-live-stage__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    color: rgba(236, 247, 255, 0.65);
+    font-size: 12px;
+    font-weight: 850;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .ds-live-stage__top strong {
+    color: var(--ds-ink);
+    text-align: right;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .ds-brand-canvas {
+    display: grid;
+    grid-template-columns: minmax(86px, auto) minmax(0, 1fr);
+    gap: 22px;
+    align-items: center;
+    margin-top: 72px;
+    padding: clamp(22px, 4vw, 34px);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 30px;
+    background: rgba(1, 7, 12, 0.52);
+  }
+
+  .ds-brand-mark,
+  .ds-avatar,
+  .ds-favicon,
+  .ds-card-mark {
+    background:
+      linear-gradient(135deg, rgba(115,241,255,0.95), rgba(40,208,181,0.82) 44%, rgba(245,208,111,0.92)),
+      #73f1ff;
+  }
+
+  .ds-brand-mark {
+    width: clamp(76px, 12vw, 118px);
+    aspect-ratio: 1;
+    border-radius: 32% 68% 54% 46% / 44% 34% 66% 56%;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 24px 70px rgba(115, 241, 255, 0.22);
+  }
+
+  .ds-brand-mark span {
+    width: 42%;
+    aspect-ratio: 1;
+    border: 3px solid rgba(2, 5, 10, 0.76);
+    border-radius: 50%;
+  }
+
+  .ds-brand-name {
+    margin: 0;
+    color: var(--ds-ink);
+    font-family: var(--font-display, "Orbitron", sans-serif);
+    font-size: clamp(28px, 4.2vw, 50px);
+    font-weight: 900;
+    line-height: 0.98;
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: none;
+    text-wrap: balance;
+  }
+
+  .ds-brand-line {
+    margin: 12px 0 0;
+    color: rgba(236, 247, 255, 0.62);
+    font-size: clamp(13px, 1.5vw, 16px);
+  }
+
+  .ds-mini-system {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .ds-swatch,
+  .ds-font-sample,
+  .ds-file-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+    min-width: 42px;
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 14px;
+    color: var(--ds-ink);
+    background: rgba(255,255,255,0.07);
+    font-weight: 900;
+  }
+
+  .ds-swatch--a { background: #73f1ff; }
+  .ds-swatch--b { background: #f5d06f; }
+  .ds-swatch--c { background: #06111a; }
+
+  .ds-file-pill {
+    min-width: 62px;
+    padding-inline: 12px;
+    border-radius: 999px;
+    font-size: 12px;
+  }
+
+  .ds-live-note {
+    margin-top: 28px;
+    padding: 18px;
+    border: 1px solid rgba(245, 208, 111, 0.22);
+    border-radius: 22px;
+    background: rgba(245, 208, 111, 0.07);
+  }
+
+  .ds-flow {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .ds-flow article {
+    position: relative;
+    min-height: 210px;
+    padding: 26px;
+    border: 1px solid var(--ds-line);
+    border-radius: var(--ds-radius);
+    background: rgba(255,255,255,0.052);
+    overflow: hidden;
+  }
+
+  .ds-flow__asset {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 88px;
+    height: 88px;
+    object-fit: contain;
+    z-index: 0;
+    opacity: 0.92;
+    filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.42));
+    transform: translateY(0) scale(1);
+    transition:
+      opacity 320ms var(--ds-ease),
+      transform 320ms var(--ds-ease),
+      filter 320ms var(--ds-ease);
+  }
+
+  .ds-flow article:hover .ds-flow__asset {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.04);
+    filter: drop-shadow(0 22px 36px rgba(115, 241, 255, 0.16)) drop-shadow(0 18px 30px rgba(0, 0, 0, 0.44));
+  }
+
+  .ds-flow article::after {
+    content: "";
+    position: absolute;
+    inset: auto 20px 18px auto;
+    width: 72px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(115,241,255,0.6));
+  }
+
+  .ds-flow span {
+    position: relative;
+    z-index: 1;
+    color: var(--ds-gold);
+    font-family: var(--font-display, "Orbitron", sans-serif);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+  }
+
+  .ds-flow h3 {
+    position: relative;
+    z-index: 1;
+    margin: 46px 0 10px;
+    color: var(--ds-ink);
+    font-family: var(--font-display, "Orbitron", sans-serif);
+    font-size: 20px;
+  }
+
+  .ds-flow p {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    color: var(--ds-muted);
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .ds-application-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .ds-application {
+    grid-column: span 4;
+    min-height: 360px;
+    padding: 22px;
+    border-radius: var(--ds-radius);
+    overflow: hidden;
+  }
+
+  .ds-application--wide {
+    grid-column: span 8;
+  }
+
+  .ds-application--tall {
+    grid-row: span 2;
+  }
+
+  .ds-browser-frame,
+  .ds-social-preview,
+  .ds-card-preview,
+  .ds-sign-preview,
+  .ds-favicon-row {
+    margin-bottom: 22px;
+  }
+
+  .ds-browser-frame {
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 22px;
+    background: #030910;
+  }
+
+  .ds-browser-bar {
+    display: flex;
+    gap: 6px;
+    padding: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .ds-browser-bar span {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.28);
+  }
+
+  .ds-site-preview {
+    min-height: 230px;
+    padding: 22px;
+    background:
+      linear-gradient(135deg, rgba(115,241,255,0.15), transparent 34%),
+      linear-gradient(315deg, rgba(245,208,111,0.13), transparent 30%),
+      #05111a;
+  }
+
+  .ds-site-preview header {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: center;
+    color: var(--ds-ink);
+  }
+
+  .ds-site-preview nav {
+    display: flex;
+    gap: 10px;
+    color: rgba(236,247,255,0.58);
+    font-size: 11px;
+  }
+
+  .ds-site-preview p {
+    margin: 54px 0 8px;
+    color: var(--ds-gold);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .ds-site-preview h3 {
+    max-width: 420px;
+    margin: 0;
+    color: var(--ds-ink);
+    font-size: clamp(24px, 4vw, 42px);
+    line-height: 1.02;
+  }
+
+  .ds-site-preview div > span {
+    display: inline-flex;
+    margin-top: 24px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    color: #031015;
+    background: #f5d06f;
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .ds-social-preview {
+    display: grid;
+    place-items: center;
+    min-height: 220px;
+    text-align: center;
+    border-radius: 24px;
+    background: rgba(255,255,255,0.055);
+  }
+
+  .ds-avatar {
+    width: 82px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    margin-bottom: 14px;
+  }
+
+  .ds-social-preview strong {
+    color: var(--ds-ink);
+  }
+
+  .ds-social-preview p {
+    margin: 4px 0 18px;
+    font-size: 12px;
+  }
+
+  .ds-social-lines {
+    display: grid;
+    gap: 6px;
+    width: min(160px, 80%);
+  }
+
+  .ds-social-lines span {
+    height: 7px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.12);
+  }
+
+  .ds-card-preview {
+    display: grid;
+    gap: 16px;
+    align-content: end;
+    min-height: 220px;
+    padding: 22px;
+    border-radius: 24px;
+    color: #06111a;
+    background: linear-gradient(145deg, #effaff, #b9f7f0 50%, #f5d06f);
+  }
+
+  .ds-card-preview strong {
+    color: #06111a;
+    font-family: var(--font-display, "Orbitron", sans-serif);
+    font-size: 22px;
+    overflow-wrap: anywhere;
+  }
+
+  .ds-card-preview small {
+    color: rgba(6,17,26,0.68);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .ds-card-mark {
+    width: 54px;
+    aspect-ratio: 1;
+    border-radius: 18px;
+    background: #06111a;
+  }
+
+  .ds-sign-preview {
+    min-height: 420px;
+    display: grid;
+    place-items: center;
+    padding: 26px;
+    border-radius: 26px;
+    background:
+      linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px),
+      linear-gradient(180deg, #0b1620, #03070d);
+    background-size: 34px 34px, 34px 34px, auto;
+  }
+
+  .ds-sign-preview span {
+    max-width: 100%;
+    color: var(--ds-ink);
+    font-family: var(--font-display, "Orbitron", sans-serif);
+    font-size: clamp(24px, 4vw, 48px);
+    font-weight: 950;
+    text-align: center;
+    text-shadow: 0 0 34px rgba(115,241,255,0.3);
+    overflow-wrap: anywhere;
+  }
+
+  .ds-favicon-row {
+    min-height: 220px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    border-radius: 24px;
+    background: rgba(255,255,255,0.055);
+  }
+
+  .ds-favicon {
+    width: 54px;
+    aspect-ratio: 1;
+    border-radius: 16px;
+  }
+
+  .ds-favicon--two {
+    width: 72px;
+    border-radius: 24px;
+  }
+
+  .ds-favicon--three {
+    width: 42px;
+    border-radius: 50%;
+  }
+
+  .ds-score {
+    background:
+      linear-gradient(180deg, transparent, rgba(115, 241, 255, 0.035), transparent);
+  }
+
+  .ds-score .ds-btn {
+    margin-top: 26px;
+  }
+
+  .ds-score-board {
+    padding: clamp(24px, 4vw, 38px);
+  }
+
+  .ds-score-board__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--ds-line);
+  }
+
+  .ds-score-board__head span {
+    color: rgba(236,247,255,0.62);
+    font-size: 12px;
+    font-weight: 850;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .ds-score-board__head strong {
+    color: var(--ds-ink);
+    font-family: var(--font-display, "Orbitron", sans-serif);
+    font-size: clamp(64px, 10vw, 112px);
+    line-height: 0.82;
+  }
+
+  .ds-score-list {
+    display: grid;
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .ds-score-row {
+    display: grid;
+    grid-template-columns: minmax(120px, 170px) minmax(80px, 1fr) 34px;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .ds-score-row span,
+  .ds-score-row strong {
+    color: rgba(236,247,255,0.8);
     font-size: 13px;
+    font-weight: 850;
+  }
+
+  .ds-score-row i {
+    position: relative;
+    height: 9px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.09);
+  }
+
+  .ds-score-row i::after {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--score);
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--ds-cyan), var(--ds-teal), var(--ds-gold));
+  }
+
+  .ds-score-warning {
+    margin-top: 28px;
+    padding: 18px;
+    border: 1px solid rgba(245, 208, 111, 0.24);
+    border-radius: 22px;
+    background: rgba(245, 208, 111, 0.075);
+  }
+
+  .ds-score-warning strong,
+  .ds-score-warning span {
+    display: block;
+  }
+
+  .ds-score-warning strong {
+    color: var(--ds-gold);
+  }
+
+  .ds-score-warning span {
+    margin-top: 6px;
     color: var(--ds-muted);
     line-height: 1.6;
   }
 
-  .ds-signa__actions {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
+  .ds-delivery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
   }
 
-  /* ══════════════════════════════════════════════════════════
-     PROCESSO
-  ═══════════════════════════════════════════════════════════ */
-  .ds-process {
-    background:
-      radial-gradient(ellipse 60% 40% at 50% 100%, rgba(208, 216, 232, 0.03), transparent 60%);
-  }
-  .ds-steps {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    position: relative;
-    max-width: 720px;
-    margin-inline: auto;
-  }
-  /* Linha vertical conectando os steps */
-  .ds-steps::before {
-    content: '';
-    position: absolute;
-    left: 26px;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: linear-gradient(180deg, transparent 0%, var(--ds-line) 15%, var(--ds-line) 85%, transparent 100%);
-  }
-  @media (min-width: 640px) {
-    .ds-steps::before { left: 32px; }
+  .ds-delivery-card {
+    min-height: 390px;
+    padding: 30px;
+    border-radius: var(--ds-radius);
   }
 
-  .ds-step {
-    display: flex;
-    gap: 28px;
-    align-items: flex-start;
-    padding: 32px 0;
-    position: relative;
-    border-bottom: 1px solid var(--ds-line);
+  .ds-delivery-card--featured {
+    border-color: rgba(115, 241, 255, 0.34);
+    transform: translateY(-18px);
   }
-  .ds-step:last-child { border-bottom: none; }
-  .ds-step__num {
-    flex-shrink: 0;
-    width: 52px;
-    height: 52px;
-    border-radius: 12px;
-    background: var(--ds-panel);
-    border: 1px solid var(--ds-line);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--font-display, "Orbitron", monospace);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.08em;
+
+  .ds-delivery-card img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 20px;
+    margin-bottom: 34px;
+  }
+
+  .ds-delivery-card span {
+    display: inline-flex;
+    margin-bottom: 12px;
     color: var(--ds-gold);
-    position: relative;
-    z-index: 1;
-    transition: background var(--ds-transition), border-color var(--ds-transition);
-  }
-  .ds-step:hover .ds-step__num {
-    background: var(--ds-gold-dim);
-    border-color: rgba(243, 217, 122, 0.3);
-  }
-  .ds-step__body { padding-top: 12px; }
-  .ds-step__body h3 {
-    font-family: var(--font-display, "Orbitron", monospace);
-    font-size: clamp(14px, 1.5vw, 16px);
-    font-weight: 700;
-    color: var(--ds-text);
-    margin: 0 0 10px;
-  }
-  .ds-step__body p {
-    font-size: 14px;
-    color: var(--ds-muted);
-    line-height: 1.65;
-    margin: 0;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
   }
 
-  /* ══════════════════════════════════════════════════════════
-     CTA FINAL
-  ═══════════════════════════════════════════════════════════ */
+  .ds-delivery-card h3 {
+    font-family: var(--font-display, "Orbitron", sans-serif);
+    font-size: clamp(22px, 2.4vw, 30px);
+    line-height: 1.05;
+  }
+
+  .ds-export-strip {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .ds-export-strip span {
+    display: inline-flex;
+    min-height: 38px;
+    align-items: center;
+    padding: 9px 14px;
+    border: 1px solid var(--ds-line);
+    border-radius: 999px;
+    color: rgba(236,247,255,0.78);
+    background: rgba(255,255,255,0.055);
+    font-size: 12px;
+    font-weight: 850;
+  }
+
   .ds-cta-section {
-    padding: clamp(80px, 10vw, 140px) 0;
     position: relative;
-    overflow: hidden;
+    padding: clamp(86px, 11vw, 150px) 0;
     text-align: center;
+    overflow: hidden;
   }
-  .ds-cta__glow {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 800px;
-    height: 400px;
-    background: radial-gradient(ellipse, rgba(208, 216, 232, 0.04), transparent 70%);
-    pointer-events: none;
-  }
+
   .ds-cta-section::before {
-    content: '';
+    content: "";
     position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--ds-line), transparent);
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.04), transparent 42%),
+      linear-gradient(120deg, rgba(115,241,255,0.11), transparent 34%),
+      linear-gradient(260deg, rgba(245,208,111,0.12), transparent 34%);
+    border-block: 1px solid rgba(255,255,255,0.09);
   }
+
   .ds-cta__inner {
     display: flex;
+    max-width: 780px;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
-    max-width: 640px;
-    text-align: center;
-  }
-  .ds-cta__wordmark {
-    opacity: 0.45;
-    margin-bottom: 8px;
-    filter: grayscale(1) brightness(1.4);
-  }
-  .ds-cta__wordmark img { width: 140px; height: auto; }
-  .ds-cta-section h2 {
-    font-family: var(--font-display, "Orbitron", monospace);
-    font-size: clamp(24px, 3.6vw, 44px);
-    font-weight: 900;
-    color: var(--ds-text);
-    margin: 0;
-    line-height: 1.1;
-  }
-  .ds-cta-section p {
-    font-size: clamp(14px, 1.6vw, 17px);
-    color: var(--ds-muted);
-    margin: 0;
-    line-height: 1.65;
-  }
-  .ds-cta__actions {
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 12px;
   }
 
-  /* ══════════════════════════════════════════════════════════
-     REVEAL ON SCROLL
-  ═══════════════════════════════════════════════════════════ */
+  .ds-cta__inner img {
+    width: 150px;
+    height: auto;
+    margin-bottom: 18px;
+    opacity: 0.62;
+    filter: brightness(1.4) grayscale(1);
+  }
+
+  .ds-cta-section h2 {
+    margin: 0;
+    color: var(--ds-ink);
+    font-family: var(--font-display, "Orbitron", sans-serif);
+    font-size: clamp(32px, 5vw, 62px);
+    line-height: 1.02;
+    text-wrap: balance;
+  }
+
+  .ds-cta-section p {
+    max-width: 640px;
+    margin: 18px 0 0;
+    color: var(--ds-muted);
+    font-size: clamp(16px, 1.7vw, 19px);
+    line-height: 1.7;
+  }
+
   [data-reveal] {
     opacity: 0;
     transform: translateY(24px);
-    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-                transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    transition:
+      opacity 680ms var(--ds-ease),
+      transform 680ms var(--ds-ease);
   }
+
   [data-reveal].is-visible {
     opacity: 1;
     transform: translateY(0);
   }
+
+  @keyframes dsAmbient {
+    0% { transform: translate3d(-1%, -1%, 0) rotate(0deg); }
+    100% { transform: translate3d(1%, 1%, 0) rotate(8deg); }
+  }
+
+  @keyframes dsHeroLight {
+    0% { transform: translate3d(-3%, -1%, 0) scale(1); opacity: 0.28; }
+    100% { transform: translate3d(3%, 1%, 0) scale(1.04); opacity: 0.52; }
+  }
+
+  @keyframes dsScrollCue {
+    0% { transform: translateY(-100%); opacity: 0; }
+    30% { opacity: 1; }
+    100% { transform: translateY(260%); opacity: 0; }
+  }
+
+  @media (max-width: 980px) {
+    .ds-intro__grid,
+    .ds-diagnostic__grid,
+    .ds-score__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .ds-flow,
+    .ds-delivery-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .ds-delivery-card--featured {
+      transform: none;
+    }
+
+    .ds-application,
+    .ds-application--wide,
+    .ds-application--tall {
+      grid-column: 1 / -1;
+      grid-row: auto;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .shell {
+      width: min(100% - 28px, 1180px);
+    }
+
+    .ds-hero {
+      min-height: 86vh;
+    }
+
+    .ds-choice-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .ds-brand-canvas {
+      grid-template-columns: 1fr;
+      text-align: left;
+      margin-top: 44px;
+    }
+
+    .ds-score-row {
+      grid-template-columns: 1fr 36px;
+      gap: 8px 12px;
+    }
+
+    .ds-score-row i {
+      grid-column: 1 / -1;
+      order: 2;
+    }
+
+    .ds-score-row strong {
+      justify-self: end;
+    }
+
+    .ds-site-preview header,
+    .ds-live-stage__top {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .ds-site-preview nav {
+      flex-wrap: wrap;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
+    :global(html) {
+      scroll-behavior: auto;
+    }
+
+    .ds-main::after,
+    .ds-hero__media::before,
+    .ds-scroll-cue span {
+      animation: none;
+    }
+
+    .ds-btn:hover,
+    .ds-delivery-card--featured {
+      transform: none;
+    }
+
     [data-reveal] {
       opacity: 1;
       transform: none;
@@ -1040,102 +1716,74 @@ const whatsappBriefing = `${ROUTES.whatsapp}?text=Olá%20VOLYNX%2C%20gostaria%20
     }
   }
 
-  /* ══════════════════════════════════════════════════════════
-     FOOTER (herda do sistema global)
-  ═══════════════════════════════════════════════════════════ */
   :global(.site-footer) {
     position: relative;
     z-index: 2;
-    border-top: 1px solid var(--ds-line);
+    border-top: 1px solid rgba(255,255,255,0.1);
   }
 </style>
 
-<!-- ═══════════════════════════════════════════════════════════
-     SCRIPTS: reveal + parallax suave
-════════════════════════════════════════════════════════════ -->
 <script>
-  (function () {
-    // ── Respect prefers-reduced-motion ─────────────────────
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  (() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const revealEls = Array.from(document.querySelectorAll("[data-reveal]"));
 
-    // ── Reveal on scroll ────────────────────────────────────
-    const revealEls = document.querySelectorAll('[data-reveal]');
-    if (revealEls.length && 'IntersectionObserver' in window) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry, i) => {
-            if (entry.isIntersecting) {
-              // Stagger siblings dentro do mesmo parent
-              const siblings = Array.from(
-                entry.target.parentElement?.querySelectorAll('[data-reveal]') ?? []
-              );
-              const idx = siblings.indexOf(entry.target as HTMLElement);
-              const delay = reduced ? 0 : Math.min(idx * 80, 300);
-              setTimeout(() => {
-                (entry.target as HTMLElement).classList.add('is-visible');
-              }, delay);
-              observer.unobserve(entry.target);
-            }
-          });
-        },
-        { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
-      );
+    if (revealEls.length && "IntersectionObserver" in window && !reduced) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const siblings = Array.from(entry.target.parentElement?.querySelectorAll("[data-reveal]") || []);
+          const index = Math.max(0, siblings.indexOf(entry.target));
+          window.setTimeout(() => {
+            entry.target.classList.add("is-visible");
+          }, Math.min(index * 70, 280));
+          observer.unobserve(entry.target);
+        });
+      }, { threshold: 0.12, rootMargin: "0px 0px -48px 0px" });
+
       revealEls.forEach((el) => observer.observe(el));
     } else {
-      // Sem suporte: exibe tudo diretamente
-      revealEls.forEach((el) => el.classList.add('is-visible'));
+      revealEls.forEach((el) => el.classList.add("is-visible"));
     }
 
-    // ── Parallax suave no vídeo do hero (CSS variable) ─────
-    if (!reduced) {
-      const heroVideo = document.querySelector<HTMLVideoElement>('.ds-hero__video');
-      if (heroVideo) {
-        let ticking = false;
-        const onScroll = () => {
-          if (!ticking) {
-            window.requestAnimationFrame(() => {
-              const y = window.scrollY;
-              const max = window.innerHeight;
-              const pct = Math.min(y / max, 1);
-              // Move levemente o vídeo para baixo ao scrollar — max 30px
-              heroVideo.style.transform = `translateY(${pct * 30}px)`;
-              heroVideo.style.opacity = String(0.28 - pct * 0.18);
-              ticking = false;
-            });
-            ticking = true;
-          }
-        };
-        window.addEventListener('scroll', onScroll, { passive: true });
-      }
-    }
-
-    // ── Floating layers sutis nos ícones de serviço ────────
-    if (!reduced) {
-      const icons = document.querySelectorAll<HTMLElement>('.ds-svc-card__icon');
-      icons.forEach((icon, i) => {
-        const amplitude = 4 + (i % 3) * 2;
-        const duration  = 3400 + i * 340;
-        const offset    = i * 600;
-        let start: number | null = null;
-
-        const animate = (ts: number) => {
-          if (!start) start = ts - offset;
-          const t   = (ts - start) / duration;
-          const y   = Math.sin(t * Math.PI * 2) * amplitude;
-          icon.style.transform = `translateY(${y}px)`;
-          requestAnimationFrame(animate);
-        };
-        requestAnimationFrame(animate);
+    const input = document.querySelector("[data-brand-input]");
+    const outputs = Array.from(document.querySelectorAll("[data-brand-output]"));
+    const updateBrandName = () => {
+      const value = input?.value?.trim() || "VOLYNX Studio";
+      outputs.forEach((node) => {
+        node.textContent = value;
       });
-    }
+    };
 
-    // ── Vídeo fallback: esconde fallback após load ─────────
-    const vid = document.querySelector<HTMLVideoElement>('.ds-hero__video');
-    const fallback = document.querySelector<HTMLElement>('.ds-hero__video-fallback');
-    if (vid && fallback) {
-      const hideFallback = () => { fallback.style.opacity = '0'; };
-      if (vid.readyState >= 2) { hideFallback(); }
-      else { vid.addEventListener('canplay', hideFallback, { once: true }); }
+    input?.addEventListener("input", updateBrandName);
+    updateBrandName();
+
+    document.querySelectorAll(".ds-choice").forEach((choice) => {
+      choice.addEventListener("click", () => {
+        document.querySelectorAll(".ds-choice").forEach((item) => item.classList.remove("is-active"));
+        choice.classList.add("is-active");
+      });
+    });
+
+    if (!reduced) {
+      const heroVideo = document.querySelector(".ds-hero__video");
+      let ticking = false;
+
+      const syncHero = () => {
+        const y = Math.min(window.scrollY, window.innerHeight);
+        const progress = y / Math.max(window.innerHeight, 1);
+        if (heroVideo) {
+          heroVideo.style.transform = `scale(${1.02 + progress * 0.025}) translateY(${progress * 22}px)`;
+          heroVideo.style.opacity = String(0.82 - progress * 0.22);
+        }
+        ticking = false;
+      };
+
+      window.addEventListener("scroll", () => {
+        if (ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(syncHero);
+      }, { passive: true });
     }
   })();
 </script>

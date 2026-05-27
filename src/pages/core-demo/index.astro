@@ -1,0 +1,581 @@
+---
+import FaviconHead from "../../components/FaviconHead.astro";
+import Topbar from "../../components/Topbar.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VOLYNX OS Core Demo</title>
+  <meta name="description" content="Snapshot renderer demo for the VOLYNX OS Core multi-tenant site foundation." />
+  <meta name="robots" content="noindex, nofollow" />
+  <FaviconHead />
+  <script is:inline src="/builder/vx-renderer.js"></script>
+</head>
+<body>
+  <Topbar leftLinks={[{ href: "/builder/", label: "Builder" }, { href: "/platform/", label: "Platform" }]} rightLinks={[{ href: "/profile/", label: "Profile" }]} />
+
+  <main class="core-shell">
+    <section class="core-hero">
+      <div class="core-copy">
+        <div class="core-mark">
+          <span class="core-mark__dot"></span>
+          <span>VOLYNX OS Core</span>
+        </div>
+        <img class="core-mobile-emblem" src="/assets/volynx-os-core.webp" alt="" width="2048" height="2048" loading="eager" />
+        <h1>The operating layer for every client site.</h1>
+        <p class="core-lead">
+          One multi-tenant foundation for pages, sections, forms, leads, media, SEO,
+          integrations and stable published snapshots.
+        </p>
+        <div class="core-actions" aria-label="Core capabilities">
+          <span>Organizations</span>
+          <span>Sites</span>
+          <span>Snapshots</span>
+          <span>Leads</span>
+        </div>
+      </div>
+
+      <div class="core-orb" aria-label="VOLYNX OS Core icon">
+        <img src="/assets/volynx-os-core.webp" alt="" width="2048" height="2048" loading="eager" />
+        <div class="core-status" id="coreStatus">Loading snapshot...</div>
+      </div>
+    </section>
+
+    <section class="core-panel" aria-label="Published snapshot renderer">
+      <div class="core-panel__head">
+        <div>
+          <p class="core-kicker">Live renderer</p>
+          <h2>Published snapshot preview</h2>
+        </div>
+        <p>
+          Renders a stable bundled snapshot by default and can read <code>core-demo</code>
+          from the Core database when live mode is requested.
+        </p>
+      </div>
+
+      <div class="core-frame-shell">
+        <div class="core-frame-top">
+          <span></span>
+          <span></span>
+          <span></span>
+          <strong>snapshot://core-demo/latest</strong>
+        </div>
+        <iframe
+          id="coreFrame"
+          class="core-frame"
+          title="VOLYNX OS Core rendered snapshot preview"
+          loading="eager"
+        ></iframe>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+
+  <script>
+    import {
+      DEMO_CORE_SNAPSHOT,
+      coreSnapshotToBuilderPage,
+      createCoreClient,
+      fetchLatestPublishedSnapshot,
+    } from "../../lib/volynx-os-core";
+
+    declare global {
+      interface Window {
+        VxRenderer: any;
+      }
+    }
+
+    const statusEl = document.getElementById("coreStatus");
+    const frame = document.getElementById("coreFrame") as HTMLIFrameElement | null;
+
+    function setStatus(message: string, mode = "neutral") {
+      if (!statusEl) return;
+      statusEl.textContent = message;
+      statusEl.setAttribute("data-mode", mode);
+    }
+
+    function renderSnapshot(snapshot: any, pagePath: string) {
+      const builderPage = coreSnapshotToBuilderPage(snapshot, pagePath);
+      frame!.srcdoc = window.VxRenderer.renderPage(builderPage);
+    }
+
+    function snapshotFallbackMessage(error: any) {
+      const message = String(error?.message || "");
+      if (message.includes("Failed to fetch")) {
+        return "Core database unavailable in this preview. Showing bundled demo snapshot.";
+      }
+      return "Could not fetch Core snapshot. Showing bundled demo snapshot.";
+    }
+
+    async function boot() {
+      if (!frame) return;
+
+      const params = new URLSearchParams(window.location.search);
+      const siteSlug = params.get("site") || "core-demo";
+      const pagePath = params.get("path") || "/";
+      const wantsLiveSnapshot =
+        params.get("live") === "1" ||
+        params.has("site") ||
+        params.has("supabaseUrl") ||
+        params.has("supabaseAnonKey");
+
+      if (!wantsLiveSnapshot) {
+        renderSnapshot(DEMO_CORE_SNAPSHOT, pagePath);
+        setStatus("Showing bundled demo snapshot. Add ?live=1 to test the Core database.", "ok");
+        return;
+      }
+
+      try {
+        const useLocalSupabase = params.get("localSupabase") === "1";
+        const supabaseUrl = params.get("supabaseUrl") || (useLocalSupabase ? "http://127.0.0.1:54321" : undefined);
+        const supabaseAnonKey = params.get("supabaseAnonKey") || (useLocalSupabase ? "sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH" : undefined);
+        const supabase = await createCoreClient("/config.json", { supabaseUrl, supabaseAnonKey });
+        const snapshot = await fetchLatestPublishedSnapshot(supabase, siteSlug);
+
+        if (!snapshot) {
+          renderSnapshot(DEMO_CORE_SNAPSHOT, pagePath);
+          setStatus(`No published snapshot found for ${siteSlug}. Showing bundled demo snapshot.`, "warn");
+          return;
+        }
+
+        renderSnapshot(snapshot, pagePath);
+        setStatus(`Rendered ${siteSlug} snapshot v${snapshot.version || "latest"}.`, "ok");
+      } catch (error: any) {
+        renderSnapshot(DEMO_CORE_SNAPSHOT, pagePath);
+        setStatus(snapshotFallbackMessage(error), "warn");
+      }
+    }
+
+    boot();
+  </script>
+
+  <style>
+    :root {
+      --core-bg: #030407;
+      --core-surface: rgba(10, 13, 20, .86);
+      --core-line: rgba(198, 225, 255, .14);
+      --core-text: #f7f9ff;
+      --core-muted: rgba(226, 235, 255, .66);
+      --core-cyan: #6ee7ff;
+      --core-violet: #b768ff;
+      --core-gold: #e8bd65;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 70% 12%, rgba(89, 126, 255, .22), transparent 34%),
+        radial-gradient(circle at 30% 0%, rgba(110, 231, 255, .12), transparent 30%),
+        linear-gradient(180deg, #07080d 0%, var(--core-bg) 46%, #05060a 100%);
+      color: var(--core-text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x: hidden;
+    }
+
+    .core-shell {
+      width: min(1240px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 50px 0 76px;
+      position: relative;
+    }
+
+    .core-shell::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(to bottom, black, transparent 75%);
+      opacity: .18;
+    }
+
+    .core-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 520px);
+      min-height: calc(100vh - 164px);
+      gap: 44px;
+      align-items: center;
+      padding: 28px 0 42px;
+      position: relative;
+    }
+
+    .core-copy {
+      position: relative;
+      z-index: 2;
+    }
+
+    .core-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 34px;
+      border: 1px solid rgba(110, 231, 255, .24);
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(110, 231, 255, .09), rgba(183, 104, 255, .06));
+      padding: 7px 11px;
+      color: #dcecff;
+      font-size: .78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .core-mark__dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--core-cyan);
+      box-shadow: 0 0 18px rgba(110, 231, 255, .9);
+      flex: 0 0 auto;
+    }
+
+    .core-mobile-emblem {
+      display: none;
+    }
+
+    .core-hero h1 {
+      max-width: 760px;
+      margin: 22px 0 0;
+      font-size: clamp(3rem, 7vw, 7.1rem);
+      line-height: .9;
+      letter-spacing: 0;
+      text-wrap: balance;
+    }
+
+    .core-lead {
+      max-width: 700px;
+      margin: 28px 0 0;
+      color: var(--core-muted);
+      font-size: clamp(1.04rem, 2vw, 1.26rem);
+      line-height: 1.72;
+    }
+
+    .core-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 34px;
+    }
+
+    .core-actions span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 38px;
+      border: 1px solid rgba(232, 189, 101, .22);
+      border-radius: 8px;
+      background: rgba(232, 189, 101, .07);
+      padding: 8px 12px;
+      color: #f6dfad;
+      font-size: .86rem;
+      font-weight: 800;
+    }
+
+    .core-orb {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 600px;
+      isolation: isolate;
+    }
+
+    .core-orb::before,
+    .core-orb::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .core-orb::before {
+      width: min(560px, 92vw);
+      aspect-ratio: 1.5;
+      background:
+        radial-gradient(ellipse, rgb(1 209 250), #ffffff24 38%),
+        conic-gradient(from 186deg, rgb(38 255 0), rgb(215 0 255), rgb(255 172 0), rgb(255 0 0));
+      filter: blur(50px);
+      opacity: .7;
+    }
+
+    .core-orb::after {
+      width: min(460px, 76vw);
+      aspect-ratio: 1;
+      border: 1px solid rgba(110, 231, 255, .2);
+      box-shadow:
+        inset 0 0 40px rgba(110, 231, 255, .08),
+        0 0 70px rgba(79, 141, 255, .22);
+    }
+
+    .core-orb img {
+      width: min(610px, 95vw);
+      max-width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+      filter:
+        drop-shadow(0 34px 70px rgba(0, 0, 0, .62))
+        drop-shadow(0 0 34px rgba(110, 231, 255, .18));
+      transform: translateY(10px);
+      animation: core-float 6.8s ease-in-out infinite;
+      will-change: transform, filter;
+    }
+
+    @keyframes core-float {
+      0%, 100% {
+        transform: translateY(10px) rotate(-.35deg) scale(1);
+        filter:
+          drop-shadow(0 34px 70px rgba(0, 0, 0, .62))
+          drop-shadow(0 0 34px rgba(110, 231, 255, .18));
+      }
+      50% {
+        transform: translateY(-10px) rotate(.45deg) scale(1.012);
+        filter:
+          drop-shadow(0 42px 82px rgba(0, 0, 0, .68))
+          drop-shadow(0 0 46px rgba(110, 231, 255, .26));
+      }
+    }
+
+    .core-status {
+      position: absolute;
+      right: 18px;
+      bottom: 54px;
+      width: min(320px, calc(100% - 36px));
+      border: 1px solid rgba(198, 225, 255, .16);
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(10, 13, 20, .92), rgba(14, 18, 31, .84));
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .46);
+      padding: 14px 15px;
+      color: var(--core-muted);
+      font-size: .88rem;
+      font-weight: 700;
+      line-height: 1.45;
+      backdrop-filter: blur(18px);
+    }
+
+    .core-kicker {
+      margin: 0 0 8px;
+      color: var(--core-cyan);
+      font-size: .78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .core-panel {
+      border: 1px solid var(--core-line);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .018)),
+        var(--core-surface);
+      box-shadow:
+        0 24px 110px rgba(0, 0, 0, .42),
+        inset 0 1px 0 rgba(255, 255, 255, .06);
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .core-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, transparent, rgba(110, 231, 255, .08), transparent),
+        radial-gradient(circle at 82% 20%, rgba(183, 104, 255, .18), transparent 30%);
+      pointer-events: none;
+    }
+
+    .core-panel__head {
+      display: grid;
+      grid-template-columns: minmax(0, .8fr) minmax(280px, .9fr);
+      gap: 24px;
+      align-items: end;
+      padding: 12px 12px 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .core-panel__head h2 {
+      margin: 0;
+      font-size: clamp(1.7rem, 4vw, 3.4rem);
+      line-height: 1;
+    }
+
+    .core-panel__head p {
+      margin: 0;
+      color: var(--core-muted);
+      font-size: .98rem;
+      line-height: 1.65;
+    }
+
+    .core-frame-shell {
+      position: relative;
+      z-index: 1;
+      border: 1px solid rgba(198, 225, 255, .16);
+      border-radius: 8px;
+      background: #070a12;
+      overflow: hidden;
+    }
+
+    .core-frame-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      border-bottom: 1px solid rgba(198, 225, 255, .12);
+      background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
+      padding: 0 14px;
+    }
+
+    .core-frame-top span {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: rgba(226, 235, 255, .22);
+    }
+
+    .core-frame-top span:nth-child(1) { background: #ff6f87; }
+    .core-frame-top span:nth-child(2) { background: #ffc96b; }
+    .core-frame-top span:nth-child(3) { background: #61e69a; }
+
+    .core-frame-top strong {
+      margin-left: 8px;
+      color: rgba(226, 235, 255, .56);
+      font-size: .8rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-weight: 700;
+    }
+
+    code {
+      color: var(--core-text);
+      background: rgba(255, 255, 255, .07);
+      border: 1px solid var(--core-line);
+      border-radius: 6px;
+      padding: 2px 6px;
+    }
+
+    .core-status[data-mode="ok"] {
+      color: #baf7d0;
+      border-color: rgba(71, 220, 129, .32);
+      box-shadow:
+        0 24px 70px rgba(0, 0, 0, .46),
+        inset 0 0 24px rgba(71, 220, 129, .06);
+    }
+
+    .core-status[data-mode="warn"] {
+      color: #ffe2a6;
+      border-color: rgba(214, 179, 106, .36);
+    }
+
+    .core-status[data-mode="error"] {
+      color: #ffb6b6;
+      border-color: rgba(255, 95, 95, .36);
+    }
+
+    .core-frame {
+      width: 100%;
+      height: min(900px, 78vh);
+      border: 0;
+      background: #070a12;
+      display: block;
+    }
+
+    @media (max-width: 980px) {
+      .core-hero,
+      .core-panel__head {
+        grid-template-columns: 1fr;
+      }
+
+      .core-hero {
+        min-height: 0;
+      }
+
+      .core-orb {
+        min-height: 460px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .core-shell {
+        width: min(100% - 22px, 1240px);
+        padding-top: 18px;
+      }
+
+      .core-hero {
+        gap: 22px;
+        padding-top: 8px;
+      }
+
+      .core-hero h1 {
+        margin-top: 14px;
+        font-size: clamp(2.45rem, 14vw, 3.75rem);
+        line-height: .91;
+      }
+
+      .core-lead {
+        margin-top: 18px;
+        font-size: .98rem;
+        line-height: 1.6;
+      }
+
+      .core-mobile-emblem {
+        display: block;
+        width: min(210px, 58vw);
+        height: auto;
+        margin: 18px auto 0;
+        filter:
+          drop-shadow(0 20px 40px rgba(0, 0, 0, .58))
+          drop-shadow(0 0 26px rgba(110, 231, 255, .2));
+        animation: core-mobile-float 6.2s ease-in-out infinite;
+        will-change: transform, filter;
+      }
+
+      @keyframes core-mobile-float {
+        0%, 100% {
+          transform: translateY(0) rotate(-.25deg) scale(1);
+        }
+        50% {
+          transform: translateY(-8px) rotate(.35deg) scale(1.015);
+        }
+      }
+
+      .core-actions {
+        margin-top: 22px;
+        gap: 8px;
+      }
+
+      .core-actions span {
+        min-height: 34px;
+        padding: 7px 10px;
+        font-size: .78rem;
+      }
+
+      .core-orb {
+        min-height: 330px;
+      }
+
+      .core-status {
+        right: 10px;
+        bottom: 24px;
+      }
+
+      .core-frame {
+        height: 720px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .core-orb img,
+      .core-mobile-emblem {
+        animation: none;
+      }
+    }
+  </style>
+</body>
+</html>
