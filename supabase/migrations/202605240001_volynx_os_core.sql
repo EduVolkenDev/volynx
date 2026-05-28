@@ -1105,7 +1105,7 @@ WITH org AS (
   VALUES (
     'VOLYNX OS Demo',
     'volynx-os-demo',
-    'studio',
+    'free',
     'active',
     '{"source":"migration_seed","purpose":"volynx_os_core"}'::jsonb
   )
