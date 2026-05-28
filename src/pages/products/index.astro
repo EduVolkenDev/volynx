@@ -4,13 +4,86 @@ import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import FlagshipFooter from "../../components/FlagshipFooter.astro";
 import PlatformAssistStrip from "../../components/PlatformAssistStrip.astro";
 import { sitePricing } from "../../data/pricing";
-import { ROUTES } from "../../data/routes";
+import { ROUTES, checkoutHref } from "../../data/routes";
 
 const currencyParam = Astro.url.searchParams.get('currency') || '';
 const currentCurrency = (['GBP', 'EUR', 'BRL'] as const).includes(currencyParam as any) ? currencyParam as 'GBP'|'EUR'|'BRL' : 'GBP';
 const qrgenPlans = sitePricing.qrgenPlans.filter((plan) => plan.id !== 'free');
 const qrgenFreePlan = sitePricing.qrgenPlans.find((plan) => plan.id === 'free');
 const qrgenProPlan = sitePricing.qrgenPlans.find((plan) => plan.id === 'pro') || qrgenPlans[0];
+const qrgenLookupByPlan = {
+  launch: 'builder_launch',
+  pro: 'builder_pro',
+  studio: 'builder_studio',
+} as Record<string, string>;
+const buyReadyOffers = [
+  {
+    label: { en: 'Fastest subscription', pt: 'Assinatura mais rápida' },
+    title: 'QRGen Pro',
+    copy: { en: 'SVG vector export, transparent backgrounds, logo export and 4096px PNG for print-ready QR work.', pt: 'SVG vetorial, fundo transparente, export com logo e PNG 4096px para QR pronto para impressão.' },
+    price: { GBP: '£24', EUR: '€28', BRL: 'R$149' },
+    billing: { en: '/month', pt: '/mês' },
+    lookup: 'builder_pro',
+    href: checkoutHref('builder_pro', { next: `${ROUTES.products}#buy-now` }),
+    cta: { en: 'Buy QRGen Pro', pt: 'Comprar QRGen Pro' },
+    image: '/assets/newqrgen.webp',
+  },
+  {
+    label: { en: 'Usage capacity', pt: 'Capacidade de uso' },
+    title: 'VX Core',
+    copy: { en: '32 VX for enabled premium actions across the ecosystem without changing a subscription.', pt: '32 VX para ações premium habilitadas no ecossistema sem trocar assinatura.' },
+    price: { GBP: '£18', EUR: '€21', BRL: 'R$119' },
+    billing: { en: 'one-time', pt: 'pagamento único' },
+    lookup: 'tokens_core',
+    href: checkoutHref('tokens_core', { next: `${ROUTES.products}#buy-now` }),
+    cta: { en: 'Buy VX Core', pt: 'Comprar VX Core' },
+    image: '/assets/vx3.webp',
+  },
+  {
+    label: { en: 'Digital product', pt: 'Produto digital' },
+    title: 'Portfolio Pro Kit',
+    copy: { en: 'A launch-ready portfolio system with Builder preset, premium sections and handoff structure.', pt: 'Sistema de portfolio pronto para lançar com preset Builder, seções premium e estrutura de entrega.' },
+    price: { GBP: '£47', EUR: '€54', BRL: 'R$329' },
+    billing: { en: 'one-time', pt: 'pagamento único' },
+    lookup: 'kit_portfolio_personal',
+    href: checkoutHref('kit_portfolio_personal', { next: ROUTES.portfolioKit }),
+    cta: { en: 'Buy Portfolio Kit', pt: 'Comprar Portfolio Kit' },
+    image: '/assets/newportfolio.webp',
+  },
+  {
+    label: { en: 'Agency package', pt: 'Pacote para agência' },
+    title: 'Agency Launch Kit',
+    copy: { en: 'Brand, page, proposal and SOW structure for studios that need to close and deliver faster.', pt: 'Marca, página, proposta e SOW para estúdios que precisam fechar e entregar mais rápido.' },
+    price: { GBP: '£87', EUR: '€101', BRL: 'R$609' },
+    billing: { en: 'one-time', pt: 'pagamento único' },
+    lookup: 'kit_agency_personal',
+    href: checkoutHref('kit_agency_personal', { next: ROUTES.agencyKit }),
+    cta: { en: 'Buy Agency Kit', pt: 'Comprar Agency Kit' },
+    image: '/assets/newlaunch.webp',
+  },
+  {
+    label: { en: 'Property SaaS kit', pt: 'Kit SaaS imobiliário' },
+    title: 'PropertyFlow Starter',
+    copy: { en: 'React source, premium catalogue, filters and bilingual interface for real estate product delivery.', pt: 'Código React, catálogo premium, filtros e interface bilíngue para produto imobiliário.' },
+    price: { GBP: '£187', EUR: '€219', BRL: 'R$1.290' },
+    billing: { en: 'one-time', pt: 'pagamento único' },
+    lookup: 'pf_starter',
+    href: checkoutHref('pf_starter', { next: ROUTES.propertyflow }),
+    cta: { en: 'Buy PropertyFlow', pt: 'Comprar PropertyFlow' },
+    image: '/assets/newproperty.webp',
+  },
+  {
+    label: { en: 'Asset pack', pt: 'Pacote visual' },
+    title: 'Icons Premium Pack',
+    copy: { en: 'Premium icon pack checkout for brand-ready product visuals and richer client surfaces.', pt: 'Pacote premium de ícones para visuais de produto e superfícies de cliente mais fortes.' },
+    price: { GBP: '£11.20', EUR: '€13', BRL: 'R$74.90' },
+    billing: { en: 'one-time', pt: 'pagamento único' },
+    lookup: 'icons_pack_premium',
+    href: checkoutHref('icons_pack_premium', { next: ROUTES.iconsStore }),
+    cta: { en: 'Buy icon pack', pt: 'Comprar pacote' },
+    image: '/assets/icons-store-logo.webp',
+  },
+];
 
 const productAssistItems = [
   { href: ROUTES.pricing, label: { en: "Compare", pt: "Comparar" }, title: { en: "See pricing", pt: "Ver pricing" }, copy: { en: "Compare Builder, Daily, bundles and VX without leaving the platform flow.", pt: "Compare Builder, Daily, bundles e VX sem sair do fluxo da plataforma." }, emphasized: true, iconSrc: "/assets/newpricing1.webp" },
@@ -42,6 +115,39 @@ const productAssistItems = [
     </section>
 
     <PlatformAssistStrip eyebrow={{ en: "Platform assist", pt: "Apoio da plataforma" }} title={{ en: "Choose, buy, recover, continue.", pt: "Escolha, compre, recupere, continue." }} description={{ en: "The public catalog should still feel operational. These paths keep discovery connected to pricing, purchases and support.", pt: "O catálogo público ainda deve ter cara de operacional. Esses caminhos mantêm descoberta conectada a pricing, compras e suporte." }} items={productAssistItems} />
+
+    <!-- ═══ BUY READY OFFERS ═══ -->
+    <section class="page-section buy-ready-section" id="buy-now">
+      <div class="shell section-head buy-ready-head">
+        <span class="eyebrow"><span class="i18n-en">Ready to sell today</span><span class="i18n-pt">Pronto para vender hoje</span></span>
+        <h2><span class="i18n-en">Direct checkout paths for the products that can monetize now.</span><span class="i18n-pt">Caminhos diretos de checkout para os produtos que podem monetizar agora.</span></h2>
+        <p><span class="i18n-en">Subscriptions, VX capacity, digital kits, PropertyFlow and premium assets stay in one purchase flow with delivery and recovery behind the account.</span><span class="i18n-pt">Assinaturas, capacidade VX, kits digitais, PropertyFlow e assets premium ficam em um fluxo de compra com entrega e recuperação na conta.</span></p>
+      </div>
+      <div class="shell buy-ready-grid">
+        {buyReadyOffers.map((offer) => (
+          <article class="buy-ready-card">
+            <img src={offer.image} alt="" class="buy-ready-card__icon" loading="lazy" decoding="async" />
+            <span class="buy-ready-card__label"><span class="i18n-en">{offer.label.en}</span><span class="i18n-pt">{offer.label.pt}</span></span>
+            <h3>{offer.title}</h3>
+            <p><span class="i18n-en">{offer.copy.en}</span><span class="i18n-pt">{offer.copy.pt}</span></p>
+            <div class="buy-ready-card__price">
+              <strong
+                data-price-gbp={offer.price.GBP}
+                data-price-eur={offer.price.EUR}
+                data-price-brl={offer.price.BRL}
+              >{offer.price[currentCurrency]}</strong>
+              <span><span class="i18n-en">{offer.billing.en}</span><span class="i18n-pt">{offer.billing.pt}</span></span>
+            </div>
+            <a
+              href={offer.href}
+              class="button button--gold vx-checkout-btn buy-ready-card__cta"
+              data-lookup={offer.lookup}
+              data-label={offer.cta.en}
+            ><span class="i18n-en">{offer.cta.en}</span><span class="i18n-pt">{offer.cta.pt}</span></a>
+          </article>
+        ))}
+      </div>
+    </section>
 
     <!-- ═══ PREMIUM KITS ═══ -->
     <section id="kits" class="page-section">
@@ -159,6 +265,14 @@ const productAssistItems = [
                   <li><span class="i18n-en">{feature}</span><span class="i18n-pt">{plan.features.pt[index] || feature}</span></li>
                 ))}
               </ul>
+              {qrgenLookupByPlan[plan.id] && (
+                <a
+                  href={checkoutHref(qrgenLookupByPlan[plan.id], { next: `${ROUTES.products}#qrgen` })}
+                  class="button button--gold vx-checkout-btn qr-product-plan__cta"
+                  data-lookup={qrgenLookupByPlan[plan.id]}
+                  data-label={plan.cta.en}
+                ><span class="i18n-en">{plan.cta.en}</span><span class="i18n-pt">{plan.cta.pt}</span></a>
+              )}
             </article>
           ))}
         </div>
@@ -256,6 +370,116 @@ const productAssistItems = [
 
   </main>
   <style>
+    .buy-ready-section {
+      position: relative;
+      padding-top: clamp(56px, 7vw, 92px);
+      border-block: 1px solid rgba(214, 179, 106, .16);
+      background:
+        linear-gradient(180deg, rgba(214, 179, 106, .08), rgba(12, 18, 28, .34) 48%, rgba(125, 211, 252, .06));
+    }
+
+    .buy-ready-head {
+      max-width: 980px;
+    }
+
+    .buy-ready-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .buy-ready-card {
+      position: relative;
+      min-width: 0;
+      min-height: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, .09);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .025)),
+        rgba(5, 9, 16, .72);
+      box-shadow: 0 18px 56px rgba(0, 0, 0, .24);
+      overflow: hidden;
+    }
+
+    .buy-ready-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, rgba(214, 179, 106, .12), transparent 46%);
+      pointer-events: none;
+    }
+
+    .buy-ready-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .buy-ready-card__icon {
+      width: 86px;
+      height: 86px;
+      object-fit: contain;
+      object-position: center;
+      margin-left: auto;
+      filter: drop-shadow(0 16px 28px rgba(0, 0, 0, .34));
+    }
+
+    .buy-ready-card__label {
+      width: fit-content;
+      min-height: 28px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(214, 179, 106, .28);
+      background: rgba(214, 179, 106, .08);
+      color: #f6d38b;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .buy-ready-card h3 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.05;
+      color: #fff;
+    }
+
+    .buy-ready-card p {
+      margin: 0;
+      color: rgba(255, 255, 255, .7);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .buy-ready-card__price {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .buy-ready-card__price strong {
+      font-size: 30px;
+      line-height: 1;
+      color: #fff;
+    }
+
+    .buy-ready-card__price span {
+      color: rgba(255, 255, 255, .56);
+      font-size: 13px;
+    }
+
+    .buy-ready-card__cta {
+      width: 100%;
+      justify-content: center;
+    }
+
     .qr-product-section {
       position: relative;
       border-block: 1px solid rgba(125, 211, 252, .12);
@@ -494,7 +718,17 @@ const productAssistItems = [
       box-shadow: 0 0 12px rgba(125, 211, 252, .42);
     }
 
+    .qr-product-plan__cta {
+      width: 100%;
+      justify-content: center;
+      margin-top: 6px;
+    }
+
     @media (max-width: 980px) {
+      .buy-ready-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
       .qr-product-grid,
       .qr-product-plan-grid {
         grid-template-columns: 1fr;
@@ -506,6 +740,14 @@ const productAssistItems = [
     }
 
     @media (max-width: 640px) {
+      .buy-ready-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .buy-ready-card {
+        min-height: 0;
+      }
+
       .qr-product-copy h3 {
         font-size: clamp(34px, 13vw, 54px);
       }
@@ -521,5 +763,6 @@ const productAssistItems = [
     }
   </style>
   <script is:inline src="/js/vx-currency.js"></script>
+  <script is:inline src="/scripts/kit-checkout.js" defer></script>
   <FlagshipFooter />
 </FlagshipLayout>

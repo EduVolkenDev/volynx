@@ -3,19 +3,32 @@ import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
 import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import FlagshipFooter from "../../components/FlagshipFooter.astro";
 import { sitePricing } from "../../data/pricing";
-import { ROUTES } from "../../data/routes";
+import { ROUTES, checkoutHref } from "../../data/routes";
 
 const currencyParam = Astro.url.searchParams.get("currency") || "";
 const currentCurrency = (["GBP", "EUR", "BRL"] as const).includes(currencyParam as any)
   ? currencyParam as "GBP" | "EUR" | "BRL"
   : "GBP";
+const qrgenLookupByPlan = {
+  launch: "builder_launch",
+  pro: "builder_pro",
+  studio: "builder_studio",
+} as Record<string, string>;
 const qrgenPlanPayload = sitePricing.qrgenPlans.map((plan) => ({
   id: plan.id,
   name: plan.name.en,
   price: plan.price,
   copy: plan.description.en,
   features: plan.features.en,
+  cta: plan.cta.en,
+  href: plan.id === "free"
+    ? ROUTES.qrgen
+    : qrgenLookupByPlan[plan.id]
+      ? checkoutHref(qrgenLookupByPlan[plan.id], { next: ROUTES.qrgen })
+      : `${ROUTES.pricing}#qrgen-plans`,
+  lookupKey: qrgenLookupByPlan[plan.id] || "",
 }));
+const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen });
 ---
 
 <FlagshipLayout title="VOLYNX QRGen - Premium QR Code Editor" pageClass="page-qrgen">
@@ -52,7 +65,7 @@ const qrgenPlanPayload = sitePricing.qrgenPlans.map((plan) => ({
         <span class="qrgen-plan__eyebrow" data-qg-i18n="plan.status">Current QRGen plan</span>
         <strong id="qgPlanLabel">Free</strong>
         <p id="qgPlanCopy" data-qg-i18n="plan.free_copy">Live preview and standard PNG export.</p>
-        <a href={ROUTES.pricing} class="qrgen-link-button" data-qg-i18n="plan.cta">Compare plans</a>
+        <a href={qrgenProCheckoutHref} class="qrgen-link-button vx-checkout-btn" data-lookup="builder_pro" data-label="Upgrade to Pro" data-qg-i18n="plan.cta">Upgrade to Pro</a>
       </aside>
     </section>
 
@@ -338,6 +351,7 @@ const qrgenPlanPayload = sitePricing.qrgenPlans.map((plan) => ({
   <script is:inline src="/js/vx-plan.js"></script>
   <script is:inline src="/js/vx-auth-bridge.js"></script>
   <script is:inline set:html={`window.VOLYNX_QRGEN_PLANS = ${JSON.stringify(qrgenPlanPayload)};`}></script>
+  <script is:inline src="/scripts/kit-checkout.js" defer></script>
   <script is:inline src="/scripts/qrgen-editor.js?v=20260525-qrgen-production"></script>
 </FlagshipLayout>
 
@@ -1230,6 +1244,11 @@ const qrgenPlanPayload = sitePricing.qrgenPlans.map((plan) => ({
     padding-left: 18px;
     display: grid;
     gap: 7px;
+  }
+
+  .qrgen-plan-card__cta {
+    width: 100%;
+    margin-top: auto;
   }
 
   @media (max-width: 1100px) {

@@ -23,6 +23,28 @@
     return /^(gbp|eur|brl)$/.test(currency) ? currency : 'gbp';
   }
 
+  function readStorage(key) {
+    try {
+      return window.localStorage ? window.localStorage.getItem(key) : '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function writeStorage(key, value) {
+    try {
+      if (window.localStorage) window.localStorage.setItem(key, value);
+    } catch (_) {}
+  }
+
+  function currentCurrency() {
+    try {
+      var fromUrl = new URLSearchParams(window.location.search).get('currency');
+      if (fromUrl) return normalizeCurrency(fromUrl);
+    } catch (_) {}
+    return normalizeCurrency(readStorage('volynx_currency') || 'gbp');
+  }
+
   function isPropertyFlowLookup(value) {
     return /^pf[_-]/i.test(String(value || ''));
   }
@@ -44,8 +66,8 @@
   }
 
   async function freshAccessToken(cfg) {
-    var token = localStorage.getItem('volynx_access_token') || '';
-    var refreshToken = localStorage.getItem('volynx_refresh_token') || '';
+    var token = readStorage('volynx_access_token') || '';
+    var refreshToken = readStorage('volynx_refresh_token') || '';
     if (!token || !refreshToken || !cfg || !cfg.supabaseUrl || !cfg.supabaseAnonKey) return token;
 
     try {
@@ -58,8 +80,8 @@
       var sess = await rr.json();
       if (sess.access_token) {
         token = sess.access_token;
-        localStorage.setItem('volynx_access_token', sess.access_token);
-        if (sess.refresh_token) localStorage.setItem('volynx_refresh_token', sess.refresh_token);
+        writeStorage('volynx_access_token', sess.access_token);
+        if (sess.refresh_token) writeStorage('volynx_refresh_token', sess.refresh_token);
       }
     } catch (_) {}
 
@@ -74,7 +96,7 @@
     var lookupBase = btn.dataset.lookup;
     if (!lookupBase) return;
 
-    var token = localStorage.getItem('volynx_access_token');
+    var token = readStorage('volynx_access_token');
     if (!token) {
       var next = encodeURIComponent(window.location.pathname + window.location.search);
       window.location.href = '/login/?next=' + next;
@@ -99,7 +121,7 @@
         return;
       }
 
-      var currency = normalizeCurrency(btn.dataset.currency || localStorage.getItem('volynx_currency') || 'gbp');
+      var currency = normalizeCurrency(btn.dataset.currency || currentCurrency());
       var lookupKey = lookupBase + '_' + currency;
 
       var res = await fetch(apiBase + '/create-checkout-session', {
