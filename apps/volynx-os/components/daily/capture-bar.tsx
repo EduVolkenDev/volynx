@@ -98,13 +98,13 @@ export function CaptureBar() {
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <section className="rounded-lg border border-white/10 bg-white/[0.035] p-4 shadow-glow backdrop-blur md:p-5">
-        <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
+      <section className="daily-panel">
+        <div className="daily-panel-header">
           <div>
-            <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">Universal Capture</p>
-            <h1 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-white md:text-3xl">Drop any thought here.</h1>
+            <p className="daily-kicker">Universal Capture</p>
+            <h1 className="daily-panel-title">Drop any thought here.</h1>
           </div>
-          <span className="hidden h-11 w-11 items-center justify-center rounded-lg bg-white text-black sm:flex">
+          <span className="daily-icon-button hidden sm:flex">
             <Sparkles className="h-5 w-5" />
           </span>
         </div>
@@ -113,13 +113,13 @@ export function CaptureBar() {
           value={rawContent}
           onChange={(event) => setRawContent(event.target.value)}
           placeholder="Task, link, note, idea, decision, draft prompt..."
-          className="mt-5 min-h-[190px] w-full resize-none rounded-lg border border-white/10 bg-black/30 p-4 text-base leading-7 text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-200/40"
+          className="daily-field mt-5 min-h-[210px] resize-none text-base leading-7"
         />
 
         {selectedFile ? (
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 bg-black/30 px-4 py-3 text-sm">
+          <div className="daily-card mt-3 flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm">
             <span className="min-w-0 truncate text-zinc-300">{selectedFile.name}</span>
-            <button type="button" onClick={() => setSelectedFile(null)} className="text-zinc-500 transition hover:text-white">
+            <button type="button" onClick={() => setSelectedFile(null)} className="text-zinc-500 transition-colors duration-300 ease-[cubic-bezier(.2,.8,.2,1)] hover:text-white">
               Remove
             </button>
           </div>
@@ -141,7 +141,7 @@ export function CaptureBar() {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="inline-flex items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-medium text-white transition hover:bg-white/[0.07]"
+            className="daily-secondary-action"
           >
             <FileUp className="mr-2 h-4 w-4" />
             Add file
@@ -151,8 +151,8 @@ export function CaptureBar() {
             onClick={handleSubmit}
             disabled={!canSubmit || isSaving}
             className={cn(
-              "inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-medium transition",
-              canSubmit && !isSaving ? "bg-white text-black hover:opacity-90" : "cursor-not-allowed bg-white/10 text-zinc-500"
+              "daily-primary-action",
+              !canSubmit || isSaving ? "cursor-not-allowed" : ""
             )}
           >
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
@@ -161,28 +161,28 @@ export function CaptureBar() {
         </div>
       </section>
 
-      <aside className="rounded-lg border border-white/10 bg-white/[0.035] p-4 shadow-glow backdrop-blur md:p-5">
+      <aside className="daily-panel">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">Local Vault</p>
-            <h2 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-white">{items.length} captures</h2>
+            <p className="daily-kicker">Local Vault</p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-white">{items.length} captures</h2>
           </div>
           <Archive className="h-5 w-5 text-zinc-500" />
         </div>
 
         <div className="mt-5 grid grid-cols-2 gap-2">
           {["task", "summary", "writing", "decision"].map((intent) => (
-            <div key={intent} className="rounded-lg border border-white/10 bg-black/25 p-3">
+            <div key={intent} className="daily-card p-3">
               <p className="text-lg font-semibold text-white">{intentCounts[intent] ?? 0}</p>
               <p className="mt-1 text-xs uppercase tracking-[0.16em] text-zinc-600">{intent}</p>
             </div>
           ))}
         </div>
 
-        <div className="mt-5 grid max-h-[520px] gap-3 overflow-y-auto pr-1">
+        <div className="daily-scroll-list mt-5 grid gap-3">
           {items.length ? (
             items.map((item) => (
-              <article key={item.id} className="rounded-lg border border-white/10 bg-black/25 p-4">
+              <article key={item.id} className="daily-card p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-white">{item.title}</p>
@@ -207,7 +207,7 @@ export function CaptureBar() {
               </article>
             ))
           ) : (
-            <div className="rounded-lg border border-dashed border-white/10 p-6 text-sm leading-6 text-zinc-500">
+            <div className="daily-empty">
               Captures saved in this browser will appear here first.
             </div>
           )}

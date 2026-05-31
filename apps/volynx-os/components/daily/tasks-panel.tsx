@@ -114,18 +114,18 @@ export function TasksPanel() {
   }
 
   return (
-    <section className="rounded-lg border border-white/10 bg-white/[0.035] p-4 shadow-glow backdrop-blur md:p-5">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
+    <section className="daily-panel">
+      <div className="daily-panel-header">
         <div>
-          <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">Tasks</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-white">Convert loose intent into trackable work.</h2>
+          <p className="daily-kicker">Tasks</p>
+          <h2 className="daily-panel-title">Convert loose intent into trackable work.</h2>
         </div>
         <div className="grid grid-cols-2 gap-2 text-center">
-          <div className="rounded-lg border border-white/10 bg-black/25 px-4 py-2">
+          <div className="daily-card px-4 py-2">
             <p className="text-xl font-semibold text-white">{groupedTasks.open.length}</p>
             <p className="text-[10px] uppercase tracking-[0.16em] text-zinc-600">Open</p>
           </div>
-          <div className="rounded-lg border border-white/10 bg-black/25 px-4 py-2">
+          <div className="daily-card px-4 py-2">
             <p className="text-xl font-semibold text-white">{groupedTasks.done.length}</p>
             <p className="text-[10px] uppercase tracking-[0.16em] text-zinc-600">Done</p>
           </div>
@@ -139,7 +139,7 @@ export function TasksPanel() {
             <select
               value={selectedItemId}
               onChange={(event) => setSelectedItemId(event.target.value)}
-              className="rounded-lg border border-white/10 bg-black/30 px-3 py-3 text-white outline-none focus:border-emerald-200/40"
+              className="daily-select"
             >
               <option value="">Manual task</option>
               {items.map((item) => (
@@ -152,7 +152,7 @@ export function TasksPanel() {
             value={manualTask}
             onChange={(event) => setManualTask(event.target.value)}
             placeholder={selectedItem ? "Optional: override selected capture..." : "Add task notes, bullets or a quick todo..."}
-            className="min-h-[140px] resize-none rounded-lg border border-white/10 bg-black/30 p-4 text-sm leading-6 text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-200/40"
+            className="daily-field min-h-[150px] resize-none text-sm leading-6"
           />
 
           {error ? (
@@ -166,8 +166,8 @@ export function TasksPanel() {
             onClick={handleGenerateTasks}
             disabled={!canGenerate || isGenerating}
             className={cn(
-              "inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-medium transition",
-              canGenerate && !isGenerating ? "bg-white text-black hover:opacity-90" : "cursor-not-allowed bg-white/10 text-zinc-500"
+              "daily-primary-action",
+              !canGenerate || isGenerating ? "cursor-not-allowed" : ""
             )}
           >
             {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
@@ -178,7 +178,7 @@ export function TasksPanel() {
         <div className="grid gap-3">
           {tasks.length ? (
             tasks.map((task) => (
-              <article key={task.id} className="rounded-lg border border-white/10 bg-black/25 p-4">
+              <article key={task.id} className="daily-card p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className={cn("text-base font-semibold leading-6 text-white", task.status === "done" && "text-zinc-500 line-through")}>
@@ -213,7 +213,7 @@ export function TasksPanel() {
               </article>
             ))
           ) : (
-            <div className="rounded-lg border border-dashed border-white/10 p-6 text-sm leading-6 text-zinc-500">
+            <div className="daily-empty">
               Task captures will become trackable tasks here.
             </div>
           )}

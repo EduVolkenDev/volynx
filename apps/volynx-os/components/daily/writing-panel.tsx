@@ -121,13 +121,13 @@ export function WritingPanel() {
   }
 
   return (
-    <section className="rounded-lg border border-white/10 bg-white/[0.035] p-4 shadow-glow backdrop-blur md:p-5">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
+    <section className="daily-panel">
+      <div className="daily-panel-header">
         <div>
-          <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">Writing</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-white">Turn ideas into editable drafts.</h2>
+          <p className="daily-kicker">Writing</p>
+          <h2 className="daily-panel-title">Turn ideas into editable drafts.</h2>
         </div>
-        <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-white text-black">
+        <span className="daily-icon-button">
           <PenLine className="h-5 w-5" />
         </span>
       </div>
@@ -139,7 +139,7 @@ export function WritingPanel() {
             <select
               value={selectedItemId}
               onChange={(event) => setSelectedItemId(event.target.value)}
-              className="rounded-lg border border-white/10 bg-black/30 px-3 py-3 text-white outline-none focus:border-violet-200/40"
+              className="daily-select"
             >
               <option value="">Ad-hoc idea</option>
               {items.map((item) => (
@@ -153,7 +153,7 @@ export function WritingPanel() {
             <select
               value={mode}
               onChange={(event) => setMode(event.target.value as typeof mode)}
-              className="rounded-lg border border-white/10 bg-black/30 px-3 py-3 text-white outline-none focus:border-violet-200/40"
+              className="daily-select"
             >
               <option value="professional">Professional</option>
               <option value="shorter">Shorter</option>
@@ -166,7 +166,7 @@ export function WritingPanel() {
             value={rawContent}
             onChange={(event) => setRawContent(event.target.value)}
             placeholder={selectedItem ? "Optional: override selected idea..." : "Paste the idea, angle, email brief or rough notes..."}
-            className="min-h-[150px] resize-none rounded-lg border border-white/10 bg-black/30 p-4 text-sm leading-6 text-white outline-none transition placeholder:text-zinc-600 focus:border-violet-200/40"
+            className="daily-field min-h-[160px] resize-none text-sm leading-6"
           />
 
           {error ? (
@@ -180,8 +180,8 @@ export function WritingPanel() {
             onClick={handleGenerate}
             disabled={!canGenerate || isGenerating}
             className={cn(
-              "inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-medium transition",
-              canGenerate && !isGenerating ? "bg-white text-black hover:opacity-90" : "cursor-not-allowed bg-white/10 text-zinc-500"
+              "daily-primary-action",
+              !canGenerate || isGenerating ? "cursor-not-allowed" : ""
             )}
           >
             {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
@@ -195,7 +195,7 @@ export function WritingPanel() {
                 type="button"
                 onClick={() => setActiveWritingId(writing.id)}
                 className={cn(
-                  "rounded-lg border border-white/10 bg-black/25 p-3 text-left transition hover:border-white/20",
+                  "daily-card p-3 text-left transition-colors duration-300 ease-[cubic-bezier(.2,.8,.2,1)] hover:border-white/20",
                   activeWritingId === writing.id && "border-violet-200/30 bg-violet-200/[0.06]"
                 )}
               >
@@ -206,7 +206,7 @@ export function WritingPanel() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-white/10 bg-black/25 p-4">
+        <div className="daily-card p-4">
           {activeWriting ? (
             <div className="grid gap-3">
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -219,16 +219,16 @@ export function WritingPanel() {
               <input
                 value={activeWriting.title}
                 onChange={(event) => updateActiveWriting({ title: event.target.value })}
-                className="rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3 text-xl font-semibold tracking-[-0.03em] text-white outline-none focus:border-violet-200/40"
+                className="daily-field text-xl font-semibold tracking-[-0.03em]"
               />
               <textarea
                 value={activeWriting.body}
                 onChange={(event) => updateActiveWriting({ body: event.target.value })}
-                className="min-h-[360px] resize-none rounded-lg border border-white/10 bg-white/[0.03] p-4 text-sm leading-7 text-zinc-200 outline-none focus:border-violet-200/40"
+                className="daily-field min-h-[360px] resize-none text-sm leading-7 text-zinc-200"
               />
             </div>
           ) : (
-            <div className="flex min-h-[320px] flex-col items-center justify-center rounded-lg border border-dashed border-white/10 p-6 text-center text-sm leading-6 text-zinc-500">
+            <div className="daily-empty flex min-h-[320px] flex-col items-center justify-center text-center">
               <Edit3 className="mb-4 h-6 w-6 text-zinc-600" />
               Generate a draft to start editing with autosave.
             </div>

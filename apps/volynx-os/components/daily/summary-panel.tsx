@@ -93,13 +93,13 @@ export function SummaryPanel() {
   }
 
   return (
-    <section className="rounded-lg border border-white/10 bg-white/[0.035] p-4 shadow-glow backdrop-blur md:p-5">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
+    <section className="daily-panel">
+      <div className="daily-panel-header">
         <div>
-          <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">Summary</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-white">Turn any capture into a structured brief.</h2>
+          <p className="daily-kicker">Summary</p>
+          <h2 className="daily-panel-title">Turn any capture into a structured brief.</h2>
         </div>
-        <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-white text-black">
+        <span className="daily-icon-button">
           <FileText className="h-5 w-5" />
         </span>
       </div>
@@ -111,7 +111,7 @@ export function SummaryPanel() {
             <select
               value={selectedItemId}
               onChange={(event) => setSelectedItemId(event.target.value)}
-              className="rounded-lg border border-white/10 bg-black/30 px-3 py-3 text-white outline-none focus:border-cyan-200/40"
+              className="daily-select"
             >
               <option value="">Ad-hoc text</option>
               {items.map((item) => (
@@ -124,7 +124,7 @@ export function SummaryPanel() {
             value={rawContent}
             onChange={(event) => setRawContent(event.target.value)}
             placeholder={selectedItem ? "Optional: override selected capture text..." : "Paste text, link notes or source material..."}
-            className="min-h-[170px] resize-none rounded-lg border border-white/10 bg-black/30 p-4 text-sm leading-6 text-white outline-none transition placeholder:text-zinc-600 focus:border-cyan-200/40"
+            className="daily-field min-h-[180px] resize-none text-sm leading-6"
           />
 
           {error ? (
@@ -138,8 +138,8 @@ export function SummaryPanel() {
             onClick={handleGenerate}
             disabled={!canGenerate || isGenerating}
             className={cn(
-              "inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-medium transition",
-              canGenerate && !isGenerating ? "bg-white text-black hover:opacity-90" : "cursor-not-allowed bg-white/10 text-zinc-500"
+              "daily-primary-action",
+              !canGenerate || isGenerating ? "cursor-not-allowed" : ""
             )}
           >
             {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
@@ -147,10 +147,10 @@ export function SummaryPanel() {
           </button>
         </div>
 
-        <div className="grid max-h-[520px] gap-3 overflow-y-auto pr-1">
+        <div className="daily-scroll-list grid gap-3">
           {summaries.length ? (
             summaries.map((summary) => (
-              <article key={summary.id} className="rounded-lg border border-white/10 bg-black/25 p-4">
+              <article key={summary.id} className="daily-card p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="text-xs uppercase tracking-[0.18em] text-cyan-100/70">Structured Summary</p>
                   <span className="rounded-md border border-white/10 px-2 py-1 text-xs text-zinc-500">
@@ -160,7 +160,7 @@ export function SummaryPanel() {
                 <p className="mt-3 text-base font-semibold leading-7 text-white">{summary.summaryText}</p>
                 <div className="mt-4 grid gap-2">
                   {summary.bullets.map((bullet) => (
-                    <div key={bullet} className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm leading-6 text-zinc-400">
+                    <div key={bullet} className="daily-card px-3 py-2 text-sm leading-6 text-zinc-400">
                       {bullet}
                     </div>
                   ))}
@@ -168,7 +168,7 @@ export function SummaryPanel() {
               </article>
             ))
           ) : (
-            <div className="rounded-lg border border-dashed border-white/10 p-6 text-sm leading-6 text-zinc-500">
+            <div className="daily-empty">
               Summaries generated from captures will appear here.
             </div>
           )}

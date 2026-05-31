@@ -61,15 +61,15 @@ export function MyDayPanel() {
   const recentItems = items.slice(0, 5)
 
   return (
-    <section className="rounded-lg border border-white/10 bg-white/[0.035] p-4 shadow-glow backdrop-blur md:p-5">
+    <section className="daily-panel">
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div>
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
+          <div className="daily-panel-header">
             <div>
-              <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">My Day</p>
-              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-white">Action queue from today&apos;s captures.</h2>
+              <p className="daily-kicker">My Day</p>
+              <h2 className="daily-panel-title">Action queue from today&apos;s captures.</h2>
             </div>
-            <span className="inline-flex items-center rounded-lg border border-white/10 bg-black/25 px-3 py-2 text-sm text-zinc-400">
+            <span className="daily-status-pill text-zinc-400">
               <CalendarDays className="mr-2 h-4 w-4" />
               {new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "2-digit", month: "short" }).format(new Date())}
             </span>
@@ -84,7 +84,7 @@ export function MyDayPanel() {
           <div className="mt-5 grid gap-3">
             {actions.length ? (
               actions.slice(0, 6).map((action) => (
-                <article key={action.id} className="rounded-lg border border-white/10 bg-black/25 p-4">
+                <article key={action.id} className="daily-card p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
                       <span className={cn("inline-flex rounded-md border px-2 py-1 text-[11px] font-medium uppercase tracking-[0.14em]", actionCopy[action.type].tone)}>
@@ -101,7 +101,7 @@ export function MyDayPanel() {
                 </article>
               ))
             ) : (
-              <div className="rounded-lg border border-dashed border-white/10 p-6 text-sm leading-6 text-zinc-500">
+              <div className="daily-empty">
                 Capture something and My Day will turn it into an action queue.
               </div>
             )}
@@ -120,7 +120,7 @@ export function MyDayPanel() {
           <SidePanel title="Open Tasks" icon={ListTodo}>
             {openTasks.length ? (
               openTasks.slice(0, 4).map((task) => (
-                <div key={task.id} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
+                <div key={task.id} className="daily-card p-3">
                   <p className="text-sm font-medium leading-5 text-zinc-200">{task.title}</p>
                   <p className="mt-1 text-xs text-zinc-600">{task.status}</p>
                 </div>
@@ -162,7 +162,7 @@ function createMyDayActions(items: DailyItem[]): MyDayAction[] {
 
 function MetricCard({ icon: Icon, label, value }: { icon: typeof ListTodo; label: string; value: number }) {
   return (
-    <div className="rounded-lg border border-white/10 bg-black/25 p-4">
+    <div className="daily-card p-4">
       <Icon className="h-5 w-5 text-zinc-500" />
       <p className="mt-4 text-3xl font-semibold tracking-[-0.05em] text-white">{value}</p>
       <p className="mt-1 text-xs uppercase tracking-[0.16em] text-zinc-600">{label}</p>
@@ -172,7 +172,7 @@ function MetricCard({ icon: Icon, label, value }: { icon: typeof ListTodo; label
 
 function SidePanel({ title, icon: Icon, children }: { title: string; icon: typeof Lightbulb; children: React.ReactNode }) {
   return (
-    <div className="rounded-lg border border-white/10 bg-black/25 p-4">
+    <div className="daily-card p-4">
       <div className="mb-4 flex items-center justify-between gap-3">
         <h3 className="text-sm font-semibold text-white">{title}</h3>
         <Icon className="h-4 w-4 text-zinc-500" />
@@ -184,7 +184,7 @@ function SidePanel({ title, icon: Icon, children }: { title: string; icon: typeo
 
 function MiniItem({ item }: { item: DailyItem }) {
   return (
-    <div className="group rounded-lg border border-white/10 bg-white/[0.03] p-3">
+    <div className="daily-card group p-3">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-zinc-200">{item.title}</p>

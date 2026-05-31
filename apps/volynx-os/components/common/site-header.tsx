@@ -110,9 +110,11 @@ export function SiteHeader({
             </div>
           ) : null}
           <ThemeSwitcher />
-          <Button href="/dashboard/purchases" className="hidden md:inline-flex">
-            {copy.purchases}
-          </Button>
+          <div className="hidden md:block">
+            <Button href="/dashboard/purchases">
+              {copy.purchases}
+            </Button>
+          </div>
         </div>
       </div>
       <nav className="container-shell flex gap-2 overflow-x-auto border-t border-white/5 pb-3 md:hidden">
