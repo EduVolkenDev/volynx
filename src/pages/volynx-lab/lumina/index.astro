@@ -1,0 +1,1083 @@
+---
+import FaviconHead from "../../../components/FaviconHead.astro";
+import LabBg from "../../../components/LabBg.astro";
+import LabToolSwitcher from "../../../components/LabToolSwitcher.astro";
+import LabUpgradeBanner from "../../../components/LabUpgradeBanner.astro";
+import PageWidgets from "../../../components/PageWidgets.astro";
+import SiteFooter from "../../../components/SiteFooter.astro";
+import Topbar from "../../../components/Topbar.astro";
+import { ROUTES, checkoutHref } from "../../../data/routes";
+
+const proHref = checkoutHref("volynx_pro", { currency: "gbp", next: ROUTES.labLumina });
+
+const features = [
+  ["Simplificar conhecimento", "Transforma textos densos, acadêmicos ou técnicos em linguagem clara e direta, sem perder precisão.", "cyan"],
+  ["Analisar artigos", "Extrai ideias centrais, métodos, conclusões e limites de papers, relatórios e publicações.", "violet"],
+  ["Traduzir e adaptar", "Adapta contexto, exemplos e idioma para públicos em português, inglês e espanhol.", "blue"],
+  ["Criar guias práticos", "Converte qualquer conhecimento em roteiros de ação, checklists e próximos passos concretos.", "gold"],
+  ["Comparar ideias", "Coloca conceitos e abordagens lado a lado para revelar diferenças, convergências e riscos.", "cyan"],
+  ["Explorar temas", "Organiza qualquer área do conhecimento com contexto, perguntas e conexões multidisciplinares.", "violet"],
+  ["Gerar conteúdo educativo", "Produz posts, aulas, roteiros, apresentações e materiais didáticos a partir de uma fonte.", "blue"],
+  ["Verificar cuidados", "Sinaliza incompletude, incerteza e pontos que precisam de verificação externa.", "gold"],
+];
+
+const plans = [
+  {
+    name: "Lumina Free",
+    price: "R$0",
+    description: "Para começar a iluminar. Sem cartão, sem fricção.",
+    cta: "Começar gratuitamente",
+    href: "#lumina-workbench",
+    tone: "free",
+    features: [
+      "Resumos simples e generosos",
+      "Explicações em linguagem clara",
+      "Modo Claro completo",
+      "5 usos gratuitos locais",
+      "Português, inglês e espanhol",
+      "Fallback local quando a IA estiver indisponível",
+    ],
+  },
+  {
+    name: "Lumina Pro",
+    price: "Pro",
+    description: "Profundidade, escala e criação para quem transforma conhecimento em trabalho real.",
+    cta: "Usar com Pro",
+    href: proHref,
+    tone: "pro",
+    features: [
+      "Análises profundas com mais contexto",
+      "PDF, link e documentos como evolução natural",
+      "Comparação entre textos e estudos",
+      "Guias práticos completos",
+      "Modo Criador para posts, aulas e roteiros",
+      "Exportação e trilhas de estudo como próximos upgrades",
+    ],
+  },
+];
+---
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Volynx Lumina transforma ciência, tecnologia e educação em explicações claras, humanas, multilíngues e aplicáveis." />
+  <title>Volynx Lumina — Conhecimento não é privilégio. É luz.</title>
+  <FaviconHead />
+</head>
+<body class="lumina-page">
+  <LabBg />
+  <Topbar rightLinks={[{ href: ROUTES.lab, label: "← Lab" }, { href: proHref, label: "Upgrade Pro" }]} />
+  <LabToolSwitcher active="lumina" />
+
+  <main class="lumina-shell">
+    <section class="lumina-hero" aria-labelledby="lumina-title">
+      <div class="lumina-hero__copy">
+        <span class="lumina-pill"><i></i> Volynx Lumina · v0.1</span>
+        <h1 id="lumina-title"><span>Conhecimento</span> não é privilégio. <em>É luz.</em></h1>
+        <p class="lumina-subtitle">Transforme conteúdos científicos, técnicos e educacionais em explicações claras, humanas e multilíngues.</p>
+        <div class="lumina-hero-actions">
+          <a href="#lumina-workbench" class="lumina-btn lumina-btn--primary">Começar gratuitamente</a>
+          <a href="#funcionalidades" class="lumina-btn lumina-btn--ghost">Ver capacidades</a>
+        </div>
+      </div>
+      <div class="lumina-crystal" aria-hidden="true">
+        <div class="lumina-crystal__halo"></div>
+        <svg viewBox="0 0 420 480" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="luminaOrbGrad" cx="38%" cy="30%" r="65%">
+              <stop offset="0%" stop-color="#c0eeff" stop-opacity=".95" />
+              <stop offset="30%" stop-color="#62b8ff" stop-opacity=".8" />
+              <stop offset="60%" stop-color="#1e3a8a" stop-opacity=".9" />
+              <stop offset="100%" stop-color="#071228" stop-opacity=".96" />
+            </radialGradient>
+            <radialGradient id="luminaInnerGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#00d8ff" stop-opacity=".55" />
+              <stop offset="48%" stop-color="#7a35ff" stop-opacity=".28" />
+              <stop offset="100%" stop-color="transparent" stop-opacity="0" />
+            </radialGradient>
+            <linearGradient id="luminaCrystalEdge" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#d6a84f" stop-opacity=".8" />
+              <stop offset="50%" stop-color="#f8faff" stop-opacity=".45" />
+              <stop offset="100%" stop-color="#7a35ff" stop-opacity=".62" />
+            </linearGradient>
+            <linearGradient id="luminaFaceTop" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#e8f6ff" stop-opacity=".9" />
+              <stop offset="100%" stop-color="#4a90d9" stop-opacity=".52" />
+            </linearGradient>
+            <linearGradient id="luminaFaceLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#1e3a8a" stop-opacity=".92" />
+              <stop offset="100%" stop-color="#2a5bb5" stop-opacity=".74" />
+            </linearGradient>
+            <linearGradient id="luminaFaceRight" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#0d2050" stop-opacity=".96" />
+              <stop offset="100%" stop-color="#122a70" stop-opacity=".82" />
+            </linearGradient>
+            <filter id="luminaGlow">
+              <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+              <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+            <clipPath id="luminaOrbClip"><ellipse cx="210" cy="210" rx="180" ry="180" /></clipPath>
+          </defs>
+          <ellipse cx="210" cy="440" rx="120" ry="18" fill="rgba(0,0,0,.35)" />
+          <ellipse cx="210" cy="210" rx="180" ry="180" fill="url(#luminaOrbGrad)" />
+          <ellipse cx="210" cy="210" rx="180" ry="180" fill="url(#luminaInnerGlow)" />
+          <ellipse cx="158" cy="155" rx="55" ry="32" fill="rgba(255,255,255,.22)" transform="rotate(-20 158 155)" class="lumina-crystal__blur" />
+          <ellipse cx="148" cy="148" rx="20" ry="10" fill="rgba(255,255,255,.55)" transform="rotate(-20 148 148)" />
+          <g clip-path="url(#luminaOrbClip)" filter="url(#luminaGlow)">
+            <polygon points="210,90 280,170 210,190 140,170" fill="url(#luminaFaceTop)" opacity=".9" stroke="rgba(255,255,255,.3)" stroke-width=".8" />
+            <polygon points="210,190 140,170 130,280 210,310" fill="url(#luminaFaceLeft)" opacity=".85" stroke="rgba(0,216,255,.22)" stroke-width=".8" />
+            <polygon points="210,190 280,170 290,280 210,310" fill="url(#luminaFaceRight)" opacity=".9" stroke="rgba(122,53,255,.32)" stroke-width=".8" />
+            <polygon points="130,280 210,310 290,280 210,330" fill="#0a1840" opacity=".8" stroke="rgba(214,168,79,.25)" stroke-width=".8" />
+            <polygon points="130,280 210,330 210,390" fill="#071228" opacity=".72" stroke="rgba(0,216,255,.15)" stroke-width=".5" />
+            <polygon points="290,280 210,330 210,390" fill="#091530" opacity=".82" stroke="rgba(122,53,255,.16)" stroke-width=".5" />
+            <line x1="210" y1="90" x2="130" y2="280" stroke="url(#luminaCrystalEdge)" stroke-width="1.2" opacity=".72" />
+            <line x1="210" y1="90" x2="290" y2="280" stroke="url(#luminaCrystalEdge)" stroke-width="1.2" opacity=".72" />
+            <line x1="210" y1="90" x2="210" y2="390" stroke="rgba(214,168,79,.42)" stroke-width=".8" opacity=".55" />
+          </g>
+          <ellipse cx="210" cy="210" rx="200" ry="55" fill="none" stroke="rgba(0,216,255,.16)" stroke-width="1" stroke-dasharray="8 6" transform="rotate(-15 210 210)" />
+          <ellipse cx="210" cy="210" rx="200" ry="55" fill="none" stroke="rgba(122,53,255,.12)" stroke-width="1" stroke-dasharray="4 10" transform="rotate(25 210 210)" />
+          <circle cx="90" cy="130" r="2.5" fill="#00d8ff" opacity=".76" />
+          <circle cx="340" cy="95" r="1.8" fill="#d6a84f" opacity=".78" />
+          <circle cx="55" cy="300" r="2.5" fill="#7a35ff" opacity=".82" />
+          <circle cx="360" cy="320" r="1.8" fill="#00d8ff" opacity=".84" />
+          <circle cx="210" cy="50" r="2.5" fill="#d6a84f" opacity=".88" />
+          <circle cx="130" cy="380" r="1.8" fill="#7a35ff" opacity=".9" />
+          <circle cx="300" cy="370" r="2.5" fill="#00d8ff" opacity=".92" />
+          <ellipse cx="210" cy="210" rx="180" ry="180" fill="none" stroke="rgba(0,216,255,.22)" stroke-width="1.5" />
+          <ellipse cx="210" cy="210" rx="176" ry="176" fill="none" stroke="rgba(214,168,79,.12)" stroke-width=".8" />
+        </svg>
+        <span>Claro</span>
+        <span>Profundo</span>
+        <span>Prático</span>
+      </div>
+    </section>
+
+    <section class="lumina-workbench" id="lumina-workbench" aria-label="Lumina workspace">
+      <div class="lumina-input-panel">
+        <div class="lumina-panel-head">
+          <div>
+            <span class="lumina-kicker">Input</span>
+            <h2>Ilumine um conteúdo complexo</h2>
+          </div>
+          <span class="lumina-free-counter" id="luminaFreeCounter">Free: 5 usos</span>
+        </div>
+
+        <label class="lumina-field">
+          <span>Texto, artigo, link ou ideia</span>
+          <textarea id="luminaInput" rows="12" placeholder="Cole aqui um texto, artigo, link ou ideia complexa..."></textarea>
+        </label>
+
+        <div class="lumina-controls">
+          <label class="lumina-select">
+            <span>Idioma</span>
+            <select id="luminaLanguage">
+              <option value="pt">Português</option>
+              <option value="en">English</option>
+              <option value="es">Español</option>
+            </select>
+          </label>
+          <label class="lumina-select">
+            <span>Modo</span>
+            <select id="luminaMode">
+              <option value="clear">Claro</option>
+              <option value="deep">Profundo</option>
+              <option value="practical">Prático</option>
+              <option value="multilingual">Multilíngue</option>
+              <option value="creator">Criador</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="lumina-actions" aria-label="Lumina actions">
+          <button type="button" data-mode="clear">Simplificar</button>
+          <button type="button" data-mode="deep">Resumir</button>
+          <button type="button" data-mode="multilingual">Traduzir</button>
+          <button type="button" data-mode="clear">Explicar como professor</button>
+          <button type="button" data-mode="practical">Transformar em guia prático</button>
+        </div>
+      </div>
+
+      <div class="lumina-result-panel">
+        <div class="lumina-panel-head">
+          <div>
+            <span class="lumina-kicker">Output</span>
+            <h2>Resposta Lumina</h2>
+          </div>
+          <span class="lumina-status" id="luminaStatus">Pronta</span>
+        </div>
+
+        <div class="lumina-output" id="luminaOutput">
+          <article class="lumina-output-card is-empty">
+            <span>Resumo essencial</span>
+            <p>A resposta aparecerá aqui em cards claros: resumo, explicação simples, conceitos, impacto prático e perguntas para continuar aprendendo.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="lumina-section" id="funcionalidades">
+      <div class="lumina-section-head">
+        <span class="lumina-kicker">Capacidades</span>
+        <h2>O que a Lumina faz</h2>
+        <p>Da simplificação à criação: um conjunto coeso de capacidades para transformar qualquer conhecimento em clareza.</p>
+      </div>
+      <div class="lumina-features">
+        {features.map(([title, copy, tone]) => (
+          <article class:list={["lumina-feature", `lumina-feature--${tone}`]}>
+            <div class="lumina-feature__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none">
+                <path d="M16 4L28 10V22L16 28L4 22V10L16 4Z" stroke="currentColor" stroke-width="1.5" fill="currentColor" fill-opacity=".08" />
+                <circle cx="16" cy="16" r="4" fill="currentColor" fill-opacity=".82" />
+              </svg>
+            </div>
+            <h3>{title}</h3>
+            <p>{copy}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="lumina-modes" aria-label="Lumina modes">
+      {[
+        ["Modo Claro", "Simplicidade que ilumina", "Explica de forma simples, direta e humana."],
+        ["Modo Profundo", "Análise sem superficialidade", "Mantém a complexidade, mas organiza melhor."],
+        ["Modo Prático", "Conhecimento em ação", "Transforma conhecimento em plano, decisão e próximos passos."],
+        ["Modo Multilíngue", "Sem fronteiras de idioma", "Traduz e adapta o conteúdo sem perder contexto."],
+        ["Modo Criador", "Conhecimento que se transforma", "Transforma estudos em post, aula, roteiro ou página."],
+      ].map(([title, subtitle, copy]) => (
+        <article>
+          <h3>{title}</h3>
+          <strong>{subtitle}</strong>
+          <p>{copy}</p>
+        </article>
+      ))}
+    </section>
+
+    <section class="lumina-plans" id="planos">
+      <div class="lumina-section-head">
+        <span class="lumina-kicker">Acesso</span>
+        <h2>Free should feel generous. <em>Pro should feel inevitable.</em></h2>
+        <p>O gratuito precisa realmente ajudar. O Pro entra como expansão natural para profundidade, escala e produtividade.</p>
+      </div>
+      <div class="lumina-plan-grid">
+        {plans.map((plan) => (
+          <article class:list={["lumina-plan", `lumina-plan--${plan.tone}`]}>
+            <div class="lumina-plan__bar"></div>
+            {plan.tone === "pro" && <span class="lumina-plan__badge">Mais popular</span>}
+            <span class="lumina-kicker">{plan.name}</span>
+            <h3>{plan.price}</h3>
+            <p>{plan.description}</p>
+            <ul>
+              {plan.features.map((item) => (
+                <li><span aria-hidden="true"></span>{item}</li>
+              ))}
+            </ul>
+            <a href={plan.href} class:list={["lumina-btn", plan.tone === "pro" ? "lumina-btn--gold" : "lumina-btn--ghost"]}>{plan.cta}</a>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="lumina-stats" aria-label="Lumina proof points">
+      {[
+        ["3", "idiomas iniciais"],
+        ["5", "modos de análise"],
+        ["∞", "tipos de conteúdo"],
+        ["1", "missão: clareza"],
+      ].map(([value, label]) => (
+        <div>
+          <strong>{value}</strong>
+          <span>{label}</span>
+        </div>
+      ))}
+    </section>
+
+    <section class="lumina-manifesto" id="manifesto">
+      <span class="lumina-kicker">Manifesto</span>
+      <h2>Queremos construir pontes.</h2>
+      <p>A Volynx Lumina nasce da ideia de que o conhecimento não deve ficar preso atrás de linguagem difícil, barreiras sociais, limitações financeiras ou sistemas feitos apenas para poucos.</p>
+      <p>Acreditamos que o conhecimento só muda o mundo quando pode ser entendido, compartilhado e usado. Porque entender o mundo é o primeiro passo para transformá-lo.</p>
+      <div class="lumina-upgrade">
+        <strong>Free should feel generous. Pro should feel inevitable.</strong>
+        <a href={proHref}>Usar com Pro</a>
+      </div>
+    </section>
+
+    <section class="lumina-final">
+      <div>
+        <span class="lumina-kicker">Comece agora</span>
+        <h2>Comece iluminando <em>uma ideia.</em></h2>
+        <p>Cole um texto, artigo ou conceito difícil e deixe a Lumina transformar complexidade em clareza. Gratuitamente.</p>
+        <div class="lumina-hero-actions">
+          <a href="#lumina-workbench" class="lumina-btn lumina-btn--primary">Experimentar Lumina</a>
+          <a href="#manifesto" class="lumina-btn lumina-btn--ghost">Ler manifesto</a>
+          <a href={proHref} class="lumina-btn lumina-btn--gold">Explorar Pro</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <LabUpgradeBanner />
+  <SiteFooter />
+  <PageWidgets hideUtilBar />
+  <script type="module" src="/volynx-lab/lumina.js"></script>
+</body>
+</html>
+
+<style>
+  :root {
+    --lumina-bg: #06142e;
+    --lumina-text: rgba(255,255,255,.92);
+    --lumina-muted: rgba(255,255,255,.62);
+    --lumina-line: rgba(255,255,255,.12);
+    --lumina-a: #00d8ff;
+    --lumina-b: #d6a84f;
+    --lumina-c: #7a35ff;
+    --lumina-blue: #1e6bff;
+  }
+
+  html { background: var(--lumina-bg); }
+  body.lumina-page {
+    min-height: 100vh;
+    margin: 0;
+    color: var(--lumina-text);
+    font-family: "Manrope", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background:
+      radial-gradient(circle at 18% 8%, rgba(122,53,255,.2), transparent 30%),
+      radial-gradient(circle at 84% 10%, rgba(0,216,255,.13), transparent 32%),
+      radial-gradient(circle at 50% 70%, rgba(30,107,255,.1), transparent 42%),
+      linear-gradient(180deg, rgba(6,20,46,.96), #05070d 74%);
+  }
+
+  .lumina-shell {
+    width: min(1180px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 42px 0 100px;
+  }
+
+  .lumina-hero {
+    min-height: 620px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 520px);
+    align-items: center;
+    gap: clamp(32px, 7vw, 86px);
+  }
+
+  .lumina-kicker {
+    display: inline-flex;
+    color: var(--lumina-a);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+
+  .lumina-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 30px;
+    padding: 8px 18px;
+    border: 1px solid rgba(0,216,255,.2);
+    border-radius: 999px;
+    background: rgba(0,216,255,.06);
+    color: var(--lumina-a);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .lumina-pill i {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--lumina-a);
+    box-shadow: 0 0 10px var(--lumina-a);
+  }
+
+  .lumina-hero h1 {
+    margin: 0;
+    font-size: clamp(50px, 7.4vw, 92px);
+    line-height: .96;
+    letter-spacing: 0;
+    max-width: 760px;
+  }
+
+  .lumina-hero h1 span {
+    background: linear-gradient(90deg, #f8faff 0%, #00d8ff 30%, #7a35ff 68%, #f8faff 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: luminaShimmer 6s linear infinite;
+  }
+
+  .lumina-hero h1 em,
+  .lumina-plans h2 em,
+  .lumina-final h2 em {
+    color: var(--lumina-b);
+    font-style: normal;
+    background: linear-gradient(90deg, #d6a84f 0%, #f8e9c1 42%, #d6a84f 72%, #a87820 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: luminaShimmer 5s linear infinite;
+  }
+
+  .lumina-subtitle {
+    max-width: 720px;
+    margin: 24px 0 0;
+    color: var(--lumina-muted);
+    font-size: clamp(17px, 2vw, 21px);
+    line-height: 1.65;
+  }
+
+  .lumina-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 34px;
+  }
+
+  .lumina-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 900;
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,.13);
+    transition: transform .22s ease, box-shadow .22s ease, background .22s ease, border-color .22s ease;
+  }
+
+  .lumina-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .lumina-btn--primary {
+    color: #f8faff;
+    border-color: rgba(122,53,255,.42);
+    background: linear-gradient(135deg, var(--lumina-blue), var(--lumina-c));
+    box-shadow: 0 14px 42px rgba(30,107,255,.26);
+  }
+
+  .lumina-btn--ghost {
+    color: var(--lumina-a);
+    border-color: rgba(0,216,255,.28);
+    background: rgba(0,216,255,.045);
+  }
+
+  .lumina-btn--gold {
+    color: #06142e;
+    border-color: rgba(214,168,79,.3);
+    background: linear-gradient(135deg, #d6a84f, #f8e9c1);
+  }
+
+  .lumina-crystal {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 520px;
+    isolation: isolate;
+  }
+
+  .lumina-crystal__halo {
+    position: absolute;
+    inset: -44px;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 50%, rgba(122,53,255,.2) 0%, rgba(0,216,255,.1) 45%, transparent 70%);
+  }
+
+  .lumina-crystal svg {
+    width: min(100%, 480px);
+    filter: drop-shadow(0 0 40px rgba(0,216,255,.35)) drop-shadow(0 0 80px rgba(122,53,255,.2));
+    animation: luminaFloat 8s ease-in-out infinite;
+  }
+
+  .lumina-crystal__blur {
+    filter: blur(6px);
+  }
+
+  .lumina-crystal span {
+    position: absolute;
+    padding: 9px 12px;
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 999px;
+    background: rgba(6,20,46,.74);
+    color: rgba(255,255,255,.82);
+    font-size: 12px;
+    font-weight: 900;
+    box-shadow: 0 14px 34px rgba(0,0,0,.24);
+  }
+
+  .lumina-crystal span:nth-of-type(1) { top: 82px; left: 42px; }
+  .lumina-crystal span:nth-of-type(2) { right: 18px; top: 46%; }
+  .lumina-crystal span:nth-of-type(3) { bottom: 88px; left: 29%; }
+
+  @keyframes luminaFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    33% { transform: translateY(-18px) rotate(1.5deg); }
+    66% { transform: translateY(-8px) rotate(-1deg); }
+  }
+
+  @keyframes luminaShimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+
+  .lumina-orb {
+    position: relative;
+    min-height: 430px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--lumina-line);
+    border-radius: 8px;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 48%, rgba(125,249,255,.18), transparent 36%),
+      linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.025));
+    box-shadow: 0 28px 100px rgba(0,0,0,.34);
+  }
+
+  .lumina-orb img {
+    width: min(72%, 300px);
+    filter: drop-shadow(0 0 28px rgba(125,249,255,.36));
+  }
+
+  .lumina-orb span {
+    position: absolute;
+    padding: 9px 12px;
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 999px;
+    background: rgba(4,8,18,.74);
+    color: rgba(255,255,255,.8);
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .lumina-orb span:nth-of-type(1) { top: 42px; left: 38px; }
+  .lumina-orb span:nth-of-type(2) { right: 34px; top: 46%; }
+  .lumina-orb span:nth-of-type(3) { bottom: 44px; left: 28%; }
+
+  .lumina-workbench {
+    display: grid;
+    grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+    gap: 18px;
+    align-items: start;
+    scroll-margin-top: 110px;
+  }
+
+  .lumina-input-panel,
+  .lumina-result-panel,
+  .lumina-feature,
+  .lumina-modes article,
+  .lumina-plan,
+  .lumina-stats,
+  .lumina-manifesto,
+  .lumina-final > div {
+    border: 1px solid var(--lumina-line);
+    border-radius: 8px;
+    background: rgba(6,20,46,.64);
+    box-shadow: 0 20px 80px rgba(0,0,0,.24);
+    backdrop-filter: blur(16px);
+  }
+
+  .lumina-input-panel,
+  .lumina-result-panel {
+    padding: clamp(18px, 3vw, 26px);
+  }
+
+  .lumina-panel-head {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+
+  .lumina-panel-head h2 {
+    margin: 7px 0 0;
+    font-size: clamp(22px, 3vw, 32px);
+    letter-spacing: 0;
+  }
+
+  .lumina-free-counter,
+  .lumina-status {
+    flex: 0 0 auto;
+    border: 1px solid rgba(125,249,255,.2);
+    border-radius: 999px;
+    padding: 8px 10px;
+    color: rgba(255,255,255,.74);
+    font-size: 12px;
+    font-weight: 900;
+    background: rgba(125,249,255,.08);
+  }
+
+  .lumina-field,
+  .lumina-select {
+    display: grid;
+    gap: 8px;
+  }
+
+  .lumina-field span,
+  .lumina-select span {
+    color: rgba(255,255,255,.72);
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .lumina-field textarea,
+  .lumina-select select {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 8px;
+    background: rgba(0,0,0,.32);
+    color: #fff;
+    font: inherit;
+    outline: none;
+  }
+
+  .lumina-field textarea {
+    min-height: 310px;
+    padding: 16px;
+    line-height: 1.55;
+    resize: vertical;
+  }
+
+  .lumina-select select {
+    min-height: 46px;
+    padding: 0 12px;
+  }
+
+  .lumina-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  .lumina-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .lumina-actions button,
+  .lumina-upgrade a {
+    min-height: 42px;
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 8px;
+    padding: 10px 13px;
+    background: rgba(255,255,255,.06);
+    color: #fff;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .lumina-actions button:first-child,
+  .lumina-upgrade a {
+    border-color: transparent;
+    color: #f8faff;
+    background: linear-gradient(135deg, var(--lumina-blue), var(--lumina-c));
+  }
+
+  .lumina-output {
+    display: grid;
+    gap: 12px;
+  }
+
+  .lumina-output-card {
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px;
+    padding: 16px;
+    background:
+      linear-gradient(135deg, rgba(125,249,255,.08), rgba(255,227,138,.035)),
+      rgba(255,255,255,.035);
+  }
+
+  .lumina-output-card span {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--lumina-b);
+    font-size: 12px;
+    font-weight: 950;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .lumina-output-card p {
+    margin: 0;
+    color: rgba(255,255,255,.78);
+    line-height: 1.62;
+    white-space: pre-wrap;
+  }
+
+  .lumina-output-card.is-empty p { color: rgba(255,255,255,.52); }
+
+  .lumina-section,
+  .lumina-plans,
+  .lumina-final {
+    margin-top: 84px;
+    scroll-margin-top: 110px;
+  }
+
+  .lumina-section-head {
+    max-width: 680px;
+    margin: 0 auto 36px;
+    text-align: center;
+  }
+
+  .lumina-section-head h2 {
+    margin: 12px 0 12px;
+    color: #fff;
+    font-size: clamp(34px, 5vw, 58px);
+    line-height: 1;
+    letter-spacing: 0;
+  }
+
+  .lumina-section-head p {
+    margin: 0 auto;
+    max-width: 560px;
+    color: rgba(255,255,255,.58);
+    line-height: 1.7;
+  }
+
+  .lumina-features {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .lumina-feature {
+    padding: 22px;
+    min-height: 230px;
+    transition: transform .24s ease, border-color .24s ease, background .24s ease, box-shadow .24s ease;
+  }
+
+  .lumina-feature:hover {
+    transform: translateY(-5px);
+    border-color: rgba(0,216,255,.25);
+    background: rgba(255,255,255,.055);
+    box-shadow: 0 24px 70px rgba(0,0,0,.34), 0 0 30px rgba(0,216,255,.08);
+  }
+
+  .lumina-feature__icon {
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    color: var(--lumina-a);
+    border: 1px solid rgba(0,216,255,.18);
+    background: rgba(0,216,255,.08);
+  }
+
+  .lumina-feature__icon svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .lumina-feature--violet .lumina-feature__icon { color: var(--lumina-c); border-color: rgba(122,53,255,.2); background: rgba(122,53,255,.09); }
+  .lumina-feature--blue .lumina-feature__icon { color: var(--lumina-blue); border-color: rgba(30,107,255,.22); background: rgba(30,107,255,.09); }
+  .lumina-feature--gold .lumina-feature__icon { color: var(--lumina-b); border-color: rgba(214,168,79,.22); background: rgba(214,168,79,.08); }
+
+  .lumina-feature h3 {
+    margin: 0 0 10px;
+    color: #fff;
+    font-size: 17px;
+    line-height: 1.2;
+    letter-spacing: 0;
+  }
+
+  .lumina-feature p {
+    margin: 0;
+    color: rgba(255,255,255,.58);
+    font-size: 14px;
+    line-height: 1.62;
+  }
+
+  .lumina-modes {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 84px;
+  }
+
+  .lumina-modes article {
+    padding: 22px;
+    min-height: 180px;
+    background:
+      linear-gradient(135deg, rgba(0,216,255,.045), rgba(122,53,255,.045)),
+      rgba(6,20,46,.64);
+  }
+
+  .lumina-modes h3 {
+    margin: 0 0 10px;
+    color: #fff;
+    font-size: 17px;
+    letter-spacing: 0;
+  }
+
+  .lumina-modes strong {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--lumina-a);
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .lumina-modes p {
+    margin: 0;
+    color: var(--lumina-muted);
+    line-height: 1.55;
+    font-size: 14px;
+  }
+
+  .lumina-plan-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    max-width: 920px;
+    margin: 0 auto;
+  }
+
+  .lumina-plan {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(26px, 4vw, 40px);
+  }
+
+  .lumina-plan--pro {
+    border-color: rgba(122,53,255,.32);
+    background:
+      linear-gradient(145deg, rgba(122,53,255,.15), rgba(30,107,255,.08), rgba(42,10,94,.25)),
+      rgba(6,20,46,.72);
+  }
+
+  .lumina-plan__bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--lumina-blue), var(--lumina-a));
+  }
+
+  .lumina-plan--pro .lumina-plan__bar {
+    background: linear-gradient(90deg, var(--lumina-c), var(--lumina-b));
+  }
+
+  .lumina-plan__badge {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    border-radius: 999px;
+    padding: 6px 10px;
+    color: #06142e;
+    background: linear-gradient(135deg, #d6a84f, #f8e9c1);
+    font-size: 11px;
+    font-weight: 950;
+    text-transform: uppercase;
+  }
+
+  .lumina-plan h3 {
+    margin: 14px 0 8px;
+    color: #fff;
+    font-size: clamp(46px, 6vw, 64px);
+    line-height: .9;
+    letter-spacing: 0;
+  }
+
+  .lumina-plan p {
+    margin: 0 0 24px;
+    color: rgba(255,255,255,.6);
+    line-height: 1.62;
+  }
+
+  .lumina-plan ul {
+    display: grid;
+    gap: 12px;
+    margin: 0 0 28px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .lumina-plan li {
+    display: grid;
+    grid-template-columns: 16px minmax(0, 1fr);
+    gap: 10px;
+    color: rgba(255,255,255,.76);
+    line-height: 1.45;
+    font-size: 14px;
+  }
+
+  .lumina-plan li span {
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    border-radius: 999px;
+    border: 1px solid rgba(0,216,255,.35);
+    background: radial-gradient(circle, var(--lumina-a) 0 32%, rgba(0,216,255,.13) 35%);
+  }
+
+  .lumina-plan--pro li span {
+    border-color: rgba(122,53,255,.38);
+    background: radial-gradient(circle, var(--lumina-c) 0 32%, rgba(122,53,255,.15) 35%);
+  }
+
+  .lumina-plan .lumina-btn {
+    width: 100%;
+  }
+
+  .lumina-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 72px;
+    padding: clamp(24px, 5vw, 46px);
+    text-align: center;
+  }
+
+  .lumina-stats strong {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--lumina-a);
+    font-size: clamp(40px, 6vw, 64px);
+    line-height: 1;
+  }
+
+  .lumina-stats div:nth-child(2) strong { color: var(--lumina-c); }
+  .lumina-stats div:nth-child(3) strong { color: var(--lumina-b); }
+  .lumina-stats div:nth-child(4) strong { color: var(--lumina-blue); }
+
+  .lumina-stats span {
+    color: rgba(255,255,255,.58);
+    font-size: 14px;
+  }
+
+  .lumina-manifesto {
+    margin-top: 72px;
+    padding: clamp(24px, 5vw, 44px);
+  }
+
+  .lumina-manifesto h2 {
+    margin: 10px 0 14px;
+    font-size: clamp(32px, 5vw, 58px);
+    line-height: 1;
+    letter-spacing: 0;
+  }
+
+  .lumina-manifesto p {
+    max-width: 860px;
+    color: rgba(255,255,255,.68);
+    line-height: 1.72;
+    font-size: 17px;
+  }
+
+  .lumina-upgrade {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 26px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,.1);
+  }
+
+  .lumina-upgrade strong {
+    color: var(--lumina-b);
+    font-size: clamp(18px, 2vw, 24px);
+  }
+
+  .lumina-final {
+    position: relative;
+    padding-bottom: 20px;
+  }
+
+  .lumina-final > div {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: clamp(34px, 7vw, 78px);
+    text-align: center;
+    border-color: rgba(0,216,255,.15);
+    background:
+      radial-gradient(ellipse at 50% 100%, rgba(30,107,255,.16), rgba(122,53,255,.1) 44%, transparent 74%),
+      rgba(6,20,46,.66);
+    animation: luminaPulseGlow 5s ease-in-out infinite;
+  }
+
+  .lumina-final h2 {
+    margin: 14px 0 18px;
+    color: #fff;
+    font-size: clamp(36px, 5vw, 60px);
+    line-height: 1.05;
+    letter-spacing: 0;
+  }
+
+  .lumina-final p {
+    max-width: 580px;
+    margin: 0 auto 28px;
+    color: rgba(255,255,255,.62);
+    font-size: 18px;
+    line-height: 1.68;
+  }
+
+  .lumina-final .lumina-hero-actions {
+    justify-content: center;
+  }
+
+  @keyframes luminaPulseGlow {
+    0%, 100% { box-shadow: 0 0 40px rgba(0,216,255,.18), 0 20px 80px rgba(0,0,0,.24); }
+    50% { box-shadow: 0 0 76px rgba(0,216,255,.3), 0 30px 100px rgba(122,53,255,.18); }
+  }
+
+  @media (max-width: 980px) {
+    .lumina-hero,
+    .lumina-workbench {
+      grid-template-columns: 1fr;
+    }
+
+    .lumina-features,
+    .lumina-modes,
+    .lumina-stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .lumina-plan-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .lumina-shell { width: min(100% - 22px, 1180px); padding-top: 28px; }
+    .lumina-hero { min-height: auto; }
+    .lumina-crystal { min-height: 340px; }
+    .lumina-crystal span { display: none; }
+    .lumina-controls,
+    .lumina-features,
+    .lumina-modes,
+    .lumina-stats {
+      grid-template-columns: 1fr;
+    }
+    .lumina-panel-head,
+    .lumina-upgrade {
+      align-items: stretch;
+      flex-direction: column;
+    }
+    .lumina-actions button { width: 100%; }
+  }
+</style>

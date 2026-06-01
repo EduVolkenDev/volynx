@@ -1,12 +1,12 @@
 /**
  * VOLYNX — AI Tools (Supabase Edge Function)
  *
- * Routes AI requests for intent, summary, writing, task, decision, and CVitae tools.
+ * Routes AI requests for intent, summary, writing, task, decision, Lumina, and CVitae tools.
  * Called by daily.volynx.world after token deduction is handled client-side.
  *
  * Request:
  *   POST /ai-tools
- *   { tool: "intent"|"summary"|"writing"|"task"|"decision"|"cvitae", input: {...}, lite: boolean }
+ *   { tool: "intent"|"summary"|"writing"|"task"|"decision"|"lumina"|"cvitae", input: {...}, lite: boolean }
  *
  * Response:
  *   200: { result: string, lite: boolean }
@@ -78,7 +78,7 @@ Deno.serve(async (req: Request) => {
     if (!tool || !input) return json({ error: "Missing tool or input" }, 400);
 
     const isLite = Boolean(lite);
-    const maxTokens = isLite ? 400 : 1024;
+    let maxTokens = isLite ? 400 : 1024;
 
     let system = "";
     let user = "";
@@ -213,6 +213,55 @@ Rules:
       }
 
     // ── CVitae resume copilot ────────────────────────────────
+    } else if (tool === "lumina") {
+      const { text, mode, language } = input;
+      if (!text?.trim()) return json({ error: "Missing text" }, 400);
+
+      const languageLabel: Record<string, string> = {
+        pt: "Portuguese",
+        en: "English",
+        es: "Spanish",
+      };
+      const modeLabel: Record<string, string> = {
+        clear: "Modo Claro: explain in simple, direct, human language for beginners.",
+        deep: "Modo Profundo: preserve complexity, but organize it with strong technical structure.",
+        practical: "Modo Pratico: turn the knowledge into actions, use cases, project ideas, and decisions.",
+        multilingual: "Modo Multilingue: explain the content in Portuguese, English, and Spanish.",
+        creator: "Modo Criador: transform the knowledge into educational content ideas, post angles, lesson structure, or a site section.",
+      };
+      maxTokens = isLite ? 650 : 1400;
+      system = `You are Volynx Lumina, an intelligence created to democratize knowledge.
+
+Mission:
+Transform complex scientific, technical, educational, and cultural content into explanations that are clear, human, accessible, multilingual when requested, and applicable.
+
+Rules:
+- Identify the main topic.
+- Explain the content simply while preserving accuracy.
+- Avoid unnecessary academic language.
+- Explain difficult terms.
+- Show why the content matters.
+- Point to practical applications.
+- Adapt the answer to the requested language.
+- Never invent data, sources, authors, dates, or findings.
+- State when the input is incomplete, uncertain, or requires verification.
+- Do not claim to have opened links or PDFs unless the content was provided in the prompt.
+
+Response format:
+Title:
+Essential summary:
+Simple explanation:
+Important concepts:
+Why this matters:
+Practical applications:
+Limitations or cautions:
+Questions to keep learning:`;
+      user = `Requested language: ${languageLabel[language || "pt"] || "Portuguese"}
+Requested mode: ${modeLabel[mode || "clear"] || modeLabel.clear}
+
+Content to illuminate:
+${text}`;
+
     } else if (tool === "cvitae") {
       const { mode, role, name, summary, skills, languages, location, experience, experiences, currentText, language } = input;
       const outputLanguage = cvitaeLanguageLabel(language);
