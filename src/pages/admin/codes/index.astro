@@ -614,6 +614,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
               <button class="codes-btn ghost" type="button" data-copy-value="${escapeHtml(shortUrl)}">Copy</button>
               <button class="codes-btn ghost" type="button" data-qr-action="never">Never</button>
               <button class="codes-btn ghost" type="button" data-qr-action="pause">${qr.status === "paused" ? "Resume" : "Pause"}</button>
+              <button class="codes-btn danger" type="button" data-qr-action="delete">Delete</button>
             </div>
           </article>`;
       }).join("");
@@ -665,6 +666,16 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       });
     }
 
+    async function deleteQrCode(qr) {
+      const name = qr.label || qr.slug;
+      const ok = confirm(`Delete QR "${name}"? The short link will stop resolving immediately.`);
+      if (!ok) return false;
+      await postgrest(`qr_codes?id=eq.${encodeURIComponent(qr.id)}`, {
+        method: "DELETE",
+      });
+      return true;
+    }
+
     async function handleQrAction(event) {
       const copyButton = event.target.closest("[data-copy-value]");
       if (copyButton) {
@@ -697,6 +708,9 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
             p_qr_id: id,
             p_status: qr.status === "paused" ? "active" : "paused",
           });
+        } else if (button.dataset.qrAction === "delete") {
+          const deleted = await deleteQrCode(qr);
+          if (!deleted) return;
         }
         await loadQrs();
         renderRecent();
@@ -814,7 +828,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       el.voucherRows.innerHTML = rows.map((voucher) => {
         const active = voucher.active && (!voucher.expires_at || new Date(voucher.expires_at) > new Date()) && Number(voucher.times_used || 0) < Number(voucher.max_uses || 1);
         return `
-          <article class="codes-row">
+          <article class="codes-row" data-voucher-id="${escapeHtml(voucher.id)}">
             <div class="codes-row-main">
               <span class="codes-pill ${active ? "codes-pill--active" : "codes-pill--expired"}">${active ? "active" : "inactive"}</span>
               <strong>${escapeHtml(voucher.label || voucher.type)}</strong>
@@ -827,9 +841,21 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
             </div>
             <div class="codes-row-actions">
               <button class="codes-btn ghost" type="button" data-copy-value="${escapeHtml(voucher.code)}">Copy</button>
+              <button class="codes-btn danger" type="button" data-voucher-action="revoke" ${!voucher.active ? "disabled" : ""}>Delete / revoke</button>
             </div>
           </article>`;
       }).join("");
+    }
+
+    async function revokeVoucher(id) {
+      const voucher = lastVoucherRows.find((item) => item.id === id);
+      const name = voucher?.label || voucher?.code || "this code";
+      const ok = confirm(`Delete/revoke "${name}"? The access code will stop working. Existing redemption history is kept.`);
+      if (!ok) return;
+      const data = await voucherApi({ action: "revoke", id });
+      if (!data?.ok) throw new Error(data?.detail || data?.error || "Could not revoke voucher.");
+      await loadVouchers();
+      renderRecent();
     }
 
     function renderRecent() {
@@ -930,6 +956,18 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       el.voucherRows.addEventListener("click", async (event) => {
         const button = event.target.closest("[data-copy-value]");
         if (button) await copyText(button.dataset.copyValue || "");
+        const revokeButton = event.target.closest('[data-voucher-action="revoke"]');
+        if (revokeButton) {
+          revokeButton.disabled = true;
+          try {
+            const row = revokeButton.closest("[data-voucher-id]");
+            await revokeVoucher(row?.dataset.voucherId || "");
+          } catch (err) {
+            alert(err.message || String(err));
+          } finally {
+            revokeButton.disabled = false;
+          }
+        }
       });
       document.addEventListener("click", async (event) => {
         const targetId = event.target.closest("[data-copy-target]")?.dataset.copyTarget;
@@ -1396,6 +1434,17 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       border-color: transparent;
       color: #061016;
       background: linear-gradient(135deg, #7df9ff, #c6ff8f);
+    }
+
+    .codes-btn.danger {
+      border-color: rgba(248,113,113,.28);
+      color: #fecaca;
+      background: rgba(248,113,113,.09);
+    }
+
+    .codes-btn.danger:hover {
+      border-color: rgba(248,113,113,.48);
+      background: rgba(248,113,113,.14);
     }
 
     .codes-btn:disabled {
