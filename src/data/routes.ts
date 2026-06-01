@@ -63,6 +63,7 @@ export const ROUTES = {
   labConverter: "/volynx-lab/converter/",
   labImageScaler: "/volynx-lab/image-scaler/",
   labImageSuite: "/volynx-lab/image-suite/",
+  labLumina: "/volynx-lab/lumina/",
   qrgen: "/qrgen/",
   labQrGen: "/qrgen/",
 
@@ -71,6 +72,7 @@ export const ROUTES = {
   studioConverter: "/volynx-lab/converter/",
   studioImageScaler: "/volynx-lab/image-scaler/",
   studioImageSuite: "/volynx-lab/image-suite/",
+  studioLumina: "/volynx-lab/lumina/",
   studioQrGen: "/qrgen/",
 
   // ── VIP / Vouchers ──────────────────
