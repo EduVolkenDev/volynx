@@ -576,25 +576,93 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       }
       el.qrRows.innerHTML = rows.map((qr) => {
         const shortUrl = `${QR_HOST}/${qr.slug}`;
+        const label = qr.label || "";
         return `
-          <article class="codes-row" data-qr-id="${escapeHtml(qr.id)}">
+          <article class="codes-row codes-row--qr" data-qr-id="${escapeHtml(qr.id)}">
             <div class="codes-row-main">
               <span class="codes-pill codes-pill--${escapeHtml(qr.status)}">${escapeHtml(qr.status.replace("_", " "))}</span>
               <strong>${escapeHtml(qr.label || qr.slug)}</strong>
               <code>${escapeHtml(shortUrl)}</code>
               <a href="${escapeHtml(qr.target_url)}" target="_blank" rel="noopener">${escapeHtml(qr.target_url)}</a>
             </div>
+            <div class="codes-row-edit" aria-label="Edit QR destination">
+              <label>
+                <span>Destination URL</span>
+                <input type="url" data-qr-field="target_url" value="${escapeHtml(qr.target_url)}" autocomplete="url" inputmode="url" />
+              </label>
+              <label>
+                <span>Label</span>
+                <input type="text" data-qr-field="label" value="${escapeHtml(label)}" maxlength="100" />
+              </label>
+            </div>
+            <div class="codes-row-qr-preview">
+              <canvas
+                width="128"
+                height="128"
+                data-qr-preview
+                data-qr-url="${escapeHtml(shortUrl)}"
+                aria-label="QR code preview for ${escapeHtml(qr.label || qr.slug)}"
+              ></canvas>
+            </div>
             <div class="codes-row-meta">
               <span>${Number(qr.scan_count || 0)} scans</span>
               <span>${qr.expires_at ? "Expires " + escapeHtml(new Date(qr.expires_at).toLocaleDateString()) : "Never expires"}</span>
             </div>
             <div class="codes-row-actions">
+              <button class="codes-btn primary" type="button" data-qr-action="save-destination">Save destination</button>
+              <button class="codes-btn ghost" type="button" data-qr-action="download">Download PNG</button>
               <button class="codes-btn ghost" type="button" data-copy-value="${escapeHtml(shortUrl)}">Copy</button>
               <button class="codes-btn ghost" type="button" data-qr-action="never">Never</button>
               <button class="codes-btn ghost" type="button" data-qr-action="pause">${qr.status === "paused" ? "Resume" : "Pause"}</button>
             </div>
           </article>`;
       }).join("");
+      renderQrPreviews();
+    }
+
+    async function renderQrPreviews() {
+      const canvases = Array.from(el.qrRows.querySelectorAll("[data-qr-preview]"));
+      await Promise.allSettled(canvases.map((canvas) => (
+        QRCode.toCanvas(canvas, canvas.dataset.qrUrl || "", {
+          width: 128,
+          margin: 1,
+          errorCorrectionLevel: "H",
+          color: { dark: "#05060a", light: "#ffffff" },
+        })
+      )));
+    }
+
+    async function downloadSavedQr(qr) {
+      const canvas = document.createElement("canvas");
+      const shortUrl = `${QR_HOST}/${qr.slug}`;
+      await QRCode.toCanvas(canvas, shortUrl, QR_CANVAS_OPTIONS);
+      const safeName = String(qr.label || qr.slug || "qr")
+        .trim()
+        .replace(/[^a-z0-9_-]+/gi, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 60) || "qr";
+      downloadCanvas(canvas, `volynx-qr-${safeName}.png`);
+    }
+
+    async function updateQrDestination(id, row) {
+      const targetInput = row.querySelector('[data-qr-field="target_url"]');
+      const labelInput = row.querySelector('[data-qr-field="label"]');
+      const target = normalizeTargetUrl(targetInput?.value || "");
+      const label = String(labelInput?.value || "").trim();
+
+      if (targetInput) targetInput.value = target;
+      if (!isValidHttpUrl(target)) {
+        targetInput?.focus({ preventScroll: true });
+        throw new Error("Enter a valid destination URL.");
+      }
+
+      await postgrest(`qr_codes?id=eq.${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          target_url: target,
+          label: label || null,
+        }),
+      });
     }
 
     async function handleQrAction(event) {
@@ -612,7 +680,12 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       if (!qr) return;
       button.disabled = true;
       try {
-        if (button.dataset.qrAction === "never") {
+        if (button.dataset.qrAction === "save-destination") {
+          await updateQrDestination(id, row);
+        } else if (button.dataset.qrAction === "download") {
+          await downloadSavedQr(qr);
+          return;
+        } else if (button.dataset.qrAction === "never") {
           await rpc("admin_update_qr_validity", {
             p_qr_id: id,
             p_status: "active",
@@ -1247,7 +1320,8 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     .codes-form select,
     .codes-filter input,
     .codes-filter select,
-    .codes-result-url input {
+    .codes-result-url input,
+    .codes-row-edit input {
       width: 100%;
       min-height: 48px;
       border-radius: 8px;
@@ -1264,7 +1338,8 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     .codes-form select:focus,
     .codes-filter input:focus,
     .codes-filter select:focus,
-    .codes-result-url input:focus {
+    .codes-result-url input:focus,
+    .codes-row-edit input:focus {
       border-color: rgba(125,249,255,.5);
       box-shadow: 0 0 0 3px rgba(125,249,255,.08);
       background: rgba(0,0,0,.42);
@@ -1361,6 +1436,10 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       transform: translateY(-1px);
     }
 
+    .codes-row--qr {
+      grid-template-columns: minmax(0, 1fr) minmax(280px, .9fr) auto auto auto;
+    }
+
     .codes-row-main {
       display: grid;
       gap: 5px;
@@ -1387,6 +1466,49 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       color: rgba(255,255,255,.58);
       overflow-wrap: anywhere;
       text-decoration: none;
+    }
+
+    .codes-row-edit {
+      display: grid;
+      grid-template-columns: minmax(170px, 1.4fr) minmax(120px, .8fr);
+      gap: 8px;
+      min-width: 0;
+      align-items: end;
+    }
+
+    .codes-row-edit label {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .codes-row-edit span {
+      color: rgba(255,255,255,.55);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .codes-row-edit input {
+      min-height: 40px;
+      padding: 9px 10px;
+      font-size: 13px;
+    }
+
+    .codes-row-qr-preview {
+      display: grid;
+      place-items: center;
+      width: 96px;
+      height: 96px;
+      padding: 7px;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
+    }
+
+    .codes-row-qr-preview canvas {
+      width: 82px;
+      height: 82px;
+      display: block;
     }
 
     .codes-row-meta {
