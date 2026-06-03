@@ -487,12 +487,10 @@ const title = "Admin · Vouchers — VOLYNX";
 
     function detectType(grants) {
       if (grants.badge === "black_diamond") return "black_diamond";
-      if (grants.plan || grants.builder_plan || grants.daily_plan) return "plan";
-      if (grants.tokens && Object.keys(grants).length === 1) return "tokens";
-      if (grants.kit_id || grants.kit_ids) return "kit";
-      if (grants.icon_pack_grants) return "icons";
-      if (grants.devjourney_tier) return "devjourney";
-      if (grants.discount_pct || grants.stripe_coupon_id) return "discount";
+      if (grants.daily_plan) return "daily_access";
+      if (grants.plan || grants.builder_plan || grants.kit_id || grants.kit_ids || grants.icon_pack_grants || grants.devjourney_tier) return "builder_bonus";
+      if (grants.tokens && Object.keys(grants).length === 1) return "token_pack";
+      if (grants.discount_pct || grants.stripe_coupon_id) return "discount_code";
       return "generic";
     }
 
