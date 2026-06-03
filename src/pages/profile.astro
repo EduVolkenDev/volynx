@@ -181,6 +181,93 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 				<div class="detail-cell"><span class="detail-label" data-i18n="profile.label_email">Email</span><strong id="detailEmail">—</strong></div>
 			</section>
 
+			<section class="layer-passport glass-section" id="layerPassport" aria-labelledby="layerPassportTitle">
+				<div class="section-headline">
+					<div>
+						<div class="section-label">
+							<span class="i18n-en">Layer Passport</span>
+							<span class="i18n-pt">Passaporte de camadas</span>
+						</div>
+						<h2 id="layerPassportTitle" class="layer-passport__title">
+							<span class="i18n-en">Your VOLYNX identity across every layer.</span>
+							<span class="i18n-pt">Sua identidade VOLYNX atravessando cada camada.</span>
+						</h2>
+						<p class="layer-passport__copy">
+							<span class="i18n-en">Plans, VX, products, and daily context now live as one operational profile.</span>
+							<span class="i18n-pt">Planos, VX, produtos e contexto diário agora aparecem como um perfil operacional único.</span>
+						</p>
+					</div>
+					<a href={ROUTES.recarregar} class="btn btn--sm btn--ghost">
+						<span id="layerVxBalance">0</span>&nbsp;VX
+					</a>
+				</div>
+
+				<div class="layer-grid">
+					<a href={ROUTES.platform} class="layer-card layer-card--core" data-layer-card="core">
+						<span class="layer-card__media"><img src="/assets/dark-icon-light.webp" alt="" loading="lazy" /></span>
+						<span class="layer-card__body">
+							<span class="layer-card__name">VOLYNX</span>
+							<span class="layer-card__desc">
+								<span class="i18n-en">Core account, billing, VX, and ecosystem access.</span>
+								<span class="i18n-pt">Conta central, pagamentos, VX e acesso ao ecossistema.</span>
+							</span>
+						</span>
+						<span class="layer-card__status" id="layerCoreStatus">Active</span>
+					</a>
+
+					<a href={ROUTES.builder} class="layer-card" data-layer-card="builder">
+						<span class="layer-card__media"><img src="/assets/new-builder.webp" alt="" loading="lazy" /></span>
+						<span class="layer-card__body">
+							<span class="layer-card__name">Builder</span>
+							<span class="layer-card__desc">
+								<span class="i18n-en">Sites, published pages, presets, and launch kits.</span>
+								<span class="i18n-pt">Sites, páginas publicadas, presets e kits de lançamento.</span>
+							</span>
+						</span>
+						<span class="layer-card__status" id="layerBuilderStatus">Free</span>
+					</a>
+
+					<a href="https://daily.volynx.world" class="layer-card" data-layer-card="daily">
+						<span class="layer-card__media"><img id="layerDailyArt" src="/assets/daily-icon.webp" alt="" loading="lazy" /></span>
+						<span class="layer-card__body">
+							<span class="layer-card__name">Daily</span>
+							<span class="layer-card__desc">
+								<span class="i18n-en">Daily command, Vault, history, and AI routines.</span>
+								<span class="i18n-pt">Comando diário, Vault, histórico e rotinas com IA.</span>
+							</span>
+						</span>
+						<span class="layer-card__status" id="layerDailyStatus">Free</span>
+					</a>
+
+					<a href="https://cvitae.volynx.world" class="layer-card" data-layer-card="cvitae">
+						<span class="layer-card__media"><img src="/assets/cvitae.webp" alt="" loading="lazy" /></span>
+						<span class="layer-card__body">
+							<span class="layer-card__name">CVitae</span>
+							<span class="layer-card__desc">
+								<span class="i18n-en">Career assets, resumes, exports, and applications.</span>
+								<span class="i18n-pt">Ativos de carreira, currículos, exportações e candidaturas.</span>
+							</span>
+						</span>
+						<span class="layer-card__status" id="layerCvitaeStatus">Free</span>
+					</a>
+
+					<a href={ROUTES.propertyflow} class="layer-card" data-layer-card="propertyflow">
+						<span class="layer-card__media"><img src="/assets/propertyflow.webp" alt="" loading="lazy" /></span>
+						<span class="layer-card__body">
+							<span class="layer-card__name">PropertyFlow</span>
+							<span class="layer-card__desc">
+								<span class="i18n-en">Property pages, delivery assets, and real-estate workflows.</span>
+								<span class="i18n-pt">Páginas imobiliárias, entregas e fluxos para imóveis.</span>
+							</span>
+						</span>
+						<span class="layer-card__status layer-card__status--soft">
+							<span class="i18n-en">Product</span>
+							<span class="i18n-pt">Produto</span>
+						</span>
+					</a>
+				</div>
+			</section>
+
 			<section id="editPanel" class="glass-section">
 				<div class="section-label" id="formLabel" data-i18n="profile.section_edit">Edit profile</div>
 				<form id="profileForm" class="edit-form">
@@ -717,9 +804,23 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 					pro: "/assets/dailypro.webp",
 					diamond: "/assets/daily-diamond.webp",
 				};
+				const layerRank = { free: 0, launch: 1, business: 2, pro: 2, diamond: 3, studio: 4, teams: 5, enterprise: 6 };
+				function titleTier(tier) {
+					const value = String(tier || "free").toLowerCase().trim();
+					return value.charAt(0).toUpperCase() + value.slice(1);
+				}
+				function paintLayerStatus(id, tier, opts = {}) {
+					const el = $(id);
+					if (!el) return;
+					const value = String(tier || "free").toLowerCase().trim();
+					el.textContent = opts.label || titleTier(value);
+					el.dataset.tier = value;
+					el.classList.toggle("layer-card__status--active", value !== "free" || !!opts.active);
+					el.classList.toggle("layer-card__status--premium", (layerRank[value] || 0) >= 2);
+				}
 
 				if (subBuilderEl) {
-					subBuilderEl.textContent = builderTier.charAt(0).toUpperCase() + builderTier.slice(1);
+					subBuilderEl.textContent = titleTier(builderTier);
 					subBuilderEl.setAttribute("data-tier", builderTier);
 					if (builderTier !== "free" && subBuilderCta) {
 						subBuilderCta.textContent = "Manage";
@@ -727,7 +828,7 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 					}
 				}
 				if (subDailyEl) {
-					subDailyEl.textContent = dailyTier.charAt(0).toUpperCase() + dailyTier.slice(1);
+					subDailyEl.textContent = titleTier(dailyTier);
 					subDailyEl.setAttribute("data-tier", dailyTier);
 					if (subDailyArt) {
 						subDailyArt.src = dailyPlanAssets[dailyTier] || dailyPlanAssets.free;
@@ -737,7 +838,7 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 					}
 				}
 				if (subCvitaeEl) {
-					subCvitaeEl.textContent = cvitaeTier.charAt(0).toUpperCase() + cvitaeTier.slice(1);
+					subCvitaeEl.textContent = titleTier(cvitaeTier);
 					subCvitaeEl.setAttribute("data-tier", cvitaeTier);
 					if (cvitaeTier !== "free" && subCvitaeCta) {
 						subCvitaeCta.textContent = "Manage";
@@ -746,6 +847,14 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 				if (subTokensEl) {
 					subTokensEl.textContent = String(profile?.token_balance || 0);
 				}
+				paintLayerStatus("layerCoreStatus", dbPlan, { active: true, label: dbPaid ? titleTier(dbPlan) : "Active" });
+				paintLayerStatus("layerBuilderStatus", builderTier);
+				paintLayerStatus("layerDailyStatus", dailyTier);
+				paintLayerStatus("layerCvitaeStatus", cvitaeTier);
+				const layerVxBalance = $("layerVxBalance");
+				if (layerVxBalance) layerVxBalance.textContent = Number(profile?.token_balance || 0).toLocaleString();
+				const layerDailyArt = $("layerDailyArt");
+				if (layerDailyArt) layerDailyArt.src = dailyPlanAssets[dailyTier] || dailyPlanAssets.free;
 
 				// ══════════════════════════════════════════════════════
 				// PHASE 3a1: Icon purchases + automatic delivery
@@ -1853,6 +1962,118 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 	.section-headline .section-label { margin-bottom: 4px; }
 	.section-subcopy { margin: 0; color: var(--muted); font-size: .85rem; }
 
+	/* Layer passport */
+	.layer-passport { border-color: rgba(0,232,197,.14); }
+	.layer-passport__title {
+		margin: 0 0 6px;
+		font-size: clamp(1.1rem, 2vw, 1.45rem);
+		line-height: 1.2;
+		letter-spacing: -.02em;
+	}
+	.layer-passport__copy {
+		margin: 0;
+		max-width: 62ch;
+		color: rgba(255,255,255,.58);
+		font-size: .88rem;
+		line-height: 1.55;
+	}
+	.layer-grid {
+		display: grid;
+		grid-template-columns: repeat(5, minmax(0, 1fr));
+		gap: 12px;
+	}
+	.layer-card {
+		min-width: 0;
+		min-height: 196px;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+		padding: 16px;
+		border-radius: 18px;
+		border: 1px solid rgba(255,255,255,.07);
+		background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+		color: inherit;
+		text-decoration: none;
+		transition: transform .22s ease, border-color .22s ease, background .22s ease, box-shadow .22s ease;
+	}
+	.layer-card:hover {
+		transform: translateY(-3px);
+		border-color: rgba(0,232,197,.28);
+		background: linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.025));
+		box-shadow: 0 16px 38px rgba(0,232,197,.12), 0 8px 18px rgba(120,0,255,.08);
+	}
+	.layer-card:focus-visible {
+		outline: 2px solid rgba(130, 220, 255, 0.7);
+		outline-offset: 3px;
+	}
+	.layer-card__media {
+		width: 58px;
+		height: 58px;
+		border-radius: 16px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(255,255,255,.05);
+		border: 1px solid rgba(255,255,255,.08);
+		overflow: hidden;
+	}
+	.layer-card__media img {
+		width: 44px;
+		height: 44px;
+		object-fit: contain;
+		display: block;
+		filter: drop-shadow(0 10px 20px rgba(0,232,197,.2));
+	}
+	.layer-card__body {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		min-width: 0;
+		flex: 1;
+	}
+	.layer-card__name {
+		color: var(--text);
+		font-size: .96rem;
+		font-weight: 800;
+		letter-spacing: -.01em;
+	}
+	.layer-card__desc {
+		color: rgba(255,255,255,.52);
+		font-size: .78rem;
+		line-height: 1.45;
+		overflow-wrap: anywhere;
+	}
+	.layer-card__status {
+		align-self: flex-start;
+		max-width: 100%;
+		border-radius: 999px;
+		border: 1px solid rgba(255,255,255,.08);
+		background: rgba(255,255,255,.045);
+		color: rgba(255,255,255,.62);
+		padding: 5px 10px;
+		font-size: .68rem;
+		font-weight: 800;
+		text-transform: uppercase;
+		letter-spacing: .08em;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.layer-card__status--active {
+		border-color: rgba(0,232,197,.26);
+		background: rgba(0,232,197,.08);
+		color: var(--accent);
+	}
+	.layer-card__status--premium {
+		border-color: rgba(244,210,122,.34);
+		background: rgba(244,210,122,.1);
+		color: #f4d27a;
+	}
+	.layer-card__status--soft {
+		color: rgba(255,255,255,.58);
+	}
+
 	.edit-form { display: grid; gap: 18px; }
 	.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 	.field { display: grid; gap: 5px; }
@@ -1957,6 +2178,7 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 	@media (max-width: 900px) {
 		.details-strip { grid-template-columns: 1fr 1fr; }
 		.bottom-grid { grid-template-columns: 1fr; }
+		.layer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 		.subs-grid { grid-template-columns: 1fr 1fr; }
 		.quick-grid { grid-template-columns: repeat(2, 1fr); }
 	}
@@ -1972,6 +2194,8 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 		.form-grid { grid-template-columns: 1fr; }
 		.glass-section { padding: 18px; border-radius: 16px; }
 		.hero-bio { max-width: none; }
+		.layer-grid { grid-template-columns: 1fr; }
+		.layer-card { min-height: auto; }
 		.subs-grid { grid-template-columns: 1fr; }
 		.sub-card__icon { width: 88px; height: 88px; }
 		.sub-card__icon img { width: 68px; height: 68px; }
