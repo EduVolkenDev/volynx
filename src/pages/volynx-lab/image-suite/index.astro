@@ -958,9 +958,14 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         throw new Error("Failed to create canvas context.");
       }
 
-      // Surface activity for non-AI tools too — even sub-second ops need feedback.
-      if (tool === "compress") updateProgressUI(0, "compress");
-      else if (tool !== "upscale") updateProgressUI(0, "scale");
+      // Surface activity for all tools — ensure feedback is visible
+      if (tool === "compress") {
+        updateProgressUI(10, "compress");
+      } else if (tool === "convert") {
+        updateProgressUI(10, "scale");
+      } else if (tool === "upscale") {
+        updateProgressUI(10, "upscale");
+      }
 
       if (tool === "upscale") {
         const aiCanvas = await aiUpscaleToCanvas(img, scale);
@@ -982,13 +987,17 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         ctx.drawImage(img, 0, 0);
       }
 
-      updateProgressUI(70, "encode");
+      // Show progress before encoding
+      updateProgressUI(60, tool === "compress" ? "compress" : "encode");
+      
       const blob = await canvasToBlob(
         canvas,
         mime,
         tool === "compress" ? quality : 0.95
       );
-      updateProgressUI(100, "done");
+      
+      // Mark as complete
+      updateProgressUI(90, "encode");
 
       // Compress protection: if output grew, preserve original
       const M = window.VxFileMetrics;
@@ -1155,6 +1164,9 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       processedResults = [];
       singleOutBlob = null;
 
+      // Always show progress UI at the start
+      updateProgressUI(0, tool);
+
       try {
         for (let i = 0; i < loadedImages.length; i++) {
           setDropMessage(copy("suite.drop_processing", "Processing {current}/{total}...", {
@@ -1162,13 +1174,24 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
             total: loadedImages.length,
           }));
 
+          // Update progress for each file
+          const fileProgress = Math.round((i / loadedImages.length) * 30);
+          updateProgressUI(fileProgress, tool);
+
           const result = await processOne(loadedImages[i], tool, scale, mime, quality);
           processedResults.push(result);
 
           if (i === 0) {
             setPreviewBlob(result.blob);
           }
+
+          // Update overall progress
+          const overallProgress = Math.round(((i + 1) / loadedImages.length) * 100);
+          updateProgressUI(Math.min(95, overallProgress), tool);
         }
+
+        // Final progress update
+        updateProgressUI(100, "done");
 
         const totalOutBytes = processedResults.reduce((sum, result) => sum + result.blob.size, 0);
         const totalInBytes = processedResults.reduce((sum, result) => sum + result.inputBytes, 0);
