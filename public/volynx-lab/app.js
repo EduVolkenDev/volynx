@@ -139,6 +139,9 @@ function addFiles(incoming) {
   incoming.forEach(f => {
     if (!files.find(x => x.name === f.name && x.size === f.size)) files.push(f);
   });
+  if (incoming.length && window.VxLab) {
+    VxLab.recordEvent('converter', 'upload', `${incoming.length} file(s) selected`);
+  }
   renderList();
 }
 
@@ -205,10 +208,22 @@ convertBtn.addEventListener('click', async () => {
         return;
       }
     } else {
+      if (window.VxLab?.shouldSendToLogin(perm)) {
+        VxLab.confirmLogin(
+          VxLab.currentReturnPath(),
+          'Sign in to continue converting. You will return to Converter with this tool ready.'
+        );
+        convertBtn.disabled = false;
+        return;
+      }
       const msg = perm.remaining === 0
         ? `Daily limit reached (${perm.limit}). ${(window.VxPlan ? !window.VxPlan.isPaid(perm.plan) : perm.plan === 'free') ? 'Upgrade to Pro for more.' : 'Try again tomorrow.'}`
         : `Limit: ${perm.remaining} remaining today. You selected ${files.length} files.`;
-      alert(msg);
+      if ((window.VxPlan ? !window.VxPlan.isPaid(perm.plan) : perm.plan === 'free') && window.VxLab) {
+        VxLab.confirmUpgrade(msg + '\n\nClick OK to see upgrade options.');
+      } else {
+        alert(msg);
+      }
       convertBtn.disabled = false;
       return;
     }
@@ -245,6 +260,14 @@ convertBtn.addEventListener('click', async () => {
   // Log usage after successful conversion
   if (converted.length > 0) {
     await logUsage('converter', converted.length);
+    if (window.VxLab) {
+      VxLab.recordEvent('converter', 'convert', `${converted.length} file(s) converted to ${format.toUpperCase()}`);
+      VxLab.savePreset('converter', {
+        format,
+        quality: qualityIn.value,
+        maxWidth: maxwSel.value === '0' ? 'original' : maxwSel.value,
+      });
+    }
   }
 
   convertBtn.disabled = false;
@@ -308,6 +331,7 @@ zipBtn.addEventListener('click', async () => {
   });
   a.click();
   URL.revokeObjectURL(a.href);
+  if (window.VxLab) VxLab.recordEvent('converter', 'download', `${converted.length} file ZIP downloaded`);
 
   zipBtn.disabled = false;
   zipBtn.textContent = 'Baixar ZIP';

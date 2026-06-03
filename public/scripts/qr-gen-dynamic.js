@@ -179,8 +179,9 @@
   }
 
   function loginUrl() {
-    const next = window.location.pathname + window.location.search;
-    return `/login/?next=${encodeURIComponent(next || "/volynx-lab/qr-gen/")}`;
+    if (window.VxLab) return VxLab.loginUrl(VxLab.currentReturnPath());
+    const next = window.location.pathname + window.location.search + window.location.hash;
+    return `/login/?next=${encodeURIComponent(next || "/qrgen/")}`;
   }
 
   function showLoginRequired() {
@@ -353,6 +354,14 @@
       if (!created) return;
 
       const shortUrl = `${QR_HOST}/${created.slug}`;
+      if (window.VxLab) {
+        VxLab.recordEvent("qr-gen", "dynamic", "Dynamic QR created");
+        VxLab.savePreset("qr-gen", {
+          mode: "dynamic",
+          host: QR_HOST,
+          label: label || "none",
+        });
+      }
 
       // Render the QR using existing styling pipeline by setting #text and calling generateQR
       const textInput = $("text");

@@ -132,11 +132,21 @@
             return;
           }
         } else {
+          if (window.VxLab?.shouldSendToLogin(perm)) {
+            VxLab.confirmLogin(
+              VxLab.currentReturnPath(),
+              'Sign in to continue upscaling. You will return to Image Scaler after login.'
+            );
+            runBtn.disabled = false;
+            runBtn.textContent = 'Process';
+            return;
+          }
           var isFreeUser = window.VxPlan ? !window.VxPlan.isPaid(perm.plan) : (perm.plan === 'free');
           var msg = isFreeUser
             ? 'Free limit reached. Sign in or upgrade to continue.'
             : 'Plan limit reached. Upgrade to continue.';
-          alert(msg);
+          if (isFreeUser && window.VxLab) VxLab.confirmUpgrade('Daily limit reached. Upgrade to Pro for more.\n\nClick OK to see upgrade options.');
+          else alert(msg);
           runBtn.disabled = false;
           runBtn.textContent = 'Process';
           return;
@@ -183,6 +193,14 @@
       outMeta.textContent = processedResults.length + ' file(s) · ' + fmtSize(totalOut) + ' (' + ext.toUpperCase() + ')';
 
       if (processedResults.length === 1) singleBlob = processedResults[0].blob;
+      if (window.VxLab) {
+        VxLab.recordEvent('image-scaler', 'upscale', processedResults.length + ' file(s) upscaled');
+        VxLab.savePreset('image-scaler', {
+          scale: scale + 'x',
+          format: format.split('/')[1],
+          smoothing: smooth ? 'high' : 'off',
+        });
+      }
 
       setDropText(processedResults.length + ' file(s) upscaled');
       downloadBtn.disabled = false;

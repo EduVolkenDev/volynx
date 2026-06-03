@@ -174,6 +174,14 @@ async function runLumina(nextMode) {
   const selectedMode = mode.value;
   const selectedLanguage = language.value;
 
+  if (getUses() >= FREE_LIMIT && window.VxLab && !VxLab.hasAccessToken()) {
+    VxLab.confirmLogin(
+      VxLab.currentReturnPath(),
+      "Sign in to continue using Lumina. You will return to this workspace after login."
+    );
+    return;
+  }
+
   actions.forEach((button) => { button.disabled = true; });
   setStatus("Iluminando...");
 
@@ -182,9 +190,17 @@ async function runLumina(nextMode) {
     setUses(getUses() + 1);
     renderCards(sections);
     setStatus("IA ativa");
+    if (window.VxLab) {
+      VxLab.recordEvent("lumina", "ai", `${selectedMode} · ${selectedLanguage}`);
+      VxLab.savePreset("lumina", { mode: selectedMode, language: selectedLanguage });
+    }
   } catch (error) {
     renderCards(localLumina(text, selectedMode, selectedLanguage));
     setStatus("Fallback local");
+    if (window.VxLab) {
+      VxLab.recordEvent("lumina", "fallback", `${selectedMode} · ${selectedLanguage}`);
+      VxLab.savePreset("lumina", { mode: selectedMode, language: selectedLanguage });
+    }
   } finally {
     actions.forEach((button) => { button.disabled = false; });
   }

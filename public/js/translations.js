@@ -1883,7 +1883,7 @@ window.VX_TRANS = {
 
     // ── lab2 ──
     "lab2.btn_browse_tools": "Browse tools",
-    "lab2.btn_see_pro": "See Pro benefits",
+    "lab2.btn_see_pro": "Open Image Suite",
     "lab2.cta_btn": "Open Studio",
     "lab2.cta_desc": "Pro unlocks batch workflows, saved presets, premium export modes and priority features. Work faster with tools built for serious production.",
     "lab2.cta_label": "Studio Pro",
@@ -1892,8 +1892,8 @@ window.VX_TRANS = {
     "lab2.hero_chip2": "Fast discovery",
     "lab2.hero_chip3": "Clear upgrade path",
     "lab2.hero_label": "Runs in the browser",
-    "lab2.hero_subtitle": "The Lab feels generous and clean. Studio Pro is an upgrade in operating quality: more comfort, more memory, better output and stronger workflow confidence.",
-    "lab2.hero_title": "Free tools for discovery. A Pro pipeline for real work.",
+    "lab2.hero_subtitle": "Converter, Image Scaler, Image Suite, Lumina and QRGen now share a cleaner workflow: use the tool, keep the preset, return from profile, and upgrade only when the limit is real.",
+    "lab2.hero_title": "One premium workspace for image, knowledge and QR production.",
     "lab2.kicker": "Local-first tools",
     "lab2.section_tools_desc": "Each free tool gets real use value, while the Pro state adds power and comfort instead of simply locking everything behind a wall.",
     "lab2.section_tools_title": "Free tools that build trust",
@@ -1923,11 +1923,11 @@ window.VX_TRANS = {
     "lab2.tool_scaler_desc": "Upscale with clearer controls and a stronger before/after experience in Pro.",
     "lab2.tool_scaler_label": "Free",
     "lab2.tool_scaler_title": "Image Scaler",
-    "lab2.tool_suite_btn": "See Pro tool",
-    "lab2.tool_suite_chip1": "Multi-step recipe",
-    "lab2.tool_suite_chip2": "Save presets",
-    "lab2.tool_suite_desc": "Advanced multi-step image processing where professional tools meet zero-compromise quality and control.",
-    "lab2.tool_suite_label": "Pro",
+    "lab2.tool_suite_btn": "Open Suite",
+    "lab2.tool_suite_chip1": "Multi-tool recipe",
+    "lab2.tool_suite_chip2": "Profile presets",
+    "lab2.tool_suite_desc": "Upscale, compress, convert and remove backgrounds with saved presets and clear plan states.",
+    "lab2.tool_suite_label": "Free + Pro",
     "lab2.tool_suite_title": "Image Suite",
 
     // ── login2 ──
@@ -4370,7 +4370,7 @@ window.VX_TRANS = {
 
     // ── lab2 ──
     "lab2.btn_browse_tools": "Explorar ferramentas",
-    "lab2.btn_see_pro": "Ver benefícios Pro",
+    "lab2.btn_see_pro": "Abrir Image Suite",
     "lab2.cta_btn": "Abrir Studio",
     "lab2.cta_desc": "Pro libera fluxos de lote, presets salvos, modos de exportação premium e recursos prioritários. Trabalhe mais rápido com ferramentas feitas para produção séria.",
     "lab2.cta_label": "Studio Pro",
@@ -4379,8 +4379,8 @@ window.VX_TRANS = {
     "lab2.hero_chip2": "Descoberta rápida",
     "lab2.hero_chip3": "Caminho de upgrade claro",
     "lab2.hero_label": "Roda no navegador",
-    "lab2.hero_subtitle": "O Lab parece generoso e limpo. Studio Pro é um upgrade em qualidade operacional: mais conforto, mais memória, melhor saída e confiança de fluxo mais forte.",
-    "lab2.hero_title": "Ferramentas grátis para descoberta. Um pipeline Pro para trabalho real.",
+    "lab2.hero_subtitle": "Converter, Image Scaler, Image Suite, Lumina e QRGen agora compartilham um fluxo mais limpo: use a ferramenta, mantenha o preset, retome pelo perfil e faça upgrade só quando o limite for real.",
+    "lab2.hero_title": "Um workspace premium para imagem, conhecimento e produção de QR.",
     "lab2.kicker": "Ferramentas local-first",
     "lab2.section_tools_desc": "Cada ferramenta grátis tem valor real de uso, enquanto o estado Pro adiciona poder e conforto em vez de simplesmente trancar tudo atrás de um muro.",
     "lab2.section_tools_title": "Ferramentas grátis que constroem confiança",
@@ -4410,11 +4410,11 @@ window.VX_TRANS = {
     "lab2.tool_scaler_desc": "Amplie com controles mais claros e uma experiência antes/depois mais forte em Pro.",
     "lab2.tool_scaler_label": "Grátis",
     "lab2.tool_scaler_title": "Image Scaler",
-    "lab2.tool_suite_btn": "Ver ferramenta Pro",
-    "lab2.tool_suite_chip1": "Receita multi-etapa",
-    "lab2.tool_suite_chip2": "Salve presets",
-    "lab2.tool_suite_desc": "Processamento de imagem avançado em múltiplas etapas onde ferramentas profissionais encontram qualidade e controle sem compromissos.",
-    "lab2.tool_suite_label": "Pro",
+    "lab2.tool_suite_btn": "Abrir Suite",
+    "lab2.tool_suite_chip1": "Receita multi-tool",
+    "lab2.tool_suite_chip2": "Presets no perfil",
+    "lab2.tool_suite_desc": "Upscale, compressão, conversão e remoção de fundo com presets salvos e estados de plano claros.",
+    "lab2.tool_suite_label": "Free + Pro",
     "lab2.tool_suite_title": "Image Suite",
 
     // ── login2 ──

@@ -610,6 +610,14 @@
       const shortUrl = `${QR_HOST}/${created.slug}`;
       setDynamicShortUrl(shortUrl);
       dynamicMessage(`${tq("dynamic.created", "Dynamic QR created:")} ${shortUrl}`, "ok");
+      if (window.VxLab) {
+        VxLab.recordEvent("qr-gen", "dynamic", "Dynamic QR created");
+        VxLab.savePreset("qr-gen", {
+          mode: "dynamic",
+          host: QR_HOST,
+          label: label || "none",
+        });
+      }
       if (labelInput) labelInput.value = "";
       renderPreview();
       refreshDynamicPanel();
@@ -1025,6 +1033,7 @@
       return {
         ok: false,
         kind: "warn",
+        action: "upgrade",
         message: `${item.label} is available on QRGen ${PLAN_LABELS[item.plan]}. Use the available free export or upgrade to unlock it.`
       };
     }
@@ -1032,6 +1041,7 @@
       return {
         ok: false,
         kind: "warn",
+        action: window.VxLab?.hasAccessToken() ? "upgrade" : "login",
         message: `Free export limit reached for today (${FREE_EXPORT_LIMIT}). QRGen Launch unlocks a production workflow.`
       };
     }
@@ -1079,6 +1089,17 @@
     const state = getState();
     const validation = validateExport(state);
     if (!validation.ok) {
+      if (validation.action === "login" && window.VxLab) {
+        VxLab.confirmLogin(
+          VxLab.currentReturnPath(),
+          "Sign in to continue exporting in QRGen. You will return to this editor after login."
+        );
+        return;
+      }
+      if (validation.action === "upgrade" && window.VxLab) {
+        VxLab.confirmUpgrade(`${validation.message}\n\nClick OK to see upgrade options.`);
+        return;
+      }
       setMessage(validation.message, validation.kind || "warn");
       return;
     }
@@ -1100,6 +1121,15 @@
         if (blob) {
           saveBlob(blob, `${fileNameForState(state)}.${extension}`);
           incrementUsage();
+          if (window.VxLab) {
+            VxLab.recordEvent("qr-gen", "export", `${extension.toUpperCase()} exported`);
+            VxLab.savePreset("qr-gen", {
+              mode: state.mode,
+              format: extension,
+              color: state.colorMode,
+              size: String(size),
+            });
+          }
           setMessage("Export complete. Test the QR before sending to print.", "ok");
           return;
         }
@@ -1107,6 +1137,15 @@
 
       await exportQr.download({ name: fileNameForState(state), extension });
       incrementUsage();
+      if (window.VxLab) {
+        VxLab.recordEvent("qr-gen", "export", `${extension.toUpperCase()} exported`);
+        VxLab.savePreset("qr-gen", {
+          mode: state.mode,
+          format: extension,
+          color: state.colorMode,
+          size: String(size),
+        });
+      }
       setMessage("Export complete. Test the QR before sending to print.", "ok");
     } catch (err) {
       console.error("[qrgen] export failed", err);
@@ -1181,7 +1220,16 @@
 
     saveProjects(rows);
     renderProjects();
-      setMessage("Draft saved in this browser. Managed dynamic QRs stay in your QR manager.", "ok");
+    if (window.VxLab) {
+      VxLab.recordEvent("qr-gen", "save", "QR draft saved");
+      VxLab.savePreset("qr-gen", {
+        mode: state.mode,
+        format: state.exportFormat,
+        color: state.colorMode,
+        dots: state.dotsType,
+      });
+    }
+    setMessage("Draft saved in this browser. Managed dynamic QRs stay in your QR manager.", "ok");
   }
 
   function applyState(state) {
