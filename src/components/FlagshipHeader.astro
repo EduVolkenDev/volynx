@@ -68,11 +68,33 @@ const { current = "", brandHref = ROUTES.platform, ctaHref = ROUTES.pricing, cta
       <a href={ROUTES.login} class="vx-login" data-i18n="nav.login">Login</a>
       <a href={ctaHref} class="vx-cta" data-vx-hide-if-plan="pro" data-i18n={ctaI18n}>{ctaLabel}</a>
 
-      <!-- Avatar (authed only) — renders <img> via vx-avatar.js when avatar cached -->
-      <a href={ROUTES.profile} class="vx-avatar" id="vxUserBadge" aria-label="Profile" data-i18n-aria="aria.profile" data-vx-avatar-slot>
-        <svg class="vx-avatar__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <span class="vx-avatar__initials" hidden></span>
-      </a>
+      <!-- Account switcher (authed only) — renders <img> via vx-avatar.js when avatar cached -->
+      <div class="vx-account">
+        <button type="button" class="vx-avatar" id="vxUserBadge" aria-label="Profile" aria-haspopup="menu" aria-expanded="false" data-i18n-aria="aria.profile" data-vx-avatar-slot>
+          <svg class="vx-avatar__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span class="vx-avatar__initials" hidden></span>
+        </button>
+        <div class="vx-account-menu" id="vxAccountMenu" role="menu" aria-labelledby="vxUserBadge" hidden>
+          <a href={ROUTES.profile} class="vx-account-menu__item" role="menuitem">
+            <span class="vx-account-menu__icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2.2a4.8 4.8 0 0 0-4.8-4.8H8.8A4.8 4.8 0 0 0 4 18.8V21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7.5" r="4" stroke="currentColor" stroke-width="2"/></svg>
+            </span>
+            <span><span class="i18n-en">Profile</span><span class="i18n-pt">Perfil</span></span>
+          </a>
+          <a href={ROUTES.daily} class="vx-account-menu__item" role="menuitem">
+            <span class="vx-account-menu__icon vx-account-menu__icon--daily" aria-hidden="true">
+              <img src="/assets/volynx-daily.webp" alt="" loading="lazy" decoding="async" />
+            </span>
+            <span>Daily</span>
+          </a>
+          <button type="button" class="vx-account-menu__item vx-account-menu__item--danger" id="vxAccountSignout" role="menuitem">
+            <span class="vx-account-menu__icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M10 17l5-5-5-5M15 12H3M21 4v16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span><span class="i18n-en">Sign out</span><span class="i18n-pt">Sair</span></span>
+          </button>
+        </div>
+      </div>
 
       <!-- Mobile menu btn -->
       <button class="vx-burger" id="mobileMenuBtn" type="button" aria-label="Open menu" data-i18n-aria="aria.open_menu" aria-expanded="false">
@@ -105,6 +127,10 @@ const { current = "", brandHref = ROUTES.platform, ctaHref = ROUTES.pricing, cta
     <a href={ROUTES.profile} class="vx-mobile__profile" data-auth="in" data-vx-avatar-slot>
       <span class="vx-mobile__avatar vx-avatar__initials" id="vxUserBadgeMobileInitials"></span>
       <span data-i18n="nav.profile">Profile</span>
+    </a>
+    <a href={ROUTES.daily} class="vx-mobile__profile" data-auth="in">
+      <span class="vx-mobile__avatar vx-mobile__avatar--daily" aria-hidden="true"><img src="/assets/volynx-daily.webp" alt="" loading="lazy" decoding="async" /></span>
+      <span>Daily</span>
     </a>
   </nav>
 </header>
@@ -410,6 +436,87 @@ const { current = "", brandHref = ROUTES.platform, ctaHref = ROUTES.pricing, cta
     object-fit: cover;
     display: block;
   }
+  .vx-account {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  .vx-account-menu {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: min(260px, calc(100vw - 24px));
+    padding: 8px;
+    border-radius: 18px;
+    border: 1px solid rgba(63, 63, 70, 0.9);
+    background: rgba(9, 9, 11, 0.97);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.46), 0 0 0 1px rgba(255,255,255,0.03) inset;
+    backdrop-filter: blur(22px) saturate(1.35);
+    -webkit-backdrop-filter: blur(22px) saturate(1.35);
+    z-index: 260;
+  }
+  .vx-account-menu[hidden] { display: none; }
+  .vx-account-menu::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    right: 14px;
+    width: 12px;
+    height: 12px;
+    border-left: 1px solid rgba(63, 63, 70, 0.9);
+    border-top: 1px solid rgba(63, 63, 70, 0.9);
+    background: rgba(9, 9, 11, 0.97);
+    transform: rotate(45deg);
+  }
+  .vx-account-menu__item {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: #f4f4f5;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 650;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .vx-account-menu__item:hover,
+  .vx-account-menu__item:focus-visible {
+    outline: none;
+    background: rgba(255,255,255,0.07);
+  }
+  .vx-account-menu__item--danger { color: #fda4af; }
+  .vx-account-menu__icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    color: var(--topbar-accent);
+    background: rgba(45, 212, 191, 0.1);
+    border: 1px solid rgba(45, 212, 191, 0.22);
+  }
+  .vx-account-menu__icon--daily {
+    background: #f4f4f5;
+    border-color: rgba(255,255,255,0.75);
+    overflow: hidden;
+  }
+  .vx-account-menu__icon--daily img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    display: block;
+  }
   /* Tier-aware ring (PT-2d) — extended in premium-tier.css */
   :global(html[data-tier="member"]) .vx-avatar { border-color: rgba(244, 210, 122, 0.3); }
   :global(html[data-tier="studio"]) .vx-avatar { border-color: rgba(220, 220, 230, 0.4); }
@@ -482,6 +589,16 @@ const { current = "", brandHref = ROUTES.platform, ctaHref = ROUTES.pricing, cta
     font-weight: 700;
     font-size: 14px;
   }
+  .vx-mobile__avatar--daily {
+    background: #f4f4f5;
+    overflow: hidden;
+  }
+  .vx-mobile__avatar--daily img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    display: block;
+  }
 
   /* ── RESPONSIVE ──────────────────────────────────── */
   @media (max-width: 979px) {
@@ -500,6 +617,8 @@ const { current = "", brandHref = ROUTES.platform, ctaHref = ROUTES.pricing, cta
     :global(.vx-authed) .vx-recharge { padding: 8px 14px; font-size: 12px; }
     .vx-actions { gap: 8px; }
     .vx-brand__mark { width: 44px; height: 44px; border-radius: 8px; }
+    .vx-account-menu { right: -48px; }
+    .vx-account-menu::before { right: 62px; }
   }
   @media (max-width: 460px) {
     :global(.vx-authed) .vx-recharge,
@@ -568,6 +687,55 @@ const { current = "", brandHref = ROUTES.platform, ctaHref = ROUTES.pricing, cta
     nav?.classList.remove("is-open");
     btn?.classList.remove("is-open");
     btn?.setAttribute("aria-expanded", "false");
+  });
+
+  // Account switcher
+  const accountToggle = document.getElementById("vxUserBadge");
+  const accountMenu = document.getElementById("vxAccountMenu");
+  const accountSignout = document.getElementById("vxAccountSignout");
+  function closeAccountMenu() {
+    if (!accountToggle || !accountMenu) return;
+    accountMenu.hidden = true;
+    accountToggle.setAttribute("aria-expanded", "false");
+  }
+  function openAccountMenu() {
+    if (!accountToggle || !accountMenu) return;
+    accountMenu.hidden = false;
+    accountToggle.setAttribute("aria-expanded", "true");
+  }
+  accountToggle?.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!accountMenu) return;
+    if (accountMenu.hidden) openAccountMenu();
+    else closeAccountMenu();
+  });
+  accountMenu?.addEventListener("click", (event) => {
+    event.stopPropagation();
+  });
+  document.addEventListener("click", (event) => {
+    const target = event.target as Node;
+    if (!accountToggle || !accountMenu || accountMenu.hidden) return;
+    if (!accountToggle.contains(target) && !accountMenu.contains(target)) closeAccountMenu();
+  });
+  document.addEventListener("keydown", (event) => {
+    if ((event.key === "Escape" || event.keyCode === 27) && accountMenu && !accountMenu.hidden) {
+      closeAccountMenu();
+      accountToggle?.focus();
+    }
+  });
+  accountSignout?.addEventListener("click", (event) => {
+    event.preventDefault();
+    try {
+      ["volynx_access_token", "volynx_refresh_token", "volynx_user_email", "volynx_session", "volynx_post_login_next"].forEach((key) => {
+        localStorage.removeItem(key);
+      });
+      (window as any).VxAuthBridge?.clear?.();
+      (window as any).VxPlan?.clearCache?.();
+      (window as any).VxPlan?.clearAllUsage?.();
+      (window as any).VxTokens?.clearCache?.();
+    } catch (_) {}
+    window.location.href = "/login/";
   });
 
   // Token pill — resilient: cache → VxTokens (polled) → direct fetch fallback
