@@ -6,7 +6,7 @@ import PageWidgets from "../../../components/PageWidgets.astro";
 import SiteFooter from "../../../components/SiteFooter.astro";
 import LabUpgradeBanner from "../../../components/LabUpgradeBanner.astro";
 import Topbar from "../../../components/Topbar.astro";
-import LabToolSwitcher from "../../../components/LabToolSwitcher.astro";
+import LabToolShell from "../../../components/LabToolShell.astro";
 
 const pageTitle = "VOLYNX Lab • Image Scaler";
 const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser — no upload, no server, 100% local processing.";
@@ -28,7 +28,7 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
   <LabBg />
 
   <Topbar rightLinks={[{ href: "/volynx-lab/", label: "← Back", i18n: "scaler.back" }]} />
-  <LabToolSwitcher active="scaler" />
+  <LabToolShell active="scaler" />
 
   <main class="wrap">
     <h1 class="tool-hero-title" aria-label="Image Scaler">
@@ -112,6 +112,7 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
   </main>
 
   <script is:inline src="/js/vx-file-metrics.js"></script>
+  <script is:inline src="/scripts/vx-lab-workspace.js?v=20260603-lab-workspace"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
   <script is:inline>
@@ -238,6 +239,7 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
       origMeta.textContent = `${valid.length} file(s) · ${(totalBytes / 1024 / 1024).toFixed(2)} MB`;
       dropEl.querySelector("p").textContent = `${valid.length} file(s) ready`;
       runBtn.disabled = false;
+      if (window.VxLab) VxLab.recordEvent("image-scaler", "upload", `${valid.length} file(s) selected`);
     }
 
     function canvasToBlob(canvas, mime, quality) {
@@ -291,7 +293,16 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
       const perm = await checkToolPermission("image-scaler", loadedImages.length);
       if (!perm.allowed) {
         const isFreeUser = window.VxPlan ? !window.VxPlan.isPaid(perm.plan) : (perm.plan === 'free');
-        alert(`Daily limit reached (${perm.limit}). ${isFreeUser ? 'Upgrade to Pro for more.' : 'Try again tomorrow.'}`);
+        if (window.VxLab?.shouldSendToLogin(perm)) {
+          VxLab.confirmLogin(
+            VxLab.currentReturnPath(),
+            "Sign in to continue upscaling. You will return to Image Scaler after login."
+          );
+        } else if (isFreeUser && window.VxLab) {
+          VxLab.confirmUpgrade(`Daily limit reached (${perm.limit}). Upgrade to Pro for more.\n\nClick OK to see upgrade options.`);
+        } else {
+          alert(`Daily limit reached (${perm.limit}). Try again tomorrow.`);
+        }
         return;
       }
 
@@ -316,6 +327,14 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
         outMeta.textContent = `${processedResults.length} file(s) · ${(totalOut / 1024 / 1024).toFixed(2)} MB`;
         if (processedResults.length === 1) singleBlob = processedResults[0].blob;
         logToolUsage("image-scaler", processedResults.length);
+        if (window.VxLab) {
+          VxLab.recordEvent("image-scaler", "upscale", `${processedResults.length} file(s) upscaled at ${scale}x`);
+          VxLab.savePreset("image-scaler", {
+            scale: `${scale}x`,
+            format: mime.split("/")[1],
+            smoothing: smooth ? "high" : "off",
+          });
+        }
         dropEl.querySelector("p").textContent = `${processedResults.length} file(s) upscaled`;
         downloadBtn.disabled = false;
       } catch (err) {
@@ -336,6 +355,7 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
         a.href = URL.createObjectURL(singleBlob);
         a.download = `${processedResults[0].baseName}-${scaleEl.value}x.${ext}`;
         a.click();
+        if (window.VxLab) VxLab.recordEvent("image-scaler", "download", a.download);
         return;
       }
 
@@ -349,6 +369,7 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
       a.href = URL.createObjectURL(zipBlob);
       a.download = "volynx-scaler-batch.zip";
       a.click();
+      if (window.VxLab) VxLab.recordEvent("image-scaler", "download", "Batch ZIP downloaded");
     });
   </script>
 

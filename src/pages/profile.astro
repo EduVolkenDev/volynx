@@ -268,6 +268,42 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 				</div>
 			</section>
 
+			<section class="lab-profile glass-section" id="labWorkspacePanel" aria-labelledby="labWorkspaceTitle">
+				<div class="section-headline">
+					<div>
+						<div class="section-label">VOLYNX Lab</div>
+						<h2 id="labWorkspaceTitle" class="lab-profile__title">
+							<span class="i18n-en">Your tools now remember the work.</span>
+							<span class="i18n-pt">Suas ferramentas agora lembram o trabalho.</span>
+						</h2>
+						<p class="lab-profile__copy">
+							<span class="i18n-en">Recent exports, generated assets, and saved presets from Converter, Image Scaler, Image Suite, Lumina, and QRGen.</span>
+							<span class="i18n-pt">Exportações recentes, ativos gerados e presets salvos do Converter, Image Scaler, Image Suite, Lumina e QRGen.</span>
+						</p>
+					</div>
+					<a href={ROUTES.lab} class="btn btn--sm btn--ghost">
+						<span class="i18n-en">Open Lab</span>
+						<span class="i18n-pt">Abrir Lab</span>
+					</a>
+				</div>
+				<div class="lab-profile__grid">
+					<div>
+						<strong class="lab-profile__heading">
+							<span class="i18n-en">Recent activity</span>
+							<span class="i18n-pt">Atividade recente</span>
+						</strong>
+						<div class="lab-profile__list" data-lab-history></div>
+					</div>
+					<div>
+						<strong class="lab-profile__heading">
+							<span class="i18n-en">Saved presets</span>
+							<span class="i18n-pt">Presets salvos</span>
+						</strong>
+						<div class="lab-profile__list" data-lab-presets></div>
+					</div>
+				</div>
+			</section>
+
 			<section id="editPanel" class="glass-section">
 				<div class="section-label" id="formLabel" data-i18n="profile.section_edit">Edit profile</div>
 				<form id="profileForm" class="edit-form">
@@ -418,6 +454,7 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 			SCRIPT 1 (is:inline): Logout + failsafe.
 			Zero imports. Zero CDN. Always runs.
 		-->
+		<script is:inline src="/scripts/vx-lab-workspace.js?v=20260603-lab-workspace"></script>
 		<script is:inline>
 		(function() {
 			var KEYS = ["volynx_access_token","volynx_refresh_token","volynx_user_email","volynx_session","volynx_post_login_next"];
@@ -1977,6 +2014,79 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 		font-size: .88rem;
 		line-height: 1.55;
 	}
+	.lab-profile {
+		border-color: rgba(125,249,255,.14);
+		background:
+			radial-gradient(circle at top left, rgba(125,249,255,.08), transparent 42%),
+			var(--glass);
+	}
+	.lab-profile__title {
+		margin: 0 0 6px;
+		font-size: clamp(1.1rem, 2vw, 1.45rem);
+		line-height: 1.2;
+		letter-spacing: -.02em;
+	}
+	.lab-profile__copy {
+		margin: 0;
+		max-width: 68ch;
+		color: rgba(255,255,255,.58);
+		font-size: .88rem;
+		line-height: 1.55;
+	}
+	.lab-profile__grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 14px;
+	}
+	.lab-profile__heading {
+		display: block;
+		margin-bottom: 10px;
+		color: rgba(255,255,255,.88);
+		font-size: .86rem;
+	}
+	.lab-profile__list {
+		display: grid;
+		gap: 8px;
+	}
+	.lab-profile-row {
+		display: grid;
+		grid-template-columns: minmax(110px, .45fr) minmax(0, 1fr) auto;
+		align-items: center;
+		gap: 10px;
+		min-height: 50px;
+		padding: 10px 12px;
+		border: 1px solid rgba(255,255,255,.08);
+		border-radius: 12px;
+		background: rgba(255,255,255,.04);
+		color: inherit;
+		text-decoration: none;
+	}
+	.lab-profile-row strong {
+		color: rgba(125,249,255,.86);
+		font-size: .8rem;
+	}
+	.lab-profile-row span {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		color: rgba(255,255,255,.72);
+		font-size: .82rem;
+	}
+	.lab-profile-row em {
+		color: rgba(255,255,255,.42);
+		font-size: .72rem;
+		font-style: normal;
+		white-space: nowrap;
+	}
+	.lab-profile-empty {
+		margin: 0;
+		padding: 14px;
+		border: 1px dashed rgba(255,255,255,.12);
+		border-radius: 12px;
+		color: rgba(255,255,255,.46);
+		font-size: .84rem;
+	}
 	.layer-grid {
 		display: grid;
 		grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -2179,6 +2289,7 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 		.details-strip { grid-template-columns: 1fr 1fr; }
 		.bottom-grid { grid-template-columns: 1fr; }
 		.layer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+		.lab-profile__grid { grid-template-columns: 1fr; }
 		.subs-grid { grid-template-columns: 1fr 1fr; }
 		.quick-grid { grid-template-columns: repeat(2, 1fr); }
 	}
@@ -2196,6 +2307,8 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 		.hero-bio { max-width: none; }
 		.layer-grid { grid-template-columns: 1fr; }
 		.layer-card { min-height: auto; }
+		.lab-profile-row { grid-template-columns: 1fr; align-items: start; }
+		.lab-profile-row span { white-space: normal; }
 		.subs-grid { grid-template-columns: 1fr; }
 		.sub-card__icon { width: 88px; height: 88px; }
 		.sub-card__icon img { width: 68px; height: 68px; }

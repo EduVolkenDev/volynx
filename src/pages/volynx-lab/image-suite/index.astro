@@ -6,7 +6,7 @@ import PageWidgets from "../../../components/PageWidgets.astro";
 import SiteFooter from "../../../components/SiteFooter.astro";
 import LabUpgradeBanner from "../../../components/LabUpgradeBanner.astro";
 import Topbar from "../../../components/Topbar.astro";
-import LabToolSwitcher from "../../../components/LabToolSwitcher.astro";
+import LabToolShell from "../../../components/LabToolShell.astro";
 
 const pageTitle = "VOLYNX Lab • iMage Suite";
 const pageDescription = "Local-first image suite — upscale, compress, convert and remove backgrounds directly in your browser, no upload required.";
@@ -29,7 +29,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
   <LabBg />
 
   <Topbar rightLinks={[{ href: "/volynx-lab/", label: "← Back", i18n: "suite.back" }]} />
-  <LabToolSwitcher active="suite" />
+  <LabToolShell active="suite" />
 
   <main class="wrap">
     <h1 class="tool-hero-title suite-logo-title" aria-label="iMage Suite">
@@ -182,6 +182,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script is:inline src="/scripts/vx-lab-workspace.js?v=20260603-lab-workspace"></script>
 
   <script is:inline>
     const FREE_LIMIT = 3;
@@ -329,6 +330,19 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
     const outMeta = $("outMeta");
     const proStatus = $("proStatus");
     const resultHint = $("resultHint");
+
+    function suiteReturnPath() {
+      return window.VxLab
+        ? VxLab.currentReturnPath({ tool: toolEl?.value || "upscale" })
+        : window.location.pathname + window.location.search + window.location.hash;
+    }
+
+    function syncToolToUrl() {
+      if (!toolEl || !window.history?.replaceState) return;
+      const url = new URL(window.location.href);
+      url.searchParams.set("tool", toolEl.value);
+      history.replaceState({}, "", url.pathname + url.search + url.hash);
+    }
 
     // isPro determined by server-side plan check, not localStorage
     let isPro = false;
@@ -818,6 +832,9 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
           baseName: file.name.replace(/\.[^/.]+$/, "")
         });
       }
+      if (window.VxLab) {
+        VxLab.recordEvent("image-suite", "upload", `${validFiles.length} file(s) selected`);
+      }
 
       const totalBytes = validFiles.reduce((sum, file) => sum + file.size, 0);
       origMeta.textContent = `${fileCountLabel(validFiles.length)} • ${formatBytesLabel(totalBytes)}`;
@@ -1067,6 +1084,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
     const fmtHint = $("fmtHint");
     toolEl.addEventListener("change", () => {
       updateFieldVisibility(toolEl.value);
+      syncToolToUrl();
     });
     fmtEl.addEventListener("change", checkFmtHint);
     bgFillEl?.addEventListener("change", syncBgFillColorVisibility);
@@ -1135,12 +1153,24 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         });
         if (!perm.allowed) {
           const isFreeUser = window.VxPlan ? !window.VxPlan.isPaid(perm.plan) : (perm.plan === 'free');
+          const returnPath = suiteReturnPath();
+          syncToolToUrl();
+          if (window.VxLab?.shouldSendToLogin(perm)) {
+            VxLab.confirmLogin(
+              returnPath,
+              "Sign in to continue in Image Suite. You will return to this exact tool after login."
+            );
+            return;
+          }
           
           // Show only paths that are actually wired for this tool.
           if (tool === "bg-remove") {
             const confirmMsg = t("suite.bg_upgrade_alert", "Remove BG is available on paid plans. Upgrade to unlock it.");
-            const goPricing = confirm(confirmMsg + "\n\nClick OK to see pricing options.");
-            if (goPricing) window.location.href = "/pricing/";
+            if (window.VxLab) {
+              VxLab.confirmUpgrade(confirmMsg + "\n\nClick OK to see upgrade options.");
+            } else {
+              alert(confirmMsg);
+            }
             return;
           }
           
@@ -1151,9 +1181,10 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
             ? "\n\nUpgrade to Pro for higher limits and Studio access.\n\nClick OK to see options."
             : "\n\nYou've used your daily allowance. Try again tomorrow or manage your plan.\n\nClick OK to see options.";
           
-          const showOptions = confirm(limitMsg + upgradeMsg);
-          if (showOptions) {
-            window.location.href = "/pricing/";
+          if (isFreeUser && window.VxLab) {
+            VxLab.confirmUpgrade(limitMsg + upgradeMsg);
+          } else {
+            alert(limitMsg + "\n\nYou've used your daily allowance. Try again tomorrow.");
           }
           return;
         }
@@ -1274,6 +1305,16 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         // Log ALL users (free + pro) — pro just doesn't get a quota check.
         // We still need per-tool call counts for analytics + total API calls.
         logToolUsage("image-suite", processedResults.length);
+        if (window.VxLab) {
+          VxLab.recordEvent("image-suite", tool, `${processedResults.length} file(s) processed`);
+          VxLab.savePreset("image-suite", {
+            tool,
+            scale: tool === "upscale" ? `${scale}x` : "",
+            format: tool === "bg-remove" ? (bgFormatEl?.value || "image/png").split("/")[1] : mime.split("/")[1],
+            quality: tool === "compress" ? quality : "",
+            fill: tool === "bg-remove" ? (bgFillEl?.value || "transparent") : "",
+          });
+        }
 
         if (tool === "bg-remove") {
           const totalBgBytes = processedResults.reduce((sum, result) => sum + result.inputBytes, 0);
@@ -1328,6 +1369,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         a.href = url;
         a.download = `${processedResults[0].baseName}.${processedResults[0].extension}`;
         a.click();
+        if (window.VxLab) VxLab.recordEvent("image-suite", "download", a.download);
         window.setTimeout(() => URL.revokeObjectURL(url), 1500);
         return;
       }
@@ -1350,6 +1392,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       a.href = url;
       a.download = "volynx-image-suite-batch.zip";
       a.click();
+      if (window.VxLab) VxLab.recordEvent("image-suite", "download", "Batch ZIP downloaded");
       window.setTimeout(() => URL.revokeObjectURL(url), 1500);
     });
   </script>

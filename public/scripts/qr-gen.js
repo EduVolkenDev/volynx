@@ -171,8 +171,17 @@ function bind() {
           });
           if (!tokenResult.ok) return;
         } else {
+          if (window.VxLab?.shouldSendToLogin(perm)) {
+            VxLab.confirmLogin(
+              VxLab.currentReturnPath(),
+              "Sign in to continue generating QRs. You will return to QRGen after login."
+            );
+            return;
+          }
           const isFreeUser = window.VxPlan ? !window.VxPlan.isPaid(perm.plan) : (perm.plan === 'free');
-          alert(`Daily limit reached (${perm.limit}). ${isFreeUser ? 'Upgrade to Pro for more.' : 'Try again tomorrow.'}`);
+          const message = `Daily limit reached (${perm.limit}). ${isFreeUser ? 'Upgrade to Pro for more.' : 'Try again tomorrow.'}`;
+          if (isFreeUser && window.VxLab) VxLab.confirmUpgrade(message + "\n\nClick OK to see upgrade options.");
+          else alert(message);
           return;
         }
       }
@@ -181,6 +190,15 @@ function bind() {
 
       // Log usage after successful generation
       await logToolUsage("qr-gen", 1);
+      if (window.VxLab) {
+        VxLab.recordEvent("qr-gen", "generate", "Static QR generated");
+        VxLab.savePreset("qr-gen", {
+          size: getVal("size"),
+          dots: getVal("dotsType"),
+          color: getVal("dotsColorType"),
+          logo: getLogoDataUrl() ? "yes" : "no",
+        });
+      }
 
       // Show save hint based on plan
       const loginHint = document.querySelector(".login-hint");
@@ -197,6 +215,7 @@ function bind() {
     e.preventDefault();
     if (!qrCode) return;
     await qrCode.download({ name: "volynx-qr", extension: "png" });
+    if (window.VxLab) VxLab.recordEvent("qr-gen", "download", "PNG downloaded");
   });
 
   const dotsColorType = $("dotsColorType");

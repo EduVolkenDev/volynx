@@ -2,26 +2,44 @@
 import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
 import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import FlagshipFooter from "../../components/FlagshipFooter.astro";
+import LabToolShell from "../../components/LabToolShell.astro";
 import { ROUTES } from "../../data/routes";
 ---
 <FlagshipLayout title="VOLYNX Lab — Free Image Tools" description="Free browser-based image tools by VOLYNX — convert, upscale and process images locally." pageClass="page-lab">
   <FlagshipHeader current={ROUTES.lab} ctaLabel="Unlock Studio Pro" />
   <main>
+    <LabToolShell active="home" />
 
     <!-- ═══ HERO ═══ -->
     <section class="hero">
       <div class="shell hero-grid">
         <div class="hero-copy">
           <span class="kicker" data-i18n="lab2.kicker">Local-first tools</span>
-          <h1 data-i18n="lab2.hero_title">Free tools for discovery. A Pro pipeline for real work.</h1>
-          <p data-i18n="lab2.hero_subtitle">The Lab feels generous and clean. Studio Pro is an upgrade in operating quality: more comfort, more memory, better output and stronger workflow confidence.</p>
+          <h1 data-i18n="lab2.hero_title">One premium workspace for image, knowledge and QR production.</h1>
+          <p data-i18n="lab2.hero_subtitle">Converter, Image Scaler, Image Suite, Lumina and QRGen now share a cleaner workflow: use the tool, keep the preset, return from profile, and upgrade only when the limit is real.</p>
           <div class="hero-actions">
             <a href="#tools" class="button button--gold" data-i18n="lab2.btn_browse_tools">Browse tools</a>
-            <a href="#studio" class="button button--ghost" data-i18n="lab2.btn_see_pro">See Pro benefits</a>
+            <a href={ROUTES.labImageSuite} class="button button--ghost" data-i18n="lab2.btn_see_pro">Open Image Suite</a>
           </div>
         </div>
         <div class="hero-visual hero-visual--float">
           <img src="/assets/labicon.webp" alt="VOLYNX Lab" class="hero-float-icon" />
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section lab-flow-section" aria-label="Lab workflow">
+      <div class="shell lab-flow">
+        <div class="lab-flow__copy">
+          <span class="kicker">Workspace memory</span>
+          <h2>Work should survive the login wall.</h2>
+          <p>Every key Lab action now records recent activity and presets locally for the profile. Login-required states return to the exact tool instead of dumping the user into pricing.</p>
+        </div>
+        <div class="lab-flow__steps">
+          <div><strong>1</strong><span>Choose a tool</span></div>
+          <div><strong>2</strong><span>Upload or write</span></div>
+          <div><strong>3</strong><span>Export cleanly</span></div>
+          <div><strong>4</strong><span>Resume in profile</span></div>
         </div>
       </div>
     </section>
@@ -54,11 +72,11 @@ import { ROUTES } from "../../data/routes";
         <article class="panel tool-card panel--pro tool-card--suite">
           <div class="tool-icon"><img src="/assets/newimagesuite.webp" alt="" /></div>
           <div class="head-row">
-            <div><span class="label label--pro" data-i18n="lab2.tool_suite_label">Pro</span><h3 data-i18n="lab2.tool_suite_title">Image Suite</h3></div>
-            <a href={ROUTES.studioImageSuite} class="button button--gold" data-i18n="lab2.tool_suite_btn">See Pro tool</a>
+            <div><span class="label label--pro" data-i18n="lab2.tool_suite_label">Free + Pro</span><h3 data-i18n="lab2.tool_suite_title">Image Suite</h3></div>
+            <a href={ROUTES.studioImageSuite} class="button button--gold" data-i18n="lab2.tool_suite_btn">Open Suite</a>
           </div>
-          <p data-i18n="lab2.tool_suite_desc">Advanced multi-step image processing where professional tools meet zero-compromise quality and control.</p>
-          <div class="mini-stats"><span class="chip" data-i18n="lab2.tool_suite_chip1">Multi-step recipe</span><span class="chip" data-i18n="lab2.tool_suite_chip2">Save presets</span></div>
+          <p data-i18n="lab2.tool_suite_desc">Upscale, compress, convert and remove backgrounds with saved presets and clear plan states.</p>
+          <div class="mini-stats"><span class="chip" data-i18n="lab2.tool_suite_chip1">Multi-tool recipe</span><span class="chip" data-i18n="lab2.tool_suite_chip2">Profile presets</span></div>
         </article>
         <article class="panel tool-card">
           <div class="tool-icon"><img src="/assets/education.webp" alt="" /></div>
@@ -73,7 +91,7 @@ import { ROUTES } from "../../data/routes";
           <div class="tool-icon"><img src="/assets/newqrgen.webp" alt="" /></div>
           <div class="head-row">
             <div><span class="label label--free" data-i18n="lab2.tool_qr_label">Free</span><h3 data-i18n="lab2.tool_qr_title">QR Generator</h3></div>
-            <a href={ROUTES.qrgen} class="button button--ghost" data-i18n="lab2.tool_qr_btn">Open</a>
+            <a href={ROUTES.labQrGen} class="button button--ghost" data-i18n="lab2.tool_qr_btn">Open</a>
           </div>
           <p data-i18n="lab2.tool_qr_desc">Campaign-ready codes with stronger brand control and export packs for Pro.</p>
           <div class="mini-stats"><span class="chip" data-i18n="lab2.tool_qr_chip1">Custom colors</span><span class="chip" data-i18n="lab2.tool_qr_chip2">Logo embed</span></div>
@@ -128,6 +146,66 @@ import { ROUTES } from "../../data/routes";
 </FlagshipLayout>
 
 <style is:global>
+  .page-lab .lab-flow-section {
+    padding-top: 12px;
+  }
+  .page-lab .lab-flow {
+    display: grid;
+    grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+    align-items: stretch;
+    gap: 18px;
+    padding: 22px;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px;
+    background:
+      radial-gradient(circle at top left, rgba(125,249,255,.12), transparent 42%),
+      linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.025));
+    box-shadow: 0 24px 80px rgba(0,0,0,.24);
+  }
+  .page-lab .lab-flow__copy h2 {
+    margin: 6px 0 8px;
+    font-size: clamp(28px, 4vw, 48px);
+    line-height: 1;
+    letter-spacing: 0;
+  }
+  .page-lab .lab-flow__copy p {
+    margin: 0;
+    min-height: 0;
+    color: rgba(255,255,255,.66);
+    line-height: 1.6;
+  }
+  .page-lab .lab-flow__steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .page-lab .lab-flow__steps div {
+    min-height: 132px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 8px;
+    background: rgba(255,255,255,.045);
+  }
+  .page-lab .lab-flow__steps strong {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(125,249,255,.18), rgba(214,168,79,.14));
+    color: #fff;
+    font-size: 14px;
+  }
+  .page-lab .lab-flow__steps span {
+    color: rgba(255,255,255,.82);
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1.25;
+  }
   .page-lab .tool-grid {
     align-items: stretch;
   }
@@ -304,6 +382,12 @@ import { ROUTES } from "../../data/routes";
     z-index: 1;
   }
   @media (max-width: 900px) {
+    .page-lab .lab-flow {
+      grid-template-columns: 1fr;
+    }
+    .page-lab .lab-flow__steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
     .page-lab .tool-icon {
       min-height: clamp(220px, 54vw, 300px);
     }
@@ -337,6 +421,14 @@ import { ROUTES } from "../../data/routes";
     .page-lab .stat-icon--status {
       width: min(100%, 220px);
       transform: translateY(10px) scale(1.06);
+    }
+  }
+  @media (max-width: 560px) {
+    .page-lab .lab-flow__steps {
+      grid-template-columns: 1fr;
+    }
+    .page-lab .lab-flow__steps div {
+      min-height: 92px;
     }
   }
 </style>
