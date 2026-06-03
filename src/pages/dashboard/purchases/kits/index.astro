@@ -367,33 +367,25 @@ const assistItems = [
       const features = entitlements?.[addonId]?.features || meta.features || [];
       const description = entitlements?.[addonId]?.description || '';
 
-      // Primary CTA priority:
-      //   1. Direct "Download ZIP" anchor when metadata.download_url is still
-      //      valid (>60s before download_expires_at). This is the canonical
-      //      delivery — kit ZIP holds the full Next.js source.
-      //   2. "Generate download link" button → POSTs to refresh-kit-url to
-      //      mint a fresh signed URL. Used when the original 24h URL has
-      //      expired or the webhook failed to mint one (delivery_status
-      //      = pending_signed_url / missing_storage_asset).
-      // Builder route ("Open in Builder" / "Set up in Builder") becomes a
-      // SECONDARY action so buyers who want the no-code path still have it.
-      const primary = downloadValid
-        ? `<a href="${escapeHtml(meta.download_url)}" class="button button--gold kit-card__cta" download>
-             <span class="i18n-en">Download ZIP</span><span class="i18n-pt">Baixar ZIP</span>
+      // Builder is the premium path for non-technical buyers. Source ZIPs stay
+      // available as an advanced fallback for developers and agency handoff.
+      const primary = projectSlug
+        ? `<a href="/builder/?project=${encodeURIComponent(projectSlug)}" class="button button--gold kit-card__cta">
+             <span class="i18n-en">Open in Builder (visual editor)</span><span class="i18n-pt">Abrir no Builder (editor visual)</span>
            </a>`
-        : `<button type="button" class="button button--gold kit-card__cta kit-card__refresh"
+        : `<a href="/builder/?preset=${encodeURIComponent(presetId)}" class="button button--gold kit-card__cta">
+             <span class="i18n-en">Set up in Builder (visual editor)</span><span class="i18n-pt">Configurar no Builder (editor visual)</span>
+           </a>`;
+
+      const sourceSecondary = downloadValid
+        ? `<a href="${escapeHtml(meta.download_url)}" class="button button--ghost kit-card__cta-secondary" download>
+             <span class="i18n-en">Download source ZIP (advanced)</span><span class="i18n-pt">Baixar ZIP fonte (avançado)</span>
+           </a>`
+        : `<button type="button" class="button button--ghost kit-card__cta-secondary kit-card__refresh"
                    ${purchaseId ? `data-purchase-id="${escapeHtml(purchaseId)}"` : ''}
                    data-addon-id="${escapeHtml(addonId)}">
-             <span class="i18n-en">Generate download link</span><span class="i18n-pt">Gerar link de download</span>
+             <span class="i18n-en">Generate source ZIP link</span><span class="i18n-pt">Gerar link do ZIP fonte</span>
            </button>`;
-
-      const builderSecondary = projectSlug
-        ? `<a href="/builder/?project=${encodeURIComponent(projectSlug)}" class="button button--ghost kit-card__cta-secondary">
-             <span class="i18n-en">Open in Builder (no-code)</span><span class="i18n-pt">Abrir no Builder (no-code)</span>
-           </a>`
-        : `<a href="/builder/?preset=${encodeURIComponent(presetId)}" class="button button--ghost kit-card__cta-secondary">
-             <span class="i18n-en">Set up in Builder (no-code)</span><span class="i18n-pt">Configurar no Builder (no-code)</span>
-           </a>`;
 
       const errorNote = meta.delivery_error
         ? `<p class="kit-card__error">${escapeHtml(String(meta.delivery_error))}</p>`
@@ -420,15 +412,15 @@ const assistItems = [
           </dl>
 
           <p class="kit-card__hint" data-kit-status>${downloadValid
-            ? `<span class="i18n-en">Direct download — link expires after ${expiresLabel}.</span><span class="i18n-pt">Download direto — o link expira após ${expiresLabel}.</span>`
-            : `<span class="i18n-en">Click below to mint a fresh 24h download link.</span><span class="i18n-pt">Clique abaixo para gerar um link de 24h novo.</span>`}</p>
+            ? `<span class="i18n-en">Visual editing works without installation. The source ZIP is for advanced customization and expires after ${expiresLabel}.</span><span class="i18n-pt">A edição visual funciona sem instalação. O ZIP fonte é para customização avançada e expira após ${expiresLabel}.</span>`
+            : `<span class="i18n-en">Visual editing works without installation. Generate a source ZIP link only if you need the code.</span><span class="i18n-pt">A edição visual funciona sem instalação. Gere o ZIP fonte apenas se precisar do código.</span>`}</p>
 
           ${errorNote}
           ${featureList(features)}
 
           <div class="kit-card__actions">
             ${primary}
-            ${builderSecondary}
+            ${sourceSecondary}
             <a href="${escapeHtml(fam.product_url)}" class="button button--ghost kit-card__cta-secondary">
               <span class="i18n-en">Product page</span><span class="i18n-pt">Página do produto</span>
             </a>
@@ -468,14 +460,14 @@ const assistItems = [
             if (res.ok && url) {
               const a = document.createElement('a');
               a.href = url;
-              a.className = 'button button--gold kit-card__cta';
+              a.className = 'button button--ghost kit-card__cta-secondary';
               a.setAttribute('download', '');
-              a.innerHTML = '<span class="i18n-en">Download ZIP</span><span class="i18n-pt">Baixar ZIP</span>';
+              a.innerHTML = '<span class="i18n-en">Download source ZIP (advanced)</span><span class="i18n-pt">Baixar ZIP fonte (avançado)</span>';
               btn.replaceWith(a);
               if (status) {
                 const exp = data.download_expires_at || data.expires_at;
                 const when = exp ? new Date(exp).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '';
-                status.innerHTML = `<span class="i18n-en">Direct download — link expires after ${when}.</span><span class="i18n-pt">Download direto — o link expira após ${when}.</span>`;
+                status.innerHTML = `<span class="i18n-en">Visual editing works without installation. The source ZIP is for advanced customization and expires after ${when}.</span><span class="i18n-pt">A edição visual funciona sem instalação. O ZIP fonte é para customização avançada e expira após ${when}.</span>`;
               }
               a.click();
             } else {
