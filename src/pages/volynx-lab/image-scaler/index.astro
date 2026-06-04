@@ -205,6 +205,10 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
       }
     }
 
+    function valueExists(select, value) {
+      return Boolean(select && Array.from(select.options).some((option) => option.value === value));
+    }
+
     const fileEl      = $("file");
     const pickBtn     = $("pickBtn");
     const dropEl      = $("drop");
@@ -220,6 +224,28 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
     let loadedImages = [];
     let processedResults = [];
     let singleBlob = null;
+
+    function applyScalerPreset(values = {}) {
+      const scale = String(values.scale || "").replace(/x$/i, "");
+      if (valueExists(scaleEl, scale)) scaleEl.value = scale;
+
+      const format = String(values.format || "");
+      const mime = format.includes("/") ? format : (format ? `image/${format === "jpg" ? "jpeg" : format}` : "");
+      if (valueExists(fmtEl, mime)) fmtEl.value = mime;
+
+      if (values.smoothing) smoothEl.checked = values.smoothing !== "off";
+      scaleEl.dispatchEvent(new Event("change", { bubbles: true }));
+      fmtEl.dispatchEvent(new Event("change", { bubbles: true }));
+      smoothEl.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+
+    if (window.VxLab?.renderToolPresets) {
+      VxLab.renderToolPresets("image-scaler", {
+        anchor: ".field-row",
+        apply: applyScalerPreset,
+        emptyText: "Upscale an image once and your scale preset appears here.",
+      });
+    }
 
     function resetPreview() {
       if (previewEl) previewEl.removeAttribute("src");

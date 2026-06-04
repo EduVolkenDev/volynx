@@ -306,6 +306,24 @@
     document.head.appendChild(style);
   }
 
+  function ensurePresetStyles() {
+    if (document.getElementById("vxLabPresetStyles")) return;
+    var style = document.createElement("style");
+    style.id = "vxLabPresetStyles";
+    style.textContent = [
+      ".vx-lab-presets{margin:14px 0 0;padding:12px;border:1px solid rgba(255,255,255,.09);border-radius:10px;background:rgba(255,255,255,.035)}",
+      ".vx-lab-presets__head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}",
+      ".vx-lab-presets__title{margin:0;color:rgba(255,255,255,.9);font:900 12px/1.2 Manrope,ui-sans-serif,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.08em}",
+      ".vx-lab-presets__status{color:rgba(125,249,255,.78);font:800 11px/1.2 Manrope,ui-sans-serif,system-ui,sans-serif}",
+      ".vx-lab-presets__list{display:flex;flex-wrap:wrap;gap:8px}",
+      ".vx-lab-presets__chip{min-height:34px;border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:7px 11px;background:rgba(255,255,255,.055);color:rgba(255,255,255,.84);font:800 12px/1.2 Manrope,ui-sans-serif,system-ui,sans-serif;cursor:pointer;max-width:100%;white-space:normal;text-align:left}",
+      ".vx-lab-presets__chip:hover,.vx-lab-presets__chip:focus-visible{border-color:rgba(125,249,255,.46);background:rgba(125,249,255,.095);color:#fff;outline:none}",
+      ".vx-lab-presets__empty{margin:0;color:rgba(255,255,255,.52);font:600 12px/1.45 Manrope,ui-sans-serif,system-ui,sans-serif}",
+      "@media(max-width:620px){.vx-lab-presets__head{align-items:flex-start;flex-direction:column}.vx-lab-presets__chip{width:100%;border-radius:8px}}"
+    ].join("");
+    document.head.appendChild(style);
+  }
+
   function closeModal(root) {
     if (!root) return;
     root.setAttribute("hidden", "");
@@ -530,6 +548,92 @@
     }[tool] || tool || "Lab";
   }
 
+  function presetSummary(tool, values) {
+    var v = values || {};
+    if (tool === "converter") {
+      return [
+        v.format ? String(v.format).toUpperCase() : "",
+        v.quality ? "Q " + v.quality : "",
+        v.maxWidth ? "Max " + v.maxWidth : "",
+      ].filter(Boolean).join(" · ");
+    }
+    if (tool === "image-scaler") {
+      return [
+        v.scale || "",
+        v.format ? String(v.format).toUpperCase() : "",
+        v.smoothing ? "Smooth " + v.smoothing : "",
+      ].filter(Boolean).join(" · ");
+    }
+    if (tool === "image-suite") {
+      return [
+        v.tool ? String(v.tool).replace(/-/g, " ") : "",
+        v.scale || "",
+        v.format ? String(v.format).toUpperCase() : "",
+        v.quality ? "Q " + v.quality : "",
+        v.fill ? "Fill " + v.fill : "",
+      ].filter(Boolean).join(" · ");
+    }
+    if (tool === "lumina") {
+      return [v.mode || "", v.language || ""].filter(Boolean).join(" · ");
+    }
+    return Object.keys(v).map(function (key) {
+      return key + ": " + v[key];
+    }).join(" · ");
+  }
+
+  function renderToolPresets(tool, options) {
+    var config = options || {};
+    var anchor = typeof config.anchor === "string" ? document.querySelector(config.anchor) : config.anchor;
+    if (!anchor || !tool) return null;
+    ensurePresetStyles();
+
+    var root = document.querySelector('[data-vx-lab-presets="' + tool + '"]');
+    if (!root) {
+      root = document.createElement("section");
+      root.className = "vx-lab-presets";
+      root.dataset.vxLabPresets = tool;
+      root.setAttribute("aria-label", toolLabel(tool) + " presets");
+      root.innerHTML = '<div class="vx-lab-presets__head"><h3 class="vx-lab-presets__title">Recent presets</h3><span class="vx-lab-presets__status" aria-live="polite"></span></div><div class="vx-lab-presets__list"></div>';
+      if (config.position === "before") anchor.parentNode.insertBefore(root, anchor);
+      else anchor.parentNode.insertBefore(root, anchor.nextSibling);
+    }
+
+    var list = root.querySelector(".vx-lab-presets__list");
+    var status = root.querySelector(".vx-lab-presets__status");
+    var presets = getPresets(tool).slice(0, config.limit || 4);
+    if (!presets.length) {
+      list.innerHTML = '<p class="vx-lab-presets__empty">' + escapeHtml(config.emptyText || "No saved presets yet. Process something once and it appears here.") + '</p>';
+      if (status) status.textContent = "";
+      return root;
+    }
+
+    list.innerHTML = "";
+    presets.forEach(function (preset) {
+      var button = document.createElement("button");
+      button.type = "button";
+      button.className = "vx-lab-presets__chip";
+      button.textContent = presetSummary(tool, preset.values) || toolLabel(tool) + " preset";
+      button.addEventListener("click", function () {
+        if (typeof config.apply === "function") config.apply(preset.values || {}, preset);
+        if (status) {
+          status.textContent = "Preset applied";
+          window.setTimeout(function () {
+            if (status.textContent === "Preset applied") status.textContent = "";
+          }, 1800);
+        }
+        recordEvent(tool, "preset_apply", button.textContent);
+      });
+      list.appendChild(button);
+    });
+
+    if (!root._vxRefreshBound) {
+      root._vxRefreshBound = true;
+      window.addEventListener("vx:lab-presets-updated", function () { renderToolPresets(tool, config); });
+      window.addEventListener("vx:lab-cloud-synced", function () { renderToolPresets(tool, config); });
+    }
+    return root;
+  }
+
   function formatTime(iso) {
     try {
       return new Date(iso).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
@@ -680,6 +784,7 @@
     renderProfilePanel: renderProfilePanel,
     getContinueTarget: getContinueTarget,
     configureProfileContinue: configureProfileContinue,
+    renderToolPresets: renderToolPresets,
     getHistory: getHistory,
     getPresets: getPresets,
     getAnalytics: getAnalytics,
