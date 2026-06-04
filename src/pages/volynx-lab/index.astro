@@ -4,6 +4,101 @@ import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import FlagshipFooter from "../../components/FlagshipFooter.astro";
 import LabToolShell from "../../components/LabToolShell.astro";
 import { ROUTES } from "../../data/routes";
+
+const toolCards = [
+  {
+    id: "qrgen",
+    title: "QRGen",
+    label: "Benchmark",
+    href: ROUTES.labQrGen,
+    cta: "Open QRGen",
+    image: "/assets/newqrgen.webp",
+    description: "Brand-ready QR projects with strong preview, export paths and campaign structure.",
+    promise: "Best first paid signal for the Lab: projects, exports, brand control and recovery.",
+    states: ["Free start", "Pro exports", "Projects", "Profile recovery"],
+    details: [
+      ["Free", "Create and test QR campaigns"],
+      ["Pro", "Premium export packs and saved project depth"],
+      ["VX", "Ready for token actions when dynamic campaigns are wired"],
+      ["Local", "Preview and design controls run immediately"],
+    ],
+  },
+  {
+    id: "lumina",
+    title: "Lumina",
+    label: "AI + Local",
+    href: ROUTES.labLumina,
+    cta: "Open Lumina",
+    image: "/assets/education.webp",
+    description: "Turn complex scientific, technical and educational content into clear explanations.",
+    promise: "The knowledge product: AI when available, local fallback when not, history and export.",
+    states: ["Free quota", "AI", "Local fallback", "Export"],
+    details: [
+      ["Free", "Daily starter usage with useful local fallback"],
+      ["Pro", "Higher capacity and deeper knowledge workflows"],
+      ["VX", "No token spend unless a specific AI action is wired"],
+      ["Local", "Fallback answer, history and TXT export stay usable"],
+    ],
+  },
+  {
+    id: "image-suite",
+    title: "Image Suite",
+    label: "Studio Pro",
+    href: ROUTES.labImageSuite,
+    cta: "Open Suite",
+    image: "/assets/newimagesuite.webp",
+    description: "Upscale, compress, convert and remove backgrounds with reusable recipes.",
+    promise: "Production surface for creators and operators who process assets repeatedly.",
+    states: ["Free tools", "Pro BG remove", "Recipes", "Batch-ready"],
+    details: [
+      ["Free", "Compress, convert and resize browser-side"],
+      ["Pro", "Background removal, higher limits and richer exports"],
+      ["VX", "Reserved for paid compute actions, not basic local work"],
+      ["Local", "Most image work stays in this browser"],
+    ],
+  },
+  {
+    id: "converter",
+    title: "Converter",
+    label: "Local Utility",
+    href: ROUTES.labConverter,
+    cta: "Open Converter",
+    image: "/assets/converterbig.webp",
+    description: "Fast WebP, JPG, PNG and AVIF conversion with quality and width presets.",
+    promise: "The trust builder: simple, fast, useful, with ZIP export and saved format recipes.",
+    states: ["Free", "Local", "ZIP", "Presets"],
+    details: [
+      ["Free", "Convert real files without account friction"],
+      ["Pro", "Natural path when volume and batch needs grow"],
+      ["VX", "No VX spend for basic conversion"],
+      ["Local", "Files are processed in the browser"],
+    ],
+  },
+  {
+    id: "image-scaler",
+    title: "Image Scaler",
+    label: "Preview-first",
+    href: ROUTES.labImageScaler,
+    cta: "Open Scaler",
+    image: "/assets/newimagescaler.webp",
+    description: "Upscale assets with clear scale controls, smoothing and saved scale presets.",
+    promise: "A focused before/after workflow that should feel safe for non-technical users.",
+    states: ["Free", "Local", "Preview", "Pro capacity"],
+    details: [
+      ["Free", "2x/3x/4x local scale modes"],
+      ["Pro", "Higher limits and advanced processing path"],
+      ["VX", "Only when compute-backed upscale is explicitly connected"],
+      ["Local", "Current scaling stays browser-side"],
+    ],
+  },
+];
+
+const workflowSteps = [
+  ["1", "Start with QRGen", "Create a campaign asset people can inspect immediately."],
+  ["2", "Use Lumina for clarity", "Turn technical material into copy, briefs or explainers."],
+  ["3", "Polish assets", "Run Image Suite, Converter or Scaler depending on the job."],
+  ["4", "Resume from profile", "History and presets bring the user back to the exact context."],
+];
 ---
 <FlagshipLayout title="VOLYNX Lab — Free Image Tools" description="Free browser-based image tools by VOLYNX — convert, upscale and process images locally." pageClass="page-lab">
   <FlagshipHeader current={ROUTES.lab} ctaLabel="Unlock Studio Pro" />
@@ -44,58 +139,61 @@ import { ROUTES } from "../../data/routes";
       </div>
     </section>
 
-    <!-- ═══ FREE TOOLS ═══ -->
+    <!-- ═══ LAB VITRINE ═══ -->
     <section id="tools" class="page-section">
       <div class="shell section-head">
-        <h2 data-i18n="lab2.section_tools_title">Free tools that build trust</h2>
-        <p data-i18n="lab2.section_tools_desc">Each free tool gets real use value, while the Pro state adds power and comfort instead of simply locking everything behind a wall.</p>
+        <span class="kicker">Premium Lab stack</span>
+        <h2>Free should feel useful. Pro should feel obvious.</h2>
+        <p>Each tool now explains its contract before the user hits a wall: what runs free, what becomes Pro, what can use VX later, and what stays local in the browser.</p>
       </div>
       <div class="shell tool-grid">
-        <article class="panel tool-card tool-card--converter">
-          <div class="tool-icon"><img src="/assets/converterbig.webp" alt="" /></div>
-          <div class="head-row">
-            <div><span class="label label--free" data-i18n="lab2.tool_converter_label">Free</span><h3 data-i18n="lab2.tool_converter_title">Converter</h3></div>
-            <a href={ROUTES.labConverter} class="button button--ghost" data-i18n="lab2.tool_converter_btn">Open</a>
-          </div>
-          <p data-i18n="lab2.tool_converter_desc">Convert images to WebP, JPG, PNG or AVIF with clean defaults.</p>
-          <div class="mini-stats"><span class="chip">Free</span><span class="chip">Local</span><span class="chip">ZIP</span><span class="chip" data-i18n="lab2.tool_converter_chip2">Basic presets</span></div>
-        </article>
-        <article class="panel tool-card tool-card--scaler">
-          <div class="tool-icon"><img src="/assets/newimagescaler.webp" alt="" /></div>
-          <div class="head-row">
-            <div><span class="label label--free" data-i18n="lab2.tool_scaler_label">Free</span><h3 data-i18n="lab2.tool_scaler_title">Image Scaler</h3></div>
-            <a href={ROUTES.labImageScaler} class="button button--ghost" data-i18n="lab2.tool_scaler_btn">Open</a>
-          </div>
-          <p data-i18n="lab2.tool_scaler_desc">Upscale with clearer controls and a stronger before/after experience in Pro.</p>
-          <div class="mini-stats"><span class="chip">Free</span><span class="chip">Local</span><span class="chip" data-i18n="lab2.tool_scaler_chip1">2x / 3x base modes</span><span class="chip" data-i18n="lab2.tool_scaler_chip2">Preview-first</span></div>
-        </article>
-        <article class="panel tool-card panel--pro tool-card--suite">
-          <div class="tool-icon"><img src="/assets/newimagesuite.webp" alt="" /></div>
-          <div class="head-row">
-            <div><span class="label label--pro" data-i18n="lab2.tool_suite_label">Free + Pro</span><h3 data-i18n="lab2.tool_suite_title">Image Suite</h3></div>
-            <a href={ROUTES.studioImageSuite} class="button button--gold" data-i18n="lab2.tool_suite_btn">Open Suite</a>
-          </div>
-          <p data-i18n="lab2.tool_suite_desc">Upscale, compress, convert and remove backgrounds with saved presets and clear plan states.</p>
-          <div class="mini-stats"><span class="chip">Free</span><span class="chip">Pro</span><span class="chip">Local AI</span><span class="chip" data-i18n="lab2.tool_suite_chip2">Profile presets</span></div>
-        </article>
-        <article class="panel tool-card tool-card--lumina">
-          <div class="tool-icon"><img src="/assets/education.webp" alt="" /></div>
-          <div class="head-row">
-            <div><span class="label label--free">Free + Pro</span><h3>Volynx Lumina</h3></div>
-            <a href={ROUTES.labLumina} class="button button--ghost">Open</a>
-          </div>
-          <p>Transform complex scientific, technical and educational content into clear, human and multilingual explanations.</p>
-          <div class="mini-stats"><span class="chip">Free</span><span class="chip">AI</span><span class="chip">Local fallback</span><span class="chip">Export</span></div>
-        </article>
-        <article class="panel tool-card tool-card--qrgen">
-          <div class="tool-icon"><img src="/assets/newqrgen.webp" alt="" /></div>
-          <div class="head-row">
-            <div><span class="label label--free" data-i18n="lab2.tool_qr_label">Free</span><h3 data-i18n="lab2.tool_qr_title">QR Generator</h3></div>
-            <a href={ROUTES.labQrGen} class="button button--ghost" data-i18n="lab2.tool_qr_btn">Open</a>
-          </div>
-          <p data-i18n="lab2.tool_qr_desc">Campaign-ready codes with stronger brand control and export packs for Pro.</p>
-          <div class="mini-stats"><span class="chip">Free</span><span class="chip">Launch</span><span class="chip">Pro</span><span class="chip">Projects</span></div>
-        </article>
+        {toolCards.map((tool) => (
+          <article class:list={["panel", "tool-card", `tool-card--${tool.id}`]}>
+            <div class="tool-card__media">
+              <span>{tool.label}</span>
+              <div class="tool-icon"><img src={tool.image} alt="" loading="lazy" /></div>
+            </div>
+            <div class="head-row">
+              <div>
+                <span class="label label--free">{tool.label}</span>
+                <h3>{tool.title}</h3>
+              </div>
+              <a href={tool.href} class:list={["button", tool.id === "qrgen" || tool.id === "image-suite" ? "button--gold" : "button--ghost"]}>{tool.cta}</a>
+            </div>
+            <p>{tool.description}</p>
+            <strong class="tool-card__promise">{tool.promise}</strong>
+            <div class="mini-stats" aria-label={`${tool.title} access states`}>
+              {tool.states.map((state) => <span class="chip">{state}</span>)}
+            </div>
+            <dl class="tool-card__matrix">
+              {tool.details.map(([label, text]) => (
+                <div>
+                  <dt>{label}</dt>
+                  <dd>{text}</dd>
+                </div>
+              ))}
+            </dl>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="page-section lab-workflow-section" aria-label="Recommended Lab workflow">
+      <div class="shell lab-workflow">
+        <div class="lab-workflow__head">
+          <span class="kicker">Recommended workflow</span>
+          <h2>Lead with the tool people can understand fastest.</h2>
+          <p>QRGen is the commercial benchmark, Lumina adds intellectual value, and the image tools make the workspace practical for daily production.</p>
+        </div>
+        <div class="lab-workflow__grid">
+          {workflowSteps.map(([number, title, copy]) => (
+            <div>
+              <strong>{number}</strong>
+              <span>{title}</span>
+              <p>{copy}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
 
@@ -210,17 +308,22 @@ import { ROUTES } from "../../data/routes";
   }
   .page-lab .tool-grid {
     align-items: stretch;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .page-lab .tool-card {
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: hidden;
     transition: transform .22s ease, filter .22s ease, background .22s ease, border-color .22s ease;
     will-change: transform, filter;
   }
   .page-lab .tool-card--qrgen { order: 1; }
   .page-lab .tool-card--lumina { order: 2; }
-  .page-lab .tool-card--suite { order: 3; }
+  .page-lab .tool-card--image-suite { order: 3; }
   .page-lab .tool-card--converter { order: 4; }
-  .page-lab .tool-card--scaler { order: 5; }
+  .page-lab .tool-card--image-scaler { order: 5; }
   .page-lab .tool-card--qrgen,
   .page-lab .tool-card--lumina {
     border-color: rgba(125,249,255,.18);
@@ -230,12 +333,46 @@ import { ROUTES } from "../../data/routes";
   }
   .page-lab .tool-card:hover,
   .page-lab .tool-card:focus-within {
-    filter: drop-shadow(0px 0px 46px white);
-    transform: translateY(-10px);
-    background: linear-gradient(175deg, black, cadetblue);
+    filter: drop-shadow(0 18px 42px rgba(125,249,255,.12));
+    transform: translateY(-6px);
+    border-color: rgba(125,249,255,.24);
+    background:
+      linear-gradient(150deg, rgba(125,249,255,.09), rgba(214,168,79,.055)),
+      rgba(255,255,255,.04);
+  }
+  .page-lab .tool-card__media {
+    position: relative;
+    display: grid;
+    min-height: clamp(254px, 27vw, 334px);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 8px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.02)),
+      rgba(0,0,0,.14);
+    overflow: hidden;
+  }
+  .page-lab .tool-card__media > span {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 2;
+    max-width: calc(100% - 24px);
+    min-height: 28px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 10px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 999px;
+    background: rgba(3,8,18,.62);
+    color: rgba(255,255,255,.84);
+    font-size: 11px;
+    font-weight: 900;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: .08em;
   }
   .page-lab .tool-card .head-row {
-    min-height: 92px;
+    min-height: 82px;
   }
   .page-lab .tool-card .head-row > div {
     flex: 1 1 auto;
@@ -243,17 +380,61 @@ import { ROUTES } from "../../data/routes";
   }
   .page-lab .tool-card p {
     margin: 0;
-    min-height: 5.5rem;
+    min-height: 4.9rem;
+  }
+  .page-lab .tool-card__promise {
+    display: block;
+    min-height: 4.2rem;
+    padding: 12px;
+    border-left: 2px solid rgba(214,168,79,.58);
+    border-radius: 8px;
+    background: rgba(214,168,79,.055);
+    color: rgba(255,255,255,.88);
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1.42;
   }
   .page-lab .tool-card .mini-stats {
-    margin-top: auto;
+    margin-top: 0;
+  }
+  .page-lab .tool-card__matrix {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin: auto 0 0;
+  }
+  .page-lab .tool-card__matrix div {
+    display: grid;
+    grid-template-columns: 58px minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+    min-height: 44px;
+    padding: 9px 10px;
+    border: 1px solid rgba(255,255,255,.075);
+    border-radius: 8px;
+    background: rgba(255,255,255,.035);
+  }
+  .page-lab .tool-card__matrix dt {
+    color: #7df9ff;
+    font-size: 11px;
+    font-weight: 950;
+    line-height: 1.25;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+  .page-lab .tool-card__matrix dd {
+    margin: 0;
+    color: rgba(255,255,255,.66);
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.35;
   }
   .page-lab .tool-icon {
     display: grid;
     place-items: end center;
     width: 100%;
-    min-height: clamp(240px, 26vw, 320px);
-    margin-bottom: 10px;
+    min-height: 100%;
+    margin: 0;
     background: none;
     border: none;
     border-radius: 12px;
@@ -267,9 +448,72 @@ import { ROUTES } from "../../data/routes";
     filter: drop-shadow(0 0 7px);
     display: block;
   }
-  .page-lab .tool-card--suite .tool-icon img {
+  .page-lab .tool-card--image-suite .tool-icon img {
     width: min(100%, 452px);
     max-height: clamp(232px, 25vw, 312px);
+  }
+  .page-lab .lab-workflow-section {
+    padding-top: 10px;
+  }
+  .page-lab .lab-workflow {
+    display: grid;
+    grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+    gap: 18px;
+    align-items: stretch;
+    padding: 22px;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.055), rgba(255,255,255,.025)),
+      rgba(0,0,0,.1);
+  }
+  .page-lab .lab-workflow__head h2 {
+    margin: 6px 0 8px;
+    font-size: clamp(28px, 4vw, 46px);
+    line-height: 1;
+    letter-spacing: 0;
+  }
+  .page-lab .lab-workflow__head p {
+    margin: 0;
+    color: rgba(255,255,255,.66);
+    line-height: 1.6;
+  }
+  .page-lab .lab-workflow__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .page-lab .lab-workflow__grid div {
+    min-height: 154px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 8px;
+    background: rgba(255,255,255,.04);
+  }
+  .page-lab .lab-workflow__grid strong {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: rgba(125,249,255,.12);
+    color: #fff;
+    font-size: 13px;
+  }
+  .page-lab .lab-workflow__grid span {
+    color: rgba(255,255,255,.9);
+    font-size: 15px;
+    font-weight: 950;
+    line-height: 1.2;
+  }
+  .page-lab .lab-workflow__grid p {
+    margin: 0;
+    color: rgba(255,255,255,.62);
+    font-size: 13px;
+    line-height: 1.48;
   }
   .page-lab .studio-badge img {
     width: 16px;
@@ -395,21 +639,32 @@ import { ROUTES } from "../../data/routes";
     position: relative;
     z-index: 1;
   }
-  @media (max-width: 900px) {
-    .page-lab .lab-flow {
-      grid-template-columns: 1fr;
-    }
-    .page-lab .lab-flow__steps {
+  @media (max-width: 1120px) {
+    .page-lab .tool-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-    .page-lab .tool-icon {
+    .page-lab .tool-card p,
+    .page-lab .tool-card__promise {
+      min-height: 0;
+    }
+  }
+  @media (max-width: 900px) {
+    .page-lab .lab-flow,
+    .page-lab .lab-workflow {
+      grid-template-columns: 1fr;
+    }
+    .page-lab .lab-flow__steps,
+    .page-lab .lab-workflow__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .page-lab .tool-card__media {
       min-height: clamp(220px, 54vw, 300px);
     }
     .page-lab .tool-icon img {
       width: min(100%, 400px);
       max-height: clamp(205px, 50vw, 280px);
     }
-    .page-lab .tool-card--suite .tool-icon img {
+    .page-lab .tool-card--image-suite .tool-icon img {
       width: min(100%, 428px);
       max-height: clamp(216px, 52vw, 292px);
     }
@@ -438,11 +693,31 @@ import { ROUTES } from "../../data/routes";
     }
   }
   @media (max-width: 560px) {
-    .page-lab .lab-flow__steps {
+    .page-lab .tool-grid {
       grid-template-columns: 1fr;
     }
-    .page-lab .lab-flow__steps div {
+    .page-lab .lab-flow__steps,
+    .page-lab .lab-workflow__grid {
+      grid-template-columns: 1fr;
+    }
+    .page-lab .lab-flow__steps div,
+    .page-lab .lab-workflow__grid div {
       min-height: 92px;
+    }
+    .page-lab .tool-card .head-row {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+    .page-lab .tool-card .head-row .button {
+      width: 100%;
+    }
+    .page-lab .tool-card__promise,
+    .page-lab .tool-card p {
+      min-height: 0;
+    }
+    .page-lab .tool-card__matrix div {
+      grid-template-columns: 1fr;
+      gap: 4px;
     }
   }
 </style>
