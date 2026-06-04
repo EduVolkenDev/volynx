@@ -200,6 +200,33 @@ function updateStats() {
   stats.textContent = files.length ? `${files.length} file(s)` : '';
 }
 
+function applyConverterPreset(values = {}) {
+  if (values.format && Array.from(formatSel.options).some(option => option.value === values.format)) {
+    formatSel.value = values.format;
+  }
+  if (values.quality) {
+    qualityIn.value = String(values.quality);
+    qualityVal.textContent = qualityIn.value;
+  }
+  if (values.maxWidth) {
+    const maxWidth = values.maxWidth === 'original' ? '0' : String(values.maxWidth);
+    if (Array.from(maxwSel.options).some(option => option.value === maxWidth)) {
+      maxwSel.value = maxWidth;
+    }
+  }
+  formatSel.dispatchEvent(new Event('change', { bubbles: true }));
+  qualityIn.dispatchEvent(new Event('input', { bubbles: true }));
+  maxwSel.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
+if (window.VxLab?.renderToolPresets) {
+  VxLab.renderToolPresets('converter', {
+    anchor: '.controls',
+    apply: applyConverterPreset,
+    emptyText: 'Convert an image once and your format recipe appears here.',
+  });
+}
+
 /* ===== Convert ===== */
 convertBtn.addEventListener('click', async () => {
   if (!files.length) return;

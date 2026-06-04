@@ -1091,6 +1091,38 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       } catch {}
     }
 
+    function valueExists(select, value) {
+      return Boolean(select && Array.from(select.options).some((option) => option.value === value));
+    }
+
+    function applySuitePreset(values = {}) {
+      if (values.tool && valueExists(toolEl, values.tool)) toolEl.value = values.tool;
+
+      const scale = String(values.scale || "").replace(/x$/i, "");
+      if (scale && valueExists(scaleEl, scale)) scaleEl.value = scale;
+
+      const format = String(values.format || "");
+      const mime = format.includes("/") ? format : (format ? `image/${format === "jpg" ? "jpeg" : format}` : "");
+      if (mime && valueExists(fmtEl, mime)) fmtEl.value = mime;
+      if (mime && valueExists(bgFormatEl, mime)) bgFormatEl.value = mime;
+
+      if (values.quality) {
+        qualityEl.value = String(values.quality);
+        qualityValEl.textContent = qualityEl.value;
+      }
+
+      if (values.fill && valueExists(bgFillEl, values.fill)) bgFillEl.value = values.fill;
+
+      updateFieldVisibility(toolEl.value);
+      syncToolToUrl();
+      checkFmtHint();
+      syncBgFillColorVisibility();
+      toolEl.dispatchEvent(new Event("change", { bubbles: true }));
+      scaleEl.dispatchEvent(new Event("change", { bubbles: true }));
+      fmtEl.dispatchEvent(new Event("change", { bubbles: true }));
+      qualityEl.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+
     applyInitialToolFromUrl();
     const proReady = detectPro();
 
@@ -1112,6 +1144,14 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       }
     });
     updateFieldVisibility(toolEl.value);
+
+    if (window.VxLab?.renderToolPresets) {
+      VxLab.renderToolPresets("image-suite", {
+        anchor: ".field-group",
+        apply: applySuitePreset,
+        emptyText: "Process an image once and your Image Suite recipe appears here.",
+      });
+    }
 
     function triggerFilePicker() {
       if (fileEl) fileEl.click();

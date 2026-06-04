@@ -59,6 +59,10 @@ function updateCounter() {
   counter.textContent = `Free: ${remaining}/${FREE_LIMIT} usos`;
 }
 
+function selectHasValue(select, value) {
+  return Boolean(select && Array.from(select.options).some((option) => option.value === value));
+}
+
 function hasPaidPlan() {
   try {
     const cached = window.VxPlan?.getCachedRelaxed?.() || window.VxPlan?.getCached?.();
@@ -89,6 +93,26 @@ function writeHistory(rows) {
   try {
     localStorage.setItem(historyKey, JSON.stringify(rows.slice(0, maxHistoryItems)));
   } catch (_) {}
+}
+
+function applyLuminaPreset(values = {}) {
+  if (values.mode && selectHasValue(mode, values.mode)) {
+    mode.value = values.mode;
+    mode.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+  if (values.language && selectHasValue(language, values.language)) {
+    language.value = values.language;
+    language.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+  setStatus("Preset aplicado", "ok");
+}
+
+if (window.VxLab?.renderToolPresets) {
+  VxLab.renderToolPresets("lumina", {
+    anchor: ".lumina-controls",
+    apply: applyLuminaPreset,
+    emptyText: "Use Lumina once and your mode preset appears here.",
+  });
 }
 
 function escapeHtml(value) {
