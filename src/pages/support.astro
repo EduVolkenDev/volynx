@@ -7,10 +7,10 @@ import { ROUTES } from "../data/routes";
 const title = "Support — VOLYNX";
 
 const supportAssistItems = [
-  { href: ROUTES.delivery, label: { en: "Recovery", pt: "Recuperação" }, title: { en: "Open my products", pt: "Abrir meus produtos" }, copy: { en: "Use the delivery hub when a purchase already happened and you need the right file or access again.", pt: "Use o hub de entrega quando uma compra já aconteceu e você precisa do arquivo certo ou acesso de novo." }, emphasized: true },
-  { href: ROUTES.daily, label: { en: "Workspace", pt: "Workspace" }, title: { en: "Open Daily", pt: "Abrir Daily" }, copy: { en: "Jump back into My Day, Summary, Writing, Vault and the rest of the personal execution layer.", pt: "Volte para My Day, Summary, Writing, Vault e o resto da camada de execução pessoal." } },
-  { href: ROUTES.products, label: { en: "Catalog", pt: "Catálogo" }, title: { en: "Browse products", pt: "Ver produtos" }, copy: { en: "If you need the product path instead of support, keep discovery and recovery in the same loop.", pt: "Se você precisa do caminho de produto em vez de suporte, mantenha descoberta e recuperação no mesmo loop." } },
-  { href: ROUTES.iconsStore, label: { en: "Assets", pt: "Ativos" }, title: { en: "Open Icons Store", pt: "Abrir Icons Store" }, copy: { en: "Route icon delivery, pack access and visual asset issues from the same recovery entry point.", pt: "Direcione entrega de ícones, acesso a packs e questões de ativos visuais pela mesma entrada de recuperação." } },
+  { href: ROUTES.delivery, label: { en: "Recovery", pt: "Recuperação" }, title: { en: "Open my products", pt: "Abrir meus produtos" }, copy: { en: "Use the delivery hub when a purchase already happened and you need the right file or access again.", pt: "Use o hub de entrega quando uma compra já aconteceu e você precisa do arquivo certo ou acesso de novo." }, emphasized: true, iconSrc: "/assets/mybox.webp" },
+  { href: ROUTES.daily, label: { en: "Workspace", pt: "Workspace" }, title: { en: "Open Daily", pt: "Abrir Daily" }, copy: { en: "Jump back into My Day, Summary, Writing, Vault and the rest of the personal execution layer.", pt: "Volte para My Day, Summary, Writing, Vault e o resto da camada de execução pessoal." }, iconSrc: "/assets/daily-icon.webp" },
+  { href: ROUTES.products, label: { en: "Catalog", pt: "Catálogo" }, title: { en: "Browse products", pt: "Ver produtos" }, copy: { en: "If you need the product path instead of support, keep discovery and recovery in the same loop.", pt: "Se você precisa do caminho de produto em vez de suporte, mantenha descoberta e recuperação no mesmo loop." }, iconSrc: "/assets/allproducts.webp" },
+  { href: ROUTES.iconsStore, label: { en: "Assets", pt: "Ativos" }, title: { en: "Open Icons Store", pt: "Abrir Icons Store" }, copy: { en: "Route icon delivery, pack access and visual asset issues from the same recovery entry point.", pt: "Direcione entrega de ícones, acesso a packs e questões de ativos visuais pela mesma entrada de recuperação." }, iconSrc: "/assets/icons-store-logo.webp" },
 ];
 ---
 
@@ -45,31 +45,37 @@ const supportAssistItems = [
 
     <section class="support-paths" aria-label="Support shortcuts" data-i18n-aria="aria.support_shortcuts">
       <a class="path-card" href={ROUTES.delivery}>
+        <span class="path-card__icon" aria-hidden="true"><img src="/assets/mybox.webp" alt="" loading="lazy" decoding="async" /></span>
         <div class="path-card__eyebrow"><span class="i18n-en">Delivery hub</span><span class="i18n-pt">Central de entregas</span></div>
         <h2><span class="i18n-en">Find a purchase</span><span class="i18n-pt">Encontrar uma compra</span></h2>
         <p><span class="i18n-en">Return to products, verify what unlocked, and recover delivery after checkout.</span><span class="i18n-pt">Volte para os produtos, confira o que foi desbloqueado e recupere a entrega após o checkout.</span></p>
       </a>
       <a class="path-card" href={ROUTES.daily}>
+        <span class="path-card__icon path-card__icon--tall" aria-hidden="true"><img src="/assets/daily-icon.webp" alt="" loading="lazy" decoding="async" /></span>
         <div class="path-card__eyebrow">VOLYNX Daily</div>
         <h2><span class="i18n-en">Open Daily</span><span class="i18n-pt">Abrir o Daily</span></h2>
         <p><span class="i18n-en">Jump back into My Day, Summary, Writing, Vault and the rest of the workspace.</span><span class="i18n-pt">Volte ao My Day, Summary, Writing, Vault e ao restante do seu workspace.</span></p>
       </a>
       <a class="path-card" href={ROUTES.propertyflow}>
+        <span class="path-card__icon" aria-hidden="true"><img src="/assets/newproperty.webp" alt="" loading="lazy" decoding="async" /></span>
         <div class="path-card__eyebrow">PropertyFlow</div>
         <h2><span class="i18n-en">Review product access</span><span class="i18n-pt">Revisar acesso ao produto</span></h2>
         <p><span class="i18n-en">Check the live product page, pricing, launch notes and the right support context.</span><span class="i18n-pt">Confira a página do produto no ar, preço, notas de lançamento e o contexto certo de suporte.</span></p>
       </a>
       <a class="path-card" href={ROUTES.iconsStore}>
+        <span class="path-card__icon path-card__icon--wide" aria-hidden="true"><img src="/assets/icons-store-logo.webp" alt="" loading="lazy" decoding="async" /></span>
         <div class="path-card__eyebrow">Icons Store</div>
         <h2><span class="i18n-en">Recover icon delivery</span><span class="i18n-pt">Recuperar entrega de ícones</span></h2>
         <p><span class="i18n-en">Return to the store, match the pack name and route icon delivery issues fast.</span><span class="i18n-pt">Volte à loja, identifique o pack pelo nome e resolva problemas de entrega rapidamente.</span></p>
       </a>
       <a class="path-card" href={ROUTES.products}>
+        <span class="path-card__icon" aria-hidden="true"><img src="/assets/allproducts.webp" alt="" loading="lazy" decoding="async" /></span>
         <div class="path-card__eyebrow"><span class="i18n-en">Platform</span><span class="i18n-pt">Plataforma</span></div>
         <h2><span class="i18n-en">Browse products</span><span class="i18n-pt">Ver produtos</span></h2>
         <p><span class="i18n-en">Move across the ecosystem without losing the path back to support or delivery.</span><span class="i18n-pt">Circule pelo ecossistema sem perder o caminho de volta para suporte ou entrega.</span></p>
       </a>
       <a class="path-card" href={ROUTES.contact}>
+        <span class="path-card__icon path-card__icon--compact" aria-hidden="true"><img src="/assets/contacticon.webp" alt="" loading="lazy" decoding="async" /></span>
         <div class="path-card__eyebrow"><span class="i18n-en">Contact &amp; sales</span><span class="i18n-pt">Contato e vendas</span></div>
         <h2><span class="i18n-en">Start a project</span><span class="i18n-pt">Iniciar um projeto</span></h2>
         <p><span class="i18n-en">New build, partnership or commercial question? Use the sales lane instead of support.</span><span class="i18n-pt">Novo projeto, parceria ou pergunta comercial? Use o canal de vendas em vez do suporte.</span></p>
@@ -78,6 +84,7 @@ const supportAssistItems = [
 
     <section class="support-grid">
       <article class="panel">
+        <span class="panel-icon" aria-hidden="true"><img src="/assets/opensupport.webp" alt="" loading="lazy" decoding="async" /></span>
         <div class="panel-label"><span class="i18n-en">What to include</span><span class="i18n-pt">O que incluir</span></div>
         <h2><span class="i18n-en">Make recovery fast</span><span class="i18n-pt">Acelere a recuperação</span></h2>
         <ul class="checklist">
@@ -89,6 +96,7 @@ const supportAssistItems = [
       </article>
 
       <article class="panel">
+        <span class="panel-icon panel-icon--contact" aria-hidden="true"><img src="/assets/support-gold.webp" alt="" loading="lazy" decoding="async" /></span>
         <div class="panel-label"><span class="i18n-en">Best next step</span><span class="i18n-pt">Próximo passo</span></div>
         <h2><span class="i18n-en">Use the right lane</span><span class="i18n-pt">Use o caminho certo</span></h2>
         <p class="panel-copy"><span class="i18n-en">If you just checked out, open My Products first. If access or delivery still looks wrong, use the prefilled support email from this page so the context stays attached.</span><span class="i18n-pt">Acabou de fazer checkout? Abra Meus Produtos primeiro. Se o acesso ou a entrega ainda parecerem errados, use o e-mail de suporte pré-preenchido nesta página para que o contexto chegue junto.</span></p>
@@ -200,8 +208,9 @@ const supportAssistItems = [
     margin-bottom: 24px;
   }
   .path-card {
-    display: block;
-    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    min-height: 286px;
     padding: 24px;
     border-radius: 20px;
     border: 1px solid rgba(255,255,255,.08);
@@ -215,6 +224,54 @@ const supportAssistItems = [
     transform: translateY(-2px);
     border-color: rgba(79,195,247,.24);
     background: rgba(12,16,26,.62);
+  }
+  .path-card__icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 92px;
+    height: 92px;
+    margin: -4px 0 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,.08);
+    background:
+      linear-gradient(150deg, rgba(255,255,255,.1), rgba(255,255,255,.025)),
+      rgba(5, 9, 20, .72);
+    overflow: hidden;
+  }
+  .path-card__icon::before {
+    content: "";
+    position: absolute;
+    inset: 14%;
+    border-radius: 999px;
+    background: rgba(79,195,247,.2);
+    filter: blur(16px);
+    opacity: .72;
+  }
+  .path-card__icon img {
+    position: relative;
+    width: 78px;
+    max-width: 86%;
+    max-height: 86%;
+    object-fit: contain;
+    filter: drop-shadow(0 14px 24px rgba(0,0,0,.34));
+    transition: transform .24s ease, filter .24s ease;
+  }
+  .path-card:hover .path-card__icon img {
+    transform: translateY(-2px) scale(1.04);
+    filter: drop-shadow(0 18px 30px rgba(0,0,0,.4));
+  }
+  .path-card__icon--tall img {
+    max-height: 94%;
+  }
+  .path-card__icon--wide {
+    width: 118px;
+  }
+  .path-card__icon--wide img {
+    width: 104px;
+  }
+  .path-card__icon--compact img {
+    width: 64px;
   }
   .path-card__eyebrow {
     font-size: 11px;
@@ -241,11 +298,35 @@ const supportAssistItems = [
     gap: 24px;
   }
   .panel {
+    position: relative;
     border: 1px solid rgba(255,255,255,.08);
     border-radius: 20px;
     padding: 32px;
     background: rgba(10,12,20,.5);
     backdrop-filter: blur(12px);
+    overflow: hidden;
+  }
+  .panel-icon {
+    display: grid;
+    place-items: center;
+    width: 84px;
+    height: 84px;
+    margin: -8px 0 18px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,.08);
+    background:
+      linear-gradient(150deg, rgba(255,255,255,.1), rgba(255,255,255,.025)),
+      rgba(5, 9, 20, .72);
+  }
+  .panel-icon img {
+    width: 70px;
+    max-width: 86%;
+    max-height: 86%;
+    object-fit: contain;
+    filter: drop-shadow(0 14px 24px rgba(0,0,0,.34));
+  }
+  .panel-icon--contact img {
+    width: 76px;
   }
   .panel-label {
     font-size: 11px;
