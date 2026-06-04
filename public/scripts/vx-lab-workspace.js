@@ -7,6 +7,8 @@
   var STATUS_KEY = "volynx_lab_status";
   var MAX_ITEMS = 12;
   var MAX_ANALYTICS = 80;
+  var configPromise = null;
+  var cloudSyncPromise = null;
 
   function readJson(key, fallback) {
     try {
@@ -21,6 +23,200 @@
     try {
       localStorage.setItem(key, JSON.stringify(value));
     } catch (_) {}
+  }
+
+  function escapeHtml(value) {
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function (ch) {
+      return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch] || ch;
+    });
+  }
+
+  function safePath(path) {
+    var p = String(path || currentReturnPath() || "/volynx-lab/");
+    return p.charAt(0) === "/" ? p : "/volynx-lab/";
+  }
+
+  function decodeJwtPayload(token) {
+    try {
+      var payload = String(token || "").split(".")[1];
+      if (!payload) return null;
+      payload = payload.replace(/-/g, "+").replace(/_/g, "/");
+      return JSON.parse(atob(payload));
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function currentUserId() {
+    var data = decodeJwtPayload(getAccessToken());
+    return data && data.sub ? String(data.sub) : "";
+  }
+
+  function getAccessToken() {
+    try {
+      if (window.VxAuthBridge && typeof window.VxAuthBridge.hydrate === "function") {
+        window.VxAuthBridge.hydrate();
+      }
+      return localStorage.getItem("volynx_access_token") || "";
+    } catch (_) {
+      return "";
+    }
+  }
+
+  function ensureFreshToken() {
+    if (window.vxEnsureFreshToken && getAccessToken()) {
+      return window.vxEnsureFreshToken().then(function () { return getAccessToken(); }).catch(function () { return getAccessToken(); });
+    }
+    return Promise.resolve(getAccessToken());
+  }
+
+  function getConfig() {
+    if (configPromise) return configPromise;
+    configPromise = fetch("/config.json", { cache: "no-store" })
+      .then(function (res) {
+        if (!res.ok) throw new Error("config " + res.status);
+        return res.json();
+      })
+      .then(function (cfg) {
+        return {
+          supabaseUrl: String(cfg.supabaseUrl || cfg.supabase_url || "").replace(/\/$/, ""),
+          supabaseAnonKey: cfg.supabaseAnonKey || cfg.anonKey || "",
+        };
+      })
+      .catch(function () { return null; });
+    return configPromise;
+  }
+
+  function apiFetch(path, options) {
+    return ensureFreshToken().then(function (token) {
+      if (!token) throw new Error("missing_token");
+      return getConfig().then(function (cfg) {
+        if (!cfg || !cfg.supabaseUrl || !cfg.supabaseAnonKey) throw new Error("missing_config");
+        var headers = Object.assign({
+          apikey: cfg.supabaseAnonKey,
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        }, (options && options.headers) || {});
+        return fetch(cfg.supabaseUrl + "/rest/v1/" + path, Object.assign({}, options || {}, { headers: headers }));
+      });
+    });
+  }
+
+  function mergeItems(localRows, remoteRows, tsKey) {
+    var seen = {};
+    return [].concat(remoteRows || [], localRows || [])
+      .filter(function (item) {
+        var id = item && item.id ? String(item.id) : "";
+        if (!id || seen[id]) return false;
+        seen[id] = true;
+        return true;
+      })
+      .sort(function (a, b) {
+        return Date.parse(b[tsKey] || b.ts || 0) - Date.parse(a[tsKey] || a.ts || 0);
+      })
+      .slice(0, MAX_ITEMS);
+  }
+
+  function toActivityRow(item) {
+    return {
+      user_id: currentUserId(),
+      client_id: String(item.id || ""),
+      tool: String(item.tool || "lab"),
+      action: String(item.action || "event"),
+      detail: String(item.detail || ""),
+      path: safePath(item.path),
+      plan_at_time: currentPlan(),
+      metadata: item.metadata && typeof item.metadata === "object" ? item.metadata : {},
+      created_at: item.ts || new Date().toISOString(),
+    };
+  }
+
+  function fromActivityRow(row) {
+    return {
+      id: row.client_id || row.id,
+      tool: row.tool || "lab",
+      action: row.action || "event",
+      detail: row.detail || "",
+      path: safePath(row.path),
+      ts: row.created_at || new Date().toISOString(),
+      metadata: row.metadata || {},
+      cloud: true,
+    };
+  }
+
+  function toPresetRow(item) {
+    return {
+      user_id: currentUserId(),
+      client_id: String(item.id || ""),
+      tool: String(item.tool || "lab"),
+      label: item.label || "",
+      values: item.values && typeof item.values === "object" ? item.values : {},
+      path: safePath(item.path),
+      plan_at_time: currentPlan(),
+      updated_at: item.ts || new Date().toISOString(),
+      created_at: item.ts || new Date().toISOString(),
+    };
+  }
+
+  function fromPresetRow(row) {
+    return {
+      id: row.client_id || row.id,
+      tool: row.tool || "lab",
+      label: row.label || "",
+      values: row.values || {},
+      path: safePath(row.path),
+      ts: row.updated_at || row.created_at || new Date().toISOString(),
+      cloud: true,
+    };
+  }
+
+  function upsertRows(table, rows) {
+    if (!rows.length || !currentUserId()) return Promise.resolve(false);
+    return apiFetch(table + "?on_conflict=user_id,client_id", {
+      method: "POST",
+      headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+      body: JSON.stringify(rows),
+    }).then(function (res) {
+      if (!res.ok) throw new Error(table + " " + res.status);
+      return true;
+    }).catch(function () { return false; });
+  }
+
+  function fetchCloudRows(table, select, orderColumn) {
+    return apiFetch(table + "?select=" + encodeURIComponent(select) + "&order=" + orderColumn + ".desc&limit=" + MAX_ITEMS, {
+      method: "GET",
+    }).then(function (res) {
+      if (!res.ok) throw new Error(table + " " + res.status);
+      return res.json();
+    }).catch(function () { return []; });
+  }
+
+  function syncLabCloud(options) {
+    if (!hasAccessToken()) return Promise.resolve(false);
+    if (cloudSyncPromise) return cloudSyncPromise;
+    var renderRoot = options && options.renderRoot;
+    var localHistory = readJson(HISTORY_KEY, []);
+    var localPresets = readJson(PRESETS_KEY, []);
+    cloudSyncPromise = Promise.all([
+      upsertRows("lab_activity", localHistory.map(toActivityRow).filter(function (row) { return row.client_id && row.user_id; })),
+      upsertRows("lab_presets", localPresets.map(toPresetRow).filter(function (row) { return row.client_id && row.user_id; })),
+      fetchCloudRows("lab_activity", "client_id,tool,action,detail,path,metadata,created_at", "created_at"),
+      fetchCloudRows("lab_presets", "client_id,tool,label,values,path,created_at,updated_at", "updated_at"),
+    ]).then(function (parts) {
+      var remoteHistory = (parts[2] || []).map(fromActivityRow);
+      var remotePresets = (parts[3] || []).map(fromPresetRow);
+      writeJson(HISTORY_KEY, mergeItems(localHistory, remoteHistory, "ts"));
+      writeJson(PRESETS_KEY, mergeItems(localPresets, remotePresets, "ts"));
+      if (renderRoot) renderProfilePanel(renderRoot, { skipCloud: true });
+      window.dispatchEvent(new CustomEvent("vx:lab-cloud-synced"));
+      return true;
+    }).catch(function () {
+      return false;
+    }).then(function (result) {
+      cloudSyncPromise = null;
+      return result;
+    });
+    return cloudSyncPromise;
   }
 
   function currentReturnPath(extraParams) {
@@ -242,6 +438,7 @@
     writeJson(HISTORY_KEY, events.slice(0, MAX_ITEMS));
     track(tool, action, { detail: detail || "", path: item.path });
     setStatus(tool, action, detail || "");
+    upsertRows("lab_activity", [toActivityRow(item)]);
     window.dispatchEvent(new CustomEvent("vx:lab-history-updated"));
   }
 
@@ -299,6 +496,7 @@
       ts: new Date().toISOString(),
     });
     writeJson(PRESETS_KEY, presets.slice(0, MAX_ITEMS));
+    upsertRows("lab_presets", [toPresetRow(presets[0])]);
     window.dispatchEvent(new CustomEvent("vx:lab-presets-updated"));
   }
 
@@ -321,7 +519,7 @@
     }
   }
 
-  function renderProfilePanel(root) {
+  function renderProfilePanel(root, options) {
     if (!root) return;
     var history = readJson(HISTORY_KEY, []);
     var presets = readJson(PRESETS_KEY, []);
@@ -331,7 +529,7 @@
     if (historyEl) {
       historyEl.innerHTML = history.length
         ? history.slice(0, 5).map(function (item) {
-            return '<a class="lab-profile-row" href="' + item.path + '"><strong>' + toolLabel(item.tool) + '</strong><span>' + (item.detail || item.action || "Recent activity") + '</span><em>' + formatTime(item.ts) + '</em></a>';
+            return '<a class="lab-profile-row" href="' + escapeHtml(safePath(item.path)) + '"><strong>' + escapeHtml(toolLabel(item.tool)) + '</strong><span>' + escapeHtml(item.detail || item.action || "Recent activity") + '</span><em>' + escapeHtml(formatTime(item.ts)) + '</em></a>';
           }).join("")
         : '<p class="lab-profile-empty">No Lab activity yet.</p>';
     }
@@ -342,9 +540,13 @@
             var summary = Object.keys(item.values || {}).map(function (key) {
               return key + ": " + item.values[key];
             }).join(" · ");
-            return '<a class="lab-profile-row" href="' + item.path + '"><strong>' + toolLabel(item.tool) + '</strong><span>' + summary + '</span><em>' + formatTime(item.ts) + '</em></a>';
+            return '<a class="lab-profile-row" href="' + escapeHtml(safePath(item.path)) + '"><strong>' + escapeHtml(toolLabel(item.tool)) + '</strong><span>' + escapeHtml(summary) + '</span><em>' + escapeHtml(formatTime(item.ts)) + '</em></a>';
           }).join("")
         : '<p class="lab-profile-empty">No saved presets yet.</p>';
+    }
+
+    if (!options || !options.skipCloud) {
+      syncLabCloud({ renderRoot: root });
     }
   }
 
@@ -387,13 +589,15 @@
     getPresets: getPresets,
     getAnalytics: getAnalytics,
     getStatuses: getStatuses,
+    syncCloud: syncLabCloud,
   };
   if (document.documentElement) {
     document.documentElement.dataset.vxLab = "ready";
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    renderProfilePanel(document.getElementById("labWorkspacePanel"));
+    var panel = document.getElementById("labWorkspacePanel");
+    renderProfilePanel(panel);
     var active = document.querySelector(".vx-lab-switcher__link.is-active span");
     if (active) recordEvent(String(active.textContent || "Lab").toLowerCase().replace(/\s+/g, "-"), "tool_open", "Tool opened");
     document.querySelectorAll(".vx-lab-shell__actions a, .vx-lab-shell__legend a").forEach(function (link) {
