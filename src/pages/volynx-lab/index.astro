@@ -51,23 +51,23 @@ import { ROUTES } from "../../data/routes";
         <p data-i18n="lab2.section_tools_desc">Each free tool gets real use value, while the Pro state adds power and comfort instead of simply locking everything behind a wall.</p>
       </div>
       <div class="shell tool-grid">
-        <article class="panel tool-card">
+        <article class="panel tool-card tool-card--converter">
           <div class="tool-icon"><img src="/assets/converterbig.webp" alt="" /></div>
           <div class="head-row">
             <div><span class="label label--free" data-i18n="lab2.tool_converter_label">Free</span><h3 data-i18n="lab2.tool_converter_title">Converter</h3></div>
             <a href={ROUTES.labConverter} class="button button--ghost" data-i18n="lab2.tool_converter_btn">Open</a>
           </div>
           <p data-i18n="lab2.tool_converter_desc">Convert images to WebP, JPG, PNG or AVIF with clean defaults.</p>
-          <div class="mini-stats"><span class="chip" data-i18n="lab2.tool_converter_chip1">Single or small batch</span><span class="chip" data-i18n="lab2.tool_converter_chip2">Basic presets</span></div>
+          <div class="mini-stats"><span class="chip">Free</span><span class="chip">Local</span><span class="chip">ZIP</span><span class="chip" data-i18n="lab2.tool_converter_chip2">Basic presets</span></div>
         </article>
-        <article class="panel tool-card">
+        <article class="panel tool-card tool-card--scaler">
           <div class="tool-icon"><img src="/assets/newimagescaler.webp" alt="" /></div>
           <div class="head-row">
             <div><span class="label label--free" data-i18n="lab2.tool_scaler_label">Free</span><h3 data-i18n="lab2.tool_scaler_title">Image Scaler</h3></div>
             <a href={ROUTES.labImageScaler} class="button button--ghost" data-i18n="lab2.tool_scaler_btn">Open</a>
           </div>
           <p data-i18n="lab2.tool_scaler_desc">Upscale with clearer controls and a stronger before/after experience in Pro.</p>
-          <div class="mini-stats"><span class="chip" data-i18n="lab2.tool_scaler_chip1">2x / 3x base modes</span><span class="chip" data-i18n="lab2.tool_scaler_chip2">Preview-first</span></div>
+          <div class="mini-stats"><span class="chip">Free</span><span class="chip">Local</span><span class="chip" data-i18n="lab2.tool_scaler_chip1">2x / 3x base modes</span><span class="chip" data-i18n="lab2.tool_scaler_chip2">Preview-first</span></div>
         </article>
         <article class="panel tool-card panel--pro tool-card--suite">
           <div class="tool-icon"><img src="/assets/newimagesuite.webp" alt="" /></div>
@@ -76,25 +76,25 @@ import { ROUTES } from "../../data/routes";
             <a href={ROUTES.studioImageSuite} class="button button--gold" data-i18n="lab2.tool_suite_btn">Open Suite</a>
           </div>
           <p data-i18n="lab2.tool_suite_desc">Upscale, compress, convert and remove backgrounds with saved presets and clear plan states.</p>
-          <div class="mini-stats"><span class="chip" data-i18n="lab2.tool_suite_chip1">Multi-tool recipe</span><span class="chip" data-i18n="lab2.tool_suite_chip2">Profile presets</span></div>
+          <div class="mini-stats"><span class="chip">Free</span><span class="chip">Pro</span><span class="chip">Local AI</span><span class="chip" data-i18n="lab2.tool_suite_chip2">Profile presets</span></div>
         </article>
-        <article class="panel tool-card">
+        <article class="panel tool-card tool-card--lumina">
           <div class="tool-icon"><img src="/assets/education.webp" alt="" /></div>
           <div class="head-row">
             <div><span class="label label--free">Free + Pro</span><h3>Volynx Lumina</h3></div>
             <a href={ROUTES.labLumina} class="button button--ghost">Open</a>
           </div>
           <p>Transform complex scientific, technical and educational content into clear, human and multilingual explanations.</p>
-          <div class="mini-stats"><span class="chip">Clarity modes</span><span class="chip">PT · EN · ES</span></div>
+          <div class="mini-stats"><span class="chip">Free</span><span class="chip">AI</span><span class="chip">Local fallback</span><span class="chip">Export</span></div>
         </article>
-        <article class="panel tool-card">
+        <article class="panel tool-card tool-card--qrgen">
           <div class="tool-icon"><img src="/assets/newqrgen.webp" alt="" /></div>
           <div class="head-row">
             <div><span class="label label--free" data-i18n="lab2.tool_qr_label">Free</span><h3 data-i18n="lab2.tool_qr_title">QR Generator</h3></div>
             <a href={ROUTES.labQrGen} class="button button--ghost" data-i18n="lab2.tool_qr_btn">Open</a>
           </div>
           <p data-i18n="lab2.tool_qr_desc">Campaign-ready codes with stronger brand control and export packs for Pro.</p>
-          <div class="mini-stats"><span class="chip" data-i18n="lab2.tool_qr_chip1">Custom colors</span><span class="chip" data-i18n="lab2.tool_qr_chip2">Logo embed</span></div>
+          <div class="mini-stats"><span class="chip">Free</span><span class="chip">Launch</span><span class="chip">Pro</span><span class="chip">Projects</span></div>
         </article>
       </div>
     </section>
@@ -142,6 +142,7 @@ import { ROUTES } from "../../data/routes";
     </section>
 
   </main>
+  <script is:inline src="/scripts/vx-lab-workspace.js?v=20260603-lab-workspace"></script>
   <FlagshipFooter />
 </FlagshipLayout>
 
@@ -213,6 +214,18 @@ import { ROUTES } from "../../data/routes";
     height: 100%;
     transition: transform .22s ease, filter .22s ease, background .22s ease, border-color .22s ease;
     will-change: transform, filter;
+  }
+  .page-lab .tool-card--qrgen { order: 1; }
+  .page-lab .tool-card--lumina { order: 2; }
+  .page-lab .tool-card--suite { order: 3; }
+  .page-lab .tool-card--converter { order: 4; }
+  .page-lab .tool-card--scaler { order: 5; }
+  .page-lab .tool-card--qrgen,
+  .page-lab .tool-card--lumina {
+    border-color: rgba(125,249,255,.18);
+    background:
+      linear-gradient(135deg, rgba(125,249,255,.08), rgba(214,168,79,.05)),
+      rgba(255,255,255,.035);
   }
   .page-lab .tool-card:hover,
   .page-lab .tool-card:focus-within {
