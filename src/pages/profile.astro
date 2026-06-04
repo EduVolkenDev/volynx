@@ -1427,34 +1427,18 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 					$("editPanel")?.scrollIntoView({ behavior: "smooth", block: "start" });
 				});
 
-				// Reveal the firstTime "Continue where you were" button only when
-				// there is a real return URL saved (i.e. the user came from a
-				// product/checkout). Prevents stranding first-time signups
-				// mid-purchase with no way back.
-				// NOTE: this script block is <script is:inline> = plain JS. Do
-				// NOT use TypeScript casts here — they break the whole file at
-				// browser parse time and leave the page stuck on the spinner.
-				const pendingNext = localStorage.getItem("volynx_post_login_next") || "";
-				if (pendingNext && pendingNext.startsWith("/") && !pendingNext.startsWith("//") && pendingNext !== "/volynx-lab/" && !pendingNext.startsWith("/profile")) {
-					const firstTimeCta = $("firstTimeContinueBtn");
-					if (firstTimeCta) {
-						firstTimeCta.hidden = false;
-						firstTimeCta.addEventListener("click", () => {
-							localStorage.removeItem("volynx_post_login_next");
-							window.location.href = pendingNext;
-						});
-					}
+				// Let the shared Lab workspace decide the best continuation:
+				// pending login return first, then latest Lab history/preset, then Lab home.
+				if (window.VxLab?.configureProfileContinue) {
+					window.VxLab.configureProfileContinue(document);
+					window.addEventListener("vx:lab-cloud-synced", () => window.VxLab.configureProfileContinue(document));
+				} else {
+					$("continueBtn")?.addEventListener("click", () => {
+						const next = localStorage.getItem("volynx_post_login_next") || "/volynx-lab/";
+						localStorage.removeItem("volynx_post_login_next");
+						window.location.href = next.startsWith("/") && !next.startsWith("//") ? next : "/volynx-lab/";
+					});
 				}
-
-				$("continueBtn")?.addEventListener("click", () => {
-					const next = localStorage.getItem("volynx_post_login_next") || "/volynx-lab/";
-					localStorage.removeItem("volynx_post_login_next");
-					if (next.startsWith("/") && !next.startsWith("//")) {
-						window.location.href = next;
-					} else {
-						window.location.href = "/volynx-lab/";
-					}
-				});
 
 				$("scrollToEdit")?.addEventListener("click", () => {
 					$("editPanel")?.scrollIntoView({ behavior: "smooth", block: "start" });

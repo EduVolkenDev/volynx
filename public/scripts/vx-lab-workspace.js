@@ -36,6 +36,24 @@
     return p.charAt(0) === "/" ? p : "/volynx-lab/";
   }
 
+  function isSafeRelativePath(path) {
+    var p = String(path || "");
+    return p.charAt(0) === "/" && p.slice(0, 2) !== "//";
+  }
+
+  function isProfilePath(path) {
+    return /^\/(profile|login|signup|auth)(\/|\?|#|$)/.test(String(path || ""));
+  }
+
+  function isUsefulLabPath(path) {
+    var p = String(path || "");
+    return /^\/(volynx-lab|qrgen|lab)(\/|\?|#|$)/.test(p);
+  }
+
+  function isPassiveAction(action) {
+    return /^(modal_|notice_|login_modal_|upgrade_modal_|upgrade_click$)/.test(String(action || ""));
+  }
+
   function decodeJwtPayload(token) {
     try {
       var payload = String(token || "").split(".")[1];
@@ -208,6 +226,7 @@
       writeJson(HISTORY_KEY, mergeItems(localHistory, remoteHistory, "ts"));
       writeJson(PRESETS_KEY, mergeItems(localPresets, remotePresets, "ts"));
       if (renderRoot) renderProfilePanel(renderRoot, { skipCloud: true });
+      configureProfileContinue();
       window.dispatchEvent(new CustomEvent("vx:lab-cloud-synced"));
       return true;
     }).catch(function () {
@@ -519,6 +538,79 @@
     }
   }
 
+  function getContinueTarget(options) {
+    var allowPending = !options || options.allowPending !== false;
+    var pending = "";
+    try {
+      pending = localStorage.getItem("volynx_post_login_next") || "";
+    } catch (_) {}
+    if (allowPending && isSafeRelativePath(pending) && !isProfilePath(pending)) {
+      return {
+        path: pending,
+        label: "Continue where you were",
+        source: "pending",
+      };
+    }
+
+    var history = readJson(HISTORY_KEY, []);
+    for (var i = 0; i < history.length; i++) {
+      var item = history[i] || {};
+      var path = safePath(item.path);
+      if (!isSafeRelativePath(path) || !isUsefulLabPath(path) || isPassiveAction(item.action)) continue;
+      return {
+        path: path,
+        label: "Continue " + toolLabel(item.tool),
+        source: "history",
+        item: item,
+      };
+    }
+
+    var presets = readJson(PRESETS_KEY, []);
+    for (var j = 0; j < presets.length; j++) {
+      var preset = presets[j] || {};
+      var presetPath = safePath(preset.path);
+      if (!isSafeRelativePath(presetPath) || !isUsefulLabPath(presetPath)) continue;
+      return {
+        path: presetPath,
+        label: "Continue " + toolLabel(preset.tool),
+        source: "preset",
+        item: preset,
+      };
+    }
+
+    return {
+      path: "/volynx-lab/",
+      label: "Open VOLYNX Lab",
+      source: "fallback",
+    };
+  }
+
+  function configureProfileContinue(root) {
+    var scope = root || document;
+    var target = getContinueTarget();
+    var continueBtn = scope.querySelector ? scope.querySelector("#continueBtn") : document.getElementById("continueBtn");
+    var firstTimeBtn = scope.querySelector ? scope.querySelector("#firstTimeContinueBtn") : document.getElementById("firstTimeContinueBtn");
+
+    function wire(button, allowFallback) {
+      if (!button) return;
+      var buttonTarget = target;
+      if (!allowFallback && buttonTarget.source === "fallback") {
+        button.hidden = true;
+        return;
+      }
+      button.hidden = false;
+      button.removeAttribute("data-i18n");
+      button.textContent = buttonTarget.label;
+      button.onclick = function () {
+        try { localStorage.removeItem("volynx_post_login_next"); } catch (_) {}
+        window.location.href = isSafeRelativePath(buttonTarget.path) ? buttonTarget.path : "/volynx-lab/";
+      };
+    }
+
+    wire(continueBtn, true);
+    wire(firstTimeBtn, false);
+  }
+
   function renderProfilePanel(root, options) {
     if (!root) return;
     var history = readJson(HISTORY_KEY, []);
@@ -548,6 +640,7 @@
     if (!options || !options.skipCloud) {
       syncLabCloud({ renderRoot: root });
     }
+    configureProfileContinue(root.ownerDocument || document);
   }
 
   function getHistory(tool) {
@@ -585,6 +678,8 @@
     setStatus: setStatus,
     savePreset: savePreset,
     renderProfilePanel: renderProfilePanel,
+    getContinueTarget: getContinueTarget,
+    configureProfileContinue: configureProfileContinue,
     getHistory: getHistory,
     getPresets: getPresets,
     getAnalytics: getAnalytics,
