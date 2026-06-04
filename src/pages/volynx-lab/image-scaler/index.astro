@@ -188,6 +188,22 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
 
     function $(id) { return document.getElementById(id); }
 
+    function labNotify(title, message, tone = "warn") {
+      if (window.VxLab?.notify) {
+        VxLab.notify({
+          tool: "image-scaler",
+          event: tone === "error" ? "error_notice" : "notice",
+          icon: tone === "error" ? "!" : "i",
+          title,
+          message,
+          primaryLabel: "OK",
+          cancelLabel: "Close",
+        });
+      } else {
+        alert(message || title);
+      }
+    }
+
     const fileEl      = $("file");
     const pickBtn     = $("pickBtn");
     const dropEl      = $("drop");
@@ -225,7 +241,10 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
       const valid = files.filter(f => f && f.type && f.type.startsWith("image/"));
       loadedImages = [];
       resetPreview();
-      if (!valid.length) { alert("No valid images found."); return; }
+      if (!valid.length) {
+        labNotify("No valid images", "Select a PNG, JPG, WebP or another browser-readable image.");
+        return;
+      }
 
       runBtn.disabled = true;
       dropEl.querySelector("p").textContent = `Loading ${valid.length} file(s)...`;
@@ -301,7 +320,7 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
         } else if (isFreeUser && window.VxLab) {
           VxLab.confirmUpgrade(`Daily limit reached (${perm.limit}). Upgrade to Pro for more.\n\nClick OK to see upgrade options.`);
         } else {
-          alert(`Daily limit reached (${perm.limit}). Try again tomorrow.`);
+          labNotify("Daily limit reached", `You have used today's Image Scaler allowance (${perm.limit}). Try again tomorrow.`, "warn");
         }
         return;
       }
@@ -339,7 +358,7 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
         downloadBtn.disabled = false;
       } catch (err) {
         console.error(err);
-        alert("Error processing images.");
+        labNotify("Processing failed", "Image Scaler could not process this image. Try a smaller file or another format.", "error");
         dropEl.querySelector("p").textContent = "Error — please try again";
       } finally {
         runBtn.disabled = false;
@@ -359,7 +378,10 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
         return;
       }
 
-      if (!window.JSZip) { alert("JSZip not loaded."); return; }
+      if (!window.JSZip) {
+        labNotify("ZIP export unavailable", "The ZIP library did not load. Reload the page and try again.", "error");
+        return;
+      }
       const zip = new window.JSZip();
       for (const r of processedResults) {
         zip.file(`${r.baseName}-${scaleEl.value}x.${ext}`, r.blob);

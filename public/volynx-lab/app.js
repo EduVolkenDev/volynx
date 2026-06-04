@@ -90,6 +90,22 @@ function isHeic(file) {
   return ext === 'heic' || ext === 'heif';
 }
 
+function labNotify(title, message, tone = 'warn') {
+  if (window.VxLab?.notify) {
+    VxLab.notify({
+      tool: 'converter',
+      event: tone === 'error' ? 'error_notice' : 'notice',
+      icon: tone === 'error' ? '!' : 'i',
+      title,
+      message,
+      primaryLabel: 'OK',
+      cancelLabel: 'Close',
+    });
+  } else {
+    alert(message || title);
+  }
+}
+
 const fileInput  = document.getElementById('file');
 const dropZone   = document.getElementById('drop');
 const formatSel  = document.getElementById('format');
@@ -222,7 +238,7 @@ convertBtn.addEventListener('click', async () => {
       if ((window.VxPlan ? !window.VxPlan.isPaid(perm.plan) : perm.plan === 'free') && window.VxLab) {
         VxLab.confirmUpgrade(msg + '\n\nClick OK to see upgrade options.');
       } else {
-        alert(msg);
+        labNotify('Daily limit reached', msg, 'warn');
       }
       convertBtn.disabled = false;
       return;
