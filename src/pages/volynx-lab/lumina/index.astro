@@ -197,6 +197,11 @@ const plans = [
           <button type="button" data-mode="clear">Explicar como professor</button>
           <button type="button" data-mode="practical">Transformar em guia prático</button>
         </div>
+        <div class="lumina-examples" aria-label="Lumina ready examples">
+          <button type="button" data-example="paper">Exemplo: paper</button>
+          <button type="button" data-example="tech">Exemplo: tecnologia</button>
+          <button type="button" data-example="strategy">Exemplo: estratégia</button>
+        </div>
       </div>
 
       <div class="lumina-result-panel">
@@ -207,12 +212,20 @@ const plans = [
           </div>
           <span class="lumina-status" id="luminaStatus">Pronta</span>
         </div>
+        <div class="lumina-output-actions" aria-label="Lumina output actions">
+          <button type="button" id="luminaCopyBtn" disabled>Copiar resposta</button>
+          <button type="button" id="luminaExportBtn" disabled>Exportar .txt</button>
+        </div>
 
         <div class="lumina-output" id="luminaOutput">
           <article class="lumina-output-card is-empty">
             <span>Resumo essencial</span>
             <p>A resposta aparecerá aqui em cards claros: resumo, explicação simples, conceitos, impacto prático e perguntas para continuar aprendendo.</p>
           </article>
+        </div>
+        <div class="lumina-history" aria-label="Lumina local history">
+          <strong>Histórico Lumina</strong>
+          <div id="luminaHistoryList" class="lumina-history__list"></div>
         </div>
       </div>
     </section>
@@ -622,6 +635,25 @@ const plans = [
     background: rgba(125,249,255,.08);
   }
 
+  .lumina-status[data-state="loading"] {
+    color: rgba(248,233,193,.95);
+    border-color: rgba(214,168,79,.28);
+    background: rgba(214,168,79,.09);
+  }
+
+  .lumina-status[data-state="ok"] {
+    color: rgba(198,255,143,.95);
+    border-color: rgba(198,255,143,.24);
+    background: rgba(198,255,143,.08);
+  }
+
+  .lumina-status[data-state="fallback"],
+  .lumina-status[data-state="warn"] {
+    color: rgba(255,214,145,.95);
+    border-color: rgba(255,214,145,.24);
+    background: rgba(255,214,145,.08);
+  }
+
   .lumina-field,
   .lumina-select {
     display: grid;
@@ -674,6 +706,8 @@ const plans = [
   }
 
   .lumina-actions button,
+  .lumina-examples button,
+  .lumina-output-actions button,
   .lumina-upgrade a {
     min-height: 42px;
     border: 1px solid rgba(255,255,255,.13);
@@ -695,6 +729,39 @@ const plans = [
     background: linear-gradient(135deg, var(--lumina-blue), var(--lumina-c));
   }
 
+  .lumina-actions button[disabled],
+  .lumina-output-actions button[disabled] {
+    cursor: wait;
+    opacity: .58;
+  }
+
+  .lumina-examples,
+  .lumina-output-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .lumina-examples button,
+  .lumina-output-actions button {
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 12px;
+    color: rgba(255,255,255,.78);
+    background: rgba(255,255,255,.05);
+  }
+
+  .lumina-output-actions {
+    margin: 0 0 14px;
+  }
+
+  .lumina-output-actions button:not([disabled]):first-child {
+    color: #06142e;
+    border-color: rgba(0,216,255,.45);
+    background: linear-gradient(135deg, var(--lumina-a), #dffcff);
+  }
+
   .lumina-output {
     display: grid;
     gap: 12px;
@@ -709,14 +776,36 @@ const plans = [
       rgba(255,255,255,.035);
   }
 
-  .lumina-output-card span {
-    display: block;
+  .lumina-output-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
     margin-bottom: 8px;
+  }
+
+  .lumina-output-card__head span {
+    display: block;
+    min-width: 0;
     color: var(--lumina-b);
     font-size: 12px;
     font-weight: 950;
     letter-spacing: .08em;
     text-transform: uppercase;
+  }
+
+  .lumina-output-card__head button {
+    min-height: 28px;
+    padding: 0 9px;
+    border: 1px solid rgba(125,249,255,.18);
+    border-radius: 8px;
+    color: rgba(125,249,255,.88);
+    background: rgba(125,249,255,.06);
+    font: inherit;
+    font-size: 11px;
+    font-weight: 900;
+    cursor: pointer;
+    white-space: nowrap;
   }
 
   .lumina-output-card p {
@@ -727,6 +816,78 @@ const plans = [
   }
 
   .lumina-output-card.is-empty p { color: rgba(255,255,255,.52); }
+
+  .lumina-history {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--lumina-line);
+  }
+
+  .lumina-history > strong {
+    display: block;
+    margin-bottom: 10px;
+    color: rgba(255,255,255,.78);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .lumina-history__list {
+    display: grid;
+    gap: 8px;
+  }
+
+  .lumina-history__item {
+    width: 100%;
+    min-height: 42px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+    padding: 9px 11px;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 8px;
+    background: rgba(255,255,255,.045);
+    color: rgba(255,255,255,.78);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .lumina-history__item span,
+  .lumina-history__item strong {
+    grid-column: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lumina-history__item span {
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .lumina-history__item strong {
+    color: rgba(255,255,255,.9);
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .lumina-history__item em {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    color: rgba(255,255,255,.48);
+    font-size: 11px;
+    font-style: normal;
+    white-space: nowrap;
+  }
+
+  .lumina-history__empty {
+    margin: 0;
+    color: rgba(255,255,255,.5);
+    font-size: 13px;
+  }
 
   .lumina-section,
   .lumina-plans,

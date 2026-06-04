@@ -3,7 +3,10 @@
 
   var HISTORY_KEY = "volynx_lab_history";
   var PRESETS_KEY = "volynx_lab_presets";
+  var ANALYTICS_KEY = "volynx_lab_analytics";
+  var STATUS_KEY = "volynx_lab_status";
   var MAX_ITEMS = 12;
+  var MAX_ANALYTICS = 80;
 
   function readJson(key, fallback) {
     try {
@@ -78,16 +81,59 @@
 
   function recordEvent(tool, action, detail) {
     var events = readJson(HISTORY_KEY, []);
-    events.unshift({
+    var item = {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
       tool: tool,
       action: action,
       detail: detail || "",
       path: currentReturnPath(),
       ts: new Date().toISOString(),
-    });
+    };
+    events.unshift(item);
     writeJson(HISTORY_KEY, events.slice(0, MAX_ITEMS));
+    track(tool, action, { detail: detail || "", path: item.path });
+    setStatus(tool, action, detail || "");
     window.dispatchEvent(new CustomEvent("vx:lab-history-updated"));
+  }
+
+  function currentPlan() {
+    try {
+      if (window.VxPlan && typeof window.VxPlan.getCachedRelaxed === "function") return window.VxPlan.getCachedRelaxed().plan;
+      if (window.VxPlan && typeof window.VxPlan.getCached === "function") return (window.VxPlan.getCached() || {}).plan || "free";
+    } catch (_) {}
+    return window.vxPlan || "free";
+  }
+
+  function track(tool, eventName, metadata) {
+    var rows = readJson(ANALYTICS_KEY, []);
+    rows.unshift({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+      tool: tool || "lab",
+      event: eventName || "event",
+      metadata: metadata && typeof metadata === "object" ? metadata : {},
+      path: currentReturnPath(),
+      plan: currentPlan(),
+      ts: new Date().toISOString(),
+    });
+    writeJson(ANALYTICS_KEY, rows.slice(0, MAX_ANALYTICS));
+    window.dispatchEvent(new CustomEvent("vx:lab-analytics-updated"));
+    try {
+      window.dispatchEvent(new CustomEvent("vx:lab-analytics", {
+        detail: { tool: tool, action: eventName, detail: metadata || {}, path: currentReturnPath() }
+      }));
+    } catch (_) {}
+  }
+
+  function setStatus(tool, state, detail) {
+    var statuses = readJson(STATUS_KEY, {});
+    statuses[tool || "lab"] = {
+      state: state || "ready",
+      detail: detail || "",
+      path: currentReturnPath(),
+      ts: new Date().toISOString(),
+    };
+    writeJson(STATUS_KEY, statuses);
+    window.dispatchEvent(new CustomEvent("vx:lab-status-updated", { detail: { tool: tool, state: state, text: detail || "" } }));
   }
 
   function savePreset(tool, values) {
@@ -153,6 +199,25 @@
     }
   }
 
+  function getHistory(tool) {
+    var rows = readJson(HISTORY_KEY, []);
+    return tool ? rows.filter(function (item) { return item.tool === tool; }) : rows;
+  }
+
+  function getPresets(tool) {
+    var rows = readJson(PRESETS_KEY, []);
+    return tool ? rows.filter(function (item) { return item.tool === tool; }) : rows;
+  }
+
+  function getAnalytics(tool) {
+    var rows = readJson(ANALYTICS_KEY, []);
+    return tool ? rows.filter(function (item) { return item.tool === tool; }) : rows;
+  }
+
+  function getStatuses() {
+    return readJson(STATUS_KEY, {});
+  }
+
   window.VxLab = {
     currentReturnPath: currentReturnPath,
     loginUrl: loginUrl,
@@ -163,8 +228,14 @@
     confirmLogin: confirmLogin,
     confirmUpgrade: confirmUpgrade,
     recordEvent: recordEvent,
+    track: track,
+    setStatus: setStatus,
     savePreset: savePreset,
     renderProfilePanel: renderProfilePanel,
+    getHistory: getHistory,
+    getPresets: getPresets,
+    getAnalytics: getAnalytics,
+    getStatuses: getStatuses,
   };
   if (document.documentElement) {
     document.documentElement.dataset.vxLab = "ready";
@@ -172,5 +243,13 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     renderProfilePanel(document.getElementById("labWorkspacePanel"));
+    var active = document.querySelector(".vx-lab-switcher__link.is-active span");
+    if (active) recordEvent(String(active.textContent || "Lab").toLowerCase().replace(/\s+/g, "-"), "tool_open", "Tool opened");
+    document.querySelectorAll(".vx-lab-shell__actions a, .vx-lab-shell__legend a").forEach(function (link) {
+      link.addEventListener("click", function () {
+        var text = String(link.textContent || "").trim();
+        if (/upgrade|studio|pro|plans|capacity/i.test(text)) recordEvent("lab", "upgrade_click", text);
+      });
+    });
   });
 })();

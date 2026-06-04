@@ -9,20 +9,76 @@ interface Props {
 }
 
 const { active = "home" } = Astro.props;
+
+const shellByTool: Record<ToolKey, { title: string; copy: string; states: string[]; cta: string; ctaHref: string }> = {
+  home: {
+    title: "Lab OS",
+    copy: "One workspace for local tools, AI tools, saved presets and plan-aware exports.",
+    states: ["Free", "Pro", "VX ready", "Local-first"],
+    cta: "Open profile memory",
+    ctaHref: ROUTES.profile,
+  },
+  converter: {
+    title: "Converter workspace",
+    copy: "Free browser conversion with ZIP export, saved presets and Pro limits when volume grows.",
+    states: ["Free", "Local", "ZIP", "Presets"],
+    cta: "Upgrade capacity",
+    ctaHref: ROUTES.pricing,
+  },
+  scaler: {
+    title: "Image Scaler workspace",
+    copy: "Local upscale with saved scale presets, clear login return and Pro capacity path.",
+    states: ["Free", "Local", "Preview", "Pro capacity"],
+    cta: "Upgrade capacity",
+    ctaHref: ROUTES.pricing,
+  },
+  suite: {
+    title: "Image Suite workspace",
+    copy: "A production recipe surface for upscale, compress, convert and Pro background removal.",
+    states: ["Free", "Pro", "Local AI", "Recipes"],
+    cta: "Open Studio Pro",
+    ctaHref: ROUTES.studio,
+  },
+  lumina: {
+    title: "Lumina workspace",
+    copy: "AI when available, explicit local fallback, reusable answers and profile history.",
+    states: ["Free", "AI", "Local fallback", "Export"],
+    cta: "Upgrade Lumina",
+    ctaHref: ROUTES.pricing,
+  },
+  qr: {
+    title: "QRGen workspace",
+    copy: "The Lab benchmark: saved projects, strong preview, managed QR path and plan-gated exports.",
+    states: ["Free", "Launch", "Pro", "Projects"],
+    cta: "Compare QRGen plans",
+    ctaHref: ROUTES.pricing,
+  },
+};
+
+const shell = shellByTool[active] || shellByTool.home;
 ---
 
 <section class="vx-lab-shell" aria-label="VOLYNX Lab workspace">
   <LabToolSwitcher active={active} />
   <div class="vx-lab-shell__bar">
     <div class="vx-lab-shell__copy">
-      <span>Lab Workspace</span>
-      <strong>History, presets and exports now follow your profile.</strong>
+      <span>{shell.title}</span>
+      <strong>{shell.copy}</strong>
+      <div class="vx-lab-shell__states" aria-label="Tool access states">
+        {shell.states.map((state) => <em>{state}</em>)}
+      </div>
     </div>
     <div class="vx-lab-shell__actions">
       <a href={ROUTES.profile} data-auth="in">Profile</a>
       <a href={`${ROUTES.login}?next=${ROUTES.lab}`} data-auth="out">Sign in</a>
-      <a href={ROUTES.pricing}>Upgrade</a>
+      <a href={shell.ctaHref}>{shell.cta}</a>
     </div>
+  </div>
+  <div class="vx-lab-shell__legend" aria-label="Plan legend">
+    <span><b>Free</b> daily/local starter limits</span>
+    <span><b>Pro</b> higher limits and premium exports</span>
+    <span><b>VX</b> only when a token action is wired</span>
+    <span><b>Local</b> runs in this browser when possible</span>
   </div>
 </section>
 
@@ -58,7 +114,7 @@ const { active = "home" } = Astro.props;
 
   .vx-lab-shell__copy {
     display: grid;
-    gap: 2px;
+    gap: 5px;
     min-width: 0;
   }
 
@@ -74,6 +130,35 @@ const { active = "home" } = Astro.props;
     color: rgba(255,255,255,.88);
     font-size: 13px;
     line-height: 1.35;
+  }
+
+  .vx-lab-shell__states,
+  .vx-lab-shell__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .vx-lab-shell__states em,
+  .vx-lab-shell__legend span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 5px 8px;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px;
+    background: rgba(255,255,255,.045);
+    color: rgba(255,255,255,.72);
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 1.15;
+  }
+
+  .vx-lab-shell__states em:first-child {
+    border-color: rgba(125,249,255,.26);
+    color: rgba(125,249,255,.9);
+    background: rgba(125,249,255,.075);
   }
 
   .vx-lab-shell__actions {
@@ -104,6 +189,19 @@ const { active = "home" } = Astro.props;
     color: #06142e;
     border-color: rgba(214,168,79,.4);
     background: linear-gradient(135deg, #d6a84f, #f8e9c1);
+  }
+
+  .vx-lab-shell__legend {
+    margin-top: 8px;
+    padding: 10px 12px;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 8px;
+    background: rgba(4,8,18,.48);
+  }
+
+  .vx-lab-shell__legend b {
+    color: #fff;
+    margin-right: 4px;
   }
 
   @media (max-width: 720px) {
