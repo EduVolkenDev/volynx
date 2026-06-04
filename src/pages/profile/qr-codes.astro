@@ -196,14 +196,22 @@ const description = "Manage your dynamic QR codes: edit destinations, pause, ren
       display: grid;
       grid-template-columns: auto 1fr auto;
       gap: 16px;
-      padding: 18px 20px;
-      background: rgba(255,255,255,.03);
-      border: 1px solid rgba(255,255,255,.06);
+      padding: 20px;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(89,198,232,.12), transparent 36%),
+        radial-gradient(circle at 100% 100%, rgba(198,255,143,.06), transparent 34%),
+        rgba(255,255,255,.035);
+      border: 1px solid rgba(89,198,232,.12);
       border-radius: 14px;
       align-items: center;
-      transition: border-color .15s;
+      box-shadow: inset 0 0 22px rgba(255,255,255,.025), 0 12px 34px rgba(0,0,0,.16);
+      transition: border-color .15s, transform .15s, box-shadow .15s;
     }
-    .qrp-item:hover { border-color: rgba(255,255,255,.12); }
+    .qrp-item:hover {
+      border-color: rgba(89,198,232,.32);
+      transform: translateY(-1px);
+      box-shadow: inset 0 0 24px rgba(89,198,232,.04), 0 16px 42px rgba(0,0,0,.22);
+    }
     .qrp-item--paused { opacity: .65; }
     .qrp-item--grace { border-color: rgba(255,200,80,.3); }
     .qrp-item--expired,
@@ -213,14 +221,22 @@ const description = "Manage your dynamic QR codes: edit destinations, pause, ren
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 10px;
-      border-radius: 999px;
+      justify-content: center;
+      min-width: 108px;
+      padding: 9px 12px;
+      border-radius: 10px;
       font-size: .68rem;
-      font-weight: 600;
+      font-weight: 900;
       letter-spacing: .4px;
       text-transform: uppercase;
     }
-    .qrp-status--active { background: rgba(74,222,128,.12); color: #6ee7b7; }
+    .qrp-status--active {
+      background: rgba(0,64,26,.26);
+      color: #02dc02;
+      border: 1px outset rgba(0,255,0,.72);
+      text-shadow: 0 0 10px #71ff71;
+      box-shadow: inset 0 0 10px rgba(3,255,3,.36), 0 0 10px rgba(147,255,147,.28);
+    }
     .qrp-status--paused { background: rgba(255,255,255,.08); color: rgba(255,255,255,.6); }
     .qrp-status--grace { background: rgba(255,200,80,.12); color: #fbbf24; }
     .qrp-status--expired,
@@ -228,12 +244,13 @@ const description = "Manage your dynamic QR codes: edit destinations, pause, ren
 
     .qrp-item-body { min-width: 0; }
     .qrp-item-title {
-      font-size: .98rem;
-      font-weight: 600;
+      font-size: 1.08rem;
+      font-weight: 750;
       margin-bottom: 4px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: rgba(255,255,255,.94);
     }
     .qrp-item-meta {
       display: flex;
@@ -243,17 +260,23 @@ const description = "Manage your dynamic QR codes: edit destinations, pause, ren
       color: rgba(255,255,255,.55);
     }
     .qrp-item-meta .copy-btn {
-      background: none;
-      border: none;
-      color: inherit;
+      background: rgba(89,198,232,.09);
+      border: 1px solid rgba(89,198,232,.16);
+      color: rgba(218,250,255,.8);
       cursor: pointer;
-      padding: 2px 4px;
+      padding: 7px 10px;
       font-size: inherit;
       font-family: 'SF Mono', Menlo, monospace;
-      border-radius: 4px;
-      transition: background .15s;
+      border-radius: 10px;
+      box-shadow: inset 0 0 12px rgba(89,198,232,.05);
+      transition: background .15s, color .15s, border-color .15s, box-shadow .15s;
     }
-    .qrp-item-meta .copy-btn:hover { background: rgba(255,255,255,.08); color: rgba(89,198,232,.85); }
+    .qrp-item-meta .copy-btn:hover {
+      background: rgba(89,198,232,.14);
+      color: #fff;
+      border-color: rgba(89,198,232,.32);
+      box-shadow: 0 0 14px rgba(89,198,232,.12);
+    }
     .qrp-target {
       max-width: 320px;
       overflow: hidden;
@@ -265,29 +288,162 @@ const description = "Manage your dynamic QR codes: edit destinations, pause, ren
 
     .qrp-actions {
       display: flex;
-      gap: 6px;
+      gap: 8px;
       align-items: center;
     }
     .qrp-action {
-      width: 34px;
-      height: 34px;
+      width: 40px;
+      height: 40px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.08);
+      background:
+        linear-gradient(135deg, rgba(89,198,232,.15), rgba(198,255,143,.045)),
+        rgba(255,255,255,.035);
+      border: 1px solid rgba(89,198,232,.16);
       border-radius: 8px;
-      color: rgba(255,255,255,.7);
+      color: rgba(235,253,255,.88);
       cursor: pointer;
+      box-shadow: inset 0 0 16px rgba(89,198,232,.055), 0 0 14px rgba(89,198,232,.055);
       transition: all .15s;
       font-size: .85rem;
     }
     .qrp-action:hover {
-      background: rgba(255,255,255,.08);
+      background:
+        linear-gradient(135deg, rgba(89,198,232,.24), rgba(198,255,143,.08)),
+        rgba(255,255,255,.045);
       color: #fff;
-      border-color: rgba(255,255,255,.16);
+      border-color: rgba(89,198,232,.38);
+      transform: translateY(-1px);
+      box-shadow: inset 0 0 16px rgba(89,198,232,.08), 0 0 18px rgba(89,198,232,.16);
     }
     .qrp-action--danger:hover {
+      background: rgba(248,113,113,.15);
+      border-color: rgba(248,113,113,.4);
+      color: #fca5a5;
+    }
+
+    :global(.qrp-items .qrp-item) {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 16px;
+      padding: 20px;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(89,198,232,.12), transparent 36%),
+        radial-gradient(circle at 100% 100%, rgba(198,255,143,.06), transparent 34%),
+        rgba(255,255,255,.035);
+      border: 1px solid rgba(89,198,232,.12);
+      border-radius: 14px;
+      align-items: center;
+      box-shadow: inset 0 0 22px rgba(255,255,255,.025), 0 12px 34px rgba(0,0,0,.16);
+      transition: border-color .15s, transform .15s, box-shadow .15s;
+    }
+
+    :global(.qrp-items .qrp-item:hover) {
+      border-color: rgba(89,198,232,.32);
+      transform: translateY(-1px);
+      box-shadow: inset 0 0 24px rgba(89,198,232,.04), 0 16px 42px rgba(0,0,0,.22);
+    }
+
+    :global(.qrp-items .qrp-status) {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 108px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-size: .68rem;
+      font-weight: 900;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+    }
+
+    :global(.qrp-items .qrp-status--active) {
+      background: rgba(0,64,26,.26);
+      color: #02dc02;
+      border: 1px outset rgba(0,255,0,.72);
+      text-shadow: 0 0 10px #71ff71;
+      box-shadow: inset 0 0 10px rgba(3,255,3,.36), 0 0 10px rgba(147,255,147,.28);
+    }
+
+    :global(.qrp-items .qrp-status--paused) { background: rgba(255,255,255,.08); color: rgba(255,255,255,.6); }
+    :global(.qrp-items .qrp-status--grace) { background: rgba(255,200,80,.12); color: #fbbf24; }
+    :global(.qrp-items .qrp-status--expired),
+    :global(.qrp-items .qrp-status--admin_blocked) { background: rgba(248,113,113,.12); color: #f87171; }
+
+    :global(.qrp-items .qrp-item-title) {
+      font-size: 1.08rem;
+      font-weight: 750;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: rgba(255,255,255,.94);
+    }
+
+    :global(.qrp-items .qrp-item-meta) {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: .78rem;
+      color: rgba(255,255,255,.55);
+    }
+
+    :global(.qrp-items .qrp-item-meta .copy-btn) {
+      background: rgba(89,198,232,.09);
+      border: 1px solid rgba(89,198,232,.16);
+      color: rgba(218,250,255,.8);
+      cursor: pointer;
+      padding: 7px 10px;
+      font-size: inherit;
+      font-family: 'SF Mono', Menlo, monospace;
+      border-radius: 10px;
+      box-shadow: inset 0 0 12px rgba(89,198,232,.05);
+      transition: background .15s, color .15s, border-color .15s, box-shadow .15s;
+    }
+
+    :global(.qrp-items .qrp-item-meta .copy-btn:hover) {
+      background: rgba(89,198,232,.14);
+      color: #fff;
+      border-color: rgba(89,198,232,.32);
+      box-shadow: 0 0 14px rgba(89,198,232,.12);
+    }
+
+    :global(.qrp-items .qrp-actions) {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    :global(.qrp-items .qrp-action) {
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        linear-gradient(135deg, rgba(89,198,232,.15), rgba(198,255,143,.045)),
+        rgba(255,255,255,.035);
+      border: 1px solid rgba(89,198,232,.16);
+      border-radius: 8px;
+      color: rgba(235,253,255,.88);
+      cursor: pointer;
+      box-shadow: inset 0 0 16px rgba(89,198,232,.055), 0 0 14px rgba(89,198,232,.055);
+      transition: all .15s;
+      font-size: .85rem;
+    }
+
+    :global(.qrp-items .qrp-action:hover) {
+      background:
+        linear-gradient(135deg, rgba(89,198,232,.24), rgba(198,255,143,.08)),
+        rgba(255,255,255,.045);
+      color: #fff;
+      border-color: rgba(89,198,232,.38);
+      transform: translateY(-1px);
+      box-shadow: inset 0 0 16px rgba(89,198,232,.08), 0 0 18px rgba(89,198,232,.16);
+    }
+
+    :global(.qrp-items .qrp-action--danger:hover) {
       background: rgba(248,113,113,.15);
       border-color: rgba(248,113,113,.4);
       color: #fca5a5;

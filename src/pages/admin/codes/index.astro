@@ -1244,9 +1244,10 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       display: inline-block;
       color: rgba(198,255,143,.86);
       font-size: 11px;
-      letter-spacing: .18em;
+      letter-spacing: .38em;
       text-transform: uppercase;
       margin-bottom: 8px;
+      text-shadow: 0 0 14px rgba(198,255,143,.32);
     }
 
     .codes-hero h1 {
@@ -1283,6 +1284,11 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       background: transparent;
       border-radius: 8px;
       width: 100%;
+    }
+
+    @keyframes codes-title-sheen {
+      0% { background-position: 180% 50%; }
+      100% { background-position: -60% 50%; }
     }
 
     .codes-tab {
@@ -1443,21 +1449,29 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     .codes-card-head strong,
     .codes-list-head h2 {
       color: rgba(255,255,255,.94);
-      font-size: 20px;
+      font-size: 25px;
+      font-weight: 250;
       letter-spacing: 0;
     }
 
     .codes-list-head {
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       justify-content: space-between;
-      gap: 18px;
+      gap: 30px;
       align-items: flex-end;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
 
     .codes-list-head h2 {
       margin: 0;
+      background: linear-gradient(90deg, #fff 0%, #7df9ff 28%, #c6ff8f 50%, #fff 72%);
+      background-size: 220% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 0 10px rgba(125,249,255,.18));
+      animation: codes-title-sheen 5.8s linear infinite;
     }
 
     .codes-form,
@@ -1519,8 +1533,8 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     .codes-result-url input:focus,
     .codes-row-edit input:focus {
       border-color: rgba(125,249,255,.5);
-      box-shadow: 0 0 0 3px rgba(125,249,255,.08);
-      background: rgba(0,0,0,.42);
+      box-shadow: 0 0 0 3px rgba(125,249,255,.08), 0 0 14px rgba(28,255,0,.16), inset 0 0 10px 1px rgba(255,255,255,.16);
+      background: linear-gradient(135deg, rgba(10,88,64,.5), rgba(6,32,28,.88));
     }
 
     .codes-result-url {
@@ -1551,35 +1565,43 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       align-items: center;
       justify-content: center;
       min-height: 40px;
-      padding: 9px 14px;
+      padding: 10px 15px;
       border-radius: 8px;
-      border: 1px solid rgba(255,255,255,.13);
-      color: #fff;
-      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(125,249,255,.18);
+      color: rgba(235,253,255,.92);
+      background:
+        linear-gradient(135deg, rgba(125,249,255,.13), rgba(198,255,143,.045)),
+        rgba(255,255,255,.035);
       text-decoration: none;
       font: inherit;
       font-size: 13px;
       font-weight: 800;
       cursor: pointer;
-      transition: transform .16s ease, border-color .16s ease, background .16s ease, color .16s ease;
+      box-shadow: inset 0 0 18px rgba(125,249,255,.055), 0 0 16px rgba(125,249,255,.06);
+      transition: transform .16s ease, border-color .16s ease, background .16s ease, color .16s ease, box-shadow .16s ease;
     }
 
     .codes-btn:hover {
       transform: translateY(-1px);
-      border-color: rgba(125,249,255,.3);
-      background: rgba(125,249,255,.08);
+      border-color: rgba(125,249,255,.46);
+      background:
+        linear-gradient(135deg, rgba(125,249,255,.22), rgba(198,255,143,.08)),
+        rgba(255,255,255,.045);
+      box-shadow: inset 0 0 20px rgba(125,249,255,.09), 0 0 22px rgba(125,249,255,.16);
     }
 
     .codes-btn.primary {
       border-color: transparent;
       color: #061016;
       background: linear-gradient(135deg, #7df9ff, #c6ff8f);
+      box-shadow: 0 0 20px rgba(125,249,255,.18), inset 0 1px 0 rgba(255,255,255,.65);
     }
 
     .codes-btn.danger {
       border-color: rgba(248,113,113,.28);
       color: #fecaca;
-      background: rgba(248,113,113,.09);
+      background: linear-gradient(135deg, rgba(248,113,113,.16), rgba(127,29,29,.08));
+      box-shadow: inset 0 0 18px rgba(248,113,113,.06), 0 0 16px rgba(248,113,113,.06);
     }
 
     .codes-btn.danger:hover {
@@ -1610,19 +1632,24 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     .codes-row {
       display: grid;
       grid-template-columns: minmax(0, 1.4fr) auto auto;
-      gap: 12px;
+      gap: 18px;
       align-items: center;
-      padding: 14px 16px;
+      padding: 18px 20px;
       border-radius: 8px;
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(0,0,0,.24);
-      transition: border-color .16s ease, background .16s ease, transform .16s ease;
+      border: 1px solid rgba(125,249,255,.1);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(125,249,255,.07), transparent 36%),
+        radial-gradient(circle at 100% 100%, rgba(198,255,143,.045), transparent 34%),
+        rgba(0,0,0,.26);
+      box-shadow: inset 0 0 24px rgba(255,255,255,.025);
+      transition: border-color .16s ease, background .16s ease, transform .16s ease, box-shadow .16s ease;
     }
 
     .codes-row:hover {
       border-color: rgba(125,249,255,.22);
       background: rgba(125,249,255,.045);
       transform: translateY(-1px);
+      box-shadow: inset 0 0 24px rgba(125,249,255,.04), 0 10px 30px rgba(0,0,0,.18);
     }
 
     .codes-row--qr {
@@ -1635,23 +1662,30 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
 
     .codes-row-main {
       display: grid;
-      gap: 5px;
+      grid-template-columns: minmax(0, 1fr) minmax(150px, .6fr);
+      gap: 12px 20px;
+      margin: 22px 0;
       min-width: 0;
+      font-size: clamp(1rem, 1.5vw, 1.3rem);
+      align-items: center;
     }
 
     .codes-row-main strong {
       color: rgba(255,255,255,.94);
       overflow-wrap: anywhere;
+      grid-column: 1 / -1;
     }
 
     .codes-row-main code,
     .codes-code {
       color: #9bf8ff;
       background: rgba(125,249,255,.1);
-      border-radius: 6px;
-      padding: 4px 8px;
+      border-radius: 7px;
+      padding: 7px 10px;
       width: fit-content;
+      max-width: 100%;
       overflow-wrap: anywhere;
+      box-shadow: inset 0 0 12px rgba(125,249,255,.05);
     }
 
     .codes-row-main a,
@@ -1664,7 +1698,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     .codes-row-edit {
       display: grid;
       grid-template-columns: minmax(170px, 1.35fr) minmax(120px, .72fr) minmax(170px, 1fr);
-      gap: 8px;
+      gap: 12px;
       min-width: 0;
       align-items: end;
     }
@@ -1675,8 +1709,22 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
 
     .codes-row-edit label {
       display: grid;
-      gap: 5px;
+      gap: 7px;
       min-width: 0;
+    }
+
+    .codes-row--qr .codes-row-edit label:nth-child(3) {
+      margin: 0 auto;
+      width: min(300px, 100%);
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(125,249,255,.22);
+      background:
+        linear-gradient(135deg, rgba(80,28,120,.34), rgba(8,22,26,.64)),
+        rgba(255,255,255,.03);
+      box-shadow: inset 0 0 18px rgba(0,0,0,.22), 0 0 18px rgba(173,15,255,.08);
+      align-items: center;
+      text-align: center;
     }
 
     .codes-row-edit span {
@@ -1687,8 +1735,14 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
 
     .codes-row-edit input {
       min-height: 40px;
-      padding: 9px 10px;
+      padding: 7px 10px;
       font-size: 13px;
+      max-width: 300px;
+      border-radius: 7px;
+      border: 0;
+      background: linear-gradient(135deg, rgba(10,88,64,.42), rgba(6,32,28,.82));
+      box-shadow: 0 0 10px rgba(28,255,0,.2), inset 0 0 10px 1px rgba(255,255,255,.13);
+      margin: 0 0 18px;
     }
 
     .codes-check--inline {
@@ -1703,33 +1757,51 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     .codes-row-qr-preview {
       display: grid;
       place-items: center;
-      width: 96px;
-      height: 96px;
-      padding: 7px;
+      width: 174px;
+      height: 174px;
+      padding: 10px;
       border-radius: 8px;
       background: #fff;
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.08), 0 0 24px rgba(255,255,255,.08);
     }
 
     .codes-row-qr-preview canvas {
-      width: 82px;
-      height: 82px;
+      width: 150px;
+      height: 150px;
       display: block;
+      border: 10px inset #fff;
+      padding: 10px;
+      margin: 10px 0 20px;
     }
 
     .codes-row-meta {
-      display: grid;
-      gap: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin: 10px 0 20px;
       color: rgba(255,255,255,.52);
       font-size: 12px;
-      white-space: nowrap;
+      white-space: normal;
+    }
+
+    .codes-row-meta span {
+      background: rgba(95,158,160,.18);
+      padding: 10px 12px;
+      border-radius: 20px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,.4), inset 0 0 15px 3px rgba(0,255,255,.12);
+      color: rgba(237,255,255,.8);
+      font-weight: 900;
+      font-style: italic;
     }
 
     .codes-pill {
       display: inline-flex;
+      align-items: center;
+      justify-content: center;
       width: fit-content;
-      padding: 3px 8px;
-      border-radius: 999px;
+      min-width: 96px;
+      padding: 8px 10px;
+      border-radius: 10px;
       background: rgba(255,255,255,.08);
       color: rgba(255,255,255,.7);
       font-size: 10px;
@@ -1738,11 +1810,28 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       font-weight: 900;
     }
 
-    .codes-pill--active { color: #6ee7b7; background: rgba(110,231,183,.12); }
+    .codes-pill--active {
+      color: #02dc02;
+      background: rgba(0,64,26,.25);
+      text-shadow: 0 0 10px #71ff71;
+      font-weight: 900;
+      border: 1px outset rgba(0,255,0,.78);
+      box-shadow: inset 0 0 10px rgba(3,255,3,.42), 0 0 10px rgba(147,255,147,.35);
+    }
     .codes-pill--paused,
     .codes-pill--neutral { color: rgba(255,255,255,.68); }
     .codes-pill--grace { color: #facc15; background: rgba(250,204,21,.12); }
-    .codes-pill--founder { color: #7df9ff; background: rgba(125,249,255,.12); }
+    .codes-pill--founder {
+      border: 0;
+      box-shadow: 0 0 10px rgba(173,15,255,.75), inset 0 0 10px 2px rgba(0,0,0,.72);
+      border-radius: 10px;
+      padding: 10px 12px;
+      text-align: center;
+      max-width: 250px;
+      background: linear-gradient(135deg, rgba(128,0,128,.82), rgba(28,10,68,.92));
+      color: #cfffff;
+      text-shadow: 0 0 5px aqua;
+    }
     .codes-pill--expired,
     .codes-pill--admin_blocked { color: #fca5a5; background: rgba(248,113,113,.12); }
 
@@ -1757,6 +1846,261 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     .codes-empty.is-error {
       color: #fca5a5;
       border-color: rgba(248,113,113,.28);
+    }
+
+    :global(.codes-rows .codes-row) {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) auto auto;
+      gap: 18px;
+      align-items: center;
+      padding: 18px 20px;
+      border-radius: 8px;
+      border: 1px solid rgba(125,249,255,.1);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(125,249,255,.07), transparent 36%),
+        radial-gradient(circle at 100% 100%, rgba(198,255,143,.045), transparent 34%),
+        rgba(0,0,0,.26);
+      box-shadow: inset 0 0 24px rgba(255,255,255,.025);
+      transition: border-color .16s ease, background .16s ease, transform .16s ease, box-shadow .16s ease;
+    }
+
+    :global(.codes-rows .codes-row:hover) {
+      border-color: rgba(125,249,255,.22);
+      background: rgba(125,249,255,.045);
+      transform: translateY(-1px);
+      box-shadow: inset 0 0 24px rgba(125,249,255,.04), 0 10px 30px rgba(0,0,0,.18);
+    }
+
+    :global(.codes-rows .codes-row--qr) {
+      grid-template-columns: minmax(0, .95fr) minmax(320px, 1.2fr) auto auto auto;
+    }
+
+    :global(.codes-rows .codes-row--voucher) {
+      grid-template-columns: minmax(0, .9fr) minmax(420px, 1.25fr) auto auto;
+    }
+
+    :global(.codes-rows .codes-row-main) {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(150px, .6fr);
+      gap: 12px 20px;
+      margin: 22px 0;
+      min-width: 0;
+      font-size: clamp(1rem, 1.5vw, 1.3rem);
+      align-items: center;
+    }
+
+    :global(.codes-rows .codes-row-main strong) {
+      color: rgba(255,255,255,.94);
+      overflow-wrap: anywhere;
+      grid-column: 1 / -1;
+    }
+
+    :global(.codes-rows .codes-row-main code),
+    :global(.codes-rows .codes-code) {
+      color: #9bf8ff;
+      background: rgba(125,249,255,.1);
+      border-radius: 7px;
+      padding: 7px 10px;
+      width: fit-content;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      box-shadow: inset 0 0 12px rgba(125,249,255,.05);
+    }
+
+    :global(.codes-rows .codes-row-main a),
+    :global(.codes-rows .codes-row-main span) {
+      color: rgba(255,255,255,.58);
+      overflow-wrap: anywhere;
+      text-decoration: none;
+    }
+
+    :global(.codes-rows .codes-row-edit) {
+      display: grid;
+      grid-template-columns: minmax(170px, 1.35fr) minmax(120px, .72fr) minmax(170px, 1fr);
+      gap: 12px;
+      min-width: 0;
+      align-items: end;
+    }
+
+    :global(.codes-rows .codes-row-edit--voucher) {
+      grid-template-columns: minmax(130px, 1fr) minmax(170px, 1.1fr) minmax(92px, .6fr) minmax(150px, .95fr) auto;
+    }
+
+    :global(.codes-rows .codes-row-edit label) {
+      display: grid;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    :global(.codes-rows .codes-row--qr .codes-row-edit label:nth-child(3)) {
+      margin: 0 auto;
+      width: min(300px, 100%);
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(125,249,255,.22);
+      background:
+        linear-gradient(135deg, rgba(80,28,120,.34), rgba(8,22,26,.64)),
+        rgba(255,255,255,.03);
+      box-shadow: inset 0 0 18px rgba(0,0,0,.22), 0 0 18px rgba(173,15,255,.08);
+      align-items: center;
+      text-align: center;
+    }
+
+    :global(.codes-rows .codes-row-edit span) {
+      color: rgba(255,255,255,.55);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    :global(.codes-rows .codes-row-edit input) {
+      width: 100%;
+      min-height: 40px;
+      padding: 7px 10px;
+      font: inherit;
+      font-size: 13px;
+      max-width: 300px;
+      border-radius: 7px;
+      border: 0;
+      color: #fff;
+      outline: none;
+      background: linear-gradient(135deg, rgba(10,88,64,.42), rgba(6,32,28,.82));
+      box-shadow: 0 0 10px rgba(28,255,0,.2), inset 0 0 10px 1px rgba(255,255,255,.13);
+      margin: 0 0 18px;
+    }
+
+    :global(.codes-rows .codes-row-qr-preview) {
+      display: grid;
+      place-items: center;
+      justify-self: center;
+      align-self: center;
+      width: 174px;
+      height: 174px;
+      padding: 10px;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.08), 0 0 24px rgba(255,255,255,.08);
+      box-sizing: border-box;
+    }
+
+    :global(.codes-rows .codes-row-qr-preview canvas) {
+      width: 150px !important;
+      height: 150px !important;
+      display: block;
+      border: 10px inset #fff;
+      padding: 10px;
+      margin: 10px 0 20px;
+      box-sizing: border-box;
+    }
+
+    :global(.codes-rows .codes-row-meta) {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin: 10px 0 20px;
+      color: rgba(255,255,255,.52);
+      font-size: 12px;
+      white-space: normal;
+    }
+
+    :global(.codes-rows .codes-row-meta span) {
+      background: rgba(95,158,160,.18);
+      padding: 10px 12px;
+      border-radius: 20px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,.4), inset 0 0 15px 3px rgba(0,255,255,.12);
+      color: rgba(237,255,255,.8);
+      font-weight: 900;
+      font-style: italic;
+    }
+
+    :global(.codes-rows .codes-pill) {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      min-width: 96px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.7);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 900;
+    }
+
+    :global(.codes-rows .codes-pill--active) {
+      color: #02dc02;
+      background: rgba(0,64,26,.25);
+      text-shadow: 0 0 10px #71ff71;
+      border: 1px outset rgba(0,255,0,.78);
+      box-shadow: inset 0 0 10px rgba(3,255,3,.42), 0 0 10px rgba(147,255,147,.35);
+    }
+
+    :global(.codes-rows .codes-pill--founder) {
+      border: 0;
+      box-shadow: 0 0 10px rgba(173,15,255,.75), inset 0 0 10px 2px rgba(0,0,0,.72);
+      padding: 10px 12px;
+      max-width: 250px;
+      background: linear-gradient(135deg, rgba(128,0,128,.82), rgba(28,10,68,.92));
+      color: #cfffff;
+      text-shadow: 0 0 5px aqua;
+    }
+
+    :global(.codes-rows .codes-pill--grace) { color: #facc15; background: rgba(250,204,21,.12); }
+    :global(.codes-rows .codes-pill--paused),
+    :global(.codes-rows .codes-pill--neutral) { color: rgba(255,255,255,.68); }
+    :global(.codes-rows .codes-pill--expired),
+    :global(.codes-rows .codes-pill--admin_blocked) { color: #fca5a5; background: rgba(248,113,113,.12); }
+
+    :global(.codes-rows .codes-row-actions) {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    :global(.codes-rows .codes-btn) {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: 1px solid rgba(125,249,255,.18);
+      color: rgba(235,253,255,.92);
+      background:
+        linear-gradient(135deg, rgba(125,249,255,.13), rgba(198,255,143,.045)),
+        rgba(255,255,255,.035);
+      text-decoration: none;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: inset 0 0 18px rgba(125,249,255,.055), 0 0 16px rgba(125,249,255,.06);
+      transition: transform .16s ease, border-color .16s ease, background .16s ease, color .16s ease, box-shadow .16s ease;
+    }
+
+    :global(.codes-rows .codes-btn:hover) {
+      transform: translateY(-1px);
+      border-color: rgba(125,249,255,.46);
+      background:
+        linear-gradient(135deg, rgba(125,249,255,.22), rgba(198,255,143,.08)),
+        rgba(255,255,255,.045);
+      box-shadow: inset 0 0 20px rgba(125,249,255,.09), 0 0 22px rgba(125,249,255,.16);
+    }
+
+    :global(.codes-rows .codes-btn.primary) {
+      border-color: transparent;
+      color: #061016;
+      background: linear-gradient(135deg, #7df9ff, #c6ff8f);
+      box-shadow: 0 0 20px rgba(125,249,255,.18), inset 0 1px 0 rgba(255,255,255,.65);
+    }
+
+    :global(.codes-rows .codes-btn.danger) {
+      border-color: rgba(248,113,113,.28);
+      color: #fecaca;
+      background: linear-gradient(135deg, rgba(248,113,113,.16), rgba(127,29,29,.08));
+      box-shadow: inset 0 0 18px rgba(248,113,113,.06), 0 0 16px rgba(248,113,113,.06);
     }
 
     @media (max-width: 920px) {
@@ -1793,8 +2137,44 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       .codes-row {
         grid-template-columns: 1fr;
       }
+      .codes-list-head {
+        grid-template-columns: 1fr;
+      }
+      .codes-row-main {
+        grid-template-columns: 1fr;
+        margin: 10px 0;
+      }
       .codes-row-edit {
         grid-template-columns: 1fr;
+      }
+      .codes-row-qr-preview {
+        width: 150px;
+        height: 150px;
+      }
+      .codes-row-qr-preview canvas {
+        width: 126px;
+        height: 126px;
+      }
+      :global(.codes-rows .codes-row),
+      :global(.codes-rows .codes-row--qr),
+      :global(.codes-rows .codes-row--voucher) {
+        grid-template-columns: 1fr;
+      }
+      :global(.codes-rows .codes-row-main) {
+        grid-template-columns: 1fr;
+        margin: 10px 0;
+      }
+      :global(.codes-rows .codes-row-edit),
+      :global(.codes-rows .codes-row-edit--voucher) {
+        grid-template-columns: 1fr;
+      }
+      :global(.codes-rows .codes-row-qr-preview) {
+        width: 150px;
+        height: 150px;
+      }
+      :global(.codes-rows .codes-row-qr-preview canvas) {
+        width: 126px !important;
+        height: 126px !important;
       }
       .codes-row-meta {
         white-space: normal;
