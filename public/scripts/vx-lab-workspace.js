@@ -545,6 +545,8 @@
       lumina: "Lumina",
       "qr-gen": "QRGen",
       qr: "QRGen",
+      lab: "Lab",
+      "lab-home": "Lab Home",
     }[tool] || tool || "Lab";
   }
 
@@ -642,6 +644,22 @@
     }
   }
 
+  function uniqueToolCount(rows) {
+    var seen = {};
+    (rows || []).forEach(function (item) {
+      if (item && item.tool) seen[item.tool] = true;
+    });
+    return Object.keys(seen).length;
+  }
+
+  function plural(count, one, many) {
+    return count === 1 ? one : many;
+  }
+
+  function renderSummaryCard(label, value, detail) {
+    return '<div class="lab-profile-summary-card"><span>' + escapeHtml(label) + '</span><strong>' + escapeHtml(value) + '</strong><em>' + escapeHtml(detail || "") + '</em></div>';
+  }
+
   function getContinueTarget(options) {
     var allowPending = !options || options.allowPending !== false;
     var pending = "";
@@ -719,8 +737,27 @@
     if (!root) return;
     var history = readJson(HISTORY_KEY, []);
     var presets = readJson(PRESETS_KEY, []);
+    var summaryEl = root.querySelector("[data-lab-summary]");
     var historyEl = root.querySelector("[data-lab-history]");
     var presetsEl = root.querySelector("[data-lab-presets]");
+    var continueTarget = getContinueTarget({ allowPending: false });
+
+    if (summaryEl) {
+      var usefulHistory = history.filter(function (item) {
+        return item && !isPassiveAction(item.action) && isUsefulLabPath(safePath(item.path));
+      });
+      var latest = usefulHistory[0] || history[0] || presets[0] || null;
+      var latestLabel = latest ? toolLabel(latest.tool) : "Lab";
+      var latestDetail = latest && latest.ts ? formatTime(latest.ts) : "Ready when you are";
+      var continuePath = isSafeRelativePath(continueTarget.path) ? continueTarget.path : "/volynx-lab/";
+      summaryEl.innerHTML = [
+        renderSummaryCard("Last workspace", latestLabel, latestDetail),
+        renderSummaryCard("Recent actions", String(history.length), plural(history.length, "recorded action", "recorded actions")),
+        renderSummaryCard("Saved presets", String(presets.length), plural(presets.length, "reusable recipe", "reusable recipes")),
+        renderSummaryCard("Tools touched", String(uniqueToolCount(history.concat(presets))), "across VOLYNX Lab"),
+        '<a class="lab-profile-summary-card lab-profile-summary-card--cta" href="' + escapeHtml(continuePath) + '"><span>Continue</span><strong>' + escapeHtml(continueTarget.label) + '</strong><em>Open the most relevant Lab workspace</em></a>'
+      ].join("");
+    }
 
     if (historyEl) {
       historyEl.innerHTML = history.length
