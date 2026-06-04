@@ -304,6 +304,22 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       return document.getElementById(id);
     }
 
+    function labNotify(title, message, tone = "warn") {
+      if (window.VxLab?.notify) {
+        VxLab.notify({
+          tool: "image-suite",
+          event: tone === "error" ? "error_notice" : "notice",
+          icon: tone === "error" ? "!" : "i",
+          title,
+          message,
+          primaryLabel: "OK",
+          cancelLabel: "Close",
+        });
+      } else {
+        alert(message || title);
+      }
+    }
+
     const fileEl = $("file");
     const dropEl = $("drop");
     const pickBtn = $("pickBtn");
@@ -815,7 +831,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       resetPreview();
 
       if (!validFiles.length) {
-        alert(t("suite.alert_no_valid", "No valid images found."));
+        labNotify("No valid images", t("suite.alert_no_valid", "Select a PNG, JPG, WebP or another browser-readable image."));
         return;
       }
 
@@ -1169,7 +1185,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
             if (window.VxLab) {
               VxLab.confirmUpgrade(confirmMsg + "\n\nClick OK to see upgrade options.");
             } else {
-              alert(confirmMsg);
+              labNotify("Upgrade required", confirmMsg, "warn");
             }
             return;
           }
@@ -1184,7 +1200,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
           if (isFreeUser && window.VxLab) {
             VxLab.confirmUpgrade(limitMsg + upgradeMsg);
           } else {
-            alert(limitMsg + "\n\nYou've used your daily allowance. Try again tomorrow.");
+            labNotify("Daily limit reached", `${limitMsg}\n\nYou've used your daily allowance. Try again tomorrow.`, "warn");
           }
           return;
         }
@@ -1347,7 +1363,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         downloadBtn.disabled = false;
       } catch (error) {
         console.error(error);
-        alert(t("suite.alert_process_error", "An error occurred while processing images."));
+        labNotify("Processing failed", t("suite.alert_process_error", "Image Suite could not process this image. Try a smaller file or another format."), "error");
         setDropMessage(t("suite.drop_error", "Error processing files"));
         setResultHint("");
       } finally {
@@ -1375,7 +1391,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       }
 
       if (!window.JSZip) {
-        alert("JSZip not loaded.");
+        labNotify("ZIP export unavailable", "The ZIP library did not load. Reload the page and try again.", "error");
         return;
       }
 

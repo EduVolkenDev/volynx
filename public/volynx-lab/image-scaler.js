@@ -36,6 +36,22 @@
   var sharpenChk  = document.getElementById('sharpen');
   var smoothChk   = document.getElementById('smooth');
 
+  function labNotify(title, message, tone) {
+    if (window.VxLab && typeof VxLab.notify === 'function') {
+      VxLab.notify({
+        tool: 'image-scaler',
+        event: tone === 'error' ? 'error_notice' : 'notice',
+        icon: tone === 'error' ? '!' : 'i',
+        title: title,
+        message: message,
+        primaryLabel: 'OK',
+        cancelLabel: 'Close'
+      });
+    } else {
+      alert(message || title);
+    }
+  }
+
   // ── State ─────────────────────────────────────────────────
   var loadedImages     = [];  // [{ file, img, baseName }]
   var processedResults = [];  // [{ baseName, blob, width, height }]
@@ -89,7 +105,10 @@
     if (outMeta) outMeta.textContent = '—';
     if (downloadBtn) downloadBtn.disabled = true;
 
-    if (!valid.length) { alert('No valid images found.'); return; }
+    if (!valid.length) {
+      labNotify('No valid images', 'Select a PNG, JPG, WebP or another browser-readable image.');
+      return;
+    }
 
     runBtn.disabled = true;
     setDropText('Loading ' + valid.length + ' file(s)…');
@@ -102,7 +121,7 @@
       }
     } catch (err) {
       console.error(err);
-      alert('Error loading image(s).');
+      labNotify('Image loading failed', 'Image Scaler could not read one of the selected files. Try another format or a smaller file.', 'error');
       setDropText('Error — please try again');
       runBtn.disabled = true;
       return;
@@ -146,7 +165,7 @@
             ? 'Free limit reached. Sign in or upgrade to continue.'
             : 'Plan limit reached. Upgrade to continue.';
           if (isFreeUser && window.VxLab) VxLab.confirmUpgrade('Daily limit reached. Upgrade to Pro for more.\n\nClick OK to see upgrade options.');
-          else alert(msg);
+          else labNotify('Daily limit reached', msg, 'warn');
           runBtn.disabled = false;
           runBtn.textContent = 'Process';
           return;
@@ -157,7 +176,7 @@
     }
     var mode = modeSelect ? modeSelect.value : 'local';
     if (mode === 'ai') {
-      alert('AI upscale requer upgrade. Usando modo local automaticamente.');
+      labNotify('AI upscale is Pro', 'AI upscale requires an upgrade. Image Scaler will continue with local mode for this run.');
     }
     await runLocal();
   });
@@ -206,7 +225,7 @@
       downloadBtn.disabled = false;
     } catch (err) {
       console.error(err);
-      alert('Error processing images.');
+      labNotify('Processing failed', 'Image Scaler could not process this image. Try a smaller file or another format.', 'error');
       setDropText('Error — please try again');
     } finally {
       runBtn.disabled  = false;
@@ -301,7 +320,10 @@
     }
 
     // Multiple files — ZIP download
-    if (!window.JSZip) { alert('JSZip not loaded. Cannot create ZIP.'); return; }
+    if (!window.JSZip) {
+      labNotify('ZIP export unavailable', 'The ZIP library did not load. Reload the page and try again.', 'error');
+      return;
+    }
     var zip = new window.JSZip();
     for (var i = 0; i < processedResults.length; i++) {
       var r = processedResults[i];
