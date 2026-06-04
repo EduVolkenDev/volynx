@@ -177,6 +177,10 @@
             <span>Label</span>
             <input data-field="label" type="text" maxlength="100" value="${escapeHtml(qr.label || "")}" />
           </label>
+          <label class="qra-field-wide">
+            <span>Transfer to user email</span>
+            <input data-field="transfer_email" type="email" placeholder="client@example.com" autocomplete="email" />
+          </label>
           <label>
             <span>Status</span>
             <select data-field="status">${optionList(qr.status)}</select>
@@ -197,6 +201,7 @@
             <button class="qra-btn ghost" type="button" data-action="expire">Expire now</button>
             <button class="qra-btn danger" type="button" data-action="block">Block</button>
             <button class="qra-btn ghost" type="button" data-action="copy" data-url="${escapeHtml(shortUrl)}">Copy URL</button>
+            <button class="qra-btn ghost" type="button" data-action="transfer">Transfer owner</button>
           </div>
         </div>
       </article>
@@ -268,6 +273,28 @@
     };
   }
 
+  function getTransferEmail(row) {
+    const email = String(row.querySelector('[data-field="transfer_email"]')?.value || "").trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      throw new Error("Enter the customer's account email before transferring.");
+    }
+    return email;
+  }
+
+  function transferErrorMessage(err) {
+    const raw = JSON.stringify(err?.data || {}) + " " + String(err?.message || err || "");
+    if (raw.includes("qr_transfer_target_profile_not_found")) {
+      return "Recipient profile not found. Ask the customer to create a VOLYNX account before transferring this QR.";
+    }
+    if (raw.includes("qr_transfer_target_quota_exceeded")) {
+      return "Recipient account is not compatible with this QR yet. Gift a compatible subscription or ask them to upgrade before transfer.";
+    }
+    if (raw.includes("qr_transfer_same_owner")) {
+      return "This QR already belongs to that account.";
+    }
+    return err?.message || String(err);
+  }
+
   function futureIso(days) {
     const date = new Date(Date.now() + days * 86400000);
     return date.toISOString();
@@ -294,6 +321,15 @@
         await updateDestination(id, getDestinationPatch(row));
       } else if (action === "save") {
         await updateValidity(id, getRowPatch(row));
+      } else if (action === "transfer") {
+        const email = getTransferEmail(row);
+        const ok = confirm(`Transfer this QR to ${email}? The short URL stays the same, but the customer will manage destination edits from their profile.`);
+        if (!ok) return;
+        await rpc("admin_transfer_qr_code", {
+          p_qr_id: id,
+          p_target_email: email,
+          p_note: "Transferred from legacy QR admin",
+        });
       } else if (action === "renew30") {
         await updateValidity(id, {
           p_status: "active",
@@ -321,10 +357,14 @@
         if (!ok) return;
         await updateValidity(id, { p_status: "admin_blocked" });
       }
-      setMessage(action === "saveDestination" ? "QR destination updated." : "QR validity updated.");
+      setMessage(action === "saveDestination"
+        ? "QR destination updated."
+        : action === "transfer"
+          ? "QR owner transferred."
+          : "QR validity updated.");
     } catch (err) {
       console.error("[qr-admin]", err);
-      setMessage(`Could not update QR: ${err.message || err}`, "error");
+      setMessage(`Could not update QR: ${action === "transfer" ? transferErrorMessage(err) : (err.message || err)}`, "error");
     } finally {
       button.disabled = false;
     }

@@ -5,6 +5,7 @@
  * Actions:
  *   { action: "list" }          — returns recent vouchers (newest first)
  *   { action: "create", … }     — create voucher, auto-generates code
+ *   { action: "update", id, … } — update validity, recipient gate and usage cap
  *   { action: "revoke", id }    — deactivate voucher
  */
 
@@ -158,6 +159,30 @@ serve(async (req: Request) => {
         .select("id, active")
         .single();
       if (error) return json({ error: "revoke_failed", detail: error.message }, 500);
+      return json({ ok: true, voucher: data });
+    }
+
+    if (action === "update") {
+      const id = String(body?.id ?? "");
+      if (!id) return json({ error: "missing_id" }, 400);
+
+      const patch: Record<string, unknown> = {};
+      if ("label" in body) patch.label = body.label ? String(body.label).slice(0, 200) : null;
+      if ("target_email" in body) patch.target_email = body.target_email ? String(body.target_email).toLowerCase().slice(0, 320) : null;
+      if ("max_uses" in body) patch.max_uses = Math.min(Math.max(parseInt(body.max_uses ?? 1), 1), 100000);
+      if ("transferable" in body) patch.transferable = body.transferable === true;
+      if ("expires_at" in body) patch.expires_at = body.expires_at ? new Date(body.expires_at).toISOString() : null;
+      if ("active" in body) patch.active = body.active === true;
+
+      if (!Object.keys(patch).length) return json({ error: "empty_update" }, 400);
+
+      const { data, error } = await supabase
+        .from("vouchers")
+        .update(patch)
+        .eq("id", id)
+        .select("id, code, type, label, description, target_email, max_uses, times_used, transferable, expires_at, grants, active, created_at, created_by")
+        .single();
+      if (error) return json({ error: "update_failed", detail: error.message }, 500);
       return json({ ok: true, voucher: data });
     }
 

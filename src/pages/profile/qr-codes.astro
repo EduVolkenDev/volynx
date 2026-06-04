@@ -70,6 +70,26 @@ const description = "Manage your dynamic QR codes: edit destinations, pause, ren
         </div>
       </div>
 
+      <!-- Transfer modal -->
+      <div id="qrpTransferModal" class="qrp-modal" hidden>
+        <div class="qrp-modal-backdrop" data-transfer-close></div>
+        <div class="qrp-modal-card">
+          <h3>Transfer QR ownership</h3>
+          <p class="qrp-modal-desc">The short URL stays the same. The recipient must have compatible QR capacity to manage this QR from their profile.</p>
+          <label>Recipient account email</label>
+          <input type="email" id="qrpTransferEmail" placeholder="client@example.com" autocomplete="email" />
+          <div class="qrp-gift-note">
+            If the recipient cannot receive this QR yet, you can gift a compatible subscription or ask them to upgrade before transferring.
+          </div>
+          <div id="qrpTransferError" class="qrp-modal-error" hidden></div>
+          <div class="qrp-modal-actions">
+            <button type="button" class="qrp-btn ghost" data-transfer-close>Cancel</button>
+            <a class="qrp-btn ghost qrp-btn-link" href={ROUTES.pricing}>Gift subscription</a>
+            <button type="button" id="qrpTransferSave" class="qrp-btn primary">Transfer</button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </main>
 
@@ -330,6 +350,16 @@ const description = "Manage your dynamic QR codes: edit destinations, pause, ren
       font-size: .85rem;
       color: #fca5a5;
     }
+    .qrp-gift-note {
+      margin-top: 14px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(245,196,81,.22);
+      background: rgba(245,196,81,.08);
+      color: rgba(255,255,255,.7);
+      font-size: .82rem;
+      line-height: 1.5;
+    }
     .qrp-modal-actions {
       display: flex;
       justify-content: flex-end;
@@ -355,6 +385,7 @@ const description = "Manage your dynamic QR codes: edit destinations, pause, ren
       background: linear-gradient(135deg, #6c0ae4, #210df7);
       color: #fff;
     }
+    .qrp-btn-link { text-decoration: none; }
     .qrp-btn.primary:hover { transform: translateY(-1px); }
     .qrp-btn:disabled { opacity: .5; cursor: not-allowed; }
 
@@ -370,5 +401,5 @@ const description = "Manage your dynamic QR codes: edit destinations, pause, ren
 
   <script is:inline src="/js/vx-auth-bridge.js"></script>
   <script is:inline src="/js/vx-token-refresh.js?v=20260515-qr-profile-auth"></script>
-  <script is:inline src="/scripts/qr-profile.js?v=20260521-admin-redirect"></script>
+  <script is:inline src="/scripts/qr-profile.js?v=20260604-transfer-owner"></script>
 </BaseLayout>
