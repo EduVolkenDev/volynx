@@ -8,7 +8,7 @@ import LabUpgradeBanner from "../../../components/LabUpgradeBanner.astro";
 import Topbar from "../../../components/Topbar.astro";
 import LabToolShell from "../../../components/LabToolShell.astro";
 
-const pageTitle = "VOLYNX Lab • Image Suite";
+const pageTitle = "VOLYNX Lab • iMage Suite";
 const pageDescription = "Local-first image suite — upscale, compress, convert and remove backgrounds directly in your browser, no upload required.";
 ---
 
@@ -32,7 +32,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
   <LabToolShell active="suite" />
 
   <main class="wrap">
-    <h1 class="tool-hero-title suite-logo-title" aria-label="Image Suite">
+    <h1 class="tool-hero-title suite-logo-title" aria-label="iMage Suite">
       <span class="tool-hero-stage suite-hero-stage" aria-hidden="true">
         <span class="tool-hero-orbit tool-hero-orbit--a suite-hero-orbit suite-hero-orbit--a"></span>
         <span class="tool-hero-orbit tool-hero-orbit--b suite-hero-orbit suite-hero-orbit--b"></span>
@@ -41,7 +41,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
           <img src="/assets/newimagesuite.webp" alt="" class="suite-logo" aria-hidden="true" />
         </span>
       </span>
-      <span class="sr-only" data-i18n="suite.title">Image Suite</span>
+      <span class="sr-only" data-i18n="suite.title">iMage Suite</span>
     </h1>
 
     <div class="suite-grid">
@@ -199,6 +199,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       model: "u2netp",
       lib: `onnxruntime-web@${ORT_VERSION} + u2netp (Apache-2.0)`
     };
+    const ENCODE_TIMEOUT_MS = 12000;
     // License keys removed — plan is checked server-side via check-permission API
 
     function todayKey() {
@@ -513,11 +514,40 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       return canvas;
     }
 
+    function withTimeout(promise, timeoutMs, message) {
+      return new Promise((resolve, reject) => {
+        const timer = window.setTimeout(() => reject(new Error(message)), timeoutMs);
+        promise.then(
+          (value) => {
+            window.clearTimeout(timer);
+            resolve(value);
+          },
+          (error) => {
+            window.clearTimeout(timer);
+            reject(error);
+          }
+        );
+      });
+    }
+
     async function surfaceToBlob(surface, mime, quality) {
       if (typeof surface.convertToBlob === "function") {
-        return surface.convertToBlob({ type: mime, quality });
+        try {
+          return await withTimeout(
+            surface.convertToBlob({ type: mime, quality }),
+            ENCODE_TIMEOUT_MS,
+            `Encoding timed out for ${mime}.`
+          );
+        } catch (error) {
+          if (mime === "image/png") throw error;
+          return withTimeout(
+            surface.convertToBlob({ type: "image/png", quality: 1 }),
+            ENCODE_TIMEOUT_MS,
+            "PNG fallback encoding timed out."
+          );
+        }
       }
-      return canvasToBlob(surface, mime, quality);
+      return (await encodeCanvasWithFallback(surface, mime, quality)).blob;
     }
 
     // ── Background removal pipeline (U²-Net portable + onnxruntime-web) ────────
@@ -930,14 +960,64 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
 
     function canvasToBlob(canvas, mime, quality) {
       return new Promise((resolve, reject) => {
-        canvas.toBlob((blob) => {
-          if (!blob) {
-            reject(new Error("Failed to generate file."));
-            return;
+        if (!canvas || !canvas.width || !canvas.height) {
+          reject(new Error("Invalid canvas dimensions."));
+          return;
+        }
+        if (typeof canvas.toBlob !== "function") {
+          reject(new Error("This browser cannot encode canvas images."));
+          return;
+        }
+        let settled = false;
+        const timer = window.setTimeout(() => {
+          if (settled) return;
+          settled = true;
+          reject(new Error(`Encoding timed out for ${mime}.`));
+        }, ENCODE_TIMEOUT_MS);
+
+        try {
+          canvas.toBlob((blob) => {
+            if (settled) return;
+            settled = true;
+            window.clearTimeout(timer);
+            if (!blob) {
+              reject(new Error(`Failed to generate ${mime}.`));
+              return;
+            }
+            resolve(blob);
+          }, mime, quality);
+        } catch (error) {
+          if (!settled) {
+            settled = true;
+            window.clearTimeout(timer);
+            reject(error);
           }
-          resolve(blob);
-        }, mime, quality);
+        }
       });
+    }
+
+    async function encodeCanvasWithFallback(canvas, mime, quality) {
+      try {
+        const blob = await canvasToBlob(canvas, mime, quality);
+        return {
+          blob,
+          mime: blob.type || mime,
+          fallback: Boolean(blob.type && blob.type !== mime),
+        };
+      } catch (error) {
+        if (mime === "image/png") throw error;
+        const fallbackBlob = await canvasToBlob(canvas, "image/png", 1);
+        return {
+          blob: fallbackBlob,
+          mime: fallbackBlob.type || "image/png",
+          fallback: true,
+          requestedMime: mime,
+        };
+      }
+    }
+
+    function encodeFallbackMessage(requestedMime, actualMime) {
+      return `Your browser could not finish ${mimeToExtension(requestedMime).toUpperCase()} encoding, so Image Suite exported ${mimeToExtension(actualMime).toUpperCase()} instead.`;
     }
 
     async function processOne(item, tool, scale, mime, quality) {
@@ -1024,11 +1104,12 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       // Show progress before encoding
       updateProgressUI(60, tool === "compress" ? "compress" : "encode");
       
-      const blob = await canvasToBlob(
+      const encoded = await encodeCanvasWithFallback(
         canvas,
         mime,
         tool === "compress" ? quality : 0.95
       );
+      const blob = encoded.blob;
       
       // Mark as complete
       updateProgressUI(90, "encode");
@@ -1042,7 +1123,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         kept = true;
       }
 
-      const finalMime = kept ? (file.type || mime) : mime;
+      const finalMime = kept ? (file.type || mime) : encoded.mime;
 
       return {
         baseName,
@@ -1052,6 +1133,8 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         height: canvas.height,
         inputBytes: file.size,
         keptOriginal: kept,
+        encodeFallback: !kept && encoded.fallback,
+        requestedMime: encoded.requestedMime || mime,
         mimeType: finalMime,
         extension: kept
           ? (fileExtFromName(file.name) || mimeToExtension(finalMime, file.name))
@@ -1285,6 +1368,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         const totalInBytes = processedResults.reduce((sum, result) => sum + result.inputBytes, 0);
         const M = window.VxFileMetrics;
         const keptCount = processedResults.filter((result) => result.keptOriginal).length;
+        const fallbackResults = processedResults.filter((result) => result.encodeFallback);
         if (processedResults.length === 1) {
           outMeta.textContent = formatSingleResultMeta(processedResults[0]);
         } else {
@@ -1352,6 +1436,12 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
               )
             );
           }
+        } else if (fallbackResults.length > 0) {
+          const firstFallback = fallbackResults[0];
+          setResultHint(encodeFallbackMessage(firstFallback.requestedMime, firstFallback.mimeType), "warning");
+          setDropMessage(copy("suite.drop_done", "{files} processed successfully", {
+            files: fileCountLabel(processedResults.length),
+          }));
         } else {
           setResultHint("");
           setDropMessage(copy("suite.drop_done", "{files} processed successfully", {
