@@ -447,6 +447,78 @@
     }
   }
 
+  function confirmVxSpend(options) {
+    var config = options || {};
+    var cost = Number(config.cost || config.tokens || 0);
+    var text = config.message || ("Use " + cost + " VX from your balance for this premium action?");
+    var title = config.title || "Use VX for this action?";
+    track(config.tool || "lab", "vx_confirm_open", {
+      action: config.action || "premium_action",
+      cost: cost,
+    });
+    return new Promise(function (resolve) {
+      if (!openModal({
+        icon: "VX",
+        title: title,
+        message: text + "\n\nCost: " + cost + " VX",
+        primaryLabel: config.primaryLabel || ("Use " + cost + " VX"),
+        cancelLabel: config.cancelLabel || "Not now",
+        onConfirm: function () { resolve(true); },
+        onCancel: function () { resolve(false); },
+      })) {
+        resolve(window.confirm(text + "\n\nCost: " + cost + " VX"));
+      }
+    });
+  }
+
+  async function spendVxAction(options) {
+    var config = options || {};
+    var cost = Number(config.tokens || config.cost || 0);
+    var tool = config.tool || "lab";
+    var actionClass = config.actionClass || "pro";
+    if (!window.VxTokens || typeof window.VxTokens.spend !== "function") {
+      return { ok: false, error: "vx_not_ready" };
+    }
+    if (!hasAccessToken()) {
+      confirmLogin(
+        config.nextPath || currentReturnPath(),
+        config.loginMessage || ("Sign in to use " + cost + " VX for this action. You will return here after login.")
+      );
+      return { ok: false, error: "not_authenticated" };
+    }
+    var accepted = await confirmVxSpend({
+      tool: tool,
+      action: config.action || actionClass,
+      cost: cost,
+      title: config.title,
+      message: config.message,
+      primaryLabel: config.primaryLabel,
+      cancelLabel: config.cancelLabel,
+    });
+    if (!accepted) return { ok: false, error: "cancelled" };
+    var result = await window.VxTokens.spend(tool, actionClass, {
+      tokens: cost,
+      description: config.description,
+    });
+    if (result && result.ok) {
+      try {
+        window.dispatchEvent(new CustomEvent("vx:balance-changed", { detail: { balance: result.balance } }));
+      } catch (_) {}
+      track(tool, "vx_spend_success", {
+        action: config.action || actionClass,
+        cost: result.spent || cost,
+        balance: result.balance,
+      });
+    } else {
+      track(tool, "vx_spend_failed", {
+        action: config.action || actionClass,
+        cost: cost,
+        error: result && result.error ? result.error : "unknown",
+      });
+    }
+    return result || { ok: false, error: "unknown" };
+  }
+
   function notify(options) {
     var config = typeof options === "string" ? { message: options } : (options || {});
     track(config.tool || "lab", config.event || "notice_open", { title: config.title || "VOLYNX Lab" });
@@ -541,7 +613,7 @@
     return {
       converter: "Converter",
       "image-scaler": "Image Scaler",
-      "image-suite": "Image Suite",
+      "image-suite": "iMage Suite",
       lumina: "Lumina",
       "qr-gen": "QRGen",
       qr: "QRGen",
@@ -812,6 +884,8 @@
     shouldSendToLogin: shouldSendToLogin,
     confirmLogin: confirmLogin,
     confirmUpgrade: confirmUpgrade,
+    confirmVxSpend: confirmVxSpend,
+    spendVxAction: spendVxAction,
     notify: notify,
     openModal: openModal,
     recordEvent: recordEvent,

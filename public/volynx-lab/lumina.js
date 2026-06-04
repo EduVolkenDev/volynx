@@ -296,12 +296,14 @@ async function callLuminaAi(text, selectedMode, selectedLanguage) {
   const cfg = await getConfig();
   const functionsUrl = String(cfg.functionsUrl || `${String(cfg.supabaseUrl || "").replace(/\/$/, "")}/functions/v1`).replace(/\/$/, "");
   if (!functionsUrl || functionsUrl === "/functions/v1") throw new Error("Functions URL unavailable");
+  const token = localStorage.getItem("volynx_access_token") || "";
+  if (!token) throw new Error("Sign in to use Lumina AI; local mode is ready");
 
   const response = await fetch(`${functionsUrl}/ai-tools`, {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      ...(localStorage.getItem("volynx_access_token") ? { Authorization: `Bearer ${localStorage.getItem("volynx_access_token")}` } : {}),
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
       tool: "lumina",

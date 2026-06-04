@@ -7,6 +7,7 @@
   const USAGE_STORAGE_KEY = "volynx_qrgen_exports_v1";
   const FREE_EXPORT_LIMIT = 2;
   const SAVE_LIMIT_FREE = 3;
+  const VX_SVG_EXPORT_COST = 4;
   const DEBOUNCE_MS = 190;
   const ADMIN_EMAIL_ALLOWLIST = ["edupelomundo13@gmail.com"];
   const USER_QR_MANAGER_PATH = "/profile/qr-codes/";
@@ -1030,6 +1031,15 @@
     const locked = getSelectedLockedFeatures(state);
     if (locked.length) {
       const item = locked[0];
+      if (canUseVxForLockedExport(state, locked)) {
+        return {
+          ok: false,
+          kind: "warn",
+          action: "vx_svg_export",
+          cost: VX_SVG_EXPORT_COST,
+          message: `SVG vector export is included in QRGen Pro, or you can use ${VX_SVG_EXPORT_COST} VX for this export only.`
+        };
+      }
       return {
         ok: false,
         kind: "warn",
@@ -1046,6 +1056,47 @@
       };
     }
     return { ok: true };
+  }
+
+  function canUseVxForLockedExport(state, locked) {
+    return state.exportFormat === "svg"
+      && Array.isArray(locked)
+      && locked.length === 1
+      && locked[0].label === "SVG export";
+  }
+
+  async function spendVxForSvgExport(state) {
+    if (!window.VxLab || typeof window.VxLab.spendVxAction !== "function") {
+      setMessage("VX checkout is not ready yet. Try again in a moment or use QRGen Pro.", "err");
+      return false;
+    }
+    const result = await window.VxLab.spendVxAction({
+      tool: "qr-gen",
+      action: "svg_export",
+      actionClass: "pro",
+      tokens: VX_SVG_EXPORT_COST,
+      title: "Use VX for SVG export?",
+      message: `SVG is included in QRGen Pro. You can also spend ${VX_SVG_EXPORT_COST} VX now to export this one SVG without changing your plan.`,
+      loginMessage: `Sign in to use ${VX_SVG_EXPORT_COST} VX for SVG export. You will return to QRGen after login.`,
+      description: `QRGen SVG export: ${state.projectName || "QR project"}`
+    });
+    if (!result.ok) {
+      if (result.error === "cancelled") {
+        setMessage("SVG export cancelled. You can use PNG standard for free or upgrade to QRGen Pro.", "warn");
+      } else if (result.error === "not_authenticated") {
+        setMessage(`Sign in to use ${VX_SVG_EXPORT_COST} VX for SVG export.`, "warn", false);
+      } else {
+        setMessage(result.error === "insufficient_balance"
+          ? `Not enough VX for SVG export. This action needs ${VX_SVG_EXPORT_COST} VX.`
+          : "Could not spend VX for SVG export. Try again.",
+          "err",
+          false
+        );
+      }
+      return false;
+    }
+    setMessage(`VX confirmed. ${result.spent || VX_SVG_EXPORT_COST} VX used for this SVG export.`, "ok", false);
+    return true;
   }
 
   function getUsage() {
@@ -1089,6 +1140,13 @@
     const state = getState();
     const validation = validateExport(state);
     if (!validation.ok) {
+      if (validation.action === "vx_svg_export") {
+        setMessage(validation.message, validation.kind || "warn", false);
+        const paidWithVx = await spendVxForSvgExport(state);
+        if (!paidWithVx) return;
+        await exportQrFile(state, { vxCost: VX_SVG_EXPORT_COST });
+        return;
+      }
       if (validation.action === "login" && window.VxLab) {
         VxLab.confirmLogin(
           VxLab.currentReturnPath(),
@@ -1097,6 +1155,7 @@
         return;
       }
       if (validation.action === "upgrade" && window.VxLab) {
+        setMessage(validation.message, validation.kind || "warn", false);
         VxLab.confirmUpgrade(`${validation.message}\n\nClick OK to see upgrade options.`);
         return;
       }
@@ -1104,6 +1163,11 @@
       return;
     }
 
+    await exportQrFile(state);
+  }
+
+  async function exportQrFile(state, options) {
+    const exportOptions = options || {};
     const btn = $("qgExportBtn");
     const original = btn?.textContent;
     if (btn) {
@@ -1122,15 +1186,20 @@
           saveBlob(blob, `${fileNameForState(state)}.${extension}`);
           incrementUsage();
           if (window.VxLab) {
-            VxLab.recordEvent("qr-gen", "export", `${extension.toUpperCase()} exported`);
+            VxLab.recordEvent("qr-gen", "export", exportOptions.vxCost ? `${extension.toUpperCase()} exported via VX` : `${extension.toUpperCase()} exported`);
             VxLab.savePreset("qr-gen", {
               mode: state.mode,
               format: extension,
               color: state.colorMode,
               size: String(size),
+              payment: exportOptions.vxCost ? `${exportOptions.vxCost} VX` : "plan/free",
             });
           }
-          setMessage("Export complete. Test the QR before sending to print.", "ok");
+          setMessage(exportOptions.vxCost
+            ? `Export complete. ${exportOptions.vxCost} VX used for this SVG export. Test the QR before sending to print.`
+            : "Export complete. Test the QR before sending to print.",
+            "ok"
+          );
           return;
         }
       }
@@ -1138,15 +1207,20 @@
       await exportQr.download({ name: fileNameForState(state), extension });
       incrementUsage();
       if (window.VxLab) {
-        VxLab.recordEvent("qr-gen", "export", `${extension.toUpperCase()} exported`);
+        VxLab.recordEvent("qr-gen", "export", exportOptions.vxCost ? `${extension.toUpperCase()} exported via VX` : `${extension.toUpperCase()} exported`);
         VxLab.savePreset("qr-gen", {
           mode: state.mode,
           format: extension,
           color: state.colorMode,
           size: String(size),
+          payment: exportOptions.vxCost ? `${exportOptions.vxCost} VX` : "plan/free",
         });
       }
-      setMessage("Export complete. Test the QR before sending to print.", "ok");
+      setMessage(exportOptions.vxCost
+        ? `Export complete. ${exportOptions.vxCost} VX used for this SVG export. Test the QR before sending to print.`
+        : "Export complete. Test the QR before sending to print.",
+        "ok"
+      );
     } catch (err) {
       console.error("[qrgen] export failed", err);
       setMessage("Could not export this QR. Try PNG standard or simplify the design.", "err");

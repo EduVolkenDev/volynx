@@ -266,7 +266,7 @@ window.VX_TRANS = {
     "homevx.eco_studio_t":         "Studio",
     "homevx.eco_studio_d":         "Premium custom work. When DIY isn't enough, the studio takes over.",
     "homevx.eco_lab_t":            "Lab",
-    "homevx.eco_lab_d":            "Free experimental tools — converters, generators, AI image suite.",
+    "homevx.eco_lab_d":            "Free experimental tools — converters, generators, AI iMage Suite.",
     "homevx.eco_daily_t":          "VOLYNX Daily",
     "homevx.eco_daily_d":          "The operational layer for daily work. Scanner, summary, vault, decisions.",
     "homevx.eco_cvitae_t":         "CVitae",
@@ -281,7 +281,7 @@ window.VX_TRANS = {
     "homevx.tools_conv_d":         "WebP, PNG, JPG, AVIF — convert in-browser, no upload.",
     "homevx.tools_scaler_t":       "Image Scaler",
     "homevx.tools_scaler_d":       "Batch resize with precise presets and clean export.",
-    "homevx.tools_suite_t":        "Image Suite",
+    "homevx.tools_suite_t":        "iMage Suite",
     "homevx.tools_suite_d":        "Cleanup, crop, AI background-remove and export in one flow.",
     "homevx.tools_qr_t":           "QR Generator",
     "homevx.tools_qr_d":           "Premium branded QR codes with logo, palette, and ready exports.",
@@ -289,7 +289,7 @@ window.VX_TRANS = {
     "homevx.free_chip":            "Free forever",
     "homevx.free_title":           "Premium things you can use without paying a cent.",
     "homevx.free_1_t":             "All Lab tools, free",
-    "homevx.free_1_d":             "Converter, Image Scaler, Image Suite, QR Generator — full power, zero paywall.",
+    "homevx.free_1_d":             "Converter, Image Scaler, iMage Suite, QR Generator — full power, zero paywall.",
     "homevx.free_2_t":             "Free icon packs after signup",
     "homevx.free_2_d":             "Hundreds of curated icons unlocked the moment you create your account.",
     "homevx.free_3_t":             "CVitae — free to build",
@@ -570,7 +570,7 @@ window.VX_TRANS = {
 
     /* === IMAGE SUITE TOOL === */
     "suite.back":               "← Back",
-    "suite.title":              "Image Suite",
+    "suite.title":              "iMage Suite",
     "suite.card_upload":        "Upload & Config",
     "suite.btn_select":         "Select",
     "suite.drop_text":          "Drop images here or click to select",
@@ -1267,7 +1267,7 @@ window.VX_TRANS = {
     "studio.tool_converter_desc": "WebP, JPG, PNG, AVIF — batch convert with quality control and resize.",
     "studio.tool_scaler": "Image Scaler",
     "studio.tool_scaler_desc": "Upscale 2×, 3×, 4× — maximum resolution, zero quality loss.",
-    "studio.tool_suite": "Image Suite",
+    "studio.tool_suite": "iMage Suite",
     "studio.tool_suite_desc": "Upscale, compress, convert — all in one interface. Pro exclusive.",
     "studio.tool_qr": "QR Generator",
     "studio.tool_qr_desc": "Styled QR codes with logos, gradients, and high-res export.",
@@ -1399,7 +1399,7 @@ window.VX_TRANS = {
     "changelog.r2_title":   "Volynx Lab tools lineup",
     "changelog.r2_item1":   "Converter",
     "changelog.r2_item2":   "Image Scaler",
-    "changelog.r2_item3":   "Image Suite",
+    "changelog.r2_item3":   "iMage Suite",
     "changelog.r2_item4":   "QR Generator",
 
     /* === STATUS PAGE === */
@@ -1864,7 +1864,7 @@ window.VX_TRANS = {
     "home2.lab_tool_converter_desc": "Convert images across formats — WebP, PNG, JPG, AVIF — in-browser.",
     "home2.lab_tool_scaler_title": "Image Scaler",
     "home2.lab_tool_scaler_desc": "Resize images at scale with precise presets and a clean batch pipeline.",
-    "home2.lab_tool_suite_title": "Image Suite",
+    "home2.lab_tool_suite_title": "iMage Suite",
     "home2.lab_tool_suite_desc": "Cleanup, crop and export in one flow — designed for creators who ship.",
     "home2.lab_tool_qr_title": "QR Generator",
     "home2.lab_tool_qr_desc": "Premium branded QR codes with logo, palette and download-ready exports.",
@@ -1873,7 +1873,7 @@ window.VX_TRANS = {
     "home2.free_kicker": "Free forever",
     "home2.free_title": "Premium things you can use without paying a cent.",
     "home2.free_1_title": "All Lab tools, free",
-    "home2.free_1_desc": "Converter, Image Scaler, Image Suite, QR Generator — full power, zero paywall.",
+    "home2.free_1_desc": "Converter, Image Scaler, iMage Suite, QR Generator — full power, zero paywall.",
     "home2.free_2_title": "Free icon packs after signup",
     "home2.free_2_desc": "Hundreds of curated icons unlocked the moment you create your account.",
     "home2.free_3_title": "CVitae — free to build",
@@ -1883,7 +1883,7 @@ window.VX_TRANS = {
 
     // ── lab2 ──
     "lab2.btn_browse_tools": "Browse tools",
-    "lab2.btn_see_pro": "Open Image Suite",
+    "lab2.btn_see_pro": "Open iMage Suite",
     "lab2.cta_btn": "Open Studio",
     "lab2.cta_desc": "Pro unlocks batch workflows, saved presets, premium export modes and priority features. Work faster with tools built for serious production.",
     "lab2.cta_label": "Studio Pro",
@@ -1892,7 +1892,7 @@ window.VX_TRANS = {
     "lab2.hero_chip2": "Fast discovery",
     "lab2.hero_chip3": "Clear upgrade path",
     "lab2.hero_label": "Runs in the browser",
-    "lab2.hero_subtitle": "Converter, Image Scaler, Image Suite, Lumina and QRGen now share a cleaner workflow: use the tool, keep the preset, return from profile, and upgrade only when the limit is real.",
+    "lab2.hero_subtitle": "Converter, Image Scaler, iMage Suite, Lumina and QRGen now share a cleaner workflow: use the tool, keep the preset, return from profile, and upgrade only when the limit is real.",
     "lab2.hero_title": "One premium workspace for image, knowledge and QR production.",
     "lab2.kicker": "Local-first tools",
     "lab2.section_tools_desc": "Each free tool gets real use value, while the Pro state adds power and comfort instead of simply locking everything behind a wall.",
@@ -1928,7 +1928,7 @@ window.VX_TRANS = {
     "lab2.tool_suite_chip2": "Profile presets",
     "lab2.tool_suite_desc": "Upscale, compress, convert and remove backgrounds with saved presets and clear plan states.",
     "lab2.tool_suite_label": "Free + Pro",
-    "lab2.tool_suite_title": "Image Suite",
+    "lab2.tool_suite_title": "iMage Suite",
 
     // ── login2 ──
     // ── price ──
@@ -2692,7 +2692,7 @@ window.VX_TRANS = {
     "changelog.r2_title":   "Lineup de ferramentas do Volynx Lab",
     "changelog.r2_item1":   "Converter",
     "changelog.r2_item2":   "Image Scaler",
-    "changelog.r2_item3":   "Image Suite",
+    "changelog.r2_item3":   "iMage Suite",
     "changelog.r2_item4":   "QR Generator",
 
     /* === STATUS PAGE === */
@@ -2793,7 +2793,7 @@ window.VX_TRANS = {
     "homevx.eco_studio_t":         "Studio",
     "homevx.eco_studio_d":         "Trabalho premium sob medida. Quando não dá pra fazer sozinho, o studio entra.",
     "homevx.eco_lab_t":            "Lab",
-    "homevx.eco_lab_d":            "Ferramentas experimentais grátis — conversores, geradores, image suite com IA.",
+    "homevx.eco_lab_d":            "Ferramentas experimentais grátis — conversores, geradores, iMage Suite com IA.",
     "homevx.eco_daily_t":          "VOLYNX Daily",
     "homevx.eco_daily_d":          "A camada operacional do dia a dia. Scanner, summary, vault, decisões.",
     "homevx.eco_cvitae_t":         "CVitae",
@@ -2808,7 +2808,7 @@ window.VX_TRANS = {
     "homevx.tools_conv_d":         "WebP, PNG, JPG, AVIF — converta no browser, sem upload.",
     "homevx.tools_scaler_t":       "Image Scaler",
     "homevx.tools_scaler_d":       "Redimensione em lote com presets precisos e export limpo.",
-    "homevx.tools_suite_t":        "Image Suite",
+    "homevx.tools_suite_t":        "iMage Suite",
     "homevx.tools_suite_d":        "Cleanup, crop, remoção de fundo com IA e export num fluxo só.",
     "homevx.tools_qr_t":           "QR Generator",
     "homevx.tools_qr_d":           "QR codes premium com logo, paleta e export pronto pra usar.",
@@ -2816,7 +2816,7 @@ window.VX_TRANS = {
     "homevx.free_chip":            "Grátis pra sempre",
     "homevx.free_title":           "Coisas premium que você usa sem pagar um centavo.",
     "homevx.free_1_t":             "Todas as ferramentas do Lab, grátis",
-    "homevx.free_1_d":             "Converter, Image Scaler, Image Suite, QR Generator — poder completo, zero paywall.",
+    "homevx.free_1_d":             "Converter, Image Scaler, iMage Suite, QR Generator — poder completo, zero paywall.",
     "homevx.free_2_t":             "Pacotes de ícones grátis após o signup",
     "homevx.free_2_d":             "Centenas de ícones curados liberados no momento que você cria sua conta.",
     "homevx.free_3_t":             "CVitae — grátis pra construir",
@@ -3097,7 +3097,7 @@ window.VX_TRANS = {
 
     /* === IMAGE SUITE TOOL === */
     "suite.back":               "← Voltar",
-    "suite.title":              "Image Suite",
+    "suite.title":              "iMage Suite",
     "suite.card_upload":        "Upload & Config",
     "suite.btn_select":         "Selecionar",
     "suite.drop_text":          "Arraste imagens aqui ou clique para selecionar",
@@ -3794,7 +3794,7 @@ window.VX_TRANS = {
     "studio.tool_converter_desc": "WebP, JPG, PNG, AVIF — conversão em lote com controle de qualidade e redimensionamento.",
     "studio.tool_scaler": "Image Scaler",
     "studio.tool_scaler_desc": "Upscale 2×, 3×, 4× — resolução máxima, zero perda de qualidade.",
-    "studio.tool_suite": "Image Suite",
+    "studio.tool_suite": "iMage Suite",
     "studio.tool_suite_desc": "Upscale, comprimir, converter — tudo em uma interface. Exclusivo Pro.",
     "studio.tool_qr": "QR Generator",
     "studio.tool_qr_desc": "QR codes estilizados com logos, gradientes e exportação em alta resolução.",
@@ -4351,7 +4351,7 @@ window.VX_TRANS = {
     "home2.lab_tool_converter_desc": "Converta imagens entre formatos — WebP, PNG, JPG, AVIF — no próprio navegador.",
     "home2.lab_tool_scaler_title": "Image Scaler",
     "home2.lab_tool_scaler_desc": "Redimensione imagens em escala com presets precisos e pipeline de batch limpo.",
-    "home2.lab_tool_suite_title": "Image Suite",
+    "home2.lab_tool_suite_title": "iMage Suite",
     "home2.lab_tool_suite_desc": "Limpar, cortar e exportar num fluxo só — feito pra criador que publica.",
     "home2.lab_tool_qr_title": "QR Generator",
     "home2.lab_tool_qr_desc": "QR codes premium com logo, paleta e exports prontos pra download.",
@@ -4360,7 +4360,7 @@ window.VX_TRANS = {
     "home2.free_kicker": "Grátis pra sempre",
     "home2.free_title": "Coisas premium que você pode usar sem pagar um centavo.",
     "home2.free_1_title": "Todas as ferramentas do Lab, grátis",
-    "home2.free_1_desc": "Converter, Image Scaler, Image Suite, QR Generator — poder total, zero paywall.",
+    "home2.free_1_desc": "Converter, Image Scaler, iMage Suite, QR Generator — poder total, zero paywall.",
     "home2.free_2_title": "Packs de ícones grátis ao cadastrar",
     "home2.free_2_desc": "Centenas de ícones curados desbloqueados no momento em que você cria sua conta.",
     "home2.free_3_title": "CVitae — grátis pra construir",
@@ -4370,7 +4370,7 @@ window.VX_TRANS = {
 
     // ── lab2 ──
     "lab2.btn_browse_tools": "Explorar ferramentas",
-    "lab2.btn_see_pro": "Abrir Image Suite",
+    "lab2.btn_see_pro": "Abrir iMage Suite",
     "lab2.cta_btn": "Abrir Studio",
     "lab2.cta_desc": "Pro libera fluxos de lote, presets salvos, modos de exportação premium e recursos prioritários. Trabalhe mais rápido com ferramentas feitas para produção séria.",
     "lab2.cta_label": "Studio Pro",
@@ -4379,7 +4379,7 @@ window.VX_TRANS = {
     "lab2.hero_chip2": "Descoberta rápida",
     "lab2.hero_chip3": "Caminho de upgrade claro",
     "lab2.hero_label": "Roda no navegador",
-    "lab2.hero_subtitle": "Converter, Image Scaler, Image Suite, Lumina e QRGen agora compartilham um fluxo mais limpo: use a ferramenta, mantenha o preset, retome pelo perfil e faça upgrade só quando o limite for real.",
+    "lab2.hero_subtitle": "Converter, Image Scaler, iMage Suite, Lumina e QRGen agora compartilham um fluxo mais limpo: use a ferramenta, mantenha o preset, retome pelo perfil e faça upgrade só quando o limite for real.",
     "lab2.hero_title": "Um workspace premium para imagem, conhecimento e produção de QR.",
     "lab2.kicker": "Ferramentas local-first",
     "lab2.section_tools_desc": "Cada ferramenta grátis tem valor real de uso, enquanto o estado Pro adiciona poder e conforto em vez de simplesmente trancar tudo atrás de um muro.",
@@ -4415,7 +4415,7 @@ window.VX_TRANS = {
     "lab2.tool_suite_chip2": "Presets no perfil",
     "lab2.tool_suite_desc": "Upscale, compressão, conversão e remoção de fundo com presets salvos e estados de plano claros.",
     "lab2.tool_suite_label": "Free + Pro",
-    "lab2.tool_suite_title": "Image Suite",
+    "lab2.tool_suite_title": "iMage Suite",
 
     // ── login2 ──
     "login2.btn_compare": "Comparar Grátis vs Pro",

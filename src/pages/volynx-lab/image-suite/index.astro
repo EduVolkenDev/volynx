@@ -8,8 +8,8 @@ import LabUpgradeBanner from "../../../components/LabUpgradeBanner.astro";
 import Topbar from "../../../components/Topbar.astro";
 import LabToolShell from "../../../components/LabToolShell.astro";
 
-const pageTitle = "VOLYNX Lab • Image Suite";
-const pageDescription = "Local-first image suite — upscale, compress, convert and remove backgrounds directly in your browser, no upload required.";
+const pageTitle = "VOLYNX Lab • iMage Suite";
+const pageDescription = "Local-first iMage Suite — upscale, compress, convert and remove backgrounds directly in your browser, no upload required.";
 ---
 
 <!DOCTYPE html>
@@ -32,7 +32,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
   <LabToolShell active="suite" />
 
   <main class="wrap">
-    <h1 class="tool-hero-title suite-logo-title" aria-label="Image Suite">
+    <h1 class="tool-hero-title suite-logo-title" aria-label="iMage Suite">
       <span class="tool-hero-stage suite-hero-stage" aria-hidden="true">
         <span class="tool-hero-orbit tool-hero-orbit--a suite-hero-orbit suite-hero-orbit--a"></span>
         <span class="tool-hero-orbit tool-hero-orbit--b suite-hero-orbit suite-hero-orbit--b"></span>
@@ -41,7 +41,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
           <img src="/assets/newimagesuite.webp" alt="" class="suite-logo" aria-hidden="true" />
         </span>
       </span>
-      <span class="sr-only" data-i18n="suite.title">Image Suite</span>
+      <span class="sr-only" data-i18n="suite.title">iMage Suite</span>
     </h1>
 
     <div class="suite-grid">
@@ -254,7 +254,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
               limit: perm.limit,
               source: 'server',
             };
-            // Anonymous/free Image Suite usage still relies on the local daily
+            // Anonymous/free iMage Suite usage still relies on the local daily
             // counter. Some deployments return limit=0 until a user token is
             // present, which made the compressor look broken because "Process"
             // immediately hit a confirm instead of falling back to the local
@@ -1017,7 +1017,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
     }
 
     function encodeFallbackMessage(requestedMime, actualMime) {
-      return `Your browser could not finish ${mimeToExtension(requestedMime).toUpperCase()} encoding, so Image Suite exported ${mimeToExtension(actualMime).toUpperCase()} instead.`;
+      return `Your browser could not finish ${mimeToExtension(requestedMime).toUpperCase()} encoding, so iMage Suite exported ${mimeToExtension(actualMime).toUpperCase()} instead.`;
     }
 
     async function processOne(item, tool, scale, mime, quality) {
@@ -1223,7 +1223,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       VxLab.renderToolPresets("image-suite", {
         anchor: ".field-group",
         apply: applySuitePreset,
-        emptyText: "Process an image once and your Image Suite recipe appears here.",
+        emptyText: "Process an image once and your iMage Suite recipe appears here.",
       });
     }
 
@@ -1289,7 +1289,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
           if (window.VxLab?.shouldSendToLogin(perm)) {
             VxLab.confirmLogin(
               returnPath,
-              "Sign in to continue in Image Suite. You will return to this exact tool after login."
+              "Sign in to continue in iMage Suite. You will return to this exact tool after login."
             );
             return;
           }
@@ -1471,7 +1471,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         downloadBtn.disabled = false;
       } catch (error) {
         console.error(error);
-        labNotify("Processing failed", t("suite.alert_process_error", "Image Suite could not process this image. Try a smaller file or another format."), "error");
+        labNotify("Processing failed", t("suite.alert_process_error", "iMage Suite could not process this image. Try a smaller file or another format."), "error");
         setDropMessage(t("suite.drop_error", "Error processing files"));
         setResultHint("");
       } finally {
