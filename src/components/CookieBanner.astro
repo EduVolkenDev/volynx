@@ -233,11 +233,12 @@ import { ROUTES } from "../data/routes";
   }
 
   @media (max-width: 480px) {
-    .vx-cookie { inset: auto 8px 8px 8px; max-width: 100vw; }
+    .vx-cookie { inset: auto 8px max(8px, env(safe-area-inset-bottom)) 8px; max-width: 100vw; }
     .vx-cookie__card {
       width: calc(100vw - 16px);
       max-width: calc(100vw - 16px);
-      max-height: 136px;
+      max-height: min(46vh, 260px);
+      overflow: auto;
       box-shadow: 0 14px 34px rgba(0, 0, 0, 0.62), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
       border-radius: 12px;
     }
@@ -259,9 +260,9 @@ import { ROUTES } from "../data/routes";
     .vx-cookie__text {
       padding: 3px 12px 0;
       font-size: 11px;
-      line-height: 1.25;
+      line-height: 1.35;
       display: -webkit-box;
-      -webkit-line-clamp: 1;
+      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
@@ -272,9 +273,9 @@ import { ROUTES } from "../data/routes";
     }
     .vx-cbtn {
       flex: 1;
-      padding: 6px 8px;
-      min-height: 34px;
-      font-size: 9px;
+      padding: 8px 10px;
+      min-height: 42px;
+      font-size: 10px;
       letter-spacing: 0.04em;
     }
     .vx-cbtn--primary {
@@ -282,11 +283,13 @@ import { ROUTES } from "../data/routes";
     }
     .vx-cookie__link {
       position: absolute;
-      top: 12px;
+      top: 10px;
       right: 12px;
-      padding: 0;
-      min-height: auto;
-      font-size: 9px;
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 0 0 0 10px;
+      font-size: 10px;
     }
   }
 </style>
