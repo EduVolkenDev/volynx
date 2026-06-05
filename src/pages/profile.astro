@@ -328,7 +328,7 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 						<span class="token-balance-number" id="tokenBalance">—</span>
 						<span class="token-balance-label" data-i18n="profile.tokens_available">VX available</span>
 					</div>
-					<div class="vx-actions" style="display:flex;flex-wrap:wrap;gap:8px;">
+					<div class="token-actions">
 						<a href={ROUTES.recarregar} class="btn btn--sm" id="buyTokensBtn" data-i18n="profile.btn_tokens">Get VX</a>
 						<a href="#tokenHistory" class="btn btn--sm btn--ghost" data-i18n="profile.btn_view_usage">View usage</a>
 						<a href={ROUTES.pricing} class="btn btn--sm btn--ghost" data-i18n="profile.btn_see_plans">See plans</a>
@@ -371,7 +371,7 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 				</div>
 			</section>
 
-			<section class="glass-section" id="iconPurchasesSection" style="display:none;">
+			<section class="glass-section purchases-section" id="iconPurchasesSection" style="display:none;">
 				<div class="section-headline">
 					<div>
 						<div class="section-label">Your icon purchases</div>
@@ -412,36 +412,36 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 			</section>
 
 			<section class="bottom-grid">
-				<div class="glass-section glass-section--compact">
+				<div class="glass-section glass-section--compact activity-section">
 					<div class="section-label" data-i18n="profile.section_activity">Activity</div>
 					<div class="timeline-row"><div class="dot"></div><div><strong data-i18n="profile.activity_created">Account created</strong><br/><span id="activityJoined" class="text-muted">—</span></div></div>
 				</div>
-				<div class="glass-section glass-section--compact">
+				<div class="glass-section glass-section--compact security-section">
 					<div class="section-label" data-i18n="profile.section_security">Security</div>
 					<div class="info-row"><span data-i18n="profile.security_password">Password</span><strong data-i18n="profile.security_set">Set</strong></div>
-					<div class="info-row" style="margin-top:8px;">
+					<div class="info-row security-action-row">
 						<button type="button" class="btn btn--sm" id="changePasswordBtn" data-i18n="profile.change_password">Change password</button>
 					</div>
-					<div id="passwordForm" hidden style="margin-top:12px;">
-						<div style="display:grid;gap:8px;">
-							<input id="newPassword" type="password" placeholder="New password (min 6 chars)" data-i18n-placeholder="profile.password_new_ph" minlength="6" class="field-input" style="padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#fff;font-size:.9rem;" />
-							<input id="confirmPassword" type="password" placeholder="Confirm new password" data-i18n-placeholder="profile.password_confirm_ph" class="field-input" style="padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#fff;font-size:.9rem;" />
-							<div style="display:flex;gap:8px;align-items:center;">
+					<div id="passwordForm" class="password-form" hidden>
+						<div class="password-form__grid">
+							<input id="newPassword" type="password" placeholder="New password (min 6 chars)" data-i18n-placeholder="profile.password_new_ph" minlength="6" class="field-input" />
+							<input id="confirmPassword" type="password" placeholder="Confirm new password" data-i18n-placeholder="profile.password_confirm_ph" class="field-input" />
+							<div class="password-actions">
 								<button type="button" class="btn btn--sm" id="savePasswordBtn" data-i18n="profile.password_save">Save password</button>
 								<button type="button" class="btn btn--sm btn--ghost" id="cancelPasswordBtn" data-i18n="profile.password_cancel">Cancel</button>
-								<span id="passwordMsg" style="font-size:.8rem;"></span>
+								<span id="passwordMsg" class="password-msg"></span>
 							</div>
 						</div>
 					</div>
-					<div class="info-row" style="margin-top:8px;"><span data-i18n="profile.security_2fa">2FA</span><strong data-i18n="profile.security_not_enabled">Not enabled</strong></div>
+					<div class="info-row security-2fa-row"><span data-i18n="profile.security_2fa">2FA</span><strong data-i18n="profile.security_not_enabled">Not enabled</strong></div>
 				</div>
 			</section>
 
-			<section class="glass-section" style="margin-top:20px;">
-				<div class="section-head" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+			<section class="glass-section session-section">
+				<div class="session-head">
 					<div>
-						<h3 style="margin:0 0 4px;font-size:1rem;" data-i18n="profile.session_title">Session</h3>
-						<p style="margin:0;color:rgba(255,255,255,.55);font-size:.85rem;" data-i18n="profile.session_desc">End your VOLYNX session on this device.</p>
+						<h3 data-i18n="profile.session_title">Session</h3>
+						<p data-i18n="profile.session_desc">End your VOLYNX session on this device.</p>
 					</div>
 					<button type="button" class="btn btn--ghost logout-btn" id="logoutBtn" data-i18n="profile.sign_out">Sign out</button>
 				</div>
@@ -2069,6 +2069,7 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 	.token-balance-display { display: flex; align-items: baseline; gap: 10px; }
 	.token-balance-number { font-size: 2.4rem; font-weight: 800; color: var(--tier-accent); line-height: 1; }
 	.token-balance-label { font-size: .85rem; color: var(--muted); }
+	.token-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 	.token-history { display: grid; gap: 0; }
 	.token-tx { display: flex; gap: 20px; align-items: center; font-weight: 800;
 		padding: 10px 0; border-top: 1px solid rgba(255,255,255,.04); font-size: .84rem; }
@@ -2076,6 +2077,12 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 	.token-tx-desc { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 	.token-tx-amount { font-weight: 700; font-variant-numeric: tabular-nums; }
 	.token-tx-date { color: var(--muted); font-size: .78rem; }
+	:global(.token-tx) { display: flex; gap: 20px; align-items: center; font-weight: 800;
+		padding: 10px 0; border-top: 1px solid rgba(255,255,255,.04); font-size: .84rem; }
+	:global(.token-tx:first-child) { border-top: none; }
+	:global(.token-tx-desc) { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	:global(.token-tx-amount) { font-weight: 700; font-variant-numeric: tabular-nums; }
+	:global(.token-tx-date) { color: var(--muted); font-size: .78rem; }
 
 	.section-label { font-size: .7rem; font-weight: 700; text-transform: uppercase;
 		letter-spacing: .12em; color: var(--tier-accent); margin-bottom: 18px; opacity: .8; }
@@ -2477,6 +2484,98 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 	}
 	.icon-purchases-empty strong { font-size: .92rem; }
 	.icon-purchases-empty span { color: var(--muted); font-size: .82rem; }
+	:global(.icon-purchase-card) {
+		display: grid;
+		grid-template-columns: 112px 1fr auto;
+		align-items: center;
+		gap: 18px;
+		padding: 18px;
+		border-radius: 18px;
+		background: rgba(255,255,255,.03);
+		border: 1px solid rgba(255,255,255,.06);
+		transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+	}
+	:global(.icon-purchase-card:hover) {
+		transform: translateY(-2px);
+		border-color: color-mix(in srgb, var(--tier-accent) 30%, transparent);
+		box-shadow: 0 14px 32px color-mix(in srgb, var(--tier-accent) 14%, transparent), 0 6px 14px color-mix(in srgb, var(--tier-accent-2) 10%, transparent);
+	}
+	:global(.icon-purchase-card__preview) {
+		width: 112px;
+		height: 112px;
+		border-radius: 22px;
+		display: grid;
+		place-items: center;
+		background: linear-gradient(135deg, color-mix(in srgb, var(--tier-accent) 18%, transparent), color-mix(in srgb, var(--tier-accent-2) 20%, transparent));
+		border: 1px solid rgba(255,255,255,.08);
+		overflow: hidden;
+		box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+		transition: transform .3s ease;
+	}
+	:global(.icon-purchase-card__preview img) {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+		padding: 6px;
+		display: block;
+		filter: drop-shadow(0 0 10px color-mix(in srgb, var(--tier-accent) 45%, transparent)) drop-shadow(0 14px 28px color-mix(in srgb, var(--tier-accent-2) 22%, transparent));
+		transition: transform .3s ease, filter .3s ease;
+	}
+	:global(.icon-purchase-card__preview span) {
+		color: rgba(255,255,255,.62);
+		font-size: .68rem;
+		font-weight: 800;
+		text-transform: uppercase;
+		letter-spacing: .08em;
+	}
+	:global(.icon-purchase-card__body) { min-width: 0; }
+	:global(.icon-purchase-card__topline) { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 5px; }
+	:global(.icon-purchase-card__topline span) {
+		padding: 3px 8px;
+		border-radius: 999px;
+		background: rgba(255,255,255,.04);
+		color: rgba(255,255,255,.48);
+		font-size: .66rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: .07em;
+	}
+	:global(.icon-purchase-card h3) { margin: 0; font-size: 1rem; line-height: 1.25; }
+	:global(.icon-purchase-card p) { margin: 4px 0 0; color: var(--muted); font-size: .82rem; line-height: 1.4; }
+	:global(.icon-purchase-card__meta) { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; color: rgba(255,255,255,.38); font-size: .72rem; }
+	:global(.icon-delivery-btn) {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 128px;
+		min-height: 38px;
+		padding: 6px 16px;
+		border-radius: 999px;
+		border: 1px solid color-mix(in srgb, var(--tier-accent) 34%, transparent);
+		background: linear-gradient(135deg, color-mix(in srgb, var(--tier-accent) 18%, transparent), color-mix(in srgb, var(--tier-accent-2) 14%, transparent));
+		color: var(--tier-accent);
+		font-size: .82rem;
+		font-weight: 700;
+		white-space: nowrap;
+	}
+	:global(.icon-delivery-btn:disabled) { opacity: .68; cursor: wait; transform: none; }
+	:global(.icon-purchases-empty) {
+		display: grid;
+		gap: 4px;
+		padding: 18px;
+		border-radius: 14px;
+		background: rgba(255,255,255,.025);
+		border: 1px dashed rgba(255,255,255,.09);
+	}
+	:global(.icon-purchases-empty strong) { font-size: .92rem; }
+	:global(.icon-purchases-empty span) { color: var(--muted); font-size: .82rem; }
+
+	.purchases-section {
+		border-color: color-mix(in srgb, var(--tier-accent) 14%, transparent);
+		background:
+			radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--tier-accent) 9%, transparent), transparent 34%),
+			var(--glass);
+	}
 
 	/* Quick access grid */
 	.quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
@@ -2505,6 +2604,67 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 	.info-row:last-child { border-bottom: 0; }
 	.info-row span { color: var(--muted); }
 	.info-row strong { font-weight: 500; }
+	.activity-section,
+	.security-section,
+	.session-section {
+		background:
+			linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02)),
+			rgba(0,0,0,.08);
+	}
+	.security-action-row,
+	.security-2fa-row {
+		margin-top: 10px;
+	}
+	.password-form { margin-top: 14px; }
+	.password-form__grid { display: grid; gap: 10px; }
+	.field-input {
+		width: 100%;
+		min-height: 42px;
+		padding: 11px 14px;
+		border-radius: 12px;
+		border: 1px solid rgba(255,255,255,.08);
+		background: rgba(0,0,0,.18);
+		color: #fff;
+		font-size: .9rem;
+		outline: none;
+		transition: border-color .15s, box-shadow .15s, background .15s;
+	}
+	.field-input:focus {
+		border-color: color-mix(in srgb, var(--tier-accent) 34%, transparent);
+		background: rgba(0,0,0,.24);
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--tier-accent) 9%, transparent);
+	}
+	.password-actions {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-wrap: wrap;
+	}
+	.password-msg {
+		min-width: 0;
+		color: var(--muted);
+		font-size: .8rem;
+		line-height: 1.4;
+	}
+	.session-section { margin-top: 20px; }
+	.session-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 14px;
+		flex-wrap: wrap;
+	}
+	.session-head h3 {
+		margin: 0 0 5px;
+		font-size: 1rem;
+		letter-spacing: -.01em;
+	}
+	.session-head p {
+		margin: 0;
+		color: rgba(255,255,255,.55);
+		font-size: .85rem;
+		line-height: 1.5;
+	}
 
 	@media (max-width: 900px) {
 		.details-strip { grid-template-columns: 1fr 1fr; }
@@ -2538,8 +2698,8 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 			max-width: calc(100vw - 28px);
 		}
 		#viewProfile {
-			gap: 18px;
-			padding-bottom: 44px;
+			gap: 22px;
+			padding-bottom: 52px;
 		}
 		.banner {
 			padding: 14px;
@@ -2641,8 +2801,11 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 		}
 		.form-grid { grid-template-columns: 1fr; }
 		.glass-section {
-			padding: 18px 16px;
-			border-radius: 18px;
+			padding: 20px;
+			border-radius: 20px;
+			background:
+				linear-gradient(180deg, rgba(255,255,255,.048), rgba(255,255,255,.024)),
+				rgba(0,0,0,.08);
 		}
 		.section-headline {
 			display: grid;
@@ -2734,9 +2897,30 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 		}
 		.quick-card__icon { width: 96px; height: 96px; }
 		.quick-card__icon img { width: 76px; height: 76px; }
-		.icon-purchase-card { grid-template-columns: 88px 1fr; }
+		.icon-purchase-card {
+			grid-template-columns: 88px 1fr;
+			gap: 12px;
+			padding: 14px;
+			border-radius: 18px;
+		}
+		:global(.icon-purchase-card) {
+			grid-template-columns: 88px 1fr;
+			gap: 12px;
+			padding: 14px;
+			border-radius: 18px;
+		}
 		.icon-purchase-card__preview { width: 88px; height: 88px; border-radius: 18px; }
-		.icon-delivery-btn { grid-column: 1 / -1; width: 100%; }
+		:global(.icon-purchase-card__preview) { width: 88px; height: 88px; border-radius: 18px; }
+		.icon-purchase-card__body { min-width: 0; }
+		:global(.icon-purchase-card__body) { min-width: 0; }
+		.icon-purchase-card h3,
+		.icon-purchase-card p,
+		.icon-purchase-card__meta { overflow-wrap: anywhere; }
+		:global(.icon-purchase-card h3),
+		:global(.icon-purchase-card p),
+		:global(.icon-purchase-card__meta) { overflow-wrap: anywhere; }
+		.icon-delivery-btn { grid-column: 1 / -1; width: 100%; border-radius: 999px; }
+		:global(.icon-delivery-btn) { grid-column: 1 / -1; width: 100%; border-radius: 999px; }
 		.quick-grid {
 			grid-template-columns: 1fr;
 			gap: 10px;
@@ -2766,42 +2950,101 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 		.token-overview {
 			display: grid;
 			grid-template-columns: 1fr;
-			gap: 14px;
-			margin-bottom: 14px;
+			gap: 16px;
+			margin-bottom: 16px;
 		}
 		.token-balance-display {
 			justify-content: space-between;
-			padding: 14px;
-			border: 1px solid rgba(0,232,197,.12);
-			border-radius: 16px;
-			background: rgba(0,232,197,.045);
+			align-items: center;
+			padding: 16px;
+			border: 1px solid color-mix(in srgb, var(--tier-accent) 20%, transparent);
+			border-radius: 18px;
+			background:
+				linear-gradient(135deg, color-mix(in srgb, var(--tier-accent) 10%, transparent), color-mix(in srgb, var(--tier-accent-2) 7%, transparent)),
+				rgba(0,0,0,.18);
+			box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
 		}
 		.token-balance-number {
-			font-size: 2rem;
+			font-size: 2.15rem;
 		}
-		.vx-actions {
+		.token-actions {
 			display: grid !important;
 			grid-template-columns: 1fr;
+			gap: 10px;
+		}
+		.vx-support {
+			margin-top: 14px !important;
+			padding: 12px;
+			border: 1px solid rgba(255,255,255,.06);
+			border-radius: 14px;
+			background: rgba(255,255,255,.025);
+		}
+		.token-history {
+			margin-top: 12px;
+			border-radius: 14px;
+			overflow: hidden;
+			border: 1px solid rgba(255,255,255,.055);
+			background: rgba(0,0,0,.12);
 		}
 		.bottom-grid {
-			gap: 10px;
+			gap: 14px;
 		}
 		.info-row {
 			gap: 12px;
 			align-items: center;
+			padding: 12px 0;
 		}
 		.info-row > * {
 			min-width: 0;
 		}
 		.form-footer { flex-direction: column; }
+		.security-section .btn,
+		.session-section .btn,
+		.token-section .btn,
+		.purchases-section .btn,
 		.btn {
 			width: 100%;
 			min-height: 42px;
 			padding-inline: 16px;
 			white-space: normal;
 			text-align: center;
+			border-radius: 999px;
 		}
-		.token-tx { grid-template-columns: 1fr; gap: 4px; }
+		.security-action-row {
+			border-bottom: 0;
+			padding-bottom: 0;
+		}
+		.password-form {
+			margin-top: 16px;
+			padding: 12px;
+			border: 1px solid rgba(255,255,255,.06);
+			border-radius: 16px;
+			background: rgba(0,0,0,.14);
+		}
+		.password-actions {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 10px;
+		}
+		.password-msg {
+			display: block;
+			text-align: center;
+		}
+		.session-section {
+			margin-top: 0;
+		}
+		.session-head {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 14px;
+		}
+		.token-tx,
+		:global(.token-tx) {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 4px;
+			padding: 12px;
+		}
 	}
 
 	@media (max-width: 420px) {
@@ -2823,7 +3066,14 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 		.icon-purchase-card {
 			grid-template-columns: 1fr;
 		}
+		:global(.icon-purchase-card) {
+			grid-template-columns: 1fr;
+		}
 		.icon-purchase-card__preview {
+			width: 100%;
+			height: 140px;
+		}
+		:global(.icon-purchase-card__preview) {
 			width: 100%;
 			height: 140px;
 		}
