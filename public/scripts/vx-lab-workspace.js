@@ -5,6 +5,7 @@
   var PRESETS_KEY = "volynx_lab_presets";
   var ANALYTICS_KEY = "volynx_lab_analytics";
   var STATUS_KEY = "volynx_lab_status";
+  var QRGEN_PROJECTS_KEY = "volynx_qrgen_projects_v1";
   var MAX_ITEMS = 12;
   var MAX_ANALYTICS = 80;
   var configPromise = null;
@@ -728,6 +729,14 @@
     return count === 1 ? one : many;
   }
 
+  function qrProjectSummary(project) {
+    var state = project && project.state ? project.state : {};
+    var mode = state.type === "dynamic" ? "Dynamic" : "Static";
+    var target = state.type === "dynamic" ? state.dynamicTarget : state.content;
+    var style = state.colorMode ? String(state.colorMode).replace(/-/g, " ") : "";
+    return [mode, target || "", style].filter(Boolean).join(" · ");
+  }
+
   function renderSummaryCard(label, value, detail) {
     return '<div class="lab-profile-summary-card"><span>' + escapeHtml(label) + '</span><strong>' + escapeHtml(value) + '</strong><em>' + escapeHtml(detail || "") + '</em></div>';
   }
@@ -760,6 +769,16 @@
     }
 
     var presets = readJson(PRESETS_KEY, []);
+    var qrProjects = readJson(QRGEN_PROJECTS_KEY, []);
+    if (qrProjects.length) {
+      return {
+        path: "/qrgen/",
+        label: "Continue QRGen",
+        source: "qr-project",
+        item: qrProjects[0],
+      };
+    }
+
     for (var j = 0; j < presets.length; j++) {
       var preset = presets[j] || {};
       var presetPath = safePath(preset.path);
@@ -809,16 +828,21 @@
     if (!root) return;
     var history = readJson(HISTORY_KEY, []);
     var presets = readJson(PRESETS_KEY, []);
+    var qrProjects = readJson(QRGEN_PROJECTS_KEY, []);
     var summaryEl = root.querySelector("[data-lab-summary]");
     var historyEl = root.querySelector("[data-lab-history]");
     var presetsEl = root.querySelector("[data-lab-presets]");
+    var qrProjectsEl = root.querySelector("[data-qr-projects]");
     var continueTarget = getContinueTarget({ allowPending: false });
 
     if (summaryEl) {
       var usefulHistory = history.filter(function (item) {
         return item && !isPassiveAction(item.action) && isUsefulLabPath(safePath(item.path));
       });
-      var latest = usefulHistory[0] || history[0] || presets[0] || null;
+      var qrProjectActivity = qrProjects.map(function (item) {
+        return { tool: "qr-gen", ts: item.updated_at || item.created_at || "", path: "/qrgen/" };
+      });
+      var latest = usefulHistory[0] || history[0] || presets[0] || qrProjectActivity[0] || null;
       var latestLabel = latest ? toolLabel(latest.tool) : "Lab";
       var latestDetail = latest && latest.ts ? formatTime(latest.ts) : "Ready when you are";
       var continuePath = isSafeRelativePath(continueTarget.path) ? continueTarget.path : "/volynx-lab/";
@@ -826,7 +850,8 @@
         renderSummaryCard("Last workspace", latestLabel, latestDetail),
         renderSummaryCard("Recent actions", String(history.length), plural(history.length, "recorded action", "recorded actions")),
         renderSummaryCard("Saved presets", String(presets.length), plural(presets.length, "reusable recipe", "reusable recipes")),
-        renderSummaryCard("Tools touched", String(uniqueToolCount(history.concat(presets))), "across VOLYNX Lab"),
+        renderSummaryCard("QR projects", String(qrProjects.length), plural(qrProjects.length, "saved draft", "saved drafts")),
+        renderSummaryCard("Tools touched", String(uniqueToolCount(history.concat(presets).concat(qrProjectActivity))), "across VOLYNX Lab"),
         '<a class="lab-profile-summary-card lab-profile-summary-card--cta" href="' + escapeHtml(continuePath) + '"><span>Continue</span><strong>' + escapeHtml(continueTarget.label) + '</strong><em>Open the most relevant Lab workspace</em></a>'
       ].join("");
     }
@@ -848,6 +873,14 @@
             return '<a class="lab-profile-row" href="' + escapeHtml(safePath(item.path)) + '"><strong>' + escapeHtml(toolLabel(item.tool)) + '</strong><span>' + escapeHtml(summary) + '</span><em>' + escapeHtml(formatTime(item.ts)) + '</em></a>';
           }).join("")
         : '<p class="lab-profile-empty">No saved presets yet.</p>';
+    }
+
+    if (qrProjectsEl) {
+      qrProjectsEl.innerHTML = qrProjects.length
+        ? qrProjects.slice(0, 5).map(function (item) {
+            return '<a class="lab-profile-row" href="/qrgen/"><strong>' + escapeHtml(item.name || "QR project") + '</strong><span>' + escapeHtml(qrProjectSummary(item) || "Saved QRGen draft") + '</span><em>' + escapeHtml(formatTime(item.updated_at || item.created_at)) + '</em></a>';
+          }).join("")
+        : '<p class="lab-profile-empty">No saved QRGen projects yet.</p>';
     }
 
     if (!options || !options.skipCloud) {
