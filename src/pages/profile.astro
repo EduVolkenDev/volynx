@@ -334,7 +334,7 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 						<a href={ROUTES.pricing} class="btn btn--sm btn--ghost" data-i18n="profile.btn_see_plans">See plans</a>
 					</div>
 				</div>
-				<p class="text-muted vx-support" style="font-size:.85rem;margin:12px 0 4px;line-height:1.6;" data-i18n="profile.vx_support">Your VX balance can be used where a product explicitly supports VX, such as CVitae exports/templates and selected Studio actions.</p>
+				<p class="text-muted vx-support" style="font-size:.85rem;margin:12px 0 4px;line-height:1.6;" data-i18n="profile.vx_support">Use VX for eligible CVitae exports, premium templates, and selected Studio actions.</p>
 				<div id="tokenHistory" class="token-history">
 					<p class="text-muted" style="font-size:.85rem;" data-i18n="profile.loading_history">Loading history...</p>
 				</div>
@@ -1373,6 +1373,42 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 				// ══════════════════════════════════════════════════════
 				const tokenBalanceEl = $("tokenBalance");
 				const tokenHistoryEl = $("tokenHistory");
+				const TOKEN_PACK_LABELS = {
+					starter: "Starter VX pack",
+					core: "Core VX pack",
+					pro: "Pro VX pack",
+					scale: "Scale VX pack",
+				};
+				const TOKEN_CURRENCY_LABELS = {
+					brl: "BRL purchase",
+					gbp: "GBP purchase",
+					eur: "EUR purchase",
+				};
+				function tokenTxMeta(tx) {
+					const raw = String(tx?.description || tx?.lookup_key || tx?.tool_name || tx?.type || "VX activity");
+					const lookup = raw.match(/tokens_(starter|core|pro|scale)(?:_(brl|gbp|eur))?/i);
+					const date = tx?.created_at
+						? new Date(tx.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+						: "";
+					if (lookup) {
+						const pack = lookup[1].toLowerCase();
+						const currency = lookup[2]?.toLowerCase();
+						const isBackfill = /backfill/i.test(raw);
+						return {
+							title: TOKEN_PACK_LABELS[pack] || "VX pack",
+							meta: [isBackfill ? "Balance correction" : TOKEN_CURRENCY_LABELS[currency], date].filter(Boolean).join(" · "),
+						};
+					}
+					const cleaned = raw
+						.replace(/[_-]+/g, " ")
+						.replace(/\s+/g, " ")
+						.trim()
+						.replace(/\b\w/g, (letter) => letter.toUpperCase());
+					return {
+						title: cleaned || "VX activity",
+						meta: date,
+					};
+				}
 
 				// Show balance from profile (instant)
 				const initialBalance = profile.token_balance || 0;
@@ -1402,9 +1438,8 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 										const isSpend = tx.amount < 0;
 										const sign = isSpend ? "" : "+";
 										const color = isSpend ? "var(--danger)" : "var(--success)";
-										const date = new Date(tx.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" });
-										const desc = tx.description || tx.tool_name || tx.type;
-										return `<div class="token-tx"><span class="token-tx-desc">${desc}</span><span class="token-tx-amount" style="color:${color}">${sign}${tx.amount}</span><span class="token-tx-date">${date}</span></div>`;
+										const txCopy = tokenTxMeta(tx);
+										return `<div class="token-tx"><span class="token-tx-icon">VX</span><span class="token-tx-main"><span class="token-tx-desc">${escapeHtml(txCopy.title)}</span><span class="token-tx-date">${escapeHtml(txCopy.meta)}</span></span><span class="token-tx-amount" style="color:${color}">${sign}${Number(tx.amount || 0).toLocaleString()} VX</span></div>`;
 									}).join("");
 								}
 								log("tokens: " + d.balance);
@@ -2071,18 +2106,28 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 	.token-balance-label { font-size: .85rem; color: var(--muted); }
 	.token-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 	.token-history { display: grid; gap: 0; }
-	.token-tx { display: flex; gap: 20px; align-items: center; font-weight: 800;
-		padding: 10px 0; border-top: 1px solid rgba(255,255,255,.04); font-size: .84rem; }
+	.token-tx { display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; gap: 12px; align-items: center; font-weight: 800;
+		padding: 12px 0; border-top: 1px solid rgba(255,255,255,.04); font-size: .84rem; }
 	.token-tx:first-child { border-top: none; }
+	.token-tx-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px;
+		border: 1px solid color-mix(in srgb, var(--tier-accent) 18%, transparent);
+		background: color-mix(in srgb, var(--tier-accent) 9%, transparent);
+		color: var(--tier-accent); font-size: .68rem; font-weight: 900; letter-spacing: .04em; }
+	.token-tx-main { display: grid; gap: 2px; min-width: 0; }
 	.token-tx-desc { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-	.token-tx-amount { font-weight: 700; font-variant-numeric: tabular-nums; }
-	.token-tx-date { color: var(--muted); font-size: .78rem; }
-	:global(.token-tx) { display: flex; gap: 20px; align-items: center; font-weight: 800;
-		padding: 10px 0; border-top: 1px solid rgba(255,255,255,.04); font-size: .84rem; }
+	.token-tx-amount { justify-self: end; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+	.token-tx-date { color: var(--muted); font-size: .76rem; font-weight: 600; }
+	:global(.token-tx) { display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; gap: 12px; align-items: center; font-weight: 800;
+		padding: 12px 0; border-top: 1px solid rgba(255,255,255,.04); font-size: .84rem; }
 	:global(.token-tx:first-child) { border-top: none; }
+	:global(.token-tx-icon) { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px;
+		border: 1px solid color-mix(in srgb, var(--tier-accent) 18%, transparent);
+		background: color-mix(in srgb, var(--tier-accent) 9%, transparent);
+		color: var(--tier-accent); font-size: .68rem; font-weight: 900; letter-spacing: .04em; }
+	:global(.token-tx-main) { display: grid; gap: 2px; min-width: 0; }
 	:global(.token-tx-desc) { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-	:global(.token-tx-amount) { font-weight: 700; font-variant-numeric: tabular-nums; }
-	:global(.token-tx-date) { color: var(--muted); font-size: .78rem; }
+	:global(.token-tx-amount) { justify-self: end; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+	:global(.token-tx-date) { color: var(--muted); font-size: .76rem; font-weight: 600; }
 
 	.section-label { font-size: .7rem; font-weight: 700; text-transform: uppercase;
 		letter-spacing: .12em; color: var(--tier-accent); margin-bottom: 18px; opacity: .8; }
@@ -3041,9 +3086,19 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 		.token-tx,
 		:global(.token-tx) {
 			display: grid;
-			grid-template-columns: 1fr;
-			gap: 4px;
+			grid-template-columns: 34px minmax(0, 1fr) auto;
+			gap: 10px;
 			padding: 12px;
+		}
+		.token-tx-icon,
+		:global(.token-tx-icon) {
+			width: 34px;
+			height: 34px;
+			border-radius: 11px;
+		}
+		.token-tx-amount,
+		:global(.token-tx-amount) {
+			font-size: .86rem;
 		}
 	}
 
