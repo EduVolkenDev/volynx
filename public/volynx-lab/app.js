@@ -35,8 +35,10 @@ async function checkPermission(toolName, count) {
   const apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
   const token = localStorage.getItem('volynx_access_token') || '';
 
-  // Try server-side check
-  if (apiBase) {
+  // Anonymous Converter is local/free. Do not hit the remote permission API
+  // without a token because production correctly answers 401 and that noise
+  // can be mistaken for a broken gated flow.
+  if (apiBase && token) {
     try {
       const ctrl = new AbortController();
       const t = setTimeout(() => ctrl.abort(), 3500);
@@ -239,6 +241,15 @@ convertBtn.addEventListener('click', async () => {
   if (!perm.allowed) {
     window.dispatchEvent(new Event('vx:usage-updated'));
 
+    if (window.VxLab?.shouldSendToLogin(perm)) {
+      VxLab.confirmLogin(
+        VxLab.currentReturnPath(),
+        'Sign in to continue converting. You will return to Converter with this tool ready.'
+      );
+      convertBtn.disabled = false;
+      return;
+    }
+
     // Offer token bypass if VxTokens is available
     if (window.VxTokens) {
       const tokenResult = await VxTokens.spend('converter', 'medium', {
@@ -251,14 +262,6 @@ convertBtn.addEventListener('click', async () => {
         return;
       }
     } else {
-      if (window.VxLab?.shouldSendToLogin(perm)) {
-        VxLab.confirmLogin(
-          VxLab.currentReturnPath(),
-          'Sign in to continue converting. You will return to Converter with this tool ready.'
-        );
-        convertBtn.disabled = false;
-        return;
-      }
       const msg = perm.remaining === 0
         ? `Daily limit reached (${perm.limit}). ${(window.VxPlan ? !window.VxPlan.isPaid(perm.plan) : perm.plan === 'free') ? 'Upgrade to Pro for more.' : 'Try again tomorrow.'}`
         : `Limit: ${perm.remaining} remaining today. You selected ${files.length} files.`;

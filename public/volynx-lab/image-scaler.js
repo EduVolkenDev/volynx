@@ -5,8 +5,8 @@
     try { cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r){ return r.json(); }); }
     catch (_) { return FREE; }
     var apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
-    if (!apiBase) return FREE;
     var token = localStorage.getItem('volynx_access_token') || '';
+    if (!apiBase || !token) return FREE;
     try {
       var ctrl = new AbortController();
       var t = setTimeout(function(){ ctrl.abort(); }, 3500);
@@ -141,6 +141,15 @@
     try {
       var perm = await checkPermission('image-scaler');
       if (!perm.allowed) {
+        if (window.VxLab?.shouldSendToLogin(perm)) {
+          VxLab.confirmLogin(
+            VxLab.currentReturnPath(),
+            'Sign in to continue upscaling. You will return to Image Scaler after login.'
+          );
+          runBtn.disabled = false;
+          runBtn.textContent = 'Process';
+          return;
+        }
         if (window.VxTokens) {
           var tokenResult = await VxTokens.spend('image-scaler', 'medium', {
             description: 'Scale images (limit exceeded)'
@@ -151,15 +160,6 @@
             return;
           }
         } else {
-          if (window.VxLab?.shouldSendToLogin(perm)) {
-            VxLab.confirmLogin(
-              VxLab.currentReturnPath(),
-              'Sign in to continue upscaling. You will return to Image Scaler after login.'
-            );
-            runBtn.disabled = false;
-            runBtn.textContent = 'Process';
-            return;
-          }
           var isFreeUser = window.VxPlan ? !window.VxPlan.isPaid(perm.plan) : (perm.plan === 'free');
           var msg = isFreeUser
             ? 'Free limit reached. Sign in or upgrade to continue.'

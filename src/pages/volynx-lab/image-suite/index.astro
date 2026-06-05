@@ -234,7 +234,7 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
       const cfg = await getConfig();
       const apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
       const token = localStorage.getItem('volynx_access_token') || '';
-      if (apiBase) {
+      if (apiBase && (token || !allowLocalFallback)) {
         try {
           const ctrl = new AbortController();
           const t = setTimeout(() => ctrl.abort(), 8000);

@@ -476,15 +476,15 @@
     var cost = Number(config.tokens || config.cost || 0);
     var tool = config.tool || "lab";
     var actionClass = config.actionClass || "pro";
-    if (!window.VxTokens || typeof window.VxTokens.spend !== "function") {
-      return { ok: false, error: "vx_not_ready" };
-    }
     if (!hasAccessToken()) {
       confirmLogin(
         config.nextPath || currentReturnPath(),
         config.loginMessage || ("Sign in to use " + cost + " VX for this action. You will return here after login.")
       );
       return { ok: false, error: "not_authenticated" };
+    }
+    if (!window.VxTokens || typeof window.VxTokens.spend !== "function") {
+      return { ok: false, error: "vx_not_ready" };
     }
     var accepted = await confirmVxSpend({
       tool: tool,
