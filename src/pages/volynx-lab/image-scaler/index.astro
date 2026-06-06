@@ -151,7 +151,7 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
       const cfg = await getConfig();
       const apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
       const token = localStorage.getItem('volynx_access_token') || '';
-      if (apiBase) {
+      if (apiBase && token) {
         try {
           const ctrl = new AbortController();
           const t = setTimeout(() => ctrl.abort(), 8000);

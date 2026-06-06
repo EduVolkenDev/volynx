@@ -9,7 +9,7 @@ import Topbar from "../../../components/Topbar.astro";
 import LabToolShell from "../../../components/LabToolShell.astro";
 
 const pageTitle = "VOLYNX Lab • iMage Suite";
-const pageDescription = "Local-first image suite — upscale, compress, convert and remove backgrounds directly in your browser, no upload required.";
+const pageDescription = "Local-first iMage Suite — upscale, compress, convert and remove backgrounds directly in your browser, no upload required.";
 ---
 
 <!DOCTYPE html>
@@ -138,17 +138,17 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
                 />
               </div>
             </label>
+
+            <div class="bg-progress" id="bgProgress" hidden>
+              <span class="bg-progress__label" id="bgProgressLabel" data-i18n="suite.bg_progress">Loading AI model...</span>
+              <div class="bg-progress__bar" aria-hidden="true">
+                <div class="bg-progress__fill" id="bgProgressFill" style="width:0%"></div>
+              </div>
+            </div>
           </div>
 
           <p id="fmtHint" class="fmt-hint" hidden></p>
           <button id="runBtn" class="btn" type="button" disabled style="margin-top:16px" data-i18n="suite.btn_process">Process</button>
-
-          <div class="bg-progress" id="bgProgress" hidden>
-            <span class="bg-progress__label" id="bgProgressLabel" data-i18n="suite.bg_progress">Loading AI model...</span>
-            <div class="bg-progress__bar" aria-hidden="true">
-              <div class="bg-progress__fill" id="bgProgressFill" style="width:0%"></div>
-            </div>
-          </div>
 
           <div id="proStatus" class="pro-status" aria-live="polite"></div>
 
@@ -234,7 +234,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       const cfg = await getConfig();
       const apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
       const token = localStorage.getItem('volynx_access_token') || '';
-      if (apiBase) {
+      if (apiBase && (token || !allowLocalFallback)) {
         try {
           const ctrl = new AbortController();
           const t = setTimeout(() => ctrl.abort(), 8000);
@@ -254,7 +254,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
               limit: perm.limit,
               source: 'server',
             };
-            // Anonymous/free Image Suite usage still relies on the local daily
+            // Anonymous/free iMage Suite usage still relies on the local daily
             // counter. Some deployments return limit=0 until a user token is
             // present, which made the compressor look broken because "Process"
             // immediately hit a confirm instead of falling back to the local
@@ -1017,7 +1017,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
     }
 
     function encodeFallbackMessage(requestedMime, actualMime) {
-      return `Your browser could not finish ${mimeToExtension(requestedMime).toUpperCase()} encoding, so Image Suite exported ${mimeToExtension(actualMime).toUpperCase()} instead.`;
+      return `Your browser could not finish ${mimeToExtension(requestedMime).toUpperCase()} encoding, so iMage Suite exported ${mimeToExtension(actualMime).toUpperCase()} instead.`;
     }
 
     async function processOne(item, tool, scale, mime, quality) {
@@ -1072,14 +1072,9 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         throw new Error("Failed to create canvas context.");
       }
 
-      // Surface activity for all tools — ensure feedback is visible
-      if (tool === "compress") {
-        updateProgressUI(10, "compress");
-      } else if (tool === "convert") {
-        updateProgressUI(10, "scale");
-      } else if (tool === "upscale") {
-        updateProgressUI(10, "upscale");
-      }
+      // Surface activity for non-AI tools too — even sub-second ops need feedback.
+      if (tool === "compress") updateProgressUI(0, "compress");
+      else if (tool !== "upscale") updateProgressUI(0, "scale");
 
       if (tool === "upscale") {
         const aiCanvas = await aiUpscaleToCanvas(img, scale);
@@ -1101,18 +1096,14 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         ctx.drawImage(img, 0, 0);
       }
 
-      // Show progress before encoding
-      updateProgressUI(60, tool === "compress" ? "compress" : "encode");
-      
+      updateProgressUI(70, "encode");
       const encoded = await encodeCanvasWithFallback(
         canvas,
         mime,
         tool === "compress" ? quality : 0.95
       );
       const blob = encoded.blob;
-      
-      // Mark as complete
-      updateProgressUI(90, "encode");
+      updateProgressUI(100, "done");
 
       // Compress protection: if output grew, preserve original
       const M = window.VxFileMetrics;
@@ -1232,7 +1223,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       VxLab.renderToolPresets("image-suite", {
         anchor: ".field-group",
         apply: applySuitePreset,
-        emptyText: "Process an image once and your Image Suite recipe appears here.",
+        emptyText: "Process an image once and your iMage Suite recipe appears here.",
       });
     }
 
@@ -1298,7 +1289,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
           if (window.VxLab?.shouldSendToLogin(perm)) {
             VxLab.confirmLogin(
               returnPath,
-              "Sign in to continue in Image Suite. You will return to this exact tool after login."
+              "Sign in to continue in iMage Suite. You will return to this exact tool after login."
             );
             return;
           }
@@ -1335,9 +1326,6 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
       processedResults = [];
       singleOutBlob = null;
 
-      // Always show progress UI at the start
-      updateProgressUI(0, tool);
-
       try {
         for (let i = 0; i < loadedImages.length; i++) {
           setDropMessage(copy("suite.drop_processing", "Processing {current}/{total}...", {
@@ -1345,24 +1333,13 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
             total: loadedImages.length,
           }));
 
-          // Update progress for each file
-          const fileProgress = Math.round((i / loadedImages.length) * 30);
-          updateProgressUI(fileProgress, tool);
-
           const result = await processOne(loadedImages[i], tool, scale, mime, quality);
           processedResults.push(result);
 
           if (i === 0) {
             setPreviewBlob(result.blob);
           }
-
-          // Update overall progress
-          const overallProgress = Math.round(((i + 1) / loadedImages.length) * 100);
-          updateProgressUI(Math.min(95, overallProgress), tool);
         }
-
-        // Final progress update
-        updateProgressUI(100, "done");
 
         const totalOutBytes = processedResults.reduce((sum, result) => sum + result.blob.size, 0);
         const totalInBytes = processedResults.reduce((sum, result) => sum + result.inputBytes, 0);
@@ -1494,7 +1471,7 @@ const pageDescription = "Local-first image suite — upscale, compress, convert 
         downloadBtn.disabled = false;
       } catch (error) {
         console.error(error);
-        labNotify("Processing failed", t("suite.alert_process_error", "Image Suite could not process this image. Try a smaller file or another format."), "error");
+        labNotify("Processing failed", t("suite.alert_process_error", "iMage Suite could not process this image. Try a smaller file or another format."), "error");
         setDropMessage(t("suite.drop_error", "Error processing files"));
         setResultHint("");
       } finally {

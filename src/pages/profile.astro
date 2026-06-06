@@ -274,8 +274,8 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 							<span class="i18n-pt">Suas ferramentas agora lembram o trabalho.</span>
 						</h2>
 						<p class="lab-profile__copy">
-							<span class="i18n-en">Recent exports, generated assets, and saved presets from Converter, Image Scaler, Image Suite, Lumina, and QRGen.</span>
-							<span class="i18n-pt">Exportações recentes, ativos gerados e presets salvos do Converter, Image Scaler, Image Suite, Lumina e QRGen.</span>
+							<span class="i18n-en">Recent exports, generated assets, and saved presets from Converter, Image Scaler, iMage Suite, Lumina, and QRGen.</span>
+							<span class="i18n-pt">Exportações recentes, ativos gerados e presets salvos do Converter, Image Scaler, iMage Suite, Lumina e QRGen.</span>
 						</p>
 					</div>
 					<a href={ROUTES.lab} class="btn btn--sm btn--ghost">
@@ -298,6 +298,13 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 							<span class="i18n-pt">Presets salvos</span>
 						</strong>
 						<div class="lab-profile__list" data-lab-presets></div>
+					</div>
+					<div>
+						<strong class="lab-profile__heading">
+							<span class="i18n-en">QRGen projects</span>
+							<span class="i18n-pt">Projetos QRGen</span>
+						</strong>
+						<div class="lab-profile__list" data-qr-projects></div>
 					</div>
 				</div>
 			</section>
@@ -2101,9 +2108,19 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 	/* Token section */
 	.token-section { border: 1px solid color-mix(in srgb, var(--tier-accent) 16%, transparent); }
 	.token-overview { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
-	.token-balance-display { display: flex; align-items: baseline; gap: 10px; }
-	.token-balance-number { font-size: 2.4rem; font-weight: 800; color: var(--tier-accent); line-height: 1; }
-	.token-balance-label { font-size: .85rem; color: var(--muted); }
+	.token-balance-display { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+	.token-balance-number {
+		display: block;
+		min-width: 0;
+		max-width: 100%;
+		font-size: clamp(1.85rem, 5vw, 2.4rem);
+		font-weight: 800;
+		color: var(--tier-accent);
+		line-height: 1;
+		font-variant-numeric: tabular-nums;
+		overflow-wrap: anywhere;
+	}
+	.token-balance-label { min-width: 0; font-size: .85rem; color: var(--muted); overflow-wrap: anywhere; }
 	.token-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 	.token-history { display: grid; gap: 0; }
 	.token-tx { display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; gap: 12px; align-items: center; font-weight: 800;
@@ -2171,7 +2188,7 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 	}
 	.lab-profile__summary {
 		display: grid;
-		grid-template-columns: repeat(5, minmax(0, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 		gap: 10px;
 		margin: 18px 0 16px;
 	}
@@ -2223,7 +2240,7 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 	}
 	.lab-profile__grid {
 		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
+		grid-template-columns: repeat(3, minmax(0, 1fr));
 		gap: 14px;
 	}
 	.lab-profile__heading {
@@ -2999,8 +3016,12 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 			margin-bottom: 16px;
 		}
 		.token-balance-display {
+			display: grid;
+			grid-template-columns: 1fr;
 			justify-content: space-between;
-			align-items: center;
+			align-items: start;
+			gap: 8px;
+			min-width: 0;
 			padding: 16px;
 			border: 1px solid color-mix(in srgb, var(--tier-accent) 20%, transparent);
 			border-radius: 18px;
@@ -3010,7 +3031,15 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 			box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
 		}
 		.token-balance-number {
-			font-size: 2.15rem;
+			width: 100%;
+			font-size: clamp(1.45rem, 8vw, 2.15rem);
+			line-height: .98;
+			white-space: nowrap;
+			overflow-wrap: normal;
+		}
+		.token-balance-label {
+			max-width: 100%;
+			line-height: 1.35;
 		}
 		.token-actions {
 			display: grid !important;

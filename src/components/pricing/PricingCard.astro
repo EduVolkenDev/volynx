@@ -37,7 +37,12 @@ const ctaHref = plan.href || freePlanHref || (planLookupPrefix ? checkoutHref(pl
       <li><span class="i18n-en">{f}</span><span class="i18n-pt">{plan.features.pt[i] || f}</span></li>
     ))}
   </ul>
-  <a href={ctaHref} class={`pricing-card__cta ${plan.featured ? 'pricing-card__cta--primary' : ''}`} data-lookup={planLookupPrefix || undefined}><span class="i18n-en">{plan.cta.en}</span><span class="i18n-pt">{plan.cta.pt}</span></a>
+  <a
+    href={ctaHref}
+    class={`pricing-card__cta ${plan.featured ? 'pricing-card__cta--primary' : ''} ${planLookupPrefix ? 'vx-checkout-btn' : ''}`}
+    data-lookup={planLookupPrefix || undefined}
+    data-label={planLookupPrefix ? plan.cta.en : undefined}
+  ><span class="i18n-en">{plan.cta.en}</span><span class="i18n-pt">{plan.cta.pt}</span></a>
 </article>
 
 <style>

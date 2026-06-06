@@ -7,7 +7,7 @@
  *   - Result metadata labels
  *   - Compression effectiveness checks
  *
- * Used by: Image Suite (free + studio), Image Scaler, Converter
+ * Used by: iMage Suite (free + studio), Image Scaler, Converter
  */
 window.VxFileMetrics = (function () {
   "use strict";

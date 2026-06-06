@@ -38,7 +38,10 @@
 
   function getStored() {
     var urlCurrency = getUrlCurrency();
-    if (urlCurrency) return urlCurrency;
+    if (urlCurrency) {
+      try { localStorage.setItem(STORAGE_KEY, urlCurrency); } catch (_) { /* noop */ }
+      return urlCurrency;
+    }
     try { return normalize(localStorage.getItem(STORAGE_KEY)) || "GBP"; } catch (_) { return "GBP"; }
   }
 

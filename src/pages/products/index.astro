@@ -4,13 +4,397 @@ import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import FlagshipFooter from "../../components/FlagshipFooter.astro";
 import PlatformAssistStrip from "../../components/PlatformAssistStrip.astro";
 import { sitePricing } from "../../data/pricing";
-import { ROUTES } from "../../data/routes";
+import { ROUTES, checkoutHref } from "../../data/routes";
 
 const currencyParam = Astro.url.searchParams.get('currency') || '';
 const currentCurrency = (['GBP', 'EUR', 'BRL'] as const).includes(currencyParam as any) ? currencyParam as 'GBP'|'EUR'|'BRL' : 'GBP';
 const qrgenPlans = sitePricing.qrgenPlans.filter((plan) => plan.id !== 'free');
 const qrgenFreePlan = sitePricing.qrgenPlans.find((plan) => plan.id === 'free');
 const qrgenProPlan = sitePricing.qrgenPlans.find((plan) => plan.id === 'pro') || qrgenPlans[0];
+const qrgenLookupByPlan = {
+  launch: 'builder_launch',
+  pro: 'builder_pro',
+  studio: 'builder_studio',
+} as Record<string, string>;
+type BuyReadyOffer = {
+  label: { en: string; pt: string };
+  title: string;
+  copy: { en: string; pt: string };
+  price: { GBP: string; EUR: string; BRL: string };
+  billing: { en: string; pt: string };
+  lookup: string;
+  href: string;
+  cta: { en: string; pt: string };
+  image: string;
+  featured?: boolean;
+};
+
+const buyReadyNext = `${ROUTES.products}#buy-now`;
+const checkoutOffer = (offer: Omit<BuyReadyOffer, 'href'> & { next?: string }): BuyReadyOffer => {
+  const { next, ...item } = offer;
+  return {
+    ...item,
+    href: checkoutHref(item.lookup, { next: next || buyReadyNext }),
+  };
+};
+
+const buyReadySections = [
+  {
+    id: 'subscriptions',
+    label: { en: 'Subscriptions & tools', pt: 'Assinaturas e ferramentas' },
+    title: { en: 'Recurring products buyers can activate now', pt: 'Produtos recorrentes que compradores podem ativar agora' },
+    copy: { en: 'Builder, QRGen, Studio, Daily, CVitae and the bundled plans stay in the same account entitlement flow.', pt: 'Builder, QRGen, Studio, Daily, CVitae e bundles ficam no mesmo fluxo de acesso da conta.' },
+    offers: [
+      checkoutOffer({
+        label: { en: 'QR export', pt: 'Export QR' },
+        title: 'QRGen Pro',
+        copy: { en: 'SVG vector export, transparent backgrounds, logo export and 4096px PNG for print-ready QR work.', pt: 'SVG vetorial, fundo transparente, export com logo e PNG 4096px para QR pronto para impressão.' },
+        price: { GBP: '£24', EUR: '€28', BRL: 'R$149' },
+        billing: { en: '/month', pt: '/mês' },
+        lookup: 'builder_pro',
+        cta: { en: 'Buy QRGen Pro', pt: 'Comprar QRGen Pro' },
+        image: '/assets/newqrgen.webp',
+        featured: true,
+      }),
+      checkoutOffer({
+        label: { en: 'Builder', pt: 'Builder' },
+        title: 'Builder Launch',
+        copy: { en: 'One published site, subdomain, basic kits and analytics for a lean first launch.', pt: 'Um site publicado, subdomínio, kits básicos e analytics para o primeiro lançamento.' },
+        price: { GBP: '£11', EUR: '€13', BRL: 'R$69' },
+        billing: { en: '/month', pt: '/mês' },
+        lookup: 'builder_launch',
+        cta: { en: 'Get Launch', pt: 'Assinar Launch' },
+        image: '/assets/builderlaunch.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'Builder', pt: 'Builder' },
+        title: 'Builder Pro',
+        copy: { en: 'Custom domain, no branding, selected premium kits and priority publish capacity.', pt: 'Domínio próprio, sem branding, kits premium selecionados e prioridade de publish.' },
+        price: { GBP: '£24', EUR: '€28', BRL: 'R$149' },
+        billing: { en: '/month', pt: '/mês' },
+        lookup: 'builder_pro',
+        cta: { en: 'Go Pro', pt: 'Ir de Pro' },
+        image: '/assets/builderpro.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'Builder', pt: 'Builder' },
+        title: 'Builder Studio',
+        copy: { en: 'Ten sites, multiple domains, full premium kits, analytics and stronger creator capacity.', pt: 'Dez sites, múltiplos domínios, kits premium completos, analytics e mais capacidade.' },
+        price: { GBP: '£54', EUR: '€63', BRL: 'R$349' },
+        billing: { en: '/month', pt: '/mês' },
+        lookup: 'builder_studio',
+        cta: { en: 'Get Studio', pt: 'Assinar Studio' },
+        image: '/assets/builderstudio.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'Builder', pt: 'Builder' },
+        title: 'Builder Teams',
+        copy: { en: 'Team workspace with central billing, shared assets, shared icon pool and priority support.', pt: 'Workspace em equipe com billing central, ativos compartilhados, pool de ícones e suporte prioritário.' },
+        price: { GBP: '£118', EUR: '€138', BRL: 'R$749' },
+        billing: { en: '/month', pt: '/mês' },
+        lookup: 'builder_teams',
+        cta: { en: 'Get Teams', pt: 'Assinar Teams' },
+        image: '/assets/builderteams.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'Lab tools', pt: 'Ferramentas Lab' },
+        title: 'Studio Pro',
+        copy: { en: 'Premium browser tool lane for higher usage, batch processing and commercial rights.', pt: 'Faixa premium das ferramentas no browser para mais uso, batch e direitos comerciais.' },
+        price: { GBP: '£18', EUR: '€21', BRL: 'R$119' },
+        billing: { en: '/month', pt: '/mês' },
+        lookup: 'studio_pro',
+        cta: { en: 'Buy Studio Pro', pt: 'Comprar Studio Pro' },
+        image: '/assets/volynxstudio.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'Daily', pt: 'Daily' },
+        title: 'Daily Pro',
+        copy: { en: 'Scanner, Summary, Vault, Writing and Decision with cloud sync and exports.', pt: 'Scanner, Summary, Vault, Writing e Decision com sync na nuvem e exports.' },
+        price: { GBP: '£14', EUR: '€16', BRL: 'R$89' },
+        billing: { en: '/month', pt: '/mês' },
+        lookup: 'daily_pro',
+        cta: { en: 'Buy Daily Pro', pt: 'Comprar Daily Pro' },
+        image: '/assets/dailypro.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'Daily', pt: 'Daily' },
+        title: 'Daily Diamond',
+        copy: { en: 'Heavy-use Daily tier with API access, shared vaults, team notes and analytics.', pt: 'Plano Daily para uso intenso com API, vaults compartilhados, notas em equipe e analytics.' },
+        price: { GBP: '£34', EUR: '€39', BRL: 'R$219' },
+        billing: { en: '/month', pt: '/mês' },
+        lookup: 'daily_diamond',
+        cta: { en: 'Buy Diamond', pt: 'Comprar Diamond' },
+        image: '/assets/daily-diamond.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'Career AI', pt: 'Carreira IA' },
+        title: 'CVitae Business',
+        copy: { en: 'Unlimited CV management, premium templates and included professional exports.', pt: 'CVs ilimitados, templates premium e exports profissionais incluídos.' },
+        price: { GBP: '£15', EUR: '€18', BRL: 'R$99' },
+        billing: { en: '/month', pt: '/mês' },
+        lookup: 'cvitae_business',
+        cta: { en: 'Buy Business', pt: 'Comprar Business' },
+        image: '/assets/cvitae.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'Bundle', pt: 'Bundle' },
+        title: 'VOLYNX Essential',
+        copy: { en: 'Builder Pro + Daily Pro in one subscription with better pricing than separate plans.', pt: 'Builder Pro + Daily Pro em uma assinatura com preço melhor do que separado.' },
+        price: { GBP: '£35', EUR: '€41', BRL: 'R$229' },
+        billing: { en: '/month', pt: '/mês' },
+        lookup: 'bundle_volynx_daily_pro',
+        cta: { en: 'Buy Essential', pt: 'Comprar Essential' },
+        image: '/assets/bundle.webp',
+        featured: true,
+      }),
+      checkoutOffer({
+        label: { en: 'Bundle', pt: 'Bundle' },
+        title: 'VOLYNX Complete',
+        copy: { en: 'Builder Studio + Daily Diamond for the strongest combined product access.', pt: 'Builder Studio + Daily Diamond para o acesso combinado mais forte.' },
+        price: { GBP: '£82', EUR: '€96', BRL: 'R$549' },
+        billing: { en: '/month', pt: '/mês' },
+        lookup: 'bundle_volynx_daily_studio',
+        cta: { en: 'Buy Complete', pt: 'Comprar Complete' },
+        image: '/assets/getbundle.webp',
+      }),
+    ],
+  },
+  {
+    id: 'vx',
+    label: { en: 'VX capacity', pt: 'Capacidade VX' },
+    title: { en: 'One-time capacity packs for enabled premium actions', pt: 'Packs avulsos para ações premium habilitadas' },
+    copy: { en: 'VX does not replace product checkout. It adds capacity where the product explicitly supports VX.', pt: 'VX não substitui checkout de produto. Ele adiciona capacidade onde o produto informa suporte a VX.' },
+    offers: [
+      checkoutOffer({
+        label: { en: 'VX pack', pt: 'Pack VX' },
+        title: 'VX Starter',
+        copy: { en: '12 VX for light usage and enabled one-off premium actions.', pt: '12 VX para uso leve e ações premium pontuais habilitadas.' },
+        price: { GBP: '£8.40', EUR: '€9.80', BRL: 'R$54' },
+        billing: { en: 'one-time', pt: 'pagamento único' },
+        lookup: 'tokens_starter',
+        cta: { en: 'Buy Starter', pt: 'Comprar Starter' },
+        image: '/assets/vx-2.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'VX pack', pt: 'Pack VX' },
+        title: 'VX Core',
+        copy: { en: '32 VX, the best balance between price and practical capacity.', pt: '32 VX, o melhor equilíbrio entre preço e capacidade prática.' },
+        price: { GBP: '£18', EUR: '€21', BRL: 'R$119' },
+        billing: { en: 'one-time', pt: 'pagamento único' },
+        lookup: 'tokens_core',
+        cta: { en: 'Buy Core', pt: 'Comprar Core' },
+        image: '/assets/vx3.webp',
+        featured: true,
+      }),
+      checkoutOffer({
+        label: { en: 'VX pack', pt: 'Pack VX' },
+        title: 'VX Pro',
+        copy: { en: '80 VX for frequent users and more demanding workflows.', pt: '80 VX para usuários frequentes e fluxos mais exigentes.' },
+        price: { GBP: '£42', EUR: '€49', BRL: 'R$279' },
+        billing: { en: 'one-time', pt: 'pagamento único' },
+        lookup: 'tokens_pro',
+        cta: { en: 'Buy Pro', pt: 'Comprar Pro' },
+        image: '/assets/VX4.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'VX pack', pt: 'Pack VX' },
+        title: 'VX Elite',
+        copy: { en: '200 VX for heavy usage and larger operations.', pt: '200 VX para uso intenso e operações maiores.' },
+        price: { GBP: '£88', EUR: '€102', BRL: 'R$589' },
+        billing: { en: 'one-time', pt: 'pagamento único' },
+        lookup: 'tokens_scale',
+        cta: { en: 'Buy Elite', pt: 'Comprar Elite' },
+        image: '/assets/VX5.webp',
+      }),
+    ],
+  },
+  {
+    id: 'kits',
+    label: { en: 'Digital kits', pt: 'Kits digitais' },
+    title: { en: 'Launch packages with tiered licenses', pt: 'Pacotes de lançamento com licenças por nível' },
+    copy: { en: 'Portfolio, agency and SaaS systems use the existing kit delivery flow after purchase.', pt: 'Portfolio, agência e SaaS usam o fluxo existente de entrega de kit após a compra.' },
+    offers: [
+      checkoutOffer({
+        label: { en: 'Portfolio', pt: 'Portfolio' },
+        title: 'Portfolio Personal',
+        copy: { en: 'Personal-license portfolio system with Builder preset and premium section direction.', pt: 'Sistema de portfolio para uso pessoal com preset Builder e seções premium.' },
+        price: { GBP: '£47', EUR: '€54', BRL: 'R$329' },
+        billing: { en: 'one-time', pt: 'pagamento único' },
+        lookup: 'kit_portfolio_personal',
+        next: ROUTES.portfolioKit,
+        cta: { en: 'Buy Personal', pt: 'Comprar Personal' },
+        image: '/assets/newportfolio.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'Portfolio', pt: 'Portfolio' },
+        title: 'Portfolio Commercial',
+        copy: { en: 'Client-facing portfolio kit with SEO structure, variants and handoff checklist.', pt: 'Kit de portfolio para cliente com SEO, variantes e checklist de entrega.' },
+        price: { GBP: '£117', EUR: '€136', BRL: 'R$819' },
+        billing: { en: 'one-time', pt: 'pagamento único' },
+        lookup: 'kit_portfolio_commercial',
+        next: ROUTES.portfolioKit,
+        cta: { en: 'Buy Commercial', pt: 'Comprar Commercial' },
+        image: '/assets/newportfolio.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'Portfolio', pt: 'Portfolio' },
+        title: 'Portfolio Studio',
+        copy: { en: 'Extended studio license for reusable portfolio delivery systems.', pt: 'Licença Studio estendida para sistemas reutilizáveis de entrega de portfolio.' },
+        price: { GBP: '£247', EUR: '€287', BRL: 'R$1.720' },
+        billing: { en: 'one-time', pt: 'pagamento único' },
+        lookup: 'kit_portfolio_studio',
+        next: ROUTES.portfolioKit,
+        cta: { en: 'Buy Studio', pt: 'Comprar Studio' },
+        image: '/assets/newportfolio.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'Agency', pt: 'Agência' },
+        title: 'Agency Starter',
+        copy: { en: 'Agency starter kit with positioning, proposal logic and launch page structure.', pt: 'Kit inicial de agência com posicionamento, proposta e estrutura de página.' },
+        price: { GBP: '£87', EUR: '€101', BRL: 'R$609' },
+        billing: { en: 'one-time', pt: 'pagamento único' },
+        lookup: 'kit_agency_personal',
+        next: ROUTES.agencyKit,
+        cta: { en: 'Buy Starter', pt: 'Comprar Starter' },
+        image: '/assets/newlaunch.webp',
+        featured: true,
+      }),
+      checkoutOffer({
+        label: { en: 'Agency', pt: 'Agência' },
+        title: 'Agency Commercial',
+        copy: { en: 'Commercial agency kit for client delivery, SOW assets and premium sections.', pt: 'Kit comercial de agência para entrega a cliente, SOW e seções premium.' },
+        price: { GBP: '£187', EUR: '€217', BRL: 'R$1.290' },
+        billing: { en: 'one-time', pt: 'pagamento único' },
+        lookup: 'kit_agency_commercial',
+        next: ROUTES.agencyKit,
+        cta: { en: 'Buy Commercial', pt: 'Comprar Commercial' },
+        image: '/assets/newlaunch.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'Agency', pt: 'Agência' },
+        title: 'Agency Studio',
+        copy: { en: 'Reusable studio license with client-ready structure and operations checklist.', pt: 'Licença Studio reutilizável com estrutura pronta para cliente e checklist operacional.' },
+        price: { GBP: '£347', EUR: '€399', BRL: 'R$2.390' },
+        billing: { en: 'one-time', pt: 'pagamento único' },
+        lookup: 'kit_agency_studio',
+        next: ROUTES.agencyKit,
+        cta: { en: 'Buy Studio', pt: 'Comprar Studio' },
+        image: '/assets/newlaunch.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'SaaS', pt: 'SaaS' },
+        title: 'SaaS Launch',
+        copy: { en: 'Conversion-first SaaS landing kit with pricing, FAQ and launch checklist.', pt: 'Kit de landing SaaS com pricing, FAQ e checklist de lançamento.' },
+        price: { GBP: '£77', EUR: '€89', BRL: 'R$539' },
+        billing: { en: 'one-time', pt: 'pagamento único' },
+        lookup: 'kit_saas_personal',
+        next: ROUTES.saasSystem,
+        cta: { en: 'Buy Launch', pt: 'Comprar Launch' },
+        image: '/assets/saasbig.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'SaaS', pt: 'SaaS' },
+        title: 'SaaS Growth',
+        copy: { en: 'Commercial SaaS system with variants, conversion sections and client-ready scope.', pt: 'Sistema SaaS comercial com variantes, seções de conversão e escopo para cliente.' },
+        price: { GBP: '£177', EUR: '€205', BRL: 'R$1.240' },
+        billing: { en: 'one-time', pt: 'pagamento único' },
+        lookup: 'kit_saas_commercial',
+        next: ROUTES.saasSystem,
+        cta: { en: 'Buy Growth', pt: 'Comprar Growth' },
+        image: '/assets/saasbig.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'SaaS', pt: 'SaaS' },
+        title: 'SaaS Scale',
+        copy: { en: 'Studio SaaS license with advanced variant structure and reusable launch framework.', pt: 'Licença Studio SaaS com variantes avançadas e framework reutilizável de lançamento.' },
+        price: { GBP: '£327', EUR: '€379', BRL: 'R$2.290' },
+        billing: { en: 'one-time', pt: 'pagamento único' },
+        lookup: 'kit_saas_studio',
+        next: ROUTES.saasSystem,
+        cta: { en: 'Buy Scale', pt: 'Comprar Scale' },
+        image: '/assets/saasbig.webp',
+      }),
+    ],
+  },
+  {
+    id: 'propertyflow-icons',
+    label: { en: 'PropertyFlow & assets', pt: 'PropertyFlow e assets' },
+    title: { en: 'High-ticket packages and visual asset packs', pt: 'Pacotes high-ticket e packs visuais' },
+    copy: { en: 'PropertyFlow and icon packs are checkout-ready; single icons remain selected inside the icon store so delivery has the exact asset metadata.', pt: 'PropertyFlow e packs de ícones estão prontos; ícones avulsos continuam dentro da loja para preservar o metadata exato do asset.' },
+    offers: [
+      checkoutOffer({
+        label: { en: 'PropertyFlow', pt: 'PropertyFlow' },
+        title: 'PropertyFlow Starter',
+        copy: { en: 'React source, premium catalogue, filters and bilingual interface for real-estate delivery.', pt: 'Código React, catálogo premium, filtros e interface bilíngue para entrega imobiliária.' },
+        price: { GBP: '£187', EUR: '€219', BRL: 'R$1.290' },
+        billing: { en: 'one-time', pt: 'pagamento único' },
+        lookup: 'pf_starter',
+        next: ROUTES.propertyflow,
+        cta: { en: 'Buy Starter', pt: 'Comprar Starter' },
+        image: '/assets/newproperty.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'PropertyFlow', pt: 'PropertyFlow' },
+        title: 'PropertyFlow Professional',
+        copy: { en: 'Supabase, admin dashboard, enquiry capture and six grid templates.', pt: 'Supabase, painel admin, captura de leads e seis templates de grid.' },
+        price: { GBP: '£447', EUR: '€519', BRL: 'R$3.090' },
+        billing: { en: 'one-time', pt: 'pagamento único' },
+        lookup: 'pf_professional',
+        next: ROUTES.propertyflow,
+        cta: { en: 'Buy Professional', pt: 'Comprar Professional' },
+        image: '/assets/flow-professional.webp',
+        featured: true,
+      }),
+      checkoutOffer({
+        label: { en: 'PropertyFlow', pt: 'PropertyFlow' },
+        title: 'PropertyFlow White-Label',
+        copy: { en: 'Fifteen templates, white-label rights, onboarding and migration support.', pt: 'Quinze templates, direitos white-label, onboarding e suporte de migração.' },
+        price: { GBP: '£897', EUR: '€1.039', BRL: 'R$6.190' },
+        billing: { en: 'one-time', pt: 'pagamento único' },
+        lookup: 'pf_white_label',
+        next: ROUTES.propertyflow,
+        cta: { en: 'Buy White-Label', pt: 'Comprar White-Label' },
+        image: '/assets/flow-whitelabel.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'Icon pack', pt: 'Pack de ícones' },
+        title: 'Icons Mixed Pack',
+        copy: { en: 'Accessible mixed icon collection checkout for lighter visual needs.', pt: 'Checkout de coleção mista de ícones para necessidades visuais mais leves.' },
+        price: { GBP: '£5.20', EUR: '€6', BRL: 'R$34.90' },
+        billing: { en: 'one-time', pt: 'pagamento único' },
+        lookup: 'icons_pack_mixed',
+        next: ROUTES.iconsStore,
+        cta: { en: 'Buy Mixed Pack', pt: 'Comprar Mixed Pack' },
+        image: '/assets/icons-store-logo.webp',
+      }),
+      checkoutOffer({
+        label: { en: 'Icon pack', pt: 'Pack de ícones' },
+        title: 'Icons Premium Pack',
+        copy: { en: 'Premium icon pack checkout for brand-ready product visuals and client surfaces.', pt: 'Pacote premium de ícones para visuais de produto e superfícies de cliente.' },
+        price: { GBP: '£11.20', EUR: '€13', BRL: 'R$74.90' },
+        billing: { en: 'one-time', pt: 'pagamento único' },
+        lookup: 'icons_pack_premium',
+        next: ROUTES.iconsStore,
+        cta: { en: 'Buy Premium Pack', pt: 'Comprar Premium Pack' },
+        image: '/assets/icons-store-logo.webp',
+        featured: true,
+      }),
+      checkoutOffer({
+        label: { en: 'Icon pack', pt: 'Pack de ícones' },
+        title: 'Icons Hyper Pack',
+        copy: { en: '5000px Hyper pack for the highest-resolution visual asset tier.', pt: 'Pack Hyper 5000px para o nível visual de maior resolução.' },
+        price: { GBP: '£37', EUR: '€43', BRL: 'R$249' },
+        billing: { en: 'one-time', pt: 'pagamento único' },
+        lookup: 'icons_pack_hyper',
+        next: ROUTES.iconsStore,
+        cta: { en: 'Buy Hyper Pack', pt: 'Comprar Hyper Pack' },
+        image: '/assets/icons-store-logo.webp',
+      }),
+    ],
+  },
+];
+
+const buyReadyOfferCount = buyReadySections.reduce((total, section) => total + section.offers.length, 0);
 
 const productAssistItems = [
   { href: ROUTES.pricing, label: { en: "Compare", pt: "Comparar" }, title: { en: "See pricing", pt: "Ver pricing" }, copy: { en: "Compare Builder, Daily, bundles and VX without leaving the platform flow.", pt: "Compare Builder, Daily, bundles e VX sem sair do fluxo da plataforma." }, emphasized: true, iconSrc: "/assets/newpricing1.webp" },
@@ -42,6 +426,53 @@ const productAssistItems = [
     </section>
 
     <PlatformAssistStrip eyebrow={{ en: "Platform assist", pt: "Apoio da plataforma" }} title={{ en: "Choose, buy, recover, continue.", pt: "Escolha, compre, recupere, continue." }} description={{ en: "The public catalog should still feel operational. These paths keep discovery connected to pricing, purchases and support.", pt: "O catálogo público ainda deve ter cara de operacional. Esses caminhos mantêm descoberta conectada a pricing, compras e suporte." }} items={productAssistItems} />
+
+    <!-- ═══ BUY READY OFFERS ═══ -->
+    <section class="page-section buy-ready-section" id="buy-now">
+      <div class="shell section-head buy-ready-head">
+        <span class="eyebrow"><span class="i18n-en">Ready to sell today</span><span class="i18n-pt">Pronto para vender hoje</span></span>
+        <h2><span class="i18n-en">The full checkout-ready catalog is now visible in one premium shelf.</span><span class="i18n-pt">O catálogo vendável completo agora aparece em uma vitrine premium.</span></h2>
+        <p><span class="i18n-en"><strong>{buyReadyOfferCount}</strong> buy-ready paths across subscriptions, VX capacity, digital kits, PropertyFlow and premium assets. Manual and coming-soon offers stay out of direct checkout until fulfillment is real.</span><span class="i18n-pt"><strong>{buyReadyOfferCount}</strong> caminhos prontos para compra entre assinaturas, capacidade VX, kits digitais, PropertyFlow e assets premium. Ofertas manuais ou futuras ficam fora do checkout direto até a entrega ser real.</span></p>
+      </div>
+      <div class="shell buy-ready-catalog">
+        {buyReadySections.map((section) => (
+          <section class="buy-ready-group" aria-labelledby={`buy-ready-${section.id}`}>
+            <div class="buy-ready-group__head">
+              <div>
+                <span class="buy-ready-group__label"><span class="i18n-en">{section.label.en}</span><span class="i18n-pt">{section.label.pt}</span></span>
+                <h3 id={`buy-ready-${section.id}`}><span class="i18n-en">{section.title.en}</span><span class="i18n-pt">{section.title.pt}</span></h3>
+                <p><span class="i18n-en">{section.copy.en}</span><span class="i18n-pt">{section.copy.pt}</span></p>
+              </div>
+              <span class="buy-ready-group__count"><strong>{section.offers.length}</strong> <span class="i18n-en">offers</span><span class="i18n-pt">ofertas</span></span>
+            </div>
+            <div class="buy-ready-grid">
+              {section.offers.map((offer) => (
+                <article class={`buy-ready-card ${offer.featured ? 'buy-ready-card--featured' : ''}`}>
+                  <img src={offer.image} alt="" class="buy-ready-card__icon" loading="lazy" decoding="async" />
+                  <span class="buy-ready-card__label"><span class="i18n-en">{offer.label.en}</span><span class="i18n-pt">{offer.label.pt}</span></span>
+                  <h4>{offer.title}</h4>
+                  <p><span class="i18n-en">{offer.copy.en}</span><span class="i18n-pt">{offer.copy.pt}</span></p>
+                  <div class="buy-ready-card__price">
+                    <strong
+                      data-price-gbp={offer.price.GBP}
+                      data-price-eur={offer.price.EUR}
+                      data-price-brl={offer.price.BRL}
+                    >{offer.price[currentCurrency]}</strong>
+                    <span><span class="i18n-en">{offer.billing.en}</span><span class="i18n-pt">{offer.billing.pt}</span></span>
+                  </div>
+                  <a
+                    href={offer.href}
+                    class="button button--gold vx-checkout-btn buy-ready-card__cta"
+                    data-lookup={offer.lookup}
+                    data-label={offer.cta.en}
+                  ><span class="i18n-en">{offer.cta.en}</span><span class="i18n-pt">{offer.cta.pt}</span></a>
+                </article>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </section>
 
     <!-- ═══ PREMIUM KITS ═══ -->
     <section id="kits" class="page-section">
@@ -159,6 +590,14 @@ const productAssistItems = [
                   <li><span class="i18n-en">{feature}</span><span class="i18n-pt">{plan.features.pt[index] || feature}</span></li>
                 ))}
               </ul>
+              {qrgenLookupByPlan[plan.id] && (
+                <a
+                  href={checkoutHref(qrgenLookupByPlan[plan.id], { next: `${ROUTES.products}#qrgen` })}
+                  class="button button--gold vx-checkout-btn qr-product-plan__cta"
+                  data-lookup={qrgenLookupByPlan[plan.id]}
+                  data-label={plan.cta.en}
+                ><span class="i18n-en">{plan.cta.en}</span><span class="i18n-pt">{plan.cta.pt}</span></a>
+              )}
             </article>
           ))}
         </div>
@@ -264,6 +703,202 @@ const productAssistItems = [
 
   </main>
   <style>
+    .buy-ready-section {
+      position: relative;
+      padding-top: clamp(56px, 7vw, 92px);
+      border-block: 1px solid rgba(214, 179, 106, .16);
+      background:
+        linear-gradient(180deg, rgba(214, 179, 106, .08), rgba(12, 18, 28, .34) 48%, rgba(125, 211, 252, .06));
+    }
+
+    .buy-ready-head {
+      max-width: 980px;
+    }
+
+    .buy-ready-head strong {
+      color: #fff;
+    }
+
+    .buy-ready-catalog {
+      display: grid;
+      gap: clamp(32px, 5vw, 58px);
+    }
+
+    .buy-ready-group {
+      display: grid;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .buy-ready-group__head {
+      min-width: 0;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .buy-ready-group__label {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(125, 211, 252, .24);
+      background: rgba(125, 211, 252, .07);
+      color: #9ee7ff;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .buy-ready-group__head h3 {
+      max-width: 860px;
+      margin: 12px 0 0;
+      color: #fff;
+      font-size: clamp(24px, 3vw, 36px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .buy-ready-group__head p {
+      max-width: 880px;
+      margin: 10px 0 0;
+      color: rgba(255, 255, 255, .62);
+      line-height: 1.6;
+    }
+
+    .buy-ready-group__count {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 6px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(214, 179, 106, .22);
+      background: rgba(214, 179, 106, .07);
+      color: rgba(255, 255, 255, .68);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .buy-ready-group__count strong {
+      color: #fff;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .buy-ready-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .buy-ready-card {
+      position: relative;
+      min-width: 0;
+      min-height: 336px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, .09);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .025)),
+        rgba(5, 9, 16, .72);
+      box-shadow: 0 18px 56px rgba(0, 0, 0, .24);
+      overflow: hidden;
+    }
+
+    .buy-ready-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, rgba(214, 179, 106, .12), transparent 46%);
+      pointer-events: none;
+    }
+
+    .buy-ready-card--featured {
+      border-color: rgba(214, 179, 106, .36);
+      background:
+        linear-gradient(145deg, rgba(214, 179, 106, .13), rgba(125, 211, 252, .045)),
+        rgba(5, 9, 16, .76);
+    }
+
+    .buy-ready-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .buy-ready-card__icon {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      object-position: center;
+      margin-left: auto;
+      filter: drop-shadow(0 16px 28px rgba(0, 0, 0, .34));
+    }
+
+    .buy-ready-card__label {
+      width: fit-content;
+      min-height: 28px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(214, 179, 106, .28);
+      background: rgba(214, 179, 106, .08);
+      color: #f6d38b;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .buy-ready-card h4 {
+      margin: 0;
+      font-size: 21px;
+      line-height: 1.08;
+      color: #fff;
+      letter-spacing: 0;
+    }
+
+    .buy-ready-card p {
+      margin: 0;
+      color: rgba(255, 255, 255, .7);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .buy-ready-card__price {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .buy-ready-card__price strong {
+      font-size: 28px;
+      line-height: 1;
+      color: #fff;
+      overflow-wrap: anywhere;
+    }
+
+    .buy-ready-card__price span {
+      color: rgba(255, 255, 255, .56);
+      font-size: 13px;
+    }
+
+    .buy-ready-card__cta {
+      width: 100%;
+      justify-content: center;
+    }
+
     .qr-product-section {
       position: relative;
       border-block: 1px solid rgba(125, 211, 252, .12);
@@ -502,7 +1137,22 @@ const productAssistItems = [
       box-shadow: 0 0 12px rgba(125, 211, 252, .42);
     }
 
+    .qr-product-plan__cta {
+      width: 100%;
+      justify-content: center;
+      margin-top: 6px;
+    }
+
     @media (max-width: 980px) {
+      .buy-ready-group__head {
+        align-items: start;
+        flex-direction: column;
+      }
+
+      .buy-ready-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
       .qr-product-grid,
       .qr-product-plan-grid {
         grid-template-columns: 1fr;
@@ -513,7 +1163,25 @@ const productAssistItems = [
       }
     }
 
+    @media (max-width: 1180px) and (min-width: 981px) {
+      .buy-ready-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
     @media (max-width: 640px) {
+      .buy-ready-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .buy-ready-card {
+        min-height: 0;
+      }
+
+      .buy-ready-group__head h3 {
+        font-size: 24px;
+      }
+
       .qr-product-copy h3 {
         font-size: clamp(34px, 13vw, 54px);
       }
@@ -529,5 +1197,6 @@ const productAssistItems = [
     }
   </style>
   <script is:inline src="/js/vx-currency.js"></script>
+  <script is:inline src="/scripts/kit-checkout.js" defer></script>
   <FlagshipFooter />
 </FlagshipLayout>

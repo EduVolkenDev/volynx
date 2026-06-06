@@ -148,8 +148,8 @@ export const sitePricing = {
       tokens: '4 tokens',
       price: { GBP: 'from £1.76', EUR: 'from €2.04', BRL: 'from R$11.80' },
       examples: {
-        pt: ['image suite completa', 'upscale melhor', 'lote médio'],
-        en: ['full image suite', 'better upscale', 'mid-size batch']
+        pt: ['iMage Suite completa', 'upscale melhor', 'lote médio'],
+        en: ['full iMage Suite', 'better upscale', 'mid-size batch']
       }
     },
     {

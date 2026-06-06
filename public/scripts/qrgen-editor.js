@@ -36,28 +36,40 @@
       name: "QRGen Free",
       price: { GBP: "£0", EUR: "€0", BRL: "R$0" },
       copy: "For fast static QR drafts and standard PNGs.",
-      features: ["Live preview", "Static QR", "Basic colors", "2 free exports/day"]
+      features: ["Live preview", "Static QR", "Basic colors", "2 free exports/day"],
+      cta: "Open QRGen",
+      href: "/qrgen/",
+      lookupKey: ""
     },
     {
       id: "launch",
       name: "QRGen Launch",
       price: { GBP: "£11", EUR: "€13", BRL: "R$69" },
       copy: "For real campaigns that need HD assets.",
-      features: ["HD PNG", "More saved projects", "Gradient styles", "No friction for launch work"]
+      features: ["HD PNG", "More saved projects", "Gradient styles", "No friction for launch work"],
+      cta: "Get Launch",
+      href: "/checkout/?lookup_key=builder_launch&next=/qrgen/",
+      lookupKey: "builder_launch"
     },
     {
       id: "pro",
       name: "QRGen Pro",
       price: { GBP: "£24", EUR: "€28", BRL: "R$149" },
       copy: "For brand-safe and print-ready exports.",
-      features: ["SVG vector", "Transparent background", "Logo export", "4096px PNG"]
+      features: ["SVG vector", "Transparent background", "Logo export", "4096px PNG"],
+      cta: "Go Pro",
+      href: "/checkout/?lookup_key=builder_pro&next=/qrgen/",
+      lookupKey: "builder_pro"
     },
     {
       id: "studio",
       name: "QRGen Studio",
       price: { GBP: "£54", EUR: "€63", BRL: "R$349" },
       copy: "For dynamic QR campaigns and client work.",
-      features: ["Dynamic QR direction", "Campaign organization", "Analytics path", "Client/project workflow"]
+      features: ["Dynamic QR direction", "Campaign organization", "Analytics path", "Client/project workflow"],
+      cta: "Get Studio",
+      href: "/checkout/?lookup_key=builder_studio&next=/qrgen/",
+      lookupKey: "builder_studio"
     }
   ];
 
@@ -69,7 +81,12 @@
   function currentCurrencyFromPage() {
     try {
       const params = new URLSearchParams(window.location.search);
-      return normalizeCurrency(params.get("currency") || localStorage.getItem("volynx_currency") || "GBP");
+      const urlCurrency = normalizeCurrency(params.get("currency") || "");
+      if (urlCurrency && params.get("currency")) {
+        try { localStorage.setItem("volynx_currency", urlCurrency); } catch (_) {}
+        return urlCurrency;
+      }
+      return normalizeCurrency(localStorage.getItem("volynx_currency") || "GBP");
     } catch (_) {
       return "GBP";
     }
@@ -84,6 +101,9 @@
         ...plan,
         price: plan?.price && typeof plan.price === "object" ? plan.price : fallback.price,
         features: Array.isArray(plan?.features) && plan.features.length ? plan.features : fallback.features,
+        cta: String(plan?.cta || fallback.cta || ""),
+        href: String(plan?.href || fallback.href || ""),
+        lookupKey: String(plan?.lookupKey || fallback.lookupKey || ""),
       };
     });
   }
@@ -98,7 +118,7 @@
       "hero.subtitle": "Crie QR Codes limpos, com marca e prontos para exportar, com preview ao vivo, controles inteligentes e caminho para campanhas dinâmicas.",
       "plan.status": "Plano atual do QRGen",
       "plan.free_copy": "Preview ao vivo e exportação PNG padrão.",
-      "plan.cta": "Comparar planos",
+      "plan.cta": "Desbloquear Pro",
       "editor.kicker": "Editor",
       "editor.title": "Conteúdo e controles de marca",
       "content.legend": "Projeto",
@@ -1404,8 +1424,27 @@
         <strong>${escapeHtml(plan.price?.[currentCurrency] || plan.price?.GBP || "")}</strong>
         <p>${escapeHtml(tq(`plans.${plan.id}.copy`, plan.copy))}</p>
         <ul>${plan.features.map((feature, index) => `<li>${escapeHtml(tq(`plans.${plan.id}.f${index + 1}`, feature))}</li>`).join("")}</ul>
+        <a class="qrgen-link-button qrgen-plan-card__cta ${plan.lookupKey ? "vx-checkout-btn" : ""}" href="${escapeHtml(planHref(plan))}" ${plan.lookupKey ? `data-lookup="${escapeHtml(plan.lookupKey)}" data-label="${escapeHtml(planCta(plan))}"` : ""}>${escapeHtml(planCta(plan))}</a>
       </article>
     `).join("");
+  }
+
+  function planCta(plan) {
+    if (plan.id === currentPlan) {
+      return getLang() === "pt" ? "Plano atual" : "Current plan";
+    }
+    return plan.cta || (plan.id === "free" ? "Open QRGen" : "Upgrade");
+  }
+
+  function planHref(plan) {
+    if (plan.id === "free") return "/qrgen/";
+    if (!plan.lookupKey) return plan.href || "/pricing/#qrgen-plans";
+    const params = new URLSearchParams({
+      lookup_key: plan.lookupKey,
+      currency: currentCurrency.toLowerCase(),
+      next: "/qrgen/",
+    });
+    return `/checkout/?${params.toString()}`;
   }
 
   function syncCurrencyButtons() {
