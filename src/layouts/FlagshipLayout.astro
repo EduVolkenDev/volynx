@@ -57,6 +57,8 @@ const canonicalUrl = `https://volynx.world${Astro.url.pathname}`;
     </script>
     <!-- Cross-subdomain auth hydration (runs BEFORE the early auth check below) -->
     <script is:inline src="/js/vx-auth-bridge.js"></script>
+    <!-- Preserve the exact page/task across login and signup. -->
+    <script is:inline src="/js/vx-return.js"></script>
     <!-- Keep the access_token fresh; otherwise authed calls 401 after 1h -->
     <script src="/js/vx-token-refresh.js" defer></script>
     <script is:inline>

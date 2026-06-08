@@ -340,7 +340,8 @@ import { DEVJOURNEY_DELIVERABLES } from "../../../data/devjourney-deliverables.j
         .then(function (r) {
           if (r.status === 401) {
             // Token expired or invalid — kick to login
-            location.replace('/login/?next=/dev-journey/student/');
+            if (window.VxReturn) window.VxReturn.redirectToLogin(null, true);
+            else location.replace('/login/?next=/dev-journey/student/');
             return null;
           }
           return r.json();

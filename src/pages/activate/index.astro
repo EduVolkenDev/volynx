@@ -434,10 +434,13 @@ import PageWidgets from "../../components/PageWidgets.astro";
     // ── Auth check ───────────────────────────────────────────────
     var token = localStorage.getItem('volynx_access_token');
     if (!token) {
-      var next = encodeURIComponent(window.location.pathname + window.location.search);
       redeemBtn.textContent = s.sign_in;
       redeemBtn.addEventListener('click', function () {
-        window.location.href = '/login/?next=' + next;
+        if (window.VxReturn) window.VxReturn.redirectToLogin();
+        else {
+          var next = encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);
+          window.location.href = '/login/?next=' + next;
+        }
       });
       return;
     }

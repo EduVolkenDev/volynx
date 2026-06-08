@@ -1,0 +1,255 @@
+---
+import FlagshipLayout from "../../../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "../../../components/FlagshipHeader.astro";
+import FlagshipFooter from "../../../components/FlagshipFooter.astro";
+import { ROUTES } from "../../../data/routes";
+---
+
+<FlagshipLayout
+  title="Professional Profile — Volynx World"
+  description="Discover a professional and their services inside Volynx World."
+  pageClass="page-world-profile"
+>
+  <FlagshipHeader current={ROUTES.world} ctaLabel="Explore World" ctaHref={ROUTES.world} ctaI18n="nav.world" />
+  <main class="world-profile shell">
+    <a class="world-back" href={ROUTES.world}>← <span class="i18n-en">Back to World</span><span class="i18n-pt">Voltar ao World</span></a>
+    <div class="world-state" id="profileState"><span class="i18n-en">Loading professional profile...</span><span class="i18n-pt">Carregando perfil profissional...</span></div>
+
+    <section class="world-profile__hero" id="profileHero" hidden>
+      <div class="world-profile__identity">
+        <div class="world-profile__avatar" id="profileAvatar">VW</div>
+        <div>
+          <div class="world-profile__eyebrow"><span id="profileHandle">@professional</span><em id="verifiedBadge" hidden>World Verified</em></div>
+          <h1 id="profileName">Professional</h1>
+          <p class="world-profile__headline" id="profileHeadline"></p>
+          <div class="world-profile__meta"><span id="profileLocation"></span><span id="profileAvailability"></span></div>
+        </div>
+      </div>
+      <div class="world-profile__actions">
+        <a class="button button--gold" href="#services"><span class="i18n-en">View services</span><span class="i18n-pt">Ver serviços</span></a>
+        <a class="button button--ghost" id="portfolioLink" href="#" target="_blank" rel="noopener noreferrer" hidden>Portfolio ↗</a>
+      </div>
+    </section>
+
+    <section class="world-profile__body" id="profileBody" hidden>
+      <article class="world-about">
+        <span class="world-label"><span class="i18n-en">Professional profile</span><span class="i18n-pt">Perfil profissional</span></span>
+        <h2><span class="i18n-en">About</span><span class="i18n-pt">Sobre</span></h2>
+        <p id="profileBio"></p>
+        <div class="world-profile__facts">
+          <div><strong><span class="i18n-en">Specialties</span><span class="i18n-pt">Especialidades</span></strong><span id="profileSpecialties"></span></div>
+          <div><strong><span class="i18n-en">Languages</span><span class="i18n-pt">Idiomas</span></strong><span id="profileLanguages"></span></div>
+        </div>
+      </article>
+      <aside class="world-promise">
+        <span>WORLD PROFILE</span>
+        <strong><span class="i18n-en">Clear offers. Direct briefs. Independent delivery.</span><span class="i18n-pt">Ofertas claras. Briefings diretos. Entrega independente.</span></strong>
+        <p><span class="i18n-en">Professionals operate independently and remain responsible for agreements and delivery. Protected payments and verified reviews are not active in this founding release.</span><span class="i18n-pt">Profissionais atuam de forma independente e continuam responsáveis pelos acordos e entregas. Pagamentos protegidos e avaliações verificadas ainda não estão ativos neste lançamento fundador.</span></p>
+      </aside>
+    </section>
+
+    <section class="world-services" id="services" hidden>
+      <div class="world-services__head">
+        <div><span class="world-label"><span class="i18n-en">Available services</span><span class="i18n-pt">Serviços disponíveis</span></span><h2><span class="i18n-en">Ways to work together.</span><span class="i18n-pt">Formas de trabalhar juntos.</span></h2></div>
+      </div>
+      <div class="world-services__grid" id="servicesGrid"></div>
+    </section>
+  </main>
+
+  <dialog class="world-dialog" id="inquiryDialog">
+    <form method="dialog" class="world-dialog__close"><button aria-label="Close">×</button></form>
+    <form id="inquiryForm">
+      <span class="world-label"><span class="i18n-en">Private project brief</span><span class="i18n-pt">Briefing privado</span></span>
+      <h2 id="inquiryTitle"></h2>
+      <label><span><span class="i18n-en">Reply email</span><span class="i18n-pt">Email para resposta</span></span><input id="inquiryEmail" type="email" required /></label>
+      <label><span><span class="i18n-en">What do you need?</span><span class="i18n-pt">O que você precisa?</span></span><input id="inquirySubject" maxlength="120" required /></label>
+      <label><span>Brief</span><textarea id="inquiryBrief" minlength="40" maxlength="3000" rows="6" required></textarea></label>
+      <div class="world-dialog__grid">
+        <label><span><span class="i18n-en">Budget</span><span class="i18n-pt">Orçamento</span></span><input id="inquiryBudget" maxlength="80" /></label>
+        <label><span>Timeline</span><input id="inquiryTimeline" maxlength="80" /></label>
+      </div>
+      <button class="button button--gold" type="submit"><span class="i18n-en">Send private brief</span><span class="i18n-pt">Enviar briefing privado</span></button>
+      <p class="world-state" id="inquiryState"></p>
+    </form>
+  </dialog>
+  <FlagshipFooter />
+</FlagshipLayout>
+
+<script>
+  import { createClient } from "@supabase/supabase-js";
+
+  const byId = (id: string) => document.getElementById(id) as HTMLElement | null;
+  const value = (id: string) => ((byId(id) as HTMLInputElement | HTMLTextAreaElement | null)?.value || "").trim();
+  const escapeHtml = (input: unknown) => String(input ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char] || char));
+  const isPt = () => document.documentElement.lang.toLowerCase().startsWith("pt");
+  const text = (en: string, pt: string) => isPt() ? pt : en;
+  let supabase: any;
+  let user: any = null;
+  let profile: any = null;
+  let services: any[] = [];
+  let selectedService: any = null;
+
+  function setState(message: string, kind = "") {
+    const state = byId("profileState");
+    if (!state) return;
+    state.innerHTML = kind === "error"
+      ? `<strong>${escapeHtml(message)}</strong><a class="button button--gold" href="/world/">${text("Explore professionals", "Explorar profissionais")}</a>`
+      : escapeHtml(message);
+    state.dataset.kind = kind;
+  }
+
+  function formatPrice(service: any) {
+    if (service.pricing_type === "quote" || !service.price_amount) return text("Request a quote", "Solicitar orçamento");
+    const formatted = new Intl.NumberFormat(isPt() ? "pt-BR" : "en-GB", { style: "currency", currency: service.currency }).format(service.price_amount / 100);
+    if (service.pricing_type === "starting_at") return `${text("From", "A partir de")} ${formatted}`;
+    if (service.pricing_type === "hourly") return `${formatted}/${text("hour", "hora")}`;
+    return formatted;
+  }
+
+  function renderProfile() {
+    const initials = String(profile.display_name).split(/\s+/).slice(0, 2).map((part: string) => part[0]).join("").toUpperCase();
+    const avatar = byId("profileAvatar")!;
+    avatar.innerHTML = profile.avatar_url ? `<img src="${escapeHtml(profile.avatar_url)}" alt="">` : escapeHtml(initials);
+    byId("profileHandle")!.textContent = `@${profile.handle}`;
+    byId("profileName")!.textContent = profile.display_name;
+    byId("profileHeadline")!.textContent = profile.headline;
+    byId("profileLocation")!.textContent = profile.location || text("Remote", "Remoto");
+    byId("profileAvailability")!.textContent = ({ available: text("Available for projects", "Disponível para projetos"), limited: text("Limited availability", "Disponibilidade limitada"), unavailable: text("Currently unavailable", "Indisponível no momento") } as any)[profile.availability] || profile.availability;
+    byId("profileBio")!.textContent = profile.bio;
+    byId("profileSpecialties")!.textContent = (profile.specialties || []).join(" · ") || text("Not specified", "Não informado");
+    byId("profileLanguages")!.textContent = (profile.languages || []).join(" · ") || text("Not specified", "Não informado");
+    (byId("verifiedBadge") as HTMLElement).hidden = !profile.is_verified;
+    if (profile.portfolio_url) {
+      const link = byId("portfolioLink") as HTMLAnchorElement;
+      link.href = profile.portfolio_url;
+      link.hidden = false;
+    }
+    byId("profileHero")!.hidden = false;
+    byId("profileBody")!.hidden = false;
+    byId("services")!.hidden = false;
+    setState("");
+  }
+
+  function renderServices() {
+    const grid = byId("servicesGrid")!;
+    if (!services.length) {
+      grid.innerHTML = `<article class="world-empty">${text("This professional has not published services yet.", "Este profissional ainda não publicou serviços.")}</article>`;
+      return;
+    }
+    grid.innerHTML = services.map((service, index) => `<article class="world-service-card">
+      <span>${escapeHtml(service.category)}</span>
+      <h3>${escapeHtml(service.title)}</h3>
+      <p>${escapeHtml(service.description)}</p>
+      <div><strong>${escapeHtml(formatPrice(service))}</strong><small>${service.delivery_days ? `${service.delivery_days} ${text("days", "dias")}` : text("Timeline by brief", "Prazo por briefing")}</small></div>
+      ${service.vx_discount_pct ? `<em>VX · ${text("Member benefit up to", "Benefício para membros de até")} ${service.vx_discount_pct}%</em>` : ""}
+      <button class="button button--gold" data-service-index="${index}" type="button">${text("Request service", "Solicitar serviço")}</button>
+    </article>`).join("");
+    grid.querySelectorAll<HTMLButtonElement>("[data-service-index]").forEach((button) => button.addEventListener("click", () => openInquiry(services[Number(button.dataset.serviceIndex)])));
+  }
+
+  function openInquiry(service: any) {
+    if (!user) {
+      location.href = `/login/?next=${encodeURIComponent(location.pathname + location.search + "#services")}`;
+      return;
+    }
+    if (user.id === profile.user_id) return setState(text("This is your own public profile.", "Este é o seu próprio perfil público."));
+    selectedService = service;
+    byId("inquiryTitle")!.textContent = service.title;
+    (byId("inquirySubject") as HTMLInputElement).value = service.title;
+    (byId("inquiryEmail") as HTMLInputElement).value = user.email || localStorage.getItem("volynx_user_email") || "";
+    (byId("inquiryDialog") as HTMLDialogElement).showModal();
+  }
+
+  byId("inquiryForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const state = byId("inquiryState")!;
+    state.textContent = text("Sending private brief...", "Enviando briefing privado...");
+    const { error } = await supabase.from("world_inquiries").insert({
+      client_id: user.id,
+      provider_id: profile.user_id,
+      service_id: selectedService.id,
+      reply_email: value("inquiryEmail"),
+      subject: value("inquirySubject"),
+      brief: value("inquiryBrief"),
+      budget: value("inquiryBudget") || null,
+      timeline: value("inquiryTimeline") || null,
+    });
+    state.textContent = error ? error.message : text("Brief sent privately.", "Briefing enviado em privado.");
+    state.dataset.kind = error ? "error" : "success";
+    if (!error) (byId("inquiryForm") as HTMLFormElement).reset();
+  });
+
+  async function boot() {
+    const handle = new URLSearchParams(location.search).get("handle")?.toLowerCase().trim();
+    if (!handle) return setState(text("Professional address missing.", "Endereço profissional não informado."), "error");
+    const cfg = await fetch("/config.json", { cache: "no-store" }).then((response) => response.json());
+    supabase = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+    const accessToken = localStorage.getItem("volynx_access_token") || "";
+    const refreshToken = localStorage.getItem("volynx_refresh_token") || "";
+    if (accessToken && refreshToken) {
+      await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+      user = (await supabase.auth.getUser()).data?.user || null;
+    }
+    const { data, error } = await supabase.from("world_profiles").select("*").eq("handle", handle).eq("is_published", true).maybeSingle();
+    if (error || !data) return setState(text("This professional profile is not available.", "Este perfil profissional não está disponível."), "error");
+    profile = data;
+    const serviceResult = await supabase.from("world_services").select("*").eq("provider_id", profile.user_id).eq("status", "published").order("updated_at", { ascending: false });
+    services = serviceResult.data || [];
+    document.title = `${profile.display_name} — Volynx World`;
+    renderProfile();
+    renderServices();
+  }
+  boot().catch((error) => setState(error?.message || "World profile could not load.", "error"));
+</script>
+
+<style>
+  .world-profile { padding:46px 0 90px; }
+  .world-back { display:inline-flex;margin-bottom:30px;color:rgba(255,255,255,.55);text-decoration:none; }
+  .world-state { color:rgba(255,255,255,.55); }
+  .world-state[data-kind="error"] { display:flex;align-items:flex-start;flex-direction:column;gap:18px;padding:28px;border:1px solid rgba(255,154,154,.18);border-radius:20px;background:rgba(255,154,154,.035);color:#ffb0b0; }
+  .world-state[data-kind="success"] { color:#74f3c9; }
+  .world-profile__hero,.world-profile__body { display:grid;gap:28px;border:1px solid rgba(255,255,255,.1);border-radius:28px;background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.015)); }
+  .world-profile__hero[hidden],.world-profile__body[hidden],.world-services[hidden] { display:none!important; }
+  .world-profile [hidden],.world-dialog [hidden] { display:none!important; }
+  .world-profile__hero { padding:clamp(24px,5vw,55px);align-items:end; }
+  .world-profile__identity { display:flex;align-items:center;gap:22px; }
+  .world-profile__avatar { width:clamp(76px,12vw,120px);height:clamp(76px,12vw,120px);display:grid;place-items:center;flex:0 0 auto;border-radius:28px;overflow:hidden;background:linear-gradient(135deg,#ffd76a,#20d9bb);color:#080808;font-size:2rem;font-weight:900; }
+  .world-profile__avatar img { width:100%;height:100%;object-fit:cover; }
+  .world-profile__eyebrow { display:flex;gap:10px;align-items:center;color:#ffd76a;font-size:.72rem;text-transform:uppercase;letter-spacing:.12em; }
+  .world-profile__eyebrow em { padding:5px 8px;border:1px solid rgba(255,215,106,.35);border-radius:999px;font-style:normal; }
+  .world-profile h1 { margin:8px 0 4px;font-size:clamp(2.5rem,7vw,6rem);line-height:.95;letter-spacing:-.06em; }
+  .world-profile__headline { margin:0;color:rgba(255,255,255,.68);font-size:1.1rem; }
+  .world-profile__meta,.world-profile__actions { display:flex;gap:10px;flex-wrap:wrap; }
+  .world-profile__meta { margin-top:18px;color:rgba(255,255,255,.48);font-size:.78rem;text-transform:uppercase;letter-spacing:.07em; }
+  .world-profile__body { margin-top:20px;padding:clamp(24px,4vw,42px); }
+  .world-label { color:#ffd76a;font-size:.7rem;text-transform:uppercase;letter-spacing:.16em; }
+  .world-about h2,.world-services h2 { margin:12px 0;font-size:clamp(2rem,5vw,4rem);letter-spacing:-.05em; }
+  .world-about>p { color:rgba(255,255,255,.68);line-height:1.8;white-space:pre-wrap; }
+  .world-profile__facts { display:grid;gap:12px;margin-top:28px; }
+  .world-profile__facts div { display:grid;gap:5px;padding:14px 0;border-top:1px solid rgba(255,255,255,.08); }
+  .world-profile__facts span { color:rgba(255,255,255,.55); }
+  .world-promise { padding:24px;border:1px solid rgba(255,215,106,.22);border-radius:20px;background:rgba(255,215,106,.04); }
+  .world-promise span { color:#ffd76a;font-size:.68rem;letter-spacing:.15em; }
+  .world-promise strong { display:block;margin:28px 0 12px;font-size:1.7rem;line-height:1.1; }
+  .world-promise p { color:rgba(255,255,255,.55);line-height:1.7;font-size:.82rem; }
+  .world-services { padding-top:72px; }
+  .world-services__grid { display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); }
+  .world-service-card,.world-empty { padding:22px;border:1px solid rgba(255,255,255,.1);border-radius:20px;background:rgba(255,255,255,.03); }
+  .world-service-card { display:flex;flex-direction:column;min-height:390px; }
+  .world-service-card>span,.world-service-card em { color:#ffd76a;font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;font-style:normal; }
+  .world-service-card h3 { margin:14px 0;font-size:1.5rem; }
+  .world-service-card p { color:rgba(255,255,255,.6);line-height:1.65; }
+  .world-service-card>div { display:flex;justify-content:space-between;gap:12px;margin-top:auto;padding:20px 0 12px;border-top:1px solid rgba(255,255,255,.08); }
+  .world-service-card small { color:rgba(255,255,255,.45); }
+  .world-service-card em { margin-bottom:14px;color:#67f1d1; }
+  .world-dialog { width:min(620px,calc(100% - 28px));border:1px solid rgba(255,255,255,.14);border-radius:22px;background:#0a0b0e;color:#fff;padding:26px; }
+  .world-dialog::backdrop { background:rgba(0,0,0,.78);backdrop-filter:blur(8px); }
+  .world-dialog form:not(.world-dialog__close) { display:grid;gap:16px; }
+  .world-dialog__close { display:flex;justify-content:flex-end; }
+  .world-dialog__close button { border:0;background:transparent;color:#fff;font-size:2rem;cursor:pointer; }
+  .world-dialog label { display:flex;flex-direction:column;color:rgba(255,255,255,.65);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em; }
+  .world-dialog input,.world-dialog textarea { width:100%;margin-top:8px;padding:13px 14px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(0,0,0,.28);color:#fff;font:inherit; }
+  .world-dialog__grid { display:grid;gap:12px; }
+  @media(min-width:780px){.world-profile__hero{grid-template-columns:1fr auto}.world-profile__body{grid-template-columns:minmax(0,1.6fr) minmax(280px,.7fr)}.world-profile__facts{grid-template-columns:1fr 1fr}.world-dialog__grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:620px){.world-profile__identity{align-items:flex-start;flex-direction:column}.world-profile__actions{display:grid}.world-profile__actions .button{width:100%}}
+</style>

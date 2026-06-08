@@ -118,7 +118,8 @@ const assistItems = [
     // ── Auth guard ────────────────────────────────────────────────────────
     const token = localStorage.getItem('volynx_access_token');
     if (!token) {
-      window.location.href = '/login/?next=/dashboard/purchases/kits/';
+      if (window.VxReturn) window.VxReturn.redirectToLogin();
+      else window.location.href = '/login/?next=/dashboard/purchases/kits/';
     }
 
     function show(id) { const el = document.getElementById(id); if (el) el.style.display = ''; }
@@ -497,7 +498,8 @@ const assistItems = [
       userId = userId || jwtSub(token);
 
       if (!userId) {
-        window.location.href = '/login/?next=/dashboard/purchases/kits/';
+        if (window.VxReturn) window.VxReturn.redirectToLogin();
+        else window.location.href = '/login/?next=/dashboard/purchases/kits/';
         return;
       }
 

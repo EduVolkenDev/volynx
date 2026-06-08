@@ -21,6 +21,10 @@ function showSuccess() {
   titleEl.textContent = "Email confirmed";
   msgEl.textContent   = "Your account is verified. You can now sign in.";
 
+  const loginHref = window.VxReturn
+    ? window.VxReturn.loginUrl(window.VxReturn.storedPath() || "/volynx-lab/")
+    : "/login/";
+  btnLogin.href = loginHref;
   btnLogin.hidden = false;
 
   countdownEl.hidden = false;
@@ -31,7 +35,7 @@ function showSuccess() {
     seconds--;
     if (seconds <= 0) {
       clearInterval(timer);
-      window.location.href = "/login/";
+      window.location.href = loginHref;
       return;
     }
     countdownEl.textContent = `Redirecting to login in ${seconds}s...`;

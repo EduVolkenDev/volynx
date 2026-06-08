@@ -377,8 +377,11 @@ window.VxTokens = (function () {
   }
 
   function showLoginPrompt() {
-    var next = encodeURIComponent(window.location.pathname + window.location.search);
-    window.location.href = '/login/?next=' + next;
+    if (window.VxReturn) window.VxReturn.redirectToLogin();
+    else {
+      var next = encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);
+      window.location.href = '/login/?next=' + next;
+    }
   }
 
   // ── Transaction History ──

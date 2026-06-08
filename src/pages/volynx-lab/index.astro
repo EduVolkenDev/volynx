@@ -99,6 +99,13 @@ const workflowSteps = [
   ["3", "Polish assets", "Run iMage Suite, Converter or Scaler depending on the job."],
   ["4", "Resume from profile", "History and presets bring the user back to the exact context."],
 ];
+
+const memorySteps = [
+  ["1", "Select", "Choose a tool", "Your current route and task stay attached to the session."],
+  ["2", "Create", "Upload or write", "Files, prompts and useful presets remain close to the work."],
+  ["3", "Deliver", "Export cleanly", "Finish the action with a clear output and recovery path."],
+  ["4", "Continue", "Resume in profile", "Return to the exact workspace instead of starting again."],
+];
 ---
 <FlagshipLayout title="VOLYNX Lab — Free Image Tools" description="Free browser-based image tools by VOLYNX — convert, upscale and process images locally." pageClass="page-lab">
   <FlagshipHeader current={ROUTES.lab} ctaLabel="Unlock Studio Pro" />
@@ -131,10 +138,18 @@ const workflowSteps = [
           <p>Every key Lab action now records recent activity and presets locally for the profile. Login-required states return to the exact tool instead of dumping the user into pricing.</p>
         </div>
         <div class="lab-flow__steps">
-          <div><strong>1</strong><span>Choose a tool</span></div>
-          <div><strong>2</strong><span>Upload or write</span></div>
-          <div><strong>3</strong><span>Export cleanly</span></div>
-          <div><strong>4</strong><span>Resume in profile</span></div>
+          {memorySteps.map(([number, state, title, copy]) => (
+            <article>
+              <div class="lab-flow__step-top">
+                <strong>{number}</strong>
+                <em>{state}</em>
+              </div>
+              <div class="lab-flow__step-copy">
+                <span>{title}</span>
+                <p>{copy}</p>
+              </div>
+            </article>
+          ))}
         </div>
       </div>
     </section>
@@ -279,16 +294,25 @@ const workflowSteps = [
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 10px;
   }
-  .page-lab .lab-flow__steps div {
-    min-height: 132px;
+  .page-lab .lab-flow__steps article {
+    min-height: 190px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 16px;
+    gap: 28px;
     padding: 16px;
     border: 1px solid rgba(255,255,255,.08);
     border-radius: 8px;
-    background: rgba(255,255,255,.045);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025)),
+      rgba(255,255,255,.025);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .page-lab .lab-flow__step-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
   }
   .page-lab .lab-flow__steps strong {
     width: 34px;
@@ -300,11 +324,29 @@ const workflowSteps = [
     color: #fff;
     font-size: 14px;
   }
+  .page-lab .lab-flow__steps em {
+    color: rgba(125,249,255,.72);
+    font-size: 9px;
+    font-style: normal;
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+  .page-lab .lab-flow__step-copy {
+    display: grid;
+    gap: 8px;
+  }
   .page-lab .lab-flow__steps span {
     color: rgba(255,255,255,.82);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 900;
     line-height: 1.25;
+  }
+  .page-lab .lab-flow__steps p {
+    margin: 0;
+    color: rgba(255,255,255,.5);
+    font-size: 11px;
+    line-height: 1.5;
   }
   .page-lab .tool-grid {
     align-items: stretch;
@@ -700,9 +742,9 @@ const workflowSteps = [
     .page-lab .lab-workflow__grid {
       grid-template-columns: 1fr;
     }
-    .page-lab .lab-flow__steps div,
+    .page-lab .lab-flow__steps article,
     .page-lab .lab-workflow__grid div {
-      min-height: 92px;
+      min-height: 136px;
     }
     .page-lab .tool-card .head-row {
       align-items: flex-start;

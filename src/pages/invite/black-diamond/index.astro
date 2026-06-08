@@ -729,8 +729,9 @@ import TierAttrInit from "../../../components/TierAttrInit.astro";
       var token = localStorage.getItem('volynx_access_token');
 
       if (!token) {
-        var next = encodeURIComponent(window.location.pathname + window.location.search);
-        acceptBtn.href        = '/login/?next=' + next;
+        acceptBtn.href = window.VxReturn
+          ? window.VxReturn.loginUrl()
+          : '/login/?next=' + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);
         setButtonMode('signin');
         return;
       }

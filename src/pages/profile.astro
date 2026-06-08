@@ -544,7 +544,8 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 				function goLogin() {
 					clearSession();
 					log("redirecting to login");
-					window.location.href = "/login/?next=/profile/";
+					if (window.VxReturn) window.VxReturn.redirectToLogin();
+					else window.location.href = "/login/?next=/profile/";
 				}
 
 				function initials(name, email) {

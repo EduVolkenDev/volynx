@@ -145,8 +145,10 @@ const deliveryAssistItems = [
   <script is:inline type="module">
     // ── Auth guard ──────────────────────────────────────────────────────────
     const token = localStorage.getItem('volynx_access_token');
+    const authRedirecting = !token;
     if (!token) {
-      window.location.href = '/login/?next=/delivery/';
+      if (window.VxReturn) window.VxReturn.redirectToLogin();
+      else window.location.href = '/login/?next=/delivery/';
     }
 
     // ── Payment status banner ──────────────────────────────────────────────
@@ -154,6 +156,7 @@ const deliveryAssistItems = [
     // checkout. Show a banner so the user gets explicit confirmation
     // (not just "the page loaded with my purchase in it").
     (function showPaymentBanner() {
+      if (authRedirecting) return;
       try {
         const params = new URLSearchParams(window.location.search);
         const status = params.get('payment');
@@ -767,7 +770,8 @@ const deliveryAssistItems = [
       userId = userId || jwtSub(token);
 
       if (!userId) {
-        window.location.href = '/login/?next=/delivery/';
+        if (window.VxReturn) window.VxReturn.redirectToLogin();
+        else window.location.href = '/login/?next=/delivery/';
         return;
       }
 

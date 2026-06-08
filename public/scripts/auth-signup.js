@@ -7,6 +7,9 @@ function t(key, fallback) {
 }
 
 function resolveRedirect() {
+  if (window.VxReturn) {
+    return window.VxReturn.paramPath() || window.VxReturn.storedPath() || DEFAULT_REDIRECT;
+  }
   try {
     const url = new URL(window.location.href);
     const next = url.searchParams.get("next") || "";
@@ -94,6 +97,7 @@ function showCheckEmail(email) {
   const msg       = document.getElementById("msg");
 
   if (!form || !emailEl || !passEl || !btn || !msg) return;
+  if (window.VxReturn) window.VxReturn.remember(resolveRedirect());
 
   // Auto-format username: lowercase, strip invalid chars
   if (usernameEl) {
@@ -142,7 +146,9 @@ function showCheckEmail(email) {
       if (out?.session?.access_token) {
         persistSession(out.session, email);
         setMsg(msg, t("signup.msg_created", "Account created. Redirecting..."), "ok");
-        window.location.href = resolveRedirect();
+        const redirect = resolveRedirect();
+        if (window.VxReturn) window.VxReturn.consume(redirect);
+        window.location.href = redirect;
         return;
       }
 

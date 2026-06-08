@@ -1913,7 +1913,7 @@ const pricingAssistItems = [
       if (!lookupPrefix) return;
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
-        if (!token) { window.location.href = '/login/?next=/pricing/'; return; }
+        if (!token) { if (window.VxReturn) window.VxReturn.redirectToLogin(); else window.location.href = '/login/?next=/pricing/'; return; }
         if (!apiBase) { vxToast(uiText('checkoutNotConfigured')); return; }
         const lookupKey = lookupPrefix + '_' + getCheckoutCurrency();
         btn.textContent = uiText('redirecting');
@@ -1935,7 +1935,7 @@ const pricingAssistItems = [
     document.querySelectorAll('.bundle-card__cta').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
-        if (!token) { window.location.href = '/login/?next=/pricing/'; return; }
+        if (!token) { if (window.VxReturn) window.VxReturn.redirectToLogin(); else window.location.href = '/login/?next=/pricing/'; return; }
         if (!apiBase) { vxToast(uiText('checkoutNotConfigured')); return; }
         const bundleKey = btn.getAttribute('data-bundle-key');
         if (!bundleKey) return;
@@ -1962,7 +1962,7 @@ const pricingAssistItems = [
       if (!packKey) return;
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
-        if (!token) { window.location.href = '/login/?next=/pricing/'; return; }
+        if (!token) { if (window.VxReturn) window.VxReturn.redirectToLogin(); else window.location.href = '/login/?next=/pricing/'; return; }
         if (!apiBase) return;
         btn.textContent = uiText('redirecting');
         try {
@@ -1989,7 +1989,7 @@ const pricingAssistItems = [
     document.querySelectorAll('.token-card__pix').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
-        if (!token) { window.location.href = '/login/?next=/pricing/'; return; }
+        if (!token) { if (window.VxReturn) window.VxReturn.redirectToLogin(); else window.location.href = '/login/?next=/pricing/'; return; }
         const packLookup = btn.getAttribute('data-pix-pack');
         if (!packLookup || !window.VxPix) return;
         window.VxPix.checkout(packLookup, {
@@ -2004,7 +2004,7 @@ const pricingAssistItems = [
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (!token) { window.location.href = '/login/?next=/pricing/'; return; }
+        if (!token) { if (window.VxReturn) window.VxReturn.redirectToLogin(); else window.location.href = '/login/?next=/pricing/'; return; }
         if (!apiBase) return;
         const addonKey = btn.getAttribute('data-addon-key');
         if (!addonKey) return;
@@ -2036,7 +2036,7 @@ const pricingAssistItems = [
     const cvitaeBusinessBtn = document.getElementById('cvitaeBusinessBtn');
     if (cvitaeBusinessBtn) {
       cvitaeBusinessBtn.addEventListener('click', async () => {
-        if (!token) { window.location.href = '/login/?next=/pricing/#cvitae'; return; }
+        if (!token) { if (window.VxReturn) window.VxReturn.redirectToLogin(); else window.location.href = '/login/?next=/pricing/#cvitae'; return; }
         if (!apiBase) { vxToast(uiText('checkoutNotConfigured')); return; }
         cvitaeBusinessBtn.textContent = uiText('redirecting');
         cvitaeBusinessBtn.style.pointerEvents = 'none';

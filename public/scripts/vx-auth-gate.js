@@ -24,8 +24,11 @@
   var refreshToken = localStorage.getItem('volynx_refresh_token') || '';
 
   if (!token) {
-    var next = encodeURIComponent(window.location.pathname + window.location.search);
-    window.location.replace(LOGIN_PATH + '?next=' + next);
+    if (window.VxReturn) window.VxReturn.redirectToLogin(null, true);
+    else {
+      var next = encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);
+      window.location.replace(LOGIN_PATH + '?next=' + next);
+    }
     return;
   }
 

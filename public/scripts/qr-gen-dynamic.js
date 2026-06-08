@@ -195,7 +195,8 @@
     if (form) form.hidden = true;
     showError("qr.dynamic_login_required", "Sign in to create dynamic QRs that you can edit later.");
     try {
-      localStorage.setItem("volynx_post_login_next", window.location.pathname + window.location.search);
+      if (window.VxReturn) window.VxReturn.remember();
+      else localStorage.setItem("volynx_post_login_next", window.location.pathname + window.location.search + window.location.hash);
     } catch (_) {}
   }
 

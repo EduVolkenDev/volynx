@@ -8,6 +8,7 @@ export const ROUTES = {
   // ── Core ──────────────────────────────
   home: "/",
   platform: "/platform/",
+  world: "/world/",
   about: "/about/",
   contact: "/contact/",
   support: "/support/",
