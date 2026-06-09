@@ -114,6 +114,9 @@ if (window.VxLab?.renderToolPresets) {
     emptyText: "Use Lumina once and your mode preset appears here.",
   });
 }
+window.VxLab?.restorePresetFromUrl?.("lumina", applyLuminaPreset, {
+  onMissing: () => setStatus("Preset Lumina não encontrado neste navegador", "warn"),
+});
 
 function escapeHtml(value) {
   return String(value)
@@ -212,21 +215,50 @@ function renderHistory() {
   }).join("");
 }
 
-function saveLuminaHistory(source, sections, selectedMode, selectedLanguage) {
+function saveLuminaHistory(source, sections, selectedMode, selectedLanguage, originalInput) {
   const rows = readHistory();
   const first = sections.find((section) => section.title === "Title") || sections[0];
   const title = first?.body || first?.title || "Resposta Lumina";
-  rows.unshift({
+  const row = {
     id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
     title: title.slice(0, 90),
     source,
     mode: selectedMode,
     language: selectedLanguage,
+    input: originalInput || "",
     sections,
     ts: new Date().toISOString(),
-  });
+  };
+  rows.unshift(row);
   writeHistory(rows);
   renderHistory();
+  return row;
+}
+
+function applyLuminaHistory(row) {
+  if (!row) return false;
+  if (row.mode && selectHasValue(mode, row.mode)) mode.value = row.mode;
+  if (row.language && selectHasValue(language, row.language)) language.value = row.language;
+  if (row.input) input.value = row.input;
+  renderCards(row.sections || []);
+  setStatus(row.source === "ai" ? "Histórico IA restaurado" : "Histórico local restaurado", "ok");
+  return true;
+}
+
+function restoreLuminaHistoryFromUrl() {
+  let historyId = "";
+  try {
+    historyId = new URLSearchParams(window.location.search).get("history") || "";
+  } catch (_) {}
+  if (!historyId) return false;
+
+  const row = readHistory().find((item) => item?.id === historyId);
+  window.VxLab?.clearQueryParam?.("history");
+  if (!row) {
+    setStatus("Resposta Lumina não encontrada neste navegador", "warn");
+    return false;
+  }
+  return applyLuminaHistory(row);
 }
 
 function parseSections(text) {
@@ -352,7 +384,7 @@ async function runLumina(nextMode) {
     const sections = await callLuminaAi(text, selectedMode, selectedLanguage);
     if (!hasPaidPlan()) setUses(getUses() + 1);
     renderCards(sections);
-    saveLuminaHistory("ai", sections, selectedMode, selectedLanguage);
+    saveLuminaHistory("ai", sections, selectedMode, selectedLanguage, text);
     setStatus("IA ativa", "ok");
     if (window.VxLab) {
       VxLab.recordEvent("lumina", "ai", `${selectedMode} · ${selectedLanguage}`);
@@ -361,7 +393,7 @@ async function runLumina(nextMode) {
   } catch (error) {
     const sections = localLumina(text, selectedMode, selectedLanguage);
     renderCards(sections);
-    saveLuminaHistory("fallback", sections, selectedMode, selectedLanguage);
+    saveLuminaHistory("fallback", sections, selectedMode, selectedLanguage, text);
     setStatus(error?.message ? `Fallback local: ${error.message}` : "Fallback local", "fallback");
     if (window.VxLab) {
       VxLab.recordEvent("lumina", "fallback", `${selectedMode} · ${selectedLanguage}`);
@@ -432,14 +464,12 @@ historyList?.addEventListener("click", (event) => {
   if (!button) return;
   const row = readHistory().find((item) => item.id === button.dataset.historyId);
   if (!row) return;
-  mode.value = row.mode || mode.value;
-  language.value = row.language || language.value;
-  renderCards(row.sections || []);
-  setStatus(row.source === "ai" ? "Histórico IA" : "Histórico local", "ok");
+  applyLuminaHistory(row);
   if (window.VxLab) VxLab.recordEvent("lumina", "history_open", row.title || "Response opened");
 });
 
 updateCounter();
 renderHistory();
+restoreLuminaHistoryFromUrl();
 window.addEventListener("vx:plan-ready", updateCounter);
 window.VxLab?.track?.("lumina", "tool_open", { surface: "lumina" });

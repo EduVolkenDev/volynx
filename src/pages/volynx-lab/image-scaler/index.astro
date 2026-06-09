@@ -209,6 +209,13 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
       return Boolean(select && Array.from(select.options).some((option) => option.value === value));
     }
 
+    function setDropMessage(message) {
+      const text = dropEl?.querySelector("p");
+      if (!text) return;
+      text.removeAttribute("data-i18n");
+      text.textContent = message;
+    }
+
     const fileEl      = $("file");
     const pickBtn     = $("pickBtn");
     const dropEl      = $("drop");
@@ -246,6 +253,10 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
         emptyText: "Upscale an image once and your scale preset appears here.",
       });
     }
+    window.VxLab?.restorePresetFromUrl?.("image-scaler", applyScalerPreset, {
+      onSuccess: () => { setDropMessage("Saved Image Scaler preset restored."); },
+      onMissing: () => { setDropMessage("Saved Image Scaler preset was not found in this browser."); },
+    });
 
     function resetPreview() {
       if (previewEl) previewEl.removeAttribute("src");

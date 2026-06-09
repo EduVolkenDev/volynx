@@ -6,6 +6,7 @@
   var ANALYTICS_KEY = "volynx_lab_analytics";
   var STATUS_KEY = "volynx_lab_status";
   var QRGEN_PROJECTS_KEY = "volynx_qrgen_projects_v1";
+  var LUMINA_HISTORY_KEY = "vx_lumina_history_v1";
   var MAX_ITEMS = 12;
   var MAX_ANALYTICS = 80;
   var configPromise = null;
@@ -62,9 +63,43 @@
     return item && item.id ? withQuery("/qrgen/", "project", item.id) : "/qrgen/";
   }
 
+  function luminaHistoryRestorePath(item) {
+    return item && item.id ? withQuery("/volynx-lab/lumina/", "history", item.id) : "/volynx-lab/lumina/";
+  }
+
   function timestampValue(value) {
     var parsed = Date.parse(value || "");
     return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  function clearQueryParam(name) {
+    if (!window.history || typeof window.history.replaceState !== "function") return;
+    try {
+      var url = new URL(window.location.href);
+      url.searchParams.delete(name);
+      window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+    } catch (_) {}
+  }
+
+  function restorePresetFromUrl(tool, apply, options) {
+    var config = options || {};
+    var presetId = "";
+    try {
+      presetId = new URLSearchParams(window.location.search).get("preset") || "";
+    } catch (_) {}
+    if (!presetId || typeof apply !== "function") return false;
+
+    var preset = getPresets(tool).find(function (item) { return item && item.id === presetId; });
+    clearQueryParam("preset");
+    if (!preset) {
+      if (typeof config.onMissing === "function") config.onMissing(presetId);
+      return false;
+    }
+
+    apply(preset.values || {}, preset);
+    if (typeof config.onSuccess === "function") config.onSuccess(preset);
+    recordEvent(tool, "preset_restore", presetSummary(tool, preset.values));
+    return true;
   }
 
   function isProfilePath(path) {
@@ -792,6 +827,7 @@
         source: "history",
         item: item,
         ts: timestampValue(item.ts),
+        specificity: 0,
       });
     }
 
@@ -805,6 +841,20 @@
         source: "qr-project",
         item: project,
         ts: timestampValue(project.updated_at || project.created_at),
+        specificity: 2,
+      });
+    }
+
+    var luminaHistory = readJson(LUMINA_HISTORY_KEY, []);
+    for (var l = 0; l < luminaHistory.length; l++) {
+      var response = luminaHistory[l] || {};
+      candidates.push({
+        path: luminaHistoryRestorePath(response),
+        label: "Continue Lumina response",
+        source: "lumina-history",
+        item: response,
+        ts: timestampValue(response.ts),
+        specificity: 2,
       });
     }
 
@@ -818,11 +868,16 @@
         source: "preset",
         item: preset,
         ts: timestampValue(preset.ts),
+        specificity: 1,
       });
     }
 
     if (candidates.length) {
-      candidates.sort(function (a, b) { return b.ts - a.ts; });
+      candidates.sort(function (a, b) {
+        var distance = Math.abs(b.ts - a.ts);
+        if (distance < 10000 && b.specificity !== a.specificity) return b.specificity - a.specificity;
+        return b.ts - a.ts;
+      });
       return candidates[0];
     }
 
@@ -969,6 +1024,8 @@
     getAnalytics: getAnalytics,
     getStatuses: getStatuses,
     syncCloud: syncLabCloud,
+    clearQueryParam: clearQueryParam,
+    restorePresetFromUrl: restorePresetFromUrl,
   };
   if (document.documentElement) {
     document.documentElement.dataset.vxLab = "ready";

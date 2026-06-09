@@ -228,6 +228,10 @@ if (window.VxLab?.renderToolPresets) {
     emptyText: 'Convert an image once and your format recipe appears here.',
   });
 }
+window.VxLab?.restorePresetFromUrl?.('converter', applyConverterPreset, {
+  onSuccess: () => { stats.textContent = 'Saved Converter recipe restored.'; },
+  onMissing: () => { stats.textContent = 'Saved Converter recipe was not found in this browser.'; },
+});
 
 /* ===== Convert ===== */
 convertBtn.addEventListener('click', async () => {
