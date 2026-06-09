@@ -231,6 +231,7 @@ function saveLuminaHistory(source, sections, selectedMode, selectedLanguage, ori
   };
   rows.unshift(row);
   writeHistory(rows);
+  window.VxLab?.syncArtifact?.("lumina-response", row);
   renderHistory();
   return row;
 }

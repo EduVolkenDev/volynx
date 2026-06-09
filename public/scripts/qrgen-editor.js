@@ -1323,6 +1323,8 @@
     }
 
     saveProjects(rows);
+    const savedProject = rows.find((item) => item.id === activeProjectId);
+    if (savedProject && window.VxLab?.syncArtifact) VxLab.syncArtifact("qr-project", savedProject);
     renderProjects();
     if (window.VxLab) {
       VxLab.recordEvent("qr-gen", "save", "QR draft saved");
@@ -1439,6 +1441,7 @@
 
     if (action === "delete") {
       saveProjects(rows.filter((item) => item.id !== id));
+      if (window.VxLab?.deleteArtifact) VxLab.deleteArtifact("qr-project", id);
       if (activeProjectId === id) activeProjectId = null;
       renderProjects();
       setMessage(tq("projects.deleted", "Project deleted."), "ok");

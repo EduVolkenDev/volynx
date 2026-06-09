@@ -182,14 +182,16 @@
   }
 
   function mergeItems(localRows, remoteRows, tsKey) {
-    var seen = {};
-    return [].concat(remoteRows || [], localRows || [])
-      .filter(function (item) {
-        var id = item && item.id ? String(item.id) : "";
-        if (!id || seen[id]) return false;
-        seen[id] = true;
-        return true;
-      })
+    var latest = {};
+    [].concat(remoteRows || [], localRows || []).forEach(function (item) {
+      var id = item && item.id ? String(item.id) : "";
+      if (!id) return;
+      var existing = latest[id];
+      var itemTs = Date.parse(item[tsKey] || item.ts || 0) || 0;
+      var existingTs = existing ? (Date.parse(existing[tsKey] || existing.ts || 0) || 0) : -1;
+      if (!existing || itemTs >= existingTs) latest[id] = item;
+    });
+    return Object.keys(latest).map(function (id) { return latest[id]; })
       .sort(function (a, b) {
         return Date.parse(b[tsKey] || b.ts || 0) - Date.parse(a[tsKey] || a.ts || 0);
       })
@@ -249,6 +251,32 @@
     };
   }
 
+  function toArtifactRow(kind, item) {
+    var createdAt = item.created_at || item.ts || new Date().toISOString();
+    var updatedAt = item.updated_at || item.ts || createdAt;
+    return {
+      user_id: currentUserId(),
+      client_id: String(item.id || ""),
+      kind: kind,
+      title: String(item.name || item.title || ""),
+      payload: item && typeof item === "object" ? item : {},
+      path: kind === "qr-project" ? "/qrgen/" : "/volynx-lab/lumina/",
+      created_at: createdAt,
+      updated_at: updatedAt,
+    };
+  }
+
+  function fromArtifactRow(row) {
+    var item = row.payload && typeof row.payload === "object" ? row.payload : {};
+    return Object.assign({}, item, {
+      id: row.client_id || item.id || row.id,
+      cloud: true,
+      created_at: item.created_at || row.created_at,
+      updated_at: item.updated_at || row.updated_at,
+      ts: item.ts || row.updated_at || row.created_at,
+    });
+  }
+
   function upsertRows(table, rows) {
     if (!rows.length || !currentUserId()) return Promise.resolve(false);
     return apiFetch(table + "?on_conflict=user_id,client_id", {
@@ -259,6 +287,31 @@
       if (!res.ok) throw new Error(table + " " + res.status);
       return true;
     }).catch(function () { return false; });
+  }
+
+  function upsertArtifacts(rows) {
+    if (!rows.length || !currentUserId()) return Promise.resolve(false);
+    return apiFetch("lab_artifacts?on_conflict=user_id,kind,client_id", {
+      method: "POST",
+      headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+      body: JSON.stringify(rows),
+    }).then(function (res) {
+      if (!res.ok) throw new Error("lab_artifacts " + res.status);
+      return true;
+    }).catch(function () { return false; });
+  }
+
+  function syncArtifact(kind, item) {
+    if (!item || !item.id || !hasAccessToken()) return Promise.resolve(false);
+    return upsertArtifacts([toArtifactRow(kind, item)]);
+  }
+
+  function deleteArtifact(kind, clientId) {
+    if (!kind || !clientId || !hasAccessToken()) return Promise.resolve(false);
+    var query = "lab_artifacts?kind=eq." + encodeURIComponent(kind) + "&client_id=eq." + encodeURIComponent(clientId);
+    return apiFetch(query, { method: "DELETE", headers: { Prefer: "return=minimal" } })
+      .then(function (res) { return res.ok; })
+      .catch(function () { return false; });
   }
 
   function fetchCloudRows(table, select, orderColumn) {
@@ -276,16 +329,26 @@
     var renderRoot = options && options.renderRoot;
     var localHistory = readJson(HISTORY_KEY, []);
     var localPresets = readJson(PRESETS_KEY, []);
+    var localQrProjects = readJson(QRGEN_PROJECTS_KEY, []);
+    var localLuminaHistory = readJson(LUMINA_HISTORY_KEY, []);
     cloudSyncPromise = Promise.all([
       upsertRows("lab_activity", localHistory.map(toActivityRow).filter(function (row) { return row.client_id && row.user_id; })),
       upsertRows("lab_presets", localPresets.map(toPresetRow).filter(function (row) { return row.client_id && row.user_id; })),
+      upsertArtifacts(localQrProjects.map(function (item) { return toArtifactRow("qr-project", item); }).filter(function (row) { return row.client_id && row.user_id; })),
+      upsertArtifacts(localLuminaHistory.map(function (item) { return toArtifactRow("lumina-response", item); }).filter(function (row) { return row.client_id && row.user_id; })),
       fetchCloudRows("lab_activity", "client_id,tool,action,detail,path,metadata,created_at", "created_at"),
       fetchCloudRows("lab_presets", "client_id,tool,label,values,path,created_at,updated_at", "updated_at"),
+      fetchCloudRows("lab_artifacts", "client_id,kind,title,payload,path,created_at,updated_at", "updated_at"),
     ]).then(function (parts) {
-      var remoteHistory = (parts[2] || []).map(fromActivityRow);
-      var remotePresets = (parts[3] || []).map(fromPresetRow);
+      var remoteHistory = (parts[4] || []).map(fromActivityRow);
+      var remotePresets = (parts[5] || []).map(fromPresetRow);
+      var remoteArtifacts = parts[6] || [];
+      var remoteQrProjects = remoteArtifacts.filter(function (row) { return row.kind === "qr-project"; }).map(fromArtifactRow);
+      var remoteLuminaHistory = remoteArtifacts.filter(function (row) { return row.kind === "lumina-response"; }).map(fromArtifactRow);
       writeJson(HISTORY_KEY, mergeItems(localHistory, remoteHistory, "ts"));
       writeJson(PRESETS_KEY, mergeItems(localPresets, remotePresets, "ts"));
+      writeJson(QRGEN_PROJECTS_KEY, mergeItems(localQrProjects, remoteQrProjects, "updated_at"));
+      writeJson(LUMINA_HISTORY_KEY, mergeItems(localLuminaHistory, remoteLuminaHistory, "ts"));
       if (renderRoot) renderProfilePanel(renderRoot, { skipCloud: true });
       configureProfileContinue();
       window.dispatchEvent(new CustomEvent("vx:lab-cloud-synced"));
@@ -1024,6 +1087,8 @@
     getAnalytics: getAnalytics,
     getStatuses: getStatuses,
     syncCloud: syncLabCloud,
+    syncArtifact: syncArtifact,
+    deleteArtifact: deleteArtifact,
     clearQueryParam: clearQueryParam,
     restorePresetFromUrl: restorePresetFromUrl,
   };
