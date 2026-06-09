@@ -359,7 +359,9 @@ const assistItems = [
       const purchaseDate = fmtDate(item.created_at);
       const price = fmtMoney(item.price_paid, item.currency);
 
+      const projectId = meta.project_id || null;
       const projectSlug = meta.project_slug || null;
+      const projectRef = projectId || projectSlug;
       const presetId = meta.preset_id || fam.preset;
       const downloadValid = isDownloadValid(meta);
       const expiresLabel = meta.download_expires_at ? fmtDate(meta.download_expires_at) : '';
@@ -370,8 +372,8 @@ const assistItems = [
 
       // Builder is the premium path for non-technical buyers. Source ZIPs stay
       // available as an advanced fallback for developers and agency handoff.
-      const primary = projectSlug
-        ? `<a href="/builder/?project=${encodeURIComponent(projectSlug)}" class="button button--gold kit-card__cta">
+      const primary = projectRef
+        ? `<a href="/builder/?project=${encodeURIComponent(projectRef)}" class="button button--gold kit-card__cta">
              <span class="i18n-en">Open in Builder (visual editor)</span><span class="i18n-pt">Abrir no Builder (editor visual)</span>
            </a>`
         : `<a href="/builder/?preset=${encodeURIComponent(presetId)}" class="button button--gold kit-card__cta">

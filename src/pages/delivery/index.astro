@@ -569,10 +569,12 @@ const deliveryAssistItems = [
     function buildProjectRecoveryCard(project) {
       const created = formatDate(project?.created_at);
       const label = projectRecoveryLabel(project);
+      const projectId = String(project?.id || '').trim();
       const slug = String(project?.slug || '').trim();
+      const projectRef = projectId || slug;
       const status = titleCase(String(project?.status || 'draft'));
-      const href = slug
-        ? '/builder/?project=' + encodeURIComponent(slug)
+      const href = projectRef
+        ? '/builder/?project=' + encodeURIComponent(projectRef)
         : ROUTES.builder;
 
       return `
