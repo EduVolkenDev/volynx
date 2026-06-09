@@ -42,6 +42,31 @@
     return p.charAt(0) === "/" && p.slice(0, 2) !== "//";
   }
 
+  function withQuery(path, key, value) {
+    var safe = safePath(path);
+    if (!isSafeRelativePath(safe) || !value) return safe;
+    try {
+      var url = new URL(safe, window.location.origin);
+      url.searchParams.set(key, String(value));
+      return url.pathname + url.search + url.hash;
+    } catch (_) {
+      return safe;
+    }
+  }
+
+  function presetRestorePath(item) {
+    return item && item.id ? withQuery(item.path, "preset", item.id) : safePath(item && item.path);
+  }
+
+  function qrProjectRestorePath(item) {
+    return item && item.id ? withQuery("/qrgen/", "project", item.id) : "/qrgen/";
+  }
+
+  function timestampValue(value) {
+    var parsed = Date.parse(value || "");
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
   function isProfilePath(path) {
     return /^\/(profile|login|signup|auth)(\/|\?|#|$)/.test(String(path || ""));
   }
@@ -755,40 +780,50 @@
       };
     }
 
+    var candidates = [];
     var history = readJson(HISTORY_KEY, []);
     for (var i = 0; i < history.length; i++) {
       var item = history[i] || {};
       var path = safePath(item.path);
       if (!isSafeRelativePath(path) || !isUsefulLabPath(path) || isPassiveAction(item.action)) continue;
-      return {
+      candidates.push({
         path: path,
         label: "Continue " + toolLabel(item.tool),
         source: "history",
         item: item,
-      };
+        ts: timestampValue(item.ts),
+      });
     }
 
     var presets = readJson(PRESETS_KEY, []);
     var qrProjects = readJson(QRGEN_PROJECTS_KEY, []);
-    if (qrProjects.length) {
-      return {
-        path: "/qrgen/",
+    for (var q = 0; q < qrProjects.length; q++) {
+      var project = qrProjects[q] || {};
+      candidates.push({
+        path: qrProjectRestorePath(project),
         label: "Continue QRGen",
         source: "qr-project",
-        item: qrProjects[0],
-      };
+        item: project,
+        ts: timestampValue(project.updated_at || project.created_at),
+      });
     }
 
     for (var j = 0; j < presets.length; j++) {
       var preset = presets[j] || {};
       var presetPath = safePath(preset.path);
       if (!isSafeRelativePath(presetPath) || !isUsefulLabPath(presetPath)) continue;
-      return {
-        path: presetPath,
+      candidates.push({
+        path: presetRestorePath(preset),
         label: "Continue " + toolLabel(preset.tool),
         source: "preset",
         item: preset,
-      };
+        ts: timestampValue(preset.ts),
+      });
+    }
+
+    if (candidates.length) {
+      candidates.sort(function (a, b) { return b.ts - a.ts; });
+      return candidates[0];
     }
 
     return {
@@ -870,7 +905,7 @@
             var summary = Object.keys(item.values || {}).map(function (key) {
               return key + ": " + item.values[key];
             }).join(" · ");
-            return '<a class="lab-profile-row" href="' + escapeHtml(safePath(item.path)) + '"><strong>' + escapeHtml(toolLabel(item.tool)) + '</strong><span>' + escapeHtml(summary) + '</span><em>' + escapeHtml(formatTime(item.ts)) + '</em></a>';
+            return '<a class="lab-profile-row" href="' + escapeHtml(presetRestorePath(item)) + '"><strong>' + escapeHtml(toolLabel(item.tool)) + '</strong><span>' + escapeHtml(summary) + '</span><em>' + escapeHtml(formatTime(item.ts)) + '</em></a>';
           }).join("")
         : '<p class="lab-profile-empty">No saved presets yet.</p>';
     }
@@ -878,7 +913,7 @@
     if (qrProjectsEl) {
       qrProjectsEl.innerHTML = qrProjects.length
         ? qrProjects.slice(0, 5).map(function (item) {
-            return '<a class="lab-profile-row" href="/qrgen/"><strong>' + escapeHtml(item.name || "QR project") + '</strong><span>' + escapeHtml(qrProjectSummary(item) || "Saved QRGen draft") + '</span><em>' + escapeHtml(formatTime(item.updated_at || item.created_at)) + '</em></a>';
+            return '<a class="lab-profile-row" href="' + escapeHtml(qrProjectRestorePath(item)) + '"><strong>' + escapeHtml(item.name || "QR project") + '</strong><span>' + escapeHtml(qrProjectSummary(item) || "Saved QRGen draft") + '</span><em>' + escapeHtml(formatTime(item.updated_at || item.created_at)) + '</em></a>';
           }).join("")
         : '<p class="lab-profile-empty">No saved QRGen projects yet.</p>';
     }

@@ -1197,6 +1197,34 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
       qualityEl.dispatchEvent(new Event("input", { bubbles: true }));
     }
 
+    function clearRestoreParam(name) {
+      if (!window.history?.replaceState) return;
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.delete(name);
+        history.replaceState({}, "", url.pathname + url.search + url.hash);
+      } catch {}
+    }
+
+    function applySuitePresetFromUrl() {
+      let presetId = "";
+      try {
+        presetId = new URLSearchParams(window.location.search).get("preset") || "";
+      } catch {}
+      if (!presetId || !window.VxLab?.getPresets) return false;
+
+      const preset = VxLab.getPresets("image-suite").find((item) => item?.id === presetId);
+      clearRestoreParam("preset");
+      if (!preset) {
+        setDropMessage("Saved iMage Suite preset was not found in this browser.");
+        return false;
+      }
+
+      applySuitePreset(preset.values || {});
+      setDropMessage("Saved iMage Suite preset restored.");
+      return true;
+    }
+
     applyInitialToolFromUrl();
     const proReady = detectPro();
 
@@ -1226,6 +1254,7 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
         emptyText: "Process an image once and your iMage Suite recipe appears here.",
       });
     }
+    applySuitePresetFromUrl();
 
     function triggerFilePicker() {
       if (fileEl) fileEl.click();

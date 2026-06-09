@@ -204,6 +204,7 @@
       "projects.clone": "Duplicar",
       "projects.delete": "Excluir",
       "projects.loaded": "Projeto carregado.",
+      "projects.not_found": "Este projeto salvo não foi encontrado neste navegador.",
       "projects.duplicated": "Projeto duplicado no editor. Salve para criar um novo rascunho.",
       "projects.deleted": "Projeto excluído.",
       "plans.free.copy": "Para rascunhos rápidos de QR estático e PNG padrão.",
@@ -1262,6 +1263,35 @@
     try { localStorage.setItem(QRGEN_STORAGE_KEY, JSON.stringify(rows)); } catch (_) {}
   }
 
+  function clearRestoreParam(name) {
+    if (!window.history?.replaceState) return;
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete(name);
+      history.replaceState({}, "", url.pathname + url.search + url.hash);
+    } catch (_) {}
+  }
+
+  function restoreProjectFromUrl() {
+    let projectId = "";
+    try {
+      projectId = new URLSearchParams(window.location.search).get("project") || "";
+    } catch (_) {}
+    if (!projectId) return false;
+
+    const row = getProjects().find((item) => item?.id === projectId);
+    clearRestoreParam("project");
+    if (!row) {
+      setMessage(tq("projects.not_found", "Saved project was not found in this browser."), "warn");
+      return false;
+    }
+
+    activeProjectId = row.id;
+    applyState(row.state);
+    setMessage(tq("projects.loaded", "Project loaded."), "ok");
+    return true;
+  }
+
   function saveProject() {
     const state = getState();
     const rows = getProjects();
@@ -1601,6 +1631,7 @@
     updateConditionalControls();
     updateModeUi();
     bind();
+    restoreProjectFromUrl();
     renderPreview();
     refreshRemoteEntitlement();
   }
