@@ -63,10 +63,10 @@ import { ROUTES } from "../../../data/routes";
       <h2 id="inquiryTitle"></h2>
       <label><span><span class="i18n-en">Reply email</span><span class="i18n-pt">Email para resposta</span></span><input id="inquiryEmail" type="email" required /></label>
       <label><span><span class="i18n-en">What do you need?</span><span class="i18n-pt">O que você precisa?</span></span><input id="inquirySubject" maxlength="120" required /></label>
-      <label><span>Brief</span><textarea id="inquiryBrief" minlength="40" maxlength="3000" rows="6" required></textarea></label>
+      <label><span><span class="i18n-en">Project brief</span><span class="i18n-pt">Briefing do projeto</span></span><textarea id="inquiryBrief" minlength="40" maxlength="3000" rows="6" required></textarea></label>
       <div class="world-dialog__grid">
         <label><span><span class="i18n-en">Budget</span><span class="i18n-pt">Orçamento</span></span><input id="inquiryBudget" maxlength="80" /></label>
-        <label><span>Timeline</span><input id="inquiryTimeline" maxlength="80" /></label>
+        <label><span><span class="i18n-en">Timeline</span><span class="i18n-pt">Prazo</span></span><input id="inquiryTimeline" maxlength="80" /></label>
       </div>
       <button class="button button--gold" type="submit"><span class="i18n-en">Send private brief</span><span class="i18n-pt">Enviar briefing privado</span></button>
       <p class="world-state" id="inquiryState"></p>
@@ -88,6 +88,7 @@ import { ROUTES } from "../../../data/routes";
   let profile: any = null;
   let services: any[] = [];
   let selectedService: any = null;
+  let profileError = "";
 
   function setState(message: string, kind = "") {
     const state = byId("profileState");
@@ -96,6 +97,12 @@ import { ROUTES } from "../../../data/routes";
       ? `<strong>${escapeHtml(message)}</strong><a class="button button--gold" href="/world/">${text("Explore professionals", "Explorar profissionais")}</a>`
       : escapeHtml(message);
     state.dataset.kind = kind;
+  }
+
+  function renderProfileError() {
+    if (profileError === "missing_handle") return setState(text("Professional address missing.", "Endereço profissional não informado."), "error");
+    if (profileError === "unavailable") return setState(text("This professional profile is not available.", "Este perfil profissional não está disponível."), "error");
+    if (profileError === "load_error") return setState(text("World profile could not load.", "O perfil World não pôde ser carregado."), "error");
   }
 
   function formatPrice(service: any) {
@@ -179,9 +186,21 @@ import { ROUTES } from "../../../data/routes";
     if (!error) (byId("inquiryForm") as HTMLFormElement).reset();
   });
 
+  window.addEventListener("vx:lang-changed", () => {
+    if (profile) {
+      renderProfile();
+      renderServices();
+    } else {
+      renderProfileError();
+    }
+  });
+
   async function boot() {
     const handle = new URLSearchParams(location.search).get("handle")?.toLowerCase().trim();
-    if (!handle) return setState(text("Professional address missing.", "Endereço profissional não informado."), "error");
+    if (!handle) {
+      profileError = "missing_handle";
+      return renderProfileError();
+    }
     const cfg = await fetch("/config.json", { cache: "no-store" }).then((response) => response.json());
     supabase = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
     const accessToken = localStorage.getItem("volynx_access_token") || "";
@@ -191,7 +210,10 @@ import { ROUTES } from "../../../data/routes";
       user = (await supabase.auth.getUser()).data?.user || null;
     }
     const { data, error } = await supabase.from("world_profiles").select("*").eq("handle", handle).eq("is_published", true).maybeSingle();
-    if (error || !data) return setState(text("This professional profile is not available.", "Este perfil profissional não está disponível."), "error");
+    if (error || !data) {
+      profileError = "unavailable";
+      return renderProfileError();
+    }
     profile = data;
     const serviceResult = await supabase.from("world_services").select("*").eq("provider_id", profile.user_id).eq("status", "published").order("updated_at", { ascending: false });
     services = serviceResult.data || [];
@@ -199,7 +221,10 @@ import { ROUTES } from "../../../data/routes";
     renderProfile();
     renderServices();
   }
-  boot().catch((error) => setState(error?.message || "World profile could not load.", "error"));
+  boot().catch(() => {
+    profileError = "load_error";
+    renderProfileError();
+  });
 </script>
 
 <style>

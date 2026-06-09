@@ -96,6 +96,17 @@ CREATE INDEX IF NOT EXISTS world_inquiries_provider_idx
 CREATE INDEX IF NOT EXISTS world_inquiries_client_idx
   ON public.world_inquiries(client_id, created_at DESC);
 
+CREATE TABLE IF NOT EXISTS public.world_starter_benefits (
+  user_id          uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  template_id      text NOT NULL
+                    CHECK (template_id IN ('executive', 'nordic', 'developer', 'creative', 'timeline')),
+  addon_id         text NOT NULL,
+  tokens_granted   numeric NOT NULL DEFAULT 2
+                    CHECK (tokens_granted > 0),
+  claimed_at       timestamptz NOT NULL DEFAULT now(),
+  metadata         jsonb NOT NULL DEFAULT '{}'::jsonb
+);
+
 DROP TRIGGER IF EXISTS world_profiles_set_updated_at ON public.world_profiles;
 CREATE TRIGGER world_profiles_set_updated_at
   BEFORE UPDATE ON public.world_profiles
@@ -157,6 +168,7 @@ CREATE TRIGGER world_inquiries_guard_participants
 ALTER TABLE public.world_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.world_services ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.world_inquiries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.world_starter_benefits ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS world_profiles_public_select ON public.world_profiles;
 CREATE POLICY world_profiles_public_select
@@ -243,5 +255,176 @@ CREATE POLICY world_inquiries_provider_update
   USING (provider_id = (SELECT auth.uid()))
   WITH CHECK (provider_id = (SELECT auth.uid()));
 
+DROP POLICY IF EXISTS world_starter_benefits_owner_select ON public.world_starter_benefits;
+CREATE POLICY world_starter_benefits_owner_select
+  ON public.world_starter_benefits FOR SELECT TO authenticated
+  USING (user_id = (SELECT auth.uid()));
+
+CREATE OR REPLACE FUNCTION public.claim_world_starter_benefit_atomic(
+  p_user_id uuid,
+  p_template_id text
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_template_id text := lower(trim(COALESCE(p_template_id, '')));
+  v_addon_id text;
+  v_claimed public.world_starter_benefits%ROWTYPE;
+  v_has_profile boolean;
+  v_has_service boolean;
+  v_already_owned boolean;
+  v_credit_result jsonb;
+BEGIN
+  IF v_template_id NOT IN ('executive', 'nordic', 'developer', 'creative', 'timeline') THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'invalid_template_id');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM public.profiles WHERE id = p_user_id) THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'profile_not_found');
+  END IF;
+
+  SELECT *
+  INTO v_claimed
+  FROM public.world_starter_benefits
+  WHERE user_id = p_user_id;
+
+  IF FOUND THEN
+    RETURN jsonb_build_object(
+      'ok', true,
+      'already_claimed', true,
+      'template_id', v_claimed.template_id,
+      'addon_id', v_claimed.addon_id,
+      'tokens_granted', v_claimed.tokens_granted,
+      'claimed_at', v_claimed.claimed_at
+    );
+  END IF;
+
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.world_profiles
+    WHERE user_id = p_user_id
+      AND is_published = true
+      AND length(trim(display_name)) >= 2
+      AND length(trim(headline)) >= 8
+      AND length(trim(bio)) >= 40
+  ) INTO v_has_profile;
+
+  IF NOT v_has_profile THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'world_profile_incomplete');
+  END IF;
+
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.world_services
+    WHERE provider_id = p_user_id
+      AND status = 'published'
+  ) INTO v_has_service;
+
+  IF NOT v_has_service THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'world_service_missing');
+  END IF;
+
+  v_addon_id := 'cvitae_template_' || v_template_id;
+
+  INSERT INTO public.world_starter_benefits (
+    user_id,
+    template_id,
+    addon_id,
+    tokens_granted,
+    metadata
+  ) VALUES (
+    p_user_id,
+    v_template_id,
+    v_addon_id,
+    2,
+    jsonb_build_object('source', 'world_starter_benefit', 'product_key', 'world')
+  )
+  ON CONFLICT (user_id) DO NOTHING
+  RETURNING * INTO v_claimed;
+
+  IF NOT FOUND THEN
+    SELECT *
+    INTO v_claimed
+    FROM public.world_starter_benefits
+    WHERE user_id = p_user_id;
+
+    RETURN jsonb_build_object(
+      'ok', true,
+      'already_claimed', true,
+      'template_id', v_claimed.template_id,
+      'addon_id', v_claimed.addon_id,
+      'tokens_granted', v_claimed.tokens_granted,
+      'claimed_at', v_claimed.claimed_at
+    );
+  END IF;
+
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.addons_purchased
+    WHERE user_id = p_user_id
+      AND status = 'active'
+      AND (addon_id = v_addon_id OR addon_id = 'cvitae_templates_bundle')
+  ) INTO v_already_owned;
+
+  IF NOT v_already_owned THEN
+    INSERT INTO public.addons_purchased (
+      user_id,
+      addon_id,
+      price_paid,
+      currency,
+      status,
+      metadata
+    ) VALUES (
+      p_user_id,
+      v_addon_id,
+      0,
+      'WORLD',
+      'active',
+      jsonb_build_object(
+        'source', 'world_starter_benefit',
+        'template_id', v_template_id,
+        'product_key', 'cvitae'
+      )
+    );
+  END IF;
+
+  SELECT public.credit_tokens_atomic(
+    p_user_id,
+    2,
+    'grant',
+    'Volynx World starter benefit',
+    'world_starter_benefit',
+    jsonb_build_object(
+      'source', 'world_starter_benefit',
+      'template_id', v_template_id,
+      'addon_id', v_addon_id,
+      'product_key', 'world'
+    )
+  ) INTO v_credit_result;
+
+  IF COALESCE((v_credit_result ->> 'ok')::boolean, false) IS NOT true THEN
+    RAISE EXCEPTION 'world_starter_benefit_credit_failed:%', COALESCE(v_credit_result ->> 'error', 'unknown');
+  END IF;
+
+  RETURN jsonb_build_object(
+    'ok', true,
+    'already_claimed', false,
+    'template_id', v_template_id,
+    'addon_id', v_addon_id,
+    'tokens_granted', 2,
+    'balance', v_credit_result -> 'balance'
+  );
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.claim_world_starter_benefit_atomic(uuid, text) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.claim_world_starter_benefit_atomic(uuid, text) FROM anon;
+REVOKE ALL ON FUNCTION public.claim_world_starter_benefit_atomic(uuid, text) FROM authenticated;
+GRANT EXECUTE ON FUNCTION public.claim_world_starter_benefit_atomic(uuid, text) TO service_role;
+
 COMMENT ON TABLE public.world_profiles IS 'Public professional identities for Volynx World, separate from private account profiles.';
 COMMENT ON COLUMN public.world_services.vx_discount_pct IS 'Maximum future VX benefit advertised for this service. No VX settlement occurs in marketplace v1.';
+COMMENT ON TABLE public.world_starter_benefits IS 'One-time founding benefit for professionals who publish a qualified Volynx World profile and service.';

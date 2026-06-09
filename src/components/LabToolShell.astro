@@ -62,23 +62,23 @@ const shell = shellByTool[active] || shellByTool.home;
   <LabToolSwitcher active={active} />
   <div class="vx-lab-shell__bar">
     <div class="vx-lab-shell__copy">
-      <span>{shell.title}</span>
-      <strong>{shell.copy}</strong>
+      <span data-i18n={`lab_shell.${active}_title`}>{shell.title}</span>
+      <strong data-i18n={`lab_shell.${active}_copy`}>{shell.copy}</strong>
       <div class="vx-lab-shell__states" aria-label="Tool access states">
-        {shell.states.map((state) => <em>{state}</em>)}
+        {shell.states.map((state, index) => <em data-i18n={`lab_shell.${active}_state${index + 1}`}>{state}</em>)}
       </div>
     </div>
     <div class="vx-lab-shell__actions">
-      <a href={ROUTES.profile} data-auth="in">Profile</a>
-      <a href={`${ROUTES.login}?next=${ROUTES.lab}`} data-auth="out">Sign in</a>
-      <a href={shell.ctaHref}>{shell.cta}</a>
+      <a href={ROUTES.profile} data-auth="in" data-i18n="nav.profile">Profile</a>
+      <a href={`${ROUTES.login}?next=${ROUTES.lab}`} data-auth="out" data-i18n="login2.kicker">Sign in</a>
+      <a href={shell.ctaHref} data-i18n={`lab_shell.${active}_cta`}>{shell.cta}</a>
     </div>
   </div>
   <div class="vx-lab-shell__legend" aria-label="Plan legend">
-    <span><b>Free</b> daily/local starter limits</span>
-    <span><b>Pro</b> higher limits and premium exports</span>
-    <span><b>VX</b> only when a token action is wired</span>
-    <span><b>Local</b> runs in this browser when possible</span>
+    <span><b data-i18n="lab_shell.legend_free_label">Free</b><em data-i18n="lab_shell.legend_free_desc">daily/local starter limits</em></span>
+    <span><b>Pro</b><em data-i18n="lab_shell.legend_pro_desc">higher limits and premium exports</em></span>
+    <span><b>VX</b><em data-i18n="lab_shell.legend_vx_desc">only when a token action is wired</em></span>
+    <span><b>Local</b><em data-i18n="lab_shell.legend_local_desc">runs in this browser when possible</em></span>
   </div>
 </section>
 
@@ -202,6 +202,10 @@ const shell = shellByTool[active] || shellByTool.home;
   .vx-lab-shell__legend b {
     color: #fff;
     margin-right: 4px;
+  }
+
+  .vx-lab-shell__legend em {
+    font-style: normal;
   }
 
   @media (max-width: 720px) {
