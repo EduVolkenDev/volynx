@@ -284,6 +284,21 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 					</a>
 				</div>
 				<div class="lab-profile__summary" data-lab-summary></div>
+				<div class="lab-memory-toolbar" data-lab-memory-toolbar>
+					<label class="lab-memory-search">
+						<span>Search saved Lab work</span>
+						<input type="search" data-lab-memory-search placeholder="Search projects, presets, and responses" autocomplete="off" />
+					</label>
+					<div class="lab-memory-filters" aria-label="Saved Lab work filters">
+						<button type="button" class="is-active" data-lab-memory-filter="all">All</button>
+						<button type="button" data-lab-memory-filter="pinned">Pinned</button>
+						<button type="button" data-lab-memory-filter="presets">Presets</button>
+						<button type="button" data-lab-memory-filter="projects">Projects</button>
+						<button type="button" data-lab-memory-filter="responses">Responses</button>
+					</div>
+					<span class="lab-memory-status" data-lab-memory-status aria-live="polite"></span>
+				</div>
+				<div class="lab-memory-list" data-lab-memory-list></div>
 				<div class="lab-profile__grid">
 					<div>
 						<strong class="lab-profile__heading">
@@ -305,6 +320,13 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 							<span class="i18n-pt">Projetos QRGen</span>
 						</strong>
 						<div class="lab-profile__list" data-qr-projects></div>
+					</div>
+					<div>
+						<strong class="lab-profile__heading">
+							<span class="i18n-en">Lumina responses</span>
+							<span class="i18n-pt">Respostas Lumina</span>
+						</strong>
+						<div class="lab-profile__list" data-lumina-responses></div>
 					</div>
 				</div>
 			</section>
@@ -500,7 +522,7 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 			SCRIPT 1 (is:inline): Logout + failsafe.
 			Zero imports. Zero CDN. Always runs.
 		-->
-		<script is:inline src="/scripts/vx-lab-workspace.js?v=20260604-lab-cloud"></script>
+		<script is:inline src="/scripts/vx-lab-workspace.js?v=20260610-memory-manager"></script>
 		<script is:inline>
 		(function() {
 			var KEYS = ["volynx_access_token","volynx_refresh_token","volynx_user_email","volynx_session","volynx_post_login_next"];
@@ -2428,8 +2450,83 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 	}
 	.lab-profile__grid {
 		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 14px;
+	}
+	.lab-memory-toolbar {
+		display: grid;
+		grid-template-columns: minmax(220px, 1fr) auto;
+		align-items: end;
+		gap: 10px 14px;
+		margin: 0 0 12px;
+		padding: 12px;
+		border: 1px solid rgba(255,255,255,.08);
+		border-radius: 8px;
+		background: rgba(0,0,0,.12);
+	}
+	.lab-memory-search {
+		display: grid;
+		gap: 6px;
+		min-width: 0;
+		color: rgba(255,255,255,.46);
+		font-size: .68rem;
+		font-weight: 800;
+		text-transform: uppercase;
+	}
+	.lab-memory-search input {
+		width: 100%;
+		min-height: 40px;
+		padding: 9px 12px;
+		border: 1px solid rgba(255,255,255,.1);
+		border-radius: 8px;
+		background: rgba(0,0,0,.2);
+		color: #fff;
+		font: inherit;
+		font-size: .82rem;
+		font-weight: 600;
+		text-transform: none;
+		outline: none;
+	}
+	.lab-memory-search input:focus {
+		border-color: rgba(125,249,255,.38);
+		box-shadow: 0 0 0 3px rgba(125,249,255,.08);
+	}
+	.lab-memory-filters {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+	}
+	.lab-memory-filters button {
+		min-height: 34px;
+		padding: 7px 10px;
+		border: 1px solid rgba(255,255,255,.09);
+		border-radius: 8px;
+		background: rgba(255,255,255,.035);
+		color: rgba(255,255,255,.56);
+		font: inherit;
+		font-size: .72rem;
+		font-weight: 800;
+		cursor: pointer;
+	}
+	.lab-memory-filters button:hover,
+	.lab-memory-filters button:focus-visible,
+	.lab-memory-filters button.is-active {
+		border-color: rgba(125,249,255,.28);
+		background: rgba(125,249,255,.08);
+		color: rgba(255,255,255,.92);
+		outline: none;
+	}
+	.lab-memory-status {
+		grid-column: 1 / -1;
+		min-height: 1em;
+		color: rgba(125,249,255,.7);
+		font-size: .72rem;
+		font-weight: 700;
+	}
+	.lab-memory-list {
+		display: grid;
+		gap: 6px;
+		margin-bottom: 18px;
 	}
 	.lab-profile__heading {
 		display: block;
@@ -2556,6 +2653,112 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 		font-size: .72rem;
 		font-style: normal;
 		white-space: nowrap;
+	}
+	:global(.lab-memory-row) {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr) auto;
+		align-items: center;
+		gap: 10px;
+		min-height: 58px;
+		padding: 9px 10px;
+		border-top: 1px solid rgba(255,255,255,.07);
+	}
+	:global(.lab-memory-row:last-child) {
+		border-bottom: 1px solid rgba(255,255,255,.07);
+	}
+	:global(.lab-memory-row__pin),
+	:global(.lab-memory-row__action) {
+		min-height: 34px;
+		padding: 6px 9px;
+		border: 1px solid rgba(255,255,255,.08);
+		border-radius: 8px;
+		background: rgba(255,255,255,.035);
+		color: rgba(255,255,255,.58);
+		font: inherit;
+		font-size: .7rem;
+		font-weight: 800;
+		cursor: pointer;
+	}
+	:global(.lab-memory-row__pin) {
+		width: 34px;
+		padding: 0;
+		color: rgba(255,255,255,.38);
+	}
+	:global(.lab-memory-row__pin.is-active) {
+		border-color: rgba(214,168,79,.32);
+		background: rgba(214,168,79,.1);
+		color: #f3cd7d;
+	}
+	:global(.lab-memory-row__pin:hover),
+	:global(.lab-memory-row__action:hover),
+	:global(.lab-memory-row__pin:focus-visible),
+	:global(.lab-memory-row__action:focus-visible) {
+		border-color: rgba(125,249,255,.3);
+		color: #fff;
+		outline: none;
+	}
+	:global(.lab-memory-row__main) {
+		display: grid;
+		grid-template-columns: minmax(120px, .45fr) minmax(0, 1fr) auto;
+		align-items: center;
+		gap: 10px;
+		min-width: 0;
+		color: inherit;
+		text-decoration: none;
+	}
+	:global(.lab-memory-row__title) {
+		min-width: 0;
+		overflow: hidden;
+		color: rgba(255,255,255,.9);
+		font-size: .8rem;
+		font-weight: 800;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	:global(.lab-memory-row__detail) {
+		min-width: 0;
+		overflow: hidden;
+		color: rgba(255,255,255,.54);
+		font-size: .76rem;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	:global(.lab-memory-row__meta) {
+		color: rgba(125,249,255,.62);
+		font-size: .68rem;
+		font-weight: 800;
+		white-space: nowrap;
+	}
+	:global(.lab-memory-row__actions) {
+		display: flex;
+		gap: 6px;
+	}
+	:global(.lab-memory-row__editor) {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		min-width: 0;
+	}
+	:global(.lab-memory-row__editor input) {
+		min-width: 0;
+		width: min(300px, 100%);
+		min-height: 34px;
+		padding: 7px 9px;
+		border: 1px solid rgba(125,249,255,.28);
+		border-radius: 8px;
+		background: rgba(0,0,0,.25);
+		color: #fff;
+		font: inherit;
+		font-size: .8rem;
+		outline: none;
+	}
+	:global(.lab-memory-empty) {
+		margin: 0 0 18px;
+		padding: 14px 0;
+		border-top: 1px dashed rgba(255,255,255,.1);
+		border-bottom: 1px dashed rgba(255,255,255,.1);
+		color: rgba(255,255,255,.46);
+		font-size: .82rem;
 	}
 	:global(.lab-profile-empty) {
 		margin: 0;
@@ -2923,6 +3126,8 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 		.layer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 		.lab-profile__summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 		.lab-profile__grid { grid-template-columns: 1fr; }
+		.lab-memory-toolbar { grid-template-columns: 1fr; align-items: stretch; }
+		.lab-memory-status { grid-column: auto; }
 		.subs-grid { grid-template-columns: 1fr 1fr; }
 		.quick-grid { grid-template-columns: repeat(2, 1fr); }
 	}
@@ -3119,6 +3324,21 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 		}
 		.lab-profile-row span,
 		:global(.lab-profile-row span) { white-space: normal; }
+		:global(.lab-memory-row) {
+			grid-template-columns: auto minmax(0, 1fr);
+			align-items: start;
+		}
+		:global(.lab-memory-row__main) {
+			grid-template-columns: 1fr;
+			gap: 3px;
+		}
+		:global(.lab-memory-row__detail),
+		:global(.lab-memory-row__title) { white-space: normal; }
+		:global(.lab-memory-row__actions) {
+			grid-column: 2;
+			flex-wrap: wrap;
+		}
+		.lab-memory-filters button { flex: 1 1 auto; }
 		.subs-grid { grid-template-columns: 1fr; }
 		.sub-card {
 			display: grid;
