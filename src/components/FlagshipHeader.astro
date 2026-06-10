@@ -1,16 +1,70 @@
 ---
 import { ROUTES } from "../data/routes";
 
-const nav = [
-  { href: ROUTES.world, label: "World", i18n: "nav.world" },
-  { href: "https://daily.volynx.world", label: "Daily", i18n: "nav.daily" },
-  { href: ROUTES.builder, label: "Builder", i18n: "nav.builder" },
-  { href: "https://cvitae.volynx.world", label: "CVitae", i18n: "nav.cvitae" },
-  { href: ROUTES.propertyflow, label: "PropertyFlow", i18n: "nav.propertyflow" },
-  { href: ROUTES.lab, label: "Lab", i18n: "nav.lab" },
-  { href: ROUTES.products, label: "Products", i18n: "nav.products" },
-  { href: ROUTES.services, label: "Services", i18n: "nav.services" },
-  { href: ROUTES.pricing, label: "Pricing", i18n: "nav.pricing" },
+const navGroups = [
+  {
+    key: "volynx",
+    href: ROUTES.platform,
+    label: "VOLYNX",
+    eyebrow: "Ecosystem",
+    eyebrowPt: "Ecossistema",
+    description: "Move between every VOLYNX layer from one command panel.",
+    descriptionPt: "Navegue por todas as camadas VOLYNX em um único painel.",
+    items: [
+      { href: ROUTES.world, label: "World", detail: "People, opportunities and the ecosystem.", detailPt: "Pessoas, oportunidades e ecossistema.", icon: "/assets/V.webp" },
+      { href: ROUTES.daily, label: "Daily OS", detail: "Daily command, Vault and intelligent routines.", detailPt: "Comando diário, Vault e rotinas inteligentes.", icon: "/assets/volynx-daily.webp" },
+      { href: ROUTES.cvitae, label: "CVitae", detail: "Career assets, resumes and applications.", detailPt: "Carreira, currículos e candidaturas.", icon: "/assets/cvitae.webp" },
+      { href: ROUTES.propertyflow, label: "PropertyFlow", detail: "Premium real-estate workflows.", detailPt: "Fluxos imobiliários premium.", icon: "/assets/propertyflow.webp" },
+    ],
+  },
+  {
+    key: "build",
+    href: ROUTES.builder,
+    label: "Build",
+    labelPt: "Construir",
+    eyebrow: "Create and ship",
+    eyebrowPt: "Criar e publicar",
+    description: "Build, publish and recover everything you own.",
+    descriptionPt: "Crie, publique e recupere tudo que é seu.",
+    items: [
+      { href: ROUTES.builder, label: "Builder", detail: "Create and publish premium sites.", detailPt: "Crie e publique sites premium.", icon: "/assets/builder.webp" },
+      { href: ROUTES.products, label: "Products", labelPt: "Produtos", detail: "Ready-to-use systems and premium kits.", detailPt: "Sistemas prontos e kits premium.", icon: "/assets/products.webp" },
+      { href: ROUTES.devHub, label: "Dev Hub", detail: "Documentation, journeys and technical resources.", detailPt: "Documentação, jornadas e recursos técnicos.", icon: "/assets/devjourneyicon1.webp" },
+      { href: ROUTES.delivery, label: "My products", labelPt: "Meus produtos", detail: "Recover purchases and delivered assets.", detailPt: "Recupere compras e arquivos entregues.", icon: "/assets/producticon.webp" },
+    ],
+  },
+  {
+    key: "lab",
+    href: ROUTES.lab,
+    label: "Lab",
+    eyebrow: "Creative intelligence",
+    eyebrowPt: "Inteligência criativa",
+    description: "Open the Lab or jump directly into a production tool.",
+    descriptionPt: "Abra o Lab ou entre direto em uma ferramenta.",
+    items: [
+      { href: ROUTES.labConverter, label: "Converter", detail: "Convert image formats locally.", detailPt: "Converta formatos de imagem localmente.", icon: "/assets/converterbig.webp" },
+      { href: ROUTES.labImageScaler, label: "Image Scaler", detail: "Resize and upscale with precision.", detailPt: "Redimensione e amplie com precisão.", icon: "/assets/newimagescaler.webp" },
+      { href: ROUTES.labImageSuite, label: "iMage Suite", detail: "Compress, clean and process images.", detailPt: "Comprima, limpe e processe imagens.", icon: "/assets/newimagesuite.webp" },
+      { href: ROUTES.labLumina, label: "Lumina", detail: "AI-assisted knowledge and writing.", detailPt: "Conhecimento e escrita assistidos por IA.", icon: "/assets/education.webp" },
+      { href: ROUTES.qrgen, label: "QRGen", detail: "Design production-ready QR projects.", detailPt: "Crie projetos QR prontos para produção.", icon: "/assets/newqrgen.webp" },
+    ],
+  },
+  {
+    key: "services",
+    href: ROUTES.services,
+    label: "Services",
+    labelPt: "Serviços",
+    eyebrow: "Expert support",
+    eyebrowPt: "Suporte especializado",
+    description: "Premium implementation, design and platform support.",
+    descriptionPt: "Implementação, design e suporte premium.",
+    items: [
+      { href: ROUTES.services, label: "Services", labelPt: "Serviços", detail: "Strategy, design and product execution.", detailPt: "Estratégia, design e execução de produto.", icon: "/assets/support-gold.webp" },
+      { href: ROUTES.designStudio, label: "Design Studio", detail: "Identity and premium visual systems.", detailPt: "Identidade e sistemas visuais premium.", icon: "/assets/producticon.webp" },
+      { href: ROUTES.support, label: "Support", labelPt: "Suporte", detail: "Get help and resolve platform questions.", detailPt: "Resolva dúvidas e problemas da plataforma.", icon: "/assets/support.webp" },
+      { href: ROUTES.pricing, label: "Plans", labelPt: "Planos", detail: "Compare access, capacity and upgrades.", detailPt: "Compare acesso, capacidade e upgrades.", icon: "/assets/producticon.webp" },
+    ],
+  },
 ];
 
 interface Props {
@@ -34,8 +88,34 @@ const { current = "", brandHref = ROUTES.platform, ctaHref = ROUTES.pricing, cta
 
     <!-- DESKTOP NAV -->
     <nav class="vx-nav" aria-label="Primary" data-i18n-aria="aria.primary_nav">
-      {nav.map((item) => (
-        <a href={item.href} class:list={{ "is-active": current === item.href }} data-i18n={item.i18n}>{item.label}</a>
+      {navGroups.map((group) => (
+        <div class:list={["vx-nav-group", { "is-active": current === group.href || group.items.some((item) => current === item.href) }]} data-vx-nav-group>
+          <a href={group.href} class="vx-nav-trigger">
+            <span><span class="i18n-en">{group.label}</span><span class="i18n-pt">{group.labelPt || group.label}</span></span>
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <div class:list={["vx-mega", `vx-mega--${group.key}`]} data-vx-mega>
+            <div class="vx-mega__intro">
+              <span><span class="i18n-en">{group.eyebrow}</span><span class="i18n-pt">{group.eyebrowPt}</span></span>
+              <strong><span class="i18n-en">{group.label}</span><span class="i18n-pt">{group.labelPt || group.label}</span></strong>
+              <p><span class="i18n-en">{group.description}</span><span class="i18n-pt">{group.descriptionPt}</span></p>
+              <a href={group.href} class="vx-mega__open">
+                <span class="i18n-en">Open {group.label}</span>
+                <span class="i18n-pt">Abrir {group.labelPt || group.label}</span>
+                <span aria-hidden="true">→</span>
+              </a>
+            </div>
+            <div class="vx-mega__grid">
+              {group.items.map((item) => (
+                <a href={item.href} class="vx-mega-item">
+                  <span class="vx-mega-item__icon"><img src={item.icon} alt="" loading="lazy" decoding="async" /></span>
+                  <span class="vx-mega-item__copy"><strong><span class="i18n-en">{item.label}</span><span class="i18n-pt">{item.labelPt || item.label}</span></strong><span><span class="i18n-en">{item.detail}</span><span class="i18n-pt">{item.detailPt}</span></span></span>
+                  <span class="vx-mega-item__arrow" aria-hidden="true">↗</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
       ))}
     </nav>
 
@@ -107,11 +187,25 @@ const { current = "", brandHref = ROUTES.platform, ctaHref = ROUTES.pricing, cta
 
   <!-- MOBILE MENU -->
   <nav class="vx-mobile" id="mobileNav" aria-label="Mobile" data-i18n-aria="aria.mobile_nav">
-    {nav.map((item) => (
-      <a href={item.href} class:list={{ "is-active": current === item.href }} data-i18n={item.i18n}>{item.label}</a>
+    {navGroups.map((group) => (
+      <div class="vx-mobile-group" data-vx-mobile-group>
+        <button type="button" class="vx-mobile-group__trigger" aria-expanded="false" data-vx-mobile-trigger>
+          <span><span class="i18n-en">{group.label}</span><span class="i18n-pt">{group.labelPt || group.label}</span></span>
+          <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="vx-mobile-group__panel" hidden>
+          <a href={group.href} class="vx-mobile-group__open">
+            <span class="i18n-en">Open {group.label}</span><span class="i18n-pt">Abrir {group.labelPt || group.label}</span><span aria-hidden="true">→</span>
+          </a>
+          {group.items.map((item) => (
+            <a href={item.href} class="vx-mobile-group__item">
+              <span class="vx-mobile-group__icon"><img src={item.icon} alt="" loading="lazy" decoding="async" /></span>
+              <span><strong><span class="i18n-en">{item.label}</span><span class="i18n-pt">{item.labelPt || item.label}</span></strong><small><span class="i18n-en">{item.detail}</span><span class="i18n-pt">{item.detailPt}</span></small></span>
+            </a>
+          ))}
+        </div>
+      </div>
     ))}
-    <a href={ROUTES.delivery} class="vx-mobile__link" data-i18n="nav.my_products">My Products</a>
-    <a href={ROUTES.support} class="vx-mobile__link" data-i18n="nav.support">Support</a>
     <hr class="vx-mobile__hr" />
     <button
       type="button"
@@ -239,24 +333,166 @@ const { current = "", brandHref = ROUTES.platform, ctaHref = ROUTES.pricing, cta
     .vx-nav {
       display: flex;
       align-items: center;
-      gap: 32px;
+      gap: 6px;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 650;
+      align-self: stretch;
     }
-    .vx-nav a {
+    .vx-nav-group {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .vx-nav-trigger {
+      min-height: 40px;
+      display: inline-flex !important;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 11px;
+      border: 1px solid transparent;
+      border-radius: 8px;
       color: var(--topbar-muted);
       text-decoration: none;
-      transition: color .25s ease, text-shadow .25s ease, transform .25s ease;
+      transition: color .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
       white-space: nowrap;
-      display: inline-block;
-      will-change: transform;
     }
-    .vx-nav a:hover {
+    .vx-nav-trigger svg { transition: transform .2s ease; }
+    .vx-nav-group:hover .vx-nav-trigger,
+    .vx-nav-group:focus-within .vx-nav-trigger,
+    .vx-nav-group.is-active .vx-nav-trigger {
       color: #fff;
-      text-shadow: 0 0 10px #fff;
-      transform: translateY(-2px);
+      border-color: rgba(45,212,191,.2);
+      background: rgba(45,212,191,.06);
+      box-shadow: 0 0 24px rgba(45,212,191,.08);
     }
-    .vx-nav a.is-active { color: #fff; }
+    .vx-nav-group:hover .vx-nav-trigger svg,
+    .vx-nav-group:focus-within .vx-nav-trigger svg { transform: rotate(180deg); }
+    .vx-mega {
+      position: absolute;
+      top: calc(100% - 2px);
+      left: 50%;
+      width: min(680px, calc(100vw - 32px));
+      display: grid;
+      grid-template-columns: 190px minmax(0, 1fr);
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid rgba(125,249,255,.16);
+      border-radius: 8px;
+      background:
+        linear-gradient(145deg, rgba(18,22,29,.98), rgba(6,8,12,.98)),
+        #09090b;
+      box-shadow: 0 28px 70px rgba(0,0,0,.58), 0 0 42px rgba(45,212,191,.08);
+      backdrop-filter: blur(28px) saturate(1.25);
+      -webkit-backdrop-filter: blur(28px) saturate(1.25);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translate(-50%, 8px);
+      transition: opacity .18s ease, visibility .18s ease, transform .18s ease;
+      z-index: 300;
+    }
+    .vx-nav-group:first-child .vx-mega { left: 0; transform: translate(0, 8px); }
+    .vx-nav-group:last-child .vx-mega { left: auto; right: 0; transform: translate(0, 8px); }
+    .vx-nav-group:hover .vx-mega,
+    .vx-nav-group:focus-within .vx-mega,
+    .vx-nav-group.is-open .vx-mega {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translate(-50%, 0);
+    }
+    .vx-nav-group:first-child:hover .vx-mega,
+    .vx-nav-group:first-child:focus-within .vx-mega,
+    .vx-nav-group:first-child.is-open .vx-mega,
+    .vx-nav-group:last-child:hover .vx-mega,
+    .vx-nav-group:last-child:focus-within .vx-mega,
+    .vx-nav-group:last-child.is-open .vx-mega { transform: translate(0, 0); }
+    .vx-mega__intro {
+      min-width: 0;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 8px;
+      background: rgba(255,255,255,.03);
+    }
+    .vx-mega__intro > span {
+      display: block;
+      margin-bottom: 9px;
+      color: #7df9ff;
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .vx-mega__intro strong { display: block; color: #fff; font-size: 19px; }
+    .vx-mega__intro p {
+      margin: 8px 0 16px;
+      color: rgba(255,255,255,.5);
+      font-size: 12px;
+      font-weight: 550;
+      line-height: 1.5;
+    }
+    .vx-mega__open {
+      min-height: 36px;
+      display: flex !important;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid rgba(214,168,79,.25);
+      border-radius: 8px;
+      background: rgba(214,168,79,.08);
+      color: #f5d78f;
+      font-size: 11px;
+      font-weight: 850;
+      text-decoration: none;
+    }
+    .vx-mega__grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .vx-mega-item {
+      min-width: 0;
+      min-height: 70px;
+      display: grid !important;
+      grid-template-columns: 38px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 9px;
+      padding: 9px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      color: #fff;
+      text-decoration: none;
+      transition: background .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+    .vx-mega-item:hover,
+    .vx-mega-item:focus-visible {
+      outline: none;
+      border-color: rgba(125,249,255,.18);
+      background: rgba(125,249,255,.055);
+      box-shadow: inset 0 0 24px rgba(125,249,255,.025);
+    }
+    .vx-mega-item__icon {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 8px;
+      background: rgba(255,255,255,.04);
+    }
+    .vx-mega-item__icon img { width: 32px; height: 32px; object-fit: contain; display: block; }
+    .vx-mega-item__copy { display: grid; gap: 3px; min-width: 0; }
+    .vx-mega-item__copy strong { color: rgba(255,255,255,.92); font-size: 12px; }
+    .vx-mega-item__copy > span {
+      overflow: hidden;
+      color: rgba(255,255,255,.42);
+      font-size: 10px;
+      font-weight: 550;
+      line-height: 1.35;
+      text-overflow: ellipsis;
+    }
+    .vx-mega-item__arrow { color: rgba(125,249,255,.42); font-size: 11px; }
   }
 
   /* ── ACTIONS ─────────────────────────────────────── */
@@ -558,6 +794,93 @@ const { current = "", brandHref = ROUTES.platform, ctaHref = ROUTES.pricing, cta
     z-index: 999; /* Above .vx-actions so the menu wins when open. */
   }
   .vx-mobile.is-open { display: flex; }
+  .vx-mobile-group {
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 8px;
+    background: rgba(255,255,255,.025);
+    transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+  }
+  .vx-mobile-group.is-open {
+    border-color: rgba(125,249,255,.24);
+    background: rgba(125,249,255,.04);
+    box-shadow: 0 0 28px rgba(125,249,255,.08), inset 0 0 22px rgba(125,249,255,.025);
+  }
+  .vx-mobile-group__trigger {
+    width: 100%;
+    min-height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 0;
+    background: transparent;
+    color: rgba(255,255,255,.88);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 850;
+    text-align: left;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .vx-mobile-group__trigger svg { color: rgba(125,249,255,.55); transition: transform .2s ease; }
+  .vx-mobile-group.is-open .vx-mobile-group__trigger svg { transform: rotate(180deg); }
+  .vx-mobile-group__panel {
+    display: grid;
+    gap: 5px;
+    padding: 0 8px 8px;
+  }
+  .vx-mobile-group__panel[hidden] { display: none; }
+  .vx-mobile-group__open {
+    min-height: 40px;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 9px 10px !important;
+    border: 1px solid rgba(214,168,79,.22);
+    border-radius: 8px;
+    background: rgba(214,168,79,.07);
+    color: #f5d78f !important;
+    font-size: 12px !important;
+    font-weight: 850 !important;
+  }
+  .vx-mobile-group__item {
+    min-height: 54px;
+    display: grid !important;
+    grid-template-columns: 38px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px !important;
+    border-radius: 8px;
+    background: rgba(255,255,255,.025);
+  }
+  .vx-mobile-group__item:active,
+  .vx-mobile-group__item:focus-visible {
+    outline: none;
+    background: rgba(125,249,255,.1);
+    box-shadow: 0 0 22px rgba(125,249,255,.11);
+  }
+  .vx-mobile-group__icon {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 8px;
+    background: rgba(255,255,255,.04);
+  }
+  .vx-mobile-group__icon img { width: 32px; height: 32px; object-fit: contain; display: block; }
+  .vx-mobile-group__item > span:last-child { display: grid; gap: 2px; min-width: 0; }
+  .vx-mobile-group__item strong { font-size: 13px; }
+  .vx-mobile-group__item small {
+    color: rgba(255,255,255,.42);
+    font-size: 10px;
+    font-weight: 550;
+    line-height: 1.35;
+  }
   .vx-mobile a, .vx-mobile__profile {
     display: block;
     padding: 14px 4px;
@@ -681,6 +1004,25 @@ const { current = "", brandHref = ROUTES.platform, ctaHref = ROUTES.pricing, cta
       btn.setAttribute("aria-expanded", String(open));
     });
   }
+
+  // Mobile ecosystem groups: first tap expands, links inside navigate directly.
+  document.querySelectorAll("[data-vx-mobile-group]").forEach((group) => {
+    const trigger = group.querySelector("[data-vx-mobile-trigger]");
+    const panel = group.querySelector(".vx-mobile-group__panel") as HTMLElement | null;
+    trigger?.addEventListener("click", () => {
+      const willOpen = !group.classList.contains("is-open");
+      document.querySelectorAll("[data-vx-mobile-group].is-open").forEach((openGroup) => {
+        if (openGroup === group) return;
+        openGroup.classList.remove("is-open");
+        openGroup.querySelector("[data-vx-mobile-trigger]")?.setAttribute("aria-expanded", "false");
+        const openPanel = openGroup.querySelector(".vx-mobile-group__panel") as HTMLElement | null;
+        if (openPanel) openPanel.hidden = true;
+      });
+      group.classList.toggle("is-open", willOpen);
+      trigger.setAttribute("aria-expanded", String(willOpen));
+      if (panel) panel.hidden = !willOpen;
+    });
+  });
 
   // Mobile lang toggle — toggle is handled globally by i18n.js.
   // We only close the menu here for a cleaner mobile flow.
