@@ -236,7 +236,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
           </div>
           <div class="info-actions">
             <a class="btn btn--accent btn--sm" id="visitSite" href="#" target="_blank" rel="noreferrer" hidden>Visit site ↗</a>
-            <button class="btn btn--ghost btn--sm" id="exportZip">Download ZIP</button>
+            <button class="btn btn--ghost btn--sm" id="exportZip" title="Advanced source-code export">Source ZIP (advanced)</button>
             <button class="btn btn--ghost btn--sm" id="deleteProject">Delete</button>
           </div>
         </div>
@@ -274,8 +274,12 @@ import PageWidgets from "../../components/PageWidgets.astro";
               </button>
             </div>
             <div class="editor-actions">
+              <span class="save-state" id="saveState" data-state="idle" aria-live="polite">
+                <span class="save-state__dot" aria-hidden="true"></span>
+                <span class="i18n-en">Open a project to start</span><span class="i18n-pt">Abra um projeto para começar</span>
+              </span>
               <button class="btn btn--ghost btn--sm editor-action-advanced" id="copy"><span class="i18n-en">Copy JSON</span><span class="i18n-pt">Copiar JSON</span></button>
-              <button class="btn btn--ghost btn--sm" id="save"><span class="i18n-en">Save changes</span><span class="i18n-pt">Salvar mudanças</span></button>
+              <button class="btn btn--ghost btn--sm" id="save"><span class="i18n-en">Save now</span><span class="i18n-pt">Salvar agora</span></button>
               <button class="btn btn--primary btn--sm" id="publish"><span class="i18n-en">Publish site →</span><span class="i18n-pt">Publicar site →</span></button>
             </div>
           </div>
@@ -363,6 +367,9 @@ import PageWidgets from "../../components/PageWidgets.astro";
 
   let supa: any = null;
   let currentProject: any = null;
+  let lastSavedJson = "";
+  let autosaveTimer: ReturnType<typeof setTimeout> | null = null;
+  let autosaveInFlight = false;
   let presetsData: any = {};
   let presets: any[] = [];
   let selectedPresetId = "blank";
@@ -541,6 +548,21 @@ import PageWidgets from "../../components/PageWidgets.astro";
   }
 
   const setStatus = (t: string) => { const el = $("status"); if (el) el.textContent = t || ""; };
+
+  function setSaveState(state: "idle" | "dirty" | "saving" | "saved" | "error", message?: string) {
+    const el = $("saveState") as HTMLElement | null;
+    if (!el) return;
+    el.dataset.state = state;
+    const labels = {
+      idle: ["Open a project to start", "Abra um projeto para começar"],
+      dirty: ["Changes waiting to save", "Mudanças aguardando salvamento"],
+      saving: ["Saving automatically...", "Salvando automaticamente..."],
+      saved: ["All changes saved", "Todas as mudanças salvas"],
+      error: [message || "Could not save automatically", message || "Não foi possível salvar automaticamente"],
+    };
+    const [en, pt] = labels[state];
+    el.innerHTML = `<span class="save-state__dot" aria-hidden="true"></span><span class="i18n-en">${en}</span><span class="i18n-pt">${pt}</span>`;
+  }
 
   const isDesktopEditor = () => {
     try { return window.matchMedia("(min-width: 960px)").matches; }
@@ -1471,7 +1493,10 @@ import PageWidgets from "../../components/PageWidgets.astro";
   function openProject(p: any) {
     currentProject = p;
     const json = $("json") as HTMLTextAreaElement | null;
-    if (json) json.value = JSON.stringify(p.builder_data || {}, null, 2);
+    lastSavedJson = JSON.stringify(p.builder_data || {}, null, 2);
+    if (json) json.value = lastSavedJson;
+    if (autosaveTimer) clearTimeout(autosaveTimer);
+    setSaveState("saved");
     const link = $("link");
     if (link) link.innerHTML = "";
     setStatus("Project loaded.");
@@ -1539,24 +1564,55 @@ import PageWidgets from "../../components/PageWidgets.astro";
     ($("json") as HTMLTextAreaElement)?.dispatchEvent(new Event("input"));
   }
 
-  async function saveCurrent() {
+  async function saveCurrent(trackUsage = true) {
     if (!currentProject) return false;
+    if (autosaveTimer) {
+      clearTimeout(autosaveTimer);
+      autosaveTimer = null;
+    }
     let parsed;
     try {
       parsed = JSON.parse(($("json") as HTMLTextAreaElement)?.value || "{}");
     } catch {
       setStatus("Invalid JSON.");
+      setSaveState("error");
       return false;
     }
     const { error } = await supa
       .from("projects")
       .update({ builder_data: parsed, updated_at: new Date().toISOString() })
       .eq("id", currentProject.id);
-    if (error) { setStatus(error.message); return false; }
+    if (error) {
+      setStatus(error.message);
+      setSaveState("error");
+      return false;
+    }
     currentProject.builder_data = parsed;
+    lastSavedJson = JSON.stringify(parsed, null, 2);
+    setSaveState("saved");
     // Telemetry — every save counts as a Builder edit action
-    logUsage("builder_save");
+    if (trackUsage) logUsage("builder_save");
     return true;
+  }
+
+  function scheduleAutosave() {
+    if (!currentProject) return;
+    const raw = ($("json") as HTMLTextAreaElement)?.value || "{}";
+    if (raw === lastSavedJson) {
+      setSaveState("saved");
+      return;
+    }
+    setSaveState("dirty");
+    if (autosaveTimer) clearTimeout(autosaveTimer);
+    autosaveTimer = setTimeout(async () => {
+      if (autosaveInFlight) return scheduleAutosave();
+      autosaveInFlight = true;
+      setSaveState("saving");
+      const ok = await saveCurrent(false);
+      autosaveInFlight = false;
+      if (ok) setStatus("Changes saved automatically.");
+      if ((($("json") as HTMLTextAreaElement)?.value || "{}") !== lastSavedJson) scheduleAutosave();
+    }, 1200);
   }
 
   // ── Boot: use existing Volynx session ──────────────────────────
@@ -1799,6 +1855,9 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
       if (error) return setStatus(error.message);
       setStatus("Project deleted.");
       currentProject = null;
+      lastSavedJson = "";
+      if (autosaveTimer) clearTimeout(autosaveTimer);
+      setSaveState("idle");
       ($("json") as HTMLTextAreaElement).value = "";
       ($("infoPanel") as HTMLElement).hidden = true;
       await listProjects(user.id);
@@ -1956,10 +2015,15 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     ($("json") as HTMLTextAreaElement)?.addEventListener("input", () => {
       clearTimeout(previewTimer);
       previewTimer = setTimeout(renderPreviewFromJson, 250);
+      scheduleAutosave();
     });
     window.addEventListener("resize", () => {
       const active = document.querySelector('.editor-tab--active:not([data-tab="preview"])') as HTMLElement | null;
       switchTab(active?.dataset.tab || "sections");
+    });
+    window.addEventListener("beforeunload", (event) => {
+      const raw = ($("json") as HTMLTextAreaElement)?.value || "{}";
+      if (currentProject && raw !== lastSavedJson) event.preventDefault();
     });
 
     // ── AI Generate / Refine ──────────────────────────────────
@@ -2782,9 +2846,44 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
 
   .editor-actions {
     display: flex;
+    align-items: center;
     gap: 8px;
     flex-wrap: wrap;
     justify-content: flex-end;
+  }
+
+  .save-state {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 34px;
+    padding: 0 4px;
+    color: var(--mut);
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .save-state__dot {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 50%;
+    background: rgba(231,238,247,.3);
+  }
+
+  .save-state[data-state="dirty"] .save-state__dot { background: #fbbf24; }
+  .save-state[data-state="saving"] .save-state__dot {
+    background: var(--accent);
+    animation: savePulse 1s ease-in-out infinite;
+  }
+  .save-state[data-state="saved"] { color: #86efac; }
+  .save-state[data-state="saved"] .save-state__dot { background: #4ade80; }
+  .save-state[data-state="error"] { color: #fca5a5; }
+  .save-state[data-state="error"] .save-state__dot { background: #f87171; }
+
+  @keyframes savePulse {
+    50% { opacity: .35; transform: scale(.75); }
   }
 
   .editor-action-advanced { display: none !important; }
