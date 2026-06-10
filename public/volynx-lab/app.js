@@ -266,6 +266,14 @@ convertBtn.addEventListener('click', async () => {
         return;
       }
     } else {
+      if (window.VxLab?.shouldSendToLogin(perm)) {
+        VxLab.confirmLogin(
+          VxLab.currentReturnPath(),
+          'Sign in to continue converting. You will return to Converter with this tool ready.'
+        );
+        convertBtn.disabled = false;
+        return;
+      }
       const msg = perm.remaining === 0
         ? `Daily limit reached (${perm.limit}). ${(window.VxPlan ? !window.VxPlan.isPaid(perm.plan) : perm.plan === 'free') ? 'Upgrade to Pro for more.' : 'Try again tomorrow.'}`
         : `Limit: ${perm.remaining} remaining today. You selected ${files.length} files.`;

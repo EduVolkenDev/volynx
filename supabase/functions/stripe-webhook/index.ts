@@ -875,9 +875,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
               download_version: KIT_VERSION,
               delivery_status: kitDeliveryStatus,
               delivery_error: kitDownloadError,
+              project_id: projectIdCreated,
               project_slug: projectSlug,
               preset_id: presetId,
-              project_delivery_status: projectSlug ? "ready" : "pending_preset_fetch",
+              project_delivery_status: projectIdCreated ? "ready" : "pending_preset_fetch",
               project_delivery_error: presetFetchError,
             },
           })

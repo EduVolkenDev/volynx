@@ -7,6 +7,9 @@ function t(key, fallback) {
 }
 
 function resolveRedirect() {
+  if (window.VxReturn) {
+    return window.VxReturn.paramPath() || window.VxReturn.storedPath() || DEFAULT_REDIRECT;
+  }
   // Accept both ?next= and ?return= — most of the platform uses `next`
   // but a few callers (icons-store) used `return`. Treat them identically
   // so a stale-token redirect never drops the user at the default Lab.
@@ -112,7 +115,6 @@ function persistSession(session, email) {
 
       persistSession(session, email);
       const redirect = resolveRedirect();
-      localStorage.setItem("volynx_post_login_next", redirect);
       setMsg(msg, t("login.msg_welcome", "Welcome back. Redirecting..."), "ok");
 
       // If the user came from a specific product / checkout / service
@@ -126,6 +128,8 @@ function persistSession(session, email) {
         && redirect !== "/profile"
         && !redirect.startsWith("/profile/?")
         && redirect.startsWith("/");
+      if (window.VxReturn) window.VxReturn.consume(redirect);
+      else localStorage.removeItem("volynx_post_login_next");
       window.location.href = isProductReturn ? redirect : "/profile/?welcome=1";
     } catch (err) {
       setMsg(msg, err?.message || t("login.err_failed", "Sign in failed. Please try again."), "err");

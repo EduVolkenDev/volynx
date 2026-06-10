@@ -18,6 +18,7 @@
   let supabaseConfig = null;
   let session = null;
   let editingId = null;
+  let transferringId = null;
 
   function $(id) { return document.getElementById(id); }
 
@@ -128,6 +129,25 @@
     };
   }
 
+  async function rpc(name, body) {
+    const cfg = await loadConfig();
+    const res = await fetch(`${cfg.url}/rest/v1/rpc/${name}`, {
+      method: "POST",
+      headers: await authHeaders(),
+      body: JSON.stringify(body || {}),
+    });
+    const text = await res.text();
+    let data = null;
+    try { data = text ? JSON.parse(text) : null; } catch (_) { data = { raw: text }; }
+    if (!res.ok) {
+      const err = new Error((data && (data.message || data.error || data.code || data.raw)) || `HTTP ${res.status}`);
+      err.status = res.status;
+      err.data = data;
+      throw err;
+    }
+    return data;
+  }
+
   async function fetchProfile() {
     const cfg = await loadConfig();
     const res = await fetch(`${cfg.url}/rest/v1/profiles?id=eq.${session.user.id}&select=plan,is_admin`, {
@@ -189,13 +209,16 @@
       const shortUrl = `${QR_HOST}/${qr.slug}`;
       const target = qr.target_url;
       const labelOrSlug = qr.label || qr.slug;
+      const founderControlled = qr.founder_controlled === true;
       const expiresLine = qr.expires_at
         ? `<span title="${escapeHtml(qr.expires_at)}">${t("qrp.expires", "Expires")}: ${formatDate(qr.expires_at)}</span>`
         : `<span>${t("qrp.never_expires", "Never expires")}</span>`;
 
-      const canPause = qr.status === "active";
-      const canResume = qr.status === "paused";
+      const canPause = !founderControlled && qr.status === "active";
+      const canResume = !founderControlled && qr.status === "paused";
       const canEdit = !["expired", "admin_blocked"].includes(qr.status);
+      const canTransfer = canEdit && !founderControlled;
+      const canDelete = !founderControlled;
 
       return `
         <article class="qrp-item qrp-item--${qr.status}" data-id="${qr.id}">
@@ -210,14 +233,16 @@
               <span class="qrp-target" title="${escapeHtml(target)}">→ ${escapeHtml(target)}</span>
               <span>${qr.scan_count} ${t("qrp.scans", "scans")}</span>
               ${expiresLine}
+              ${founderControlled ? `<span>${t("qrp.founder_managed", "Founder managed")}</span>` : ""}
             </div>
           </div>
 
           <div class="qrp-actions">
             ${canEdit ? `<button type="button" class="qrp-action" data-action="edit" data-id="${qr.id}" title="${t("qrp.action_edit", "Edit destination")}">✏️</button>` : ""}
+            ${canTransfer ? `<button type="button" class="qrp-action" data-action="transfer" data-id="${qr.id}" title="${t("qrp.action_transfer", "Transfer ownership")}">⇄</button>` : ""}
             ${canPause ? `<button type="button" class="qrp-action" data-action="pause" data-id="${qr.id}" title="${t("qrp.action_pause", "Pause")}">⏸</button>` : ""}
             ${canResume ? `<button type="button" class="qrp-action" data-action="resume" data-id="${qr.id}" title="${t("qrp.action_resume", "Resume")}">▶️</button>` : ""}
-            <button type="button" class="qrp-action qrp-action--danger" data-action="delete" data-id="${qr.id}" title="${t("qrp.action_delete", "Delete")}">🗑</button>
+            ${canDelete ? `<button type="button" class="qrp-action qrp-action--danger" data-action="delete" data-id="${qr.id}" title="${t("qrp.action_delete", "Delete")}">🗑</button>` : ""}
           </div>
         </article>
       `;
@@ -230,6 +255,7 @@
         const qr = qrs.find((q) => q.id === id);
         if (!qr) return;
         if (action === "edit") openEditModal(qr);
+        else if (action === "transfer") openTransferModal(qr);
         else if (action === "pause") updateStatus(id, "paused");
         else if (action === "resume") updateStatus(id, "active");
         else if (action === "delete") deleteQr(id, qr.label || qr.slug);
@@ -293,6 +319,76 @@
     editingId = null;
     const modal = $("qrpEditModal");
     if (modal) modal.hidden = true;
+  }
+
+  function openTransferModal(qr) {
+    transferringId = qr.id;
+    const modal = $("qrpTransferModal");
+    const email = $("qrpTransferEmail");
+    const error = $("qrpTransferError");
+    if (email) email.value = "";
+    if (error) error.hidden = true;
+    if (modal) modal.hidden = false;
+    setTimeout(() => email?.focus({ preventScroll: true }), 0);
+  }
+
+  function closeTransferModal() {
+    transferringId = null;
+    const modal = $("qrpTransferModal");
+    if (modal) modal.hidden = true;
+  }
+
+  function transferErrorMessage(err) {
+    const raw = JSON.stringify(err?.data || {}) + " " + String(err?.message || err || "");
+    if (raw.includes("qr_transfer_target_profile_not_found")) {
+      return "That email does not have a VOLYNX profile yet. Ask the recipient to create an account first.";
+    }
+    if (raw.includes("qr_transfer_target_quota_exceeded")) {
+      return "The recipient account is not compatible with this QR yet. Gift a compatible subscription or ask them to upgrade before transferring.";
+    }
+    if (raw.includes("qr_transfer_same_owner")) {
+      return "This QR already belongs to that account.";
+    }
+    if (raw.includes("qr_transfer_locked_status")) {
+      return "This QR is locked and cannot be transferred.";
+    }
+    return "Could not transfer this QR. Check the recipient email and try again.";
+  }
+
+  async function saveTransfer() {
+    if (!transferringId) return;
+    const email = ($("qrpTransferEmail")?.value || "").trim().toLowerCase();
+    const error = $("qrpTransferError");
+    const saveBtn = $("qrpTransferSave");
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      if (error) {
+        error.textContent = "Enter the recipient account email.";
+        error.hidden = false;
+      }
+      return;
+    }
+
+    const ok = confirm(`Transfer this QR to ${email}? The short URL stays the same, but the recipient will manage destination edits from their profile.`);
+    if (!ok) return;
+
+    if (saveBtn) saveBtn.disabled = true;
+    try {
+      await rpc("transfer_qr_code", {
+        p_qr_id: transferringId,
+        p_target_email: email,
+        p_note: "Transferred from user QR manager",
+      });
+      closeTransferModal();
+      refresh();
+    } catch (err) {
+      if (error) {
+        error.textContent = transferErrorMessage(err);
+        error.hidden = false;
+      }
+    } finally {
+      if (saveBtn) saveBtn.disabled = false;
+    }
   }
 
   async function saveEdit() {
@@ -366,8 +462,13 @@
       el.addEventListener("click", closeEditModal);
     });
     $("qrpEditSave")?.addEventListener("click", saveEdit);
+    $("qrpTransferModal")?.querySelectorAll("[data-transfer-close]").forEach((el) => {
+      el.addEventListener("click", closeTransferModal);
+    });
+    $("qrpTransferSave")?.addEventListener("click", saveTransfer);
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && !$("qrpEditModal")?.hidden) closeEditModal();
+      if (e.key === "Escape" && !$("qrpTransferModal")?.hidden) closeTransferModal();
     });
 
     await refresh();

@@ -585,7 +585,8 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 				function goLogin() {
 					clearSession();
 					log("redirecting to login");
-					window.location.href = "/login/?next=/profile/";
+					if (window.VxReturn) window.VxReturn.redirectToLogin();
+					else window.location.href = "/login/?next=/profile/";
 				}
 
 				function initials(name, email) {
@@ -2595,19 +2596,20 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 		outline-offset: 3px;
 	}
 	.layer-card__media {
-		width: 58px;
-		height: 58px;
-		border-radius: 16px;
+		width: 150px;
+		height: 150px;
+		border-radius: 35px;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		background: rgba(255,255,255,.05);
-		border: 1px solid rgba(255,255,255,.08);
+		background: rgb(16 36 229 / 7%);
+		border: 0;
 		overflow: hidden;
+		margin: 0 auto;
 	}
 	.layer-card__media img {
-		width: 44px;
-		height: 44px;
+		width: 130px;
+		height: auto;
 		object-fit: contain;
 		display: block;
 		filter: drop-shadow(0 10px 20px color-mix(in srgb, var(--tier-accent) 22%, transparent));

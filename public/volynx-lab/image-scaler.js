@@ -160,6 +160,15 @@
             return;
           }
         } else {
+          if (window.VxLab?.shouldSendToLogin(perm)) {
+            VxLab.confirmLogin(
+              VxLab.currentReturnPath(),
+              'Sign in to continue upscaling. You will return to Image Scaler after login.'
+            );
+            runBtn.disabled = false;
+            runBtn.textContent = 'Process';
+            return;
+          }
           var isFreeUser = window.VxPlan ? !window.VxPlan.isPaid(perm.plan) : (perm.plan === 'free');
           var msg = isFreeUser
             ? 'Free limit reached. Sign in or upgrade to continue.'

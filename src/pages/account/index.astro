@@ -131,7 +131,10 @@ import { ROUTES } from "../../data/routes";
   <script is:inline type="module">
     // ── Auth guard ──
     const token = localStorage.getItem('volynx_access_token');
-    if (!token) { window.location.href = '/login/?next=/account/'; }
+    if (!token) {
+      if (window.VxReturn) window.VxReturn.redirectToLogin();
+      else window.location.href = '/login/?next=/account/';
+    }
 
     // ── Config ──
     let cfg = null;

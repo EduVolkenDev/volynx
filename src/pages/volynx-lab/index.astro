@@ -8,6 +8,7 @@ import { ROUTES } from "../../data/routes";
 const toolCards = [
   {
     id: "qrgen",
+    i18n: "qrgen",
     title: "QRGen",
     label: "Benchmark",
     href: ROUTES.labQrGen,
@@ -25,11 +26,12 @@ const toolCards = [
   },
   {
     id: "lumina",
+    i18n: "lumina",
     title: "Lumina",
     label: "AI + Local",
     href: ROUTES.labLumina,
     cta: "Open Lumina",
-    image: "/assets/education.webp",
+    image: "/assets/.webp",
     description: "Turn complex scientific, technical and educational content into clear explanations.",
     promise: "The knowledge product: AI when available, local fallback when not, history and export.",
     states: ["Free quota", "AI", "Local fallback", "Export"],
@@ -42,6 +44,7 @@ const toolCards = [
   },
   {
     id: "image-suite",
+    i18n: "suite",
     title: "iMage Suite",
     label: "Studio Pro",
     href: ROUTES.labImageSuite,
@@ -59,6 +62,7 @@ const toolCards = [
   },
   {
     id: "converter",
+    i18n: "converter",
     title: "Converter",
     label: "Local Utility",
     href: ROUTES.labConverter,
@@ -76,6 +80,7 @@ const toolCards = [
   },
   {
     id: "image-scaler",
+    i18n: "scaler",
     title: "Image Scaler",
     label: "Preview-first",
     href: ROUTES.labImageScaler,
@@ -99,9 +104,16 @@ const workflowSteps = [
   ["3", "Polish assets", "Run iMage Suite, Converter or Scaler depending on the job."],
   ["4", "Resume from profile", "History and presets bring the user back to the exact context."],
 ];
+
+const memorySteps = [
+  ["1", "Select", "Choose a tool", "Your current route and task stay attached to the session.", "/assets/chooseatool.webp"],
+  ["2", "Create", "Upload or write", "Files, prompts and useful presets remain close to the work.", "/assets/uploadorwrite.webp"],
+  ["3", "Deliver", "Export cleanly", "Finish the action with a clear output and recovery path.", "/assets/exportcleanly.webp"],
+  ["4", "Continue", "Resume in profile", "Return to the exact workspace instead of starting again.", "/assets/resumeinprofile.webp"],
+];
 ---
 <FlagshipLayout title="VOLYNX Lab — Free Image Tools" description="Free browser-based image tools by VOLYNX — convert, upscale and process images locally." pageClass="page-lab">
-  <FlagshipHeader current={ROUTES.lab} ctaLabel="Unlock Studio Pro" />
+  <FlagshipHeader current={ROUTES.lab} ctaLabel="Unlock Studio Pro" ctaI18n="lab2.header_cta" />
   <main>
     <LabToolShell active="home" />
 
@@ -126,15 +138,26 @@ const workflowSteps = [
     <section class="page-section lab-flow-section" aria-label="Lab workflow">
       <div class="shell lab-flow">
         <div class="lab-flow__copy">
-          <span class="kicker">Workspace memory</span>
-          <h2>Work should survive the login wall.</h2>
-          <p>Every key Lab action now records recent activity and presets locally for the profile. Login-required states return to the exact tool instead of dumping the user into pricing.</p>
+          <span class="kicker" data-i18n="lab2.memory_kicker">Workspace memory</span>
+          <h2 data-i18n="lab2.memory_title">Work should survive the login wall.</h2>
+          <p data-i18n="lab2.memory_desc">Every key Lab action now records recent activity and presets locally for the profile. Login-required states return to the exact tool instead of dumping the user into pricing.</p>
         </div>
         <div class="lab-flow__steps">
-          <div><strong>1</strong><span>Choose a tool</span></div>
-          <div><strong>2</strong><span>Upload or write</span></div>
-          <div><strong>3</strong><span>Export cleanly</span></div>
-          <div><strong>4</strong><span>Resume in profile</span></div>
+          {memorySteps.map(([number, state, title, copy, iconSrc]) => (
+            <article>
+              <div class="lab-flow__step-top">
+                <strong>{number}</strong>
+                <em data-i18n={`lab2.memory_step${number}_state`}>{state}</em>
+              </div>
+              <div class="lab-flow__step-art" aria-hidden="true">
+                <img src={iconSrc} alt="" loading="lazy" decoding="async" />
+              </div>
+              <div class="lab-flow__step-copy">
+                <span data-i18n={`lab2.memory_step${number}_title`}>{title}</span>
+                <p data-i18n={`lab2.memory_step${number}_desc`}>{copy}</p>
+              </div>
+            </article>
+          ))}
         </div>
       </div>
     </section>
@@ -142,34 +165,34 @@ const workflowSteps = [
     <!-- ═══ LAB VITRINE ═══ -->
     <section id="tools" class="page-section">
       <div class="shell section-head">
-        <span class="kicker">Premium Lab stack</span>
-        <h2>Free should feel useful. Pro should feel obvious.</h2>
-        <p>Each tool now explains its contract before the user hits a wall: what runs free, what becomes Pro, what can use VX later, and what stays local in the browser.</p>
+        <span class="kicker" data-i18n="lab2.stack_kicker">Premium Lab stack</span>
+        <h2 data-i18n="lab2.stack_title">Free should feel useful. Pro should feel obvious.</h2>
+        <p data-i18n="lab2.stack_desc">Each tool now explains its contract before the user hits a wall: what runs free, what becomes Pro, what can use VX later, and what stays local in the browser.</p>
       </div>
       <div class="shell tool-grid">
         {toolCards.map((tool) => (
           <article class:list={["panel", "tool-card", `tool-card--${tool.id}`]}>
             <div class="tool-card__media">
-              <span>{tool.label}</span>
+              <span data-i18n={`lab2.tool_${tool.i18n}_label`}>{tool.label}</span>
               <div class="tool-icon"><img src={tool.image} alt="" loading="lazy" /></div>
             </div>
             <div class="head-row">
               <div>
-                <span class="label label--free">{tool.label}</span>
+                <span class="label label--free" data-i18n={`lab2.tool_${tool.i18n}_label`}>{tool.label}</span>
                 <h3>{tool.title}</h3>
               </div>
-              <a href={tool.href} class:list={["button", tool.id === "qrgen" || tool.id === "image-suite" ? "button--gold" : "button--ghost"]}>{tool.cta}</a>
+              <a href={tool.href} class:list={["button", tool.id === "qrgen" || tool.id === "image-suite" ? "button--gold" : "button--ghost"]} data-i18n={`lab2.tool_${tool.i18n}_btn`}>{tool.cta}</a>
             </div>
-            <p>{tool.description}</p>
-            <strong class="tool-card__promise">{tool.promise}</strong>
+            <p data-i18n={`lab2.tool_${tool.i18n}_desc`}>{tool.description}</p>
+            <strong class="tool-card__promise" data-i18n={`lab2.tool_${tool.i18n}_promise`}>{tool.promise}</strong>
             <div class="mini-stats" aria-label={`${tool.title} access states`}>
-              {tool.states.map((state) => <span class="chip">{state}</span>)}
+              {tool.states.map((state, index) => <span class="chip" data-i18n={`lab2.tool_${tool.i18n}_state${index + 1}`}>{state}</span>)}
             </div>
             <dl class="tool-card__matrix">
-              {tool.details.map(([label, text]) => (
+              {tool.details.map(([label, text], index) => (
                 <div>
-                  <dt>{label}</dt>
-                  <dd>{text}</dd>
+                  <dt data-i18n={`lab2.detail_${label.toLowerCase()}`}>{label}</dt>
+                  <dd data-i18n={`lab2.tool_${tool.i18n}_detail${index + 1}`}>{text}</dd>
                 </div>
               ))}
             </dl>
@@ -181,16 +204,16 @@ const workflowSteps = [
     <section class="page-section lab-workflow-section" aria-label="Recommended Lab workflow">
       <div class="shell lab-workflow">
         <div class="lab-workflow__head">
-          <span class="kicker">Recommended workflow</span>
-          <h2>Lead with the tool people can understand fastest.</h2>
-          <p>QRGen is the commercial benchmark, Lumina adds intellectual value, and the image tools make the workspace practical for daily production.</p>
+          <span class="kicker" data-i18n="lab2.workflow_kicker">Recommended workflow</span>
+          <h2 data-i18n="lab2.workflow_title">Lead with the tool people can understand fastest.</h2>
+          <p data-i18n="lab2.workflow_desc">QRGen is the commercial benchmark, Lumina adds intellectual value, and the image tools make the workspace practical for daily production.</p>
         </div>
         <div class="lab-workflow__grid">
           {workflowSteps.map(([number, title, copy]) => (
             <div>
               <strong>{number}</strong>
-              <span>{title}</span>
-              <p>{copy}</p>
+              <span data-i18n={`lab2.workflow_step${number}_title`}>{title}</span>
+              <p data-i18n={`lab2.workflow_step${number}_desc`}>{copy}</p>
             </div>
           ))}
         </div>
@@ -279,8 +302,8 @@ const workflowSteps = [
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 10px;
   }
-  .page-lab .lab-flow__steps div {
-    min-height: 132px;
+  .page-lab .lab-flow__steps article {
+    min-height: 222px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -288,7 +311,16 @@ const workflowSteps = [
     padding: 16px;
     border: 1px solid rgba(255,255,255,.08);
     border-radius: 8px;
-    background: rgba(255,255,255,.045);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025)),
+      rgba(255,255,255,.025);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .page-lab .lab-flow__step-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
   }
   .page-lab .lab-flow__steps strong {
     width: 34px;
@@ -300,11 +332,45 @@ const workflowSteps = [
     color: #fff;
     font-size: 14px;
   }
+  .page-lab .lab-flow__steps em {
+    color: rgba(125,249,255,.72);
+    font-size: 9px;
+    font-style: normal;
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+  .page-lab .lab-flow__step-copy {
+    display: grid;
+    gap: 8px;
+  }
+  .page-lab .lab-flow__step-art {
+    min-height: 78px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background:
+      radial-gradient(circle at 50% 42%, rgba(125,249,255,.14), transparent 58%),
+      rgba(255,255,255,.025);
+    overflow: hidden;
+  }
+  .page-lab .lab-flow__step-art img {
+    width: min(100%, 165px);
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 18px 28px rgba(0,0,0,.34));
+  }
   .page-lab .lab-flow__steps span {
     color: rgba(255,255,255,.82);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 900;
     line-height: 1.25;
+  }
+  .page-lab .lab-flow__steps p {
+    margin: 0;
+    color: rgba(255,255,255,.5);
+    font-size: 11px;
+    line-height: 1.5;
   }
   .page-lab .tool-grid {
     align-items: stretch;
@@ -700,9 +766,15 @@ const workflowSteps = [
     .page-lab .lab-workflow__grid {
       grid-template-columns: 1fr;
     }
-    .page-lab .lab-flow__steps div,
+    .page-lab .lab-flow__steps article,
     .page-lab .lab-workflow__grid div {
-      min-height: 92px;
+      min-height: 158px;
+    }
+    .page-lab .lab-flow__step-art {
+      min-height: 64px;
+    }
+    .page-lab .lab-flow__step-art img {
+      max-height: 66px;
     }
     .page-lab .tool-card .head-row {
       align-items: flex-start;

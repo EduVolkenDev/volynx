@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Volynx Icons — Essentials Pack</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #06060a;
+    --bg-deep: #030305;
+    --surface: rgba(10, 10, 18, 0.85);
+    --surface-hover: rgba(14, 14, 26, 0.95);
+    --border: rgba(255, 255, 255, 0.05);
+    --border-hover: rgba(120, 220, 255, 0.4);
+    --text: #f0f0f4;
+    --text-muted: #7a7a88;
+    --text-dim: #44444f;
+    --cyan: #78dcff;
+    --violet: #b084ff;
+    --pink: #ff7eb3;
+    --glow-cyan: rgba(120, 220, 255, 0.18);
+    --glow-violet: rgba(176, 132, 255, 0.15);
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, 'SF Pro Display', 'Inter', system-ui, sans-serif;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Ambient background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% -10%, rgba(120, 220, 255, 0.1), transparent),
+      radial-gradient(ellipse 50% 40% at 85% 55%, rgba(176, 132, 255, 0.07), transparent),
+      radial-gradient(ellipse 40% 30% at 15% 75%, rgba(255, 126, 179, 0.04), transparent);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Subtle dot grid */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 80px 48px 120px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Header ────────────────────────────── */
+  header {
+    margin-bottom: 96px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 36px;
+  }
+
+  .brand-mark {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #0a0a14 100%);
+    border: 1px solid rgba(120, 220, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 0 16px rgba(120, 220, 255, 0.12), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  .brand-mark svg { position: relative; z-index: 1; }
+
+  .brand-text {
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+  .brand-text strong { color: var(--text); font-weight: 700; letter-spacing: 0.18em; }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    background: rgba(120, 220, 255, 0.07);
+    border: 1px solid rgba(120, 220, 255, 0.18);
+    border-radius: 100px;
+    margin-bottom: 24px;
+  }
+  .eyebrow::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  h1 {
+    font-size: 64px;
+    line-height: 1;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    margin-bottom: 20px;
+    max-width: 820px;
+  }
+  h1 .accent {
+    background: linear-gradient(120deg, var(--cyan) 0%, var(--violet) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .lede {
+    font-size: 18px;
+    line-height: 1.65;
+    color: var(--text-muted);
+    max-width: 600px;
+  }
+
+  .meta {
+    display: flex;
+    gap: 48px;
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+  .meta-item { display: flex; flex-direction: column; gap: 6px; }
+  .meta-label {
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+  .meta-value {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+
+  /* ── Category ───────────────────────────── */
+  .category { margin-bottom: 80px; }
+
+  .category-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .category-title { display: flex; align-items: baseline; gap: 16px; }
+  .category-num {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: var(--cyan);
+    opacity: 0.6;
+    font-variant-numeric: tabular-nums;
+  }
+  .category-name {
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+  .category-count {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+  }
+
+  /* ── Grid ───────────────────────────────── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(186px, 1fr));
+    gap: 14px;
+  }
+
+  /* ── Card ───────────────────────────────── */
+  .card {
+    position: relative;
+    aspect-ratio: 1 / 1.1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    overflow: hidden;
+    padding: 28px 20px 20px;
+  }
+
+  /* Subtle grid lines on card */
+  .card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    background-image:
+      linear-gradient(rgba(120, 220, 255, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(120, 220, 255, 0.025) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  /* Top accent line */
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 20%; right: 20%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0;
+    transition: opacity 0.4s, left 0.4s, right 0.4s;
+    border-radius: 1px;
+  }
+
+  .card:hover {
+    background: var(--surface-hover);
+    border-color: rgba(120, 220, 255, 0.22);
+    transform: translateY(-4px);
+    box-shadow:
+      0 0 0 1px rgba(120, 220, 255, 0.08),
+      0 8px 32px rgba(0, 0, 0, 0.5),
+      0 0 40px rgba(120, 220, 255, 0.08);
+  }
+  .card:hover::before { opacity: 1; left: 10%; right: 10%; }
+  .card:hover::after { opacity: 1; }
+  .card:hover .icon-stage { box-shadow: 0 0 24px rgba(120, 220, 255, 0.2), 0 0 6px rgba(120, 220, 255, 0.12); border-color: rgba(120, 220, 255, 0.2); }
+  .card:hover .icon-stage svg { transform: scale(1.1); }
+  .card:hover .copy-btn { opacity: 1; transform: translateY(0) scale(1); }
+
+  /* ── Icon Stage (independent container) ── */
+  .icon-stage {
+    width: 80px;
+    height: 80px;
+    border-radius: 22px;
+    background: linear-gradient(145deg, rgba(14, 18, 28, 0.9) 0%, rgba(8, 10, 18, 0.95) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+    margin-bottom: 18px;
+    transition: box-shadow 0.4s, border-color 0.4s;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+
+  /* Corner accents on stage */
+  .icon-stage::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: -1px;
+    width: 12px; height: 12px;
+    border-top: 1px solid rgba(120, 220, 255, 0.35);
+    border-left: 1px solid rgba(120, 220, 255, 0.35);
+    border-radius: 22px 0 0 0;
+  }
+  .icon-stage::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; right: -1px;
+    width: 12px; height: 12px;
+    border-bottom: 1px solid rgba(176, 132, 255, 0.3);
+    border-right: 1px solid rgba(176, 132, 255, 0.3);
+    border-radius: 0 0 22px 0;
+  }
+
+  .icon-stage svg {
+    width: 44px;
+    height: 44px;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Card label ─────────────────────────── */
+  .card-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+  }
+  .card-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.02em;
+    text-align: center;
+  }
+  .card-num {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Copy button ────────────────────────── */
+  .copy-btn {
+    position: absolute;
+    top: 14px; right: 14px;
+    width: 26px; height: 26px;
+    border-radius: 8px;
+    background: rgba(120, 220, 255, 0.08);
+    border: 1px solid rgba(120, 220, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--cyan);
+    font-size: 14px;
+    opacity: 0;
+    transform: translateY(-6px) scale(0.9);
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 10;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .copy-btn:hover { background: rgba(120, 220, 255, 0.16); }
+
+  /* ── Footer ─────────────────────────────── */
+  footer {
+    margin-top: 120px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-dim);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+  footer a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+  footer a:hover { color: var(--cyan); }
+
+  /* ── Responsive ──────────────────────────── */
+  @media (max-width: 768px) {
+    .wrap { padding: 48px 20px 80px; }
+    h1 { font-size: 38px; }
+    .lede { font-size: 16px; }
+    .meta { flex-wrap: wrap; gap: 24px; }
+    .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+    footer { flex-direction: column; gap: 16px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <polygon points="12 2 22 12 12 22 2 12" fill="rgba(120,220,255,0.12)" stroke="#78dcff" stroke-width="1.5"/>
+          <polyline points="7 10 12 15 17 10" stroke="#78dcff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="brand-text"><strong>VOLYNX</strong> · ICONS</div>
+    </div>
+
+    <div class="eyebrow">Essentials Pack · 24 icons</div>
+    <h1>Crafted icons that feel like <span class="accent">product.</span></h1>
+    <p class="lede">Twenty-four foundational icons in premium metal and glass — built for interfaces that don't settle for default. Every stroke aligned to a 24px grid, every gradient hand-tuned.</p>
+
+    <div class="meta">
+      <div class="meta-item">
+        <div class="meta-label">Format</div>
+        <div class="meta-value">SVG</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Grid</div>
+        <div class="meta-value">24 × 24</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Style</div>
+        <div class="meta-value">Neon · Glass</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">License</div>
+        <div class="meta-value">Commercial</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════
+       SHARED DEFS
+  ═══════════════════════════════════════════════ -->
+  <svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true">
+    <defs>
+      <!-- Cyan stroke gradient (top-left → bottom-right) -->
+      <linearGradient id="g-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#a8eeff"/>
+        <stop offset="60%" stop-color="#78dcff"/>
+        <stop offset="100%" stop-color="#3ab8e8"/>
+      </linearGradient>
+
+      <!-- Cyan → Violet -->
+      <linearGradient id="g-cv" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#78dcff"/>
+        <stop offset="100%" stop-color="#b084ff"/>
+      </linearGradient>
+
+      <!-- Violet stroke gradient -->
+      <linearGradient id="g-violet" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#c8a0ff"/>
+        <stop offset="100%" stop-color="#8050d0"/>
+      </linearGradient>
+
+      <!-- Fill: dark with subtle cyan tint -->
+      <linearGradient id="g-fill" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="rgba(100,210,255,0.12)"/>
+        <stop offset="100%" stop-color="rgba(60,140,200,0.06)"/>
+      </linearGradient>
+
+      <!-- Fill: violet tint -->
+      <linearGradient id="g-fill-v" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="rgba(176,132,255,0.15)"/>
+        <stop offset="100%" stop-color="rgba(120,80,220,0.06)"/>
+      </linearGradient>
+
+      <!-- Glow filter — cyan -->
+      <filter id="glow-c" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur"/>
+        <feColorMatrix in="blur" type="matrix"
+          values="0 1.2 1.6 0 0
+                  0 0.8 1.2 0 0.1
+                  0 0.6 1.5 0 0.2
+                  0 0   0   1 0" result="cyan-blur"/>
+        <feMerge>
+          <feMergeNode in="cyan-blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+
+      <!-- Glow filter — violet -->
+      <filter id="glow-v" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur"/>
+        <feColorMatrix in="blur" type="matrix"
+          values="0.6 0 1.2 0 0.1
+                  0.2 0 1.0 0 0
+                  0.8 0 1.5 0 0.2
+                  0   0 0   1 0" result="v-blur"/>
+        <feMerge>
+          <feMergeNode in="v-blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+
+      <!-- Subtle drop shadow -->
+      <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.6)"/>
+      </filter>
+    </defs>
+  </svg>
+
+
+  <!-- ═══════════════════════════════════════════════
+       01 · COMMUNICATION
+  ═══════════════════════════════════════════════ -->
+  <section class="category">
+    <div class="category-head">
+      <div class="category-title">
+        <span class="category-num">01</span>
+        <span class="category-name">Communication</span>
+      </div>
+      <span class="category-count">6 icons</span>
+    </div>
+
+    <div class="grid">
+
+      <!-- Message -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-c)">
+            <rect x="2" y="3.5" width="20" height="14" rx="3"
+              fill="url(#g-fill)" stroke="url(#g-cyan)" stroke-width="1.4"/>
+            <polyline points="2,7 12,13.5 22,7"
+              stroke="url(#g-cv)" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Message</div>
+          <div class="card-num">VX / 01</div>
+        </div>
+      </div>
+
+      <!-- Envelope -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-c)">
+            <rect x="2" y="4" width="20" height="16" rx="2"
+              fill="url(#g-fill)" stroke="url(#g-cv)" stroke-width="1.4"/>
+            <polyline points="2,8 12,14 22,8"
+              stroke="url(#g-cyan)" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M22 18L15 12M2 18L9 12"
+              stroke="url(#g-violet)" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Envelope</div>
+          <div class="card-num">VX / 02</div>
+        </div>
+      </div>
+
+      <!-- Phone -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-c)">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"
+              fill="url(#g-fill)" stroke="url(#g-cyan)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Phone</div>
+          <div class="card-num">VX / 03</div>
+        </div>
+      </div>
+
+      <!-- Video Call -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-v)">
+            <rect x="2" y="6" width="15" height="12" rx="2"
+              fill="url(#g-fill-v)" stroke="url(#g-violet)" stroke-width="1.4"/>
+            <path d="M22 7.5l-5 3.5v2l5 3.5z"
+              fill="url(#g-fill-v)" stroke="url(#g-cv)" stroke-width="1.3" stroke-linejoin="round"/>
+            <circle cx="9.5" cy="12" r="2.5"
+              fill="none" stroke="url(#g-cyan)" stroke-width="1.3"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Video Call</div>
+          <div class="card-num">VX / 04</div>
+        </div>
+      </div>
+
+      <!-- Group -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-c)">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
+              stroke="url(#g-cyan)" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="9" cy="7" r="4"
+              fill="url(#g-fill)" stroke="url(#g-cyan)" stroke-width="1.4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"
+              stroke="url(#g-violet)" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"
+              stroke="url(#g-violet)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Group</div>
+          <div class="card-num">VX / 05</div>
+        </div>
+      </div>
+
+      <!-- Share -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-c)">
+            <circle cx="18" cy="5" r="2.5" fill="url(#g-fill)" stroke="url(#g-cyan)" stroke-width="1.4"/>
+            <circle cx="6"  cy="12" r="2.5" fill="url(#g-fill)" stroke="url(#g-cv)"   stroke-width="1.4"/>
+            <circle cx="18" cy="19" r="2.5" fill="url(#g-fill)" stroke="url(#g-violet)" stroke-width="1.4"/>
+            <line x1="8.5" y1="13.4" x2="15.5" y2="17.6" stroke="url(#g-cv)" stroke-width="1.3" stroke-linecap="round"/>
+            <line x1="15.5" y1="6.4" x2="8.5" y2="10.6" stroke="url(#g-cv)" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Share</div>
+          <div class="card-num">VX / 06</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════════
+       02 · FILES & DOCUMENTS
+  ═══════════════════════════════════════════════ -->
+  <section class="category">
+    <div class="category-head">
+      <div class="category-title">
+        <span class="category-num">02</span>
+        <span class="category-name">Files &amp; Documents</span>
+      </div>
+      <span class="category-count">5 icons</span>
+    </div>
+
+    <div class="grid">
+
+      <!-- Document -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-c)">
+            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"
+              fill="url(#g-fill)" stroke="url(#g-cyan)" stroke-width="1.4" stroke-linejoin="round"/>
+            <polyline points="13 2 13 9 20 9"
+              stroke="url(#g-cv)" stroke-width="1.4" stroke-linejoin="round"/>
+            <line x1="8" y1="13" x2="16" y2="13" stroke="url(#g-violet)" stroke-width="1.3" stroke-linecap="round"/>
+            <line x1="8" y1="17" x2="13" y2="17" stroke="rgba(120,220,255,0.5)" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Document</div>
+          <div class="card-num">VX / 07</div>
+        </div>
+      </div>
+
+      <!-- Folder -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-v)">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+              fill="url(#g-fill-v)" stroke="url(#g-violet)" stroke-width="1.4" stroke-linejoin="round"/>
+            <line x1="6" y1="13" x2="18" y2="13" stroke="rgba(176,132,255,0.5)" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Folder</div>
+          <div class="card-num">VX / 08</div>
+        </div>
+      </div>
+
+      <!-- Download -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-c)">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+              stroke="url(#g-cyan)" stroke-width="1.5" stroke-linecap="round"/>
+            <polyline points="7 10 12 15 17 10"
+              stroke="url(#g-cv)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="12" y1="15" x2="12" y2="3"
+              stroke="url(#g-violet)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Download</div>
+          <div class="card-num">VX / 09</div>
+        </div>
+      </div>
+
+      <!-- Cloud -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-c)">
+            <path d="M17.5 19H9a3.5 3.5 0 0 1 0-7h.5A5.5 5.5 0 0 1 17 8.5a4.5 4.5 0 0 1 2 8.5"
+              fill="url(#g-fill)" stroke="url(#g-cv)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="12 10 12 16 9.5 13.5"
+              stroke="url(#g-cyan)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="12" y1="16" x2="14.5" y2="13.5"
+              stroke="url(#g-cyan)" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Cloud</div>
+          <div class="card-num">VX / 10</div>
+        </div>
+      </div>
+
+      <!-- Trash -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-v)">
+            <polyline points="3 6 5 6 21 6"
+              stroke="url(#g-violet)" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+              stroke="url(#g-cv)" stroke-width="1.4" stroke-linecap="round"/>
+            <rect x="7" y="9" width="10" height="12" rx="2"
+              fill="url(#g-fill-v)" stroke="url(#g-violet)" stroke-width="1.4"/>
+            <line x1="10" y1="12" x2="10" y2="18" stroke="rgba(176,132,255,0.5)" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="14" y1="12" x2="14" y2="18" stroke="rgba(176,132,255,0.5)" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Trash</div>
+          <div class="card-num">VX / 11</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════════
+       03 · PRODUCTIVITY & TOOLS
+  ═══════════════════════════════════════════════ -->
+  <section class="category">
+    <div class="category-head">
+      <div class="category-title">
+        <span class="category-num">03</span>
+        <span class="category-name">Productivity &amp; Tools</span>
+      </div>
+      <span class="category-count">7 icons</span>
+    </div>
+
+    <div class="grid">
+
+      <!-- Search -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-c)">
+            <circle cx="11" cy="11" r="7"
+              fill="url(#g-fill)" stroke="url(#g-cyan)" stroke-width="1.5"/>
+            <line x1="17" y1="17" x2="21" y2="21"
+              stroke="url(#g-cv)" stroke-width="2" stroke-linecap="round"/>
+            <!-- Inner ring -->
+            <circle cx="11" cy="11" r="3.5"
+              fill="none" stroke="rgba(120,220,255,0.25)" stroke-width="1"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Search</div>
+          <div class="card-num">VX / 12</div>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-v)">
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+              stroke="url(#g-violet)" stroke-width="1.4" fill="url(#g-fill-v)"/>
+            <circle cx="12" cy="12" r="3"
+              fill="url(#g-fill-v)" stroke="url(#g-cv)" stroke-width="1.4"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Settings</div>
+          <div class="card-num">VX / 13</div>
+        </div>
+      </div>
+
+      <!-- Calendar -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-c)">
+            <rect x="3" y="4" width="18" height="18" rx="3"
+              fill="url(#g-fill)" stroke="url(#g-cyan)" stroke-width="1.4"/>
+            <line x1="8" y1="2" x2="8" y2="6"  stroke="url(#g-cv)" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="16" y1="2" x2="16" y2="6" stroke="url(#g-cv)" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="3" y1="10" x2="21" y2="10" stroke="url(#g-cyan)" stroke-width="1.2" stroke-linecap="round"/>
+            <circle cx="8"  cy="15" r="1.2" fill="var(--cyan)"/>
+            <circle cx="12" cy="15" r="1.2" fill="var(--violet)"/>
+            <circle cx="16" cy="15" r="1.2" fill="var(--cyan)"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Calendar</div>
+          <div class="card-num">VX / 14</div>
+        </div>
+      </div>
+
+      <!-- Clock -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-c)">
+            <circle cx="12" cy="12" r="9"
+              fill="url(#g-fill)" stroke="url(#g-cyan)" stroke-width="1.4"/>
+            <circle cx="12" cy="12" r="6"
+              fill="none" stroke="rgba(120,220,255,0.15)" stroke-width="1"/>
+            <!-- Tick marks -->
+            <line x1="12" y1="4.5" x2="12" y2="6"  stroke="rgba(120,220,255,0.5)" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="19.5" y1="12" x2="18" y2="12" stroke="rgba(120,220,255,0.5)" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="12" y1="19.5" x2="12" y2="18" stroke="rgba(120,220,255,0.5)" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="4.5" y1="12" x2="6" y2="12"  stroke="rgba(120,220,255,0.5)" stroke-width="1.2" stroke-linecap="round"/>
+            <!-- Hands -->
+            <line x1="12" y1="12" x2="12" y2="7"
+              stroke="url(#g-cyan)" stroke-width="1.6" stroke-linecap="round"/>
+            <line x1="12" y1="12" x2="15.5" y2="13.5"
+              stroke="url(#g-cv)" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="12" cy="12" r="1" fill="var(--cyan)"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Clock</div>
+          <div class="card-num">VX / 15</div>
+        </div>
+      </div>
+
+      <!-- Lock -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-v)">
+            <rect x="5" y="11" width="14" height="11" rx="3"
+              fill="url(#g-fill-v)" stroke="url(#g-violet)" stroke-width="1.4"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"
+              stroke="url(#g-cv)" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="12" cy="16.5" r="2"
+              fill="url(#g-fill-v)" stroke="url(#g-cyan)" stroke-width="1.3"/>
+            <line x1="12" y1="18.5" x2="12" y2="20"
+              stroke="var(--cyan)" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Lock</div>
+          <div class="card-num">VX / 16</div>
+        </div>
+      </div>
+
+      <!-- Heart -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-v)">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+              fill="rgba(176,132,255,0.12)" stroke="url(#g-cv)" stroke-width="1.4" stroke-linejoin="round"/>
+            <!-- Inner highlight -->
+            <path d="M8 8.5a3 3 0 0 1 4 0"
+              stroke="rgba(255,126,179,0.5)" stroke-width="1" stroke-linecap="round" fill="none"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Heart</div>
+          <div class="card-num">VX / 17</div>
+        </div>
+      </div>
+
+      <!-- Star -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-c)">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+              fill="rgba(120,220,255,0.08)" stroke="url(#g-cv)" stroke-width="1.4" stroke-linejoin="round"/>
+            <!-- Inner star shimmer -->
+            <line x1="12" y1="2" x2="12" y2="6" stroke="rgba(255,220,120,0.4)" stroke-width="1" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Star</div>
+          <div class="card-num">VX / 18</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════════
+       04 · WEB & NAVIGATION
+  ═══════════════════════════════════════════════ -->
+  <section class="category">
+    <div class="category-head">
+      <div class="category-title">
+        <span class="category-num">04</span>
+        <span class="category-name">Web &amp; Navigation</span>
+      </div>
+      <span class="category-count">6 icons</span>
+    </div>
+
+    <div class="grid">
+
+      <!-- Home -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-c)">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+              fill="url(#g-fill)" stroke="url(#g-cyan)" stroke-width="1.4" stroke-linejoin="round"/>
+            <polyline points="9 22 9 12 15 12 15 22"
+              stroke="url(#g-cv)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Home</div>
+          <div class="card-num">VX / 19</div>
+        </div>
+      </div>
+
+      <!-- Cart -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-v)">
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"
+              stroke="url(#g-cv)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="9" cy="21" r="1.5" fill="var(--violet)" stroke="none"/>
+            <circle cx="20" cy="21" r="1.5" fill="var(--cyan)" stroke="none"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Cart</div>
+          <div class="card-num">VX / 20</div>
+        </div>
+      </div>
+
+      <!-- Camera -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-c)">
+            <rect x="2" y="7" width="20" height="13" rx="2.5"
+              fill="url(#g-fill)" stroke="url(#g-cyan)" stroke-width="1.4"/>
+            <path d="M16 7l-1.5-3H9.5L8 7"
+              stroke="url(#g-cv)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="13.5" r="3.5"
+              fill="none" stroke="url(#g-cv)" stroke-width="1.4"/>
+            <circle cx="12" cy="13.5" r="1.5"
+              fill="rgba(120,220,255,0.2)" stroke="none"/>
+            <circle cx="19" cy="9.5" r="1" fill="var(--cyan)"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Camera</div>
+          <div class="card-num">VX / 21</div>
+        </div>
+      </div>
+
+      <!-- Location -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-v)">
+            <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"
+              fill="url(#g-fill-v)" stroke="url(#g-cv)" stroke-width="1.4" stroke-linejoin="round"/>
+            <circle cx="12" cy="10" r="3"
+              fill="rgba(176,132,255,0.2)" stroke="url(#g-violet)" stroke-width="1.3"/>
+            <circle cx="12" cy="10" r="1" fill="var(--violet)"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Location</div>
+          <div class="card-num">VX / 22</div>
+        </div>
+      </div>
+
+      <!-- Link -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-c)">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+              stroke="url(#g-cyan)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+              stroke="url(#g-violet)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Link</div>
+          <div class="card-num">VX / 23</div>
+        </div>
+      </div>
+
+      <!-- Refresh -->
+      <div class="card">
+        <div class="copy-btn" title="Copy SVG">+</div>
+        <div class="icon-stage">
+          <svg viewBox="0 0 24 24" fill="none" filter="url(#glow-c)">
+            <path d="M23 4v6h-6"
+              stroke="url(#g-cyan)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M1 20v-6h6"
+              stroke="url(#g-violet)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"
+              stroke="url(#g-cv)" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
+              stroke="url(#g-cv)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-label">Refresh</div>
+          <div class="card-num">VX / 24</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <div>© 2026 VOLYNX · Icons Store</div>
+    <div><a href="#">License</a> &nbsp;·&nbsp; <a href="#">Usage</a> &nbsp;·&nbsp; <a href="#">Support</a></div>
+  </footer>
+
+</div>
+
+<script>
+  // Copy button feedback
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const svg = btn.nextElementSibling.querySelector('svg').outerHTML;
+      navigator.clipboard?.writeText(svg);
+      const orig = btn.textContent;
+      btn.textContent = '✓';
+      btn.style.color = '#78dcff';
+      btn.style.background = 'rgba(120,220,255,0.18)';
+      setTimeout(() => {
+        btn.textContent = orig;
+        btn.style.color = '';
+        btn.style.background = '';
+      }, 1400);
+    });
+  });
+</script>
+
+</body>
+</html>

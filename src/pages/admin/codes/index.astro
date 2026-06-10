@@ -15,19 +15,19 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
 
   <main class="codes-shell">
     <section id="codesLoading" class="codes-state">
-      <p>Loading access console...</p>
+      <p data-i18n="admin.codes.loading_console">Loading access console...</p>
     </section>
 
     <section id="codesLoggedOut" class="codes-state" hidden>
-      <h1>Sign in required</h1>
-      <p>The access console is gated to platform admins.</p>
-      <a class="codes-btn primary" href={`${ROUTES.login}?next=${ROUTES.adminCodes}`}>Sign in</a>
+      <h1 data-i18n="admin.codes.login_required">Sign in required</h1>
+      <p data-i18n="admin.codes.login_msg">The access console is gated to platform admins.</p>
+      <a class="codes-btn primary" href={`${ROUTES.login}?next=${ROUTES.adminCodes}`} data-i18n="admin.codes.sign_in">Sign in</a>
     </section>
 
     <section id="codesForbidden" class="codes-state" hidden>
-      <h1>Forbidden</h1>
-      <p>Your account does not have admin privileges.</p>
-      <a class="codes-btn ghost" href={ROUTES.home}>Back to home</a>
+      <h1 data-i18n="admin.codes.forbidden">Forbidden</h1>
+      <p data-i18n="admin.codes.forbidden_msg">Your account does not have admin privileges.</p>
+      <a class="codes-btn ghost" href={ROUTES.home} data-i18n="admin.codes.back_home">Back to home</a>
     </section>
 
     <section id="codesConsole" class="codes-console" hidden>
@@ -35,49 +35,49 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
         <div class="codes-hero-main">
           <span class="codes-appmark" aria-hidden="true">AC</span>
           <div>
-            <span class="codes-kicker">Admin · Codes</span>
-            <h1>Access Console</h1>
-            <p>QR links, vouchers and client handoff codes in one operational surface.</p>
+            <span class="codes-kicker" data-i18n="admin.codes.hero_kicker">Admin · Codes</span>
+            <h1 data-i18n="admin.codes.hero_title">Access Console</h1>
+            <p data-i18n="admin.codes.hero_subtitle">QR links, vouchers and client handoff codes in one operational surface.</p>
           </div>
         </div>
         <div class="codes-hero-actions">
-          <a class="codes-btn ghost" href={ROUTES.qrgen}>Styled QR designer</a>
-          <button class="codes-btn ghost" type="button" data-tab-jump="qr">QR workspace</button>
-          <button class="codes-btn ghost" type="button" data-tab-jump="vouchers">Voucher workspace</button>
+          <a class="codes-btn ghost" href={ROUTES.qrgen} data-i18n="admin.codes.action_designer">Styled QR designer</a>
+          <button class="codes-btn ghost" type="button" data-tab-jump="qr" data-i18n="admin.codes.action_qr_workspace">QR workspace</button>
+          <button class="codes-btn ghost" type="button" data-tab-jump="vouchers" data-i18n="admin.codes.action_voucher_workspace">Voucher workspace</button>
         </div>
       </header>
 
-      <nav class="codes-tabs" aria-label="Code admin sections">
+      <nav class="codes-tabs" aria-label="Code admin sections" data-i18n-aria="admin.codes.tabs_aria">
         <button class="codes-tab is-active" type="button" data-tab="qr">
           <span class="codes-tab__icon" aria-hidden="true">QR</span>
-          <span><strong>QR Codes</strong><small data-count-for="qr">Dynamic links</small></span>
+          <span><strong data-i18n="admin.codes.tab_qr">QR Codes</strong><small data-count-for="qr" data-i18n="admin.codes.tab_qr_desc">Dynamic links</small></span>
         </button>
         <button class="codes-tab" type="button" data-tab="vouchers">
           <span class="codes-tab__icon" aria-hidden="true">GR</span>
-          <span><strong>Vouchers</strong><small data-count-for="vouchers">Invites & grants</small></span>
+          <span><strong data-i18n="admin.codes.tab_vouchers">Vouchers</strong><small data-count-for="vouchers" data-i18n="admin.codes.tab_vouchers_desc">Invites & grants</small></span>
         </button>
         <button class="codes-tab" type="button" data-tab="recent">
           <span class="codes-tab__icon" aria-hidden="true">IN</span>
-          <span><strong>Recent</strong><small data-count-for="recent">Snapshot</small></span>
+          <span><strong data-i18n="admin.codes.tab_recent">Recent</strong><small data-count-for="recent" data-i18n="admin.codes.tab_recent_desc">Snapshot</small></span>
         </button>
       </nav>
 
-      <section class="codes-status-grid" aria-label="Access console status">
+      <section class="codes-status-grid" aria-label="Access console status" data-i18n-aria="admin.codes.status_aria">
         <div class="codes-status-card">
-          <span>Admin</span>
-          <strong id="codesAdminName">Checking...</strong>
+          <span data-i18n="admin.codes.status_admin">Admin</span>
+          <strong id="codesAdminName" data-i18n="admin.codes.checking">Checking...</strong>
         </div>
         <div class="codes-status-card">
-          <span>QR state</span>
-          <strong id="codesQrState">Idle</strong>
+          <span data-i18n="admin.codes.status_qr">QR state</span>
+          <strong id="codesQrState" data-i18n="admin.codes.idle">Idle</strong>
         </div>
         <div class="codes-status-card">
-          <span>Voucher state</span>
-          <strong id="codesVoucherState">Idle</strong>
+          <span data-i18n="admin.codes.status_voucher">Voucher state</span>
+          <strong id="codesVoucherState" data-i18n="admin.codes.idle">Idle</strong>
         </div>
         <div class="codes-status-card">
-          <span>Last refresh</span>
-          <strong id="codesLastRefresh">Not loaded</strong>
+          <span data-i18n="admin.codes.status_refresh">Last refresh</span>
+          <strong id="codesLastRefresh" data-i18n="admin.codes.not_loaded">Not loaded</strong>
         </div>
       </section>
 
@@ -85,49 +85,49 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
         <div class="codes-grid codes-grid--primary">
           <article class="codes-card codes-card--create">
             <div class="codes-card-head">
-              <span>Dynamic QR</span>
-              <strong>Print-safe link</strong>
+              <span data-i18n="admin.codes.dynamic_qr">Dynamic QR</span>
+              <strong data-i18n="admin.codes.print_safe">Print-safe link</strong>
             </div>
             <form id="qrCreateForm" class="codes-form">
               <label>
-                <span>Destination URL</span>
-                <input id="qrTarget" type="text" placeholder="client-site.com" autocomplete="url" inputmode="url" required />
+                <span data-i18n="admin.codes.destination_url">Destination URL</span>
+                <input id="qrTarget" type="text" placeholder="client-site.com" data-i18n-placeholder="admin.codes.ph_client_site" autocomplete="url" inputmode="url" required />
               </label>
               <div class="codes-form-row">
                 <label>
-                  <span>Label</span>
-                  <input id="qrLabel" type="text" maxlength="100" placeholder="Client banner" />
+                  <span data-i18n="admin.codes.label">Label</span>
+                  <input id="qrLabel" type="text" maxlength="100" placeholder="Client banner" data-i18n-placeholder="admin.codes.ph_client_banner" />
                 </label>
                 <label>
-                  <span>Custom slug</span>
-                  <input id="qrSlug" type="text" maxlength="32" placeholder="optional" />
+                  <span data-i18n="admin.codes.custom_slug">Custom slug</span>
+                  <input id="qrSlug" type="text" maxlength="32" placeholder="optional" data-i18n-placeholder="admin.codes.ph_optional" />
                 </label>
               </div>
               <label class="codes-check">
                 <input id="qrNeverExpires" type="checkbox" checked />
-                <span>Never expires</span>
+                <span data-i18n="admin.codes.never_expires">Never expires</span>
               </label>
-              <button id="qrCreateBtn" class="codes-btn primary" type="submit">Create QR</button>
+              <button id="qrCreateBtn" class="codes-btn primary" type="submit" data-i18n="admin.codes.create_qr">Create QR</button>
               <p id="qrCreateMsg" class="codes-msg" aria-live="polite"></p>
             </form>
           </article>
 
           <article id="qrResult" class="codes-card codes-card--result" hidden>
             <div class="codes-card-head">
-              <span>Ready</span>
-              <strong>Test before print</strong>
+              <span data-i18n="admin.codes.ready">Ready</span>
+              <strong data-i18n="admin.codes.test_before_print">Test before print</strong>
             </div>
             <div class="codes-result-url">
               <input id="qrShortUrl" type="text" readonly />
-              <button class="codes-btn ghost" type="button" data-copy-target="qrShortUrl">Copy</button>
+              <button class="codes-btn ghost" type="button" data-copy-target="qrShortUrl" data-i18n="admin.codes.copy">Copy</button>
             </div>
             <div class="codes-preview">
-              <canvas id="qrCanvas" width="360" height="360" aria-label="Generated QR code"></canvas>
+              <canvas id="qrCanvas" width="360" height="360" aria-label="Generated QR code" data-i18n-aria="admin.codes.generated_qr_aria"></canvas>
             </div>
             <div class="codes-result-actions">
-              <a id="qrOpenLink" class="codes-btn ghost" href="#" target="_blank" rel="noopener">Open</a>
-              <button id="qrDownloadPng" class="codes-btn ghost" type="button">Download PNG</button>
-              <button id="qrRefreshList" class="codes-btn ghost" type="button">Refresh list</button>
+              <a id="qrOpenLink" class="codes-btn ghost" href="#" target="_blank" rel="noopener" data-i18n="admin.codes.open">Open</a>
+              <button id="qrDownloadPng" class="codes-btn ghost" type="button" data-i18n="admin.codes.download_png">Download PNG</button>
+              <button id="qrRefreshList" class="codes-btn ghost" type="button" data-i18n="admin.codes.refresh_list">Refresh list</button>
             </div>
           </article>
         </div>
@@ -135,20 +135,20 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
         <article class="codes-card">
           <div class="codes-list-head">
             <div>
-              <span class="codes-kicker">QR Inventory</span>
-              <h2>Live QR codes</h2>
+              <span class="codes-kicker" data-i18n="admin.codes.qr_inventory">QR Inventory</span>
+              <h2 data-i18n="admin.codes.live_qr_codes">Live QR codes</h2>
             </div>
             <div class="codes-filter">
               <select id="qrStatusFilter">
-                <option value="">All</option>
-                <option value="active">Active</option>
-                <option value="paused">Paused</option>
-                <option value="grace">Grace</option>
-                <option value="expired">Expired</option>
-                <option value="admin_blocked">Blocked</option>
+                <option value="" data-i18n="admin.codes.filter_all">All</option>
+                <option value="active" data-i18n="admin.codes.status_active">Active</option>
+                <option value="paused" data-i18n="admin.codes.status_paused">Paused</option>
+                <option value="grace" data-i18n="admin.codes.status_grace">Grace</option>
+                <option value="expired" data-i18n="admin.codes.status_expired">Expired</option>
+                <option value="admin_blocked" data-i18n="admin.codes.status_blocked">Blocked</option>
               </select>
-              <input id="qrSearch" type="search" placeholder="slug, label, URL or owner" />
-              <button id="qrLoadBtn" class="codes-btn ghost" type="button">Refresh</button>
+              <input id="qrSearch" type="search" placeholder="slug, label, URL or owner" data-i18n-placeholder="admin.codes.ph_search" />
+              <button id="qrLoadBtn" class="codes-btn ghost" type="button" data-i18n="admin.codes.refresh">Refresh</button>
             </div>
           </div>
           <div id="qrRows" class="codes-rows"></div>
@@ -159,53 +159,53 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
         <div class="codes-grid">
           <article class="codes-card">
             <div class="codes-card-head">
-              <span>Voucher</span>
-              <strong>Quick issue</strong>
+              <span data-i18n="admin.codes.voucher">Voucher</span>
+              <strong data-i18n="admin.codes.quick_issue">Quick issue</strong>
             </div>
             <form id="voucherForm" class="codes-form">
               <label>
-                <span>Preset</span>
+                <span data-i18n="admin.codes.preset">Preset</span>
                 <select id="voucherPreset">
-                  <option value="black_diamond">Black Diamond pack</option>
-                  <option value="vx_80">80 VX bonus</option>
-                  <option value="pro_perm">Pro plan permanent</option>
-                  <option value="diamond_90">Daily Diamond 90d</option>
+                  <option value="black_diamond" data-i18n="admin.codes.preset_black_diamond">Black Diamond pack</option>
+                  <option value="vx_80" data-i18n="admin.codes.preset_vx_80">80 VX bonus</option>
+                  <option value="pro_perm" data-i18n="admin.codes.preset_pro_perm">Pro plan permanent</option>
+                  <option value="diamond_90" data-i18n="admin.codes.preset_diamond_90">Daily Diamond 90d</option>
                 </select>
               </label>
               <div class="codes-form-row">
                 <label>
-                  <span>Recipient</span>
-                  <input id="voucherRecipient" type="text" maxlength="80" placeholder="Client name" />
+                  <span data-i18n="admin.codes.recipient">Recipient</span>
+                  <input id="voucherRecipient" type="text" maxlength="80" placeholder="Client name" data-i18n-placeholder="admin.codes.ph_client_name" />
                 </label>
                 <label>
-                  <span>Email gate</span>
-                  <input id="voucherEmail" type="email" maxlength="320" placeholder="optional" />
+                  <span data-i18n="admin.codes.email_gate">Email gate</span>
+                  <input id="voucherEmail" type="email" maxlength="320" placeholder="optional" data-i18n-placeholder="admin.codes.ph_optional" />
                 </label>
               </div>
               <label>
-                <span>Label</span>
-                <input id="voucherLabel" type="text" maxlength="200" placeholder="Auto-generated if empty" />
+                <span data-i18n="admin.codes.label">Label</span>
+                <input id="voucherLabel" type="text" maxlength="200" placeholder="Auto-generated if empty" data-i18n-placeholder="admin.codes.ph_auto_label" />
               </label>
-              <button id="voucherCreateBtn" class="codes-btn primary" type="submit">Create voucher</button>
+              <button id="voucherCreateBtn" class="codes-btn primary" type="submit" data-i18n="admin.codes.create_voucher">Create voucher</button>
               <p id="voucherMsg" class="codes-msg" aria-live="polite"></p>
             </form>
           </article>
 
           <article id="voucherResult" class="codes-card codes-card--result" hidden>
             <div class="codes-card-head">
-              <span>Voucher created</span>
-              <strong>Share link</strong>
+              <span data-i18n="admin.codes.voucher_created">Voucher created</span>
+              <strong data-i18n="admin.codes.share_link">Share link</strong>
             </div>
             <div class="codes-result-url">
               <input id="voucherUrl" type="text" readonly />
-              <button class="codes-btn ghost" type="button" data-copy-target="voucherUrl">Copy</button>
+              <button class="codes-btn ghost" type="button" data-copy-target="voucherUrl" data-i18n="admin.codes.copy">Copy</button>
             </div>
             <div class="codes-preview">
-              <canvas id="voucherCanvas" width="320" height="320" aria-label="Voucher QR code"></canvas>
+              <canvas id="voucherCanvas" width="320" height="320" aria-label="Voucher QR code" data-i18n-aria="admin.codes.voucher_qr_aria"></canvas>
             </div>
             <div class="codes-result-actions">
               <code id="voucherCode" class="codes-code">-</code>
-              <button id="voucherDownloadPng" class="codes-btn ghost" type="button">Download PNG</button>
+              <button id="voucherDownloadPng" class="codes-btn ghost" type="button" data-i18n="admin.codes.download_png">Download PNG</button>
             </div>
           </article>
         </div>
@@ -213,10 +213,10 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
         <article class="codes-card">
           <div class="codes-list-head">
             <div>
-              <span class="codes-kicker">Voucher Inventory</span>
-              <h2>Recent vouchers</h2>
+              <span class="codes-kicker" data-i18n="admin.codes.voucher_inventory">Voucher Inventory</span>
+              <h2 data-i18n="admin.codes.recent_vouchers">Recent vouchers</h2>
             </div>
-            <button id="voucherLoadBtn" class="codes-btn ghost" type="button">Refresh</button>
+            <button id="voucherLoadBtn" class="codes-btn ghost" type="button" data-i18n="admin.codes.refresh">Refresh</button>
           </div>
           <div id="voucherRows" class="codes-rows"></div>
         </article>
@@ -226,10 +226,10 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
         <article class="codes-card">
           <div class="codes-list-head">
             <div>
-              <span class="codes-kicker">Recent</span>
-              <h2>Operational snapshot</h2>
+              <span class="codes-kicker" data-i18n="admin.codes.recent">Recent</span>
+              <h2 data-i18n="admin.codes.operational_snapshot">Operational snapshot</h2>
             </div>
-            <button id="recentRefresh" class="codes-btn ghost" type="button">Refresh all</button>
+            <button id="recentRefresh" class="codes-btn ghost" type="button" data-i18n="admin.codes.refresh_all">Refresh all</button>
           </div>
           <div id="recentRows" class="codes-rows"></div>
         </article>
@@ -307,6 +307,28 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       codesLastRefresh: $("codesLastRefresh"),
     };
 
+    function t(key, fallback, vars = {}) {
+      const raw = window.VxI18n?.t ? window.VxI18n.t(key, fallback) : fallback;
+      return String(raw).replace(/\{(\w+)\}/g, (_, name) => (
+        Object.prototype.hasOwnProperty.call(vars, name) ? String(vars[name]) : `{${name}}`
+      ));
+    }
+
+    function statusLabel(status) {
+      const key = String(status || "neutral").replace(/[^a-z0-9_]/gi, "_");
+      return t(`admin.codes.status_${key}`, String(status || "").replace("_", " "));
+    }
+
+    function voucherPresetLabel(preset) {
+      const map = {
+        black_diamond: "admin.codes.preset_black_diamond",
+        vx_80: "admin.codes.preset_vx_80",
+        pro_perm: "admin.codes.preset_pro_perm",
+        diamond_90: "admin.codes.preset_diamond_90",
+      };
+      return t(map[preset] || "admin.codes.preset_diamond_90", preset);
+    }
+
     function showOnly(node) {
       [el.loading, el.loggedOut, el.forbidden, el.console].forEach((item) => {
         if (item) item.hidden = item !== node;
@@ -331,15 +353,35 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       const qrCount = document.querySelector('[data-count-for="qr"]');
       const voucherCount = document.querySelector('[data-count-for="vouchers"]');
       const recentCount = document.querySelector('[data-count-for="recent"]');
-      if (qrCount) qrCount.textContent = `${lastQrRows.length} dynamic link${lastQrRows.length === 1 ? "" : "s"}`;
-      if (voucherCount) voucherCount.textContent = `${lastVoucherRows.length} voucher${lastVoucherRows.length === 1 ? "" : "s"}`;
-      if (recentCount) recentCount.textContent = `${Math.min(lastQrRows.length + lastVoucherRows.length, 10)} loaded`;
+      if (qrCount) qrCount.textContent = lastQrRows.length
+        ? t("admin.codes.count_qr", "{count} dynamic links", { count: lastQrRows.length })
+        : t("admin.codes.tab_qr_desc", "Dynamic links");
+      if (voucherCount) voucherCount.textContent = lastVoucherRows.length
+        ? t("admin.codes.count_vouchers", "{count} vouchers", { count: lastVoucherRows.length })
+        : t("admin.codes.tab_vouchers_desc", "Invites & grants");
+      if (recentCount) recentCount.textContent = Math.min(lastQrRows.length + lastVoucherRows.length, 10)
+        ? t("admin.codes.count_loaded", "{count} loaded", { count: Math.min(lastQrRows.length + lastVoucherRows.length, 10) })
+        : t("admin.codes.tab_recent_desc", "Snapshot");
     }
 
     function escapeHtml(value) {
       return String(value ?? "").replace(/[&<>"']/g, (c) => ({
         "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
       }[c]));
+    }
+
+    function toInputValue(iso) {
+      if (!iso) return "";
+      const date = new Date(iso);
+      if (Number.isNaN(date.getTime())) return "";
+      const shifted = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+      return shifted.toISOString().slice(0, 16);
+    }
+
+    function inputToIso(value) {
+      if (!value) return null;
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date.toISOString();
     }
 
     function decodeJwtPayload(jwt) {
@@ -476,10 +518,10 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       event.preventDefault();
       setMsg(el.qrCreateMsg, "");
       el.qrCreateBtn.disabled = true;
-      el.qrCreateBtn.textContent = "Creating...";
+      el.qrCreateBtn.textContent = t("admin.codes.creating", "Creating...");
       try {
         const session = await getSession();
-        if (!session) throw new Error("Sign in again before creating a QR.");
+        if (!session) throw new Error(t("admin.codes.err_signin_qr", "Sign in again before creating a QR."));
 
         const target = normalizeTargetUrl(el.qrTarget.value);
         const label = el.qrLabel.value.trim();
@@ -487,10 +529,10 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
         el.qrTarget.value = target;
         if (!isValidHttpUrl(target)) {
           el.qrTarget.focus({ preventScroll: true });
-          throw new Error("Enter a valid destination URL.");
+          throw new Error(t("admin.codes.err_valid_url", "Enter a valid destination URL."));
         }
         if (requestedSlug && (requestedSlug.length < 4 || requestedSlug.length > 32)) {
-          throw new Error("Custom slug must be 4 to 32 characters.");
+          throw new Error(t("admin.codes.err_slug_length", "Custom slug must be 4 to 32 characters."));
         }
 
         let created = null;
@@ -516,7 +558,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
             throw err;
           }
         }
-        if (!created) throw new Error("Could not create QR.");
+        if (!created) throw new Error(t("admin.codes.err_create_qr", "Could not create QR."));
 
         if (el.qrNeverExpires.checked && isAdmin) {
           await rpc("admin_update_qr_validity", {
@@ -534,7 +576,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
         el.qrCanvas.dataset.qrUrl = shortUrl;
         el.qrResult.hidden = false;
         await QRCode.toCanvas(el.qrCanvas, shortUrl, QR_CANVAS_OPTIONS);
-        setMsg(el.qrCreateMsg, "QR created. Test the link before sending to print.", "ok");
+        setMsg(el.qrCreateMsg, t("admin.codes.qr_created_msg", "QR created. Test the link before sending to print."), "ok");
         el.qrTarget.value = "";
         el.qrLabel.value = "";
         el.qrSlug.value = "";
@@ -544,13 +586,13 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
         setMsg(el.qrCreateMsg, err.message || String(err), "error");
       } finally {
         el.qrCreateBtn.disabled = false;
-        el.qrCreateBtn.textContent = "Create QR";
+        el.qrCreateBtn.textContent = t("admin.codes.create_qr", "Create QR");
       }
     }
 
     async function loadQrs() {
-      setState(el.codesQrState, "Loading");
-      el.qrRows.innerHTML = `<div class="codes-empty">Loading QR codes...</div>`;
+      setState(el.codesQrState, t("admin.codes.loading", "Loading"));
+      el.qrRows.innerHTML = `<div class="codes-empty">${escapeHtml(t("admin.codes.loading_qrs", "Loading QR codes..."))}</div>`;
       try {
         const rows = await rpc("admin_list_qr_codes", {
           p_limit: 100,
@@ -559,40 +601,47 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
         });
         lastQrRows = rows || [];
         renderQrs(lastQrRows);
-        setState(el.codesQrState, `${lastQrRows.length} loaded`);
+        setState(el.codesQrState, t("admin.codes.loaded_count", "{count} loaded", { count: lastQrRows.length }));
         updateTabCounts();
         markRefresh();
       } catch (err) {
-        el.qrRows.innerHTML = `<div class="codes-empty is-error">Could not load QR codes: ${escapeHtml(err.message || err)}</div>`;
-        setState(el.codesQrState, "Error");
+        el.qrRows.innerHTML = `<div class="codes-empty is-error">${escapeHtml(t("admin.codes.err_load_qrs", "Could not load QR codes:"))} ${escapeHtml(err.message || err)}</div>`;
+        setState(el.codesQrState, t("admin.codes.error", "Error"));
         updateTabCounts();
       }
     }
 
     function renderQrs(rows) {
       if (!rows.length) {
-        el.qrRows.innerHTML = `<div class="codes-empty">No QR codes found.</div>`;
+        el.qrRows.innerHTML = `<div class="codes-empty">${escapeHtml(t("admin.codes.no_qrs", "No QR codes found."))}</div>`;
         return;
       }
       el.qrRows.innerHTML = rows.map((qr) => {
         const shortUrl = `${QR_HOST}/${qr.slug}`;
         const label = qr.label || "";
+        const founderManaged = qr.founder_controlled === true;
         return `
           <article class="codes-row codes-row--qr" data-qr-id="${escapeHtml(qr.id)}">
             <div class="codes-row-main">
-              <span class="codes-pill codes-pill--${escapeHtml(qr.status)}">${escapeHtml(qr.status.replace("_", " "))}</span>
+              <span class="codes-pill codes-pill--${escapeHtml(qr.status)}">${escapeHtml(statusLabel(qr.status))}</span>
+              ${founderManaged ? `<span class="codes-pill codes-pill--founder">${escapeHtml(t("admin.codes.founder_managed", "Founder managed"))}</span>` : ""}
               <strong>${escapeHtml(qr.label || qr.slug)}</strong>
               <code>${escapeHtml(shortUrl)}</code>
+              <span>${escapeHtml(t("admin.codes.owner", "Owner"))}: ${escapeHtml(qr.owner_email || qr.owner_id || t("admin.codes.unknown", "unknown"))}</span>
               <a href="${escapeHtml(qr.target_url)}" target="_blank" rel="noopener">${escapeHtml(qr.target_url)}</a>
             </div>
-            <div class="codes-row-edit" aria-label="Edit QR destination">
+            <div class="codes-row-edit" aria-label="${escapeHtml(t("admin.codes.edit_qr_destination", "Edit QR destination"))}">
               <label>
-                <span>Destination URL</span>
+                <span>${escapeHtml(t("admin.codes.destination_url", "Destination URL"))}</span>
                 <input type="url" data-qr-field="target_url" value="${escapeHtml(qr.target_url)}" autocomplete="url" inputmode="url" />
               </label>
               <label>
-                <span>Label</span>
+                <span>${escapeHtml(t("admin.codes.label", "Label"))}</span>
                 <input type="text" data-qr-field="label" value="${escapeHtml(label)}" maxlength="100" />
+              </label>
+              <label>
+                <span>${escapeHtml(t("admin.codes.transfer_to_email", "Transfer to user email"))}</span>
+                <input type="email" data-qr-field="transfer_email" placeholder="${escapeHtml(t("admin.codes.ph_client_email", "client@example.com"))}" autocomplete="email" />
               </label>
             </div>
             <div class="codes-row-qr-preview">
@@ -601,20 +650,24 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
                 height="128"
                 data-qr-preview
                 data-qr-url="${escapeHtml(shortUrl)}"
-                aria-label="QR code preview for ${escapeHtml(qr.label || qr.slug)}"
+                aria-label="${escapeHtml(t("admin.codes.qr_preview_for", "QR code preview for {name}", { name: qr.label || qr.slug }))}"
               ></canvas>
             </div>
             <div class="codes-row-meta">
-              <span>${Number(qr.scan_count || 0)} scans</span>
-              <span>${qr.expires_at ? "Expires " + escapeHtml(new Date(qr.expires_at).toLocaleDateString()) : "Never expires"}</span>
+              <span>${escapeHtml(t("admin.codes.scan_count", "{count} scans", { count: Number(qr.scan_count || 0) }))}</span>
+              <span>${qr.expires_at ? escapeHtml(t("admin.codes.expires_date", "Expires {date}", { date: new Date(qr.expires_at).toLocaleDateString() })) : escapeHtml(t("admin.codes.never_expires", "Never expires"))}</span>
+              <span>${qr.grace_until ? escapeHtml(t("admin.codes.grace_date", "Grace {date}", { date: new Date(qr.grace_until).toLocaleDateString() })) : escapeHtml(t("admin.codes.no_grace_limit", "No grace limit"))}</span>
             </div>
             <div class="codes-row-actions">
-              <button class="codes-btn primary" type="button" data-qr-action="save-destination">Save destination</button>
-              <button class="codes-btn ghost" type="button" data-qr-action="download">Download PNG</button>
-              <button class="codes-btn ghost" type="button" data-copy-value="${escapeHtml(shortUrl)}">Copy</button>
-              <button class="codes-btn ghost" type="button" data-qr-action="never">Never</button>
-              <button class="codes-btn ghost" type="button" data-qr-action="pause">${qr.status === "paused" ? "Resume" : "Pause"}</button>
-              <button class="codes-btn danger" type="button" data-qr-action="delete">Delete</button>
+              <button class="codes-btn primary" type="button" data-qr-action="save-destination">${escapeHtml(t("admin.codes.save_destination", "Save destination"))}</button>
+              <button class="codes-btn ghost" type="button" data-qr-action="download">${escapeHtml(t("admin.codes.download_png", "Download PNG"))}</button>
+              <button class="codes-btn ghost" type="button" data-copy-value="${escapeHtml(shortUrl)}">${escapeHtml(t("admin.codes.copy", "Copy"))}</button>
+              <button class="codes-btn ghost" type="button" data-qr-action="transfer-owner">${escapeHtml(t("admin.codes.transfer_owner", "Transfer owner"))}</button>
+              <button class="codes-btn ghost" type="button" data-qr-action="founder-control">${escapeHtml(founderManaged ? t("admin.codes.release_founder_control", "Release founder control") : t("admin.codes.founder_control", "Founder control"))}</button>
+              <button class="codes-btn ghost" type="button" data-qr-action="never">${escapeHtml(t("admin.codes.never", "Never"))}</button>
+              <button class="codes-btn ghost" type="button" data-qr-action="pause">${escapeHtml(qr.status === "paused" ? t("admin.codes.resume", "Resume") : t("admin.codes.pause", "Pause"))}</button>
+              <button class="codes-btn danger" type="button" data-qr-action="block">${escapeHtml(t("admin.codes.block", "Block"))}</button>
+              <button class="codes-btn danger" type="button" data-qr-action="delete">${escapeHtml(t("admin.codes.delete", "Delete"))}</button>
             </div>
           </article>`;
       }).join("");
@@ -654,7 +707,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       if (targetInput) targetInput.value = target;
       if (!isValidHttpUrl(target)) {
         targetInput?.focus({ preventScroll: true });
-        throw new Error("Enter a valid destination URL.");
+        throw new Error(t("admin.codes.err_valid_url", "Enter a valid destination URL."));
       }
 
       await postgrest(`qr_codes?id=eq.${encodeURIComponent(id)}`, {
@@ -666,9 +719,54 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       });
     }
 
+    async function updateQrFounderControl(qr) {
+      const next = qr.founder_controlled !== true;
+      const ok = confirm(next
+        ? t("admin.codes.confirm_founder_on", `Put "{name}" under founder control? The recipient can edit destination, but cannot pause, delete or transfer it.`, { name: qr.label || qr.slug })
+        : t("admin.codes.confirm_founder_off", `Release founder control for "{name}"? The owner will regain full QR controls.`, { name: qr.label || qr.slug }));
+      if (!ok) return false;
+      await postgrest(`qr_codes?id=eq.${encodeURIComponent(qr.id)}`, {
+        method: "PATCH",
+        body: JSON.stringify({ founder_controlled: next }),
+      });
+      return true;
+    }
+
+    async function transferQrOwner(id, row, qr) {
+      const emailInput = row.querySelector('[data-qr-field="transfer_email"]');
+      const email = String(emailInput?.value || "").trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        emailInput?.focus({ preventScroll: true });
+        throw new Error(t("admin.codes.err_transfer_email", "Enter the customer's account email before transferring."));
+      }
+      const name = qr.label || qr.slug;
+      const ok = confirm(t("admin.codes.confirm_transfer_qr", `Transfer QR "{name}" to {email}? The short URL stays the same, but this customer will manage destination edits from their profile.`, { name, email }));
+      if (!ok) return false;
+      await rpc("admin_transfer_qr_code", {
+        p_qr_id: id,
+        p_target_email: email,
+        p_note: `Transferred from admin QR workspace: ${name}`,
+      });
+      return true;
+    }
+
+    function qrTransferErrorMessage(err) {
+      const raw = JSON.stringify(err?.data || {}) + " " + String(err?.message || err || "");
+      if (raw.includes("qr_transfer_target_profile_not_found")) {
+        return t("admin.codes.err_recipient_not_found", "Recipient profile not found. Ask the customer to create a VOLYNX account before transferring this QR.");
+      }
+      if (raw.includes("qr_transfer_target_quota_exceeded")) {
+        return t("admin.codes.err_recipient_quota", "Recipient account is not compatible with this QR yet. Gift a compatible subscription or ask them to upgrade before transfer.");
+      }
+      if (raw.includes("qr_transfer_same_owner")) {
+        return t("admin.codes.err_same_owner", "This QR already belongs to that account.");
+      }
+      return err?.message || String(err);
+    }
+
     async function deleteQrCode(qr) {
       const name = qr.label || qr.slug;
-      const ok = confirm(`Delete QR "${name}"? The short link will stop resolving immediately.`);
+      const ok = confirm(t("admin.codes.confirm_delete_qr", `Delete QR "{name}"? The short link will stop resolving immediately.`, { name }));
       if (!ok) return false;
       await postgrest(`qr_codes?id=eq.${encodeURIComponent(qr.id)}`, {
         method: "DELETE",
@@ -696,6 +794,12 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
         } else if (button.dataset.qrAction === "download") {
           await downloadSavedQr(qr);
           return;
+        } else if (button.dataset.qrAction === "transfer-owner") {
+          const transferred = await transferQrOwner(id, row, qr);
+          if (!transferred) return;
+        } else if (button.dataset.qrAction === "founder-control") {
+          const changed = await updateQrFounderControl(qr);
+          if (!changed) return;
         } else if (button.dataset.qrAction === "never") {
           await rpc("admin_update_qr_validity", {
             p_qr_id: id,
@@ -708,6 +812,13 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
             p_qr_id: id,
             p_status: qr.status === "paused" ? "active" : "paused",
           });
+        } else if (button.dataset.qrAction === "block") {
+          const ok = confirm(t("admin.codes.confirm_block_qr", `Block QR "{name}"? The short link will stop resolving until an admin reactivates it.`, { name: qr.label || qr.slug }));
+          if (!ok) return;
+          await rpc("admin_update_qr_validity", {
+            p_qr_id: id,
+            p_status: "admin_blocked",
+          });
         } else if (button.dataset.qrAction === "delete") {
           const deleted = await deleteQrCode(qr);
           if (!deleted) return;
@@ -715,7 +826,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
         await loadQrs();
         renderRecent();
       } catch (err) {
-        alert(err.message || String(err));
+        alert(button.dataset.qrAction === "transfer-owner" ? qrTransferErrorMessage(err) : (err.message || String(err)));
       } finally {
         button.disabled = false;
       }
@@ -732,17 +843,17 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
             tokens: 80,
             icon_pack_grants: ["Hyper-Icons-Premium", "Poligon-Premium", "metal-chrome-premium"],
           },
-          label: "Black Diamond pack",
+          label: voucherPresetLabel("black_diamond"),
         };
       }
-      if (preset === "vx_80") return { type: "token_pack", grants: { tokens: 80 }, label: "80 VX bonus" };
-      if (preset === "pro_perm") return { type: "builder_bonus", grants: { plan: "pro" }, label: "Pro plan permanent" };
-      return { type: "daily_access", grants: { daily_plan: "diamond", daily_plan_expires_in_days: 90 }, label: "Daily Diamond 90d" };
+      if (preset === "vx_80") return { type: "token_pack", grants: { tokens: 80 }, label: voucherPresetLabel("vx_80") };
+      if (preset === "pro_perm") return { type: "builder_bonus", grants: { plan: "pro" }, label: voucherPresetLabel("pro_perm") };
+      return { type: "daily_access", grants: { daily_plan: "diamond", daily_plan_expires_in_days: 90 }, label: voucherPresetLabel("diamond_90") };
     }
 
     async function voucherApi(payload) {
       const session = await getSession();
-      if (!session) throw new Error("Sign in again before creating a voucher.");
+      if (!session) throw new Error(t("admin.codes.err_signin_voucher", "Sign in again before creating a voucher."));
       const res = await fetch(VOUCHER_FN_URL, {
         method: "POST",
         headers: {
@@ -764,7 +875,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       event.preventDefault();
       setMsg(el.voucherMsg, "");
       el.voucherCreateBtn.disabled = true;
-      el.voucherCreateBtn.textContent = "Creating...";
+      el.voucherCreateBtn.textContent = t("admin.codes.creating", "Creating...");
       try {
         const preset = grantsForPreset(el.voucherPreset.value);
         const recipient = el.voucherRecipient.value.trim();
@@ -792,68 +903,111 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
           errorCorrectionLevel: "H",
           color: { dark: "#05060a", light: "#ffffff" },
         });
-        setMsg(el.voucherMsg, "Voucher created.", "ok");
+        setMsg(el.voucherMsg, t("admin.codes.voucher_created_msg", "Voucher created."), "ok");
         await loadVouchers();
         renderRecent();
       } catch (err) {
         setMsg(el.voucherMsg, err.message || String(err), "error");
       } finally {
         el.voucherCreateBtn.disabled = false;
-        el.voucherCreateBtn.textContent = "Create voucher";
+        el.voucherCreateBtn.textContent = t("admin.codes.create_voucher", "Create voucher");
       }
     }
 
     async function loadVouchers() {
-      setState(el.codesVoucherState, "Loading");
-      el.voucherRows.innerHTML = `<div class="codes-empty">Loading vouchers...</div>`;
+      setState(el.codesVoucherState, t("admin.codes.loading", "Loading"));
+      el.voucherRows.innerHTML = `<div class="codes-empty">${escapeHtml(t("admin.codes.loading_vouchers", "Loading vouchers..."))}</div>`;
       try {
         const data = await voucherApi({ action: "list", limit: 100 });
         lastVoucherRows = data.items || [];
         renderVouchers(lastVoucherRows);
-        setState(el.codesVoucherState, `${lastVoucherRows.length} loaded`);
+        setState(el.codesVoucherState, t("admin.codes.loaded_count", "{count} loaded", { count: lastVoucherRows.length }));
         updateTabCounts();
         markRefresh();
       } catch (err) {
-        el.voucherRows.innerHTML = `<div class="codes-empty is-error">Could not load vouchers: ${escapeHtml(err.message || err)}</div>`;
-        setState(el.codesVoucherState, "Error");
+        el.voucherRows.innerHTML = `<div class="codes-empty is-error">${escapeHtml(t("admin.codes.err_load_vouchers", "Could not load vouchers:"))} ${escapeHtml(err.message || err)}</div>`;
+        setState(el.codesVoucherState, t("admin.codes.error", "Error"));
         updateTabCounts();
       }
     }
 
     function renderVouchers(rows) {
       if (!rows.length) {
-        el.voucherRows.innerHTML = `<div class="codes-empty">No vouchers found.</div>`;
+        el.voucherRows.innerHTML = `<div class="codes-empty">${escapeHtml(t("admin.codes.no_vouchers", "No vouchers found."))}</div>`;
         return;
       }
       el.voucherRows.innerHTML = rows.map((voucher) => {
         const active = voucher.active && (!voucher.expires_at || new Date(voucher.expires_at) > new Date()) && Number(voucher.times_used || 0) < Number(voucher.max_uses || 1);
+        const inactive = !voucher.active;
         return `
-          <article class="codes-row" data-voucher-id="${escapeHtml(voucher.id)}">
+          <article class="codes-row codes-row--voucher" data-voucher-id="${escapeHtml(voucher.id)}">
             <div class="codes-row-main">
-              <span class="codes-pill ${active ? "codes-pill--active" : "codes-pill--expired"}">${active ? "active" : "inactive"}</span>
+              <span class="codes-pill ${active ? "codes-pill--active" : "codes-pill--expired"}">${escapeHtml(active ? t("admin.codes.status_active", "Active") : t("admin.codes.status_inactive", "Inactive"))}</span>
               <strong>${escapeHtml(voucher.label || voucher.type)}</strong>
               <code>${escapeHtml(voucher.code)}</code>
-              <span>${escapeHtml(voucher.target_email || "transferable")}</span>
+              <span>${escapeHtml(voucher.target_email || t("admin.codes.transferable", "transferable"))}</span>
             </div>
             <div class="codes-row-meta">
-              <span>${Number(voucher.times_used || 0)}/${Number(voucher.max_uses || 1)} used</span>
-              <span>${voucher.expires_at ? "Expires " + escapeHtml(new Date(voucher.expires_at).toLocaleDateString()) : "No expiry"}</span>
+              <span>${escapeHtml(t("admin.codes.used_count", "{used}/{max} used", { used: Number(voucher.times_used || 0), max: Number(voucher.max_uses || 1) }))}</span>
+              <span>${voucher.expires_at ? escapeHtml(t("admin.codes.expires_date", "Expires {date}", { date: new Date(voucher.expires_at).toLocaleDateString() })) : escapeHtml(t("admin.codes.no_expiry", "No expiry"))}</span>
+            </div>
+            <div class="codes-row-edit codes-row-edit--voucher" aria-label="${escapeHtml(t("admin.codes.edit_voucher_controls", "Edit voucher controls"))}">
+              <label>
+                <span>${escapeHtml(t("admin.codes.label", "Label"))}</span>
+                <input type="text" data-voucher-field="label" value="${escapeHtml(voucher.label || "")}" maxlength="200" />
+              </label>
+              <label>
+                <span>${escapeHtml(t("admin.codes.email_gate", "Email gate"))}</span>
+                <input type="email" data-voucher-field="target_email" value="${escapeHtml(voucher.target_email || "")}" maxlength="320" placeholder="${escapeHtml(t("admin.codes.ph_optional", "optional"))}" />
+              </label>
+              <label>
+                <span>${escapeHtml(t("admin.codes.max_uses", "Max uses"))}</span>
+                <input type="number" data-voucher-field="max_uses" min="${Math.max(1, Number(voucher.times_used || 0))}" max="100000" value="${Number(voucher.max_uses || 1)}" />
+              </label>
+              <label>
+                <span>${escapeHtml(t("admin.codes.expires_at", "Expires at"))}</span>
+                <input type="datetime-local" data-voucher-field="expires_at" value="${escapeHtml(toInputValue(voucher.expires_at))}" />
+              </label>
+              <label class="codes-check codes-check--inline">
+                <input type="checkbox" data-voucher-field="transferable" ${voucher.transferable ? "checked" : ""} />
+                <span>${escapeHtml(t("admin.codes.transferable_label", "Transferable"))}</span>
+              </label>
             </div>
             <div class="codes-row-actions">
-              <button class="codes-btn ghost" type="button" data-copy-value="${escapeHtml(voucher.code)}">Copy</button>
-              <button class="codes-btn danger" type="button" data-voucher-action="revoke" ${!voucher.active ? "disabled" : ""}>Delete / revoke</button>
+              <button class="codes-btn ghost" type="button" data-copy-value="${escapeHtml(voucher.code)}">${escapeHtml(t("admin.codes.copy", "Copy"))}</button>
+              <button class="codes-btn primary" type="button" data-voucher-action="save">${escapeHtml(t("admin.codes.save_controls", "Save controls"))}</button>
+              <button class="codes-btn ghost" type="button" data-voucher-action="never">${escapeHtml(t("admin.codes.no_expiry", "No expiry"))}</button>
+              <button class="codes-btn ${inactive ? "ghost" : "danger"}" type="button" data-voucher-action="toggle-active">${escapeHtml(inactive ? t("admin.codes.reactivate", "Reactivate") : t("admin.codes.revoke", "Revoke"))}</button>
             </div>
           </article>`;
       }).join("");
     }
 
+    function voucherPatchFromRow(row) {
+      const maxUses = Number(row.querySelector('[data-voucher-field="max_uses"]')?.value || 1);
+      return {
+        label: String(row.querySelector('[data-voucher-field="label"]')?.value || "").trim() || null,
+        target_email: String(row.querySelector('[data-voucher-field="target_email"]')?.value || "").trim().toLowerCase() || null,
+        max_uses: Number.isFinite(maxUses) ? maxUses : 1,
+        expires_at: inputToIso(row.querySelector('[data-voucher-field="expires_at"]')?.value || ""),
+        transferable: row.querySelector('[data-voucher-field="transferable"]')?.checked === true,
+      };
+    }
+
+    async function updateVoucher(id, patch) {
+      const data = await voucherApi({ action: "update", id, ...patch });
+      if (!data?.ok) throw new Error(data?.detail || data?.error || t("admin.codes.err_update_voucher", "Could not update voucher."));
+      await loadVouchers();
+      renderRecent();
+    }
+
     async function revokeVoucher(id) {
       const voucher = lastVoucherRows.find((item) => item.id === id);
-      const name = voucher?.label || voucher?.code || "this code";
-      const ok = confirm(`Delete/revoke "${name}"? The access code will stop working. Existing redemption history is kept.`);
+      const name = voucher?.label || voucher?.code || t("admin.codes.this_code", "this code");
+      const ok = confirm(t("admin.codes.confirm_revoke_voucher", `Delete/revoke "{name}"? The access code will stop working. Existing redemption history is kept.`, { name }));
       if (!ok) return;
       const data = await voucherApi({ action: "revoke", id });
-      if (!data?.ok) throw new Error(data?.detail || data?.error || "Could not revoke voucher.");
+      if (!data?.ok) throw new Error(data?.detail || data?.error || t("admin.codes.err_revoke_voucher", "Could not revoke voucher."));
       await loadVouchers();
       renderRecent();
     }
@@ -861,10 +1015,10 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     function renderRecent() {
       const entries = [
         ...lastQrRows.slice(0, 5).map((qr) => ({ kind: "QR", label: qr.label || qr.slug, detail: `${QR_HOST}/${qr.slug}`, status: qr.status })),
-        ...lastVoucherRows.slice(0, 5).map((voucher) => ({ kind: "Voucher", label: voucher.label || voucher.type, detail: voucher.code, status: voucher.active ? "active" : "inactive" })),
+        ...lastVoucherRows.slice(0, 5).map((voucher) => ({ kind: t("admin.codes.voucher", "Voucher"), label: voucher.label || voucher.type, detail: voucher.code, status: voucher.active ? "active" : "inactive" })),
       ].slice(0, 10);
       if (!entries.length) {
-        el.recentRows.innerHTML = `<div class="codes-empty">No recent codes loaded yet.</div>`;
+        el.recentRows.innerHTML = `<div class="codes-empty">${escapeHtml(t("admin.codes.no_recent", "No recent codes loaded yet."))}</div>`;
         updateTabCounts();
         return;
       }
@@ -876,7 +1030,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
             <code>${escapeHtml(item.detail)}</code>
           </div>
           <div class="codes-row-meta">
-            <span>${escapeHtml(item.status)}</span>
+            <span>${escapeHtml(statusLabel(item.status))}</span>
           </div>
         </article>
       `).join("");
@@ -956,16 +1110,30 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       el.voucherRows.addEventListener("click", async (event) => {
         const button = event.target.closest("[data-copy-value]");
         if (button) await copyText(button.dataset.copyValue || "");
-        const revokeButton = event.target.closest('[data-voucher-action="revoke"]');
-        if (revokeButton) {
-          revokeButton.disabled = true;
+        const actionButton = event.target.closest("[data-voucher-action]");
+        if (actionButton) {
+          actionButton.disabled = true;
           try {
-            const row = revokeButton.closest("[data-voucher-id]");
-            await revokeVoucher(row?.dataset.voucherId || "");
+            const row = actionButton.closest("[data-voucher-id]");
+            const id = row?.dataset.voucherId || "";
+            const voucher = lastVoucherRows.find((item) => item.id === id);
+            if (actionButton.dataset.voucherAction === "save") {
+              await updateVoucher(id, voucherPatchFromRow(row));
+            } else if (actionButton.dataset.voucherAction === "never") {
+              await updateVoucher(id, { expires_at: null });
+            } else if (actionButton.dataset.voucherAction === "toggle-active") {
+              if (voucher?.active) {
+                await revokeVoucher(id);
+              } else {
+                const ok = confirm(t("admin.codes.confirm_reactivate_voucher", `Reactivate "{name}"?`, { name: voucher?.label || voucher?.code || t("admin.codes.this_code", "this code") }));
+                if (!ok) return;
+                await updateVoucher(id, { active: true });
+              }
+            }
           } catch (err) {
             alert(err.message || String(err));
           } finally {
-            revokeButton.disabled = false;
+            actionButton.disabled = false;
           }
         }
       });
@@ -980,6 +1148,12 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       el.recentRefresh.addEventListener("click", async () => {
         await Promise.allSettled([loadQrs(), loadVouchers()]);
         renderRecent();
+      });
+      window.addEventListener("vx:lang-changed", () => {
+        renderQrs(lastQrRows);
+        renderVouchers(lastVoucherRows);
+        renderRecent();
+        updateTabCounts();
       });
     }
 
@@ -1104,9 +1278,10 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       display: inline-block;
       color: rgba(198,255,143,.86);
       font-size: 11px;
-      letter-spacing: .18em;
+      letter-spacing: .38em;
       text-transform: uppercase;
       margin-bottom: 8px;
+      text-shadow: 0 0 14px rgba(198,255,143,.32);
     }
 
     .codes-hero h1 {
@@ -1143,6 +1318,11 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       background: transparent;
       border-radius: 8px;
       width: 100%;
+    }
+
+    @keyframes codes-title-sheen {
+      0% { background-position: 180% 50%; }
+      100% { background-position: -60% 50%; }
     }
 
     .codes-tab {
@@ -1303,21 +1483,29 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     .codes-card-head strong,
     .codes-list-head h2 {
       color: rgba(255,255,255,.94);
-      font-size: 20px;
+      font-size: 25px;
+      font-weight: 250;
       letter-spacing: 0;
     }
 
     .codes-list-head {
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       justify-content: space-between;
-      gap: 18px;
+      gap: 30px;
       align-items: flex-end;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
 
     .codes-list-head h2 {
       margin: 0;
+      background: linear-gradient(90deg, #fff 0%, #7df9ff 28%, #c6ff8f 50%, #fff 72%);
+      background-size: 220% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 0 10px rgba(125,249,255,.18));
+      animation: codes-title-sheen 5.8s linear infinite;
     }
 
     .codes-form,
@@ -1379,8 +1567,8 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     .codes-result-url input:focus,
     .codes-row-edit input:focus {
       border-color: rgba(125,249,255,.5);
-      box-shadow: 0 0 0 3px rgba(125,249,255,.08);
-      background: rgba(0,0,0,.42);
+      box-shadow: 0 0 0 3px rgba(125,249,255,.08), 0 0 14px rgba(28,255,0,.16), inset 0 0 10px 1px rgba(255,255,255,.16);
+      background: linear-gradient(135deg, rgba(10,88,64,.5), rgba(6,32,28,.88));
     }
 
     .codes-result-url {
@@ -1411,35 +1599,43 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       align-items: center;
       justify-content: center;
       min-height: 40px;
-      padding: 9px 14px;
+      padding: 10px 15px;
       border-radius: 8px;
-      border: 1px solid rgba(255,255,255,.13);
-      color: #fff;
-      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(125,249,255,.18);
+      color: rgba(235,253,255,.92);
+      background:
+        linear-gradient(135deg, rgba(125,249,255,.13), rgba(198,255,143,.045)),
+        rgba(255,255,255,.035);
       text-decoration: none;
       font: inherit;
       font-size: 13px;
       font-weight: 800;
       cursor: pointer;
-      transition: transform .16s ease, border-color .16s ease, background .16s ease, color .16s ease;
+      box-shadow: inset 0 0 18px rgba(125,249,255,.055), 0 0 16px rgba(125,249,255,.06);
+      transition: transform .16s ease, border-color .16s ease, background .16s ease, color .16s ease, box-shadow .16s ease;
     }
 
     .codes-btn:hover {
       transform: translateY(-1px);
-      border-color: rgba(125,249,255,.3);
-      background: rgba(125,249,255,.08);
+      border-color: rgba(125,249,255,.46);
+      background:
+        linear-gradient(135deg, rgba(125,249,255,.22), rgba(198,255,143,.08)),
+        rgba(255,255,255,.045);
+      box-shadow: inset 0 0 20px rgba(125,249,255,.09), 0 0 22px rgba(125,249,255,.16);
     }
 
     .codes-btn.primary {
       border-color: transparent;
       color: #061016;
       background: linear-gradient(135deg, #7df9ff, #c6ff8f);
+      box-shadow: 0 0 20px rgba(125,249,255,.18), inset 0 1px 0 rgba(255,255,255,.65);
     }
 
     .codes-btn.danger {
       border-color: rgba(248,113,113,.28);
       color: #fecaca;
-      background: rgba(248,113,113,.09);
+      background: linear-gradient(135deg, rgba(248,113,113,.16), rgba(127,29,29,.08));
+      box-shadow: inset 0 0 18px rgba(248,113,113,.06), 0 0 16px rgba(248,113,113,.06);
     }
 
     .codes-btn.danger:hover {
@@ -1469,45 +1665,62 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
 
     .codes-row {
       display: grid;
-      grid-template-columns: minmax(0, 1.4fr) auto auto;
-      gap: 12px;
-      align-items: center;
-      padding: 14px 16px;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: start;
+      padding: 18px 20px;
       border-radius: 8px;
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(0,0,0,.24);
-      transition: border-color .16s ease, background .16s ease, transform .16s ease;
+      border: 1px solid rgba(125,249,255,.1);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(125,249,255,.07), transparent 36%),
+        radial-gradient(circle at 100% 100%, rgba(198,255,143,.045), transparent 34%),
+        rgba(0,0,0,.26);
+      box-shadow: inset 0 0 24px rgba(255,255,255,.025);
+      transition: border-color .16s ease, background .16s ease, transform .16s ease, box-shadow .16s ease;
     }
 
     .codes-row:hover {
       border-color: rgba(125,249,255,.22);
       background: rgba(125,249,255,.045);
       transform: translateY(-1px);
+      box-shadow: inset 0 0 24px rgba(125,249,255,.04), 0 10px 30px rgba(0,0,0,.18);
     }
 
     .codes-row--qr {
-      grid-template-columns: minmax(0, 1fr) minmax(280px, .9fr) auto auto auto;
+      grid-template-columns: minmax(0, 1fr) 190px;
+    }
+
+    .codes-row--voucher {
+      grid-template-columns: minmax(0, 1fr) auto;
     }
 
     .codes-row-main {
       display: grid;
-      gap: 5px;
+      grid-template-columns: minmax(0, 1fr) minmax(150px, .6fr);
+      gap: 12px 20px;
+      grid-column: 1;
+      margin: 0;
       min-width: 0;
+      font-size: clamp(1rem, 1.5vw, 1.3rem);
+      align-items: center;
     }
 
     .codes-row-main strong {
       color: rgba(255,255,255,.94);
       overflow-wrap: anywhere;
+      grid-column: 1 / -1;
     }
 
     .codes-row-main code,
     .codes-code {
       color: #9bf8ff;
       background: rgba(125,249,255,.1);
-      border-radius: 6px;
-      padding: 4px 8px;
+      border-radius: 7px;
+      padding: 7px 10px;
       width: fit-content;
+      max-width: 100%;
       overflow-wrap: anywhere;
+      box-shadow: inset 0 0 12px rgba(125,249,255,.05);
     }
 
     .codes-row-main a,
@@ -1519,16 +1732,36 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
 
     .codes-row-edit {
       display: grid;
-      grid-template-columns: minmax(170px, 1.4fr) minmax(120px, .8fr);
-      gap: 8px;
+      grid-template-columns: minmax(170px, 1.35fr) minmax(120px, .72fr) minmax(170px, 1fr);
+      gap: 12px;
+      grid-column: 1;
       min-width: 0;
       align-items: end;
     }
 
+    .codes-row-edit--voucher {
+      grid-template-columns: minmax(130px, 1fr) minmax(170px, 1.1fr) minmax(92px, .6fr) minmax(150px, .95fr) auto;
+      grid-column: 1 / -1;
+    }
+
     .codes-row-edit label {
       display: grid;
-      gap: 5px;
+      gap: 7px;
       min-width: 0;
+    }
+
+    .codes-row--qr .codes-row-edit label:nth-child(3) {
+      margin: 0 auto;
+      width: min(300px, 100%);
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(125,249,255,.22);
+      background:
+        linear-gradient(135deg, rgba(80,28,120,.34), rgba(8,22,26,.64)),
+        rgba(255,255,255,.03);
+      box-shadow: inset 0 0 18px rgba(0,0,0,.22), 0 0 18px rgba(173,15,255,.08);
+      align-items: center;
+      text-align: center;
     }
 
     .codes-row-edit span {
@@ -1539,40 +1772,84 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
 
     .codes-row-edit input {
       min-height: 40px;
-      padding: 9px 10px;
+      padding: 7px 10px;
       font-size: 13px;
+      max-width: 300px;
+      border-radius: 7px;
+      border: 0;
+      background: linear-gradient(135deg, rgba(10,88,64,.42), rgba(6,32,28,.82));
+      box-shadow: 0 0 10px rgba(28,255,0,.2), inset 0 0 10px 1px rgba(255,255,255,.13);
+      margin: 0 0 18px;
+    }
+
+    .codes-check--inline {
+      align-self: end;
+      min-height: 40px;
+      padding: 8px 10px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      background: rgba(0,0,0,.2);
     }
 
     .codes-row-qr-preview {
       display: grid;
       place-items: center;
-      width: 96px;
-      height: 96px;
-      padding: 7px;
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      justify-self: end;
+      width: 174px;
+      height: 174px;
+      padding: 10px;
       border-radius: 8px;
       background: #fff;
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.08), 0 0 24px rgba(255,255,255,.08);
     }
 
     .codes-row-qr-preview canvas {
-      width: 82px;
-      height: 82px;
+      width: 150px;
+      height: 150px;
       display: block;
+      border: 10px inset #fff;
+      padding: 10px;
+      margin: 10px 0 20px;
     }
 
     .codes-row-meta {
-      display: grid;
-      gap: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      grid-column: 1 / -1;
+      margin: 10px 0 20px;
       color: rgba(255,255,255,.52);
       font-size: 12px;
-      white-space: nowrap;
+      white-space: normal;
+    }
+
+    .codes-row-actions {
+      grid-column: 1 / -1;
+      justify-content: flex-end;
+      padding-top: 14px;
+      border-top: 1px solid rgba(125,249,255,.1);
+    }
+
+    .codes-row-meta span {
+      background: rgba(95,158,160,.18);
+      padding: 10px 12px;
+      border-radius: 20px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,.4), inset 0 0 15px 3px rgba(0,255,255,.12);
+      color: rgba(237,255,255,.8);
+      font-weight: 900;
+      font-style: italic;
     }
 
     .codes-pill {
       display: inline-flex;
+      align-items: center;
+      justify-content: center;
       width: fit-content;
-      padding: 3px 8px;
-      border-radius: 999px;
+      min-width: 96px;
+      padding: 8px 10px;
+      border-radius: 10px;
       background: rgba(255,255,255,.08);
       color: rgba(255,255,255,.7);
       font-size: 10px;
@@ -1581,10 +1858,28 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       font-weight: 900;
     }
 
-    .codes-pill--active { color: #6ee7b7; background: rgba(110,231,183,.12); }
+    .codes-pill--active {
+      color: #02dc02;
+      background: rgba(0,64,26,.25);
+      text-shadow: 0 0 10px #71ff71;
+      font-weight: 900;
+      border: 1px outset rgba(0,255,0,.78);
+      box-shadow: inset 0 0 10px rgba(3,255,3,.42), 0 0 10px rgba(147,255,147,.35);
+    }
     .codes-pill--paused,
     .codes-pill--neutral { color: rgba(255,255,255,.68); }
     .codes-pill--grace { color: #facc15; background: rgba(250,204,21,.12); }
+    .codes-pill--founder {
+      border: 0;
+      box-shadow: 0 0 10px rgba(173,15,255,.75), inset 0 0 10px 2px rgba(0,0,0,.72);
+      border-radius: 10px;
+      padding: 10px 12px;
+      text-align: center;
+      max-width: 250px;
+      background: linear-gradient(135deg, rgba(128,0,128,.82), rgba(28,10,68,.92));
+      color: #cfffff;
+      text-shadow: 0 0 5px aqua;
+    }
     .codes-pill--expired,
     .codes-pill--admin_blocked { color: #fca5a5; background: rgba(248,113,113,.12); }
 
@@ -1599,6 +1894,271 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
     .codes-empty.is-error {
       color: #fca5a5;
       border-color: rgba(248,113,113,.28);
+    }
+
+    :global(.codes-rows .codes-row) {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: start;
+      padding: 18px 20px;
+      border-radius: 8px;
+      border: 1px solid rgba(125,249,255,.1);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(125,249,255,.07), transparent 36%),
+        radial-gradient(circle at 100% 100%, rgba(198,255,143,.045), transparent 34%),
+        rgba(0,0,0,.26);
+      box-shadow: inset 0 0 24px rgba(255,255,255,.025);
+      transition: border-color .16s ease, background .16s ease, transform .16s ease, box-shadow .16s ease;
+    }
+
+    :global(.codes-rows .codes-row:hover) {
+      border-color: rgba(125,249,255,.22);
+      background: rgba(125,249,255,.045);
+      transform: translateY(-1px);
+      box-shadow: inset 0 0 24px rgba(125,249,255,.04), 0 10px 30px rgba(0,0,0,.18);
+    }
+
+    :global(.codes-rows .codes-row--qr) {
+      grid-template-columns: minmax(0, 1fr) 190px;
+    }
+
+    :global(.codes-rows .codes-row--voucher) {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    :global(.codes-rows .codes-row-main) {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(150px, .6fr);
+      gap: 12px 20px;
+      grid-column: 1;
+      margin: 0;
+      min-width: 0;
+      font-size: clamp(1rem, 1.5vw, 1.3rem);
+      align-items: center;
+    }
+
+    :global(.codes-rows .codes-row-main strong) {
+      color: rgba(255,255,255,.94);
+      overflow-wrap: anywhere;
+      grid-column: 1 / -1;
+    }
+
+    :global(.codes-rows .codes-row-main code),
+    :global(.codes-rows .codes-code) {
+      color: #9bf8ff;
+      background: rgba(125,249,255,.1);
+      border-radius: 7px;
+      padding: 7px 10px;
+      width: fit-content;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      box-shadow: inset 0 0 12px rgba(125,249,255,.05);
+    }
+
+    :global(.codes-rows .codes-row-main a),
+    :global(.codes-rows .codes-row-main span) {
+      color: rgba(255,255,255,.58);
+      overflow-wrap: anywhere;
+      text-decoration: none;
+    }
+
+    :global(.codes-rows .codes-row-edit) {
+      display: grid;
+      grid-template-columns: minmax(170px, 1.35fr) minmax(120px, .72fr) minmax(170px, 1fr);
+      gap: 12px;
+      grid-column: 1;
+      min-width: 0;
+      align-items: end;
+    }
+
+    :global(.codes-rows .codes-row-edit--voucher) {
+      grid-template-columns: minmax(130px, 1fr) minmax(170px, 1.1fr) minmax(92px, .6fr) minmax(150px, .95fr) auto;
+      grid-column: 1 / -1;
+    }
+
+    :global(.codes-rows .codes-row-edit label) {
+      display: grid;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    :global(.codes-rows .codes-row--qr .codes-row-edit label:nth-child(3)) {
+      margin: 0 auto;
+      width: min(300px, 100%);
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(125,249,255,.22);
+      background:
+        linear-gradient(135deg, rgba(80,28,120,.34), rgba(8,22,26,.64)),
+        rgba(255,255,255,.03);
+      box-shadow: inset 0 0 18px rgba(0,0,0,.22), 0 0 18px rgba(173,15,255,.08);
+      align-items: center;
+      text-align: center;
+    }
+
+    :global(.codes-rows .codes-row-edit span) {
+      color: rgba(255,255,255,.55);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    :global(.codes-rows .codes-row-edit input) {
+      width: 100%;
+      min-height: 40px;
+      padding: 7px 10px;
+      font: inherit;
+      font-size: 13px;
+      max-width: 300px;
+      border-radius: 7px;
+      border: 0;
+      color: #fff;
+      outline: none;
+      background: linear-gradient(135deg, rgba(10,88,64,.42), rgba(6,32,28,.82));
+      box-shadow: 0 0 10px rgba(28,255,0,.2), inset 0 0 10px 1px rgba(255,255,255,.13);
+      margin: 0 0 18px;
+    }
+
+    :global(.codes-rows .codes-row-qr-preview) {
+      display: grid;
+      place-items: center;
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      justify-self: end;
+      align-self: center;
+      width: 174px;
+      height: 174px;
+      padding: 10px;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.08), 0 0 24px rgba(255,255,255,.08);
+      box-sizing: border-box;
+    }
+
+    :global(.codes-rows .codes-row-qr-preview canvas) {
+      width: 150px !important;
+      height: 150px !important;
+      display: block;
+      border: 10px inset #fff;
+      padding: 10px;
+      margin: 10px 0 20px;
+      box-sizing: border-box;
+    }
+
+    :global(.codes-rows .codes-row-meta) {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      grid-column: 1 / -1;
+      margin: 10px 0 20px;
+      color: rgba(255,255,255,.52);
+      font-size: 12px;
+      white-space: normal;
+    }
+
+    :global(.codes-rows .codes-row-meta span) {
+      background: rgba(95,158,160,.18);
+      padding: 10px 12px;
+      border-radius: 20px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,.4), inset 0 0 15px 3px rgba(0,255,255,.12);
+      color: rgba(237,255,255,.8);
+      font-weight: 900;
+      font-style: italic;
+    }
+
+    :global(.codes-rows .codes-pill) {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      min-width: 96px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.7);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 900;
+    }
+
+    :global(.codes-rows .codes-pill--active) {
+      color: #02dc02;
+      background: rgba(0,64,26,.25);
+      text-shadow: 0 0 10px #71ff71;
+      border: 1px outset rgba(0,255,0,.78);
+      box-shadow: inset 0 0 10px rgba(3,255,3,.42), 0 0 10px rgba(147,255,147,.35);
+    }
+
+    :global(.codes-rows .codes-pill--founder) {
+      border: 0;
+      box-shadow: 0 0 10px rgba(173,15,255,.75), inset 0 0 10px 2px rgba(0,0,0,.72);
+      padding: 10px 12px;
+      max-width: 250px;
+      background: linear-gradient(135deg, rgba(128,0,128,.82), rgba(28,10,68,.92));
+      color: #cfffff;
+      text-shadow: 0 0 5px aqua;
+    }
+
+    :global(.codes-rows .codes-pill--grace) { color: #facc15; background: rgba(250,204,21,.12); }
+    :global(.codes-rows .codes-pill--paused),
+    :global(.codes-rows .codes-pill--neutral) { color: rgba(255,255,255,.68); }
+    :global(.codes-rows .codes-pill--expired),
+    :global(.codes-rows .codes-pill--admin_blocked) { color: #fca5a5; background: rgba(248,113,113,.12); }
+
+    :global(.codes-rows .codes-row-actions) {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      grid-column: 1 / -1;
+      justify-content: flex-end;
+      padding-top: 14px;
+      border-top: 1px solid rgba(125,249,255,.1);
+    }
+
+    :global(.codes-rows .codes-btn) {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: 1px solid rgba(125,249,255,.18);
+      color: rgba(235,253,255,.92);
+      background:
+        linear-gradient(135deg, rgba(125,249,255,.13), rgba(198,255,143,.045)),
+        rgba(255,255,255,.035);
+      text-decoration: none;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: inset 0 0 18px rgba(125,249,255,.055), 0 0 16px rgba(125,249,255,.06);
+      transition: transform .16s ease, border-color .16s ease, background .16s ease, color .16s ease, box-shadow .16s ease;
+    }
+
+    :global(.codes-rows .codes-btn:hover) {
+      transform: translateY(-1px);
+      border-color: rgba(125,249,255,.46);
+      background:
+        linear-gradient(135deg, rgba(125,249,255,.22), rgba(198,255,143,.08)),
+        rgba(255,255,255,.045);
+      box-shadow: inset 0 0 20px rgba(125,249,255,.09), 0 0 22px rgba(125,249,255,.16);
+    }
+
+    :global(.codes-rows .codes-btn.primary) {
+      border-color: transparent;
+      color: #061016;
+      background: linear-gradient(135deg, #7df9ff, #c6ff8f);
+      box-shadow: 0 0 20px rgba(125,249,255,.18), inset 0 1px 0 rgba(255,255,255,.65);
+    }
+
+    :global(.codes-rows .codes-btn.danger) {
+      border-color: rgba(248,113,113,.28);
+      color: #fecaca;
+      background: linear-gradient(135deg, rgba(248,113,113,.16), rgba(127,29,29,.08));
+      box-shadow: inset 0 0 18px rgba(248,113,113,.06), 0 0 16px rgba(248,113,113,.06);
     }
 
     @media (max-width: 920px) {
@@ -1635,8 +2195,61 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       .codes-row {
         grid-template-columns: 1fr;
       }
+      .codes-list-head {
+        grid-template-columns: 1fr;
+      }
+      .codes-row-main {
+        grid-template-columns: 1fr;
+        margin: 10px 0;
+      }
+      .codes-row-edit {
+        grid-template-columns: 1fr;
+      }
+      .codes-row-qr-preview {
+        grid-column: 1;
+        grid-row: auto;
+        justify-self: center;
+        width: 150px;
+        height: 150px;
+      }
+      .codes-row-qr-preview canvas {
+        width: 126px;
+        height: 126px;
+      }
+      :global(.codes-rows .codes-row),
+      :global(.codes-rows .codes-row--qr),
+      :global(.codes-rows .codes-row--voucher) {
+        grid-template-columns: 1fr;
+      }
+      :global(.codes-rows .codes-row-main) {
+        grid-template-columns: 1fr;
+        margin: 10px 0;
+      }
+      :global(.codes-rows .codes-row-edit),
+      :global(.codes-rows .codes-row-edit--voucher) {
+        grid-template-columns: 1fr;
+      }
+      :global(.codes-rows .codes-row-qr-preview) {
+        grid-column: 1;
+        grid-row: auto;
+        justify-self: center;
+        width: 150px;
+        height: 150px;
+      }
+      :global(.codes-rows .codes-row-qr-preview canvas) {
+        width: 126px !important;
+        height: 126px !important;
+      }
       .codes-row-meta {
         white-space: normal;
+      }
+      .codes-row-actions,
+      :global(.codes-rows .codes-row-actions) {
+        justify-content: stretch;
+      }
+      .codes-row-actions .codes-btn,
+      :global(.codes-rows .codes-row-actions .codes-btn) {
+        flex: 1 1 min(180px, 100%);
       }
       .codes-form-row {
         grid-template-columns: 1fr;

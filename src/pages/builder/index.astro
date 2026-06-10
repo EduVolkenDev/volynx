@@ -1589,7 +1589,8 @@ import PageWidgets from "../../components/PageWidgets.astro";
       ($("authMsg") as HTMLElement).textContent = "Sign in to your Volynx account first.";
       ($("sendLink") as HTMLButtonElement).textContent = "Go to Login";
       ($("sendLink") as HTMLButtonElement).onclick = () => {
-        window.location.href = "/login/?next=/builder/";
+        if (window.VxReturn) window.VxReturn.redirectToLogin();
+        else window.location.href = "/login/?next=/builder/";
       };
       ($("email") as HTMLElement).style.display = "none";
       return;
@@ -1606,7 +1607,8 @@ import PageWidgets from "../../components/PageWidgets.astro";
       ($("authMsg") as HTMLElement).textContent = "Session expired. Please sign in again.";
       ($("sendLink") as HTMLButtonElement).textContent = "Go to Login";
       ($("sendLink") as HTMLButtonElement).onclick = () => {
-        window.location.href = "/login/?next=/builder/";
+        if (window.VxReturn) window.VxReturn.redirectToLogin();
+        else window.location.href = "/login/?next=/builder/";
       };
       ($("email") as HTMLElement).style.display = "none";
       return;
@@ -1639,7 +1641,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
 
     // ── URL parameter handling ──────────────────────────────────
     // ?preset={id}   → auto-select a preset in the wizard and advance to step 2
-    // ?project={uuid} → load an existing project directly into the editor, skipping the wizard
+    // ?project={uuid|slug} → load an existing project directly into the editor, skipping the wizard
     // No params + has projects → auto-open the most recent (smooth post-purchase flow).
     await (async function handleUrlParams() {
       const params = new URLSearchParams(window.location.search);
@@ -1647,15 +1649,27 @@ import PageWidgets from "../../components/PageWidgets.astro";
       const projectParam = params.get("project");
 
       if (projectParam) {
-        // Load a specific project by UUID directly into the editor
+        // New deliveries use the UUID. Slug fallback keeps older purchase
+        // dashboards and delivery emails working without a migration.
         log("url param: project=" + projectParam);
-        const { data, error } = await supa
+        let { data, error } = await supa
           .from("projects")
           .select("id,name,slug,builder_data,status,created_at")
           .eq("id", projectParam)
           .eq("user_id", user.id)
           .is("deleted_at", null)
           .single();
+        if (error || !data) {
+          const bySlug = await supa
+            .from("projects")
+            .select("id,name,slug,builder_data,status,created_at")
+            .eq("slug", projectParam)
+            .eq("user_id", user.id)
+            .is("deleted_at", null)
+            .single();
+          data = bySlug.data;
+          error = bySlug.error;
+        }
         if (error || !data) {
           log("project url param load failed: " + (error?.message || "not found"));
           setStatus("Project not found or access denied.");

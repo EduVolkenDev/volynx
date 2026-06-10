@@ -27,7 +27,7 @@ window.VxGate = (function () {
   }
 
   function currentPath() {
-    return window.location.pathname + window.location.search;
+    return window.location.pathname + window.location.search + window.location.hash;
   }
 
   /**
@@ -41,7 +41,8 @@ window.VxGate = (function () {
     // Step 1: Auth check
     var token = getAccessToken();
     if (!token) {
-      window.location.href = LOGIN_URL + '?next=' + encodeURIComponent(currentPath());
+      if (window.VxReturn) window.VxReturn.redirectToLogin();
+      else window.location.href = LOGIN_URL + '?next=' + encodeURIComponent(currentPath());
       return false;
     }
 
@@ -107,7 +108,8 @@ window.VxGate = (function () {
   function requireAuth() {
     var token = getAccessToken();
     if (!token) {
-      window.location.href = LOGIN_URL + '?next=' + encodeURIComponent(currentPath());
+      if (window.VxReturn) window.VxReturn.redirectToLogin();
+      else window.location.href = LOGIN_URL + '?next=' + encodeURIComponent(currentPath());
       return false;
     }
     return true;

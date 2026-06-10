@@ -227,35 +227,37 @@ export function CommandInbox() {
   }
 
   return (
-    <section className="rounded-lg border border-emerald-200/20 bg-white/[0.055] p-4 shadow-glow backdrop-blur-xl md:p-5">
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start">
+    <section className="daily-command-surface">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-stretch">
         <div>
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.22em] text-emerald-100/70">Command Inbox</p>
-              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-white">Capture once. Let Daily route it.</h2>
+              <p className="daily-kicker">Command Inbox</p>
+              <h2 className="mt-3 text-3xl font-semibold leading-tight text-white md:text-4xl">Capture once. Let Daily route it.</h2>
             </div>
-            <span className={cn("inline-flex items-center rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm", aiStatus.tone)}>
+            <span className={cn("daily-status-pill", aiStatus.tone)}>
               <Zap className="mr-2 h-4 w-4" />
               {aiStatus.label}
             </span>
           </div>
 
-          <textarea
-            value={input}
-            onChange={(event) => setInput(event.target.value)}
-            placeholder="Type anything: todo, link, rough idea, A vs B decision, meeting note..."
-            className="min-h-[140px] w-full resize-none rounded-lg border border-white/10 bg-black/35 p-4 text-base leading-7 text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-200/40"
-          />
+          <div className="daily-command-input">
+            <textarea
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              placeholder="Type anything: todo, link, rough idea, A vs B decision, meeting note..."
+              className="min-h-[180px] w-full resize-none border-0 bg-transparent p-5 text-lg leading-8 text-white outline-none placeholder:text-zinc-600"
+            />
+          </div>
 
           {selectedFile ? (
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 bg-black/30 px-4 py-3 text-sm text-zinc-300">
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 bg-black/30 px-4 py-3 text-sm text-zinc-300 backdrop-blur-xl">
               <span className="min-w-0 truncate">{selectedFile.name}</span>
-              <button type="button" onClick={() => setSelectedFile(null)} className="text-zinc-500 transition hover:text-white">Remove</button>
+              <button type="button" onClick={() => setSelectedFile(null)} className="text-zinc-500 transition-colors duration-300 ease-[cubic-bezier(.2,.8,.2,1)] hover:text-white">Remove</button>
             </div>
           ) : null}
 
-          <div className="mt-4 flex flex-wrap items-center gap-3">
+          <div className="mt-4 flex flex-wrap items-center gap-3 rounded-lg border border-white/10 bg-black/30 p-2 backdrop-blur-xl">
             <input
               ref={fileInputRef}
               type="file"
@@ -266,7 +268,7 @@ export function CommandInbox() {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="inline-flex flex-1 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-medium text-white transition hover:bg-white/[0.07] sm:flex-none"
+              className="daily-command-action flex-1 sm:flex-none"
             >
               <FileUp className="mr-2 h-4 w-4" />
               File / screenshot
@@ -275,8 +277,8 @@ export function CommandInbox() {
               type="button"
               onClick={toggleVoice}
               className={cn(
-                "inline-flex flex-1 items-center justify-center rounded-lg border border-white/10 px-4 py-3 text-sm font-medium transition sm:flex-none",
-                isListening ? "bg-emerald-200 text-black" : "bg-white/[0.04] text-white hover:bg-white/[0.07]"
+                "daily-command-action flex-1 sm:flex-none",
+                isListening ? "border-emerald-200 bg-emerald-200 text-black" : "text-white"
               )}
             >
               <Mic className="mr-2 h-4 w-4" />
@@ -287,8 +289,8 @@ export function CommandInbox() {
               onClick={handleRun}
               disabled={!canSubmit || isRunning}
               className={cn(
-                "inline-flex w-full items-center justify-center rounded-lg px-5 py-3 text-sm font-medium transition sm:w-auto",
-                canSubmit && !isRunning ? "bg-white text-black hover:opacity-90" : "cursor-not-allowed bg-white/10 text-zinc-500"
+                "inline-flex w-full items-center justify-center rounded-lg px-5 py-3 text-sm font-semibold transition-[background,color,opacity,transform] duration-300 ease-[cubic-bezier(.2,.8,.2,1)] sm:w-auto",
+                canSubmit && !isRunning ? "bg-white text-black hover:-translate-y-0.5 hover:opacity-90" : "cursor-not-allowed bg-white/10 text-zinc-500"
               )}
             >
               {isRunning ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
@@ -297,9 +299,9 @@ export function CommandInbox() {
           </div>
         </div>
 
-        <aside className="rounded-lg border border-white/10 bg-black/25 p-4">
+        <aside className="daily-command-aside">
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-black">
+            <span className="daily-icon-button bg-white text-black">
               <Sparkles className="h-5 w-5" />
             </span>
             <div>
@@ -307,14 +309,17 @@ export function CommandInbox() {
               <p className="mt-1 text-xs text-zinc-600">{route ? `${route.label} / ${Math.round(route.confidence * 100)}%` : "Routing appears here"}</p>
             </div>
           </div>
-          <div className="mt-5 grid grid-cols-3 gap-2 text-center">
+          <div className="mt-6 grid grid-cols-3 gap-2 text-center">
             <Metric label="Captures" value={metrics.captures} />
             <Metric label="Outputs" value={metrics.outputs} />
             <Metric label="Latency" value={metrics.lastLatencyMs ? `${metrics.lastLatencyMs}ms` : "-"} />
           </div>
-          <p className="mt-4 text-xs leading-5 text-zinc-500">
-            Launch target: input to first local output under 2s. Remote VOLYNX AI upgrades the result when a valid token is present.
-          </p>
+          <div className="mt-6 rounded-lg border border-white/10 bg-white/[0.035] p-3">
+            <p className="text-xs font-medium uppercase text-zinc-500">Next</p>
+            <p className="mt-2 text-sm leading-6 text-zinc-300">
+              {route ? route.label : "Awaiting input"}
+            </p>
+          </div>
         </aside>
       </div>
     </section>
@@ -323,9 +328,9 @@ export function CommandInbox() {
 
 function Metric({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">
+    <div className="rounded-lg border border-white/10 bg-white/[0.035] px-3 py-3">
       <p className="text-sm font-semibold text-white">{value}</p>
-      <p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-zinc-600">{label}</p>
+      <p className="mt-1 text-[10px] uppercase text-zinc-600">{label}</p>
     </div>
   )
 }

@@ -175,7 +175,7 @@ import { ROUTES } from "../../data/routes";
   async function startCheckout() {
     const fallback = inferProductPath(lookupBase);
     const fallbackBackHref = sanitizeInternalPath(requestedNext) || fallback.href;
-    const retryHref = window.location.pathname + window.location.search;
+    const retryHref = window.location.pathname + window.location.search + window.location.hash;
 
     retryLink.setAttribute("href", retryHref);
     backLink.setAttribute("href", fallbackBackHref);
@@ -191,10 +191,11 @@ import { ROUTES } from "../../data/routes";
     if (messageEl) messageEl.textContent = tt.checking_session;
 
     let token = localStorage.getItem("volynx_access_token") || "";
-    const currentPath = window.location.pathname + window.location.search;
+    const currentPath = window.location.pathname + window.location.search + window.location.hash;
 
     if (!token) {
-      window.location.href = `/login/?next=${encodeURIComponent(currentPath)}`;
+      if (window.VxReturn) window.VxReturn.redirectToLogin(currentPath);
+      else window.location.href = `/login/?next=${encodeURIComponent(currentPath)}`;
       return;
     }
 
@@ -209,7 +210,8 @@ import { ROUTES } from "../../data/routes";
       token = await freshAccessToken(cfg);
 
       if (!token) {
-        window.location.href = `/login/?next=${encodeURIComponent(currentPath)}`;
+        if (window.VxReturn) window.VxReturn.redirectToLogin(currentPath);
+        else window.location.href = `/login/?next=${encodeURIComponent(currentPath)}`;
         return;
       }
 

@@ -94,7 +94,8 @@ window.VxPix = (function () {
 
     var token = getAccessToken();
     if (!token) {
-      window.location.href = '/login/?next=' + encodeURIComponent(window.location.pathname);
+      if (window.VxReturn) window.VxReturn.redirectToLogin();
+      else window.location.href = '/login/?next=' + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);
       return;
     }
 

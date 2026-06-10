@@ -1,10 +1,11 @@
+import Image from "next/image"
 import Link from "next/link"
-import { BrandLockup } from "@/components/common/brand-lockup"
 import { propertyFlowUrl } from "@/content/site"
 import { type SiteLocale } from "@/lib/site-locale"
 
 type SiteFooterProps = {
   locale?: SiteLocale
+  brand?: "platform" | "daily"
 }
 
 const footerCopy = {
@@ -65,16 +66,43 @@ const footerCopy = {
   legalLinks: Array<{ href: string; label: string }>
 }>
 
-export function SiteFooter({ locale = "en" }: SiteFooterProps) {
+export function SiteFooter({ locale = "en", brand = "platform" }: SiteFooterProps) {
   const copy = footerCopy[locale]
+  const isDaily = brand === "daily"
+  const brandHref = isDaily ? "/daily" : (locale === "pt" ? "/?lang=pt" : "/")
+  const brandLabel = isDaily ? "VOLYNX DAILY" : "VOLYNX OS"
+  const brandCaption = isDaily ? "Personal execution OS" : copy.brandCaption
+  const brandDescription = isDaily
+    ? "Daily workspace for capture, planning, writing, decisions and follow-through."
+    : copy.description
+  const brandIcon = isDaily ? "/assets/brand/daily-icon.webp" : "/assets/brand/vx-new.webp"
+  const brandIconAlt = isDaily ? "Volynx Daily icon" : "VOLYNX OS icon"
 
   return (
-    <footer className="border-t border-white/5 py-10">
+    <footer className="overflow-hidden border-t border-white/5 py-10">
       <div className="container-shell grid gap-8 lg:grid-cols-[1fr_auto] lg:items-start">
         <div>
-          <BrandLockup href={locale === "pt" ? "/?lang=pt" : "/"} size="md" caption={copy.brandCaption} />
+          <Link href={brandHref} className="inline-flex items-center gap-5" aria-label={brandLabel}>
+            <span className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-white/10 bg-[radial-gradient(circle_at_50%_0%,rgba(88,214,141,.16),transparent_60%),linear-gradient(145deg,rgba(9,13,25,.96),rgba(12,18,14,.92))] p-2 shadow-[0_24px_60px_rgba(0,0,0,.34)]">
+              <Image
+                src={brandIcon}
+                alt={brandIconAlt}
+                width={320}
+                height={320}
+                className="h-full w-full object-contain drop-shadow-[0_18px_30px_rgba(88,214,141,.22)]"
+              />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-lg font-semibold leading-none tracking-[0.3em] text-white md:text-xl">
+                {brandLabel}
+              </span>
+              <span className="mt-2 block text-[11px] uppercase leading-none tracking-[0.28em] text-zinc-500">
+                {brandCaption}
+              </span>
+            </span>
+          </Link>
           <p className="mt-2 text-sm text-zinc-500">
-            {copy.description}
+            {brandDescription}
           </p>
         </div>
         <div className="grid gap-4">
@@ -91,7 +119,7 @@ export function SiteFooter({ locale = "en" }: SiteFooterProps) {
               </Link>
             ))}
           </div>
-          <div className="flex flex-wrap gap-4 lg:justify-end">
+          <div className="flex flex-wrap gap-3 lg:justify-end">
             {copy.legalLinks.map((item) => (
               <Link key={item.label} href={item.href} className="text-xs text-zinc-500 transition hover:text-white">
                 {item.label}

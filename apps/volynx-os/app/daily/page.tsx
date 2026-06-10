@@ -1,6 +1,6 @@
+import Image from "next/image"
 import type { Metadata } from "next"
-import { Archive, CalendarDays, FileText, GitCompareArrows, ListTodo, PenLine, Sparkles, Zap } from "lucide-react"
-import { BrandLockup } from "@/components/common/brand-lockup"
+import { ArrowUpRight, CalendarDays, FileText, GitCompareArrows, ListTodo, PenLine, Sparkles, Zap } from "lucide-react"
 import { SiteFooter } from "@/components/common/site-footer"
 import { SiteHeader } from "@/components/common/site-header"
 import { CommandInbox } from "@/components/daily/command-inbox"
@@ -18,13 +18,19 @@ export const metadata: Metadata = {
 }
 
 const dailyModules = [
-  { href: "#command", label: "Command", icon: Zap },
-  { href: "#my-day", label: "My Day", icon: CalendarDays },
-  { href: "#capture", label: "Capture", icon: Sparkles },
-  { href: "#summary", label: "Summary", icon: FileText },
-  { href: "#writing", label: "Writing", icon: PenLine },
-  { href: "#tasks", label: "Tasks", icon: ListTodo },
-  { href: "#decision", label: "Decision", icon: GitCompareArrows }
+  { href: "#command", label: "Command", detail: "route", icon: Zap },
+  { href: "#my-day", label: "My Day", detail: "focus", icon: CalendarDays },
+  { href: "#capture", label: "Capture", detail: "save", icon: Sparkles },
+  { href: "#summary", label: "Summary", detail: "brief", icon: FileText },
+  { href: "#writing", label: "Writing", detail: "draft", icon: PenLine },
+  { href: "#tasks", label: "Tasks", detail: "track", icon: ListTodo },
+  { href: "#decision", label: "Decision", detail: "compare", icon: GitCompareArrows }
+] as const
+
+const workspaceSignals = [
+  { label: "Mode", value: "Live" },
+  { label: "Vault", value: "Local" },
+  { label: "Flow", value: "Fast" }
 ] as const
 
 export default function DailyPage() {
@@ -32,47 +38,68 @@ export default function DailyPage() {
     <>
       <DailySyncBootstrap />
       <SiteHeader />
-      <main className="min-h-screen border-t border-white/5 bg-[radial-gradient(circle_at_28%_0%,rgba(45,212,191,.11),transparent_30rem),radial-gradient(circle_at_80%_10%,rgba(251,191,36,.08),transparent_26rem)]">
-        <section className="container-shell py-8 md:py-10">
-          <div className="mb-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end">
-            <div>
-              <BrandLockup size="sm" caption="VX signature" className="mb-5" />
-              <span className="eyebrow">VOLYNX Daily MVP</span>
-              <h1 className="max-w-3xl text-4xl font-semibold tracking-[-0.05em] text-white md:text-6xl">
-                The place where thoughts become actions.
-              </h1>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-400">
-                A focused daily workspace for capture, execution, writing and follow-through.
-              </p>
-            </div>
-            <div className="rounded-lg border border-white/10 bg-white/[0.035] p-4 shadow-glow backdrop-blur">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Workspace</p>
-                  <p className="mt-2 text-lg font-semibold text-white">Today</p>
+      <main className="daily-stage min-h-screen border-t border-white/5">
+        <section className="container-shell relative py-8 md:py-12">
+          <div className="daily-hero mb-7 overflow-hidden rounded-lg border border-white/10 px-5 py-6 shadow-[0_36px_120px_rgba(0,0,0,.5)] backdrop-blur-2xl md:px-8 md:py-9 lg:px-10">
+            <div className="relative z-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-end">
+              <div>
+                <div className="mb-7 inline-flex items-center gap-4">
+                  <span className="daily-brand-mark">
+                    <Image
+                      src="/assets/brand/daily-icon.webp"
+                      alt="Volynx Daily icon"
+                      width={192}
+                      height={192}
+                      priority
+                      className="h-full w-full object-contain"
+                    />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-base font-semibold leading-none tracking-[0.24em] text-white md:text-lg">
+                      VOLYNX DAILY
+                    </span>
+                    <span className="mt-2 block text-[10px] uppercase leading-none tracking-[0.24em] text-zinc-500">
+                      Personal execution OS
+                    </span>
+                  </span>
                 </div>
-                <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-white text-black">
-                  <Archive className="h-5 w-5" />
-                </span>
+                <span className="daily-kicker">Daily workspace</span>
+                <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-none text-white md:text-6xl lg:text-7xl">
+                  Volynx Daily
+                </h1>
+                <p className="mt-6 max-w-2xl text-base leading-7 text-zinc-300 md:text-lg">
+                  Your command layer for capture, planning, writing, decisions and follow-through.
+                </p>
               </div>
-              <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                <div className="rounded-lg border border-white/10 bg-black/25 px-3 py-2">
-                  <p className="text-sm font-semibold text-white">Live</p>
-                  <p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-zinc-600">Mode</p>
+              <aside className="daily-hero-panel hidden md:block">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-medium uppercase text-zinc-500">Workspace</p>
+                    <p className="mt-2 text-2xl font-semibold text-white">Today</p>
+                  </div>
+                  <span className="daily-icon-button">
+                    <ArrowUpRight className="h-5 w-5" />
+                  </span>
                 </div>
-                <div className="rounded-lg border border-white/10 bg-black/25 px-3 py-2">
-                  <p className="text-sm font-semibold text-white">Local</p>
-                  <p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-zinc-600">Vault</p>
+                <div className="mt-6 grid grid-cols-3 gap-2">
+                  {workspaceSignals.map((signal) => (
+                    <div key={signal.label} className="daily-signal-tile">
+                      <p className="text-base font-semibold text-white">{signal.value}</p>
+                      <p className="mt-1 text-[11px] uppercase text-zinc-500">{signal.label}</p>
+                    </div>
+                  ))}
                 </div>
-                <div className="rounded-lg border border-white/10 bg-black/25 px-3 py-2">
-                  <p className="text-sm font-semibold text-white">Fast</p>
-                  <p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-zinc-600">Flow</p>
+                <div className="mt-6 h-2 overflow-hidden rounded-full bg-white/[0.06]">
+                  <div className="h-full w-2/3 rounded-full bg-[linear-gradient(90deg,#f4f4f1,#58d68d,#6ee7f0)]" />
                 </div>
-              </div>
+                <p className="mt-4 text-sm leading-6 text-zinc-400">
+                  Local-first capture with server AI upgrades when access is present.
+                </p>
+              </aside>
             </div>
           </div>
 
-          <nav className="sticky top-[118px] z-20 mb-5 rounded-lg border border-white/10 bg-[#070807]/85 p-2 backdrop-blur-xl md:top-[76px]" aria-label="Daily modules">
+          <nav className="daily-module-nav sticky top-[118px] z-20 mb-6 p-2 md:top-[76px]" aria-label="Daily modules">
             <div className="grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-7">
               {dailyModules.map((module) => {
                 const Icon = module.icon
@@ -81,10 +108,13 @@ export default function DailyPage() {
                   <a
                     key={module.href}
                     href={module.href}
-                    className="inline-flex items-center justify-center rounded-md px-3 py-2 text-sm font-medium text-zinc-400 transition hover:bg-white/[0.06] hover:text-white"
+                    className="group inline-flex min-h-14 items-center justify-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-zinc-400 transition-[background,color,transform,border-color] duration-300 ease-[cubic-bezier(.2,.8,.2,1)] hover:-translate-y-0.5 hover:bg-white/[0.07] hover:text-white"
                   >
-                    <Icon className="mr-2 h-4 w-4" />
-                    {module.label}
+                    <Icon className="h-4 w-4 text-zinc-500 transition-colors duration-300 group-hover:text-emerald-200" />
+                    <span className="flex flex-col leading-tight">
+                      <span>{module.label}</span>
+                      <span className="mt-0.5 text-[11px] font-normal text-zinc-600 group-hover:text-zinc-400">{module.detail}</span>
+                    </span>
                   </a>
                 )
               })}
@@ -116,7 +146,7 @@ export default function DailyPage() {
           </div>
         </section>
       </main>
-      <SiteFooter />
+      <SiteFooter brand="daily" />
     </>
   )
 }

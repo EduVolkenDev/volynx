@@ -98,8 +98,11 @@
 
     var token = readStorage('volynx_access_token');
     if (!token) {
-      var next = encodeURIComponent(window.location.pathname + window.location.search);
-      window.location.href = '/login/?next=' + next;
+      if (window.VxReturn) window.VxReturn.redirectToLogin();
+      else {
+        var next = encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);
+        window.location.href = '/login/?next=' + next;
+      }
       return;
     }
 
@@ -116,8 +119,11 @@
 
       token = await freshAccessToken(cfg);
       if (!token) {
-        var next = encodeURIComponent(window.location.pathname + window.location.search);
-        window.location.href = '/login/?next=' + next;
+        if (window.VxReturn) window.VxReturn.redirectToLogin();
+        else {
+          var next = encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);
+          window.location.href = '/login/?next=' + next;
+        }
         return;
       }
 

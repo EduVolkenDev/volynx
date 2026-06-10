@@ -376,14 +376,18 @@
 
   function loginUrl(nextPath) {
     var next = nextPath || currentReturnPath();
-    return "/login/?next=" + encodeURIComponent(next || "/volynx-lab/");
+    return window.VxReturn
+      ? window.VxReturn.loginUrl(next)
+      : "/login/?next=" + encodeURIComponent(next || "/volynx-lab/");
   }
 
   function goLogin(nextPath) {
     var next = nextPath || currentReturnPath();
-    try {
-      localStorage.setItem("volynx_post_login_next", next);
-    } catch (_) {}
+    if (window.VxReturn) {
+      window.VxReturn.redirectToLogin(next);
+      return;
+    }
+    try { localStorage.setItem("volynx_post_login_next", next); } catch (_) {}
     window.location.href = loginUrl(next);
   }
 
