@@ -11,6 +11,7 @@
   var MAX_ANALYTICS = 80;
   var configPromise = null;
   var cloudSyncPromise = null;
+  var memoryManagerState = { query: "", filter: "all", editing: "" };
 
   function readJson(key, fallback) {
     try {
@@ -233,6 +234,7 @@
       label: item.label || "",
       values: item.values && typeof item.values === "object" ? item.values : {},
       path: safePath(item.path),
+      pinned: Boolean(item.pinned),
       plan_at_time: currentPlan(),
       updated_at: item.ts || new Date().toISOString(),
       created_at: item.ts || new Date().toISOString(),
@@ -246,6 +248,7 @@
       label: row.label || "",
       values: row.values || {},
       path: safePath(row.path),
+      pinned: Boolean(row.pinned),
       ts: row.updated_at || row.created_at || new Date().toISOString(),
       cloud: true,
     };
@@ -314,6 +317,14 @@
       .catch(function () { return false; });
   }
 
+  function deleteCloudRow(table, clientId) {
+    if (!table || !clientId || !hasAccessToken()) return Promise.resolve(false);
+    return apiFetch(table + "?client_id=eq." + encodeURIComponent(clientId), {
+      method: "DELETE",
+      headers: { Prefer: "return=minimal" },
+    }).then(function (res) { return res.ok; }).catch(function () { return false; });
+  }
+
   function fetchCloudRows(table, select, orderColumn) {
     return apiFetch(table + "?select=" + encodeURIComponent(select) + "&order=" + orderColumn + ".desc&limit=" + MAX_ITEMS, {
       method: "GET",
@@ -337,7 +348,7 @@
       upsertArtifacts(localQrProjects.map(function (item) { return toArtifactRow("qr-project", item); }).filter(function (row) { return row.client_id && row.user_id; })),
       upsertArtifacts(localLuminaHistory.map(function (item) { return toArtifactRow("lumina-response", item); }).filter(function (row) { return row.client_id && row.user_id; })),
       fetchCloudRows("lab_activity", "client_id,tool,action,detail,path,metadata,created_at", "created_at"),
-      fetchCloudRows("lab_presets", "client_id,tool,label,values,path,created_at,updated_at", "updated_at"),
+      fetchCloudRows("lab_presets", "client_id,tool,label,values,path,pinned,created_at,updated_at", "updated_at"),
       fetchCloudRows("lab_artifacts", "client_id,kind,title,payload,path,created_at,updated_at", "updated_at"),
     ]).then(function (parts) {
       var remoteHistory = (parts[4] || []).map(fromActivityRow);
@@ -864,6 +875,239 @@
     return [mode, target || "", style].filter(Boolean).join(" · ");
   }
 
+  function luminaSummary(item) {
+    return [item && item.mode, item && item.language, item && item.source].filter(Boolean).join(" · ") || "Saved Lumina response";
+  }
+
+  function memoryItems() {
+    var rows = [];
+    readJson(PRESETS_KEY, []).forEach(function (item) {
+      if (!item || !item.id) return;
+      rows.push({
+        id: item.id,
+        key: "preset:" + item.id,
+        kind: "preset",
+        group: "presets",
+        title: item.label || toolLabel(item.tool) + " preset",
+        detail: presetSummary(item.tool, item.values) || "Reusable settings",
+        meta: toolLabel(item.tool),
+        path: presetRestorePath(item),
+        pinned: Boolean(item.pinned),
+        ts: item.ts,
+      });
+    });
+    readJson(QRGEN_PROJECTS_KEY, []).forEach(function (item) {
+      if (!item || !item.id) return;
+      rows.push({
+        id: item.id,
+        key: "qr-project:" + item.id,
+        kind: "qr-project",
+        group: "projects",
+        title: item.name || "QR project",
+        detail: qrProjectSummary(item) || "Saved QRGen draft",
+        meta: "QRGen",
+        path: qrProjectRestorePath(item),
+        pinned: Boolean(item.pinned),
+        ts: item.updated_at || item.created_at,
+      });
+    });
+    readJson(LUMINA_HISTORY_KEY, []).forEach(function (item) {
+      if (!item || !item.id) return;
+      rows.push({
+        id: item.id,
+        key: "lumina-response:" + item.id,
+        kind: "lumina-response",
+        group: "responses",
+        title: item.title || "Lumina response",
+        detail: luminaSummary(item),
+        meta: "Lumina",
+        path: luminaHistoryRestorePath(item),
+        pinned: Boolean(item.pinned),
+        ts: item.ts || item.updated_at || item.created_at,
+      });
+    });
+    return rows.sort(function (a, b) {
+      if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+      return timestampValue(b.ts) - timestampValue(a.ts);
+    });
+  }
+
+  function memoryStorage(kind) {
+    if (kind === "preset") return { key: PRESETS_KEY, cloudKind: "", table: "lab_presets" };
+    if (kind === "qr-project") return { key: QRGEN_PROJECTS_KEY, cloudKind: "qr-project", table: "" };
+    return { key: LUMINA_HISTORY_KEY, cloudKind: "lumina-response", table: "" };
+  }
+
+  function updateMemoryItem(kind, id, changes) {
+    var storage = memoryStorage(kind);
+    var rows = readJson(storage.key, []);
+    var updated = null;
+    rows = rows.map(function (item) {
+      if (!item || String(item.id) !== String(id)) return item;
+      var now = new Date().toISOString();
+      updated = Object.assign({}, item, changes || {});
+      if (kind === "qr-project") {
+        updated.updated_at = now;
+        if (updated.state && updated.name) updated.state = Object.assign({}, updated.state, { projectName: updated.name });
+      } else {
+        updated.ts = now;
+        updated.updated_at = now;
+      }
+      return updated;
+    });
+    if (!updated) return false;
+    writeJson(storage.key, rows);
+    if (storage.table) upsertRows(storage.table, [toPresetRow(updated)]);
+    else syncArtifact(storage.cloudKind, updated);
+    return true;
+  }
+
+  function removeMemoryItem(kind, id) {
+    var storage = memoryStorage(kind);
+    var rows = readJson(storage.key, []);
+    var filtered = rows.filter(function (item) { return !item || String(item.id) !== String(id); });
+    if (filtered.length === rows.length) return false;
+    writeJson(storage.key, filtered);
+    if (storage.table) deleteCloudRow(storage.table, id);
+    else deleteArtifact(storage.cloudKind, id);
+    return true;
+  }
+
+  function setMemoryStatus(root, text) {
+    var status = root.querySelector("[data-lab-memory-status]");
+    if (!status) return;
+    status.textContent = text || "";
+    if (text) window.setTimeout(function () {
+      if (status.textContent === text) status.textContent = "";
+    }, 3200);
+  }
+
+  function memoryNameInput(root, key) {
+    var inputs = root.querySelectorAll("[data-lab-memory-name]");
+    for (var i = 0; i < inputs.length; i++) {
+      if (inputs[i].getAttribute("data-lab-memory-name") === key) return inputs[i];
+    }
+    return null;
+  }
+
+  function memoryActionButton(root, actionName, key) {
+    var buttons = root.querySelectorAll("[data-lab-memory-action]");
+    for (var i = 0; i < buttons.length; i++) {
+      if (buttons[i].getAttribute("data-lab-memory-action") === actionName
+        && buttons[i].getAttribute("data-memory-key") === key) return buttons[i];
+    }
+    return null;
+  }
+
+  function renderMemoryManager(root) {
+    var list = root.querySelector("[data-lab-memory-list]");
+    if (!list) return;
+    var query = memoryManagerState.query.toLowerCase();
+    var rows = memoryItems().filter(function (item) {
+      var matchesFilter = memoryManagerState.filter === "all"
+        || (memoryManagerState.filter === "pinned" && item.pinned)
+        || memoryManagerState.filter === item.group;
+      var haystack = [item.title, item.detail, item.meta].join(" ").toLowerCase();
+      return matchesFilter && (!query || haystack.indexOf(query) !== -1);
+    });
+    list.innerHTML = rows.length ? rows.map(function (item) {
+      var editing = memoryManagerState.editing === item.key;
+      var title = editing
+        ? '<span class="lab-memory-row__editor"><input data-lab-memory-name="' + escapeHtml(item.key) + '" value="' + escapeHtml(item.title) + '" maxlength="80"><button type="button" class="lab-memory-row__action" data-lab-memory-action="save" data-memory-key="' + escapeHtml(item.key) + '">Save</button><button type="button" class="lab-memory-row__action" data-lab-memory-action="cancel">Cancel</button></span>'
+        : '<a class="lab-memory-row__main" href="' + escapeHtml(item.path) + '"><span class="lab-memory-row__title">' + escapeHtml(item.title) + '</span><span class="lab-memory-row__detail">' + escapeHtml(item.detail) + '</span><span class="lab-memory-row__meta">' + escapeHtml(item.meta + " · " + formatTime(item.ts)) + '</span></a>';
+      return '<div class="lab-memory-row" data-memory-key="' + escapeHtml(item.key) + '">'
+        + '<button type="button" class="lab-memory-row__pin' + (item.pinned ? " is-active" : "") + '" data-lab-memory-action="pin" data-memory-key="' + escapeHtml(item.key) + '" aria-label="' + (item.pinned ? "Unpin " : "Pin ") + escapeHtml(item.title) + '" title="' + (item.pinned ? "Unpin" : "Pin") + '">★</button>'
+        + title
+        + '<span class="lab-memory-row__actions"><button type="button" class="lab-memory-row__action" data-lab-memory-action="rename" data-memory-key="' + escapeHtml(item.key) + '">Rename</button><button type="button" class="lab-memory-row__action" data-lab-memory-action="delete" data-memory-key="' + escapeHtml(item.key) + '">Delete</button></span>'
+        + '</div>';
+    }).join("") : '<p class="lab-memory-empty">No saved work matches this view.</p>';
+
+    root.querySelectorAll("[data-lab-memory-filter]").forEach(function (button) {
+      button.classList.toggle("is-active", button.getAttribute("data-lab-memory-filter") === memoryManagerState.filter);
+    });
+    if (memoryManagerState.editing) {
+      var input = memoryNameInput(root, memoryManagerState.editing);
+      if (input) {
+        input.focus({ preventScroll: true });
+        input.select();
+      }
+    }
+  }
+
+  function bindMemoryManager(root) {
+    if (root._vxMemoryBound) return;
+    root._vxMemoryBound = true;
+    var search = root.querySelector("[data-lab-memory-search]");
+    if (search) search.addEventListener("input", function () {
+      memoryManagerState.query = String(search.value || "").trim();
+      renderMemoryManager(root);
+    });
+    root.addEventListener("click", function (event) {
+      var filter = event.target.closest("[data-lab-memory-filter]");
+      if (filter) {
+        memoryManagerState.filter = filter.getAttribute("data-lab-memory-filter") || "all";
+        renderMemoryManager(root);
+        return;
+      }
+      var action = event.target.closest("[data-lab-memory-action]");
+      if (!action) return;
+      var actionName = action.getAttribute("data-lab-memory-action");
+      var key = action.getAttribute("data-memory-key") || memoryManagerState.editing;
+      if (actionName === "cancel") {
+        memoryManagerState.editing = "";
+        renderMemoryManager(root);
+        return;
+      }
+      if (!key) return;
+      var separator = key.indexOf(":");
+      var kind = key.slice(0, separator);
+      var id = key.slice(separator + 1);
+      var item = memoryItems().find(function (row) { return row.key === key; });
+      if (!item) return;
+      if (actionName === "rename") {
+        memoryManagerState.editing = key;
+        renderMemoryManager(root);
+      } else if (actionName === "save") {
+        var input = memoryNameInput(root, key);
+        var name = input ? String(input.value || "").trim() : "";
+        if (!name) return setMemoryStatus(root, "Add a name before saving.");
+        updateMemoryItem(kind, id, kind === "preset" ? { label: name } : (kind === "qr-project" ? { name: name } : { title: name }));
+        memoryManagerState.editing = "";
+        renderProfilePanel(root, { skipCloud: true });
+        setMemoryStatus(root, "Name updated.");
+      } else if (actionName === "pin") {
+        updateMemoryItem(kind, id, { pinned: !item.pinned });
+        renderProfilePanel(root, { skipCloud: true });
+        setMemoryStatus(root, item.pinned ? "Removed from pinned." : "Pinned for quick access.");
+      } else if (actionName === "delete") {
+        openModal({
+          icon: "×",
+          title: "Delete saved Lab work?",
+          message: item.title + " will be removed from this device and your VOLYNX profile.",
+          primaryLabel: "Delete",
+          cancelLabel: "Keep it",
+          onConfirm: function () {
+            removeMemoryItem(kind, id);
+            renderProfilePanel(root, { skipCloud: true });
+            setMemoryStatus(root, "Saved work deleted.");
+          },
+        });
+      }
+    });
+    root.addEventListener("keydown", function (event) {
+      if (!event.target || !event.target.hasAttribute("data-lab-memory-name")) return;
+      if (event.key === "Escape") {
+        memoryManagerState.editing = "";
+        renderMemoryManager(root);
+      } else if (event.key === "Enter") {
+        event.preventDefault();
+        var key = event.target.getAttribute("data-lab-memory-name");
+        var save = memoryActionButton(root, "save", key);
+        if (save) save.click();
+      }
+    });
+  }
+
   function renderSummaryCard(label, value, detail) {
     return '<div class="lab-profile-summary-card"><span>' + escapeHtml(label) + '</span><strong>' + escapeHtml(value) + '</strong><em>' + escapeHtml(detail || "") + '</em></div>';
   }
@@ -986,10 +1230,12 @@
     var history = readJson(HISTORY_KEY, []);
     var presets = readJson(PRESETS_KEY, []);
     var qrProjects = readJson(QRGEN_PROJECTS_KEY, []);
+    var luminaHistory = readJson(LUMINA_HISTORY_KEY, []);
     var summaryEl = root.querySelector("[data-lab-summary]");
     var historyEl = root.querySelector("[data-lab-history]");
     var presetsEl = root.querySelector("[data-lab-presets]");
     var qrProjectsEl = root.querySelector("[data-qr-projects]");
+    var luminaResponsesEl = root.querySelector("[data-lumina-responses]");
     var continueTarget = getContinueTarget({ allowPending: false });
 
     if (summaryEl) {
@@ -1008,6 +1254,7 @@
         renderSummaryCard("Recent actions", String(history.length), plural(history.length, "recorded action", "recorded actions")),
         renderSummaryCard("Saved presets", String(presets.length), plural(presets.length, "reusable recipe", "reusable recipes")),
         renderSummaryCard("QR projects", String(qrProjects.length), plural(qrProjects.length, "saved draft", "saved drafts")),
+        renderSummaryCard("Lumina responses", String(luminaHistory.length), plural(luminaHistory.length, "saved response", "saved responses")),
         renderSummaryCard("Tools touched", String(uniqueToolCount(history.concat(presets).concat(qrProjectActivity))), "across VOLYNX Lab"),
         '<a class="lab-profile-summary-card lab-profile-summary-card--cta" href="' + escapeHtml(continuePath) + '"><span>Continue</span><strong>' + escapeHtml(continueTarget.label) + '</strong><em>Open the most relevant Lab workspace</em></a>'
       ].join("");
@@ -1039,6 +1286,17 @@
           }).join("")
         : '<p class="lab-profile-empty">No saved QRGen projects yet.</p>';
     }
+
+    if (luminaResponsesEl) {
+      luminaResponsesEl.innerHTML = luminaHistory.length
+        ? luminaHistory.slice(0, 5).map(function (item) {
+            return '<a class="lab-profile-row" href="' + escapeHtml(luminaHistoryRestorePath(item)) + '"><strong>' + escapeHtml(item.title || "Lumina response") + '</strong><span>' + escapeHtml(luminaSummary(item)) + '</span><em>' + escapeHtml(formatTime(item.ts || item.updated_at || item.created_at)) + '</em></a>';
+          }).join("")
+        : '<p class="lab-profile-empty">No saved Lumina responses yet.</p>';
+    }
+
+    bindMemoryManager(root);
+    renderMemoryManager(root);
 
     if (!options || !options.skipCloud) {
       syncLabCloud({ renderRoot: root });
