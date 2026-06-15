@@ -1748,11 +1748,14 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     function assetCardToSingleItem(card: HTMLButtonElement) {
       const svgEl = card.querySelector(".asset-card-icon svg");
       const category = card.closest(".asset-category")?.getAttribute("data-category") || "SVG Essentials";
+      const number = String(card.dataset.number || "").match(/\d+/)?.[0]?.padStart(2, "0") || "00";
+      const labelSlug = String(card.dataset.label || "icon").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
       return {
         type: "svg",
         label: card.dataset.label || "SVG Icon",
         number: card.dataset.number || "",
         svg: svgEl ? svgEl.outerHTML : "",
+        path: `/assets/icons-store/svg-essentials/vx-${number}-${labelSlug}.svg`,
         category,
         collection: "SVG Essentials",
         relatedCollection: findCollectionForCategory("futuristic") || "Neon Icons",

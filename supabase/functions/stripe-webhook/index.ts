@@ -701,6 +701,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             icon_collection: meta.icon_collection || null,
             tier: prefix.replace(/^icons_(single|pack)_/, ""),
             kind: prefix.startsWith("icons_single_") ? "single" : "pack",
+            delivery_status: "pending_signed_url",
           },
         }));
         console.log(`Icon purchase ${prefix} recorded for ${userId}`);

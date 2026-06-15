@@ -978,7 +978,7 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 				const iconPurchasesSection = $("iconPurchasesSection");
 				const iconPurchasesGrid = $("iconPurchasesGrid");
 				let iconPurchaseRows = [];
-				const iconDeliveryApiBase = ((cfg).apiBaseUrl || (cfg).functionsUrl || "").replace(/\/$/, "");
+				const iconDeliveryApiBase = ((cfg).functionsUrl || (cfg).apiBaseUrl || "").replace(/\/$/, "");
 				const iconDeliveryEndpoint = iconDeliveryApiBase
 					? iconDeliveryApiBase.includes("/functions/v1")
 						? `${iconDeliveryApiBase}/icon-purchase-delivery`
@@ -1124,18 +1124,14 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 
 				function iconPurchaseDeliverable(row) {
 					const meta = iconMeta(row);
-					const kind = iconKind(row);
-					const directPath = safeAssetPath(meta.icon_path);
-					if (kind === "single" && directPath) {
-						return { ready: true, mode: "single", label: "Download icon" };
+					const expiresAt = Date.parse(String(meta.delivery_expires_at || ""));
+					const signedUrlReady = /^https:\/\/[^/]+\.supabase\.co\/storage\/v1\/object\/sign\//i.test(String(meta.delivery_url || ""))
+						&& Number.isFinite(expiresAt)
+						&& expiresAt > Date.now() + 30000;
+					if (signedUrlReady) {
+						return { ready: true, mode: "private", label: iconKind(row) === "pack" ? "Download ZIP" : "Download icon" };
 					}
-					if (kind === "pack" && meta.icon_collection) {
-						return { ready: true, mode: "pack", label: "Download ZIP" };
-					}
-					if (directPath) {
-						return { ready: true, mode: "single", label: "Download file" };
-					}
-					if (iconSessionId(row)) {
+					if (row?.id || iconSessionId(row)) {
 						return { ready: false, mode: "recover", label: "Open delivery" };
 					}
 					return { ready: false, mode: "manual", label: "Prepare delivery" };
@@ -1304,14 +1300,11 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 							deliverable = iconPurchaseDeliverable(workingRow);
 						}
 
-						if (deliverable.mode === "single") {
-							const path = safeAssetPath(meta.icon_path);
-							if (!path) throw new Error("Icon path is missing.");
-							downloadDirect(path, fileNameFromPath(path, slugFileName(iconPurchaseTitle(workingRow), "volynx-icon")));
+						if (deliverable.mode === "private") {
+							const path = String(meta.delivery_url || "");
+							if (!path) throw new Error("Signed delivery URL is missing.");
+							downloadDirect(path, meta.delivery_filename || fileNameFromPath(path, slugFileName(iconPurchaseTitle(workingRow), "volynx-icon")));
 							button.textContent = "Downloaded";
-						} else if (deliverable.mode === "pack") {
-							await downloadIconPackZip(workingRow);
-							button.textContent = "ZIP ready";
 						} else {
 							const recoveryHref = iconRecoveryHref(workingRow);
 							if (recoveryHref) {

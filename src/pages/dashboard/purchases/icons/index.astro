@@ -91,6 +91,7 @@ const assistItems = [
 
   <script is:inline type="module">
     const token = localStorage.getItem('volynx_access_token');
+    let iconDeliveryEndpoint = '';
     if (!token) {
       if (window.VxReturn) window.VxReturn.redirectToLogin();
       else window.location.href = '/login/?next=/dashboard/purchases/icons/';
@@ -238,12 +239,14 @@ const assistItems = [
 
     function iconPurchaseDeliverable(row) {
       const meta = parseMeta(row?.metadata);
-      const kind = iconKind(row);
-      const directPath = safeAssetPath(meta.icon_path);
-      if (kind === 'single' && directPath) return { ready: true, mode: 'single', label: 'Download icon' };
-      if (kind === 'pack' && meta.icon_collection) return { ready: true, mode: 'pack', label: 'Download ZIP' };
-      if (directPath) return { ready: true, mode: 'single', label: 'Download file' };
-      if (iconSessionId(row)) return { ready: false, mode: 'recover', label: 'Recover purchase' };
+      const expiresAt = Date.parse(String(meta.delivery_expires_at || ''));
+      const signedUrlReady = /^https:\/\/[^/]+\.supabase\.co\/storage\/v1\/object\/sign\//i.test(String(meta.delivery_url || ''))
+        && Number.isFinite(expiresAt)
+        && expiresAt > Date.now() + 30000;
+      if (signedUrlReady) {
+        return { ready: true, mode: 'private', label: iconKind(row) === 'pack' ? 'Download ZIP' : 'Download icon' };
+      }
+      if (row?.id || iconSessionId(row)) return { ready: false, mode: 'recover', label: 'Recover purchase' };
       return { ready: false, mode: 'manual', label: 'Open support' };
     }
 
@@ -371,28 +374,45 @@ const assistItems = [
       downloadBlob(content, `${folderName}.zip`);
     }
 
+    async function resolveIconDelivery(row) {
+      if (iconPurchaseDeliverable(row).ready) return row;
+      if (!iconDeliveryEndpoint) throw new Error('Icon delivery endpoint is unavailable.');
+      const res = await fetch(iconDeliveryEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          purchase_id: row?.id || null,
+          session_id: iconSessionId(row) || null,
+        }),
+      });
+      const payload = await res.json().catch(() => ({}));
+      if (!res.ok || !payload?.ok || !payload?.purchase) {
+        throw new Error(payload?.error || 'Could not resolve icon delivery.');
+      }
+      return { ...row, ...payload.purchase, metadata: payload.purchase.metadata || row.metadata || {} };
+    }
+
     async function handleIconDelivery(row, button) {
       const originalText = button.textContent;
-      const deliverable = iconPurchaseDeliverable(row);
-      const meta = parseMeta(row?.metadata);
+      let workingRow = row;
+      let deliverable = iconPurchaseDeliverable(workingRow);
+      let meta = parseMeta(workingRow?.metadata);
       button.disabled = true;
 
       try {
-        if (deliverable.mode === 'single') {
-          const path = safeAssetPath(meta.icon_path);
-          if (!path) throw new Error('Icon path is missing.');
-          downloadDirect(path, fileNameFromPath(path, slugFileName(iconPurchaseTitle(row), 'volynx-icon')));
+        if (!deliverable.ready && deliverable.mode === 'recover') {
+          button.textContent = 'Preparing delivery...';
+          workingRow = await resolveIconDelivery(workingRow);
+          deliverable = iconPurchaseDeliverable(workingRow);
+          meta = parseMeta(workingRow?.metadata);
+        }
+        if (deliverable.mode === 'private') {
+          const path = String(meta.delivery_url || '');
+          if (!path) throw new Error('Signed delivery URL is missing.');
+          downloadDirect(path, meta.delivery_filename || fileNameFromPath(path, slugFileName(iconPurchaseTitle(workingRow), 'volynx-icon')));
           button.textContent = 'Downloaded';
-        } else if (deliverable.mode === 'pack') {
-          button.textContent = 'Building ZIP...';
-          await downloadIconPackZip(row);
-          button.textContent = 'ZIP ready';
-        } else if (deliverable.mode === 'recover') {
-          const purchaseId = encodeURIComponent(row?.id || row?.addon_id || 'icons');
-          window.location.href = `${ROUTES.support}?product=volynx-icons-store&intent=delivery&purchase=${purchaseId}&session_id=${encodeURIComponent(iconSessionId(row))}`;
-          return;
         } else {
-          const purchaseId = encodeURIComponent(row?.id || row?.addon_id || 'icons');
+          const purchaseId = encodeURIComponent(workingRow?.id || workingRow?.addon_id || 'icons');
           window.location.href = `${ROUTES.support}?product=volynx-icons-store&intent=delivery&purchase=${purchaseId}`;
           return;
         }
@@ -435,6 +455,12 @@ const assistItems = [
       try { cfg = await fetch('/config.json', { cache: 'no-store' }).then((r) => r.json()); } catch {}
       const supabaseUrl = (cfg?.supabaseUrl || '').replace(/\/$/, '');
       const anonKey = cfg?.supabaseAnonKey || cfg?.anonKey || '';
+      const functionsBase = String(cfg?.functionsUrl || cfg?.apiBaseUrl || '').replace(/\/$/, '');
+      iconDeliveryEndpoint = functionsBase
+        ? functionsBase.includes('/functions/v1')
+          ? `${functionsBase}/icon-purchase-delivery`
+          : `${functionsBase}/api/icon-purchase-delivery`
+        : '';
 
       if (!supabaseUrl || !anonKey) {
         hide('iconsLoading');
