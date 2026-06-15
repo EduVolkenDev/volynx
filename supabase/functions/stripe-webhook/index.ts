@@ -49,6 +49,16 @@ const supabase = createClient(
   { auth: { persistSession: false } }
 );
 
+function requireDbSuccess<T>(
+  label: string,
+  result: { data: T | null; error: { message?: string } | null },
+): T | null {
+  if (result.error) {
+    throw new Error(`${label}: ${result.error.message || "database operation failed"}`);
+  }
+  return result.data;
+}
+
 function slugify(input: string): string {
   return String(input || "")
     .toLowerCase()
@@ -136,6 +146,64 @@ const PLAN_DOWNGRADE_MAP: Record<string, Record<string, string>> = {
   builder_teams:  { builder_plan: "free" },
   studio_pro:     { builder_plan: "free" },
 };
+
+const PLAN_RANK: Record<string, number> = {
+  free: 0,
+  launch: 1,
+  business: 2,
+  pro: 2,
+  diamond: 2,
+  studio: 3,
+  teams: 4,
+};
+
+function mergeHighestPlan(
+  updates: Record<string, string>,
+  candidate: Record<string, string>,
+): void {
+  for (const [field, value] of Object.entries(candidate)) {
+    if (field === "plan") {
+      if (value === "pro") updates.plan = "pro";
+      continue;
+    }
+    const current = updates[field] || "free";
+    if ((PLAN_RANK[value] ?? 0) > (PLAN_RANK[current] ?? 0)) {
+      updates[field] = value;
+    }
+  }
+}
+
+async function syncUserSubscriptionEntitlements(userId: string): Promise<void> {
+  const activeSubscriptions = requireDbSuccess(
+    "load active subscriptions",
+    await supabase
+      .from("subscriptions")
+      .select("plan_key,status")
+      .eq("user_id", userId)
+      .in("status", ["active", "trialing"]),
+  ) || [];
+
+  const updates: Record<string, string> = {
+    plan: "free",
+    builder_plan: "free",
+    daily_plan: "free",
+    cvitae_plan: "free",
+  };
+
+  for (const subscription of activeSubscriptions as Array<{ plan_key?: string | null }>) {
+    const planUpdates = PLAN_PROFILE_MAP[subscription.plan_key || ""];
+    if (planUpdates) mergeHighestPlan(updates, planUpdates);
+  }
+
+  requireDbSuccess(
+    "sync subscription entitlements to profile",
+    await supabase.from("profiles").update(updates).eq("id", userId),
+  );
+  requireDbSuccess(
+    "sync subscription entitlements to app metadata",
+    await supabase.rpc("sync_plan_to_app_metadata", { p_user_id: userId }),
+  );
+}
 
 // Product key detection from prefix
 function detectProductKey(prefix: string): string {
@@ -299,11 +367,14 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     return;
   }
 
-  const { data: existingPurchase } = await supabase
-    .from("purchase_events")
-    .select("id,status")
-    .eq("stripe_session_id", session.id)
-    .maybeSingle();
+  const existingPurchase = requireDbSuccess(
+    "check purchase idempotency",
+    await supabase
+      .from("purchase_events")
+      .select("id,status")
+      .eq("stripe_session_id", session.id)
+      .maybeSingle(),
+  );
 
   if (existingPurchase?.status === "completed") {
     console.log(`Session ${session.id} already fulfilled; skipping duplicate webhook`);
@@ -328,11 +399,14 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const productKey = detectProductKey(prefix);
 
   // Resolve user email for identification in all records
-  const { data: userProfile } = await supabase
-    .from("profiles")
-    .select("email")
-    .eq("id", userId)
-    .single();
+  const userProfile = requireDbSuccess(
+    "load purchaser profile",
+    await supabase
+      .from("profiles")
+      .select("email")
+      .eq("id", userId)
+      .single(),
+  );
   const userEmail = userProfile?.email || session.customer_details?.email || "";
 
   console.log(
@@ -348,7 +422,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     const subscription = await stripe.subscriptions.retrieve(subId);
 
     // Upsert subscription record
-    await supabase.from("subscriptions").upsert(
+    requireDbSuccess("upsert subscription", await supabase.from("subscriptions").upsert(
       {
         user_id: userId,
         user_email: userEmail,
@@ -363,7 +437,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         cancel_at_period_end: subscription.cancel_at_period_end,
       },
       { onConflict: "stripe_subscription_id" }
-    );
+    ));
 
     // Update user profile with plan
     const profileUpdates = PLAN_PROFILE_MAP[prefix];
@@ -373,15 +447,21 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         stripe_customer_id: session.customer as string,
       };
 
-      await supabase.from("profiles").update(updates).eq("id", userId);
+      requireDbSuccess(
+        "activate subscription plan",
+        await supabase.from("profiles").update(updates).eq("id", userId),
+      );
       // Sync plan to JWT app_metadata for zero-query auth
-      await supabase.rpc("sync_plan_to_app_metadata", { p_user_id: userId });
+      requireDbSuccess(
+        "sync activated plan to app metadata",
+        await supabase.rpc("sync_plan_to_app_metadata", { p_user_id: userId }),
+      );
       console.log(`Updated plan for ${userId}: ${JSON.stringify(updates)}`);
     }
 
     // Track bundle if applicable
     if (prefix.startsWith("bundle_")) {
-      await supabase.from("active_bundles").upsert(
+      requireDbSuccess("activate bundle", await supabase.from("active_bundles").upsert(
         {
           user_id: userId,
           user_email: userEmail,
@@ -390,7 +470,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           status: "active",
         },
         { onConflict: "user_id,bundle_key" }
-      );
+      ));
     }
 
     // Subscription add-ons (currently only addon_extra_slot). Each renewal
@@ -398,15 +478,18 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     // so the slot counter stays accurate even across reactivations.
     if (prefix.startsWith("addon_")) {
       const addonId = prefix.replace(/^addon_/, "");
-      const { data: existing } = await supabase
-        .from("addons_purchased")
-        .select("id")
-        .eq("user_id", userId)
-        .eq("addon_id", addonId)
-        .eq("metadata->>stripe_subscription_id", subId || "")
-        .maybeSingle();
+      const existing = requireDbSuccess(
+        "check subscription addon idempotency",
+        await supabase
+          .from("addons_purchased")
+          .select("id")
+          .eq("user_id", userId)
+          .eq("addon_id", addonId)
+          .eq("metadata->>stripe_subscription_id", subId || "")
+          .maybeSingle(),
+      );
       if (!existing) {
-        await supabase.from("addons_purchased").insert({
+        requireDbSuccess("activate subscription addon", await supabase.from("addons_purchased").insert({
           user_id: userId,
           addon_id: addonId,
           price_paid: (session.amount_total || 0) / 100,
@@ -420,13 +503,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             stripe_prefix: stripePrefix,
             billing: "subscription",
           },
-        });
+        }));
         console.log(`Subscription addon ${addonId} activated for ${userId} (sub ${subId})`);
       }
     }
 
     // Log purchase event
-    await supabase.from("purchase_events").insert({
+    requireDbSuccess("record subscription purchase event", await supabase.from("purchase_events").insert({
       user_id: userId,
       user_email: userEmail,
       stripe_session_id: session.id,
@@ -444,7 +527,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         stripe_lookup_key: stripeLookupKey,
         stripe_prefix: stripePrefix,
       },
-    });
+    }));
 
     // Notify the buyer — bundle gets its own template, single-product subs
     // get plan_activated.
@@ -491,35 +574,35 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     if (tokenAmount > 0) {
       // Atomic credit via Postgres RPC — SELECT ... FOR UPDATE inside
       const { data: creditResult, error: creditErr } = await supabase.rpc(
-        "credit_tokens_atomic",
+        "credit_token_purchase_atomic",
         {
           p_user_id: userId,
           p_amount: tokenAmount,
-          p_type: "purchase",
+          p_stripe_session_id: session.id,
+          p_lookup_key: lookupKey,
           p_description: `Token pack: ${prefix} (${lookupKey})`,
-          p_metadata: JSON.stringify({
-            stripe_session_id: session.id,
-            lookup_key: lookupKey,
-            stripe_lookup_key: stripeLookupKey,
-          }),
         }
       );
 
       if (creditErr) {
-        console.error(`credit_tokens_atomic error for ${userId}:`, creditErr.message);
+        throw new Error(`credit_token_purchase_atomic error for ${userId}: ${creditErr.message}`);
+      } else if (!creditResult?.ok) {
+        throw new Error(`credit_token_purchase_atomic rejected purchase for ${userId}: ${creditResult?.error || "unknown error"}`);
       } else {
-        console.log(`Credited ${tokenAmount} tokens to ${userId}. New balance: ${creditResult?.balance}`);
-        await queueEmail({
-          event_type: "tokens_credited",
-          user_id: userId,
-          recipient_email: userEmail,
-          idempotency_key: session.id,
-          payload: {
-            tokens: tokenAmount,
-            new_balance: creditResult?.balance ?? null,
-            pack_name: prefix,
-          },
-        });
+        console.log(`${creditResult?.duplicate ? "Skipped duplicate credit" : `Credited ${tokenAmount} tokens`} for ${userId}. New balance: ${creditResult?.balance}`);
+        if (!creditResult?.duplicate) {
+          await queueEmail({
+            event_type: "tokens_credited",
+            user_id: userId,
+            recipient_email: userEmail,
+            idempotency_key: session.id,
+            payload: {
+              tokens: tokenAmount,
+              new_balance: creditResult?.balance ?? null,
+              pack_name: prefix,
+            },
+          });
+        }
       }
     }
 
@@ -528,12 +611,15 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
       // Idempotency: Stripe can retry the same checkout.session.completed
       // event. Reject the second insert so a retry never double-grants.
-      const { data: existing } = await supabase
-        .from("addons_purchased")
-        .select("id")
-        .eq("user_id", userId)
-        .eq("metadata->>stripe_session_id", session.id)
-        .maybeSingle();
+      const existing = requireDbSuccess(
+        "check one-time addon idempotency",
+        await supabase
+          .from("addons_purchased")
+          .select("id")
+          .eq("user_id", userId)
+          .eq("metadata->>stripe_session_id", session.id)
+          .maybeSingle(),
+      );
       if (existing) {
         console.log(`Addon ${addonId} already recorded for session ${session.id} — skip`);
       } else {
@@ -545,7 +631,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           .eq("addon_id", addonId)
           .maybeSingle();
 
-        await supabase.from("addons_purchased").insert({
+        requireDbSuccess("activate one-time addon", await supabase.from("addons_purchased").insert({
           user_id: userId,
           addon_id: addonId,
           price_paid: (session.amount_total || 0) / 100,
@@ -562,7 +648,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             download_zip: entitlement?.download_zip || null,
             delivery_status: entitlement?.download_zip ? "pending_download" : "ready",
           },
-        });
+        }));
         console.log(`Addon ${addonId} activated for ${userId} (features: ${(entitlement?.features || []).join(",")})`);
         await queueEmail({
           event_type: "addon_activated",
@@ -587,16 +673,19 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       // Idempotency: Stripe retries (or async_payment_succeeded firing after
       // checkout.session.completed) would otherwise double-grant the row,
       // double-fire the icons_delivered email, and skew purchase_events.
-      const { data: existingIcon } = await supabase
-        .from("addons_purchased")
-        .select("id")
-        .eq("user_id", userId)
-        .eq("metadata->>stripe_session_id", session.id)
-        .maybeSingle();
+      const existingIcon = requireDbSuccess(
+        "check icon purchase idempotency",
+        await supabase
+          .from("addons_purchased")
+          .select("id")
+          .eq("user_id", userId)
+          .eq("metadata->>stripe_session_id", session.id)
+          .maybeSingle(),
+      );
       if (existingIcon) {
         console.log(`Icon purchase ${prefix} already recorded for session ${session.id} — skip`);
       } else {
-        await supabase.from("addons_purchased").insert({
+        requireDbSuccess("record icon purchase", await supabase.from("addons_purchased").insert({
           user_id: userId,
           addon_id: prefix,
           price_paid: (session.amount_total || 0) / 100,
@@ -613,7 +702,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             tier: prefix.replace(/^icons_(single|pack)_/, ""),
             kind: prefix.startsWith("icons_single_") ? "single" : "pack",
           },
-        });
+        }));
         console.log(`Icon purchase ${prefix} recorded for ${userId}`);
         await queueEmail({
           event_type: "icons_delivered",
@@ -726,18 +815,21 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       // Idempotency guard — Stripe retries (or async_payment_succeeded
       // firing after checkout.session.completed) would otherwise re-INSERT
       // the row on every redelivery and double-create the Builder project.
-      const { data: existingKitOrPf } = await supabase
-        .from("addons_purchased")
-        .select("id")
-        .eq("user_id", userId)
-        .eq("metadata->>stripe_session_id", session.id)
-        .maybeSingle();
+      const existingKitOrPf = requireDbSuccess(
+        "check kit or PropertyFlow idempotency",
+        await supabase
+          .from("addons_purchased")
+          .select("id")
+          .eq("user_id", userId)
+          .eq("metadata->>stripe_session_id", session.id)
+          .maybeSingle(),
+      );
 
       // Record as addon purchase (single source of truth for /delivery/).
       // For PF and kits, metadata carries delivery context on first insert.
       // Kits still receive a Builder project below as a secondary fallback.
       if (!existingKitOrPf) {
-        await supabase.from("addons_purchased").insert({
+        requireDbSuccess("record kit or PropertyFlow purchase", await supabase.from("addons_purchased").insert({
           user_id: userId,
           addon_id: addonId,
           price_paid: (session.amount_total || 0) / 100,
@@ -769,7 +861,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
               delivery_error: kitDownloadError,
             } : {}),
           },
-        });
+        }));
       } else {
         console.log(`Kit/PF purchase ${prefix} already recorded for session ${session.id} — skip insert`);
       }
@@ -855,7 +947,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           presetFetchError = (e as Error).message;
         }
 
-        await supabase
+        requireDbSuccess("update kit delivery metadata", await supabase
           .from("addons_purchased")
           .update({
             metadata: {
@@ -884,7 +976,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           })
           .eq("user_id", userId)
           .eq("addon_id", addonId)
-          .eq("metadata->>stripe_session_id", session.id);
+          .eq("metadata->>stripe_session_id", session.id));
 
         if (presetFetchError) {
           console.error(`Kit ${prefix} for ${userId}: preset fetch failed — ${presetFetchError}`);
@@ -930,7 +1022,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       }
     }
 
-    await supabase.from("purchase_events").insert({
+    requireDbSuccess("record one-time purchase event", await supabase.from("purchase_events").insert({
       user_id: userId,
       user_email: userEmail,
       stripe_session_id: session.id,
@@ -946,99 +1038,94 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         stripe_lookup_key: stripeLookupKey,
         stripe_prefix: stripePrefix,
       },
-    });
+    }));
   }
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
-  const subRecord = await supabase
-    .from("subscriptions")
-    .select("user_id, plan_key")
-    .eq("stripe_subscription_id", subscription.id)
-    .single();
+  const subRecord = requireDbSuccess(
+    "load subscription for update",
+    await supabase
+      .from("subscriptions")
+      .select("user_id, plan_key")
+      .eq("stripe_subscription_id", subscription.id)
+      .single(),
+  );
 
-  if (!subRecord.data) {
+  if (!subRecord) {
     console.error(`subscription.updated: no record for ${subscription.id}`);
     return;
   }
 
-  const { user_id, plan_key } = subRecord.data;
+  const { user_id, plan_key: oldPlanKey } = subRecord as { user_id: string; plan_key?: string | null };
+  const price = subscription.items.data[0]?.price;
+  const priceLookupKey = price?.lookup_key || subscription.metadata?.lookup_key || "";
+  const nextPlanKey = canonicalizeLookupPrefix(
+    priceLookupKey ? extractPrefix(priceLookupKey) : (subscription.metadata?.plan_key || oldPlanKey || ""),
+  );
 
-  await supabase
-    .from("subscriptions")
-    .update({
-      status: subscription.status,
-      current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-      cancel_at_period_end: subscription.cancel_at_period_end,
-    })
-    .eq("stripe_subscription_id", subscription.id);
+  requireDbSuccess(
+    "update subscription lifecycle",
+    await supabase
+      .from("subscriptions")
+      .update({
+        status: subscription.status,
+        price_id: price?.id || null,
+        plan_key: nextPlanKey || oldPlanKey,
+        lookup_key: priceLookupKey ? canonicalizeLookupKey(priceLookupKey) : undefined,
+        product_key: nextPlanKey ? detectProductKey(nextPlanKey) : undefined,
+        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+        cancel_at_period_end: subscription.cancel_at_period_end,
+      })
+      .eq("stripe_subscription_id", subscription.id),
+  );
 
-  // If subscription is no longer active, downgrade
-  if (["canceled", "unpaid", "past_due"].includes(subscription.status)) {
-    const prefix = plan_key || "";
-    const downgrades = PLAN_DOWNGRADE_MAP[prefix] || {};
-
-    if (Object.keys(downgrades).length > 0) {
-      await supabase.from("profiles").update(downgrades).eq("id", user_id);
-    }
-
-    // Mark bundle as canceled
-    if (prefix.startsWith("bundle_")) {
+  if (oldPlanKey?.startsWith("bundle_") && oldPlanKey !== nextPlanKey) {
+    requireDbSuccess(
+      "deactivate replaced bundle",
       await supabase.from("active_bundles")
         .update({ status: "canceled" })
         .eq("user_id", user_id)
-        .eq("bundle_key", prefix);
-    }
-
-    // Check if user has any other active subscriptions before downgrading global plan
-    const { data: activeSubs } = await supabase
-      .from("subscriptions")
-      .select("id")
-      .eq("user_id", user_id)
-      .eq("status", "active")
-      .neq("stripe_subscription_id", subscription.id);
-
-    if (!activeSubs || activeSubs.length === 0) {
-      await supabase.from("profiles").update({ plan: "free" }).eq("id", user_id);
-    }
-
-    // Sync downgraded plan to JWT app_metadata
-    await supabase.rpc("sync_plan_to_app_metadata", { p_user_id: user_id });
-
-    console.log(`Subscription ${subscription.id} status: ${subscription.status} for user ${user_id}`);
+        .eq("bundle_key", oldPlanKey),
+    );
   }
+
+  await syncUserSubscriptionEntitlements(user_id);
+  console.log(`Subscription ${subscription.id} synced as ${nextPlanKey || oldPlanKey} (${subscription.status}) for user ${user_id}`);
 }
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
-  const subRecord = await supabase
-    .from("subscriptions")
-    .select("user_id, plan_key")
-    .eq("stripe_subscription_id", subscription.id)
-    .single();
+  const subRecord = requireDbSuccess(
+    "load deleted subscription",
+    await supabase
+      .from("subscriptions")
+      .select("user_id, plan_key")
+      .eq("stripe_subscription_id", subscription.id)
+      .single(),
+  );
 
-  if (!subRecord.data) return;
+  if (!subRecord) return;
 
-  const { user_id, plan_key } = subRecord.data;
+  const { user_id, plan_key } = subRecord as { user_id: string; plan_key?: string | null };
 
-  await supabase
-    .from("subscriptions")
-    .update({ status: "canceled" })
-    .eq("stripe_subscription_id", subscription.id);
-
-  // Downgrade the specific product
-  const prefix = plan_key || "";
-  const downgrades = PLAN_DOWNGRADE_MAP[prefix] || {};
-
-  if (Object.keys(downgrades).length > 0) {
-    await supabase.from("profiles").update(downgrades).eq("id", user_id);
-  }
+  requireDbSuccess(
+    "mark subscription canceled",
+    await supabase
+      .from("subscriptions")
+      .update({ status: "canceled" })
+      .eq("stripe_subscription_id", subscription.id),
+  );
 
   // Mark bundle as canceled
+  const prefix = plan_key || "";
   if (prefix.startsWith("bundle_")) {
-    await supabase.from("active_bundles")
-      .update({ status: "canceled" })
-      .eq("user_id", user_id)
-      .eq("bundle_key", prefix);
+    requireDbSuccess(
+      "cancel active bundle",
+      await supabase.from("active_bundles")
+        .update({ status: "canceled" })
+        .eq("user_id", user_id)
+        .eq("bundle_key", prefix),
+    );
   }
 
   // Subscription add-ons (e.g. addon_extra_slot) — flip the matching addon
@@ -1047,28 +1134,16 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   // Builder UI when the user next opens it.
   if (prefix.startsWith("addon_")) {
     const addonId = prefix.replace(/^addon_/, "");
-    await supabase
+    requireDbSuccess("cancel subscription addon", await supabase
       .from("addons_purchased")
       .update({ status: "canceled" })
       .eq("user_id", user_id)
       .eq("addon_id", addonId)
-      .eq("metadata->>stripe_subscription_id", subscription.id);
+      .eq("metadata->>stripe_subscription_id", subscription.id));
     console.log(`Subscription addon ${addonId} canceled for ${user_id} (sub ${subscription.id})`);
   }
 
-  // Check for other active subscriptions
-  const { data: activeSubs } = await supabase
-    .from("subscriptions")
-    .select("id")
-    .eq("user_id", user_id)
-    .eq("status", "active");
-
-  if (!activeSubs || activeSubs.length === 0) {
-    await supabase.from("profiles").update({ plan: "free" }).eq("id", user_id);
-  }
-
-  // Sync downgraded plan to JWT app_metadata
-  await supabase.rpc("sync_plan_to_app_metadata", { p_user_id: user_id });
+  await syncUserSubscriptionEntitlements(user_id);
 
   console.log(`Subscription deleted: ${subscription.id}, user ${user_id} downgraded`);
 }
@@ -1089,23 +1164,29 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
 
   // purchase_events stores the payment_intent_id we wrote at purchase time;
   // join through it to find the session_id that the addon row references.
-  const { data: pe } = await supabase
-    .from("purchase_events")
-    .select("user_id, stripe_session_id")
-    .eq("stripe_payment_intent_id", paymentIntentId)
-    .maybeSingle();
+  const pe = requireDbSuccess(
+    "load purchase event for refund",
+    await supabase
+      .from("purchase_events")
+      .select("user_id, stripe_session_id")
+      .eq("stripe_payment_intent_id", paymentIntentId)
+      .maybeSingle(),
+  );
 
   if (!pe?.stripe_session_id) {
     console.log(`No purchase_events row for payment_intent ${paymentIntentId}`);
     return;
   }
 
-  const { data: addons } = await supabase
-    .from("addons_purchased")
-    .update({ status: "refunded" })
-    .eq("user_id", pe.user_id)
-    .eq("metadata->>stripe_session_id", pe.stripe_session_id)
-    .select("id, addon_id");
+  const addons = requireDbSuccess(
+    "revoke refunded add-ons",
+    await supabase
+      .from("addons_purchased")
+      .update({ status: "refunded" })
+      .eq("user_id", pe.user_id)
+      .eq("metadata->>stripe_session_id", pe.stripe_session_id)
+      .select("id, addon_id"),
+  );
 
   if (addons && addons.length > 0) {
     console.log(`Refund for ${pe.user_id}: ${addons.length} addon(s) revoked — ${addons.map(a => a.addon_id).join(", ")}`);
@@ -1121,13 +1202,16 @@ async function handleInvoiceSucceeded(invoice: Stripe.Invoice) {
 
   const subscription = await stripe.subscriptions.retrieve(subId);
 
-  await supabase
-    .from("subscriptions")
-    .update({
-      status: subscription.status,
-      current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-    })
-    .eq("stripe_subscription_id", subId);
+  requireDbSuccess(
+    "record successful invoice",
+    await supabase
+      .from("subscriptions")
+      .update({
+        status: subscription.status,
+        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+      })
+      .eq("stripe_subscription_id", subId),
+  );
 
   console.log(`Invoice paid, subscription ${subId} renewed`);
 }
@@ -1139,33 +1223,38 @@ async function handleInvoiceFailed(invoice: Stripe.Invoice) {
     ? invoice.subscription
     : invoice.subscription.id;
 
-  await supabase
-    .from("subscriptions")
-    .update({ status: "past_due" })
-    .eq("stripe_subscription_id", subId);
+  requireDbSuccess(
+    "mark subscription past due",
+    await supabase
+      .from("subscriptions")
+      .update({ status: "past_due" })
+      .eq("stripe_subscription_id", subId),
+  );
 
-  const { data: subRecord } = await supabase
-    .from("subscriptions")
-    .select("user_id, plan_key")
-    .eq("stripe_subscription_id", subId)
-    .single();
+  const subRecord = requireDbSuccess(
+    "load past-due subscription",
+    await supabase
+      .from("subscriptions")
+      .select("user_id")
+      .eq("stripe_subscription_id", subId)
+      .single(),
+  );
 
   if (subRecord?.user_id) {
-    const downgrades = PLAN_DOWNGRADE_MAP[subRecord.plan_key || ""] || {};
-    if (Object.keys(downgrades).length > 0) {
-      await supabase.from("profiles").update(downgrades).eq("id", subRecord.user_id);
-    }
-    await supabase.rpc("sync_plan_to_app_metadata", { p_user_id: subRecord.user_id });
+    await syncUserSubscriptionEntitlements(subRecord.user_id);
   }
 
   console.log(`Invoice failed, subscription ${subId} marked past_due`);
 }
 
 async function handleAsyncPaymentFailed(session: Stripe.Checkout.Session) {
-  await supabase
-    .from("purchase_events")
-    .update({ status: "failed" })
-    .eq("stripe_session_id", session.id);
+  requireDbSuccess(
+    "mark async payment failed",
+    await supabase
+      .from("purchase_events")
+      .update({ status: "failed" })
+      .eq("stripe_session_id", session.id),
+  );
 
   console.log(`Async payment failed for session ${session.id}`);
 }
