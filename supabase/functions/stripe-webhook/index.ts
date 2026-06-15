@@ -858,6 +858,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         await supabase
           .from("addons_purchased")
           .update({
+            project_id: projectIdCreated,
             metadata: {
               stripe_session_id: session.id,
               lookup_key: lookupKey,
