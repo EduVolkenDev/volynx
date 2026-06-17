@@ -280,6 +280,87 @@ function isLikelyMissingStorageAsset(message: string | null): boolean {
   return /not found|does not exist|404|no such object|object not found|failed to find/i.test(String(message || ""));
 }
 
+const ICONS_BUCKET = "icons";
+const ICONS_VERSION = "v1.0.0";
+const ICONS_SIGNED_URL_TTL = 60 * 60 * 24; // 24h
+
+function safeFilename(value: string | null | undefined, fallback = "volynx-icon.webp"): string {
+  const file = String(value || fallback).split("?")[0].split("#")[0].split("/").filter(Boolean).pop() || fallback;
+  return file.replace(/[^a-z0-9._-]+/gi, "-").slice(0, 120) || fallback;
+}
+
+function resolveIconDeliveryPath(prefix: string, meta: Record<string, string>): { path: string | null; filename: string | null } {
+  const isPack = prefix.startsWith("icons_pack_");
+  if (isPack) {
+    const collection = String(meta.icon_collection || "").trim();
+    if (!collection) return { path: null, filename: null };
+    if (collection === "__all_premium__") {
+      return {
+        path: `${ICONS_VERSION}/packs/full-premium-combo.zip`,
+        filename: "volynx-full-premium-icon-combo.zip",
+      };
+    }
+    const slug = slugify(collection);
+    return {
+      path: `${ICONS_VERSION}/packs/${slug}.zip`,
+      filename: `${slug || "volynx-icons-pack"}.zip`,
+    };
+  }
+
+  const iconId = String(meta.icon_id || "").trim();
+  const iconPath = String(meta.icon_path || "").trim();
+  if (!iconId || !iconPath || iconPath.includes("..")) return { path: null, filename: null };
+  const filename = safeFilename(iconPath);
+  return {
+    path: `${ICONS_VERSION}/singles/${slugify(iconId)}/${filename}`,
+    filename,
+  };
+}
+
+async function signIconDelivery(prefix: string, meta: Record<string, string>) {
+  const resolved = resolveIconDeliveryPath(prefix, meta);
+  if (!resolved.path) {
+    return {
+      ...resolved,
+      url: null,
+      expiresAt: null,
+      status: "manual_review",
+      error: "missing_icon_delivery_metadata",
+    };
+  }
+
+  try {
+    const { data: signed, error } = await supabase.storage
+      .from(ICONS_BUCKET)
+      .createSignedUrl(resolved.path, ICONS_SIGNED_URL_TTL);
+    if (error || !signed?.signedUrl) {
+      return {
+        ...resolved,
+        url: null,
+        expiresAt: null,
+        status: isLikelyMissingStorageAsset(error?.message || null) ? "missing_storage_asset" : "pending_signed_url",
+        error: error?.message || "missing_signed_url",
+      };
+    }
+    return {
+      ...resolved,
+      url: signed.signedUrl,
+      expiresAt: new Date(Date.now() + ICONS_SIGNED_URL_TTL * 1000).toISOString(),
+      status: "ready",
+      error: null,
+    };
+  } catch (e) {
+    const message = (e as Error).message;
+    return {
+      ...resolved,
+      url: null,
+      expiresAt: null,
+      status: isLikelyMissingStorageAsset(message) ? "missing_storage_asset" : "pending_signed_url",
+      error: message,
+    };
+  }
+}
+
 function isSubscription(prefix: string): boolean {
   return !!(PLAN_PROFILE_MAP[prefix]) ||
     prefix === "addon_extra_slot";
@@ -596,6 +677,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       if (existingIcon) {
         console.log(`Icon purchase ${prefix} already recorded for session ${session.id} — skip`);
       } else {
+        const iconDelivery = await signIconDelivery(prefix, meta);
+        if (iconDelivery.error) {
+          console.error(`Icon delivery ${prefix} signing status=${iconDelivery.status}:`, iconDelivery.error);
+        }
         await supabase.from("addons_purchased").insert({
           user_id: userId,
           addon_id: prefix,
@@ -612,6 +697,14 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             icon_collection: meta.icon_collection || null,
             tier: prefix.replace(/^icons_(single|pack)_/, ""),
             kind: prefix.startsWith("icons_single_") ? "single" : "pack",
+            download_bucket: ICONS_BUCKET,
+            download_path: iconDelivery.path,
+            download_filename: iconDelivery.filename,
+            download_url: iconDelivery.url,
+            download_expires_at: iconDelivery.expiresAt,
+            download_version: ICONS_VERSION,
+            delivery_status: iconDelivery.status,
+            delivery_error: iconDelivery.error,
           },
         });
         console.log(`Icon purchase ${prefix} recorded for ${userId}`);
@@ -624,6 +717,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             tier: prefix.replace(/^icons_(single|pack)_/, ""),
             kind: prefix.startsWith("icons_single_") ? "single" : "pack",
             session_id: session.id,
+            signed_url: iconDelivery.url,
+            expires_at: iconDelivery.expiresAt,
+            delivery_status: iconDelivery.status,
           },
         });
       }

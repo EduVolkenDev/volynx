@@ -280,16 +280,39 @@ function kitDelivered(p: Profile, x: Record<string, any>): RenderResult {
 // ── icons_delivered ────────────────────────────────────────────────────────
 function iconsDelivered(p: Profile, x: Record<string, any>): RenderResult {
   const tier = String(x.tier || "");
+  const kind = String(x.kind || "");
+  const isSingle = kind === "single";
   const sessionId = String(x.session_id || "");
-  const subject = p.locale === "pt"
-    ? `Seu pacote de ícones está pronto`
-    : `Your icon pack is ready`;
-  const intro = p.locale === "pt"
-    ? `Olá ${p.first_name}, seu pacote ${tier ? tier + " " : ""}já está disponível. Baixe pelo link abaixo (válido por 24h, renovável quando precisar).`
-    : `Hi ${p.first_name}, your ${tier ? tier + " " : ""}pack is ready. Download from the link below (valid 24h, refresh anytime).`;
-  const downloadUrl = sessionId
+  const signedUrl = String(x.signed_url || "");
+  const deliveryStatus = String(x.delivery_status || "");
+  const ready = Boolean(signedUrl) && (!deliveryStatus || deliveryStatus === "ready");
+  const dashboardUrl = sessionId
     ? `${URL_BASE}/dashboard/purchases/icons/?session_id=${encodeURIComponent(sessionId)}`
     : `${URL_BASE}/delivery/`;
+  const downloadUrl = ready ? signedUrl : dashboardUrl;
+  const subject = ready
+    ? (isSingle
+      ? (p.locale === "pt" ? `Seu ícone está pronto` : `Your icon is ready`)
+      : (p.locale === "pt" ? `Seu pacote de ícones está pronto` : `Your icon pack is ready`))
+    : (p.locale === "pt" ? `Sua compra de ícones foi registrada` : `Your icon purchase is registered`);
+  const intro = ready
+    ? (isSingle
+      ? (p.locale === "pt"
+        ? `Olá ${p.first_name}, seu ícone ${tier ? tier + " " : ""}já está disponível. O link é privado, válido por 24h e renovável quando precisar.`
+        : `Hi ${p.first_name}, your ${tier ? tier + " " : ""}icon is ready. The link is private, valid for 24h, and refreshable anytime.`)
+      : (p.locale === "pt"
+        ? `Olá ${p.first_name}, seu pacote ${tier ? tier + " " : ""}já está disponível. O link é privado, válido por 24h e renovável quando precisar.`
+        : `Hi ${p.first_name}, your ${tier ? tier + " " : ""}pack is ready. The link is private, valid for 24h, and refreshable anytime.`))
+    : (p.locale === "pt"
+      ? `Olá ${p.first_name}, sua compra de ícones foi registrada. Abra a página de entrega para gerar ou recuperar o link privado.`
+      : `Hi ${p.first_name}, your icon purchase is registered. Open the delivery page to generate or recover the private link.`);
+  const expiresAt = String(x.expires_at || "");
+  const expiresHuman = expiresAt
+    ? new Date(expiresAt).toLocaleString(p.locale === "pt" ? "pt-BR" : "en-GB", { dateStyle: "medium", timeStyle: "short" })
+    : "";
+  const expiryNote = ready && expiresHuman
+    ? (p.locale === "pt" ? `<p style="margin:18px 0 0;font-size:13px;color:#a1a1aa;">Link válido até <strong>${escapeText(expiresHuman)}</strong>.</p>` : `<p style="margin:18px 0 0;font-size:13px;color:#a1a1aa;">Link valid until <strong>${escapeText(expiresHuman)}</strong>.</p>`)
+    : "";
 
   return {
     subject,
@@ -297,8 +320,15 @@ function iconsDelivered(p: Profile, x: Record<string, any>): RenderResult {
       preheader: intro,
       heading: subject,
       intro,
-      ctaLabel: p.locale === "pt" ? "Baixar ícones" : "Download icons",
+      bodyHtml: expiryNote,
+      ctaLabel: ready
+        ? (isSingle
+          ? (p.locale === "pt" ? "Baixar arquivo privado" : "Download private file")
+          : (p.locale === "pt" ? "Baixar ZIP privado" : "Download private ZIP"))
+        : (p.locale === "pt" ? "Abrir entrega" : "Open delivery"),
       ctaUrl: downloadUrl,
+      secondaryLabel: ready ? (p.locale === "pt" ? "Ver entregas" : "Open delivery page") : undefined,
+      secondaryUrl: ready ? dashboardUrl : undefined,
       locale: p.locale,
     }),
   };

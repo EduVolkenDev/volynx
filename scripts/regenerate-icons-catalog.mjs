@@ -2,12 +2,13 @@
 /**
  * VOLYNX Icons Store — catalog regenerator
  *
- * Scans public/assets/icons-store/ and builds catalog.json from ONLY the
- * top-level folders tagged GREEN or PURPLE in Finder (macOS color label).
+ * Scans public/assets/icons-store/ and builds catalog.json from the explicit
+ * FOLDER_MANIFEST below.
  *
  * - Does NOT recurse into sub-folders of Regenerate/, Repairable/, etc.
- * - Skips folders tagged Orange (needs regenerate), Yellow (needs repair),
- *   Grey (uncertain), or untagged folders.
+ * - Skips folders that are not listed in FOLDER_MANIFEST.
+ * - Finder tags can still be used as human review notes, but they are not a
+ *   shipping gate. A local macOS tag should not decide production inventory.
  *
  * Usage:
  *   node scripts/regenerate-icons-catalog.mjs
@@ -18,7 +19,6 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { execSync } from "node:child_process";
 
 const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const iconsRoot = path.join(repoRoot, "public/assets/icons-store");
@@ -29,7 +29,8 @@ const DRY_RUN = process.argv.includes("--dry-run");
 const IMAGE_EXT = new Set([".png", ".webp", ".jpg", ".jpeg", ".svg"]);
 
 // ── Explicit folder → friendly-name + category + plan mapping ──────────────
-// Only folders listed here will ship, AND the folder must be tagged GREEN or PURPLE.
+// Only folders listed here ship. Keep this as the source of truth so catalog
+// generation stays deterministic across machines and CI.
 const FOLDER_MANIFEST = {
   "Abstract-Free":         { name: "Abstract",         category: "futuristic", plan: "free" },
   // "BigIcons-Free":      REMOVED — icons render broken; needs redo (re-enable after fix)
@@ -37,9 +38,16 @@ const FOLDER_MANIFEST = {
   "Day-By-Day-free":       { name: "Day by Day",       category: "simple",     plan: "free" },
   // "Free-Greens":        REMOVED — icons render broken; needs redo
   // "Free-Purples":       REMOVED — icons render broken; needs redo
+  "daily-common-free":     { name: "Daily Common",     category: "daily",      plan: "free" },
+  "daily-common2-free":    { name: "Daily Common II",  category: "daily",      plan: "free" },
+  "daily-iridescent-premium": { name: "Daily Iridescent", category: "daily",   plan: "premium" },
+  "daily-poligon-free":    { name: "Daily Polygon",    category: "daily",      plan: "free" },
+  "daily3Dpremium":        { name: "Daily 3D",         category: "daily",      plan: "premium" },
   "glow-premium":          { name: "Glow",             category: "futuristic", plan: "standard" },
+  "golden-icons":          { name: "Golden Icons",     category: "metal",      plan: "free" },
   "Hyper-Icons-Premium":   { name: "Hyper Icons",      category: "futuristic", plan: "premium" },
   "Icons-Glass-Premium":   { name: "Glass Icons",      category: "futuristic", plan: "premium" },
+  "icons-tech-free":       { name: "Tech Icons",       category: "futuristic", plan: "free" },
   // "Icons-Glass-Premium-2": REMOVED — folder deleted from disk
   "Iridescent-Premium":    { name: "Iridescent",       category: "futuristic", plan: "premium" },
   // "Metal-Premium":      REMOVED — folder deleted from disk (replaced by metal-chrome-premium)
@@ -57,24 +65,6 @@ const FOLDER_MANIFEST = {
   "soft-red":              { name: "Soft Red",         category: "pink",       plan: "standard" },
   "vintage-premium":       { name: "Vintage",          category: "futuristic", plan: "premium" },
 };
-
-// ── Read Finder tag for a folder via mdls ──────────────────────────────────
-function getTags(absPath) {
-  try {
-    const out = execSync(
-      `mdls -raw -name kMDItemUserTags ${JSON.stringify(absPath)}`,
-      { encoding: "utf8" }
-    );
-    return [...out.matchAll(/\b(Red|Orange|Yellow|Green|Blue|Purple|Gr[ae]y)\b/gi)]
-      .map(m => m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase());
-  } catch {
-    return [];
-  }
-}
-
-function isShippingTagged(tags) {
-  return tags.includes("Green") || tags.includes("Purple");
-}
 
 // ── Walk files in a single folder (no recursion) ──────────────────────────
 function filesIn(dir) {
@@ -107,22 +97,16 @@ function main() {
     .filter(e => e.isDirectory())
     .map(e => e.name);
 
-  const report = { included: [], skipped_not_green: [], skipped_unmapped: [], missing_manifest: [] };
+  const report = { included: [], skipped_unmapped: [], missing_manifest: [] };
   const catalog = [];
   let idx = 0;
 
   for (const folderName of entries.sort()) {
     const abs = path.join(iconsRoot, folderName);
-    const tags = getTags(abs);
-    const tagLabel = tags.length ? tags.join(", ") : "(untagged)";
     const manifestEntry = FOLDER_MANIFEST[folderName];
 
-    if (!isShippingTagged(tags)) {
-      report.skipped_not_green.push({ folder: folderName, tag: tagLabel });
-      continue;
-    }
     if (!manifestEntry) {
-      report.missing_manifest.push({ folder: folderName, tag: tagLabel });
+      report.missing_manifest.push({ folder: folderName, reason: "not listed in FOLDER_MANIFEST" });
       continue;
     }
 
@@ -158,19 +142,14 @@ function main() {
   console.log("Icons Store catalog regenerator");
   console.log("═══════════════════════════════════════════════════════════════════════\n");
 
-  console.log(`Included (green/purple-tagged + in manifest):`);
+  console.log(`Included (listed in manifest):`);
   for (const r of report.included) {
     console.log(`  ✓ ${r.folder.padEnd(28)} → "${r.name}" · ${r.count} icons · ${r.plan}`);
   }
 
-  if (report.skipped_not_green.length) {
-    console.log(`\nSkipped (not green/purple-tagged):`);
-    for (const r of report.skipped_not_green) console.log(`  ✗ ${r.folder.padEnd(28)} tag=${r.tag}`);
-  }
-
   if (report.missing_manifest.length) {
-    console.log(`\nNeeds manifest entry (green/purple but unmapped):`);
-    for (const r of report.missing_manifest) console.log(`  ⚠ ${r.folder.padEnd(28)} tag=${r.tag}  — add to FOLDER_MANIFEST`);
+    console.log(`\nSkipped (not listed in manifest):`);
+    for (const r of report.missing_manifest) console.log(`  ⚠ ${r.folder.padEnd(28)} ${r.reason || r.tag || ""}`);
   }
 
   if (report.skipped_unmapped.length) {

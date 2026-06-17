@@ -29,6 +29,24 @@ function shouldBlockTestStripeKey(stripeKey: string): boolean {
   return isProductionOrigin(FRONTEND_ORIGIN) && stripeKey.startsWith("sk_test_");
 }
 
+function isProductionUrl(value: unknown): boolean {
+  if (typeof value !== "string" || !value) return false;
+  try {
+    return isProductionOrigin(new URL(value).origin);
+  } catch {
+    return false;
+  }
+}
+
+function shouldBlockLiveStripeKey(req: Request, stripeKey: string, successUrl: unknown, cancelUrl: unknown): boolean {
+  if (!stripeKey.startsWith("sk_live_")) return false;
+  const requestOrigin = req.headers.get("Origin") || "";
+  if (!isProductionOrigin(requestOrigin)) return true;
+  if (typeof successUrl === "string" && successUrl && !isProductionUrl(successUrl)) return true;
+  if (typeof cancelUrl === "string" && cancelUrl && !isProductionUrl(cancelUrl)) return true;
+  return false;
+}
+
 function getCheckoutMode(prefix: string): "subscription" | "payment" {
   // All plan subscriptions: volynx, daily, bundles, legacy builder_
   if (prefix.startsWith("builder_") || prefix.startsWith("volynx_")) return "subscription";
@@ -151,6 +169,10 @@ Deno.serve(async (req: Request) => {
     if (shouldBlockTestStripeKey(stripeKey)) {
       console.error("[checkout] blocked test Stripe key on production origin");
       return json({ error: "Live checkout is not configured. Contact support." }, 500);
+    }
+    if (shouldBlockLiveStripeKey(req, stripeKey, success_url, cancel_url)) {
+      console.error("[checkout] blocked live Stripe key outside production origin");
+      return json({ error: "Live checkout is only available on volynx.world." }, 403);
     }
 
     const stripe = new Stripe(stripeKey, {

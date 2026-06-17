@@ -236,6 +236,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
           </div>
           <div class="info-actions">
             <a class="btn btn--accent btn--sm" id="visitSite" href="#" target="_blank" rel="noreferrer" hidden>Visit site ↗</a>
+            <button class="btn btn--ghost btn--sm" id="unpublishSite" hidden>Unpublish</button>
             <button class="btn btn--ghost btn--sm" id="exportZip" title="Advanced source-code export">Source ZIP (advanced)</button>
             <button class="btn btn--ghost btn--sm" id="deleteProject">Delete</button>
           </div>
@@ -1539,14 +1540,17 @@ import PageWidgets from "../../components/PageWidgets.astro";
     const infoUrlBox = $("infoUrlBox") as HTMLElement;
     const infoUrl = $("infoUrl") as HTMLAnchorElement;
     const visitBtn = $("visitSite") as HTMLAnchorElement;
+    const unpublishBtn = $("unpublishSite") as HTMLButtonElement;
 
     if (p.status === "published" && liveUrl) {
       if (infoUrlBox) infoUrlBox.hidden = false;
       if (infoUrl) { infoUrl.href = liveUrl; infoUrl.textContent = liveUrl; }
       if (visitBtn) { visitBtn.hidden = false; visitBtn.href = liveUrl; }
+      if (unpublishBtn) unpublishBtn.hidden = false;
     } else {
       if (infoUrlBox) infoUrlBox.hidden = true;
       if (visitBtn) visitBtn.hidden = true;
+      if (unpublishBtn) unpublishBtn.hidden = true;
     }
 
     document.querySelectorAll(".project-btn").forEach((b) => b.classList.remove("active"));
@@ -1787,6 +1791,53 @@ import PageWidgets from "../../components/PageWidgets.astro";
       window.location.href = "/";
     });
 
+    async function unpublishCurrentProject() {
+      if (!currentProject) return false;
+      const { data: sessData } = await supa.auth.getSession();
+      const token = sessData?.session?.access_token;
+      if (!token) {
+        setStatus("Session expired. Please refresh the page.");
+        return false;
+      }
+
+      const apiBase = ((cfg as any).apiBaseUrl || "").replace(/\/$/, "");
+      if (!apiBase) {
+        setStatus("Publish backend not configured. Add apiBaseUrl to config.json.");
+        return false;
+      }
+
+      const r = await fetch(`${apiBase}/unpublish`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ projectId: currentProject.id }),
+      });
+      const j: any = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        const errMap: Record<string, string> = {
+          missing_token: "Authentication failed. Try signing out and back in.",
+          invalid_token: "Session invalid. Try signing out and back in.",
+          missing_projectId: "Internal error: project ID missing.",
+          project_not_found: "Project not found in the database.",
+          forbidden: "You don't have permission to unpublish this project.",
+          missing_slug: "Project needs a slug before unpublishing.",
+        };
+        setStatus(errMap[j?.error] || j?.error || `Unpublish failed (HTTP ${r.status}).`);
+        return false;
+      }
+
+      currentProject.status = "draft";
+      const infoBadge = $("infoBadge") as HTMLElement;
+      const infoUrlBox = $("infoUrlBox") as HTMLElement;
+      const visitBtn = $("visitSite") as HTMLAnchorElement;
+      const unpublishBtn = $("unpublishSite") as HTMLButtonElement;
+      if (infoBadge) { infoBadge.textContent = "draft"; infoBadge.className = "status-badge status-badge--draft"; }
+      if (infoUrlBox) infoUrlBox.hidden = true;
+      if (visitBtn) visitBtn.hidden = true;
+      if (unpublishBtn) unpublishBtn.hidden = true;
+      await listProjects(user.id);
+      return true;
+    }
+
     // Export ZIP
     $("exportZip")?.addEventListener("click", async () => {
       if (!currentProject) return setStatus("Select a project.");
@@ -1842,10 +1893,26 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
       }
     });
 
+    $("unpublishSite")?.addEventListener("click", async () => {
+      if (!currentProject) return setStatus("Select a project.");
+      if (!confirm(`Unpublish "${currentProject.name}"? The editor stays saved, but the public site will go offline.`)) return;
+      const btn = $("unpublishSite") as HTMLButtonElement;
+      btnLoading(btn, true, "Unpublishing...");
+      const ok = await unpublishCurrentProject();
+      btnLoading(btn, false);
+      if (ok) setStatus("Site unpublished.");
+    });
+
     // Delete project (soft delete)
     $("deleteProject")?.addEventListener("click", async () => {
       if (!currentProject) return setStatus("Select a project.");
       if (!confirm(`Delete "${currentProject.name}"? This can't be undone.`)) return;
+
+      if (currentProject.status === "published") {
+        setStatus("Unpublishing before delete...");
+        const unpublished = await unpublishCurrentProject();
+        if (!unpublished) return;
+      }
 
       const { error } = await supa
         .from("projects")
