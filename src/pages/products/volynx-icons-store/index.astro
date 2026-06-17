@@ -1803,11 +1803,14 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       const svgEl = card.querySelector(".asset-card-icon-stage svg");
       const category = card.closest(".asset-category")?.getAttribute("data-category") || "SVG Essentials";
       const collection = card.closest(".asset-category")?.getAttribute("data-source") || "SVG Essentials";
+      const number = String(card.dataset.number || "").match(/\d+/)?.[0]?.padStart(2, "0") || "00";
+      const labelSlug = String(card.dataset.label || "icon").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
       return {
         type: "svg",
         label: card.dataset.label || "SVG Icon",
         number: card.dataset.number || "",
         svg: svgEl ? svgEl.outerHTML : "",
+        path: `/assets/icons-store/svg-essentials/vx-${number}-${labelSlug}.svg`,
         category,
         collection,
         relatedCollection: findCollectionForCategory("futuristic") || "Neon Icons",

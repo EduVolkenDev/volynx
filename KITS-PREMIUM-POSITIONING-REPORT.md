@@ -1,6 +1,6 @@
 # VOLYNX Kits — Premium Positioning & Delivery Audit Report
 
-**Data:** 31 de Maio de 2026  
+**Data:** 31 de Maio de 2026
 **Objetivo:** Ajustar entrega e posicionamento dos kits para serem premium e claros para usuários leigos, com Builder-first approach.
 
 ---
@@ -134,7 +134,7 @@ await copyDir(path.join(ROOT, "content"), path.join(buildDir, "content"), {
 
 O script **já copia** os arquivos essenciais mencionados na tarefa:
 - ✅ `lib/utils.ts`
-- ✅ `lib/motion.ts`  
+- ✅ `lib/motion.ts`
 - ✅ `lib/volynx-public.ts`
 - ✅ `lib/site-locale.ts`
 - ✅ `content/*.ts` (site.ts, icons-store.ts, legal-pages.ts, kit-offers.ts, etc.)
@@ -384,6 +384,6 @@ git push origin codex/builder-editor-ux
 
 ---
 
-**Relatório gerado por:** Claude (Cline)  
-**Data:** 31/05/2026  
+**Relatório gerado por:** Claude (Cline)
+**Data:** 31/05/2026
 **Arquivo:** `/Users/eduardovolken_1/VOLYNX/KITS-PREMIUM-POSITIONING-REPORT.md`
