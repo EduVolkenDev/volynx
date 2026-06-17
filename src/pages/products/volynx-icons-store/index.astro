@@ -161,7 +161,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
           </div>
           <div class="single-format-tabs" role="tablist" aria-label="Single icon format">
             <button type="button" class="single-format-btn active" data-single-format="all" data-i18n="icons.single_filter_all">All singles</button>
-            <button type="button" class="single-format-btn" data-single-format="webp" data-i18n="icons.single_filter_webp">WEBP</button>
+            <button type="button" class="single-format-btn" data-single-format="webp" data-i18n="icons.single_filter_webp">SVG</button>
             <button type="button" class="single-format-btn" data-single-format="png" data-i18n="icons.single_filter_png">PNG</button>
           </div>
         </div>
@@ -1518,27 +1518,55 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       assetSingles = [...items, ...assetSingles];
     }
 
+    const ASSET_GALLERY_SOURCES = [
+      {
+        path: "/assets/icons-store/volynx-icons-gallery 2.html",
+        label: "Neon Glass SVG Essentials",
+        collection: "Neon Glass SVG",
+        stageSelector: ".icon-stage svg",
+      },
+      {
+        path: "/assets/icons-store/volynx-icons-gallery.html",
+        label: "Classic SVG Essentials",
+        collection: "Classic SVG",
+        stageSelector: ".icon-wrap svg",
+      },
+    ];
+
     async function loadAssetShowcase() {
       const mount = document.getElementById("assetShowcaseGrid");
       if (!mount) return;
 
       try {
-        const res = await fetch("/assets/icons-store/volynx-icons-gallery.html", { cache: "no-store" });
-        if (!res.ok) throw new Error(`HTTP ${res.status} fetching volynx-icons-gallery.html`);
+        const loaded = await Promise.all(ASSET_GALLERY_SOURCES.map(async (source) => {
+          const res = await fetch(source.path, { cache: "no-store" });
+          if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${source.path}`);
 
-        const html = await res.text();
-        const doc = new DOMParser().parseFromString(html, "text/html");
-        const defsSvg = doc.querySelector('svg[width="0"][height="0"]');
-        const categories = Array.from(doc.querySelectorAll(".category")).map((section, index) => {
-          const title = section.querySelector(".category-name")?.textContent?.trim() || `Category ${index + 1}`;
-          const count = section.querySelector(".category-count")?.textContent?.trim() || "";
-          const cards = Array.from(section.querySelectorAll(".card")).map((card) => ({
-            label: card.querySelector(".card-label")?.textContent?.trim() || "Icon",
-            number: card.querySelector(".card-num")?.textContent?.trim() || "",
-            svg: card.querySelector(".icon-wrap svg")?.outerHTML || "",
-          })).filter((card) => card.svg);
-          return { title, count, cards };
-        }).filter((category) => category.cards.length);
+          const html = await res.text();
+          const doc = new DOMParser().parseFromString(html, "text/html");
+          const defsSvg = doc.querySelector('svg[width="0"][height="0"]');
+          const categories = Array.from(doc.querySelectorAll(".category")).map((section, index) => {
+            const title = section.querySelector(".category-name")?.textContent?.trim() || `Category ${index + 1}`;
+            const count = section.querySelector(".category-count")?.textContent?.trim() || "";
+            const cards = Array.from(section.querySelectorAll(".card")).map((card) => ({
+              label: card.querySelector(".card-label")?.textContent?.trim() || "Icon",
+              number: card.querySelector(".card-num")?.textContent?.trim() || "",
+              svg: card.querySelector(source.stageSelector)?.outerHTML || card.querySelector("svg:not([width='0'])")?.outerHTML || "",
+            })).filter((card) => card.svg);
+            return {
+              title,
+              count: count || `${cards.length} icons`,
+              sourceLabel: source.label,
+              sourceCollection: source.collection,
+              cards,
+            };
+          }).filter((category) => category.cards.length);
+
+          return { source, defsSvg, categories };
+        }));
+
+        const defs = loaded.map((item) => item.defsSvg?.outerHTML).filter(Boolean);
+        const categories = loaded.flatMap((item) => item.categories);
 
         if (!categories.length) throw new Error("No categories found in source gallery HTML");
         assetSingles = categories.flatMap((category) => category.cards.map((card) => ({
@@ -1546,8 +1574,8 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
           label: card.label,
           number: card.number,
           svg: card.svg,
-          category: category.title,
-          collection: "SVG Essentials",
+          category: `${category.sourceLabel} · ${category.title}`,
+          collection: category.sourceCollection,
           relatedCollection: findCollectionForCategory("futuristic") || "Neon Icons",
           priceVX: ICON_PRICE_TIERS.budget.vx,
           money: ICON_PRICE_TIERS.budget.money,
@@ -1556,17 +1584,20 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         })));
 
         mount.innerHTML = `
-          ${defsSvg ? `<div class="asset-showcase-defs" aria-hidden="true">${defsSvg.outerHTML}</div>` : ""}
+          ${defs.length ? `<div class="asset-showcase-defs" aria-hidden="true">${defs.join("")}</div>` : ""}
           ${categories.map((category) => `
-            <section class="asset-category" data-category="${escHtml(category.title)}">
+            <section class="asset-category" data-category="${escHtml(category.sourceLabel)} · ${escHtml(category.title)}" data-source="${escHtml(category.sourceCollection)}">
               <div class="asset-category-head">
-                <h3 class="asset-category-title">${escHtml(category.title)}</h3>
+                <div>
+                  <p class="asset-category-source">${escHtml(category.sourceLabel)}</p>
+                  <h3 class="asset-category-title">${escHtml(category.title)}</h3>
+                </div>
                 <span class="asset-category-count">${escHtml(category.count)}</span>
               </div>
               <div class="asset-category-grid">
                 ${category.cards.map((card) => `
                   <button type="button" class="asset-card" data-label="${escHtml(card.label)}" data-number="${escHtml(card.number)}">
-                    <span class="asset-card-icon">${card.svg}</span>
+                    <span class="asset-card-icon"><span class="asset-card-icon-stage">${card.svg}</span></span>
                     <span class="asset-card-label">${escHtml(card.label)}</span>
                     <span class="asset-card-number">${escHtml(card.number)}</span>
                   </button>
@@ -1769,15 +1800,16 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     }
 
     function assetCardToSingleItem(card: HTMLButtonElement) {
-      const svgEl = card.querySelector(".asset-card-icon svg");
+      const svgEl = card.querySelector(".asset-card-icon-stage svg");
       const category = card.closest(".asset-category")?.getAttribute("data-category") || "SVG Essentials";
+      const collection = card.closest(".asset-category")?.getAttribute("data-source") || "SVG Essentials";
       return {
         type: "svg",
         label: card.dataset.label || "SVG Icon",
         number: card.dataset.number || "",
         svg: svgEl ? svgEl.outerHTML : "",
         category,
-        collection: "SVG Essentials",
+        collection,
         relatedCollection: findCollectionForCategory("futuristic") || "Neon Icons",
         priceVX: ICON_PRICE_TIERS.standard.vx,
         money: ICON_PRICE_TIERS.standard.money,
@@ -2224,7 +2256,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     }
 
     function showAssetPreviewModal(card: HTMLButtonElement) {
-      const svgEl = card.querySelector(".asset-card-icon svg");
+      const svgEl = card.querySelector(".asset-card-icon-stage svg");
       const label = card.dataset.label || "Icon";
       const number = card.dataset.number || "";
       const category = card.closest(".asset-category")?.getAttribute("data-category") || "Latest Assets";
