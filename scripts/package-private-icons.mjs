@@ -13,7 +13,7 @@ import JSZip from "jszip";
 const REPO_ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const CATALOG_PATH = path.join(REPO_ROOT, "public/assets/icons-store/catalog.json");
 const OUT_ROOT = path.join(REPO_ROOT, "storage/icons-store");
-const VERSION = process.env.ICONS_DELIVERY_VERSION || "v1.0.0";
+const VERSION = process.env.ICONS_DELIVERY_VERSION || "v1.0.1";
 const VERSION_ROOT = path.join(OUT_ROOT, VERSION);
 const PAID_PLANS = new Set(["standard", "premium", "paid"]);
 

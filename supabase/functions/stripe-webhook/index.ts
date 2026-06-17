@@ -349,7 +349,7 @@ function isLikelyMissingStorageAsset(message: string | null): boolean {
 }
 
 const ICONS_BUCKET = "icons";
-const ICONS_VERSION = "v1.0.0";
+const ICONS_VERSION = "v1.0.1";
 const ICONS_SIGNED_URL_TTL = 60 * 60 * 24; // 24h
 
 function safeFilename(value: string | null | undefined, fallback = "volynx-icon.webp"): string {

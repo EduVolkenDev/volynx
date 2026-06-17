@@ -20,7 +20,7 @@ const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24; // 24h
 const REFRESH_COOLDOWN_MS = 60 * 1000;
 const ICONS_BUCKET = "icons";
-const ICONS_VERSION = "v1.0.0";
+const ICONS_VERSION = "v1.0.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

@@ -7,7 +7,7 @@
  *   SUPABASE_SERVICE_ROLE_KEY
  *
  * Optional:
- *   ICONS_DELIVERY_VERSION=v1.0.0
+ *   ICONS_DELIVERY_VERSION=v1.0.1
  */
 
 import fs from "node:fs/promises";
@@ -15,7 +15,7 @@ import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
 
 const REPO_ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
-const VERSION = process.env.ICONS_DELIVERY_VERSION || "v1.0.0";
+const VERSION = process.env.ICONS_DELIVERY_VERSION || "v1.0.1";
 const OUT_ROOT = path.join(REPO_ROOT, "storage/icons-store");
 const VERSION_ROOT = path.join(OUT_ROOT, VERSION);
 const MANIFEST_PATH = path.join(VERSION_ROOT, "manifest.json");
