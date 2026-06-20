@@ -429,18 +429,32 @@
     style.id = "vxLabModalStyles";
     style.textContent = [
       ".vx-lab-modal{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:20px;background:rgba(2,6,14,.68);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}",
+      ".vx-lab-modal--login{background:radial-gradient(circle at 50% 18%,rgba(125,249,255,.18),transparent 34%),radial-gradient(circle at 50% 82%,rgba(214,168,79,.11),transparent 30%),rgba(2,6,14,.76)}",
       ".vx-lab-modal[hidden]{display:none!important}",
       ".vx-lab-modal__card{width:min(440px,100%);border:1px solid rgba(255,255,255,.14);border-radius:12px;background:linear-gradient(135deg,rgba(125,249,255,.11),rgba(214,168,79,.07)),rgba(4,8,18,.96);box-shadow:0 30px 90px rgba(0,0,0,.46);color:#fff;overflow:hidden}",
+      ".vx-lab-modal--login .vx-lab-modal__card{width:min(500px,100%);border-color:rgba(125,249,255,.24);background:linear-gradient(180deg,rgba(125,249,255,.13),rgba(214,168,79,.06) 58%,rgba(4,8,18,.98));box-shadow:0 34px 110px rgba(0,0,0,.56),0 0 70px rgba(125,249,255,.12)}",
       ".vx-lab-modal__top{display:flex;align-items:center;gap:12px;padding:18px 18px 12px}",
+      ".vx-lab-modal--login .vx-lab-modal__top{flex-direction:column;justify-content:center;text-align:center;gap:14px;padding:28px 28px 12px}",
       ".vx-lab-modal__icon{width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(125,249,255,.2);border-radius:10px;background:rgba(125,249,255,.09);color:#7df9ff;font-size:20px;font-weight:900;flex:0 0 auto}",
+      ".vx-lab-modal__icon--image{width:54px;height:54px;border:0;background:transparent;box-shadow:0 12px 32px rgba(125,249,255,.12)}",
+      ".vx-lab-modal__icon--image img{width:100%;height:100%;display:block;object-fit:contain}",
+      ".vx-lab-modal--login .vx-lab-modal__icon--image{width:150px;height:150px;border-radius:999px;background:radial-gradient(circle,rgba(125,249,255,.12),rgba(125,249,255,.02) 62%,transparent 70%);box-shadow:0 24px 70px rgba(125,249,255,.16);position:relative}",
+      ".vx-lab-modal--login .vx-lab-modal__icon--image::before{content:\"\";position:absolute;inset:-14px;border-radius:999px;background:radial-gradient(circle,rgba(125,249,255,.28),rgba(214,168,79,.12) 42%,transparent 70%);filter:blur(10px);opacity:.58;animation:vx-login-portal-pulse 2.8s ease-in-out infinite;pointer-events:none}",
+      ".vx-lab-modal--login .vx-lab-modal__icon--image::after{content:\"\";position:absolute;inset:14px;border:1px solid rgba(255,255,255,.12);border-radius:999px;pointer-events:none}",
+      ".vx-lab-modal--login .vx-lab-modal__icon--image img{position:relative;z-index:1}",
+      "@keyframes vx-login-portal-pulse{0%,100%{opacity:.34;transform:scale(.94)}45%{opacity:.8;transform:scale(1.08)}70%{opacity:.48;transform:scale(1.02)}}",
       ".vx-lab-modal__title{margin:0;color:#fff;font:900 18px/1.15 Manrope,ui-sans-serif,system-ui,sans-serif;letter-spacing:0}",
+      ".vx-lab-modal--login .vx-lab-modal__title{max-width:360px;font-size:24px;line-height:1.12}",
       ".vx-lab-modal__body{padding:0 18px 16px;color:rgba(255,255,255,.68);font:500 14px/1.55 Manrope,ui-sans-serif,system-ui,sans-serif}",
+      ".vx-lab-modal--login .vx-lab-modal__body{padding:0 32px 22px;text-align:center;color:rgba(255,255,255,.72)}",
       ".vx-lab-modal__body p{margin:0 0 10px}.vx-lab-modal__body p:last-child{margin-bottom:0}",
       ".vx-lab-modal__actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;padding:14px 18px 18px;border-top:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025)}",
+      ".vx-lab-modal--login .vx-lab-modal__actions{justify-content:center;padding:18px 28px 28px;background:rgba(255,255,255,.018)}",
       ".vx-lab-modal__btn{min-height:40px;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:0 14px;background:rgba(255,255,255,.055);color:rgba(255,255,255,.86);font:900 13px/1 Manrope,ui-sans-serif,system-ui,sans-serif;cursor:pointer}",
+      ".vx-lab-modal--login .vx-lab-modal__btn{min-width:130px;min-height:44px}",
       ".vx-lab-modal__btn:hover{border-color:rgba(125,249,255,.42);color:#fff}",
       ".vx-lab-modal__btn--primary{border-color:rgba(214,168,79,.42);background:linear-gradient(135deg,#d6a84f,#f8e9c1);color:#06142e}",
-      "@media(max-width:520px){.vx-lab-modal{align-items:end;padding:12px}.vx-lab-modal__actions{display:grid;grid-template-columns:1fr}.vx-lab-modal__btn{width:100%}}"
+      "@media(max-width:520px){.vx-lab-modal{align-items:end;padding:12px}.vx-lab-modal__actions{display:grid;grid-template-columns:1fr}.vx-lab-modal__btn{width:100%}.vx-lab-modal--login .vx-lab-modal__top{padding:24px 22px 10px}.vx-lab-modal--login .vx-lab-modal__icon--image{width:128px;height:128px}.vx-lab-modal--login .vx-lab-modal__title{font-size:22px}.vx-lab-modal--login .vx-lab-modal__body{padding:0 22px 20px}.vx-lab-modal--login .vx-lab-modal__actions{padding:16px 22px 22px}}"
     ].join("");
     document.head.appendChild(style);
   }
@@ -485,6 +499,7 @@
 
     var root = document.createElement("div");
     root.className = "vx-lab-modal";
+    if (options.loginExperience) root.className += " vx-lab-modal--login";
     root.setAttribute("role", "dialog");
     root.setAttribute("aria-modal", "true");
     root.setAttribute("aria-labelledby", "vxLabModalTitle");
@@ -497,7 +512,18 @@
 
     var icon = document.createElement("div");
     icon.className = "vx-lab-modal__icon";
-    icon.textContent = options.icon || "V";
+    if (options.iconSrc) {
+      icon.className += " vx-lab-modal__icon--image";
+      var iconImg = document.createElement("img");
+      iconImg.src = options.iconSrc;
+      iconImg.alt = "";
+      iconImg.setAttribute("aria-hidden", "true");
+      iconImg.loading = "eager";
+      iconImg.decoding = "async";
+      icon.appendChild(iconImg);
+    } else {
+      icon.textContent = options.icon || "V";
+    }
 
     var title = document.createElement("h2");
     title.id = "vxLabModalTitle";
@@ -559,8 +585,9 @@
     var text = message || "Sign in to continue. You will return to this tool after login.";
     track("lab", "login_modal_open", { next: nextPath || currentReturnPath() });
     if (!openModal({
-      icon: "L",
-      title: "Sign in to keep working",
+      iconSrc: "/assets/login-portal.webp",
+      loginExperience: true,
+      title: "Enter your VOLYNX workspace",
       message: text,
       primaryLabel: "Sign in",
       cancelLabel: "Stay here",

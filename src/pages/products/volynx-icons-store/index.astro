@@ -102,7 +102,6 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
               <button class="filter-btn" data-filter="purple">Purple</button>
               <button class="filter-btn" data-filter="soft"><span class="i18n-en">Soft Pastel</span><span class="i18n-pt">Pastel</span></button>
               <button class="filter-btn" data-filter="daily"><span class="i18n-en">Daily</span><span class="i18n-pt">Dia a dia</span></button>
-              <button class="filter-btn" data-filter="abstract">Abstract</button>
             </div>
             <div class="format-toggle" role="group" aria-label="Format">
               <button class="format-btn active" data-format="all"><span class="i18n-en">Any format</span><span class="i18n-pt">Qualquer formato</span></button>
@@ -178,6 +177,12 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
             <h3><span class="i18n-en">Preparing the premium single-icon gallery.</span><span class="i18n-pt">Preparando a galeria premium de ícones avulsos.</span></h3>
             <p><span class="i18n-en">The best PNG and SVG singles will appear here.</span><span class="i18n-pt">Os melhores avulsos PNG e SVG vão aparecer aqui.</span></p>
           </article>
+        </div>
+        <div class="single-icons-actions">
+          <button class="btn btn-secondary" id="singleToggleBtn" type="button" hidden>
+            <span class="i18n-en">Show all singles</span><span class="i18n-pt">Ver todos os avulsos</span>
+          </button>
+          <span class="load-more-count" id="singlePreviewCount" aria-live="polite"></span>
         </div>
       </div>
     </section>
@@ -1004,14 +1009,22 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     let allIcons: any[] = [];
     let assetSingles: any[] = [];
     let singleFormatFilter = "all";
+    let singlePreviewExpanded = false;
 
-    // Responsive page size: mobile 12, tablet 24, desktop 48.
-    // Kept small to prevent a giant endless scroll on phones.
+    // Compact previews keep the storefront scannable; users can expand when
+    // they want the full catalog depth.
     function initialPageSize() {
       const w = window.innerWidth;
-      if (w < 640) return 12;
-      if (w < 1024) return 24;
-      return 48;
+      if (w < 640) return 8;
+      if (w < 1024) return 12;
+      return 18;
+    }
+
+    function singlePreviewSize() {
+      const w = window.innerWidth;
+      if (w < 640) return 6;
+      if (w < 1024) return 8;
+      return 12;
     }
     let visibleCount = initialPageSize();
     // Catalog is deduped at generation time (see scripts/regenerate-icons-catalog.mjs).
@@ -1136,6 +1149,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       "Vintage": { order: 6, band: "premium", packLookup: "icons_pack_premium" },
       "Polygon": { order: 7, band: "premium", packLookup: "icons_pack_premium" },
       "Glow": { order: 8, band: "curated", packLookup: "icons_pack_mixed" },
+      "Soft Spectrum": { order: 9, band: "curated", packLookup: "icons_pack_mixed" },
       "Soft Blue": { order: 9, band: "curated", packLookup: "icons_pack_mixed" },
       "Soft Dark Blue": { order: 10, band: "curated", packLookup: "icons_pack_mixed" },
       "Soft Green": { order: 11, band: "curated", packLookup: "icons_pack_mixed" },
@@ -1144,6 +1158,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       "Tech Icons": { order: 14, band: "free", packLookup: "" },
       "Golden Icons": { order: 15, band: "free", packLookup: "" },
       "Purple Icons": { order: 16, band: "free", packLookup: "" },
+      "Daily Essentials": { order: 17, band: "free", packLookup: "" },
       "Day by Day": { order: 17, band: "free", packLookup: "" },
       "Daily Polygon": { order: 18, band: "free", packLookup: "" },
       "Daily Common": { order: 19, band: "free", packLookup: "" },
@@ -1151,6 +1166,32 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       "Neon Icons": { order: 21, band: "free", packLookup: "" },
       "Abstract": { order: 22, band: "free", packLookup: "" },
     } as const;
+
+    const HIDDEN_STOREFRONT_COLLECTIONS = new Set(["Abstract"]);
+
+    const COLLECTION_FAMILIES = [
+      {
+        name: "Soft Spectrum",
+        collections: ["Soft Blue", "Soft Dark Blue", "Soft Green", "Soft Orange", "Soft Red"],
+        descriptor: { en: "5 colorways", pt: "5 cores" },
+      },
+      {
+        name: "Daily Essentials",
+        collections: ["Day by Day", "Daily Common", "Daily Common II"],
+        descriptor: { en: "3 everyday sets", pt: "3 conjuntos essenciais" },
+      },
+    ] as const;
+
+    function collectionFamily(collection: string) {
+      return COLLECTION_FAMILIES.find((family) =>
+        family.name === collection || family.collections.includes(collection as never)
+      );
+    }
+
+    function collectionMembers(collection: string) {
+      const family = collectionFamily(collection);
+      return family?.name === collection ? Array.from(family.collections) : [collection];
+    }
 
     const PACK_LOOKUP_TO_PRICE = {
       "": ICON_PACK_PRICES.free,
@@ -1567,6 +1608,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
 
         const defs = loaded.map((item) => item.defsSvg?.outerHTML).filter(Boolean);
         const categories = loaded.flatMap((item) => item.categories);
+        const previewCategories = loaded.flatMap((item) => item.categories.slice(0, 1));
 
         if (!categories.length) throw new Error("No categories found in source gallery HTML");
         assetSingles = categories.flatMap((category) => category.cards.map((card) => ({
@@ -1585,7 +1627,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
 
         mount.innerHTML = `
           ${defs.length ? `<div class="asset-showcase-defs" aria-hidden="true">${defs.join("")}</div>` : ""}
-          ${categories.map((category) => `
+          ${previewCategories.map((category) => `
             <section class="asset-category" data-category="${escHtml(category.sourceLabel)} · ${escHtml(category.title)}" data-source="${escHtml(category.sourceCollection)}">
               <div class="asset-category-head">
                 <div>
@@ -1632,7 +1674,13 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         if (!res.ok) throw new Error(`HTTP ${res.status} fetching catalog.json`);
         const parsed = await res.json();
         if (!Array.isArray(parsed)) throw new Error("catalog.json is not an array");
-        allIcons = parsed;
+        allIcons = parsed
+          .filter((icon) => !HIDDEN_STOREFRONT_COLLECTIONS.has(String(icon?.collection || "")))
+          .sort((a, b) => {
+            const aOrder = COLLECTION_CURATION[a.collection as keyof typeof COLLECTION_CURATION]?.order ?? 999;
+            const bOrder = COLLECTION_CURATION[b.collection as keyof typeof COLLECTION_CURATION]?.order ?? 999;
+            return aOrder - bOrder;
+          });
         console.info(`[icons-store] catalog loaded: ${allIcons.length} icons across ${new Set(allIcons.map(i => i.collection)).size} packs`);
         updateGalleryHeading();
         renderGallery();
@@ -1654,7 +1702,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
 
     function updateStats() {
       const total = allIcons.length;
-      const packs = new Set(allIcons.map(packFolder)).size;
+      const packs = getCollectionGroups().length;
       const heroCount = document.getElementById('heroIconCount');
       if (heroCount) heroCount.textContent = total.toLocaleString() + '+';
       const statEls = document.querySelectorAll<HTMLElement>(".stat-number");
@@ -1678,6 +1726,8 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     }
 
     const COLLECTION_PALETTES = [
+      { match: "Soft Spectrum", accent: "#8fe3d2", soft: "rgba(143,227,210,0.16)", bg: "#0b1d1d", border: "rgba(143,227,210,0.32)" },
+      { match: "Daily Essentials", accent: "#7dd3fc", soft: "rgba(125,211,252,0.15)", bg: "#0d1b24", border: "rgba(125,211,252,0.32)" },
       { match: "Abstract", accent: "#ff5ec4", soft: "rgba(255,94,196,0.16)", bg: "#211021", border: "rgba(255,94,196,0.34)" },
       { match: "Big Icons", accent: "#ffd166", soft: "rgba(255,209,102,0.16)", bg: "#221a0c", border: "rgba(255,209,102,0.32)" },
       { match: "Chromed", accent: "#b8d8ff", soft: "rgba(184,216,255,0.16)", bg: "#121821", border: "rgba(184,216,255,0.32)" },
@@ -1846,6 +1896,10 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       const grid = document.getElementById("singleIconsGrid");
       if (!grid) return;
       const items = getSingleIconItems();
+      const previewLimit = singlePreviewSize();
+      const visibleItems = singlePreviewExpanded ? items : items.slice(0, previewLimit);
+      const toggleBtn = document.getElementById("singleToggleBtn") as HTMLButtonElement | null;
+      const count = document.getElementById("singlePreviewCount");
       updateSinglePricingNote();
       if (!items.length) {
         grid.innerHTML = `
@@ -1855,16 +1909,33 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
             <p>${storeLang() === "pt" ? "Os melhores PNG e SVG aparecerão aqui." : "The best PNG and SVG singles will appear here."}</p>
           </article>
         `;
+        if (toggleBtn) toggleBtn.hidden = true;
+        if (count) count.textContent = "";
         return;
       }
 
-      grid.innerHTML = items.map((item, index) => singleCardMarkup(item, index)).join("");
+      grid.innerHTML = visibleItems.map((item, index) => singleCardMarkup(item, index)).join("");
       grid.querySelectorAll<HTMLButtonElement>(".single-icon-card").forEach((card) => {
         card.addEventListener("click", () => {
           const index = Number(card.dataset.singleIndex || 0);
           showSingleIconModal(items[index]);
         });
       });
+
+      if (toggleBtn) {
+        toggleBtn.hidden = items.length <= previewLimit;
+        toggleBtn.textContent = singlePreviewExpanded
+          ? (storeLang() === "pt" ? "Mostrar menos" : "Show fewer")
+          : (storeLang() === "pt" ? "Ver todos os avulsos" : "Show all singles");
+        toggleBtn.setAttribute("aria-expanded", String(singlePreviewExpanded));
+      }
+      if (count) {
+        const shown = visibleItems.length;
+        const total = items.length;
+        count.textContent = storeLang() === "pt"
+          ? `${shown} de ${total} avulsos`
+          : `${shown} of ${total} singles`;
+      }
     }
 
     function findCollectionForCategory(category: string) {
@@ -1881,7 +1952,8 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     function getCollectionGroups() {
       const groups = new Map<string, any[]>();
       allIcons.forEach(icon => {
-        const name = icon.collection || icon.category || "Icon Pack";
+        const sourceName = icon.collection || icon.category || "Icon Pack";
+        const name = collectionFamily(sourceName)?.name || sourceName;
         if (!groups.has(name)) groups.set(name, []);
         groups.get(name)?.push(icon);
       });
@@ -1901,14 +1973,20 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       grid.innerHTML = "";
 
       getCollectionGroups().forEach(pack => {
-        const previews = pack.icons.slice(0, 4).map(i =>
+        const family = collectionFamily(pack.name);
+        const previewIcons = family?.name === pack.name
+          ? family.collections.map((collection) => pack.icons.find((icon) => icon.collection === collection)).filter(Boolean).slice(0, 4)
+          : pack.icons.slice(0, 4);
+        const previews = previewIcons.map(i =>
           `<div class="preview-icon${isPaidIcon(i) ? " icon-preview-protected" : ""}"${isPaidIcon(i) ? ' data-preview-label="VOLYNX"' : ""}>
             <img src="${i.path}" alt="" style="width:100%;height:100%;object-fit:contain;" loading="lazy" />
           </div>`
         ).join("");
 
         const count = pack.icons.length;
-        const firstCategory = CATEGORY_CONFIG.find(c => c.key === pack.icons[0]?.category)?.label || pack.icons[0]?.category || "Icon Pack";
+        const firstCategory = family?.name === pack.name
+          ? (storeLang() === "pt" ? family.descriptor.pt : family.descriptor.en)
+          : CATEGORY_CONFIG.find(c => c.key === pack.icons[0]?.category)?.label || pack.icons[0]?.category || "Icon Pack";
         const strategy = collectionStrategy(pack.name, pack.icons);
         const isPremiumSurface = strategy.band === "flagship" || strategy.band === "premium";
 
@@ -1929,7 +2007,9 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
             <p class="collection-count">${escHtml(strategy.bandLabel)}</p>
           </div>
           <h3 class="collection-title">${escHtml(pack.name)}</h3>
-          <p class="collection-count">${count} icons · ${escHtml(strategy.priceDisplay)}</p>
+          <p class="collection-count">${family?.name === pack.name
+            ? `${family.collections.length} packs · ${count} ${storeLang() === "pt" ? "ícones" : "icons"}`
+            : `${count} icons · ${escHtml(strategy.priceDisplay)}`}</p>
           <button class="collection-open-btn" type="button">${storeText("openPack")}</button>
         `;
 
@@ -1965,7 +2045,6 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       { key: "purple",     label: "Purple Icons (PNG)", collections: ["Purple Icons"],                                         color: "#c084fc", glow: "rgba(192,132,252,0.22)" },
       { key: "soft",       label: "Soft Pastel",        collections: ["Soft Blue","Soft Dark Blue","Soft Green","Soft Orange","Soft Red","Glow"], color: "#86efac", glow: "rgba(134,239,172,0.18)" },
       { key: "daily",      label: "Daily Systems",      collections: ["Day by Day","Daily Common","Daily Common II","Daily Polygon","Daily 3D","Daily Iridescent"], color: "#7dd3fc", glow: "rgba(125,211,252,0.22)" },
-      { key: "abstract",   label: "Abstract",           collections: ["Abstract"],                                             color: "#ff5ec4", glow: "rgba(255,94,196,0.22)"  },
     ];
 
     let currentFormat: "all" | "webp" | "png" = "all";
@@ -1978,7 +2057,10 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
 
     function getFilteredIconsFor(format = currentFormat) {
       let pool = allIcons.filter((icon) => matchesFormat(icon, format));
-      if (currentCollection) return pool.filter(i => i.collection === currentCollection);
+      if (currentCollection) {
+        const members = collectionMembers(currentCollection);
+        return pool.filter(i => members.includes(i.collection));
+      }
       if (currentFilter === "all") return pool;
       const group = CATEGORY_CONFIG.find(c => c.key === currentFilter)?.collections;
       if (!group || group.length === 0) return pool;
@@ -2044,7 +2126,25 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       }
     }
 
+    function selectPackInGallery(collection: string) {
+      currentCollection = collection;
+      currentFilter = "all";
+      visibleCount = initialPageSize();
+      document.querySelectorAll<HTMLButtonElement>(".filter-btn").forEach(b => {
+        b.classList.toggle("active", b.dataset.filter === "all");
+      });
+      ensureVisibleVaultFormat();
+      updateGalleryHeading();
+      renderGallery();
+    }
+
     function openPack(collection: string) {
+      selectPackInGallery(collection);
+      const family = collectionFamily(collection);
+      if (family?.name === collection) {
+        showCollectionFamilyModal(family);
+        return;
+      }
       showPackModal(collection);
     }
 
@@ -2082,7 +2182,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       const count = document.getElementById("loadMoreCount");
       const shown = Math.min(visibleCount, filtered.length);
       const total = filtered.length;
-      const hasMore = !currentCollection && total > visibleCount;
+      const hasMore = total > visibleCount;
       if (btn) btn.style.display = hasMore ? "inline-flex" : "none";
       if (count) {
         if (!total) { count.textContent = ""; }
@@ -2307,7 +2407,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       `;
     }
 
-    function showSingleIconModal(item: any) {
+    function showSingleIconModal(item: any, returnCollection = "") {
       if (!item) return;
       const L = storeLang();
       const label = item.label || "Volynx Icon";
@@ -2322,6 +2422,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         ? catalogCollection
         : "";
       const hasPack = Boolean(relatedCollection);
+      const packToRestore = returnCollection || relatedCollection;
       const requestHref = `${STORE_ROUTES.contact}?product=volynx-icons-store&intent=single-icon&icon=${encodeURIComponent(label)}&collection=${encodeURIComponent(collection)}`;
       const category = item.category || (item.icon?.category ?? "Icon");
       const isCatalogSingle = Boolean(item.icon?.id && item.icon?.path && String(item.icon.path).startsWith("/assets/icons-store/"));
@@ -2377,14 +2478,78 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         startIconCheckout(checkoutLookup, event.currentTarget as HTMLElement, item);
       });
       document.getElementById("singleRelatedPackBtn")?.addEventListener("click", () => {
-        showPackModal(relatedCollection);
+        openPack(packToRestore || relatedCollection);
       });
-      document.getElementById("singleCloseBtn")?.addEventListener("click", closeModal);
+      document.getElementById("singleCloseBtn")?.addEventListener("click", () => {
+        if (packToRestore) {
+          openPack(packToRestore);
+          return;
+        }
+        closeModal();
+      });
     }
 
-    function showPackModal(collection: string) {
+    function showCollectionFamilyModal(family: typeof COLLECTION_FAMILIES[number]) {
+      const L = storeLang();
+      const familyIcons = allIcons.filter((icon) => family.collections.includes(icon.collection as never));
+      if (!familyIcons.length) return;
+
+      const variants = family.collections.map((collection) => {
+        const icons = familyIcons.filter((icon) => icon.collection === collection);
+        const strategy = collectionStrategy(collection, icons);
+        const previews = icons.slice(0, 4).map((icon) => `
+          <span class="family-variant-icon${isPaidIcon(icon) ? " icon-preview-protected" : ""}"${isPaidIcon(icon) ? ' data-preview-label="VOLYNX"' : ""}>
+            <img src="${icon.path}" alt="" loading="lazy" />
+          </span>
+        `).join("");
+        return `
+          <button class="family-variant-card" type="button" data-family-collection="${escHtml(collection)}" style="${collectionStyle(collection)}">
+            <span class="family-variant-preview">${previews}</span>
+            <span class="family-variant-copy">
+              <strong>${escHtml(collection)}</strong>
+              <small>${icons.length} ${L === "pt" ? "ícones" : "icons"} · ${escHtml(strategy.priceDisplay)}</small>
+            </span>
+            <span class="family-variant-action">${L === "pt" ? "Abrir variante" : "Open variant"}</span>
+          </button>
+        `;
+      }).join("");
+
+      const strategy = collectionStrategy(family.name, familyIcons);
+      const planLabel = strategy.band === "free"
+        ? (L === "pt" ? "Família gratuita" : "Free family")
+        : (L === "pt" ? "Família curada" : "Curated family");
+
+      openModal(`
+        <div class="pack-modal-shell family-modal-shell">
+          <header class="pack-modal-header" style="${collectionStyle(family.name)}">
+            <div>
+              <p class="pack-modal-kicker">${escHtml(planLabel)} · ${L === "pt" ? family.descriptor.pt : family.descriptor.en}</p>
+              <h3 class="pack-modal-title">${escHtml(family.name)}</h3>
+              <p class="pack-modal-meta">${familyIcons.length.toLocaleString(L === "pt" ? "pt-BR" : "en")} ${L === "pt" ? "ícones reunidos. Escolha uma variante para ver o pack completo." : "icons together. Choose a variant to see its complete pack."}</p>
+            </div>
+          </header>
+          <div class="family-variant-grid">${variants}</div>
+          <footer class="pack-modal-footer">
+            <button class="modal-btn modal-btn--ghost" type="button" id="familyCloseBtn">${L === "pt" ? "Continuar vendo packs" : "Keep browsing packs"}</button>
+          </footer>
+        </div>
+      `, "pack");
+
+      document.querySelectorAll<HTMLButtonElement>("[data-family-collection]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const collection = button.dataset.familyCollection || "";
+          if (collection) showPackModal(collection, family.name);
+        });
+      });
+      document.getElementById("familyCloseBtn")?.addEventListener("click", closeModal);
+    }
+
+    function showPackModal(collection: string, galleryCollection = collection) {
       const icons = allIcons.filter((icon) => icon.collection === collection);
       if (!icons.length) return;
+      if (currentCollection !== galleryCollection) {
+        selectPackInGallery(galleryCollection);
+      }
       const L = storeLang();
       const firstCategory = CATEGORY_CONFIG.find(c => c.key === icons[0]?.category)?.label || icons[0]?.category || "Icon Pack";
       const strategy = collectionStrategy(collection, icons);
@@ -2436,7 +2601,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       document.querySelectorAll<HTMLButtonElement>(".pack-modal-icon").forEach((button) => {
         button.addEventListener("click", () => {
           const index = Number(button.dataset.packIconIndex || 0);
-          showSingleIconModal(iconToSingleItem(icons[index]));
+          showSingleIconModal(iconToSingleItem(icons[index]), collection);
         });
       });
       document.getElementById("packCloseBtn")?.addEventListener("click", closeModal);
@@ -2557,8 +2722,14 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
           singleFormatBtns.forEach(item => item.classList.remove("active"));
           btn.classList.add("active");
           singleFormatFilter = btn.dataset.singleFormat || "all";
+          singlePreviewExpanded = false;
           renderSingleIcons();
         });
+      });
+
+      document.getElementById("singleToggleBtn")?.addEventListener("click", () => {
+        singlePreviewExpanded = !singlePreviewExpanded;
+        renderSingleIcons();
       });
 
       // Featured Icons → open inline-SVG preview modal (NOT scroll to gallery)
@@ -2638,14 +2809,21 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       const signInLabel = L === "pt" ? "Entrar" : "Sign in";
       const createLabel = L === "pt" ? "Criar conta grátis" : "Create free account";
       openModal(`
-        <div style="font-size:2.5rem;margin-bottom:1rem;">🔒</div>
-        <h3 style="color:#fff;margin-bottom:.5rem;">${title}</h3>
-        <p style="color:rgba(255,255,255,.7);font-size:.9rem;margin-bottom:1.5rem;">${desc}</p>
-        <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
-          <a href="${STORE_ROUTES.login}?next=${encodeURIComponent(STORE_ROUTES.iconsStore)}" style="padding:.75rem 1.5rem;background:linear-gradient(135deg,#00f0ff,#0066ff);color:#000;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;">${signInLabel}</a>
-          <a href="${STORE_ROUTES.signup}?next=${encodeURIComponent(STORE_ROUTES.iconsStore)}" style="padding:.75rem 1.5rem;background:transparent;color:#fff;font-weight:700;border-radius:10px;text-decoration:none;font-size:.9rem;border:1px solid rgba(255,255,255,.3);">${createLabel}</a>
+        <div class="login-gate">
+          <div class="login-gate-portal" aria-hidden="true">
+            <img src="/assets/login-portal.webp" alt="" />
+          </div>
+          <div class="login-gate-copy">
+            <p class="login-gate-kicker">VOLYNX Access</p>
+            <h3>${title}</h3>
+            <p>${desc}</p>
+          </div>
+          <div class="login-gate-actions">
+            <a class="modal-btn modal-btn--primary" href="${STORE_ROUTES.login}?next=${encodeURIComponent(STORE_ROUTES.iconsStore)}">${signInLabel}</a>
+            <a class="modal-btn modal-btn--ghost" href="${STORE_ROUTES.signup}?next=${encodeURIComponent(STORE_ROUTES.iconsStore)}">${createLabel}</a>
+          </div>
         </div>
-      `);
+      `, "login");
     }
 
     function showPremiumModal(icon: any) {
