@@ -344,6 +344,10 @@ function getKitStorageTier(tier: string | null): string | null {
   return map[tier] || null;
 }
 
+function normalizeInternalKitPrefix(prefix: string): string {
+  return prefix.endsWith("_e2e") ? prefix.replace(/_e2e$/, "") : prefix;
+}
+
 function isLikelyMissingStorageAsset(message: string | null): boolean {
   return /not found|does not exist|404|no such object|object not found|failed to find/i.test(String(message || ""));
 }
@@ -823,7 +827,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       // Tier extracted from lookup_key suffix — used for delivery differentiation
       // and as the in-product license label (Starter / Pro / Studio for kits;
       // Starter / Professional / White-Label for PropertyFlow).
-      const tierMatch = prefix.match(/_(personal|commercial|studio|starter|professional|white_label)$/);
+      const kitFulfillmentPrefix = isKit ? normalizeInternalKitPrefix(prefix) : prefix;
+      const tierMatch = kitFulfillmentPrefix.match(/_(personal|commercial|studio|starter|professional|white_label)$/);
       const tier = tierMatch ? tierMatch[1] : null;
       const tierLabel = tier
         ? ({ personal: "Starter", commercial: "Pro", studio: "Studio",
@@ -872,7 +877,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       let kitDownloadPath: string | null = null;
       const KIT_VERSION = "v1.0.0";
       const KIT_SIGNED_URL_TTL = 60 * 60 * 24; // 24h
-      const kitSlug = isKit ? getKitStorageSlug(prefix) : null;
+      const kitSlug = isKit ? getKitStorageSlug(kitFulfillmentPrefix) : null;
       const kitStorageTier = isKit ? getKitStorageTier(tier) : null;
 
       if (isKit && kitSlug && kitStorageTier) {
@@ -980,7 +985,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         kit_saas_studio: "saas",
       };
 
-      const presetId = presetMap[prefix];
+      const presetId = presetMap[kitFulfillmentPrefix];
       let projectSlug: string | null = null;
       let projectIdCreated: string | null = null;
       let presetFetchError: string | null = null;

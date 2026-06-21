@@ -178,7 +178,8 @@ const assistItems = [
     /** Extract tier suffix from kit_* addon_id. */
     function kitTier(addonId, metaTier) {
       if (metaTier) return metaTier;
-      const m = String(addonId || '').toLowerCase().match(/_(personal|commercial|studio)$/);
+      const normalized = String(addonId || '').toLowerCase().replace(/_e2e$/, '').replace(/-e2e$/, '');
+      const m = normalized.match(/[_-](personal|commercial|studio)$/);
       return m ? m[1] : null;
     }
 
