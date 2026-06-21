@@ -229,6 +229,14 @@ const catalog = [
     amounts: { gbp: 1800, eur: 2100, brl: 11900 },
   },
   {
+    name: "VOLYNX Checkout Smoke Test",
+    description: "Low-value one-time product used only to verify live checkout, webhook, and post-payment return flows.",
+    lookupPrefix: "checkout_smoke_test",
+    family: "checkout_test",
+    tier: "smoke_test",
+    amounts: { gbp: 30, eur: 50, brl: 50 },
+  },
+  {
     name: "Icons Store Single - Budget",
     description: "Accessible single-icon license for lighter SVG/PNG assets.",
     lookupPrefix: "icons_single_budget",
