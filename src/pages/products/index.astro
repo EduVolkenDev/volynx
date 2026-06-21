@@ -27,14 +27,17 @@ type BuyReadyOffer = {
   cta: { en: string; pt: string };
   image: string;
   featured?: boolean;
+  checkout?: boolean;
 };
 
 const buyReadyNext = `${ROUTES.products}#buy-now`;
 const checkoutOffer = (offer: Omit<BuyReadyOffer, 'href'> & { next?: string }): BuyReadyOffer => {
   const { next, ...item } = offer;
+  const needsStoreContext = item.lookup.startsWith('icons_pack_');
   return {
     ...item,
-    href: checkoutHref(item.lookup, { next: next || buyReadyNext }),
+    href: needsStoreContext ? ROUTES.iconsStore : checkoutHref(item.lookup, { next: next || buyReadyNext }),
+    checkout: !needsStoreContext,
   };
 };
 
@@ -359,35 +362,35 @@ const buyReadySections = [
       checkoutOffer({
         label: { en: 'Icon pack', pt: 'Pack de ícones' },
         title: 'Icons Mixed Pack',
-        copy: { en: 'Accessible mixed icon collection checkout for lighter visual needs.', pt: 'Checkout de coleção mista de ícones para necessidades visuais mais leves.' },
+        copy: { en: 'Choose the exact collection inside Icon Vault so delivery can attach the correct private ZIP.', pt: 'Escolha a coleção exata dentro do Icon Vault para a entrega anexar o ZIP privado correto.' },
         price: { GBP: '£5.20', EUR: '€6', BRL: 'R$34.90' },
         billing: { en: 'one-time', pt: 'pagamento único' },
         lookup: 'icons_pack_mixed',
         next: ROUTES.iconsStore,
-        cta: { en: 'Buy Mixed Pack', pt: 'Comprar Mixed Pack' },
+        cta: { en: 'Choose pack', pt: 'Escolher pack' },
         image: '/assets/icons-store-logo.webp',
       }),
       checkoutOffer({
         label: { en: 'Icon pack', pt: 'Pack de ícones' },
         title: 'Icons Premium Pack',
-        copy: { en: 'Premium icon pack checkout for brand-ready product visuals and client surfaces.', pt: 'Pacote premium de ícones para visuais de produto e superfícies de cliente.' },
+        copy: { en: 'Open Icon Vault first, select the premium collection, then checkout with delivery metadata attached.', pt: 'Abra o Icon Vault, selecione a coleção premium e então finalize com a metadata de entrega anexada.' },
         price: { GBP: '£11.20', EUR: '€13', BRL: 'R$74.90' },
         billing: { en: 'one-time', pt: 'pagamento único' },
         lookup: 'icons_pack_premium',
         next: ROUTES.iconsStore,
-        cta: { en: 'Buy Premium Pack', pt: 'Comprar Premium Pack' },
+        cta: { en: 'Choose pack', pt: 'Escolher pack' },
         image: '/assets/icons-store-logo.webp',
         featured: true,
       }),
       checkoutOffer({
         label: { en: 'Icon pack', pt: 'Pack de ícones' },
         title: 'Icons Hyper Pack',
-        copy: { en: '5000px Hyper pack for the highest-resolution visual asset tier.', pt: 'Pack Hyper 5000px para o nível visual de maior resolução.' },
+        copy: { en: 'Select the Hyper collection in Icon Vault so the checkout can deliver the exact 5000px ZIP.', pt: 'Selecione a coleção Hyper no Icon Vault para o checkout entregar o ZIP 5000px correto.' },
         price: { GBP: '£37', EUR: '€43', BRL: 'R$249' },
         billing: { en: 'one-time', pt: 'pagamento único' },
         lookup: 'icons_pack_hyper',
         next: ROUTES.iconsStore,
-        cta: { en: 'Buy Hyper Pack', pt: 'Comprar Hyper Pack' },
+        cta: { en: 'Choose pack', pt: 'Escolher pack' },
         image: '/assets/icons-store-logo.webp',
       }),
     ],
@@ -462,8 +465,8 @@ const productAssistItems = [
                   </div>
                   <a
                     href={offer.href}
-                    class="button button--gold vx-checkout-btn buy-ready-card__cta"
-                    data-lookup={offer.lookup}
+                    class:list={["button", "button--gold", "buy-ready-card__cta", offer.checkout !== false && "vx-checkout-btn"]}
+                    data-lookup={offer.checkout !== false ? offer.lookup : undefined}
                     data-label={offer.cta.en}
                   ><span class="i18n-en">{offer.cta.en}</span><span class="i18n-pt">{offer.cta.pt}</span></a>
                 </article>
