@@ -30,7 +30,9 @@ const APPLY = args.has("--apply");
 const REQUIRE_LIVE = args.has("--live");
 const DRY_RUN = !APPLY;
 
-const STRIPE_KEY = process.env.STRIPE_SECRET_KEY || "";
+const STRIPE_KEY = (REQUIRE_LIVE && process.env.STRIPE_LIVE_SECRET_KEY)
+  ? process.env.STRIPE_LIVE_SECRET_KEY
+  : process.env.STRIPE_SECRET_KEY || "";
 if (!STRIPE_KEY.startsWith("sk_test_") && !STRIPE_KEY.startsWith("sk_live_")) {
   console.error("STRIPE_SECRET_KEY is missing or invalid. Put it in scripts/.env.");
   process.exit(1);
