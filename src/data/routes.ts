@@ -107,7 +107,6 @@ export const ROUTES = {
   daily: "https://daily.volynx.world",
 
   // ── External ──────────────────────────
-  whatsapp: "https://wa.me/447577991080",
   email: "mailto:hello@volynx.world",
 } as const;
 

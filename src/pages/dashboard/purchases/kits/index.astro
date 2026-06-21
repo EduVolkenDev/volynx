@@ -7,16 +7,16 @@ import PlatformAssistStrip from "../../../../components/PlatformAssistStrip.astr
 import { ROUTES } from "../../../../data/routes";
 
 const assistItems = [
-  { href: ROUTES.builder, label: { en: "Start", pt: "Comece" }, title: { en: "Open the Builder draft", pt: "Abrir o draft no Builder" }, copy: { en: "Your kit is meant to become a site, not sit in a receipt. Start with the visual path first.", pt: "Seu kit foi feito para virar site, nao para ficar parado em um recibo. Comece pelo caminho visual." }, emphasized: true },
-  { href: ROUTES.delivery, label: { en: "Own", pt: "Posse" }, title: { en: "Back to all products", pt: "Voltar aos produtos" }, copy: { en: "Keep every purchase connected across VX, PropertyFlow, icons and kits.", pt: "Mantenha cada compra conectada entre VX, PropertyFlow, icones e kits." } },
-  { href: ROUTES.products, label: { en: "Expand", pt: "Expandir" }, title: { en: "Browse more kits", pt: "Ver mais kits" }, copy: { en: "Compare Portfolio, Agency and SaaS systems when you are ready for the next launch.", pt: "Compare Portfolio, Agency e SaaS quando estiver pronto para o proximo lancamento." } },
-  { href: ROUTES.support, label: { en: "Recover", pt: "Recuperar" }, title: { en: "Support with context", pt: "Suporte com contexto" }, copy: { en: "If a draft, source ZIP or license needs attention, the purchase context stays attached.", pt: "Se um draft, ZIP fonte ou licenca precisar de atencao, o contexto da compra continua junto." } },
+  { href: ROUTES.builder, label: { en: "Start", pt: "Comece" }, title: { en: "Open the Builder draft", pt: "Abrir o draft no Builder" }, copy: { en: "Your kit is meant to become a site, not sit in a receipt. Start with the visual path first.", pt: "Seu kit foi feito para virar site, nao para ficar parado em um recibo. Comece pelo caminho visual." }, emphasized: true, iconSrc: "/assets/new-builder.webp" },
+  { href: ROUTES.delivery, label: { en: "Own", pt: "Posse" }, title: { en: "Back to all products", pt: "Voltar aos produtos" }, copy: { en: "Keep every purchase connected across VX, PropertyFlow, icons and kits.", pt: "Mantenha cada compra conectada entre VX, PropertyFlow, icones e kits." }, iconSrc: "/assets/Volynx-OS-Cards/allproducts.webp" },
+  { href: ROUTES.products, label: { en: "Expand", pt: "Expandir" }, title: { en: "Browse more kits", pt: "Ver mais kits" }, copy: { en: "Compare Portfolio, Agency and SaaS systems when you are ready for the next launch.", pt: "Compare Portfolio, Agency e SaaS quando estiver pronto para o proximo lancamento." }, iconSrc: "/assets/Volynx-OS-Cards/kits.webp" },
+  { href: ROUTES.support, label: { en: "Recover", pt: "Recuperar" }, title: { en: "Support with context", pt: "Suporte com contexto" }, copy: { en: "If a draft, source ZIP or license needs attention, the purchase context stays attached.", pt: "Se um draft, ZIP fonte ou licenca precisar de atencao, o contexto da compra continua junto." }, iconSrc: "/assets/Volynx-OS-Cards/support.webp" },
 ];
 
 const kitValueItems = [
-  { label: { en: "Premium structure", pt: "Estrutura premium" }, copy: { en: "Sections, hierarchy and motion decisions already shaped for a serious launch.", pt: "Secoes, hierarquia e decisoes de movimento ja moldadas para um lancamento serio." } },
-  { label: { en: "Builder-first", pt: "Builder primeiro" }, copy: { en: "No setup ceremony: open the draft, edit visually and move toward publication.", pt: "Sem ritual de instalacao: abra o draft, edite visualmente e avance para a publicacao." } },
-  { label: { en: "Source included", pt: "Fonte incluido" }, copy: { en: "Advanced source ZIP delivery stays available when you need code-level control.", pt: "A entrega do ZIP fonte continua disponivel quando voce precisa de controle no codigo." } },
+  { iconSrc: "/assets/Volynx-OS-Cards/kits.webp", label: { en: "Premium structure", pt: "Estrutura premium" }, copy: { en: "Sections, hierarchy and motion decisions already shaped for a serious launch.", pt: "Secoes, hierarquia e decisoes de movimento ja moldadas para um lancamento serio." } },
+  { iconSrc: "/assets/new-builder.webp", label: { en: "Builder-first", pt: "Builder primeiro" }, copy: { en: "No setup ceremony: open the draft, edit visually and move toward publication.", pt: "Sem ritual de instalacao: abra o draft, edite visualmente e avance para a publicacao." } },
+  { iconSrc: "/assets/Volynx-OS-Cards/allproducts.webp", label: { en: "Source included", pt: "Fonte incluido" }, copy: { en: "Advanced source ZIP delivery stays available when you need code-level control.", pt: "A entrega do ZIP fonte continua disponivel quando voce precisa de controle no codigo." } },
 ];
 ---
 <FlagshipLayout title="Kits — VOLYNX" description="Open your purchased Portfolio, Agency, and SaaS kits in Builder, manage tier licenses, recover preset drafts." pageClass="page-kits-delivery">
@@ -73,9 +73,14 @@ const kitValueItems = [
         <div class="kits-values">
           {kitValueItems.map((item) => (
             <article class="kits-value">
-              <span class="kits-value__light" aria-hidden="true"></span>
-              <h2><span class="i18n-en">{item.label.en}</span><span class="i18n-pt">{item.label.pt}</span></h2>
-              <p><span class="i18n-en">{item.copy.en}</span><span class="i18n-pt">{item.copy.pt}</span></p>
+              <div class="kits-value__icon" aria-hidden="true">
+                <img src={item.iconSrc} alt="" loading="eager" decoding="async" />
+              </div>
+              <div class="kits-value__copy">
+                <span class="kits-value__light" aria-hidden="true"></span>
+                <h2><span class="i18n-en">{item.label.en}</span><span class="i18n-pt">{item.label.pt}</span></h2>
+                <p><span class="i18n-en">{item.copy.en}</span><span class="i18n-pt">{item.copy.pt}</span></p>
+              </div>
             </article>
           ))}
         </div>
@@ -455,9 +460,9 @@ const kitValueItems = [
           </dl>
 
           <div class="kit-card__route" aria-label="Kit delivery route">
-            <span><b>01</b><span class="i18n-en">Open draft</span><span class="i18n-pt">Abrir draft</span></span>
-            <span><b>02</b><span class="i18n-en">Customize</span><span class="i18n-pt">Personalizar</span></span>
-            <span><b>03</b><span class="i18n-en">Ship</span><span class="i18n-pt">Publicar</span></span>
+            <div class="kit-card__route-step"><b>01</b><span class="i18n-en">Open draft</span><span class="i18n-pt">Abrir draft</span></div>
+            <div class="kit-card__route-step"><b>02</b><span class="i18n-en">Customize</span><span class="i18n-pt">Personalizar</span></div>
+            <div class="kit-card__route-step"><b>03</b><span class="i18n-en">Ship</span><span class="i18n-pt">Publicar</span></div>
           </div>
 
           <p class="kit-card__hint" data-kit-status>${downloadValid
@@ -779,7 +784,7 @@ const kitValueItems = [
       margin-top: 10px;
     }
     .kits-hero-glow {
-      width: min(118vw, 620px);
+      width: min(100%, 420px);
       aspect-ratio: 2000 / 1020;
       height: auto;
       margin: 0;
@@ -820,14 +825,58 @@ const kitValueItems = [
   }
   .kits-value {
     position: relative;
-    min-height: 150px;
-    padding: 22px;
+    display: grid;
+    grid-template-columns: minmax(118px, 34%) 1fr;
+    align-items: center;
+    gap: clamp(16px, 2vw, 22px);
+    min-height: 210px;
+    padding: clamp(18px, 2.5vw, 24px);
     border-radius: 18px;
     border: 1px solid rgba(255,255,255,.08);
     background:
       linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.022)),
       rgba(8,10,20,.55);
     overflow: hidden;
+  }
+  .kits-value::before {
+    content: "";
+    position: absolute;
+    inset: auto -12% -28% 18%;
+    height: 55%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(167,139,250,.2), transparent 66%);
+    filter: blur(20px);
+    pointer-events: none;
+  }
+  .kits-value__icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 150px;
+    border-radius: 16px;
+    background:
+      radial-gradient(circle at 50% 54%, rgba(255,255,255,.10), transparent 56%),
+      rgba(255,255,255,.035);
+    border: 1px solid rgba(255,255,255,.08);
+    overflow: hidden;
+    z-index: 1;
+  }
+  .kits-value__icon img {
+    width: min(116%, 190px);
+    max-height: 172px;
+    object-fit: contain;
+    filter:
+      saturate(1.12)
+      contrast(1.05)
+      drop-shadow(0 16px 26px rgba(0,0,0,.35))
+      drop-shadow(0 0 20px rgba(167,139,250,.22));
+  }
+  .kits-value:nth-child(2) .kits-value__icon img {
+    width: min(126%, 210px);
+  }
+  .kits-value__copy {
+    position: relative;
+    z-index: 1;
   }
   .kits-value__light {
     display: block;
@@ -865,6 +914,30 @@ const kitValueItems = [
   }
   @media (min-width: 860px) {
     .kits-values { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (max-width: 1120px) and (min-width: 861px) {
+    .kits-value {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+  }
+  @media (max-width: 680px) {
+    .kits-value {
+      grid-template-columns: 1fr;
+      min-height: 0;
+      padding: 14px;
+      gap: 14px;
+    }
+    .kits-value__icon {
+      min-height: 180px;
+    }
+    .kits-value__icon img {
+      width: min(112%, 210px);
+      max-height: 196px;
+    }
+    .kits-value:nth-child(2) .kits-value__icon img {
+      width: min(118%, 230px);
+    }
   }
 
   /* ── Grid ───────────────────────────────────────────────── */
@@ -985,7 +1058,7 @@ const kitValueItems = [
     border: 1px solid rgba(255,255,255,.07);
     background: rgba(0,0,0,.16);
   }
-  .kit-card__route > span {
+  .kit-card__route-step {
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -1069,5 +1142,308 @@ const kitValueItems = [
   @media (max-width: 860px) {
     .kits-help { flex-direction: column; align-items: flex-start; }
     .kit-card__route { grid-template-columns: 1fr; }
+  }
+
+  :global(.kit-card) {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: clamp(22px, 3vw, 30px);
+    border: 1px solid rgba(255,255,255,.08);
+    background:
+      linear-gradient(152deg, rgba(255,255,255,.065), rgba(255,255,255,.025) 52%, rgba(255,255,255,.04)),
+      rgba(6,8,18,.72);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 18px;
+    overflow: hidden;
+    transition: border-color .2s, box-shadow .2s, transform .2s;
+  }
+  :global(.kit-card:hover) {
+    border-color: rgba(196,181,253,.28);
+    transform: translateY(-2px);
+    box-shadow: 0 18px 46px rgba(0,0,0,.26);
+  }
+  :global(.kit-card--portfolio) { border-top: 2px solid rgba(45,212,191,.62); }
+  :global(.kit-card--agency) { border-top: 2px solid rgba(167,139,250,.62); }
+  :global(.kit-card--saas) { border-top: 2px solid rgba(34,211,238,.62); }
+  :global(.kit-card__glow) {
+    position: absolute;
+    inset: -80px -70px auto auto;
+    width: 220px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    filter: blur(30px);
+    opacity: .42;
+    pointer-events: none;
+  }
+  :global(.kit-card--portfolio .kit-card__glow) { background: rgba(45,212,191,.42); }
+  :global(.kit-card--agency .kit-card__glow) { background: rgba(167,139,250,.45); }
+  :global(.kit-card--saas .kit-card__glow) { background: rgba(34,211,238,.42); }
+  :global(.kit-card > *:not(.kit-card__glow)) {
+    position: relative;
+    z-index: 1;
+  }
+  :global(.kit-card__head) {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  :global(.kit-card__title h2) {
+    font-size: clamp(1.05rem, 2.6vw, 1.25rem);
+    font-weight: 700;
+    margin: 6px 0 0;
+    line-height: 1.3;
+    color: rgba(255,255,255,.96);
+  }
+  :global(.kit-card__family) {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: rgba(255,255,255,.42);
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.06);
+  }
+  :global(.kit-card__desc) {
+    font-size: .85rem;
+    color: rgba(255,255,255,.65);
+    line-height: 1.55;
+    margin: 0;
+  }
+  :global(.kit-card__value-line) {
+    margin: -4px 0 0;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.035);
+    color: rgba(255,255,255,.72);
+    font-size: .84rem;
+    line-height: 1.55;
+  }
+  :global(.kit-card__meta) {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px 12px;
+    margin: 0;
+  }
+  :global(.kit-card__meta > div) { display: flex; flex-direction: column; gap: 2px; }
+  :global(.kit-card__meta dt) {
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: rgba(255,255,255,.38);
+    font-weight: 600;
+  }
+  :global(.kit-card__meta dd) {
+    margin: 0;
+    color: rgba(255,255,255,.78);
+    font-size: .88rem;
+  }
+  :global(.kit-card__slug) {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .78rem !important;
+    color: rgba(196,181,253,.78) !important;
+    word-break: break-all;
+  }
+  :global(.kit-card__route) {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    padding: 10px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.07);
+    background: rgba(0,0,0,.16);
+  }
+  :global(.kit-card__route-step) {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    padding: 8px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.035);
+    color: rgba(255,255,255,.66);
+    font-size: .76rem;
+    line-height: 1.2;
+  }
+  :global(.kit-card__route b) {
+    color: rgba(255,255,255,.42);
+    font-size: .62rem;
+    letter-spacing: .08em;
+  }
+  :global(.kit-card__hint) {
+    margin: 0;
+    color: rgba(255,255,255,.62);
+    font-size: .82rem;
+    line-height: 1.6;
+  }
+  :global(.kit-card__actions) {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: auto;
+  }
+  :global(.kit-card__cta),
+  :global(.kit-card__cta-secondary) {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+  :global(.kit-card__cta-secondary) { font-size: .85rem; }
+  :global(.kit-card__error) {
+    font-size: .78rem;
+    color: rgba(255,140,140,.85);
+    background: rgba(255,90,90,.06);
+    border: 1px solid rgba(255,90,90,.18);
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin: 0;
+  }
+  :global(.kit-pill) {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  :global(.kit-pill--ok) { background: rgba(52,211,153,.1); color: #34D399; border-color: rgba(52,211,153,.25); }
+  :global(.kit-pill--warn) { background: rgba(251,191,36,.1); color: #fbbf24; border-color: rgba(251,191,36,.28); }
+  :global(.kit-pill--muted) { background: rgba(255,255,255,.04); color: rgba(255,255,255,.55); }
+  :global(.kit-features summary) {
+    cursor: pointer;
+    font-size: .82rem;
+    color: rgba(196,181,253,.78);
+    font-weight: 600;
+    list-style: none;
+    padding: 4px 0;
+  }
+  :global(.kit-features summary::-webkit-details-marker) { display: none; }
+  :global(.kit-features summary::before) { content: "+ "; opacity: .6; }
+  :global(.kit-features[open] summary::before) { content: "− "; }
+  :global(.kit-features ul) {
+    list-style: none;
+    padding: 6px 0 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 4px;
+  }
+  :global(.kit-features li) {
+    font-size: .78rem;
+    color: rgba(255,255,255,.6);
+    text-transform: capitalize;
+  }
+  @media (max-width: 860px) {
+    :global(.kit-card__route) { grid-template-columns: 1fr; }
+  }
+
+  :global(.page-kits-delivery .platform-assist__grid) {
+    gap: clamp(14px, 1.8vw, 18px);
+  }
+  :global(.page-kits-delivery .platform-assist__card.has-art) {
+    min-height: 390px;
+    padding: 18px;
+    background:
+      linear-gradient(154deg, rgba(255,255,255,.065), rgba(255,255,255,.022)),
+      rgba(8,10,20,.62);
+  }
+  :global(.page-kits-delivery .platform-assist__card.has-art.is-emphasized) {
+    background:
+      linear-gradient(154deg, rgba(45,212,191,.11), rgba(255,255,255,.025)),
+      rgba(8,10,20,.68);
+  }
+  :global(.page-kits-delivery .platform-assist__art-shell) {
+    min-height: 230px;
+    padding: 12px;
+    border-radius: 18px;
+    background:
+      radial-gradient(circle at 50% 56%, rgba(255,255,255,.11), transparent 58%),
+      linear-gradient(155deg, rgba(255,255,255,.085), rgba(255,255,255,.025)),
+      rgba(4,7,18,.7);
+  }
+  :global(.page-kits-delivery .platform-assist__art) {
+    width: min(118%, 300px);
+    max-height: 245px;
+    filter:
+      saturate(1.12)
+      contrast(1.06)
+      drop-shadow(0 18px 30px rgba(0,0,0,.36))
+      drop-shadow(0 0 18px rgba(96,165,250,.22));
+  }
+  :global(.page-kits-delivery .platform-assist__card:nth-child(1) .platform-assist__art) {
+    width: min(130%, 320px);
+  }
+  :global(.page-kits-delivery .platform-assist__card:nth-child(2) .platform-assist__art) {
+    width: min(112%, 270px);
+  }
+  :global(.page-kits-delivery .platform-assist__card:nth-child(3) .platform-assist__art) {
+    width: min(135%, 330px);
+    max-height: 230px;
+  }
+  :global(.page-kits-delivery .platform-assist__card:nth-child(4) .platform-assist__art) {
+    width: min(104%, 250px);
+    max-height: 235px;
+  }
+  :global(.page-kits-delivery .platform-assist__copy) {
+    gap: 9px;
+  }
+  :global(.page-kits-delivery .platform-assist__copy strong) {
+    font-size: clamp(1.02rem, 1.5vw, 1.18rem);
+    line-height: 1.22;
+  }
+  :global(.page-kits-delivery .platform-assist__copy p) {
+    font-size: .9rem;
+    line-height: 1.58;
+  }
+  @media (max-width: 860px) {
+    :global(.page-kits-delivery .platform-assist__card.has-art) {
+      min-height: auto;
+      display: grid;
+      grid-template-columns: 138px 1fr;
+      align-items: center;
+      gap: 14px;
+    }
+    :global(.page-kits-delivery .platform-assist__art-shell) {
+      min-height: 138px;
+      height: 138px;
+    }
+    :global(.page-kits-delivery .platform-assist__art),
+    :global(.page-kits-delivery .platform-assist__card:nth-child(1) .platform-assist__art),
+    :global(.page-kits-delivery .platform-assist__card:nth-child(2) .platform-assist__art),
+    :global(.page-kits-delivery .platform-assist__card:nth-child(3) .platform-assist__art),
+    :global(.page-kits-delivery .platform-assist__card:nth-child(4) .platform-assist__art) {
+      width: min(138%, 172px);
+      max-height: 164px;
+    }
+    :global(.page-kits-delivery .platform-assist__card.has-art .platform-assist__copy) {
+      margin-top: 0;
+    }
+  }
+  @media (max-width: 440px) {
+    :global(.page-kits-delivery .platform-assist__card.has-art) {
+      grid-template-columns: 126px 1fr;
+      padding: 14px;
+    }
+    :global(.page-kits-delivery .platform-assist__art-shell) {
+      min-height: 126px;
+      height: 126px;
+    }
+    :global(.page-kits-delivery .platform-assist__art),
+    :global(.page-kits-delivery .platform-assist__card:nth-child(1) .platform-assist__art),
+    :global(.page-kits-delivery .platform-assist__card:nth-child(2) .platform-assist__art),
+    :global(.page-kits-delivery .platform-assist__card:nth-child(3) .platform-assist__art),
+    :global(.page-kits-delivery .platform-assist__card:nth-child(4) .platform-assist__art) {
+      width: min(142%, 158px);
+      max-height: 150px;
+    }
   }
 </style>

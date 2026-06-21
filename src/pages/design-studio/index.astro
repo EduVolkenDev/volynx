@@ -4,7 +4,7 @@ import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import FlagshipFooter from "../../components/FlagshipFooter.astro";
 import { ROUTES } from "../../data/routes";
 
-const whatsappBriefing = `${ROUTES.whatsapp}?text=Ol%C3%A1%20VOLYNX%2C%20quero%20come%C3%A7ar%20um%20diagn%C3%B3stico%20de%20marca%20no%20Design%20Studio.`;
+const designBriefHref = `${ROUTES.contact}?product=design-studio&intent=brand-diagnosis`;
 ---
 
 <FlagshipLayout
@@ -294,7 +294,7 @@ const whatsappBriefing = `${ROUTES.whatsapp}?text=Ol%C3%A1%20VOLYNX%2C%20quero%2
           <span class="ds-eyebrow" data-i18n="ds.score_eyebrow">Brand Score</span>
           <h2 id="ds-score-title" data-i18n="ds.score_title">Um logo pode ser bonito e ainda falhar.</h2>
           <p data-i18n="ds.score_copy">A camada de score ajuda a explicar, com critério visual, onde a marca está forte e onde precisa ser refinada. Não promete validação jurídica, mas evita escolhas fracas, genéricas ou pouco versáteis.</p>
-          <a href={whatsappBriefing} target="_blank" rel="noopener noreferrer" class="ds-btn ds-btn--ghost" data-i18n="ds.score_cta">Pedir análise de marca</a>
+          <a href="#caminho" class="ds-btn ds-btn--ghost" data-i18n="ds.score_cta">Ver o caminho recomendado</a>
         </div>
 
         <div class="ds-score-board" data-reveal>
@@ -386,15 +386,53 @@ const whatsappBriefing = `${ROUTES.whatsapp}?text=Ol%C3%A1%20VOLYNX%2C%20quero%2
       </div>
     </section>
 
+    <section class="ds-guidance page-section" id="caminho" aria-labelledby="ds-guidance-title">
+      <div class="shell">
+        <div class="ds-section-head" data-reveal>
+          <span class="ds-eyebrow" data-i18n="ds.guidance_eyebrow">Caminho recomendado</span>
+          <h2 id="ds-guidance-title" data-i18n="ds.guidance_title">Você não precisa decidir tudo agora. Só precisa dar o próximo passo certo.</h2>
+          <p data-i18n="ds.guidance_copy">A VOLYNX conduz a identidade com calma, critério e presença. Primeiro entendemos a marca; depois escolhemos o nível de entrega com segurança, sem pressão e sem atalhos frágeis.</p>
+        </div>
+
+        <div class="ds-guidance-grid" aria-label="Etapas recomendadas para iniciar o Design Studio" data-i18n-aria="ds.guidance_aria">
+          <article class="ds-guidance-card" data-reveal>
+            <span>01</span>
+            <h3 data-i18n="ds.guidance_1_title">Comece pelo diagnóstico.</h3>
+            <p data-i18n="ds.guidance_1_copy">Nome, contexto, público, mercado e intenção visual. Esse primeiro recorte evita escolhas bonitas, mas vazias.</p>
+          </article>
+
+          <article class="ds-guidance-card ds-guidance-card--featured" data-reveal>
+            <span>02</span>
+            <h3 data-i18n="ds.guidance_2_title">Receba uma direção clara.</h3>
+            <p data-i18n="ds.guidance_2_copy">A VOLYNX organiza o que faz sentido para sua marca: Signa, Brand System ou Launch Kit. Você entende o porquê antes de investir.</p>
+          </article>
+
+          <article class="ds-guidance-card" data-reveal>
+            <span>03</span>
+            <h3 data-i18n="ds.guidance_3_title">Avance com confiança.</h3>
+            <p data-i18n="ds.guidance_3_copy">Quando o caminho estiver alinhado, a entrega vira sistema: arquivos, aplicações, guia e presença pronta para crescer.</p>
+          </article>
+        </div>
+
+        <div class="ds-guidance-panel" data-reveal>
+          <div>
+            <span class="ds-guidance-panel__label" data-i18n="ds.guidance_panel_label">Valor VOLYNX</span>
+            <strong data-i18n="ds.guidance_panel_title">A marca precisa parecer viva, mas também precisa sustentar decisões reais.</strong>
+          </div>
+          <p data-i18n="ds.guidance_panel_copy">O caminho certo é aquele que combina beleza, leitura, coerência e uso prático. É assim que a identidade deixa de ser gosto pessoal e vira uma ferramenta de confiança.</p>
+        </div>
+      </div>
+    </section>
+
     <section class="ds-cta-section" aria-labelledby="ds-cta-title">
       <div class="shell ds-cta__inner" data-reveal>
         <img src="/assets/wordmark-dark.webp" alt="VOLYNX" width="160" height="42" loading="lazy" />
         <span class="ds-eyebrow" data-i18n="ds.cta_eyebrow">Próxima marca</span>
-        <h2 id="ds-cta-title" data-i18n="ds.cta_title">Vamos construir uma identidade que pareça pronta para existir.</h2>
-        <p data-i18n="ds.cta_copy">Comece pelo diagnóstico. A partir dele, a VOLYNX define o melhor caminho: Signa, Brand System ou Launch Kit.</p>
+        <h2 id="ds-cta-title" data-i18n="ds.cta_title">Se a marca pede mais presença, siga por um caminho que cuida dela.</h2>
+        <p data-i18n="ds.cta_copy">Abra um brief inicial. A VOLYNX recebe o contexto, entende o momento da marca e responde com uma recomendação firme, humana e proporcional ao que você quer construir.</p>
         <div class="ds-cta__actions">
-          <a href={whatsappBriefing} target="_blank" rel="noopener noreferrer" class="ds-btn ds-btn--primary ds-btn--large">
-            <span data-i18n="ds.cta_whatsapp">Começar pelo WhatsApp</span>
+          <a href={designBriefHref} class="ds-btn ds-btn--primary ds-btn--large">
+            <span data-i18n="ds.cta_brief">Abrir brief guiado</span>
           </a>
           <a href="#diagnostico" class="ds-btn ds-btn--ghost" data-i18n="ds.cta_review">Rever diagnóstico</a>
         </div>
@@ -1539,6 +1577,119 @@ const whatsappBriefing = `${ROUTES.whatsapp}?text=Ol%C3%A1%20VOLYNX%2C%20quero%2
     font-weight: 850;
   }
 
+  .ds-guidance {
+    background:
+      linear-gradient(180deg, rgba(245, 208, 111, 0.035), rgba(115, 241, 255, 0.035), transparent);
+  }
+
+  .ds-guidance-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .ds-guidance-card,
+  .ds-guidance-panel {
+    position: relative;
+    border: 1px solid var(--ds-line);
+    background:
+      linear-gradient(145deg, rgba(255,255,255,0.095), rgba(255,255,255,0.032)),
+      rgba(3, 10, 16, 0.7);
+    box-shadow: var(--ds-shadow);
+    backdrop-filter: blur(24px);
+  }
+
+  .ds-guidance-card {
+    min-height: 300px;
+    padding: 28px;
+    border-radius: var(--ds-radius);
+    overflow: hidden;
+  }
+
+  .ds-guidance-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.66;
+    background:
+      radial-gradient(circle at 20% 16%, rgba(115,241,255,0.16), transparent 34%),
+      linear-gradient(145deg, transparent, rgba(245,208,111,0.07));
+  }
+
+  .ds-guidance-card--featured {
+    border-color: rgba(245, 208, 111, 0.36);
+    background:
+      linear-gradient(145deg, rgba(245,208,111,0.14), rgba(115,241,255,0.055)),
+      rgba(3, 10, 16, 0.78);
+  }
+
+  .ds-guidance-card span,
+  .ds-guidance-card h3,
+  .ds-guidance-card p {
+    position: relative;
+    z-index: 1;
+  }
+
+  .ds-guidance-card span {
+    display: inline-flex;
+    color: var(--ds-gold);
+    font-family: var(--font-display, "Orbitron", sans-serif);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+  }
+
+  .ds-guidance-card h3 {
+    margin: 58px 0 12px;
+    color: var(--ds-ink);
+    font-family: var(--font-display, "Orbitron", sans-serif);
+    font-size: clamp(22px, 2.4vw, 30px);
+    line-height: 1.06;
+  }
+
+  .ds-guidance-card p {
+    margin: 0;
+    color: var(--ds-muted);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .ds-guidance-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(22px, 4vw, 46px);
+    align-items: center;
+    margin-top: 18px;
+    padding: clamp(24px, 4vw, 38px);
+    border-radius: var(--ds-radius-lg);
+  }
+
+  .ds-guidance-panel__label {
+    display: inline-flex;
+    margin-bottom: 12px;
+    color: var(--ds-gold);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .ds-guidance-panel strong {
+    display: block;
+    color: var(--ds-ink);
+    font-family: var(--font-display, "Orbitron", sans-serif);
+    font-size: clamp(24px, 3.2vw, 42px);
+    line-height: 1.05;
+  }
+
+  .ds-guidance-panel p {
+    margin: 0;
+    color: var(--ds-muted);
+    font-size: clamp(15px, 1.6vw, 18px);
+    line-height: 1.75;
+  }
+
   .ds-cta-section {
     position: relative;
     padding: clamp(86px, 11vw, 150px) 0;
@@ -1626,12 +1777,17 @@ const whatsappBriefing = `${ROUTES.whatsapp}?text=Ol%C3%A1%20VOLYNX%2C%20quero%2
     }
 
     .ds-flow,
+    .ds-guidance-grid,
     .ds-delivery-grid {
       grid-template-columns: 1fr;
     }
 
     .ds-delivery-card--featured {
       transform: none;
+    }
+
+    .ds-guidance-panel {
+      grid-template-columns: 1fr;
     }
 
     .ds-application,
