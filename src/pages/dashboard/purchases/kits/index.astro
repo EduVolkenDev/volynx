@@ -7,10 +7,16 @@ import PlatformAssistStrip from "../../../../components/PlatformAssistStrip.astr
 import { ROUTES } from "../../../../data/routes";
 
 const assistItems = [
-  { href: ROUTES.delivery, label: "All purchases", title: "Back to my products", copy: "Switch to the full delivery dashboard for VX, PropertyFlow and other purchases.", emphasized: true },
-  { href: ROUTES.builder, label: "Builder", title: "Open Builder", copy: "Pick up where the kit left off — every kit ships pre-loaded as a draft project." },
-  { href: ROUTES.products, label: "Catalog", title: "Browse products", copy: "Compare tiers across Portfolio, Agency and SaaS kits before adding more." },
-  { href: ROUTES.support, label: "Help", title: "Open support", copy: "Hit support if a kit didn't auto-load, the preset is missing, or licensing needs clarification." },
+  { href: ROUTES.builder, label: { en: "Start", pt: "Comece" }, title: { en: "Open the Builder draft", pt: "Abrir o draft no Builder" }, copy: { en: "Your kit is meant to become a site, not sit in a receipt. Start with the visual path first.", pt: "Seu kit foi feito para virar site, nao para ficar parado em um recibo. Comece pelo caminho visual." }, emphasized: true },
+  { href: ROUTES.delivery, label: { en: "Own", pt: "Posse" }, title: { en: "Back to all products", pt: "Voltar aos produtos" }, copy: { en: "Keep every purchase connected across VX, PropertyFlow, icons and kits.", pt: "Mantenha cada compra conectada entre VX, PropertyFlow, icones e kits." } },
+  { href: ROUTES.products, label: { en: "Expand", pt: "Expandir" }, title: { en: "Browse more kits", pt: "Ver mais kits" }, copy: { en: "Compare Portfolio, Agency and SaaS systems when you are ready for the next launch.", pt: "Compare Portfolio, Agency e SaaS quando estiver pronto para o proximo lancamento." } },
+  { href: ROUTES.support, label: { en: "Recover", pt: "Recuperar" }, title: { en: "Support with context", pt: "Suporte com contexto" }, copy: { en: "If a draft, source ZIP or license needs attention, the purchase context stays attached.", pt: "Se um draft, ZIP fonte ou licenca precisar de atencao, o contexto da compra continua junto." } },
+];
+
+const kitValueItems = [
+  { label: { en: "Premium structure", pt: "Estrutura premium" }, copy: { en: "Sections, hierarchy and motion decisions already shaped for a serious launch.", pt: "Secoes, hierarquia e decisoes de movimento ja moldadas para um lancamento serio." } },
+  { label: { en: "Builder-first", pt: "Builder primeiro" }, copy: { en: "No setup ceremony: open the draft, edit visually and move toward publication.", pt: "Sem ritual de instalacao: abra o draft, edite visualmente e avance para a publicacao." } },
+  { label: { en: "Source included", pt: "Fonte incluido" }, copy: { en: "Advanced source ZIP delivery stays available when you need code-level control.", pt: "A entrega do ZIP fonte continua disponivel quando voce precisa de controle no codigo." } },
 ];
 ---
 <FlagshipLayout title="Kits — VOLYNX" description="Open your purchased Portfolio, Agency, and SaaS kits in Builder, manage tier licenses, recover preset drafts." pageClass="page-kits-delivery">
@@ -30,19 +36,24 @@ const assistItems = [
 
         <div class="hero-grid kits-hero-grid">
           <div class="hero-copy">
-            <span class="eyebrow"><span class="i18n-en">Your kits</span><span class="i18n-pt">Seus kits</span></span>
-            <h1><span class="i18n-en">Open. Edit. Ship.</span><span class="i18n-pt">Abrir. Editar. Publicar.</span></h1>
+            <span class="eyebrow"><span class="i18n-en">Kit delivery</span><span class="i18n-pt">Entrega do kit</span></span>
+            <h1><span class="i18n-en">Your VOLYNX kit is unlocked. Make it visible.</span><span class="i18n-pt">Seu kit VOLYNX foi liberado. Faça ele aparecer.</span></h1>
             <p>
-              <span class="i18n-en">Every kit you've purchased is auto-loaded into Builder as a draft project. Use the visual editor (no installation needed) or download the source code for advanced customization.</span>
-              <span class="i18n-pt">Cada kit comprado é carregado no Builder como projeto draft. Use o editor visual (sem instalação) ou baixe o código-fonte para customização avançada.</span>
+              <span class="i18n-en">Thank you for backing the ecosystem. This is the handoff from checkout into production: premium structure, Builder access, protected source delivery and a clear path to ship.</span>
+              <span class="i18n-pt">Obrigado por acreditar no ecossistema. Este e o handoff do checkout para a producao: estrutura premium, acesso ao Builder, fonte protegido e um caminho claro para publicar.</span>
             </p>
             <div class="hero-actions">
-              <a href={ROUTES.builder} class="button button--gold"><span class="i18n-en">Customize my site</span><span class="i18n-pt">Personalizar meu site</span></a>
-              <a href={ROUTES.products} class="button button--ghost"><span class="i18n-en">Browse more kits</span><span class="i18n-pt">Ver mais kits</span></a>
+              <a href="#kitsGrid" class="button button--gold"><span class="i18n-en">Open my kit</span><span class="i18n-pt">Abrir meu kit</span></a>
+              <a href={ROUTES.builder} class="button button--ghost"><span class="i18n-en">Open Builder</span><span class="i18n-pt">Abrir Builder</span></a>
+            </div>
+            <div class="kits-hero-proof" aria-label="Kit delivery highlights">
+              <span><strong>Builder</strong><em>Draft-ready</em></span>
+              <span><strong>Source</strong><em>Protected ZIP</em></span>
+              <span><strong>Launch</strong><em>Production path</em></span>
             </div>
           </div>
           <div class="kits-hero-visual" aria-hidden="true">
-            <span class="vx-glow-container vx-glow-container--gold vx-glow-container--strong vx-glow-container--xl">
+            <span class="kits-hero-glow vx-glow-container vx-glow-container--gold vx-glow-container--strong vx-glow-container--xl">
               <img src="/assets/Volynx-OS-Cards/kits.webp" alt="" loading="eager" />
             </span>
           </div>
@@ -51,15 +62,37 @@ const assistItems = [
     </section>
 
     <PlatformAssistStrip
-      eyebrow="Kit lane"
-      title="Stay close to delivery, Builder, and support."
-      description="One click to your draft. One click to recovery if the preset didn't auto-load."
+      eyebrow={{ en: "What this unlocks", pt: "O que isso libera" }}
+      title={{ en: "A kit purchase should feel like opening a production system.", pt: "Comprar um kit precisa parecer abrir um sistema de producao." }}
+      description={{ en: "The delivery screen keeps the premium promise visible: use the kit, recover the files, and keep the launch moving.", pt: "A tela de entrega deixa a promessa premium visivel: use o kit, recupere os arquivos e mantenha o lancamento em movimento." }}
       items={assistItems}
     />
+
+    <section class="page-section page-section--tight kits-values-band" aria-label="VOLYNX kit value">
+      <div class="shell">
+        <div class="kits-values">
+          {kitValueItems.map((item) => (
+            <article class="kits-value">
+              <span class="kits-value__light" aria-hidden="true"></span>
+              <h2><span class="i18n-en">{item.label.en}</span><span class="i18n-pt">{item.label.pt}</span></h2>
+              <p><span class="i18n-en">{item.copy.en}</span><span class="i18n-pt">{item.copy.pt}</span></p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
 
     <!-- ═══ PURCHASES ═══ -->
     <section class="page-section">
       <div class="shell">
+        <div class="kits-section-head">
+          <span class="eyebrow"><span class="i18n-en">Unlocked for you</span><span class="i18n-pt">Liberado para voce</span></span>
+          <h2><span class="i18n-en">Your purchased kits</span><span class="i18n-pt">Seus kits comprados</span></h2>
+          <p>
+            <span class="i18n-en">Start in Builder for the fastest premium path. Use source ZIP delivery only when you need advanced code handoff.</span>
+            <span class="i18n-pt">Comece pelo Builder para o caminho premium mais rapido. Use o ZIP fonte apenas quando precisar de handoff avancado de codigo.</span>
+          </p>
+        </div>
 
         <!-- Loading state -->
         <div id="kitsLoading" class="kits-state">
@@ -370,6 +403,10 @@ const assistItems = [
 
       const features = entitlements?.[addonId]?.features || meta.features || [];
       const description = entitlements?.[addonId]?.description || '';
+      const featureCount = Array.isArray(features) ? features.length : 0;
+      const valueLine = featureCount > 0
+        ? `<span class="i18n-en">${featureCount} licensed sections and assets are connected to this purchase.</span><span class="i18n-pt">${featureCount} secoes e assets licenciados estao conectados a esta compra.</span>`
+        : `<span class="i18n-en">Builder access and source delivery are connected to this purchase.</span><span class="i18n-pt">Acesso ao Builder e entrega do fonte estao conectados a esta compra.</span>`;
 
       // Builder is the premium path for non-technical buyers. Source ZIPs stay
       // available as an advanced fallback for developers and agency handoff.
@@ -397,6 +434,7 @@ const assistItems = [
 
       return `
         <article class="panel kit-card kit-card--${fam.tone}" data-row-id="${escapeHtml(item.id)}">
+          <div class="kit-card__glow" aria-hidden="true"></div>
           <header class="kit-card__head">
             <div class="kit-card__title">
               <span class="eyebrow">${statusPill(meta)}</span>
@@ -407,6 +445,7 @@ const assistItems = [
           </header>
 
           ${description ? `<p class="kit-card__desc">${escapeHtml(description)}</p>` : ''}
+          <p class="kit-card__value-line">${valueLine}</p>
 
           <dl class="kit-card__meta">
             ${purchaseDate ? `<div><dt><span class="i18n-en">Purchased</span><span class="i18n-pt">Compra</span></dt><dd>${purchaseDate}</dd></div>` : ''}
@@ -414,6 +453,12 @@ const assistItems = [
             ${downloadValid && expiresLabel ? `<div><dt><span class="i18n-en">Link expires</span><span class="i18n-pt">Link expira</span></dt><dd>${expiresLabel}</dd></div>` : ''}
             ${projectSlug  ? `<div><dt><span class="i18n-en">Builder draft</span><span class="i18n-pt">Draft no Builder</span></dt><dd class="kit-card__slug">${escapeHtml(projectSlug)}</dd></div>` : ''}
           </dl>
+
+          <div class="kit-card__route" aria-label="Kit delivery route">
+            <span><b>01</b><span class="i18n-en">Open draft</span><span class="i18n-pt">Abrir draft</span></span>
+            <span><b>02</b><span class="i18n-en">Customize</span><span class="i18n-pt">Personalizar</span></span>
+            <span><b>03</b><span class="i18n-en">Ship</span><span class="i18n-pt">Publicar</span></span>
+          </div>
 
           <p class="kit-card__hint" data-kit-status>${downloadValid
             ? `<span class="i18n-en">Visual editing works without installation. The source ZIP is for advanced customization and expires after ${expiresLabel}.</span><span class="i18n-pt">A edição visual funciona sem instalação. O ZIP fonte é para customização avançada e expira após ${expiresLabel}.</span>`
