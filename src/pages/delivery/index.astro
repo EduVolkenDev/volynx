@@ -143,6 +143,16 @@ const deliveryAssistItems = [
   <FlagshipFooter />
 
   <script is:inline type="module">
+    const ROUTES = {
+      support: "/support/",
+      products: "/products/",
+      profile: "/profile/",
+      builder: "/builder/",
+      kitsDelivery: "/dashboard/purchases/kits",
+      propertyflowDelivery: "/dashboard/purchases/propertyflow",
+      iconsDelivery: "/dashboard/purchases/icons",
+    };
+
     // ── Auth guard ──────────────────────────────────────────────────────────
     const token = localStorage.getItem('volynx_access_token');
     const authRedirecting = !token;
@@ -409,6 +419,10 @@ const deliveryAssistItems = [
       return String(id || '').startsWith('addon-');
     }
 
+    function isCheckoutSmokeProductId(id) {
+      return String(id || '') === 'checkout-smoke-test';
+    }
+
     function isSubscriptionProductId(id) {
       const value = String(id || '');
       return value.startsWith('volynx-')
@@ -425,7 +439,8 @@ const deliveryAssistItems = [
         || isKitProductId(productId)
         || isPropertyFlowProductId(productId)
         || isIconsProductId(productId)
-        || isAddonProductId(productId);
+        || isAddonProductId(productId)
+        || isCheckoutSmokeProductId(productId);
     }
 
     function tokenPackLabel(id) {
@@ -646,6 +661,9 @@ const deliveryAssistItems = [
       if (id.startsWith('addon-')) {
         return 'Add-on \u2014 ' + titleCase(id.replace(/^addon-/, ''));
       }
+      if (isCheckoutSmokeProductId(id)) {
+        return 'VOLYNX Checkout Verification';
+      }
       if (id === 'kit-landing-express' || id.startsWith('kit-landing')) {
         return 'Landing Express';
       }
@@ -704,6 +722,7 @@ const deliveryAssistItems = [
         }
         return ROUTES.iconsDelivery;
       }
+      if (isCheckoutSmokeProductId(id)) return ROUTES.products;
       return ROUTES.profile;
     }
 
@@ -716,6 +735,7 @@ const deliveryAssistItems = [
       if (id.startsWith('pf-')) return sessionId ? 'Open PropertyFlow delivery' : 'Recover PropertyFlow access';
       if (id.startsWith('icons-')) return sessionId ? 'Open icon delivery' : 'Open icon purchases';
       if (id.startsWith('addon-')) return 'Open support';
+      if (isCheckoutSmokeProductId(id)) return 'Browse products';
       return 'Open account';
     }
 
@@ -748,7 +768,7 @@ const deliveryAssistItems = [
       return `
         <article class="panel delivery-card">
           <div class="delivery-card__body">
-            <span class="eyebrow delivery-card__eyebrow">Product</span>
+            <span class="eyebrow delivery-card__eyebrow">${isCheckoutSmokeProductId(productId) ? 'Checkout verification' : 'Product'}</span>
             <h3 class="delivery-card__name">${label}</h3>
             <dl class="delivery-card__meta">
               ${date  ? `<div><dt>Purchased</dt><dd>${date}</dd></div>` : ''}
@@ -799,16 +819,24 @@ const deliveryAssistItems = [
       const functionsUrl = (cfg?.functionsUrl || '').replace(/\/$/, '');
 
       try {
+        const safeFetch = (url, options) => fetch(url, options).catch((error) => {
+          console.warn('delivery source fetch failed', {
+            url,
+            error: error instanceof Error ? error.message : String(error),
+          });
+          return null;
+        });
+
         // Aggregate every revenue-bearing family we can recover from the
         // platform: one-time products, payment events, subscriptions and kit
         // Builder drafts that may exist even when the addon row is missing.
         const [purchasedRes, eventsRes, subscriptionsRes, projectsRes, devJourneyRes] = await Promise.all([
-          fetch(`${supabaseUrl}/rest/v1/addons_purchased?select=id,addon_id,price_paid,currency,status,metadata,created_at&user_id=eq.${userId}&order=created_at.desc`, { headers }),
-          fetch(`${supabaseUrl}/rest/v1/purchase_events?select=id,lookup_key,product_key,amount_paid,currency,status,metadata,created_at,stripe_session_id&user_id=eq.${userId}&status=eq.completed&order=created_at.desc`, { headers }),
-          fetch(`${supabaseUrl}/rest/v1/subscriptions?select=id,product_key,plan_key,lookup_key,status,current_period_end,cancel_at_period_end,created_at&user_id=eq.${userId}&order=created_at.desc`, { headers }),
-          fetch(`${supabaseUrl}/rest/v1/projects?select=id,name,slug,status,created_at,metadata&user_id=eq.${userId}&order=created_at.desc`, { headers }),
+          safeFetch(`${supabaseUrl}/rest/v1/addons_purchased?select=id,addon_id,price_paid,currency,status,metadata,created_at&user_id=eq.${userId}&order=created_at.desc`, { headers }),
+          safeFetch(`${supabaseUrl}/rest/v1/purchase_events?select=id,lookup_key,product_key,amount_paid,currency,status,metadata,created_at,stripe_session_id&user_id=eq.${userId}&status=eq.completed&order=created_at.desc`, { headers }),
+          safeFetch(`${supabaseUrl}/rest/v1/subscriptions?select=id,product_key,plan_key,lookup_key,status,current_period_end,cancel_at_period_end,created_at&user_id=eq.${userId}&order=created_at.desc`, { headers }),
+          safeFetch(`${supabaseUrl}/rest/v1/projects?select=id,name,slug,status,created_at,metadata&user_id=eq.${userId}&order=created_at.desc`, { headers }),
           functionsUrl
-            ? fetch(`${functionsUrl}/devjourney-progress`, {
+            ? safeFetch(`${functionsUrl}/devjourney-progress`, {
                 method: 'POST',
                 headers: {
                   Authorization: 'Bearer ' + token,

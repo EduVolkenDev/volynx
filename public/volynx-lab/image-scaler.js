@@ -41,11 +41,10 @@
       VxLab.notify({
         tool: 'image-scaler',
         event: tone === 'error' ? 'error_notice' : 'notice',
+        tone: tone || 'warn',
         icon: tone === 'error' ? '!' : 'i',
         title: title,
-        message: message,
-        primaryLabel: 'OK',
-        cancelLabel: 'Close'
+        message: message
       });
     } else {
       alert(message || title);
@@ -324,6 +323,10 @@
       a.href     = URL.createObjectURL(singleBlob);
       a.download = processedResults[0].baseName + '-' + scale + 'x.' + ext;
       a.click();
+      if (window.VxLab) {
+        VxLab.recordEvent('image-scaler', 'download', a.download);
+        VxLab.notifySuccess?.({ kind: 'download', tool: 'image-scaler', event: 'scaled_image_download_success' });
+      }
       setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
       return;
     }
@@ -343,6 +346,10 @@
     a2.href     = URL.createObjectURL(zipBlob);
     a2.download = 'volynx-scaler-batch.zip';
     a2.click();
+    if (window.VxLab) {
+      VxLab.recordEvent('image-scaler', 'download', 'Batch ZIP downloaded');
+      VxLab.notifySuccess?.({ kind: 'download', tool: 'image-scaler', event: 'scaled_batch_download_success' });
+    }
     setTimeout(function () { URL.revokeObjectURL(a2.href); }, 5000);
   });
 

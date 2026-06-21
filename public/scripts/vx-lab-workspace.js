@@ -423,6 +423,93 @@
     return true;
   }
 
+  function modalLanguage() {
+    try {
+      return localStorage.getItem("volynx_lang") === "pt" ? "pt" : "en";
+    } catch (_) {
+      return "en";
+    }
+  }
+
+  var MODAL_FALLBACK_COPY = {
+    en: {
+      "modal.action.close": "Close",
+      "modal.action.done": "Done",
+      "modal.action.delete": "Delete",
+      "modal.action.keep": "Keep it",
+      "modal.action.not_now": "Not now",
+      "modal.action.sign_in": "Sign in",
+      "modal.action.stay_here": "Stay here",
+      "modal.action.upgrade": "See upgrade options",
+      "modal.login.title": "Enter your VOLYNX workspace",
+      "modal.login.message": "Sign in to continue. You will return to this tool after login.",
+      "modal.upgrade.title": "Upgrade for the premium workflow",
+      "modal.upgrade.message": "Upgrade to unlock higher limits and premium exports.",
+      "modal.vx.title": "Use VX for this action?",
+      "modal.vx.message": "Use {cost} VX from your balance for this premium action?",
+      "modal.vx.primary": "Use {cost} VX",
+      "modal.vx.cost": "Cost: {cost} VX",
+      "modal.notice.title": "VOLYNX Lab",
+      "modal.warning.title": "Action needs attention",
+      "modal.error.title": "Something needs fixing",
+      "modal.success.download_title": "Download started",
+      "modal.success.download_message": "Your file is ready and the download has started.",
+      "modal.success.export_title": "Export complete",
+      "modal.success.export_message": "Your file is ready. Review it before using it in production.",
+      "modal.success.save_title": "Saved to your workspace",
+      "modal.success.save_message": "Your latest work is ready to continue from this browser.",
+      "modal.delete.title": "Delete saved Lab work?",
+      "modal.delete.message": "{name} will be removed from this device and your VOLYNX profile."
+    },
+    pt: {
+      "modal.action.close": "Fechar",
+      "modal.action.done": "Concluído",
+      "modal.action.delete": "Excluir",
+      "modal.action.keep": "Manter",
+      "modal.action.not_now": "Agora não",
+      "modal.action.sign_in": "Entrar",
+      "modal.action.stay_here": "Ficar aqui",
+      "modal.action.upgrade": "Ver opções de upgrade",
+      "modal.login.title": "Entre no seu workspace VOLYNX",
+      "modal.login.message": "Entre para continuar. Você voltará para esta ferramenta após o login.",
+      "modal.upgrade.title": "Evolua para o workflow premium",
+      "modal.upgrade.message": "Faça upgrade para liberar limites maiores e exportações premium.",
+      "modal.vx.title": "Usar VX nesta ação?",
+      "modal.vx.message": "Usar {cost} VX do seu saldo nesta ação premium?",
+      "modal.vx.primary": "Usar {cost} VX",
+      "modal.vx.cost": "Custo: {cost} VX",
+      "modal.notice.title": "VOLYNX Lab",
+      "modal.warning.title": "Esta ação precisa de atenção",
+      "modal.error.title": "Algo precisa ser corrigido",
+      "modal.success.download_title": "Download iniciado",
+      "modal.success.download_message": "Seu arquivo está pronto e o download foi iniciado.",
+      "modal.success.export_title": "Exportação concluída",
+      "modal.success.export_message": "Seu arquivo está pronto. Revise-o antes de usar em produção.",
+      "modal.success.save_title": "Salvo no seu workspace",
+      "modal.success.save_message": "Seu trabalho está pronto para continuar neste navegador.",
+      "modal.delete.title": "Excluir trabalho salvo do Lab?",
+      "modal.delete.message": "{name} será removido deste dispositivo e do seu perfil VOLYNX."
+    }
+  };
+
+  function modalText(key, replacements) {
+    var lang = modalLanguage();
+    var translations = window.VX_TRANS && window.VX_TRANS[lang];
+    var text = (translations && translations[key]) || MODAL_FALLBACK_COPY[lang][key] || MODAL_FALLBACK_COPY.en[key] || key;
+    Object.keys(replacements || {}).forEach(function (name) {
+      text = text.replace(new RegExp("\\{" + name + "\\}", "g"), String(replacements[name]));
+    });
+    return text;
+  }
+
+  function localizedModalOption(value, fallbackKey, replacements) {
+    if (value && typeof value === "object") {
+      return value[modalLanguage()] || value.en || value.pt || modalText(fallbackKey, replacements);
+    }
+    if (modalLanguage() === "pt") return modalText(fallbackKey, replacements);
+    return value || modalText(fallbackKey, replacements);
+  }
+
   function ensureModalStyles() {
     if (document.getElementById("vxLabModalStyles")) return;
     var style = document.createElement("style");
@@ -430,11 +517,20 @@
     style.textContent = [
       ".vx-lab-modal{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:20px;background:rgba(2,6,14,.68);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}",
       ".vx-lab-modal--login{background:radial-gradient(circle at 50% 18%,rgba(125,249,255,.18),transparent 34%),radial-gradient(circle at 50% 82%,rgba(214,168,79,.11),transparent 30%),rgba(2,6,14,.76)}",
+      ".vx-lab-modal--upgrade{background:radial-gradient(circle at 50% 18%,rgba(214,168,79,.16),transparent 34%),radial-gradient(circle at 50% 80%,rgba(125,249,255,.1),transparent 32%),rgba(2,6,14,.78)}",
+      ".vx-lab-modal--confirm{background:radial-gradient(circle at 50% 20%,rgba(125,249,255,.15),transparent 34%),rgba(2,6,14,.78)}",
+      ".vx-lab-modal--success{background:radial-gradient(circle at 50% 20%,rgba(125,249,255,.17),transparent 34%),radial-gradient(circle at 50% 82%,rgba(214,168,79,.09),transparent 30%),rgba(2,6,14,.76)}",
+      ".vx-lab-modal--warning,.vx-lab-modal--error{background:radial-gradient(circle at 50% 20%,rgba(255,111,97,.14),transparent 34%),rgba(2,6,14,.8)}",
       ".vx-lab-modal[hidden]{display:none!important}",
-      ".vx-lab-modal__card{width:min(440px,100%);border:1px solid rgba(255,255,255,.14);border-radius:12px;background:linear-gradient(135deg,rgba(125,249,255,.11),rgba(214,168,79,.07)),rgba(4,8,18,.96);box-shadow:0 30px 90px rgba(0,0,0,.46);color:#fff;overflow:hidden}",
+      ".vx-lab-modal__card{width:min(440px,100%);max-height:calc(100dvh - 40px);border:1px solid rgba(255,255,255,.14);border-radius:12px;background:linear-gradient(135deg,rgba(125,249,255,.11),rgba(214,168,79,.07)),rgba(4,8,18,.96);box-shadow:0 30px 90px rgba(0,0,0,.46);color:#fff;overflow:auto;overscroll-behavior:contain;animation:vx-modal-enter .24s ease-out both}",
       ".vx-lab-modal--login .vx-lab-modal__card{width:min(500px,100%);border-color:rgba(125,249,255,.24);background:linear-gradient(180deg,rgba(125,249,255,.13),rgba(214,168,79,.06) 58%,rgba(4,8,18,.98));box-shadow:0 34px 110px rgba(0,0,0,.56),0 0 70px rgba(125,249,255,.12)}",
+      ".vx-lab-modal--experience .vx-lab-modal__card{width:min(500px,100%);box-shadow:0 34px 110px rgba(0,0,0,.58),0 0 64px rgba(125,249,255,.08)}",
+      ".vx-lab-modal--upgrade .vx-lab-modal__card{border-color:rgba(214,168,79,.26);background:linear-gradient(180deg,rgba(214,168,79,.12),rgba(125,249,255,.055) 58%,rgba(4,8,18,.98))}",
+      ".vx-lab-modal--confirm .vx-lab-modal__card,.vx-lab-modal--success .vx-lab-modal__card{border-color:rgba(125,249,255,.22);background:linear-gradient(180deg,rgba(125,249,255,.11),rgba(214,168,79,.045) 58%,rgba(4,8,18,.98))}",
+      ".vx-lab-modal--warning .vx-lab-modal__card,.vx-lab-modal--error .vx-lab-modal__card{border-color:rgba(255,145,117,.24);background:linear-gradient(180deg,rgba(255,111,97,.1),rgba(214,168,79,.035) 58%,rgba(4,8,18,.98))}",
       ".vx-lab-modal__top{display:flex;align-items:center;gap:12px;padding:18px 18px 12px}",
       ".vx-lab-modal--login .vx-lab-modal__top{flex-direction:column;justify-content:center;text-align:center;gap:14px;padding:28px 28px 12px}",
+      ".vx-lab-modal--experience .vx-lab-modal__top{flex-direction:column;justify-content:center;text-align:center;gap:14px;padding:28px 28px 12px}",
       ".vx-lab-modal__icon{width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(125,249,255,.2);border-radius:10px;background:rgba(125,249,255,.09);color:#7df9ff;font-size:20px;font-weight:900;flex:0 0 auto}",
       ".vx-lab-modal__icon--image{width:54px;height:54px;border:0;background:transparent;box-shadow:0 12px 32px rgba(125,249,255,.12)}",
       ".vx-lab-modal__icon--image img{width:100%;height:100%;display:block;object-fit:contain}",
@@ -442,19 +538,35 @@
       ".vx-lab-modal--login .vx-lab-modal__icon--image::before{content:\"\";position:absolute;inset:-14px;border-radius:999px;background:radial-gradient(circle,rgba(125,249,255,.28),rgba(214,168,79,.12) 42%,transparent 70%);filter:blur(10px);opacity:.58;animation:vx-login-portal-pulse 2.8s ease-in-out infinite;pointer-events:none}",
       ".vx-lab-modal--login .vx-lab-modal__icon--image::after{content:\"\";position:absolute;inset:14px;border:1px solid rgba(255,255,255,.12);border-radius:999px;pointer-events:none}",
       ".vx-lab-modal--login .vx-lab-modal__icon--image img{position:relative;z-index:1}",
+      ".vx-lab-modal--experience:not(.vx-lab-modal--login) .vx-lab-modal__icon--image{width:146px;height:146px;position:relative;box-shadow:none}",
+      ".vx-lab-modal--experience:not(.vx-lab-modal--login) .vx-lab-modal__icon--image::before{content:\"\";position:absolute;inset:5px;border-radius:999px;background:radial-gradient(circle,rgba(125,249,255,.2),transparent 68%);filter:blur(12px);opacity:.58;animation:vx-modal-aura 3.2s ease-in-out infinite;pointer-events:none}",
+      ".vx-lab-modal--upgrade .vx-lab-modal__icon--image::before{background:radial-gradient(circle,rgba(214,168,79,.22),rgba(125,249,255,.1) 45%,transparent 70%)}",
+      ".vx-lab-modal--warning .vx-lab-modal__icon--image::before,.vx-lab-modal--error .vx-lab-modal__icon--image::before{background:radial-gradient(circle,rgba(255,111,97,.2),rgba(214,168,79,.08) 45%,transparent 70%)}",
+      ".vx-lab-modal--experience:not(.vx-lab-modal--login) .vx-lab-modal__icon--image img{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 16px 26px rgba(0,0,0,.32));animation:vx-modal-float 4.4s ease-in-out infinite}",
+      "@keyframes vx-modal-enter{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}",
       "@keyframes vx-login-portal-pulse{0%,100%{opacity:.34;transform:scale(.94)}45%{opacity:.8;transform:scale(1.08)}70%{opacity:.48;transform:scale(1.02)}}",
+      "@keyframes vx-modal-aura{0%,100%{opacity:.34;transform:scale(.94)}50%{opacity:.72;transform:scale(1.08)}}",
+      "@keyframes vx-modal-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}",
       ".vx-lab-modal__title{margin:0;color:#fff;font:900 18px/1.15 Manrope,ui-sans-serif,system-ui,sans-serif;letter-spacing:0}",
       ".vx-lab-modal--login .vx-lab-modal__title{max-width:360px;font-size:24px;line-height:1.12}",
+      ".vx-lab-modal--experience .vx-lab-modal__title{max-width:380px;font-size:24px;line-height:1.12}",
       ".vx-lab-modal__body{padding:0 18px 16px;color:rgba(255,255,255,.68);font:500 14px/1.55 Manrope,ui-sans-serif,system-ui,sans-serif}",
       ".vx-lab-modal--login .vx-lab-modal__body{padding:0 32px 22px;text-align:center;color:rgba(255,255,255,.72)}",
+      ".vx-lab-modal--experience .vx-lab-modal__body{padding:0 32px 22px;text-align:center;color:rgba(255,255,255,.72)}",
       ".vx-lab-modal__body p{margin:0 0 10px}.vx-lab-modal__body p:last-child{margin-bottom:0}",
       ".vx-lab-modal__actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;padding:14px 18px 18px;border-top:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025)}",
       ".vx-lab-modal--login .vx-lab-modal__actions{justify-content:center;padding:18px 28px 28px;background:rgba(255,255,255,.018)}",
+      ".vx-lab-modal--experience .vx-lab-modal__actions{justify-content:center;padding:18px 28px 28px;background:rgba(255,255,255,.018)}",
+      ".vx-lab-modal__actions--single{display:grid;grid-template-columns:minmax(130px,220px);justify-content:center}",
       ".vx-lab-modal__btn{min-height:40px;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:0 14px;background:rgba(255,255,255,.055);color:rgba(255,255,255,.86);font:900 13px/1 Manrope,ui-sans-serif,system-ui,sans-serif;cursor:pointer}",
       ".vx-lab-modal--login .vx-lab-modal__btn{min-width:130px;min-height:44px}",
+      ".vx-lab-modal--experience .vx-lab-modal__btn{min-width:130px;min-height:44px}",
       ".vx-lab-modal__btn:hover{border-color:rgba(125,249,255,.42);color:#fff}",
+      ".vx-lab-modal__btn:focus-visible{outline:2px solid #7df9ff;outline-offset:3px}",
       ".vx-lab-modal__btn--primary{border-color:rgba(214,168,79,.42);background:linear-gradient(135deg,#d6a84f,#f8e9c1);color:#06142e}",
-      "@media(max-width:520px){.vx-lab-modal{align-items:end;padding:12px}.vx-lab-modal__actions{display:grid;grid-template-columns:1fr}.vx-lab-modal__btn{width:100%}.vx-lab-modal--login .vx-lab-modal__top{padding:24px 22px 10px}.vx-lab-modal--login .vx-lab-modal__icon--image{width:128px;height:128px}.vx-lab-modal--login .vx-lab-modal__title{font-size:22px}.vx-lab-modal--login .vx-lab-modal__body{padding:0 22px 20px}.vx-lab-modal--login .vx-lab-modal__actions{padding:16px 22px 22px}}"
+      ".vx-lab-modal--warning .vx-lab-modal__btn--primary,.vx-lab-modal--error .vx-lab-modal__btn--primary{border-color:rgba(255,145,117,.52);background:linear-gradient(135deg,#d65f58,#ff9d82);color:#190807}",
+      "@media(max-width:520px){.vx-lab-modal{align-items:end;padding:12px}.vx-lab-modal__card{max-height:calc(100dvh - 24px)}.vx-lab-modal__actions{display:grid;grid-template-columns:1fr}.vx-lab-modal__btn{width:100%}.vx-lab-modal--experience .vx-lab-modal__top{padding:22px 22px 10px}.vx-lab-modal--login .vx-lab-modal__icon--image,.vx-lab-modal--experience:not(.vx-lab-modal--login) .vx-lab-modal__icon--image{width:124px;height:124px}.vx-lab-modal--experience .vx-lab-modal__title{font-size:22px}.vx-lab-modal--experience .vx-lab-modal__body{padding:0 22px 20px}.vx-lab-modal--experience .vx-lab-modal__actions{padding:16px 22px 22px}}",
+      "@media(prefers-reduced-motion:reduce){.vx-lab-modal__card,.vx-lab-modal__icon--image::before,.vx-lab-modal__icon--image img{animation:none!important}}"
     ].join("");
     document.head.appendChild(style);
   }
@@ -477,11 +589,14 @@
     document.head.appendChild(style);
   }
 
-  function closeModal(root) {
+  function closeModal(root, restoreFocus) {
     if (!root) return;
     root.setAttribute("hidden", "");
     root.remove();
     document.removeEventListener("keydown", root._vxKeyHandler);
+    if (restoreFocus !== false && root._vxPreviousFocus && typeof root._vxPreviousFocus.focus === "function") {
+      try { root._vxPreviousFocus.focus({ preventScroll: true }); } catch (_) {}
+    }
   }
 
   function modalParagraphs(message) {
@@ -497,12 +612,21 @@
     if (!document.body) return false;
     ensureModalStyles();
 
+    var previousModal = document.querySelector(".vx-lab-modal");
+    if (previousModal) closeModal(previousModal, false);
+
+    var allowedExperiences = { login: true, upgrade: true, confirm: true, success: true, warning: true, error: true };
+    var requestedExperience = options.experience || (options.loginExperience ? "login" : "");
+    var experience = allowedExperiences[requestedExperience] ? requestedExperience : "";
+    var modalId = "vxLabModal" + Date.now().toString(36);
+
     var root = document.createElement("div");
     root.className = "vx-lab-modal";
-    if (options.loginExperience) root.className += " vx-lab-modal--login";
-    root.setAttribute("role", "dialog");
+    if (experience) root.className += " vx-lab-modal--experience vx-lab-modal--" + experience;
+    root.setAttribute("role", experience === "error" || experience === "warning" ? "alertdialog" : "dialog");
     root.setAttribute("aria-modal", "true");
-    root.setAttribute("aria-labelledby", "vxLabModalTitle");
+    root.setAttribute("aria-labelledby", modalId + "Title");
+    root._vxPreviousFocus = document.activeElement;
 
     var card = document.createElement("div");
     card.className = "vx-lab-modal__card";
@@ -526,17 +650,19 @@
     }
 
     var title = document.createElement("h2");
-    title.id = "vxLabModalTitle";
+    title.id = modalId + "Title";
     title.className = "vx-lab-modal__title";
     title.textContent = options.title || "VOLYNX Lab";
 
     var body = document.createElement("div");
+    body.id = modalId + "Body";
     body.className = "vx-lab-modal__body";
     modalParagraphs(options.message || "").forEach(function (part) {
       var p = document.createElement("p");
       p.textContent = part;
       body.appendChild(p);
     });
+    if (body.childNodes.length) root.setAttribute("aria-describedby", body.id);
 
     var actions = document.createElement("div");
     actions.className = "vx-lab-modal__actions";
@@ -561,7 +687,12 @@
       if (typeof options.onConfirm === "function") options.onConfirm();
     });
 
-    actions.appendChild(cancel);
+    var showCancel = options.showCancel !== false && !options.hideCancel;
+    if (showCancel) {
+      actions.appendChild(cancel);
+    } else {
+      actions.className += " vx-lab-modal__actions--single";
+    }
     actions.appendChild(primary);
     top.appendChild(icon);
     top.appendChild(title);
@@ -570,10 +701,30 @@
     card.appendChild(actions);
     root.appendChild(card);
     root.addEventListener("click", function (event) {
-      if (event.target === root) cancel.click();
+      if (event.target !== root) return;
+      if (showCancel) cancel.click();
+      else {
+        track("lab", "modal_dismiss", { title: options.title || "VOLYNX Lab" });
+        closeModal(root);
+      }
     });
     root._vxKeyHandler = function (event) {
-      if (event.key === "Escape") cancel.click();
+      if (event.key === "Escape") {
+        if (showCancel) cancel.click();
+        else closeModal(root);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      var focusable = showCancel ? [cancel, primary] : [primary];
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener("keydown", root._vxKeyHandler);
     document.body.appendChild(root);
@@ -582,15 +733,15 @@
   }
 
   function confirmLogin(nextPath, message) {
-    var text = message || "Sign in to continue. You will return to this tool after login.";
+    var text = localizedModalOption(message, "modal.login.message");
     track("lab", "login_modal_open", { next: nextPath || currentReturnPath() });
     if (!openModal({
       iconSrc: "/assets/login-portal.webp",
-      loginExperience: true,
-      title: "Enter your VOLYNX workspace",
+      experience: "login",
+      title: modalText("modal.login.title"),
       message: text,
-      primaryLabel: "Sign in",
-      cancelLabel: "Stay here",
+      primaryLabel: modalText("modal.action.sign_in"),
+      cancelLabel: modalText("modal.action.stay_here"),
       onConfirm: function () { goLogin(nextPath); },
     }) && window.confirm(text)) {
       goLogin(nextPath);
@@ -598,15 +749,16 @@
   }
 
   function confirmUpgrade(message, href) {
-    var text = message || "Upgrade to unlock higher limits and premium exports.";
+    var text = localizedModalOption(message, "modal.upgrade.message");
     var target = href || "/pricing/";
     track("lab", "upgrade_modal_open", { href: target });
     if (!openModal({
-      icon: "P",
-      title: "Upgrade for the premium workflow",
+      iconSrc: "/assets/modal-upgrade.webp",
+      experience: "upgrade",
+      title: modalText("modal.upgrade.title"),
       message: text,
-      primaryLabel: "See upgrade options",
-      cancelLabel: "Not now",
+      primaryLabel: modalText("modal.action.upgrade"),
+      cancelLabel: modalText("modal.action.not_now"),
       onConfirm: function () { window.location.href = target; },
     }) && window.confirm(text)) {
       window.location.href = target;
@@ -616,23 +768,24 @@
   function confirmVxSpend(options) {
     var config = options || {};
     var cost = Number(config.cost || config.tokens || 0);
-    var text = config.message || ("Use " + cost + " VX from your balance for this premium action?");
-    var title = config.title || "Use VX for this action?";
+    var text = localizedModalOption(config.message, "modal.vx.message", { cost: cost });
+    var title = localizedModalOption(config.title, "modal.vx.title");
     track(config.tool || "lab", "vx_confirm_open", {
       action: config.action || "premium_action",
       cost: cost,
     });
     return new Promise(function (resolve) {
       if (!openModal({
-        icon: "VX",
+        iconSrc: "/assets/modal-confirm.webp",
+        experience: "confirm",
         title: title,
-        message: text + "\n\nCost: " + cost + " VX",
-        primaryLabel: config.primaryLabel || ("Use " + cost + " VX"),
-        cancelLabel: config.cancelLabel || "Not now",
+        message: text + "\n\n" + modalText("modal.vx.cost", { cost: cost }),
+        primaryLabel: modalLanguage() === "pt" ? modalText("modal.vx.primary", { cost: cost }) : (config.primaryLabel || modalText("modal.vx.primary", { cost: cost })),
+        cancelLabel: modalLanguage() === "pt" ? modalText("modal.action.not_now") : (config.cancelLabel || modalText("modal.action.not_now")),
         onConfirm: function () { resolve(true); },
         onCancel: function () { resolve(false); },
       })) {
-        resolve(window.confirm(text + "\n\nCost: " + cost + " VX"));
+        resolve(window.confirm(text + "\n\n" + modalText("modal.vx.cost", { cost: cost })));
       }
     });
   }
@@ -687,16 +840,35 @@
 
   function notify(options) {
     var config = typeof options === "string" ? { message: options } : (options || {});
+    var noticeText = [config.tone, config.event, config.icon, config.title].join(" ").toLowerCase();
+    var experience = config.experience || (/success|complete|done|ready|saved/.test(noticeText) ? "success" : (/error|fail|invalid|unavailable/.test(noticeText) ? "error" : "warning"));
+    var iconSrc = config.iconSrc || (experience === "success" ? "/assets/modal-success.webp" : "/assets/modal-warning.webp");
+    var defaultTitle = experience === "error" ? modalText("modal.error.title") : (experience === "warning" ? modalText("modal.warning.title") : modalText("modal.notice.title"));
     track(config.tool || "lab", config.event || "notice_open", { title: config.title || "VOLYNX Lab" });
     return openModal({
-      icon: config.icon || "!",
-      title: config.title || "VOLYNX Lab",
+      iconSrc: iconSrc,
+      experience: experience,
+      title: config.title || defaultTitle,
       message: config.message || "",
-      primaryLabel: config.primaryLabel || "OK",
-      cancelLabel: config.cancelLabel || "Close",
+      primaryLabel: config.primaryLabel || modalText("modal.action.close"),
+      cancelLabel: config.cancelLabel || modalText("modal.action.close"),
+      hideCancel: config.showCancel !== true,
       onConfirm: config.onConfirm,
       onCancel: config.onCancel,
     });
+  }
+
+  function notifySuccess(options) {
+    var config = options || {};
+    var kind = /^(download|export|save)$/.test(config.kind || "") ? config.kind : "download";
+    return notify(Object.assign({}, config, {
+      tone: "success",
+      experience: "success",
+      event: config.event || kind + "_success",
+      title: config.title || modalText("modal.success." + kind + "_title"),
+      message: config.message || modalText("modal.success." + kind + "_message"),
+      primaryLabel: config.primaryLabel || modalText("modal.action.done")
+    }));
   }
 
   function recordEvent(tool, action, detail) {
@@ -1108,11 +1280,12 @@
         setMemoryStatus(root, item.pinned ? "Removed from pinned." : "Pinned for quick access.");
       } else if (actionName === "delete") {
         openModal({
-          icon: "×",
-          title: "Delete saved Lab work?",
-          message: item.title + " will be removed from this device and your VOLYNX profile.",
-          primaryLabel: "Delete",
-          cancelLabel: "Keep it",
+          iconSrc: "/assets/modal-warning.webp",
+          experience: "warning",
+          title: modalText("modal.delete.title"),
+          message: modalText("modal.delete.message", { name: item.title }),
+          primaryLabel: modalText("modal.action.delete"),
+          cancelLabel: modalText("modal.action.keep"),
           onConfirm: function () {
             removeMemoryItem(kind, id);
             renderProfilePanel(root, { skipCloud: true });
@@ -1362,6 +1535,8 @@
     confirmVxSpend: confirmVxSpend,
     spendVxAction: spendVxAction,
     notify: notify,
+    notifySuccess: notifySuccess,
+    modalText: modalText,
     openModal: openModal,
     recordEvent: recordEvent,
     track: track,
@@ -1383,6 +1558,7 @@
   };
   if (document.documentElement) {
     document.documentElement.dataset.vxLab = "ready";
+    document.documentElement.dataset.vxLabModalSystem = "20260621";
   }
 
   document.addEventListener("DOMContentLoaded", function () {

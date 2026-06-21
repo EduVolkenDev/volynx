@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import Stripe from "https://esm.sh/stripe@14.14.0?target=deno";
+import Stripe from "npm:stripe@22.2.2";
 
 const STRIPE_API_VERSION = "2026-02-25.clover";
 const STRIPE_PIX_API_VERSION = "2026-02-25.clover";
@@ -109,6 +109,8 @@ Deno.serve(async (req: Request) => {
     return json({ error: "Method not allowed" }, 405);
   }
 
+  let checkoutStage = "authenticate";
+
   try {
     const authHeader = req.headers.get("Authorization") || "";
     const token = authHeader.replace("Bearer ", "");
@@ -187,6 +189,7 @@ Deno.serve(async (req: Request) => {
     // Resolve Stripe price. White-Label keeps compatibility with the
     // existing `pf_enterprise_*` lookup keys already present in Stripe.
     const lookupCandidates = resolveStripeLookupCandidates(lookup_key);
+    checkoutStage = "resolve_price";
     const prices = await stripe.prices.list({
       lookup_keys: lookupCandidates,
       limit: lookupCandidates.length,
@@ -224,15 +227,44 @@ Deno.serve(async (req: Request) => {
       .eq("id", user.id)
       .single();
 
-    let customerId = profile?.stripe_customer_id;
+    let customerId = profile?.stripe_customer_id || "";
+
+    // A customer ID is scoped to Stripe test/live mode. Profiles created while
+    // testing can therefore contain an ID that a live key cannot retrieve.
+    if (customerId) {
+      checkoutStage = "validate_customer";
+      try {
+        const existingCustomer = await stripe.customers.retrieve(customerId);
+        if ("deleted" in existingCustomer && existingCustomer.deleted) {
+          console.warn(`[checkout] replacing deleted Stripe customer ${customerId}`);
+          customerId = "";
+        }
+      } catch (error) {
+        const stripeError = error as { code?: string; statusCode?: number };
+        if (stripeError.code === "resource_missing" || stripeError.statusCode === 404) {
+          console.warn(`[checkout] replacing unavailable Stripe customer ${customerId}`);
+          customerId = "";
+        } else {
+          throw error;
+        }
+      }
+    }
 
     if (!customerId) {
+      checkoutStage = "create_customer";
       const customer = await stripe.customers.create({
         email: user.email,
         metadata: { supabase_user_id: user.id },
       });
       customerId = customer.id;
-      await supabase.from("profiles").update({ stripe_customer_id: customerId }).eq("id", user.id);
+      const { error: customerUpdateError } = await supabase
+        .from("profiles")
+        .update({ stripe_customer_id: customerId })
+        .eq("id", user.id);
+
+      if (customerUpdateError) {
+        throw new Error(`Unable to save Stripe customer: ${customerUpdateError.message}`);
+      }
     }
 
     // Optional per-product metadata (icon purchase: which icon?)
@@ -264,6 +296,13 @@ Deno.serve(async (req: Request) => {
       cancel_url: cancel_url || `${FRONTEND_ORIGIN}/pricing/?payment=cancelled`,
       allow_promotion_codes: true,
     };
+
+    if (isCheckoutSmokeTest) {
+      params.adaptive_pricing = { enabled: false };
+      if (price.currency.toLowerCase() === "brl") {
+        params.locale = "pt-BR";
+      }
+    }
 
     if (mode === "subscription") {
       params.subscription_data = {
@@ -306,10 +345,18 @@ Deno.serve(async (req: Request) => {
       })
       : stripe;
 
+    checkoutStage = "create_session";
     const session = await sessionStripe.checkout.sessions.create(params as any);
     return json({ url: session.url });
   } catch (err) {
-    console.error("[checkout] error:", (err as Error).message);
+    const checkoutError = err as Error & { code?: string; requestId?: string; type?: string };
+    console.error("[checkout] error", {
+      stage: checkoutStage,
+      message: checkoutError.message,
+      type: checkoutError.type,
+      code: checkoutError.code,
+      requestId: checkoutError.requestId,
+    });
     return json({ error: "Server error" }, 500);
   }
 });
