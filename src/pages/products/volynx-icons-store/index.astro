@@ -99,7 +99,6 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
               <button class="filter-btn" data-filter="tech">Tech</button>
               <button class="filter-btn" data-filter="metal">Metal</button>
               <button class="filter-btn" data-filter="vintage">Vintage</button>
-              <button class="filter-btn" data-filter="purple">Purple</button>
               <button class="filter-btn" data-filter="soft"><span class="i18n-en">Soft Pastel</span><span class="i18n-pt">Pastel</span></button>
               <button class="filter-btn" data-filter="daily"><span class="i18n-en">Daily</span><span class="i18n-pt">Dia a dia</span></button>
             </div>
@@ -985,6 +984,10 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         </div>
 
         <div class="collections-grid" id="collectionsGrid"></div>
+        <div class="collections-actions">
+          <button class="btn btn-secondary" id="collectionsToggleBtn" type="button" aria-expanded="false" aria-controls="collectionsGrid" hidden></button>
+          <span class="load-more-count" id="collectionsPreviewCount" aria-live="polite"></span>
+        </div>
       </div>
     </section>
 
@@ -1010,6 +1013,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     let assetSingles: any[] = [];
     let singleFormatFilter = "all";
     let singlePreviewExpanded = false;
+    let collectionsExpanded = false;
 
     // Compact previews keep the storefront scannable; users can expand when
     // they want the full catalog depth.
@@ -1141,33 +1145,36 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
 
     const COLLECTION_CURATION = {
       "Hyper Icons": { order: 0, band: "flagship", packLookup: "icons_pack_hyper" },
-      "Metal Chrome": { order: 1, band: "premium", packLookup: "icons_pack_premium" },
-      "Glass Icons": { order: 2, band: "premium", packLookup: "icons_pack_premium" },
-      "Iridescent": { order: 3, band: "premium", packLookup: "icons_pack_premium" },
-      "Daily Iridescent": { order: 4, band: "premium", packLookup: "icons_pack_premium" },
-      "Daily 3D": { order: 5, band: "premium", packLookup: "icons_pack_premium" },
-      "Vintage": { order: 6, band: "premium", packLookup: "icons_pack_premium" },
-      "Polygon": { order: 7, band: "premium", packLookup: "icons_pack_premium" },
-      "Glow": { order: 8, band: "curated", packLookup: "icons_pack_mixed" },
-      "Soft Spectrum": { order: 9, band: "curated", packLookup: "icons_pack_mixed" },
-      "Soft Blue": { order: 9, band: "curated", packLookup: "icons_pack_mixed" },
+      "Glass Icons": { order: 1, band: "premium", packLookup: "icons_pack_premium" },
+      "Iridescent": { order: 2, band: "premium", packLookup: "icons_pack_premium" },
+      "Tech Icons": { order: 3, band: "free", packLookup: "" },
+      "Metal Chrome": { order: 4, band: "premium", packLookup: "icons_pack_premium" },
+      "Daily Iridescent": { order: 5, band: "premium", packLookup: "icons_pack_premium" },
+      "Daily 3D": { order: 6, band: "premium", packLookup: "icons_pack_premium" },
+      "Vintage": { order: 7, band: "premium", packLookup: "icons_pack_premium" },
+      "Polygon": { order: 8, band: "premium", packLookup: "icons_pack_premium" },
+      "Glow": { order: 9, band: "curated", packLookup: "icons_pack_mixed" },
+      "Soft Spectrum": { order: 10, band: "curated", packLookup: "icons_pack_mixed" },
+      "Soft Blue": { order: 10, band: "curated", packLookup: "icons_pack_mixed" },
       "Soft Dark Blue": { order: 10, band: "curated", packLookup: "icons_pack_mixed" },
-      "Soft Green": { order: 11, band: "curated", packLookup: "icons_pack_mixed" },
-      "Soft Orange": { order: 12, band: "curated", packLookup: "icons_pack_mixed" },
-      "Soft Red": { order: 13, band: "curated", packLookup: "icons_pack_mixed" },
-      "Tech Icons": { order: 14, band: "free", packLookup: "" },
-      "Golden Icons": { order: 15, band: "free", packLookup: "" },
-      "Purple Icons": { order: 16, band: "free", packLookup: "" },
-      "Daily Essentials": { order: 17, band: "free", packLookup: "" },
-      "Day by Day": { order: 17, band: "free", packLookup: "" },
-      "Daily Polygon": { order: 18, band: "free", packLookup: "" },
-      "Daily Common": { order: 19, band: "free", packLookup: "" },
-      "Daily Common II": { order: 20, band: "free", packLookup: "" },
-      "Neon Icons": { order: 21, band: "free", packLookup: "" },
-      "Abstract": { order: 22, band: "free", packLookup: "" },
+      "Soft Green": { order: 10, band: "curated", packLookup: "icons_pack_mixed" },
+      "Soft Orange": { order: 10, band: "curated", packLookup: "icons_pack_mixed" },
+      "Soft Red": { order: 10, band: "curated", packLookup: "icons_pack_mixed" },
+      "Golden Icons": { order: 11, band: "free", packLookup: "" },
+      "Daily Essentials": { order: 12, band: "free", packLookup: "" },
+      "Day by Day": { order: 12, band: "free", packLookup: "" },
+      "Daily Common": { order: 12, band: "free", packLookup: "" },
+      "Daily Common II": { order: 12, band: "free", packLookup: "" },
+      "Daily Polygon": { order: 13, band: "free", packLookup: "" },
+      "Neon Icons": { order: 14, band: "free", packLookup: "" },
+      "Purple Icons": { order: 98, band: "free", packLookup: "" },
+      "Abstract": { order: 99, band: "free", packLookup: "" },
     } as const;
 
     const HIDDEN_STOREFRONT_COLLECTIONS = new Set(["Abstract"]);
+    const HIDDEN_COLLECTION_SHOWCASE = new Set(["Purple Icons"]);
+    const CORE_COLLECTIONS = new Set(["Hyper Icons", "Glass Icons", "Iridescent", "Tech Icons"]);
+    const COLLECTION_PREVIEW_LIMIT = 6;
 
     const COLLECTION_FAMILIES = [
       {
@@ -1826,7 +1833,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
     }
 
     function getCuratedPngSingles() {
-      const preferred = ["Metal Chrome", "Iridescent", "Daily Iridescent", "Daily 3D", "Glow", "Hyper Icons", "Glass Icons", "Vintage", "Tech Icons", "Golden Icons", "Purple Icons", "Soft Blue", "Soft Dark Blue", "Soft Green", "Soft Orange", "Soft Red", "Polygon", "Daily Polygon", "Daily Common", "Daily Common II", "Neon Icons"];
+      const preferred = ["Hyper Icons", "Glass Icons", "Iridescent", "Tech Icons", "Metal Chrome", "Daily Iridescent", "Daily 3D", "Vintage", "Glow", "Golden Icons", "Soft Blue", "Soft Dark Blue", "Soft Green", "Soft Orange", "Soft Red", "Polygon", "Daily Polygon", "Daily Common", "Daily Common II", "Neon Icons"];
       const picks: any[] = [];
       preferred.forEach((collection) => {
         const icons = allIcons.filter((icon) => icon.collection === collection);
@@ -1834,14 +1841,13 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
         // 4 per collection gives every pack a fair showcase regardless of size
         picks.push(...pickEvenly(icons, 4));
       });
-      // Previous slice(0, 30) dropped the last ~4 packs (Soft Orange/Red,
-      // Polygon, Neon). Lift the cap so every green/purple-tagged pack lands
-      // at least one representative icon in the Single Icons PNG filter.
+      // Keep representation broad after the four core collections while
+      // excluding packs currently held back from the storefront showcase.
       return picks.filter(Boolean).slice(0, 80).map(iconToSingleItem);
     }
 
     function getSingleIconItems() {
-      const png = getCuratedPngSingles();      // Curated PNG singles (Purple Icons)
+      const png = getCuratedPngSingles();      // Curated PNG singles
       const webp = assetSingles;               // Latest WEBP singles (asset-showcase)
       const merged = [...png, ...webp];
       if (singleFormatFilter === "png") return png;
@@ -1953,6 +1959,7 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       const groups = new Map<string, any[]>();
       allIcons.forEach(icon => {
         const sourceName = icon.collection || icon.category || "Icon Pack";
+        if (HIDDEN_COLLECTION_SHOWCASE.has(sourceName)) return;
         const name = collectionFamily(sourceName)?.name || sourceName;
         if (!groups.has(name)) groups.set(name, []);
         groups.get(name)?.push(icon);
@@ -1971,8 +1978,9 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       const grid = document.getElementById("collectionsGrid");
       if (!grid || !allIcons.length) return;
       grid.innerHTML = "";
+      const collectionGroups = getCollectionGroups();
 
-      getCollectionGroups().forEach(pack => {
+      collectionGroups.forEach((pack, index) => {
         const family = collectionFamily(pack.name);
         const previewIcons = family?.name === pack.name
           ? family.collections.map((collection) => pack.icons.find((icon) => icon.collection === collection)).filter(Boolean).slice(0, 4)
@@ -1989,19 +1997,23 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
           : CATEGORY_CONFIG.find(c => c.key === pack.icons[0]?.category)?.label || pack.icons[0]?.category || "Icon Pack";
         const strategy = collectionStrategy(pack.name, pack.icons);
         const isPremiumSurface = strategy.band === "flagship" || strategy.band === "premium";
+        const isCoreCollection = CORE_COLLECTIONS.has(pack.name);
 
         const card = document.createElement("article");
         card.className = "collection-card"
           + (isPremiumSurface ? " collection-card--premium" : "")
           + (strategy.band === "flagship" ? " collection-card--flagship" : "")
-          + (strategy.band === "curated" ? " collection-card--curated" : "");
+          + (strategy.band === "curated" ? " collection-card--curated" : "")
+          + (isCoreCollection ? " collection-card--core" : "");
         card.tabIndex = 0;
         card.dataset.collection = pack.name;
+        card.hidden = !collectionsExpanded && index >= COLLECTION_PREVIEW_LIMIT;
         card.setAttribute("style", collectionStyle(pack.name));
         card.style.cursor = "pointer";
         card.innerHTML = `
           <span class="collection-plan-badge collection-plan-badge--${strategy.band}">${escHtml(strategy.badgeLabel)}</span>
           <div class="collection-preview">${previews}</div>
+          ${isCoreCollection ? `<span class="collection-core-label">VOLYNX Core</span>` : ""}
           <div class="collection-meta-row">
             <span class="collection-category">${escHtml(firstCategory)}</span>
             <p class="collection-count">${escHtml(strategy.bandLabel)}</p>
@@ -2028,6 +2040,22 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
 
         grid.appendChild(card);
       });
+
+      const toggle = document.getElementById("collectionsToggleBtn") as HTMLButtonElement | null;
+      const count = document.getElementById("collectionsPreviewCount");
+      const shown = collectionsExpanded ? collectionGroups.length : Math.min(COLLECTION_PREVIEW_LIMIT, collectionGroups.length);
+      if (toggle) {
+        toggle.hidden = collectionGroups.length <= COLLECTION_PREVIEW_LIMIT;
+        toggle.textContent = collectionsExpanded
+          ? (storeLang() === "pt" ? "Mostrar menos famílias" : "Show fewer families")
+          : (storeLang() === "pt" ? "Ver todas as famílias" : "View all families");
+        toggle.setAttribute("aria-expanded", String(collectionsExpanded));
+      }
+      if (count) {
+        count.textContent = storeLang() === "pt"
+          ? `${shown} de ${collectionGroups.length} famílias`
+          : `${shown} of ${collectionGroups.length} families`;
+      }
     }
 
     // ===== CATEGORY CONFIG =====
@@ -2042,7 +2070,6 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       { key: "tech",       label: "Tech Icons",         collections: ["Tech Icons"],                                           color: "#38bdf8", glow: "rgba(56,189,248,0.22)"  },
       { key: "metal",      label: "Metal Chrome",       collections: ["Metal Chrome","Golden Icons"],                          color: "#cbd5e1", glow: "rgba(203,213,225,0.18)" },
       { key: "vintage",    label: "Vintage",            collections: ["Vintage"],                                              color: "#d4a574", glow: "rgba(212,165,116,0.22)" },
-      { key: "purple",     label: "Purple Icons (PNG)", collections: ["Purple Icons"],                                         color: "#c084fc", glow: "rgba(192,132,252,0.22)" },
       { key: "soft",       label: "Soft Pastel",        collections: ["Soft Blue","Soft Dark Blue","Soft Green","Soft Orange","Soft Red","Glow"], color: "#86efac", glow: "rgba(134,239,172,0.18)" },
       { key: "daily",      label: "Daily Systems",      collections: ["Day by Day","Daily Common","Daily Common II","Daily Polygon","Daily 3D","Daily Iridescent"], color: "#7dd3fc", glow: "rgba(125,211,252,0.22)" },
     ];
@@ -2730,6 +2757,11 @@ const pageDescription = "Browse curated VOLYNX icon packs, preview every collect
       document.getElementById("singleToggleBtn")?.addEventListener("click", () => {
         singlePreviewExpanded = !singlePreviewExpanded;
         renderSingleIcons();
+      });
+
+      document.getElementById("collectionsToggleBtn")?.addEventListener("click", () => {
+        collectionsExpanded = !collectionsExpanded;
+        renderCollections();
       });
 
       // Featured Icons → open inline-SVG preview modal (NOT scroll to gallery)

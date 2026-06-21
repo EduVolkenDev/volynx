@@ -1375,6 +1375,16 @@ body {
     margin-bottom: 1.5rem;
 }
 
+.collection-card[hidden] { display: none; }
+
+.collections-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: 0.25rem;
+}
+
 .collection-card {
     --collection-card-accent: var(--collection-accent, var(--cyan));
     isolation: isolate;
@@ -1470,6 +1480,32 @@ body {
         radial-gradient(circle at 14% 8%, color-mix(in srgb, var(--collection-soft, rgba(255, 183, 77, 0.22)) 88%, transparent), transparent 34%),
         radial-gradient(circle at 88% 0%, rgba(255,255,255,0.08), transparent 26%),
         linear-gradient(152deg, color-mix(in srgb, var(--collection-bg, #16120d) 76%, #05070f), #05070f 88%);
+}
+
+.collection-card--core {
+    border-color: color-mix(in srgb, var(--collection-accent, #7df9ff) 64%, rgba(255,255,255,0.2));
+    box-shadow:
+        0 30px 84px rgba(0,0,0,0.3),
+        0 0 42px var(--collection-soft, rgba(125,249,255,0.18)),
+        inset 0 1px 0 rgba(255,255,255,0.13);
+}
+
+.collection-card--core:hover {
+    border-color: var(--collection-accent, #7df9ff);
+    box-shadow:
+        0 36px 100px rgba(0,0,0,0.38),
+        0 0 62px var(--collection-soft, rgba(125,249,255,0.26)),
+        inset 0 1px 0 rgba(255,255,255,0.16);
+}
+
+.collection-core-label {
+    align-self: flex-start;
+    margin: -0.35rem 0 0.65rem;
+    color: var(--collection-accent, #7df9ff);
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
 }
 
 .collection-preview {
@@ -2395,9 +2431,8 @@ body.vx-modal-open { overflow: hidden; }
     .cta-section { padding: 6rem 0; }
     .cta-box { padding: 4rem 3rem; }
     .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
-    /* Pack cards: 2 per row on desktop. The base `.collection-card` is
-       grid-column: span 6 against the 12-col base grid. Keeping the grid
-       at base lets the span control the layout cleanly. */
+    /* Two columns keep the four core families together as a 2x2 standard set. */
+    .collections-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 /* ── Tablet (768px–1023px) ── */
