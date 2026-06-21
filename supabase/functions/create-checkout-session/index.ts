@@ -135,9 +135,13 @@ Deno.serve(async (req: Request) => {
       return json({ error: "Missing lookup_key" }, 400);
     }
 
+    const isCheckoutSmokeTest = extractPrefix(lookup_key) === "checkout_smoke_test";
+
     // ── Admin bypass — simulate purchase, skip Stripe entirely ──
     // Admin already has all plans + huge balance, so we just return a
     // success URL with ?simulated=admin so the success page can show a banner.
+    // Smoke tests must still hit Stripe so checkout/webhook/delivery can be
+    // verified end-to-end with an admin account.
     {
       const { data: adminProfile } = await supabase
         .from("profiles")
@@ -145,7 +149,7 @@ Deno.serve(async (req: Request) => {
         .eq("id", user.id)
         .maybeSingle();
 
-      if (adminProfile?.is_admin) {
+      if (adminProfile?.is_admin && !isCheckoutSmokeTest) {
         const baseSuccess = (typeof success_url === "string" && success_url)
           ? success_url
           : `${FRONTEND_ORIGIN}/billing/success/`;
