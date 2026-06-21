@@ -215,7 +215,10 @@ function bind() {
     e.preventDefault();
     if (!qrCode) return;
     await qrCode.download({ name: "volynx-qr", extension: "png" });
-    if (window.VxLab) VxLab.recordEvent("qr-gen", "download", "PNG downloaded");
+    if (window.VxLab) {
+      VxLab.recordEvent("qr-gen", "download", "PNG downloaded");
+      VxLab.notifySuccess?.({ kind: "download", tool: "qr-gen", event: "qr_download_success" });
+    }
   });
 
   const dotsColorType = $("dotsColorType");

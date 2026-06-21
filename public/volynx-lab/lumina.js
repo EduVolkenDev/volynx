@@ -457,7 +457,10 @@ exportBtn?.addEventListener("click", () => {
   link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1200);
   setStatus("Resposta exportada", "ok");
-  if (window.VxLab) VxLab.recordEvent("lumina", "export", "TXT exported");
+  if (window.VxLab) {
+    VxLab.recordEvent("lumina", "export", "TXT exported");
+    VxLab.notifySuccess?.({ kind: "export", tool: "lumina", event: "lumina_export_success" });
+  }
 });
 
 historyList?.addEventListener("click", (event) => {

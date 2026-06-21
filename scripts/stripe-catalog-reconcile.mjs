@@ -30,7 +30,9 @@ const APPLY = args.has("--apply");
 const REQUIRE_LIVE = args.has("--live");
 const DRY_RUN = !APPLY;
 
-const STRIPE_KEY = process.env.STRIPE_SECRET_KEY || "";
+const STRIPE_KEY = (REQUIRE_LIVE && process.env.STRIPE_LIVE_SECRET_KEY)
+  ? process.env.STRIPE_LIVE_SECRET_KEY
+  : process.env.STRIPE_SECRET_KEY || "";
 if (!STRIPE_KEY.startsWith("sk_test_") && !STRIPE_KEY.startsWith("sk_live_")) {
   console.error("STRIPE_SECRET_KEY is missing or invalid. Put it in scripts/.env.");
   process.exit(1);
@@ -227,6 +229,14 @@ const catalog = [
     family: "addons",
     tier: "addon",
     amounts: { gbp: 1800, eur: 2100, brl: 11900 },
+  },
+  {
+    name: "VOLYNX Checkout Smoke Test",
+    description: "Low-value one-time product used only to verify live checkout, webhook, and post-payment return flows.",
+    lookupPrefix: "checkout_smoke_test",
+    family: "checkout_test",
+    tier: "smoke_test",
+    amounts: { gbp: 30, eur: 50, brl: 50 },
   },
   {
     name: "Icons Store Single - Budget",

@@ -1136,6 +1136,14 @@
     setTimeout(() => URL.revokeObjectURL(url), 1200);
   }
 
+  function showExportSuccess() {
+    window.VxLab?.notifySuccess?.({
+      kind: "export",
+      tool: "qr-gen",
+      event: "qr_export_success"
+    });
+  }
+
   async function exportFinal() {
     await refreshRemoteEntitlement();
     const state = getState();
@@ -1201,6 +1209,7 @@
             : "Export complete. Test the QR before sending to print.",
             "ok"
           );
+          showExportSuccess();
           return;
         }
       }
@@ -1222,6 +1231,7 @@
         : "Export complete. Test the QR before sending to print.",
         "ok"
       );
+      showExportSuccess();
     } catch (err) {
       console.error("[qrgen] export failed", err);
       setMessage("Could not export this QR. Try PNG standard or simplify the design.", "err");
@@ -1336,6 +1346,11 @@
       });
     }
     setMessage("Draft saved in this browser. Managed dynamic QRs stay in your QR manager.", "ok");
+    window.VxLab?.notifySuccess?.({
+      kind: "save",
+      tool: "qr-gen",
+      event: "qr_project_save_success"
+    });
   }
 
   function applyState(state) {

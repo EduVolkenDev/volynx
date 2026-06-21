@@ -97,11 +97,10 @@ function labNotify(title, message, tone = 'warn') {
     VxLab.notify({
       tool: 'converter',
       event: tone === 'error' ? 'error_notice' : 'notice',
+      tone,
       icon: tone === 'error' ? '!' : 'i',
       title,
       message,
-      primaryLabel: 'OK',
-      cancelLabel: 'Close',
     });
   } else {
     alert(message || title);
@@ -190,6 +189,15 @@ function renderList() {
 
   updateStats();
 }
+
+list.addEventListener('click', (event) => {
+  const downloadLink = event.target.closest('a[download]');
+  if (!downloadLink || !window.VxLab) return;
+  VxLab.recordEvent('converter', 'download', downloadLink.getAttribute('download') || 'Converted file downloaded');
+  window.setTimeout(() => {
+    VxLab.notifySuccess?.({ kind: 'download', tool: 'converter', event: 'converted_file_download_success' });
+  }, 0);
+});
 
 function formatSize(bytes) {
   if (window.VxFileMetrics) return window.VxFileMetrics.formatBytes(bytes);
@@ -389,7 +397,10 @@ zipBtn.addEventListener('click', async () => {
   });
   a.click();
   URL.revokeObjectURL(a.href);
-  if (window.VxLab) VxLab.recordEvent('converter', 'download', `${converted.length} file ZIP downloaded`);
+  if (window.VxLab) {
+    VxLab.recordEvent('converter', 'download', `${converted.length} file ZIP downloaded`);
+    VxLab.notifySuccess?.({ kind: 'download', tool: 'converter', event: 'converted_zip_download_success' });
+  }
 
   zipBtn.disabled = false;
   zipBtn.textContent = 'Baixar ZIP';

@@ -113,7 +113,7 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
 
   <script is:inline src="/js/vx-file-metrics.js"></script>
   <script is:inline src="/js/vx-auth-bridge.js"></script>
-  <script is:inline src="/scripts/vx-lab-workspace.js?v=20260610-memory-manager"></script>
+  <script is:inline src="/scripts/vx-lab-workspace.js?v=20260621-modal-system"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
   <script is:inline>
@@ -194,11 +194,10 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
         VxLab.notify({
           tool: "image-scaler",
           event: tone === "error" ? "error_notice" : "notice",
+          tone,
           icon: tone === "error" ? "!" : "i",
           title,
           message,
-          primaryLabel: "OK",
-          cancelLabel: "Close",
         });
       } else {
         alert(message || title);
@@ -412,7 +411,10 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
         a.href = URL.createObjectURL(singleBlob);
         a.download = `${processedResults[0].baseName}-${scaleEl.value}x.${ext}`;
         a.click();
-        if (window.VxLab) VxLab.recordEvent("image-scaler", "download", a.download);
+        if (window.VxLab) {
+          VxLab.recordEvent("image-scaler", "download", a.download);
+          VxLab.notifySuccess?.({ kind: "download", tool: "image-scaler", event: "scaled_image_download_success" });
+        }
         return;
       }
 
@@ -429,7 +431,10 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
       a.href = URL.createObjectURL(zipBlob);
       a.download = "volynx-scaler-batch.zip";
       a.click();
-      if (window.VxLab) VxLab.recordEvent("image-scaler", "download", "Batch ZIP downloaded");
+      if (window.VxLab) {
+        VxLab.recordEvent("image-scaler", "download", "Batch ZIP downloaded");
+        VxLab.notifySuccess?.({ kind: "download", tool: "image-scaler", event: "scaled_batch_download_success" });
+      }
     });
   </script>
 

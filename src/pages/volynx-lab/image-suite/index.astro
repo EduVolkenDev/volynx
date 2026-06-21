@@ -183,7 +183,7 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
 
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script is:inline src="/js/vx-auth-bridge.js"></script>
-  <script is:inline src="/scripts/vx-lab-workspace.js?v=20260610-memory-manager"></script>
+  <script is:inline src="/scripts/vx-lab-workspace.js?v=20260621-modal-system"></script>
 
   <script is:inline>
     const FREE_LIMIT = 3;
@@ -311,11 +311,10 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
         VxLab.notify({
           tool: "image-suite",
           event: tone === "error" ? "error_notice" : "notice",
+          tone,
           icon: tone === "error" ? "!" : "i",
           title,
           message,
-          primaryLabel: "OK",
-          cancelLabel: "Close",
         });
       } else {
         alert(message || title);
@@ -1522,7 +1521,10 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
         a.href = url;
         a.download = `${processedResults[0].baseName}.${processedResults[0].extension}`;
         a.click();
-        if (window.VxLab) VxLab.recordEvent("image-suite", "download", a.download);
+        if (window.VxLab) {
+          VxLab.recordEvent("image-suite", "download", a.download);
+          VxLab.notifySuccess?.({ kind: "download", tool: "image-suite", event: "image_download_success" });
+        }
         window.setTimeout(() => URL.revokeObjectURL(url), 1500);
         return;
       }
@@ -1545,7 +1547,10 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
       a.href = url;
       a.download = "volynx-image-suite-batch.zip";
       a.click();
-      if (window.VxLab) VxLab.recordEvent("image-suite", "download", "Batch ZIP downloaded");
+      if (window.VxLab) {
+        VxLab.recordEvent("image-suite", "download", "Batch ZIP downloaded");
+        VxLab.notifySuccess?.({ kind: "download", tool: "image-suite", event: "image_batch_download_success" });
+      }
       window.setTimeout(() => URL.revokeObjectURL(url), 1500);
     });
   </script>
