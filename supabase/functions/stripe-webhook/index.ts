@@ -594,7 +594,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }
 
     // Log purchase event
-    requireDbSuccess("record subscription purchase event", await supabase.from("purchase_events").insert({
+    const subscriptionPurchaseEvent = await supabase.from("purchase_events").insert({
       user_id: userId,
       user_email: userEmail,
       stripe_session_id: session.id,
@@ -612,7 +612,12 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         stripe_lookup_key: stripeLookupKey,
         stripe_prefix: stripePrefix,
       },
-    }));
+    });
+    if (subscriptionPurchaseEvent.error?.code === "23505") {
+      console.log(`Subscription purchase event already recorded for session ${session.id} — skip`);
+    } else {
+      requireDbSuccess("record subscription purchase event", subscriptionPurchaseEvent);
+    }
 
     // Notify the buyer — bundle gets its own template, single-product subs
     // get plan_activated.
@@ -920,7 +925,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         "check kit or PropertyFlow idempotency",
         await supabase
           .from("addons_purchased")
-          .select("id")
+          .select("id, project_id, metadata")
           .eq("user_id", userId)
           .eq("metadata->>stripe_session_id", session.id)
           .maybeSingle(),
@@ -986,10 +991,34 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       };
 
       const presetId = presetMap[kitFulfillmentPrefix];
-      let projectSlug: string | null = null;
-      let projectIdCreated: string | null = null;
+      const existingDeliveryMetadata = (existingKitOrPf?.metadata || {}) as Record<string, unknown>;
+      let projectSlug: string | null = typeof existingDeliveryMetadata.project_slug === "string"
+        ? existingDeliveryMetadata.project_slug
+        : null;
+      let projectIdCreated: string | null = existingKitOrPf?.project_id
+        || (typeof existingDeliveryMetadata.project_id === "string" ? existingDeliveryMetadata.project_id : null);
       let presetFetchError: string | null = null;
-      if (presetId) {
+      const shouldUpdateKitMetadata = !existingKitOrPf || !projectIdCreated;
+
+      // Recover a project created before a previous webhook attempt stopped
+      // between the project insert and the addon metadata update.
+      if (presetId && !projectIdCreated) {
+        const existingProject = requireDbSuccess(
+          "recover kit project by Stripe session",
+          await supabase
+            .from("projects")
+            .select("id, slug")
+            .eq("user_id", userId)
+            .eq("metadata->>stripe_session_id", session.id)
+            .maybeSingle(),
+        );
+        if (existingProject) {
+          projectIdCreated = existingProject.id;
+          projectSlug = existingProject.slug;
+        }
+      }
+
+      if (presetId && !projectIdCreated) {
         try {
           const presetsRes = await fetch("https://volynx.world/builder/presets.json");
           if (!presetsRes.ok) {
@@ -1047,7 +1076,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         } catch (e) {
           presetFetchError = (e as Error).message;
         }
+      }
 
+      if (presetId && shouldUpdateKitMetadata) {
         requireDbSuccess("update kit delivery metadata", await supabase
           .from("addons_purchased")
           .update({
@@ -1079,10 +1110,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           .eq("user_id", userId)
           .eq("addon_id", addonId)
           .eq("metadata->>stripe_session_id", session.id));
+      }
 
-        if (presetFetchError) {
-          console.error(`Kit ${prefix} for ${userId}: preset fetch failed — ${presetFetchError}`);
-        }
+      if (presetFetchError) {
+        console.error(`Kit ${prefix} for ${userId}: preset fetch failed — ${presetFetchError}`);
       }
 
       console.log(`${isPropertyFlow ? "PropertyFlow" : "Kit"} purchase ${prefix} activated for ${userId}`);
@@ -1124,7 +1155,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       }
     }
 
-    requireDbSuccess("record one-time purchase event", await supabase.from("purchase_events").insert({
+    const oneTimePurchaseEvent = await supabase.from("purchase_events").insert({
       user_id: userId,
       user_email: userEmail,
       stripe_session_id: session.id,
@@ -1140,7 +1171,12 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         stripe_lookup_key: stripeLookupKey,
         stripe_prefix: stripePrefix,
       },
-    }));
+    });
+    if (oneTimePurchaseEvent.error?.code === "23505") {
+      console.log(`One-time purchase event already recorded for session ${session.id} — skip`);
+    } else {
+      requireDbSuccess("record one-time purchase event", oneTimePurchaseEvent);
+    }
   }
 }
 
