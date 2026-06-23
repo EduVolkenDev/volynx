@@ -38,6 +38,9 @@ export interface RenderResult {
 }
 
 const URL_BASE = "https://volynx.world";
+const ICONS_DELIVERY_URL = `${URL_BASE}/dashboard/purchases/icons/`;
+const KITS_DELIVERY_URL = `${URL_BASE}/dashboard/purchases/kits/`;
+const PROPERTYFLOW_DELIVERY_URL = `${URL_BASE}/dashboard/purchases/propertyflow/`;
 
 export function renderTemplate(args: RenderArgs): RenderResult {
   const { event_type, profile, payload } = args;
@@ -187,8 +190,12 @@ function voucherRedeemed(p: Profile, x: Record<string, any>): RenderResult {
 // ── propertyflow_ready ─────────────────────────────────────────────────────
 function propertyflowReady(p: Profile, x: Record<string, any>): RenderResult {
   const tier = String(x.tier_label || x.tier || "Starter");
-  const url = String(x.signed_url || `${URL_BASE}/delivery/`);
+  const url = String(x.signed_url || PROPERTYFLOW_DELIVERY_URL);
   const expiresAt = String(x.expires_at || "");
+  const sessionId = String(x.session_id || "");
+  const deliveryUrl = sessionId
+    ? `${PROPERTYFLOW_DELIVERY_URL}?session_id=${encodeURIComponent(sessionId)}`
+    : PROPERTYFLOW_DELIVERY_URL;
   const expiresHuman = expiresAt
     ? new Date(expiresAt).toLocaleString(p.locale === "pt" ? "pt-BR" : "en-GB", { dateStyle: "medium", timeStyle: "short" })
     : "";
@@ -212,8 +219,8 @@ function propertyflowReady(p: Profile, x: Record<string, any>): RenderResult {
       bodyHtml: expiryNote,
       ctaLabel: p.locale === "pt" ? "Baixar ZIP" : "Download ZIP",
       ctaUrl: url,
-      secondaryLabel: p.locale === "pt" ? "Ver entregas" : "Open delivery page",
-      secondaryUrl: `${URL_BASE}/delivery/`,
+      secondaryLabel: p.locale === "pt" ? "Abrir PropertyFlow" : "Open PropertyFlow delivery",
+      secondaryUrl: deliveryUrl,
       locale: p.locale,
     }),
   };
@@ -261,6 +268,10 @@ function kitDelivered(p: Profile, x: Record<string, any>): RenderResult {
   const builderUrl = projectId
     ? `${URL_BASE}/builder/?project=${encodeURIComponent(projectId)}`
     : `${URL_BASE}/builder/`;
+  const sessionId = String(x.session_id || "");
+  const kitDeliveryUrl = sessionId
+    ? `${KITS_DELIVERY_URL}?session_id=${encodeURIComponent(sessionId)}`
+    : KITS_DELIVERY_URL;
 
   return {
     subject,
@@ -270,8 +281,8 @@ function kitDelivered(p: Profile, x: Record<string, any>): RenderResult {
       intro,
       ctaLabel: p.locale === "pt" ? "Abrir no Builder" : "Open in Builder",
       ctaUrl: builderUrl,
-      secondaryLabel: p.locale === "pt" ? "Ver entregas" : "Delivery page",
-      secondaryUrl: `${URL_BASE}/delivery/`,
+      secondaryLabel: p.locale === "pt" ? "Abrir entrega do kit" : "Open kit delivery",
+      secondaryUrl: kitDeliveryUrl,
       locale: p.locale,
     }),
   };
@@ -288,7 +299,7 @@ function iconsDelivered(p: Profile, x: Record<string, any>): RenderResult {
   const ready = Boolean(signedUrl) && (!deliveryStatus || deliveryStatus === "ready");
   const dashboardUrl = sessionId
     ? `${URL_BASE}/dashboard/purchases/icons/?session_id=${encodeURIComponent(sessionId)}`
-    : `${URL_BASE}/delivery/`;
+    : ICONS_DELIVERY_URL;
   const downloadUrl = ready ? signedUrl : dashboardUrl;
   const subject = ready
     ? (isSingle

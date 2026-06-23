@@ -28,25 +28,54 @@ const deliveryAssistItems = [
           <span><span class="i18n-en">My Products</span><span class="i18n-pt">Meus produtos</span></span>
         </nav>
 
-        <!-- Payment success banner — shown when ?payment=success in URL after Stripe redirect -->
+<!-- Payment success banner — shown when ?payment=success in URL after Stripe redirect -->
         <div id="paymentSuccessBanner" class="payment-banner payment-banner--success" role="status" aria-live="polite" hidden>
-          <div class="payment-banner__icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          <div class="payment-banner__icon payment-banner__icon--success" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6 9 17l-5-5"/>
+            </svg>
           </div>
-          <div class="payment-banner__copy">
-            <strong><span class="i18n-en">Payment confirmed.</span><span class="i18n-pt">Pagamento confirmado.</span></strong>
-            <span><span class="i18n-en">Your purchase is below. Downloads and access were unlocked automatically.</span><span class="i18n-pt">Sua compra está abaixo. Downloads e acessos foram liberados automaticamente.</span></span>
+          <div class="payment-banner__content">
+            <div class="payment-banner__title">
+              <span class="i18n-en">All set. Your purchase is ready.</span>
+              <span class="i18n-pt">Pronto. Sua compra está disponível.</span>
+            </div>
+            <p class="payment-banner__product" id="paymentSuccessProduct" hidden></p>
+            <p class="payment-banner__message">
+              <span class="i18n-en">Access unlocked below — your product is ready to open, download or continue building.</span>
+              <span class="i18n-pt">Acesso liberado abaixo — seu produto está pronto para abrir, baixar ou continuar construindo.</span>
+            </p>
           </div>
-          <button type="button" class="payment-banner__close" id="paymentBannerClose" aria-label="Dismiss notification" data-i18n-aria="delivery.dismiss">×</button>
+          <button type="button" class="payment-banner__close" id="paymentBannerClose" aria-label="Dismiss notification" data-i18n-aria="delivery.dismiss">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+          </button>
         </div>
 
         <!-- Payment cancelled banner -->
-        <div id="paymentCancelledBanner" class="payment-banner payment-banner--info" role="status" aria-live="polite" hidden>
-          <div class="payment-banner__copy">
-            <strong><span class="i18n-en">Checkout cancelled.</span><span class="i18n-pt">Checkout cancelado.</span></strong>
-            <span><span class="i18n-en">No charge was made. You can resume from the catalog whenever you're ready.</span><span class="i18n-pt">Nenhuma cobrança foi feita. Você pode retomar pelo catálogo quando quiser.</span></span>
+        <div id="paymentCancelledBanner" class="payment-banner payment-banner--cancelled" role="status" aria-live="polite" hidden>
+          <div class="payment-banner__icon payment-banner__icon--muted" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 8v4M12 16h.01"/>
+            </svg>
           </div>
-          <button type="button" class="payment-banner__close" id="paymentCancelledClose" aria-label="Dismiss notification" data-i18n-aria="delivery.dismiss">×</button>
+          <div class="payment-banner__content">
+            <div class="payment-banner__title">
+              <span class="i18n-en">Checkout paused.</span>
+              <span class="i18n-pt">Checkout pausado.</span>
+            </div>
+            <p class="payment-banner__message">
+              <span class="i18n-en">No charge was made. Resume when you're ready — your cart is saved.</span>
+              <span class="i18n-pt">Nenhuma cobrança foi feita. Retorne quando quiser — seu carrinho está salvo.</span>
+            </p>
+          </div>
+          <button type="button" class="payment-banner__close" id="paymentCancelledClose" aria-label="Dismiss notification" data-i18n-aria="delivery.dismiss">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+          </button>
         </div>
 
         <div class="hero-grid delivery-hero-grid">
@@ -77,25 +106,57 @@ const deliveryAssistItems = [
     <section class="page-section">
       <div class="shell">
 
-        <!-- Loading state -->
+<!-- Loading state -->
         <div id="deliveryLoading" class="delivery-state">
-          <div class="delivery-spinner" aria-hidden="true"></div>
-          <p class="delivery-state__label"><span class="i18n-en">Loading your purchases...</span><span class="i18n-pt">Carregando suas compras...</span></p>
+          <div class="delivery-spinner delivery-spinner--premium" aria-hidden="true">
+            <div class="delivery-spinner__ring"></div>
+            <div class="delivery-spinner__ring"></div>
+            <div class="delivery-spinner__ring"></div>
+          </div>
+          <p class="delivery-state__label">
+            <span class="i18n-en">Preparing your deliverables...</span>
+            <span class="i18n-pt">Preparando seus arquivos...</span>
+          </p>
+          <p class="delivery-state__sublabel"><span class="i18n-en">Loading your collection</span><span class="i18n-pt">Carregando sua coleção</span></p>
         </div>
 
         <!-- Error state -->
-        <div id="deliveryError" class="delivery-state" style="display:none;">
-          <p class="delivery-state__label delivery-state__label--error" id="deliveryErrorMsg"><span class="i18n-en">Something went wrong. Please try again.</span><span class="i18n-pt">Algo deu errado. Tente novamente.</span></p>
+        <div id="deliveryError" class="delivery-state delivery-state--error" style="display:none;">
+          <div class="delivery-state__icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 8v4M12 16h.01"/>
+            </svg>
+          </div>
+          <p class="delivery-state__label" id="deliveryErrorMsg">
+            <span class="i18n-en">We couldn't load your purchases.</span>
+            <span class="i18n-pt">Não foi possível carregar suas compras.</span>
+          </p>
+          <p class="delivery-state__hint"><span class="i18n-en">This might be a temporary issue. Try again or contact support.</span><span class="i18n-pt">Pode ser um problema temporário. Tente novamente ou entre em contato.</span></p>
           <div class="delivery-state__actions">
-            <a href={ROUTES.login + "?next=/delivery/"} class="button button--ghost"><span class="i18n-en">Sign in again</span><span class="i18n-pt">Entrar novamente</span></a>
-            <a href={ROUTES.support} class="button button--ghost"><span class="i18n-en">Open support</span><span class="i18n-pt">Abrir suporte</span></a>
+            <button type="button" class="button button--gold" id="deliveryRetryBtn"><span class="i18n-en">Try again</span><span class="i18n-pt">Tentar novamente</span></button>
+            <a href={ROUTES.support} class="button button--ghost"><span class="i18n-en">Get help</span><span class="i18n-pt">Obter ajuda</span></a>
           </div>
         </div>
 
         <!-- Empty state -->
-        <div id="deliveryEmpty" class="delivery-state" style="display:none;">
-          <p class="delivery-state__label"><span class="i18n-en">No purchases yet.</span><span class="i18n-pt">Você ainda não tem compras.</span></p>
-          <a href={ROUTES.products} class="button button--gold"><span class="i18n-en">Browse products</span><span class="i18n-pt">Ver produtos</span></a>
+        <div id="deliveryEmpty" class="delivery-state delivery-state--empty" style="display:none;">
+          <div class="delivery-state__visual" aria-hidden="true">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+              <line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+          </div>
+          <p class="delivery-state__label">
+            <span class="i18n-en">Your collection is empty.</span>
+            <span class="i18n-pt">Sua coleção está vazia.</span>
+          </p>
+          <p class="delivery-state__hint"><span class="i18n-en">Ready to start exploring? Browse our kit catalog.</span><span class="i18n-pt">Pronto para explorar? Navegue pelo catálogo de kits.</span></p>
+          <div class="delivery-state__actions">
+            <a href={ROUTES.products} class="button button--gold"><span class="i18n-en">Explore kits</span><span class="i18n-pt">Explorar kits</span></a>
+            <a href={ROUTES.pricing} class="button button--ghost"><span class="i18n-en">View pricing</span><span class="i18n-pt">Ver preços</span></a>
+          </div>
         </div>
 
         <!-- Product grid -->
@@ -153,6 +214,7 @@ const deliveryAssistItems = [
       iconsDelivery: "/dashboard/purchases/icons",
     };
     const tx = (key, fallback) => window.VxI18n?.t?.(key, fallback) ?? fallback;
+    let paymentSuccessVisible = false;
 
     // ── Auth guard ──────────────────────────────────────────────────────────
     const token = localStorage.getItem('volynx_access_token');
@@ -195,6 +257,7 @@ const deliveryAssistItems = [
 
         if (status === 'success' && successEl) {
           showBanner(successEl);
+          paymentSuccessVisible = true;
         } else if (status === 'cancelled' && cancelledEl) {
           showBanner(cancelledEl);
         }
@@ -354,6 +417,16 @@ const deliveryAssistItems = [
         });
         return '';
       }
+    }
+
+    function updatePaymentSuccessProduct(item) {
+      if (!paymentSuccessVisible || !item) return;
+      const productEl = document.getElementById('paymentSuccessProduct');
+      if (!productEl) return;
+      const label = addonLabel(purchaseLookupBase(item));
+      if (!label || label === 'Unknown Product') return;
+      productEl.textContent = label;
+      productEl.hidden = false;
     }
 
     function withQuery(path, params) {
@@ -747,7 +820,7 @@ const deliveryAssistItems = [
       } catch { return iso; }
     }
 
-    function formatPrice(amount, currency, minorUnits = false) {
+function formatPrice(amount, currency, minorUnits = false) {
       if (!amount && amount !== 0) return '';
       try {
         const num = typeof amount === 'number' ? amount : parseFloat(amount);
@@ -756,6 +829,16 @@ const deliveryAssistItems = [
           .format(minorUnits ? num / 100 : num);
       } catch { return String(amount); }
     }
+
+    // Retry button handler
+    document.addEventListener('DOMContentLoaded', function() {
+      var retryBtn = document.getElementById('deliveryRetryBtn');
+      if (retryBtn) {
+        retryBtn.addEventListener('click', function() {
+          window.location.reload();
+        });
+      }
+    });
 
     function buildCard(item) {
       const productId = String(purchaseLookupBase(item) || '');
@@ -905,6 +988,13 @@ const deliveryAssistItems = [
           return timestampFor(b?.created_at) - timestampFor(a?.created_at);
         });
 
+        const requestedSessionId = new URLSearchParams(window.location.search).get('session_id');
+        if (requestedSessionId) {
+          updatePaymentSuccessProduct(items.find((item) => purchaseSessionId(item) === requestedSessionId));
+        } else {
+          updatePaymentSuccessProduct(items[0]);
+        }
+
         hide('deliveryLoading');
 
         const cardEntries = [];
@@ -988,74 +1078,121 @@ const deliveryAssistItems = [
 </FlagshipLayout>
 
 <style>
-  /* ── Payment status banner ──────────────────────────────────────────────── */
+/* ── Payment status banner ──────────────────────────────────────────────── */
   .payment-banner {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 14px;
     margin: 16px 0 24px;
-    padding: 14px 18px;
-    border-radius: 14px;
+    padding: 18px 20px;
+    border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(8px);
-    animation: payment-banner-in 0.32s ease;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
+    backdrop-filter: blur(12px);
+    animation: payment-banner-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .payment-banner[hidden] {
     display: none !important;
   }
   .payment-banner--success {
-    border-color: rgba(140, 255, 210, 0.32);
-    background: rgba(60, 200, 150, 0.08);
+    border-color: rgba(212, 179, 106, 0.25);
+    background: linear-gradient(135deg, rgba(212, 179, 106, 0.08) 0%, rgba(180, 150, 80, 0.04) 100%);
   }
-  .payment-banner--info {
-    border-color: rgba(255, 255, 255, 0.14);
-    background: rgba(255, 255, 255, 0.04);
+  .payment-banner--cancelled {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.03);
   }
   .payment-banner__icon {
     flex: 0 0 auto;
-    width: 36px;
-    height: 36px;
+    width: 42px;
+    height: 42px;
     display: grid;
     place-items: center;
-    border-radius: 50%;
-    background: rgba(140, 255, 210, 0.16);
-    color: rgba(150, 255, 220, 0.95);
+    border-radius: 12px;
+    transition: transform 0.2s ease;
   }
-  .payment-banner__copy {
+  .payment-banner__icon--success {
+    background: linear-gradient(135deg, rgba(212, 179, 106, 0.2) 0%, rgba(180, 150, 80, 0.12) 100%);
+    color: rgba(255, 220, 150, 0.95);
+  }
+  .payment-banner__icon--muted {
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .payment-banner__content {
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    font-size: 14px;
-    line-height: 1.45;
-    color: rgba(255, 255, 255, 0.86);
+    gap: 6px;
+    min-width: 0;
   }
-  .payment-banner__copy strong {
-    color: #fff;
+  .payment-banner__title {
+    font-size: 15px;
     font-weight: 700;
-    font-size: 14.5px;
+    color: #fff;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .payment-banner__message {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+  }
+  .payment-banner__product {
+    display: inline-flex;
+    align-self: flex-start;
+    margin: 0;
+    padding: 5px 9px;
+    border-radius: 999px;
+    border: 1px solid rgba(212, 179, 106, 0.22);
+    background: rgba(212, 179, 106, 0.08);
+    color: rgba(255, 232, 177, 0.96);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+  .payment-banner__product[hidden] {
+    display: none !important;
   }
   .payment-banner__close {
     flex: 0 0 auto;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.10);
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     background: transparent;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.5);
     cursor: pointer;
-    font-size: 20px;
-    line-height: 1;
-    transition: background 0.18s, color 0.18s;
+    transition: all 0.18s ease;
   }
   .payment-banner__close:hover {
     background: rgba(255, 255, 255, 0.06);
     color: #fff;
+    border-color: rgba(255, 255, 255, 0.14);
   }
   @keyframes payment-banner-in {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: none; }
+    from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @media (max-width: 480px) {
+    .payment-banner {
+      padding: 14px 16px;
+      gap: 12px;
+    }
+    .payment-banner__icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+    }
+    .payment-banner__title {
+      font-size: 14px;
+    }
+    .payment-banner__message {
+      font-size: 13px;
+    }
   }
 
   /* ── Hero ───────────────────────────────────────────────────────────────── */
@@ -1100,7 +1237,7 @@ const deliveryAssistItems = [
   }
   .delivery-breadcrumbs a:hover { color: #fff; }
 
-  /* ── Loading / states ────────────────────────────────────────────────────── */
+/* ── Loading / states ────────────────────────────────────────────────────── */
   .delivery-state {
     display: flex;
     flex-direction: column;
@@ -1110,27 +1247,91 @@ const deliveryAssistItems = [
     text-align: center;
   }
   .delivery-state__label {
-    color: rgba(255, 255, 255, .55);
-    font-size: .95rem;
+    color: rgba(255, 255, 255, .9);
+    font-size: 1.05rem;
+    font-weight: 600;
     margin: 0;
   }
-  .delivery-state__label--error { color: rgba(255, 120, 120, .85); }
+  .delivery-state__sublabel {
+    color: rgba(255, 255, 255, .45);
+    font-size: .85rem;
+    margin: -12px 0 0;
+  }
+  .delivery-state__hint {
+    color: rgba(255, 255, 255, .5);
+    font-size: .88rem;
+    margin: -8px 0 0;
+    max-width: 280px;
+  }
+  .delivery-state__icon {
+    width: 56px;
+    height: 56px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255, 180, 100, .12);
+    color: rgba(255, 180, 100, .9);
+  }
+  .delivery-state__visual {
+    width: 72px;
+    height: 72px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(139, 250, 240, .08), rgba(214, 179, 106, .08));
+    border: 1px solid rgba(255, 255, 255, .1);
+    color: rgba(180, 220, 255, .7);
+  }
   .delivery-state__actions {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 12px;
+    margin-top: 8px;
   }
+  .delivery-state--error { }
+  .delivery-state--error .delivery-state__label { color: rgba(255, 180, 100, .95); }
+  .delivery-state--empty { }
+  .delivery-state--empty .delivery-state__actions {
+    flex-direction: column;
+    width: 100%;
+    max-width: 240px;
+  }
+  .delivery-state--empty .delivery-state__actions .button { width: 100%; }
 
+  /* ── Premium spinner ─────────────────────────────────────────────────────────── */
   .delivery-spinner {
-    width: 32px;
-    height: 32px;
-    border: 2px solid rgba(255, 255, 255, .12);
-    border-top-color: rgba(139, 250, 240, .7);
+    position: relative;
+    width: 48px;
+    height: 48px;
+  }
+  .delivery-spinner__ring {
+    position: absolute;
+    inset: 0;
+    border: 2px solid transparent;
     border-radius: 50%;
-    animation: spin 700ms linear infinite;
+    animation: spinner-orbit 1.4s linear infinite;
+  }
+  .delivery-spinner__ring:nth-child(1) {
+    border-top-color: rgba(214, 179, 106, .85);
+    animation-delay: 0s;
+  }
+  .delivery-spinner__ring:nth-child(2) {
+    inset: 6px;
+    border-top-color: rgba(139, 250, 240, .7);
+    animation-delay: 0.15s;
+    animation-direction: reverse;
+  }
+  .delivery-spinner__ring:nth-child(3) {
+    inset: 12px;
+    border-top-color: rgba(180, 160, 255, .5);
+    animation-delay: 0.3s;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes spinner-orbit {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 
   /* ── Product grid ────────────────────────────────────────────────────────── */
   .delivery-grid {

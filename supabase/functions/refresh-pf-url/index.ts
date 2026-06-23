@@ -14,7 +14,7 @@
  *
  * POST /functions/v1/refresh-pf-url
  *   headers: Authorization: Bearer <user JWT>
- *   body:    { purchase_id: <addons_purchased.id> }
+ *   body:    { purchase_id?: <addons_purchased.id>, addon_id?: <pf_* SKU> }
  *   returns: { download_url, expires_at } | { error }
  */
 
@@ -65,15 +65,16 @@ serve(async (req) => {
   }
   const userId = userData.user.id;
 
-  let body: { purchase_id?: string };
+  let body: { purchase_id?: string; addon_id?: string };
   try {
     body = await req.json();
   } catch {
     return jsonResponse({ error: "bad_json" }, 400);
   }
-  const purchaseId = body.purchase_id;
-  if (!purchaseId) {
-    return jsonResponse({ error: "missing_purchase_id" }, 400);
+  const purchaseId = body.purchase_id ? String(body.purchase_id).trim() : "";
+  const fallbackAddonId = body.addon_id ? String(body.addon_id).trim().replace(/-/g, "_").replace(/_(gbp|eur|brl)$/i, "") : "";
+  if (!purchaseId && !fallbackAddonId) {
+    return jsonResponse({ error: "missing_purchase_id_or_addon_id" }, 400);
   }
 
   // Service-role client for the protected lookups + storage signing.
@@ -81,17 +82,47 @@ serve(async (req) => {
     auth: { persistSession: false },
   });
 
-  const { data: purchase, error: purchaseErr } = await admin
-    .from("addons_purchased")
-    .select("id, user_id, addon_id, status, metadata")
-    .eq("id", purchaseId)
-    .eq("user_id", userId)
-    .maybeSingle();
+  let purchase: {
+    id: string;
+    user_id: string;
+    addon_id: string;
+    status: string;
+    metadata: Record<string, unknown> | null;
+  } | null = null;
 
-  if (purchaseErr) {
-    console.error("refresh-pf-url lookup error:", purchaseErr.message);
-    return jsonResponse({ error: "lookup_failed" }, 500);
+  if (purchaseId) {
+    const { data, error: purchaseErr } = await admin
+      .from("addons_purchased")
+      .select("id, user_id, addon_id, status, metadata")
+      .eq("id", purchaseId)
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (purchaseErr) {
+      console.error("refresh-pf-url lookup by id error:", purchaseErr.message);
+      return jsonResponse({ error: "lookup_failed" }, 500);
+    }
+    purchase = data;
   }
+
+  if (!purchase && fallbackAddonId) {
+    const { data, error: purchaseErr } = await admin
+      .from("addons_purchased")
+      .select("id, user_id, addon_id, status, metadata")
+      .eq("user_id", userId)
+      .eq("addon_id", fallbackAddonId)
+      .eq("status", "active")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (purchaseErr) {
+      console.error("refresh-pf-url lookup by addon_id error:", purchaseErr.message);
+      return jsonResponse({ error: "lookup_failed" }, 500);
+    }
+    purchase = data;
+  }
+
   if (!purchase) {
     return jsonResponse({ error: "not_found" }, 404);
   }
@@ -150,6 +181,8 @@ serve(async (req) => {
   return jsonResponse({
     download_url: signed.signedUrl,
     expires_at: expiresAt,
+    download_expires_at: expiresAt,
+    delivery_status: "ready",
     version,
   });
 });

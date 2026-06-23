@@ -1127,6 +1127,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           payload: {
             tier,
             tier_label: tierLabel,
+            session_id: session.id,
             signed_url: pfDownloadUrl,
             expires_at: pfDownloadExpiresAt,
           },
@@ -1146,6 +1147,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             kit_name: kitDisplayName,
             tier,
             tier_label: tierLabel,
+            session_id: session.id,
             project_id: projectIdCreated,
             project_slug: projectSlug,
             preset_id: presetId,

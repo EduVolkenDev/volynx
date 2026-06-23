@@ -144,12 +144,84 @@ const assistItems = [
     function canonicalAddonId(raw) {
       const id = String(raw || '').toLowerCase();
       if (id === 'pf_enterprise' || id === 'pf-enterprise') return 'pf_white_label';
-      return id.replace(/-/g, '_');
+      return id.replace(/-/g, '_').replace(/_(gbp|eur|brl)$/i, '');
     }
 
     function isPfAddon(raw) {
       const id = canonicalAddonId(raw);
       return id === 'pf_starter' || id === 'pf_professional' || id === 'pf_white_label';
+    }
+
+    function parseMeta(value) {
+      if (!value) return {};
+      if (typeof value === 'string') {
+        try { return JSON.parse(value); } catch { return {}; }
+      }
+      return typeof value === 'object' ? value : {};
+    }
+
+    function hasValue(value) {
+      if (value == null) return false;
+      if (typeof value === 'string') return value.trim() !== '';
+      return true;
+    }
+
+    function firstValue(...values) {
+      for (const value of values) {
+        if (hasValue(value)) return value;
+      }
+      return null;
+    }
+
+    function pfSessionId(item) {
+      const meta = parseMeta(item?.metadata);
+      return String(meta.stripe_session_id || item?.stripe_session_id || '').trim();
+    }
+
+    function pfLookupBase(item) {
+      const meta = parseMeta(item?.metadata);
+      return canonicalAddonId(firstValue(item?.addon_id, item?.lookup_key, meta.lookup_key, meta.stripe_lookup_key));
+    }
+
+    function samePfPurchase(a, b) {
+      const aSession = pfSessionId(a);
+      const bSession = pfSessionId(b);
+      if (aSession && bSession) return aSession === bSession;
+      return false;
+    }
+
+    function mergePfPurchaseRecords(baseItem, incomingItem) {
+      const metadata = {
+        ...parseMeta(incomingItem?.metadata),
+        ...parseMeta(baseItem?.metadata),
+      };
+      const baseAddonId = pfLookupBase(baseItem);
+      const incomingAddonId = pfLookupBase(incomingItem);
+      const incomingAmountPaid = incomingItem?.amount_paid;
+
+      return {
+        ...incomingItem,
+        ...baseItem,
+        id: firstValue(baseItem?.id, incomingItem?.id),
+        addon_id: firstValue(baseAddonId, incomingAddonId, canonicalAddonId(metadata.lookup_key), canonicalAddonId(metadata.stripe_lookup_key)),
+        lookup_key: firstValue(baseItem?.lookup_key, incomingItem?.lookup_key, metadata.lookup_key, metadata.stripe_lookup_key),
+        stripe_session_id: firstValue(pfSessionId(baseItem), pfSessionId(incomingItem), metadata.stripe_session_id),
+        purchase_id: firstValue(
+          baseItem?.purchase_id,
+          incomingItem?.purchase_id,
+          baseItem?.source === 'addon' ? baseItem?.id : null,
+          incomingItem?.source === 'addon' ? incomingItem?.id : null
+        ),
+        price_paid: firstValue(
+          baseItem?.price_paid,
+          incomingItem?.price_paid,
+          typeof incomingAmountPaid === 'number' ? incomingAmountPaid / 100 : null
+        ),
+        currency: firstValue(baseItem?.currency, incomingItem?.currency),
+        status: firstValue(baseItem?.status, incomingItem?.status, 'completed'),
+        created_at: firstValue(baseItem?.created_at, incomingItem?.created_at),
+        metadata,
+      };
     }
 
     function urlIsValid(meta) {
@@ -200,7 +272,7 @@ const assistItems = [
     function buildCard(item) {
       const addonId = canonicalAddonId(item.addon_id);
       const tier = TIER_LABELS[addonId] || { name: 'PropertyFlow', tone: 'starter' };
-      const meta = item.metadata || {};
+      const meta = parseMeta(item.metadata);
       const purchaseDate = fmtDate(item.created_at);
       const price = fmtMoney(item.price_paid, item.currency);
       const valid = urlIsValid(meta);
@@ -209,6 +281,8 @@ const assistItems = [
       const errorNote = meta.delivery_error
         ? `<p class="pf-card__error" data-i18n-html="">${escapeHtml(String(meta.delivery_error))}</p>`
         : '';
+
+      const purchaseId = item.purchase_id || item.id || '';
 
       const primary = valid
         ? `<a href="${escapeHtml(meta.download_url)}" class="button button--gold pf-card__cta" download>
@@ -274,8 +348,8 @@ const assistItems = [
                 Authorization: 'Bearer ' + token,
                 apikey: anonKey,
               },
-              // Send both keys so this works against either contract
-              // (purchase_id = main HEAD, addon_id = legacy fallback).
+              // Send both keys so this works for persisted addon rows and
+              // event-only recovery rows.
               body: JSON.stringify({ purchase_id: purchaseId, addon_id: addonId }),
             });
             const data = await res.json().catch(() => ({}));
@@ -339,18 +413,43 @@ const assistItems = [
       }
 
       try {
-        const url = `${supabaseUrl}/rest/v1/addons_purchased?select=id,addon_id,price_paid,currency,status,metadata,created_at&user_id=eq.${userId}&status=eq.active&order=created_at.desc`;
-        const res = await fetch(url, {
-          headers: {
-            apikey: anonKey,
-            Authorization: 'Bearer ' + token,
-            'Content-Type': 'application/json',
-          },
-        });
+        const headers = {
+          apikey: anonKey,
+          Authorization: 'Bearer ' + token,
+          'Content-Type': 'application/json',
+        };
+        const [purchasesRes, eventsRes] = await Promise.all([
+          fetch(`${supabaseUrl}/rest/v1/addons_purchased?select=id,addon_id,price_paid,currency,status,metadata,created_at&user_id=eq.${userId}&status=eq.active&order=created_at.desc`, { headers }),
+          fetch(`${supabaseUrl}/rest/v1/purchase_events?select=id,lookup_key,amount_paid,currency,status,metadata,created_at,stripe_session_id&user_id=eq.${userId}&status=eq.completed&order=created_at.desc`, { headers }),
+        ]);
 
-        if (!res.ok) throw new Error('rest fetch failed: ' + res.status);
-        const rows = await res.json();
-        const pfRows = (Array.isArray(rows) ? rows : []).filter(r => isPfAddon(r.addon_id));
+        if (!purchasesRes.ok) throw new Error('purchases fetch failed: ' + purchasesRes.status);
+
+        const purchaseRows = await purchasesRes.json().catch(() => []);
+        const eventRows = eventsRes.ok ? await eventsRes.json().catch(() => []) : [];
+        const mergedRows = [];
+        const upsertRow = (row) => {
+          const existingIndex = mergedRows.findIndex((entry) => samePfPurchase(entry, row));
+          if (existingIndex === -1) {
+            mergedRows.push(mergePfPurchaseRecords(row, {}));
+            return;
+          }
+          mergedRows[existingIndex] = mergePfPurchaseRecords(mergedRows[existingIndex], row);
+        };
+
+        for (const row of (Array.isArray(purchaseRows) ? purchaseRows : [])) {
+          upsertRow({ ...row, source: 'addon', purchase_id: row.id });
+        }
+        for (const row of (Array.isArray(eventRows) ? eventRows : [])) {
+          upsertRow({ ...row, source: 'event' });
+        }
+
+        const requestedSessionId = new URLSearchParams(window.location.search).get('session_id');
+        let pfRows = mergedRows.filter((row) => isPfAddon(row.addon_id || row.lookup_key));
+        if (requestedSessionId) {
+          const focusedRows = pfRows.filter((row) => pfSessionId(row) === requestedSessionId);
+          if (focusedRows.length > 0) pfRows = focusedRows;
+        }
 
         hide('pfLoading');
 
