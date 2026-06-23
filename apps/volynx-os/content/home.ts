@@ -355,12 +355,12 @@ const homeContent: Record<SiteLocale, HomeContent> = {
     productKits: {
       badge: "Kits",
       title: "Quatro linhas de produto prontas para vender no mesmo sistema operacional.",
-      copy: "O VolynxOS organiza portfólio, agência, SaaS e property em uma plataforma comercial coerente, com casos de uso claros e caminhos diretos para compra.",
+      copy: "O VolynxOS organiza produtos de portfólio, agência, SaaS e mercado imobiliário em uma plataforma comercial coerente, com casos de uso claros e caminhos diretos para compra.",
       openLabel: "Abrir kit",
       items: [
         {
           name: "Portfolio Pro Kit",
-          label: "Kit flagship",
+          label: "Kit principal",
           href: "https://volynx.world/products/portfolio-pro-kit/",
           description: "Lance rápido, pareça premium e dê à sua marca pessoal um sistema operacional de verdade.",
           points: ["A partir de $49", "Você é o produto", "5 a 12+ seções"]
@@ -383,16 +383,16 @@ const homeContent: Record<SiteLocale, HomeContent> = {
           name: "PropertyFlow",
           label: "SaaS imobiliário",
           href: propertyFlowUrl,
-          description: "Kit SaaS imobiliário bilíngue com entrega por tiers, docs e lógica white-label.",
-          points: ["A partir de $239", "15 templates", "Tier white-label"]
+          description: "Kit SaaS imobiliário bilíngue com níveis de entrega, documentação e recursos white-label.",
+          points: ["A partir de $239", "15 modelos", "Nível white-label"]
         }
       ]
     },
     metrics: [
       { label: "Kits centrais", value: "4" },
       { label: "Seções", value: "39+" },
-      { label: "Tempo de launch", value: "< 1 dia" },
-      { label: "Upsell Pro", value: "$19/mês" }
+      { label: "Tempo de lançamento", value: "< 1 dia" },
+      { label: "Evolução para o Pro", value: "$19/mês" }
     ],
     valueGrid: {
       badge: "Sistema",
@@ -401,42 +401,42 @@ const homeContent: Record<SiteLocale, HomeContent> = {
       cards: [
         {
           title: "Arquitetura orientada por seções",
-          description: "Monte páginas de produto trocando blocos opinados em vez de reconstruir superfícies de launch do zero."
+          description: "Monte páginas de produto combinando blocos bem definidos, sem reconstruir toda a experiência de lançamento do zero."
         },
         {
-          title: "Copy orientada à monetização",
-          description: "Cada bloco tem um trabalho comercial: esclarecer a oferta, reduzir dúvida e empurrar o comprador para a ação."
+          title: "Conteúdo orientado à monetização",
+          description: "Cada bloco cumpre uma função comercial: esclarecer a oferta, reduzir dúvidas e conduzir o comprador à ação."
         },
         {
           title: "Lançamento rápido por padrão",
-          description: "Componentes enxutos, efeitos contidos e styling consciente de performance deixam a plataforma pronta para ir ao ar."
+          description: "Componentes enxutos, efeitos contidos e estilos orientados ao desempenho mantêm a plataforma pronta para publicação."
         },
         {
           title: "Tokens VolynxOS",
-          description: "Tipografia, espaçamento, containers e superfícies permanecem coerentes em cada kit, demo e linha de produto."
+          description: "Tipografia, espaçamento, contêineres e superfícies permanecem coerentes em cada kit, demonstração e linha de produto."
         }
       ]
     },
     featureSplit: {
-      badge: "Feature split",
-      title: "Construído como infraestrutura de launch que realmente escala.",
+      badge: "Estrutura",
+      title: "Construído como uma infraestrutura de lançamento realmente escalável.",
       copy: "O objetivo não é impressionar com ruído. O objetivo é ajudar cada linha de produto do VolynxOS a parecer premium e lançar mais rápido.",
       points: [
-        "Variações de hero, prova social, pricing, FAQ, CTA e footer",
-        "Tokens de design para tipografia, espaçamento, superfícies e containers",
-        "Três demos prontas para lançamento em SaaS, agência e portfólio",
-        "Documentação e base de copywriting incluídas"
+        "Variações de apresentação, prova social, preços, perguntas frequentes, chamadas para ação e rodapé",
+        "Tokens de design para tipografia, espaçamento, superfícies e contêineres",
+        "Três demonstrações prontas para lançamento em SaaS, agência e portfólio",
+        "Documentação e fundamentos de conteúdo incluídos"
       ],
       stats: [
         {
           label: "Layouts",
           value: "12 centrais",
-          copy: "Opiniados o suficiente para parecer premium e flexíveis o suficiente para várias categorias."
+          copy: "Definidos o suficiente para transmitir qualidade premium e flexíveis para atender a várias categorias."
         },
         {
           label: "Componentes",
           value: "24+",
-          copy: "Seções plug-and-play com hierarquia visual coerente e estrutura de copy consistente."
+          copy: "Seções prontas para uso, com hierarquia visual coerente e estrutura de conteúdo consistente."
         },
         {
           label: "Posicionamento",
@@ -446,13 +446,13 @@ const homeContent: Record<SiteLocale, HomeContent> = {
       ]
     },
     workflow: {
-      badge: "Workflow",
-      title: "Um processo repetível de launch, não uma galeria de páginas desconectadas.",
+      badge: "Fluxo de trabalho",
+      title: "Um processo de lançamento repetível, não uma galeria de páginas desconectadas.",
       copy: "Use o VolynxOS como estúdios sérios operam: escolha a linha de produto, encaixe os blocos certos e publique com documentação e velocidade.",
       items: [
-        { step: "01", title: "Escolha a linha de produto", copy: "Portfólio, agência, SaaS ou property." },
-        { step: "02", title: "Anexe os blocos que vendem", copy: "Hero, prova, pricing, FAQ e CTA final." },
-        { step: "03", title: "Publique em direção à receita", copy: "Docs, tokens e links de produto mantêm a execução limpa." }
+        { step: "01", title: "Escolha a linha de produto", copy: "Portfólio, agência, SaaS ou mercado imobiliário." },
+        { step: "02", title: "Adicione os blocos de venda", copy: "Apresentação, prova, preços, perguntas frequentes e chamada final para ação." },
+        { step: "03", title: "Publique e comece a vender", copy: "Documentação, tokens e links de produto mantêm a execução organizada." }
       ]
     },
     testimonials: {
@@ -461,79 +461,79 @@ const homeContent: Record<SiteLocale, HomeContent> = {
       copy: "O VolynxOS é moldado em torno do que acontece depois da primeira tela bonita: reuso, posicionamento e entrega mais rápida.",
       items: [
         {
-          quote: "As seções deram estrutura suficiente para a página de launch parecer deliberada sem desacelerar o time.",
+          quote: "As seções deram estrutura suficiente para a página de lançamento parecer intencional sem desacelerar a equipe.",
           name: "Mara Chen",
-          role: "Founder, Northstar Labs"
+          role: "Fundadora, Northstar Labs"
         },
         {
           quote: "Usamos a demo de agência como base, trocamos a camada de conteúdo e enviamos uma primeira versão pronta para cliente no mesmo dia.",
           name: "Eli Ramos",
-          role: "Creative director, Forma Studio"
+          role: "Diretor criativo, Forma Studio"
         },
         {
-          quote: "Parece infraestrutura de launch, não template. Essa distinção importa quando você vende trabalho premium.",
+          quote: "Parece uma infraestrutura de lançamento, não um modelo genérico. Essa distinção importa quando você vende trabalho premium.",
           name: "Noah Patel",
-          role: "Independent product builder"
+          role: "Criador independente de produtos"
         }
       ]
     },
     comparison: {
       badge: "Comparação",
       title: "VolynxOS supera uma pasta de páginas atraentes.",
-      copy: "A plataforma foi estruturada para launches repetíveis, entrega para clientes e páginas de produto que mantêm forma premium à medida que o escopo cresce.",
+      copy: "A plataforma foi estruturada para lançamentos repetíveis, entregas para clientes e páginas de produto que preservam sua qualidade conforme o escopo cresce.",
       headers: {
         decisionPoint: "Ponto de decisão",
-        templatePack: "Pacote de template",
+        templatePack: "Pacote de modelos",
         volynx: "VolynxOS"
       },
       rows: [
         {
           feature: "Composição de página",
-          templatePack: "Páginas fixas que exigem rewire manual.",
+          templatePack: "Páginas fixas que exigem reconfiguração manual.",
           volynx: "Seções do VolynxOS com variantes reutilizáveis."
         },
         {
           feature: "Posicionamento",
-          templatePack: "Copy genérica e novidade visual.",
-          volynx: "Estrutura de copy comercial e sinais premium mais contidos."
+          templatePack: "Conteúdo genérico e novidade visual.",
+          volynx: "Estrutura de conteúdo comercial e sinais premium mais equilibrados."
         },
         {
           feature: "Escala",
-          templatePack: "Novo produto quase sempre significa novo template.",
+          templatePack: "Um novo produto quase sempre exige outro modelo.",
           volynx: "Tokens, demos e dados de conteúdo compartilhados entre linhas de produto."
         },
         {
-          feature: "Workflow de dev",
-          templatePack: "Começo bonito, handoff confuso.",
-          volynx: "Componentes em Next.js, utilitários Tailwind, docs e CTAs de launch."
+          feature: "Fluxo de desenvolvimento",
+          templatePack: "Início atraente, transferência confusa.",
+          volynx: "Componentes em Next.js, utilitários Tailwind, documentação e chamadas para lançamento."
         }
       ]
     },
     pricing: {
-      badge: "Pricing",
-      title: "Precifique o VolynxOS como infraestrutura de launch, não como template descartável.",
-      copy: "Cada tier aponta para uso comercial: percepção premium, arquitetura reutilizável e empacotamento de produto que pode começar a vender hoje.",
+      badge: "Preços",
+      title: "Precifique o VolynxOS como infraestrutura de lançamento, não como um modelo descartável.",
+      copy: "Cada nível é orientado ao uso comercial: percepção premium, arquitetura reutilizável e produtos preparados para começar a vender hoje.",
       tiers: [
         {
           name: "Kit Starter",
           price: "a partir de $49",
-          description: "Para quem precisa de uma superfície premium de launch agora.",
+          description: "Para quem precisa de uma experiência premium de lançamento agora.",
           features: ["Portfolio a partir de $49", "Agency a partir de $69", "SaaS a partir de $79", "Uso comercial"],
           href: storeUrl
         },
         {
           name: "Volynx Pro",
           price: "$19/mês",
-          description: "Para quem deve levar todos os kits, todos os tiers e toda a camada de ferramentas.",
-          features: ["Todos os 3 kits", "Todos os tiers", "Image Suite Pro", "Daily ilimitado"],
+          description: "Para quem precisa de todos os kits, todos os níveis e da camada completa de ferramentas.",
+          features: ["Todos os 3 kits", "Todos os níveis", "Image Suite Pro", "Daily ilimitado"],
           highlight: true,
           href: "https://volynx.world/pricing/"
         },
         {
           name: "Studio / Scale",
           price: "a partir de $209",
-          description: "Para estúdios e launches sérios que precisam de páginas, modos e ativos de expansão.",
-          features: ["Páginas extras", "Modo dark/light", "Pricing comparativo", "Expansão premium"],
+          description: "Para estúdios e lançamentos que precisam de páginas, modos e recursos de expansão.",
+          features: ["Páginas extras", "Modos claro e escuro", "Comparação de preços", "Expansão premium"],
           href: storeUrl
         }
       ],
@@ -541,10 +541,10 @@ const homeContent: Record<SiteLocale, HomeContent> = {
       getLabel: "Quero",
       bestValueLabel: "Melhor valor",
       comparisonFeatureLabel: "Recurso",
-      upsellBadge: "Central de upsell",
+      upsellBadge: "Evolução recomendada",
       compareProLabel: "Comparar Pro",
       upsellTitle: "Volynx Pro por $19/mês",
-      upsellBody: "Todos os kits, todos os tiers e toda a camada de ferramentas para quem deve sair da intenção pontual e entrar em valor recorrente.",
+      upsellBody: "Todos os kits, todos os níveis e a camada completa de ferramentas para transformar uma compra pontual em valor recorrente.",
       annualLabel: "Opção anual"
     },
     faq: {
@@ -553,12 +553,12 @@ const homeContent: Record<SiteLocale, HomeContent> = {
       copy: "Responder isso com clareza reduz atrito, carga de suporte e lacunas de confiança.",
       items: [
         {
-          question: "Isso é um UI kit ou um pacote de templates?",
-          answer: "É VolynxOS: seções reutilizáveis, variantes estruturadas, tokens e páginas de produto prontas para launch."
+          question: "Isso é um kit de interface ou um pacote de modelos?",
+          answer: "É o VolynxOS: seções reutilizáveis, variantes estruturadas, tokens e páginas de produto prontas para lançamento."
         },
         {
           question: "Posso usar em trabalho para clientes?",
-          answer: "Sim. O VolynxOS foi construído para launches comerciais, seus próprios produtos e entrega para clientes."
+          answer: "Sim. O VolynxOS foi construído para lançamentos comerciais, produtos próprios e entregas para clientes."
         },
         {
           question: "Quão rápido eu consigo lançar?",
@@ -569,9 +569,9 @@ const homeContent: Record<SiteLocale, HomeContent> = {
     finalCta: {
       eyebrow: "Lance hoje",
       title: "Pare de polir em privado. Coloque o VolynxOS na frente dos compradores.",
-      subtitle: "A plataforma já tem linhas de produto, lógica de pricing, documentação e CTAs comerciais para começar a monetizar agora.",
+      subtitle: "A plataforma já reúne linhas de produto, lógica de preços, documentação e chamadas comerciais para começar a monetizar agora.",
       primaryCta: "Abrir loja de produtos",
-      secondaryCta: "Ler docs"
+      secondaryCta: "Ler documentação"
     }
   }
 }

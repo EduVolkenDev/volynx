@@ -36,7 +36,7 @@ window.VxPix = (function () {
     pt: {
       title: 'Abrindo checkout Pix',
       detail: 'A Stripe vai mostrar o QR code Pix e confirmar o pagamento com segurança.',
-      error: 'Nao foi possivel iniciar o Pix. Tente novamente.',
+      error: 'Não foi possível iniciar o Pix. Tente novamente.',
       close: 'Fechar',
     },
   };

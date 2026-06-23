@@ -81,7 +81,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
           <span class="dot" aria-hidden="true"></span>
           <span id="who" class="session-email">...</span>
         </div>
-        <button id="logout" class="btn btn--ghost btn--sm">Sign out</button>
+        <button id="logout" class="btn btn--ghost btn--sm" data-i18n="builder.workspace.sign_out">Sign out</button>
       </div>
 
       <div class="grid">
@@ -89,17 +89,17 @@ import PageWidgets from "../../components/PageWidgets.astro";
         <div class="card card--wizard" id="wizardCard">
           <!-- Step indicator -->
           <div class="wizard-steps">
-            <div class="wizard-step-dot wizard-step-dot--active" data-step="1"><span>1</span><small>Kit</small></div>
+            <div class="wizard-step-dot wizard-step-dot--active" data-step="1"><span>1</span><small data-i18n="builder.workspace.step_kit">Kit</small></div>
             <div class="wizard-line-bar"><div class="wizard-line-fill" id="wizProgress"></div></div>
-            <div class="wizard-step-dot" data-step="2"><span>2</span><small>Layout</small></div>
+            <div class="wizard-step-dot" data-step="2"><span>2</span><small data-i18n="builder.workspace.step_layout">Layout</small></div>
             <div class="wizard-line-bar"><div class="wizard-line-fill" id="wizProgress2"></div></div>
-            <div class="wizard-step-dot" data-step="3"><span>3</span><small>Brand</small></div>
+            <div class="wizard-step-dot" data-step="3"><span>3</span><small data-i18n="builder.workspace.step_brand">Brand</small></div>
           </div>
 
           <!-- STEP 1: Choose Kit -->
           <div class="wizard-step" id="wizStep1">
-            <h3 class="card__title">What are you building?</h3>
-            <p class="hint" style="margin-bottom:16px">Choose a starting point. Everything is customizable after creation.</p>
+            <h3 class="card__title" data-i18n="builder.workspace.start_title">What are you building?</h3>
+            <p class="hint" style="margin-bottom:16px" data-i18n="builder.workspace.start_copy">Choose a starting point. You can customize everything after creation.</p>
 
             <div class="archetype-grid" id="presetGrid">
               <!-- Populated by JS with enhanced archetype cards -->
@@ -107,24 +107,24 @@ import PageWidgets from "../../components/PageWidgets.astro";
 
             <div class="row" style="margin-top:16px">
               <div class="field-group">
-                <label class="label" for="pname">Project name</label>
+                <label class="label" for="pname" data-i18n="builder.workspace.project_name">Project name</label>
                 <input id="pname" class="field" placeholder="My landing page" data-i18n-placeholder="builder.ph_pname" />
               </div>
               <div class="field-group">
-                <label class="label" for="pslug">Site address</label>
+                <label class="label" for="pslug" data-i18n="builder.workspace.site_address">Site address</label>
                 <input id="pslug" class="field" placeholder="my-landing-page" data-i18n-placeholder="builder.ph_pslug" />
               </div>
             </div>
 
             <button class="btn btn--primary" id="toStep2" style="margin-top:14px;width:100%">
-              Next: Choose layout →
+              <span data-i18n="builder.workspace.next_layout">Next: Choose layout →</span>
             </button>
           </div>
 
           <!-- STEP 2: Layout & Variants -->
           <div class="wizard-step" id="wizStep2" hidden>
-            <h3 class="card__title">Pick your layout</h3>
-            <p class="hint" style="margin-bottom:16px">Choose how each section looks. Mix and match freely.</p>
+            <h3 class="card__title" data-i18n="builder.workspace.layout_title">Choose your layout</h3>
+            <p class="hint" style="margin-bottom:16px" data-i18n="builder.workspace.layout_copy">Choose how each section looks. Combine variants freely.</p>
 
             <!-- Variant selectors (populated by JS per preset) -->
             <div id="variantSelectors" class="variant-selectors"></div>
@@ -133,74 +133,74 @@ import PageWidgets from "../../components/PageWidgets.astro";
             <div id="optionalToggles" class="optional-toggles"></div>
 
             <div style="display:flex;gap:8px;margin-top:18px">
-              <button class="btn btn--ghost" id="backStep1" style="flex:1">← Back</button>
-              <button class="btn btn--primary" id="toStep3" style="flex:2">Next: Brand details →</button>
+              <button class="btn btn--ghost" id="backStep1" style="flex:1" data-i18n="builder.workspace.back">← Back</button>
+              <button class="btn btn--primary" id="toStep3" style="flex:2" data-i18n="builder.workspace.next_brand">Next: Brand details →</button>
             </div>
           </div>
 
           <!-- STEP 3: Brand & Config -->
           <div class="wizard-step" id="wizStep3" hidden>
-            <h3 class="card__title">Brand & details</h3>
-            <p class="hint" style="margin-bottom:16px">Tell us about your brand — we'll generate the copy.</p>
+            <h3 class="card__title" data-i18n="builder.workspace.brand_title">Brand and details</h3>
+            <p class="hint" style="margin-bottom:16px" data-i18n="builder.workspace.brand_copy">Tell us about your brand and we will generate the initial copy.</p>
 
             <div class="row">
               <div class="field-group">
-                <label class="label" for="wBrand">Brand name</label>
+                <label class="label" for="wBrand" data-i18n="builder.workspace.brand_name">Brand name</label>
                 <input id="wBrand" class="field" placeholder="Acme Inc" data-i18n-placeholder="builder.ph_brand" />
               </div>
               <div class="field-group">
-                <label class="label" for="wTagline">Tagline</label>
+                <label class="label" for="wTagline" data-i18n="builder.workspace.tagline">Tagline</label>
                 <input id="wTagline" class="field" placeholder="Build faster, ship smarter." data-i18n-placeholder="builder.ph_tagline" />
               </div>
             </div>
 
             <div class="row" style="margin-top:12px">
               <div class="field-group">
-                <label class="label" for="wCta">Primary CTA label</label>
+                <label class="label" for="wCta" data-i18n="builder.workspace.cta_label">Primary button label</label>
                 <input id="wCta" class="field" placeholder="Get started" data-i18n-placeholder="builder.ph_cta" />
               </div>
               <div class="field-group">
-                <label class="label" for="wCtaHref">CTA link</label>
+                <label class="label" for="wCtaHref" data-i18n="builder.workspace.cta_link">Primary button link</label>
                 <input id="wCtaHref" class="field" placeholder="https://..." data-i18n-placeholder="builder.ph_cta_href" />
               </div>
             </div>
 
             <div class="row" style="margin-top:12px">
               <div class="field-group">
-                <label class="label" for="wAudience">Audience</label>
+                <label class="label" for="wAudience" data-i18n="builder.workspace.audience">Audience</label>
                 <select id="wAudience" class="field">
-                  <option value="b2b">B2B / Companies</option>
-                  <option value="b2c">B2C / Consumers</option>
-                  <option value="developers">Developers</option>
-                  <option value="creators">Creators / Freelancers</option>
-                  <option value="agencies">Agencies</option>
+                  <option value="b2b" data-i18n="builder.workspace.audience_b2b">B2B / Companies</option>
+                  <option value="b2c" data-i18n="builder.workspace.audience_b2c">B2C / Consumers</option>
+                  <option value="developers" data-i18n="builder.workspace.audience_devs">Developers</option>
+                  <option value="creators" data-i18n="builder.workspace.audience_creators">Creators / Freelancers</option>
+                  <option value="agencies" data-i18n="builder.workspace.audience_agencies">Agencies</option>
                 </select>
               </div>
               <div class="field-group">
-                <label class="label" for="wGoal">Goal</label>
+                <label class="label" for="wGoal" data-i18n="builder.workspace.goal">Goal</label>
                 <select id="wGoal" class="field">
-                  <option value="leads">Lead generation</option>
-                  <option value="sales">Direct sales</option>
-                  <option value="showcase">Showcase / portfolio</option>
-                  <option value="bookings">Bookings</option>
-                  <option value="waitlist">Waitlist</option>
+                  <option value="leads" data-i18n="builder.workspace.goal_leads">Lead generation</option>
+                  <option value="sales" data-i18n="builder.workspace.goal_sales">Direct sales</option>
+                  <option value="showcase" data-i18n="builder.workspace.goal_showcase">Showcase / portfolio</option>
+                  <option value="bookings" data-i18n="builder.workspace.goal_bookings">Bookings</option>
+                  <option value="waitlist" data-i18n="builder.workspace.goal_waitlist">Waitlist</option>
                 </select>
               </div>
             </div>
 
             <div class="row" style="margin-top:12px">
               <div class="field-group">
-                <label class="label" for="wTone">Tone</label>
+                <label class="label" for="wTone" data-i18n="builder.workspace.tone">Tone</label>
                 <select id="wTone" class="field">
-                  <option value="premium">Premium</option>
-                  <option value="minimal">Minimal</option>
-                  <option value="bold">Bold</option>
-                  <option value="futuristic">Futuristic</option>
-                  <option value="organic">Organic</option>
+                  <option value="premium" data-i18n="builder.workspace.tone_premium">Premium</option>
+                  <option value="minimal" data-i18n="builder.workspace.tone_minimal">Minimal</option>
+                  <option value="bold" data-i18n="builder.workspace.tone_bold">Bold</option>
+                  <option value="futuristic" data-i18n="builder.workspace.tone_futuristic">Futuristic</option>
+                  <option value="organic" data-i18n="builder.workspace.tone_organic">Organic</option>
                 </select>
               </div>
               <div class="field-group">
-                <label class="label" for="wLang">Language</label>
+                <label class="label" for="wLang" data-i18n="builder.workspace.language">Language</label>
                 <select id="wLang" class="field">
                   <option value="en">English</option>
                   <option value="pt">Português</option>
@@ -209,19 +209,19 @@ import PageWidgets from "../../components/PageWidgets.astro";
             </div>
 
             <div style="display:flex;gap:8px;margin-top:18px">
-              <button class="btn btn--ghost" id="backStep2" style="flex:1">← Back</button>
-              <button class="btn btn--primary" id="create" style="flex:2">Create project →</button>
+              <button class="btn btn--ghost" id="backStep2" style="flex:1" data-i18n="builder.workspace.back">← Back</button>
+              <button class="btn btn--primary" id="create" style="flex:2" data-i18n="builder.workspace.create">Create project →</button>
             </div>
             <p class="hint" style="margin-top:10px;text-align:center">
-              Will publish at <code style="color:var(--accent)">https://<span id="slugPreview">your-name</span>.volynx.world</code>
+              <span data-i18n="builder.workspace.publish_at">Publishing address:</span> <code style="color:var(--accent)">https://<span id="slugPreview">your-name</span>.volynx.world</code>
             </p>
           </div>
         </div>
 
         <!-- PROJECTS LIST -->
         <div class="card card--list">
-          <h3 class="card__title">My projects</h3>
-          <div id="projects" class="projects-list hint">No projects yet.</div>
+          <h3 class="card__title" data-i18n="builder.workspace.projects">My projects</h3>
+          <div id="projects" class="projects-list hint" data-i18n="builder.workspace.projects_empty">No projects yet.</div>
         </div>
 
         <!-- PROJECT INFO PANEL (shown after selecting a project) -->
@@ -231,14 +231,14 @@ import PageWidgets from "../../components/PageWidgets.astro";
             <span class="status-badge" id="infoBadge">draft</span>
           </div>
           <div class="info-url-box" id="infoUrlBox" hidden>
-            <span class="info-url-label">Live at</span>
+            <span class="info-url-label" data-i18n="builder.workspace.live_at">Live at</span>
             <a class="info-url-link" id="infoUrl" href="#" target="_blank" rel="noreferrer">—</a>
           </div>
           <div class="info-actions">
-            <a class="btn btn--accent btn--sm" id="visitSite" href="#" target="_blank" rel="noreferrer" hidden>Visit site ↗</a>
-            <button class="btn btn--ghost btn--sm" id="unpublishSite" hidden>Unpublish</button>
-            <button class="btn btn--ghost btn--sm" id="exportZip" title="Advanced source-code export">Source ZIP (advanced)</button>
-            <button class="btn btn--ghost btn--sm" id="deleteProject">Delete</button>
+            <a class="btn btn--accent btn--sm" id="visitSite" href="#" target="_blank" rel="noreferrer" hidden data-i18n="builder.workspace.visit">Visit site ↗</a>
+            <button class="btn btn--ghost btn--sm" id="unpublishSite" hidden data-i18n="builder.workspace.unpublish">Unpublish</button>
+            <button class="btn btn--ghost btn--sm" id="exportZip" title="Advanced source-code export" data-i18n-title="builder.workspace.export_title" data-i18n="builder.workspace.export">Source ZIP (advanced)</button>
+            <button class="btn btn--ghost btn--sm" id="deleteProject" data-i18n="builder.workspace.delete">Delete</button>
           </div>
         </div>
 
@@ -263,7 +263,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
               </button>
               <button class="editor-tab" id="tabPreview" data-tab="preview" title="See your site live as visitors will">
                 <span class="editor-tab__icon" aria-hidden="true">◉</span>
-                <span class="editor-tab__label"><span class="i18n-en">See preview</span><span class="i18n-pt">Ver preview</span></span>
+                <span class="editor-tab__label"><span class="i18n-en">See preview</span><span class="i18n-pt">Ver prévia</span></span>
               </button>
               <button class="editor-tab editor-tab--ai" id="tabAI" data-tab="ai" title="Let AI generate or refine your site">
                 <span class="editor-tab__icon" aria-hidden="true">✦</span>
@@ -308,12 +308,12 @@ import PageWidgets from "../../components/PageWidgets.astro";
                 <div class="ai-panel-inner">
                   <div class="ai-panel-header">
                     <span class="ai-panel-badge">✦ AI Builder</span>
-                    <p class="ai-panel-sub">Describe the site you want — AI will generate valid VxOS sections for you.</p>
+                    <p class="ai-panel-sub" data-i18n="builder.workspace.ai_copy">Describe the site you want. AI will generate valid VxOS sections for you.</p>
                   </div>
                   <textarea id="aiPrompt" class="ai-textarea" rows="5" placeholder="Ex: A SaaS landing page for a project management tool for remote teams. Include pricing with 3 tiers, a workflow section showing 3 steps, and a FAQ." data-i18n-placeholder="builder.ph_ai"></textarea>
                   <div class="ai-actions">
                     <button class="btn btn--primary" id="aiGenerate">✦ Generate site</button>
-                    <button class="btn btn--ghost" id="aiRefine" disabled title="Select a project first to refine it">Refine current</button>
+                    <button class="btn btn--ghost" id="aiRefine" disabled title="Select a project first to refine it" data-i18n-title="builder.workspace.ai_refine_title" data-i18n="builder.workspace.ai_refine">Refine current</button>
                   </div>
                   <div id="aiStatus" class="ai-status" hidden></div>
                 </div>
@@ -326,7 +326,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
                 <div class="preview-shell__bar">
                   <div>
                     <span class="preview-shell__eyebrow"><span class="i18n-en">Live preview</span><span class="i18n-pt">Preview ao vivo</span></span>
-                    <strong><span class="i18n-en">What visitors will see</span><span class="i18n-pt">O que visitantes vao ver</span></strong>
+                    <strong><span class="i18n-en">What visitors will see</span><span class="i18n-pt">O que os visitantes verão</span></strong>
                   </div>
                   <span class="preview-shell__status"><span class="i18n-en">Updates as you edit</span><span class="i18n-pt">Atualiza ao editar</span></span>
                 </div>
@@ -359,10 +359,12 @@ import PageWidgets from "../../components/PageWidgets.astro";
       VxRenderer: any;
       VxSectionEditor: any;
       applyTranslations: any;
+      VxI18n: any;
     }
   }
 
   const $ = (id: string) => document.getElementById(id);
+  const tr = (key: string, fallback: string) => window.VxI18n?.t?.(key, fallback) ?? fallback;
   const DEBUG = (() => { try { return new URLSearchParams(location.search).has("debug"); } catch (_) { return false; } })();
   const log = DEBUG ? (msg: string) => console.log(`[builder] ${msg}`) : (_msg: string) => {};
 
@@ -732,18 +734,24 @@ import PageWidgets from "../../components/PageWidgets.astro";
   };
 
   // Enhanced archetype descriptions
-  const archetypeInfo: Record<string, { outcome: string; ideal: string }> = {
+  const archetypeInfo: Record<string, { outcome: string; ideal: string; outcomePt: string; idealPt: string }> = {
     saas: {
       outcome: "A conversion-focused product page with pricing, features and social proof",
       ideal: "Software products, apps, and platforms that need to convert visitors into users",
+      outcomePt: "Uma página de produto orientada à conversão, com preços, recursos e prova social",
+      idealPt: "Produtos de software, aplicativos e plataformas que precisam converter visitantes em usuários",
     },
     agency: {
       outcome: "A professional services page with process steps, packages and client trust signals",
       ideal: "Agencies, studios, and consultancies that sell expertise and services",
+      outcomePt: "Uma página de serviços profissionais com etapas, pacotes e sinais de confiança",
+      idealPt: "Agências, estúdios e consultorias que vendem conhecimento e serviços",
     },
     portfolio: {
       outcome: "A personal brand page with work showcase, skills and a clear hire-me CTA",
       ideal: "Developers, designers, and freelancers presenting their work and availability",
+      outcomePt: "Uma página de marca pessoal com projetos, competências e uma chamada clara para contratação",
+      idealPt: "Desenvolvedores, designers e profissionais independentes que apresentam seu trabalho e disponibilidade",
     },
   };
 
@@ -758,25 +766,25 @@ import PageWidgets from "../../components/PageWidgets.astro";
     const blank = `<button type="button" class="archetype-card${selectedPresetId === "blank" ? " archetype-card--active" : ""}" data-preset="blank">
       <div class="archetype-icon">${presetIcons.blank}</div>
       <div class="archetype-body">
-        <span class="archetype-name">Custom</span>
-        <span class="archetype-outcome">Start from scratch with a blank canvas</span>
-        <span class="archetype-ideal">For experienced users who want full control</span>
+        <span class="archetype-name"><span class="i18n-en">Custom</span><span class="i18n-pt">Personalizado</span></span>
+        <span class="archetype-outcome"><span class="i18n-en">Start from scratch with a blank canvas</span><span class="i18n-pt">Comece do zero com uma tela em branco</span></span>
+        <span class="archetype-ideal"><span class="i18n-en">For experienced users who want full control</span><span class="i18n-pt">Para usuários experientes que desejam controle total</span></span>
       </div>
     </button>`;
 
     const cards = presets.filter((p: any) => p.id !== "landing_express").map((p: any) => {
-      const info = archetypeInfo[p.id] || { outcome: p.description, ideal: "" };
+      const info = archetypeInfo[p.id] || { outcome: p.description, ideal: "", outcomePt: p.description, idealPt: "" };
       const locked = !canUsePresetId(p.id);
       const premiumTag = isPremiumPreset(p.id)
-        ? `<span class="archetype-tag">${locked ? "Buy kit" : "Unlocked"}</span>`
+        ? `<span class="archetype-tag">${locked ? '<span class="i18n-en">Buy kit</span><span class="i18n-pt">Comprar kit</span>' : '<span class="i18n-en">Unlocked</span><span class="i18n-pt">Liberado</span>'}</span>`
         : "";
       return `<button type="button" class="archetype-card${p.id === selectedPresetId ? ' archetype-card--active' : ''}${locked ? ' archetype-card--locked' : ''}" data-preset="${p.id}" ${locked ? 'aria-label="' + p.name + ' premium preset. Open purchase page."' : ""}>
       <div class="archetype-icon">${presetIcons[p.id] || p.icon || "📦"}</div>
       <div class="archetype-body">
         <span class="archetype-name">${p.name}</span>
         ${premiumTag}
-        <span class="archetype-outcome">${info.outcome}</span>
-        <span class="archetype-ideal">${info.ideal}</span>
+        <span class="archetype-outcome"><span class="i18n-en">${info.outcome}</span><span class="i18n-pt">${info.outcomePt}</span></span>
+        <span class="archetype-ideal"><span class="i18n-en">${info.ideal}</span><span class="i18n-pt">${info.idealPt}</span></span>
       </div>
     </button>`;
     }).join("");
@@ -787,9 +795,9 @@ import PageWidgets from "../../components/PageWidgets.astro";
       <div class="archetype-icon archetype-icon--express">⚡</div>
       <div class="archetype-body">
         <span class="archetype-name">Landing Express</span>
-        <span class="archetype-tag">${expressLocked ? "Buy kit" : "Guided"}</span>
-        <span class="archetype-outcome">Answer 3 questions and get a ready-to-edit landing page in seconds</span>
-        <span class="archetype-ideal">The fastest way to launch. Perfect for first-time users.</span>
+        <span class="archetype-tag">${expressLocked ? '<span class="i18n-en">Buy kit</span><span class="i18n-pt">Comprar kit</span>' : '<span class="i18n-en">Guided</span><span class="i18n-pt">Guiado</span>'}</span>
+        <span class="archetype-outcome"><span class="i18n-en">Answer three questions and get a ready-to-edit landing page in seconds</span><span class="i18n-pt">Responda a três perguntas e receba uma página pronta para editar em segundos</span></span>
+        <span class="archetype-ideal"><span class="i18n-en">The fastest way to launch. Ideal for first-time users.</span><span class="i18n-pt">O caminho mais rápido para publicar. Ideal para novos usuários.</span></span>
       </div>
     </button>`;
 
@@ -802,7 +810,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
         const preset = normalizePresetId((btn as HTMLElement).dataset.preset || "blank");
 
         if (!canUsePresetId(preset)) {
-          setStatus(lockedPresetMessage(preset) + " Opening the product page...");
+          setStatus(lockedPresetMessage(preset) + " " + tr("builder.status.opening_product", "Opening the product page..."));
           window.location.href = presetProductHref(preset);
           return;
         }
@@ -836,59 +844,59 @@ import PageWidgets from "../../components/PageWidgets.astro";
       <div class="express-flow" id="expressFlow">
         <div class="express-header">
           <span class="express-badge"><span aria-hidden="true">⚡</span> Landing Express</span>
-          <h3 class="card__title">Build your landing page in 60 seconds</h3>
+          <h3 class="card__title" data-i18n="builder.express.title">Build your landing page in 60 seconds</h3>
         </div>
 
         <div class="express-step" id="exStep1">
-          <div class="express-q">What type of business is this for?</div>
+          <div class="express-q" data-i18n="builder.express.business_question">What type of business is this for?</div>
           <div class="express-options" id="exArchetype">
-            <button class="express-opt" data-val="saas"><span aria-hidden="true">⚡</span> Software / SaaS</button>
-            <button class="express-opt" data-val="agency"><span aria-hidden="true">🏢</span> Agency / Studio</button>
-            <button class="express-opt" data-val="portfolio"><span aria-hidden="true">👤</span> Freelancer / Portfolio</button>
-            <button class="express-opt" data-val="local"><span aria-hidden="true">📍</span> Local Business</button>
-            <button class="express-opt" data-val="ecommerce"><span aria-hidden="true">🛒</span> E-commerce</button>
-            <button class="express-opt" data-val="event"><span aria-hidden="true">🎯</span> Event / Launch</button>
+            <button class="express-opt" data-val="saas"><span aria-hidden="true">⚡</span> <span data-i18n="builder.express.type_saas">Software / SaaS</span></button>
+            <button class="express-opt" data-val="agency"><span aria-hidden="true">🏢</span> <span data-i18n="builder.express.type_agency">Agency / Studio</span></button>
+            <button class="express-opt" data-val="portfolio"><span aria-hidden="true">👤</span> <span data-i18n="builder.express.type_portfolio">Freelancer / Portfolio</span></button>
+            <button class="express-opt" data-val="local"><span aria-hidden="true">📍</span> <span data-i18n="builder.express.type_local">Local business</span></button>
+            <button class="express-opt" data-val="ecommerce"><span aria-hidden="true">🛒</span> <span data-i18n="builder.express.type_ecommerce">E-commerce</span></button>
+            <button class="express-opt" data-val="event"><span aria-hidden="true">🎯</span> <span data-i18n="builder.express.type_event">Event / Launch</span></button>
           </div>
         </div>
 
         <div class="express-step" id="exStep2" hidden>
-          <div class="express-q">What should visitors do?</div>
+          <div class="express-q" data-i18n="builder.express.goal_question">What should visitors do?</div>
           <div class="express-options" id="exGoal">
-            <button class="express-opt" data-val="leads"><span aria-hidden="true">📩</span> Book a call / Get in touch</button>
-            <button class="express-opt" data-val="sales"><span aria-hidden="true">💳</span> Buy or subscribe</button>
-            <button class="express-opt" data-val="waitlist"><span aria-hidden="true">📋</span> Join a waitlist</button>
-            <button class="express-opt" data-val="showcase"><span aria-hidden="true">👁</span> Learn and trust</button>
+            <button class="express-opt" data-val="leads"><span aria-hidden="true">📩</span> <span data-i18n="builder.express.goal_contact">Book a call / Get in touch</span></button>
+            <button class="express-opt" data-val="sales"><span aria-hidden="true">💳</span> <span data-i18n="builder.express.goal_sales">Buy or subscribe</span></button>
+            <button class="express-opt" data-val="waitlist"><span aria-hidden="true">📋</span> <span data-i18n="builder.express.goal_waitlist">Join a waitlist</span></button>
+            <button class="express-opt" data-val="showcase"><span aria-hidden="true">👁</span> <span data-i18n="builder.express.goal_trust">Learn and build trust</span></button>
           </div>
         </div>
 
         <div class="express-step" id="exStep3" hidden>
-          <div class="express-q">Last details</div>
+          <div class="express-q" data-i18n="builder.express.details">Final details</div>
           <div class="row">
             <div class="field-group">
-              <label class="label" for="exBrand">Brand name</label>
+              <label class="label" for="exBrand" data-i18n="builder.workspace.brand_name">Brand name</label>
               <input id="exBrand" class="field" placeholder="Your brand" data-i18n-placeholder="builder.ph_ex_brand" />
             </div>
             <div class="field-group">
-              <label class="label" for="exTagline">One-line description</label>
+              <label class="label" for="exTagline" data-i18n="builder.express.description">One-line description</label>
               <input id="exTagline" class="field" placeholder="What you do, in one sentence" data-i18n-placeholder="builder.ph_ex_tagline" />
             </div>
           </div>
           <div class="row" style="margin-top:12px">
             <div class="field-group">
-              <label class="label" for="exCta">Main button text</label>
+              <label class="label" for="exCta" data-i18n="builder.workspace.cta_label">Main button text</label>
               <input id="exCta" class="field" placeholder="Get started" data-i18n-placeholder="builder.ph_ex_cta" />
             </div>
             <div class="field-group">
-              <label class="label" for="exSlug">Site address</label>
+              <label class="label" for="exSlug" data-i18n="builder.workspace.site_address">Site address</label>
               <input id="exSlug" class="field" placeholder="my-brand" data-i18n-placeholder="builder.ph_ex_slug" />
             </div>
           </div>
           <button class="btn btn--primary" id="exGenerate" style="margin-top:18px;width:100%">
-            Generate my landing page <span aria-hidden="true">→</span>
+            <span data-i18n="builder.express.generate">Generate my landing page</span> <span aria-hidden="true">→</span>
           </button>
         </div>
 
-        <button class="btn btn--ghost btn--sm" id="exBack" style="margin-top:12px"><span aria-hidden="true">←</span> Back to templates</button>
+        <button class="btn btn--ghost btn--sm" id="exBack" style="margin-top:12px"><span aria-hidden="true">←</span> <span data-i18n="builder.express.back">Back to templates</span></button>
       </div>
     `;
 
@@ -937,7 +945,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
     $("exGenerate")?.addEventListener("click", async () => {
       const user = currentUser;
       if (!user?.id) {
-        setStatus("Session expired. Please sign in again.");
+        setStatus(tr("builder.status.session_signin", "Session expired. Please sign in again."));
         return;
       }
 
@@ -980,12 +988,12 @@ import PageWidgets from "../../components/PageWidgets.astro";
       const projectName = brand;
       const builder_data = buildProjectData();
 
-      setStatus("Creating your landing page...");
+      setStatus(tr("builder.status.creating_landing", "Creating your landing page..."));
       const { data, error, slug: projectSlug } = await createDraftProject(user.id, projectName, slug || brand, builder_data);
 
       if (error) { setStatus(error.message); return; }
       await logUsage("builder_create");
-      setStatus(`Landing page created at ${projectSlug}.volynx.world`);
+      setStatus(tr("builder.status.landing_created", "Landing page created at {address}").replace("{address}", `${projectSlug}.volynx.world`));
       await listProjects(user.id);
       openProject(data);
 
@@ -1086,7 +1094,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
     const preset = presets.find((p: any) => p.id === selectedPresetId);
     if (!preset?.optionalSections) { box.innerHTML = ""; return; }
 
-    box.innerHTML = `<label class="label">Include sections</label><div class="toggle-grid">` +
+    box.innerHTML = `<label class="label"><span class="i18n-en">Include sections</span><span class="i18n-pt">Incluir seções</span></label><div class="toggle-grid">` +
       Object.entries(preset.optionalSections as Record<string, any>).map(([key, cfg]: [string, any]) =>
         `<label class="toggle-item">
           <input type="checkbox" data-section="${key}" ${cfg.default ? "checked" : ""} />
@@ -1482,7 +1490,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
           </div>
           <span class="project-slug">${p.slug ? p.slug + '.volynx.world' : 'no slug'}</span>
         </button>
-      `).join("") || `<span class="hint">No projects yet.</span>`;
+      `).join("") || `<span class="hint"><span class="i18n-en">No projects yet.</span><span class="i18n-pt">Nenhum projeto criado.</span></span>`;
 
     box.querySelectorAll(".project-btn").forEach((btn) => {
       btn.addEventListener("click", () =>
@@ -1500,7 +1508,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
     setSaveState("saved");
     const link = $("link");
     if (link) link.innerHTML = "";
-    setStatus("Project loaded.");
+    setStatus(tr("builder.status.project_loaded", "Project loaded."));
 
     // Render the visual section editor — without this, the Sections tab
     // stayed stuck on the "Select a project" empty state even after the
@@ -1578,7 +1586,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
     try {
       parsed = JSON.parse(($("json") as HTMLTextAreaElement)?.value || "{}");
     } catch {
-      setStatus("Invalid JSON.");
+      setStatus(tr("builder.status.invalid_json", "Invalid JSON."));
       setSaveState("error");
       return false;
     }
@@ -1614,7 +1622,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
       setSaveState("saving");
       const ok = await saveCurrent(false);
       autosaveInFlight = false;
-      if (ok) setStatus("Changes saved automatically.");
+      if (ok) setStatus(tr("builder.status.autosaved", "Changes saved automatically."));
       if ((($("json") as HTMLTextAreaElement)?.value || "{}") !== lastSavedJson) scheduleAutosave();
     }, 1200);
   }
@@ -1732,7 +1740,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
         }
         if (error || !data) {
           log("project url param load failed: " + (error?.message || "not found"));
-          setStatus("Project not found or access denied.");
+          setStatus(tr("builder.status.project_unavailable", "Project not found or access denied."));
           return;
         }
         openProject(data);
@@ -1796,13 +1804,13 @@ import PageWidgets from "../../components/PageWidgets.astro";
       const { data: sessData } = await supa.auth.getSession();
       const token = sessData?.session?.access_token;
       if (!token) {
-        setStatus("Session expired. Please refresh the page.");
+        setStatus(tr("builder.status.session_refresh", "Session expired. Please refresh the page."));
         return false;
       }
 
       const apiBase = ((cfg as any).apiBaseUrl || "").replace(/\/$/, "");
       if (!apiBase) {
-        setStatus("Publish backend not configured. Add apiBaseUrl to config.json.");
+        setStatus(tr("builder.status.publish_config", "Publishing service is not configured. Add apiBaseUrl to config.json."));
         return false;
       }
 
@@ -1840,8 +1848,8 @@ import PageWidgets from "../../components/PageWidgets.astro";
 
     // Export ZIP
     $("exportZip")?.addEventListener("click", async () => {
-      if (!currentProject) return setStatus("Select a project.");
-      setStatus("Generating ZIP…");
+      if (!currentProject) return setStatus(tr("builder.status.select_project", "Select a project."));
+      setStatus(tr("builder.status.generating_zip", "Generating ZIP…"));
       try {
         const jsonStr = JSON.stringify(currentProject.builder_data || {}, null, 2);
         const slug = currentProject.slug || "project";
@@ -1878,7 +1886,7 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
           a.download = `${slug}-volynx-export.zip`;
           a.click();
           URL.revokeObjectURL(a.href);
-          setStatus("ZIP downloaded ✓");
+          setStatus(tr("builder.status.zip_downloaded", "ZIP downloaded ✓"));
         } else {
           // Fallback: just download JSON
           const a = document.createElement("a");
@@ -1886,30 +1894,30 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
           a.download = `${slug}-builder_data.json`;
           a.click();
           URL.revokeObjectURL(a.href);
-          setStatus("JSON downloaded ✓");
+          setStatus(tr("builder.status.json_downloaded", "JSON downloaded ✓"));
         }
       } catch (err: any) {
-        setStatus("Export failed: " + (err?.message || err));
+        setStatus(tr("builder.status.export_failed", "Export failed: {error}").replace("{error}", err?.message || String(err)));
       }
     });
 
     $("unpublishSite")?.addEventListener("click", async () => {
-      if (!currentProject) return setStatus("Select a project.");
-      if (!confirm(`Unpublish "${currentProject.name}"? The editor stays saved, but the public site will go offline.`)) return;
+      if (!currentProject) return setStatus(tr("builder.status.select_project", "Select a project."));
+      if (!confirm(tr("builder.confirm_unpublish", 'Unpublish "{name}"? The editor stays saved, but the public site will go offline.').replace("{name}", currentProject.name))) return;
       const btn = $("unpublishSite") as HTMLButtonElement;
       btnLoading(btn, true, "Unpublishing...");
       const ok = await unpublishCurrentProject();
       btnLoading(btn, false);
-      if (ok) setStatus("Site unpublished.");
+      if (ok) setStatus(tr("builder.status.unpublished", "Site unpublished."));
     });
 
     // Delete project (soft delete)
     $("deleteProject")?.addEventListener("click", async () => {
-      if (!currentProject) return setStatus("Select a project.");
-      if (!confirm(`Delete "${currentProject.name}"? This can't be undone.`)) return;
+      if (!currentProject) return setStatus(tr("builder.status.select_project", "Select a project."));
+      if (!confirm(tr("builder.confirm_delete", 'Delete "{name}"? This cannot be undone.').replace("{name}", currentProject.name))) return;
 
       if (currentProject.status === "published") {
-        setStatus("Unpublishing before delete...");
+        setStatus(tr("builder.status.unpublishing_delete", "Taking the site offline before deletion..."));
         const unpublished = await unpublishCurrentProject();
         if (!unpublished) return;
       }
@@ -1920,7 +1928,7 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
         .eq("id", currentProject.id);
 
       if (error) return setStatus(error.message);
-      setStatus("Project deleted.");
+      setStatus(tr("builder.status.deleted", "Project deleted."));
       currentProject = null;
       lastSavedJson = "";
       if (autosaveTimer) clearTimeout(autosaveTimer);
@@ -1973,52 +1981,52 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
       btnLoading(btn, false);
       if (error) return setStatus(error.message);
       await logUsage("builder_create");
-      setStatus(`Project created at ${slug}.volynx.world`);
+      setStatus(tr("builder.status.created", "Project created at {address}").replace("{address}", `${slug}.volynx.world`));
       showWizardStep(1); // reset wizard
       await listProjects(user.id);
       openProject(data);
     });
 
     $("save")?.addEventListener("click", async () => {
-      if (!currentProject) return setStatus("Select a project.");
+      if (!currentProject) return setStatus(tr("builder.status.select_project", "Select a project."));
       const ok = await saveCurrent();
-      if (ok) setStatus("Saved ✓");
+      if (ok) setStatus(tr("builder.status.saved", "Saved ✓"));
     });
 
     $("copy")?.addEventListener("click", async () => {
       try {
         await navigator.clipboard.writeText(($("json") as HTMLTextAreaElement)?.value || "");
-        setStatus("Copied to clipboard.");
-      } catch { setStatus("Clipboard permission denied."); }
+        setStatus(tr("builder.status.copied", "Copied to clipboard."));
+      } catch { setStatus(tr("builder.status.clipboard_denied", "Clipboard permission denied.")); }
     });
 
     $("publish")?.addEventListener("click", async () => {
-      if (!currentProject) return setStatus("Select a project.");
-      if (!currentProject.slug) return setStatus("Project has no site address yet. Create a new project address before publishing.");
+      if (!currentProject) return setStatus(tr("builder.status.select_project", "Select a project."));
+      if (!currentProject.slug) return setStatus(tr("builder.status.no_address", "This project has no site address. Create one before publishing."));
 
       // Check publish limit based on builder_plan
       const counts = await countActiveProjects(user.id);
       const pubCheck = canPublish(counts);
       if (!pubCheck.ok) return setStatus(pubCheck.msg);
 
-      setStatus("Saving…");
+      setStatus(tr("builder.status.saving", "Saving…"));
       const ok = await saveCurrent();
       if (!ok) return;
 
       const { data: sessData } = await supa.auth.getSession();
       const token = sessData?.session?.access_token;
-      if (!token) return setStatus("Session expired. Please refresh the page.");
+      if (!token) return setStatus(tr("builder.status.session_refresh", "Session expired. Please refresh the page."));
 
       const apiBase = ((cfg as any).apiBaseUrl || "").replace(/\/$/, "");
       if (!apiBase) {
-        setStatus("Publish backend not configured. Add apiBaseUrl to config.json.");
+        setStatus(tr("builder.status.publish_config", "Publishing service is not configured. Add apiBaseUrl to config.json."));
         log("publish blocked: apiBaseUrl missing from config.json");
         return;
       }
 
       const pubBtn = $("publish") as HTMLButtonElement;
       btnLoading(pubBtn, true, "Publishing...");
-      setStatus("Publishing to " + currentProject.slug + ".volynx.world…");
+      setStatus(tr("builder.status.publishing", "Publishing to {address}…").replace("{address}", currentProject.slug + ".volynx.world"));
       try {
         const ctrl = new AbortController();
         const timeout = setTimeout(() => ctrl.abort(), 15000);
@@ -2046,7 +2054,7 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
         }
 
         btnLoading(pubBtn, false);
-        setStatus("Published ✓");
+        setStatus(tr("builder.status.published", "Published ✓"));
         currentProject.status = "published";
         await logUsage("builder_publish");
 
@@ -2069,9 +2077,9 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
       } catch (err: any) {
         btnLoading(pubBtn, false);
         if (err?.name === "AbortError") {
-          setStatus("Publish timed out. The API may be starting up — try again in 30s.");
+          setStatus(tr("builder.status.publish_timeout", "Publishing timed out. The service may be starting. Try again in 30 seconds."));
         } else {
-          setStatus("Cannot reach publish API. Check that api.volynx.world is configured.");
+          setStatus(tr("builder.status.publish_unreachable", "Cannot reach the publishing service. Confirm that api.volynx.world is configured."));
           log("publish error: " + (err?.message || err));
         }
       }
@@ -2122,7 +2130,7 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     async function runAI(refine: boolean) {
       const prompt = ($("aiPrompt") as HTMLTextAreaElement)?.value?.trim();
       if (!prompt) {
-        setAIStatus("Please describe the site you want to build.", "error");
+        setAIStatus(tr("builder.ai.describe", "Please describe the site you want to build."), "error");
         return;
       }
       const generateBtn = $("aiGenerate") as HTMLButtonElement;
@@ -2131,10 +2139,10 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
       // Deduct a token first
       const token = localStorage.getItem("volynx_access_token");
       if (!token) {
-        setAIStatus("Sign in to use AI Builder.", "error");
+        setAIStatus(tr("builder.ai.signin", "Sign in to use AI Builder."), "error");
         return;
       }
-      setAIStatus("Checking balance…", "info");
+      setAIStatus(tr("builder.ai.checking_balance", "Checking balance…"), "info");
       try {
         const deductRes = await fetch(`${functionsBase}/deduct-tokens`, {
           method: "POST",
@@ -2143,16 +2151,16 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
         });
         const deductData = await deductRes.json();
         if (!deductData.ok && deductData.error === "insufficient_balance") {
-          setAIStatus("Not enough tokens. Add more to use AI Builder.", "error");
+          setAIStatus(tr("builder.ai.insufficient", "Not enough tokens. Add more to use AI Builder."), "error");
           ($("aiStatus") as HTMLElement).innerHTML +=
-            ' <a href="/pricing/" class="btn btn--primary btn--sm" style="margin-left:8px;">Add tokens</a>';
+            ' <a href="/pricing/" class="btn btn--primary btn--sm" style="margin-left:8px;">' + tr("builder.ai.add_tokens", "Add tokens") + '</a>';
           return;
         }
       } catch { /* allow on network error */ }
 
       generateBtn.disabled = true;
       refineBtn.disabled = true;
-      setAIStatus("Generating site with AI… this may take a few seconds.", "info");
+      setAIStatus(tr("builder.ai.generating", "Generating site with AI… this may take a few seconds."), "info");
 
       try {
         const current = refine && currentProject ? currentProject.builder_data : undefined;
@@ -2166,7 +2174,7 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
             jsonEl.dispatchEvent(new Event("input"));
           }
           currentProject.builder_data = builderData;
-          setAIStatus("Sections updated! Switch to Sections or JSON to review, then Save.", "success");
+          setAIStatus(tr("builder.ai.updated", "Sections updated. Switch to Sections or JSON to review, then save."), "success");
           switchTab("sections");
         } else {
           // Create a new draft project with AI-generated data
@@ -2181,13 +2189,13 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
 
           if (error) { setAIStatus(error.message, "error"); return; }
           await logUsage("builder_ai");
-          setAIStatus("Site generated! Switch to Sections to review and edit.", "success");
+          setAIStatus(tr("builder.ai.generated", "Site generated. Switch to Sections to review and edit."), "success");
           await listProjects(user.id);
           openProject(data);
           switchTab("sections");
         }
       } catch (err: any) {
-        setAIStatus("Error: " + (err?.message || "AI generation failed."), "error");
+        setAIStatus(tr("builder.ai.error", "Error: {error}").replace("{error}", err?.message || tr("builder.ai.failed", "AI generation failed.")), "error");
       } finally {
         generateBtn.disabled = false;
         if (currentProject) refineBtn.disabled = false;

@@ -16,62 +16,62 @@ const title = "Admin · Vouchers — VOLYNX";
     <div class="container">
       <!-- Loading state -->
       <section id="adminLoading" class="admin-state">
-        <p class="admin-state__text">Loading admin context...</p>
+        <p class="admin-state__text" data-i18n="admin.vouchers.loading">Loading admin context...</p>
       </section>
 
       <!-- Not logged in -->
       <section id="adminLoggedOut" class="admin-state" hidden>
-        <h1>Sign in required</h1>
-        <p class="muted">The voucher admin is gated to platform admins.</p>
-        <a class="btn primary" href="/login/?next=/admin/vouchers/">Sign in</a>
+        <h1 data-i18n="admin.vouchers.signin_title">Sign in required</h1>
+        <p class="muted" data-i18n="admin.vouchers.signin_copy">Voucher administration is restricted to platform administrators.</p>
+        <a class="btn primary" href="/login/?next=/admin/vouchers/" data-i18n="admin.vouchers.signin">Sign in</a>
       </section>
 
       <!-- Not admin -->
       <section id="adminForbidden" class="admin-state" hidden>
-        <h1>Forbidden</h1>
-        <p class="muted">Your account does not have admin privileges. If this is a mistake, contact support.</p>
-        <a class="btn ghost" href="/">Back to home</a>
+        <h1 data-i18n="admin.vouchers.forbidden_title">Access denied</h1>
+        <p class="muted" data-i18n="admin.vouchers.forbidden_copy">Your account does not have administrator privileges. If this is incorrect, contact support.</p>
+        <a class="btn ghost" href="/" data-i18n="admin.vouchers.home">Back to home</a>
       </section>
 
       <!-- Admin UI -->
       <section id="adminUI" class="admin-ui" hidden>
         <header class="admin-head">
           <div>
-            <span class="kicker">Admin · Vouchers</span>
-            <h1>Issue invites, discounts, kit unlocks &amp; token grants</h1>
-            <p class="muted">Each voucher is a single record in the <code>vouchers</code> table. Black Diamond invites generate a personalized URL ready to share.</p>
+            <span class="kicker" data-i18n="admin.vouchers.kicker">Admin · Vouchers</span>
+            <h1 data-i18n="admin.vouchers.title">Issue invitations, discounts, kit access and token grants</h1>
+            <p class="muted" data-i18n-html="admin.vouchers.copy">Each voucher is a single record in the <code>vouchers</code> table. Black Diamond invitations generate a personalized URL ready to share.</p>
           </div>
-          <button id="refreshBtn" class="btn ghost" type="button">Refresh list</button>
+          <button id="refreshBtn" class="btn ghost" type="button" data-i18n="admin.vouchers.refresh">Refresh list</button>
         </header>
 
         <!-- Create form -->
         <article class="panel admin-create">
-          <h2>Create voucher</h2>
+          <h2 data-i18n="admin.vouchers.create">Create voucher</h2>
           <form id="createForm" class="admin-form">
 
             <!-- QUICK FILL PRESETS -->
             <fieldset class="grants quick-fill">
-              <legend>Quick fill</legend>
-              <p class="grant-help">Pre-fill common combinations. You can still override anything below.</p>
+              <legend data-i18n="admin.vouchers.quick_fill">Quick fill</legend>
+              <p class="grant-help" data-i18n="admin.vouchers.quick_fill_copy">Pre-fill common combinations. You can still change any field below.</p>
               <div class="quick-fill__row">
                 <button type="button" class="btn ghost btn-sm" data-preset="black_diamond">◆ Black Diamond pack</button>
                 <button type="button" class="btn ghost btn-sm" data-preset="vx_80">+ 80 VX bonus</button>
                 <button type="button" class="btn ghost btn-sm" data-preset="diamond_only">Daily Diamond 90d</button>
                 <button type="button" class="btn ghost btn-sm" data-preset="pro_perm">Pro plan (permanent)</button>
-                <button type="button" class="btn ghost btn-sm" data-preset="reset">↺ Reset all</button>
+                <button type="button" class="btn ghost btn-sm" data-preset="reset">↺ <span data-i18n="admin.vouchers.reset">Reset all</span></button>
               </div>
             </fieldset>
 
             <!-- 1) GRANTS — à la carte. Toggle each section independently. -->
             <fieldset class="grants">
-              <legend>What does this voucher unlock? <small>(check what applies — combine freely)</small></legend>
+              <legend><span data-i18n="admin.vouchers.unlock_title">What does this voucher unlock?</span> <small data-i18n="admin.vouchers.unlock_hint">Select every applicable item. Grants can be combined.</small></legend>
 
               <!-- BD BADGE -->
               <div class="grant-section" data-section="bd">
                 <label class="grant-section__head">
                   <input type="checkbox" data-section-toggle="bd" />
-                  <span class="grant-section__title">◆ Black Diamond marker</span>
-                  <span class="grant-section__hint">Sets <code>is_black_diamond=true</code> on profile.</span>
+                  <span class="grant-section__title" data-i18n="admin.vouchers.bd_title">◆ Black Diamond marker</span>
+                  <span class="grant-section__hint" data-i18n-html="admin.vouchers.bd_hint">Sets <code>is_black_diamond=true</code> on the profile.</span>
                 </label>
               </div>
 
@@ -79,13 +79,13 @@ const title = "Admin · Vouchers — VOLYNX";
               <div class="grant-section" data-section="plan">
                 <label class="grant-section__head">
                   <input type="checkbox" data-section-toggle="plan" />
-                  <span class="grant-section__title">📈 Plan upgrade</span>
+                  <span class="grant-section__title" data-i18n="admin.vouchers.plan_title">📈 Plan upgrade</span>
                   <span class="grant-section__hint">Updates <code>profiles.plan</code> / <code>builder_plan</code> / <code>daily_plan</code>.</span>
                 </label>
                 <div class="grant-section__body">
                   <div class="form-row">
                     <label class="field">
-                      <span>Plan</span>
+                      <span data-i18n="admin.vouchers.plan">Plan</span>
                       <select name="grant_plan">
                         <option value="launch">Launch</option>
                         <option value="business">Business</option>
@@ -96,7 +96,7 @@ const title = "Admin · Vouchers — VOLYNX";
                       </select>
                     </label>
                     <label class="field">
-                      <span>Affects</span>
+                      <span data-i18n="admin.vouchers.affects">Affects</span>
                       <select name="grant_plan_scope">
                         <option value="plan" selected>profiles.plan (global)</option>
                         <option value="builder_plan">builder_plan only</option>
@@ -107,10 +107,10 @@ const title = "Admin · Vouchers — VOLYNX";
                   </div>
                   <label class="field field--checkbox">
                     <input type="checkbox" name="grant_plan_expires_enable" />
-                    <span>Expires after a fixed number of days <small>(unchecked = permanent)</small></span>
+                    <span data-i18n-html="admin.vouchers.expires_days">Expires after a fixed number of days <small>(unchecked = permanent)</small></span>
                   </label>
                   <label class="field" data-show-if="grant_plan_expires_enable">
-                    <span>Duration (days)</span>
+                    <span data-i18n="admin.vouchers.duration">Duration (days)</span>
                     <input type="number" name="grant_plan_expires_days" min="1" max="3650" value="90" />
                   </label>
                 </div>
@@ -120,12 +120,12 @@ const title = "Admin · Vouchers — VOLYNX";
               <div class="grant-section" data-section="tokens">
                 <label class="grant-section__head">
                   <input type="checkbox" data-section-toggle="tokens" />
-                  <span class="grant-section__title">🪙 VX tokens</span>
+                  <span class="grant-section__title" data-i18n="admin.vouchers.tokens_title">🪙 VX tokens</span>
                   <span class="grant-section__hint">Credits VX balance via <code>credit_tokens_atomic</code>.</span>
                 </label>
                 <div class="grant-section__body">
                   <label class="field">
-                    <span>VX amount</span>
+                    <span data-i18n="admin.vouchers.tokens_amount">VX amount</span>
                     <div class="quick-presets">
                       <input type="number" name="grant_tokens" min="1" max="100000" value="80" />
                       <button type="button" class="btn ghost btn-sm" data-preset-tokens="12">+12</button>
@@ -141,8 +141,8 @@ const title = "Admin · Vouchers — VOLYNX";
               <div class="grant-section" data-section="kits">
                 <label class="grant-section__head">
                   <input type="checkbox" data-section-toggle="kits" />
-                  <span class="grant-section__title">📦 Kit unlocks <small>(multi)</small></span>
-                  <span class="grant-section__hint warn">⚠️ Captured in voucher. Auto-delivery in Phase 2.</span>
+                  <span class="grant-section__title" data-i18n-html="admin.vouchers.kits_title">📦 Kit access <small>(multiple)</small></span>
+                  <span class="grant-section__hint warn" data-i18n="admin.vouchers.delivery_phase2">⚠️ Stored in the voucher. Automatic delivery is planned for Phase 2.</span>
                 </label>
                 <div class="grant-section__body">
                   <fieldset class="check-grid">
@@ -157,8 +157,8 @@ const title = "Admin · Vouchers — VOLYNX";
               <div class="grant-section" data-section="icons">
                 <label class="grant-section__head">
                   <input type="checkbox" data-section-toggle="icons" />
-                  <span class="grant-section__title">🎨 Icon packs <small>(multi)</small></span>
-                  <span class="grant-section__hint warn">⚠️ Captured in voucher. Auto-delivery in Phase 2.</span>
+                  <span class="grant-section__title" data-i18n-html="admin.vouchers.icons_title">🎨 Icon packs <small>(multiple)</small></span>
+                  <span class="grant-section__hint warn" data-i18n="admin.vouchers.delivery_phase2">⚠️ Stored in the voucher. Automatic delivery is planned for Phase 2.</span>
                 </label>
                 <div class="grant-section__body">
                   <fieldset class="check-grid">
@@ -185,12 +185,12 @@ const title = "Admin · Vouchers — VOLYNX";
               <div class="grant-section" data-section="devjourney">
                 <label class="grant-section__head">
                   <input type="checkbox" data-section-toggle="devjourney" />
-                  <span class="grant-section__title">🎓 Dev Journey tier</span>
-                  <span class="grant-section__hint warn">⚠️ Captured in voucher. Auto-enrollment in Phase 2.</span>
+                  <span class="grant-section__title" data-i18n="admin.vouchers.journey_title">🎓 Dev Journey tier</span>
+                  <span class="grant-section__hint warn" data-i18n="admin.vouchers.enrollment_phase2">⚠️ Stored in the voucher. Automatic enrollment is planned for Phase 2.</span>
                 </label>
                 <div class="grant-section__body">
                   <label class="field">
-                    <span>Tier</span>
+                    <span data-i18n="admin.vouchers.tier">Tier</span>
                     <select name="grant_devjourney_tier">
                       <option value="social">Social Sprint</option>
                       <option value="pro" selected>Pro</option>
@@ -204,17 +204,17 @@ const title = "Admin · Vouchers — VOLYNX";
               <div class="grant-section" data-section="discount">
                 <label class="grant-section__head">
                   <input type="checkbox" data-section-toggle="discount" />
-                  <span class="grant-section__title">💰 Discount %</span>
-                  <span class="grant-section__hint warn">⚠️ Captured in voucher. Stripe checkout wiring in Phase 2.</span>
+                  <span class="grant-section__title" data-i18n="admin.vouchers.discount_title">💰 Discount percentage</span>
+                  <span class="grant-section__hint warn" data-i18n="admin.vouchers.discount_phase2">⚠️ Stored in the voucher. Stripe checkout integration is planned for Phase 2.</span>
                 </label>
                 <div class="grant-section__body">
                   <div class="form-row">
                     <label class="field">
-                      <span>Discount %</span>
+                      <span data-i18n="admin.vouchers.discount">Discount percentage</span>
                       <input type="number" name="grant_discount_pct" min="1" max="100" value="20" />
                     </label>
                     <label class="field">
-                      <span>Stripe coupon ID <small>(optional)</small></span>
+                      <span data-i18n-html="admin.vouchers.coupon">Stripe coupon ID <small>(optional)</small></span>
                       <input type="text" name="grant_stripe_coupon_id" placeholder="coupon_xxx" />
                     </label>
                   </div>
@@ -225,12 +225,12 @@ const title = "Admin · Vouchers — VOLYNX";
               <div class="grant-section" data-section="custom">
                 <label class="grant-section__head">
                   <input type="checkbox" data-section-toggle="custom" />
-                  <span class="grant-section__title">🧩 Custom grants JSON</span>
-                  <span class="grant-section__hint">Merged into the final grants payload. Use only if you know what redeem-voucher consumes.</span>
+                  <span class="grant-section__title" data-i18n="admin.vouchers.custom_title">🧩 Custom grants JSON</span>
+                  <span class="grant-section__hint" data-i18n="admin.vouchers.custom_hint">Merged into the final grants payload. Use only when the expected redeem-voucher schema is known.</span>
                 </label>
                 <div class="grant-section__body">
                   <label class="field">
-                    <span>Raw JSON</span>
+                    <span data-i18n="admin.vouchers.raw_json">Raw JSON</span>
                     <textarea name="grant_json" rows="4" placeholder='{"feature":"early_access"}'></textarea>
                   </label>
                 </div>
@@ -242,44 +242,44 @@ const title = "Admin · Vouchers — VOLYNX";
 
             <!-- 2) WHO is this for? -->
             <fieldset class="grants">
-              <legend>Who is this for?</legend>
+              <legend data-i18n="admin.vouchers.recipient_title">Who is this for?</legend>
               <div class="form-row">
                 <label class="field">
-                  <span>Recipient name <small>(goes into the personalized URL ?to=)</small></span>
+                  <span data-i18n-html="admin.vouchers.recipient_name">Recipient name <small>(included in the personalized ?to= URL)</small></span>
                   <input id="recipient_name" name="recipient_name" type="text" maxlength="80" placeholder="Maria Silva" />
                 </label>
                 <label class="field">
-                  <span>Target email <small>(optional gate — locks redemption to this email)</small></span>
+                  <span data-i18n-html="admin.vouchers.target_email">Target email <small>(optional restriction that limits redemption to this address)</small></span>
                   <input id="target_email" name="target_email" type="email" maxlength="320" placeholder="maria@example.com" />
                 </label>
               </div>
               <label class="field">
-                <span>Label <small>(auto-suggested from selection — edit if needed)</small></span>
+                <span data-i18n-html="admin.vouchers.label">Label <small>(suggested from the selection and editable)</small></span>
                 <input id="label" name="label" type="text" maxlength="200" placeholder="Auto-filled when you pick a category" />
               </label>
             </fieldset>
 
             <!-- 3) WHEN does it work? -->
             <fieldset class="grants">
-              <legend>When does it work?</legend>
+              <legend data-i18n="admin.vouchers.validity_title">When is it valid?</legend>
               <div class="form-row">
                 <label class="field">
-                  <span>Max uses</span>
+                  <span data-i18n="admin.vouchers.max_uses">Maximum uses</span>
                   <input id="max_uses" name="max_uses" type="number" min="1" max="100000" value="1" required />
                 </label>
                 <label class="field">
-                  <span>Expires at <small>(optional)</small></span>
+                  <span data-i18n-html="admin.vouchers.expires_at">Expires at <small>(optional)</small></span>
                   <input id="expires_at" name="expires_at" type="datetime-local" />
                 </label>
                 <label class="field field--checkbox">
                   <input id="transferable" name="transferable" type="checkbox" checked />
-                  <span>Transferable (anyone with code can redeem)</span>
+                  <span data-i18n="admin.vouchers.transferable">Transferable (anyone with the code can redeem it)</span>
                 </label>
               </div>
             </fieldset>
 
             <div class="form-actions">
-              <button id="submitBtn" type="submit" class="btn primary">Create voucher</button>
+              <button id="submitBtn" type="submit" class="btn primary" data-i18n="admin.vouchers.create">Create voucher</button>
               <span id="formMsg" class="form-msg" aria-live="polite"></span>
             </div>
           </form>
@@ -287,48 +287,48 @@ const title = "Admin · Vouchers — VOLYNX";
 
         <!-- Result panel — hidden until a voucher is created -->
         <article id="resultPanel" class="panel admin-result" hidden>
-          <h2>Voucher created</h2>
+          <h2 data-i18n="admin.vouchers.created">Voucher created</h2>
           <div class="result-grid">
             <div>
-              <h3>Code</h3>
+              <h3 data-i18n="admin.vouchers.code">Code</h3>
               <div class="code-row">
                 <code id="resultCode" class="code-badge">—</code>
-                <button class="btn ghost btn-sm" data-copy="code" type="button">Copy</button>
+                <button class="btn ghost btn-sm" data-copy="code" type="button" data-i18n="admin.vouchers.copy_action">Copy</button>
               </div>
-              <h3>Personalized URL</h3>
+              <h3 data-i18n="admin.vouchers.personalized_url">Personalized URL</h3>
               <div class="code-row">
                 <input id="resultUrl" type="text" readonly />
-                <button class="btn ghost btn-sm" data-copy="url" type="button">Copy</button>
+                <button class="btn ghost btn-sm" data-copy="url" type="button" data-i18n="admin.vouchers.copy_action">Copy</button>
               </div>
               <p class="muted" id="resultMeta">—</p>
             </div>
             <div class="qr-shell">
-              <h3>QR code</h3>
+              <h3 data-i18n="admin.vouchers.qr_code">QR code</h3>
               <canvas id="resultQR" width="220" height="220" aria-label="Personalized invite QR"></canvas>
-              <button class="btn ghost btn-sm" id="downloadQR" type="button">Download PNG</button>
+              <button class="btn ghost btn-sm" id="downloadQR" type="button" data-i18n="admin.vouchers.download_png">Download PNG</button>
             </div>
           </div>
         </article>
 
         <!-- List -->
         <article class="panel admin-list">
-          <h2>Recent vouchers</h2>
+          <h2 data-i18n="admin.vouchers.recent">Recent vouchers</h2>
           <div class="table-wrap">
             <table class="admin-table">
               <thead>
                 <tr>
-                  <th>Code</th>
-                  <th>Type</th>
-                  <th>Label</th>
-                  <th>Target</th>
-                  <th>Used</th>
-                  <th>Status</th>
-                  <th>Expires</th>
+                  <th data-i18n="admin.vouchers.code">Code</th>
+                  <th data-i18n="admin.vouchers.type">Type</th>
+                  <th data-i18n="admin.vouchers.label_short">Label</th>
+                  <th data-i18n="admin.vouchers.target">Target</th>
+                  <th data-i18n="admin.vouchers.used">Used</th>
+                  <th data-i18n="admin.vouchers.status">Status</th>
+                  <th data-i18n="admin.vouchers.expires">Expires</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody id="vouchersBody">
-                <tr><td colspan="8" class="muted">Loading…</td></tr>
+                <tr><td colspan="8" class="muted" data-i18n="admin.vouchers.table_loading">Loading…</td></tr>
               </tbody>
             </table>
           </div>
@@ -346,6 +346,8 @@ const title = "Admin · Vouchers — VOLYNX";
     const SITE_URL = location.origin;
 
     const $ = (id) => document.getElementById(id);
+    const tx = (key, fallback) => window.VxI18n?.t?.(key, fallback) ?? fallback;
+    let currentVouchers = [];
     const els = {
       loading: $("adminLoading"),
       loggedOut: $("adminLoggedOut"),
@@ -507,15 +509,18 @@ const title = "Admin · Vouchers — VOLYNX";
 
       if (grants.badge === "black_diamond") parts.push("Black Diamond");
       const plan = grants.plan || grants.builder_plan || grants.daily_plan;
-      if (plan) parts.push(`${PLAN_NAMES[plan] || plan} plan`);
+      if (plan) parts.push(tx("admin.vouchers.runtime_plan", "{plan} plan").replace("{plan}", PLAN_NAMES[plan] || plan));
       if (grants.tokens) parts.push(`${grants.tokens} VX`);
-      if (grants.kit_ids?.length) parts.push(`${grants.kit_ids.length} kits`);
+      if (grants.kit_ids?.length) parts.push(tx("admin.vouchers.runtime_kits", "{count} kits").replace("{count}", grants.kit_ids.length));
       else if (grants.kit_id) parts.push(`${KIT_NAMES[grants.kit_id] || "Kit"}`);
-      if (grants.icon_pack_grants?.length) parts.push(`${grants.icon_pack_grants.length} icon pack${grants.icon_pack_grants.length > 1 ? "s" : ""}`);
+      if (grants.icon_pack_grants?.length) {
+        const key = grants.icon_pack_grants.length > 1 ? "admin.vouchers.runtime_icon_packs" : "admin.vouchers.runtime_icon_pack";
+        parts.push(tx(key, "{count} icon pack").replace("{count}", grants.icon_pack_grants.length));
+      }
       if (grants.devjourney_tier) parts.push(`DJ ${DJ_NAMES[grants.devjourney_tier] || grants.devjourney_tier}`);
-      if (grants.discount_pct) parts.push(`${grants.discount_pct}% off`);
+      if (grants.discount_pct) parts.push(tx("admin.vouchers.runtime_discount", "{discount}% off").replace("{discount}", grants.discount_pct));
 
-      const base = parts.length ? parts.join(" + ") : "Empty voucher";
+      const base = parts.length ? parts.join(" + ") : tx("admin.vouchers.runtime_empty_label", "Empty voucher");
       labelInput.value = base + recipientSuffix;
     }
 
@@ -604,26 +609,31 @@ const title = "Admin · Vouchers — VOLYNX";
       const { status, data } = await callApi({ action: "list", limit: 100 });
       if (status === 401) { showOnly(els.loggedOut); return; }
       if (status === 403) { showOnly(els.forbidden); return; }
-      if (!data?.ok) { els.tbody.innerHTML = `<tr><td colspan="8" class="muted">Error: ${data?.error || status}</td></tr>`; return; }
+      if (!data?.ok) {
+        const message = tx("admin.vouchers.runtime_error", "Error: {error}").replace("{error}", data?.error || status);
+        els.tbody.innerHTML = `<tr><td colspan="8" class="muted">${escapeHtml(message)}</td></tr>`;
+        return;
+      }
       showOnly(els.ui);
       renderList(data.items || []);
     }
 
     function renderList(items) {
+      currentVouchers = items;
       if (items.length === 0) {
-        els.tbody.innerHTML = `<tr><td colspan="8" class="muted">No vouchers yet. Create one above.</td></tr>`;
+        els.tbody.innerHTML = `<tr><td colspan="8" class="muted">${escapeHtml(tx("admin.vouchers.runtime_empty_list", "No vouchers yet. Create one above."))}</td></tr>`;
         return;
       }
       els.tbody.innerHTML = items.map((v) => {
         const expired = v.expires_at && new Date(v.expires_at) < new Date();
         const exhausted = v.times_used >= v.max_uses;
         const status = !v.active
-          ? `<span class="pill pill--off">revoked</span>`
+          ? `<span class="pill pill--off">${escapeHtml(tx("admin.vouchers.runtime_revoked", "Revoked"))}</span>`
           : expired
-          ? `<span class="pill pill--off">expired</span>`
+          ? `<span class="pill pill--off">${escapeHtml(tx("admin.vouchers.runtime_expired", "Expired"))}</span>`
           : exhausted
-          ? `<span class="pill pill--off">exhausted</span>`
-          : `<span class="pill pill--on">active</span>`;
+          ? `<span class="pill pill--off">${escapeHtml(tx("admin.vouchers.runtime_exhausted", "Exhausted"))}</span>`
+          : `<span class="pill pill--on">${escapeHtml(tx("admin.vouchers.runtime_active", "Active"))}</span>`;
         return `<tr>
           <td><code>${escapeHtml(v.code)}</code></td>
           <td>${escapeHtml(v.type)}</td>
@@ -632,7 +642,7 @@ const title = "Admin · Vouchers — VOLYNX";
           <td>${v.times_used}/${v.max_uses}</td>
           <td>${status}</td>
           <td>${fmtDate(v.expires_at)}</td>
-          <td><button class="btn ghost btn-sm" data-action="revoke" data-id="${escapeHtml(v.id)}" ${!v.active ? "disabled" : ""}>Revoke</button></td>
+          <td><button class="btn ghost btn-sm" data-action="revoke" data-id="${escapeHtml(v.id)}" ${!v.active ? "disabled" : ""}>${escapeHtml(tx("admin.vouchers.runtime_revoke", "Revoke"))}</button></td>
         </tr>`;
       }).join("");
     }
@@ -644,14 +654,14 @@ const title = "Admin · Vouchers — VOLYNX";
     async function submitCreate(e) {
       e.preventDefault();
       els.submitBtn.disabled = true;
-      els.formMsg.textContent = "Creating…";
+      els.formMsg.textContent = tx("admin.vouchers.runtime_creating", "Creating…");
       els.formMsg.className = "form-msg form-msg--info";
 
       const fd = new FormData(els.form);
       const grants = buildGrants();
       if (Object.keys(grants).length === 0) {
         els.submitBtn.disabled = false;
-        els.formMsg.textContent = "Pick at least one grant section above.";
+        els.formMsg.textContent = tx("admin.vouchers.runtime_pick_grant", "Select at least one grant section above.");
         els.formMsg.className = "form-msg form-msg--err";
         return;
       }
@@ -673,19 +683,29 @@ const title = "Admin · Vouchers — VOLYNX";
       els.submitBtn.disabled = false;
 
       if (!data?.ok) {
-        els.formMsg.textContent = `Error: ${data?.error || status} ${data?.detail ? "— " + data.detail : ""}`;
+        els.formMsg.textContent = tx("admin.vouchers.runtime_error", "Error: {error}").replace(
+          "{error}",
+          `${data?.error || status}${data?.detail ? " — " + data.detail : ""}`,
+        );
         els.formMsg.className = "form-msg form-msg--err";
         return;
       }
 
-      els.formMsg.textContent = "Created.";
+      els.formMsg.textContent = tx("admin.vouchers.runtime_created", "Created.");
       els.formMsg.className = "form-msg form-msg--ok";
 
       const v = data.voucher;
       const url = data.invite_url || `${SITE_URL}/invite/black-diamond/?code=${encodeURIComponent(v.code)}`;
       els.resultCode.textContent = v.code;
       els.resultUrl.value = url;
-      els.resultMeta.textContent = `Type: ${v.type} · max uses: ${v.max_uses} · expires: ${fmtDate(v.expires_at)} · grants: ${JSON.stringify(v.grants)}`;
+      els.resultMeta.textContent = tx(
+        "admin.vouchers.runtime_result_meta",
+        "Type: {type} · Maximum uses: {uses} · Expires: {expires} · Grants: {grants}",
+      )
+        .replace("{type}", v.type)
+        .replace("{uses}", v.max_uses)
+        .replace("{expires}", fmtDate(v.expires_at))
+        .replace("{grants}", JSON.stringify(v.grants));
       els.result.hidden = false;
 
       try {
@@ -703,10 +723,10 @@ const title = "Admin · Vouchers — VOLYNX";
     }
 
     async function revokeVoucher(id) {
-      if (!confirm("Revoke this voucher? Existing redemptions are kept; the code stops working.")) return;
+      if (!confirm(tx("admin.vouchers.runtime_revoke_confirm", "Revoke this voucher? Existing redemptions will remain valid, but the code will stop working."))) return;
       const { data } = await callApi({ action: "revoke", id });
       if (data?.ok) loadList();
-      else alert("Revoke failed: " + (data?.error || "unknown"));
+      else alert(tx("admin.vouchers.runtime_revoke_failed", "Voucher revocation failed: {error}").replace("{error}", data?.error || tx("admin.vouchers.runtime_unknown", "Unknown error")));
     }
 
     function copyText(text) {
@@ -773,8 +793,8 @@ const title = "Admin · Vouchers — VOLYNX";
         const target = btn.getAttribute("data-copy");
         const text = target === "code" ? els.resultCode.textContent : els.resultUrl.value;
         copyText(text);
-        btn.textContent = "Copied";
-        setTimeout(() => { btn.textContent = "Copy"; }, 1400);
+        btn.textContent = tx("admin.vouchers.runtime_copied", "Copied");
+        setTimeout(() => { btn.textContent = tx("admin.vouchers.copy_action", "Copy"); }, 1400);
       });
     });
 
@@ -795,6 +815,13 @@ const title = "Admin · Vouchers — VOLYNX";
     });
 
     // Boot
+    window.addEventListener("vx:lang-changed", () => {
+      suggestLabel();
+      if (currentVouchers.length || !els.tbody.querySelector('[data-i18n="admin.vouchers.table_loading"]')) {
+        renderList(currentVouchers);
+      }
+    });
+
     if (!getToken()) { showOnly(els.loggedOut); }
     else { syncSectionBodies(); loadList(); }
   </script>

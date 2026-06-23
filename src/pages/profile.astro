@@ -286,15 +286,15 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 				<div class="lab-profile__summary" data-lab-summary></div>
 				<div class="lab-memory-toolbar" data-lab-memory-toolbar>
 					<label class="lab-memory-search">
-						<span>Search saved Lab work</span>
-						<input type="search" data-lab-memory-search placeholder="Search projects, presets, and responses" autocomplete="off" />
+						<span data-i18n="profile.memory_search">Search saved Lab work</span>
+						<input type="search" data-lab-memory-search placeholder="Search projects, presets, and responses" data-i18n-placeholder="profile.memory_search_ph" autocomplete="off" />
 					</label>
 					<div class="lab-memory-filters" aria-label="Saved Lab work filters">
-						<button type="button" class="is-active" data-lab-memory-filter="all">All</button>
-						<button type="button" data-lab-memory-filter="pinned">Pinned</button>
-						<button type="button" data-lab-memory-filter="presets">Presets</button>
-						<button type="button" data-lab-memory-filter="projects">Projects</button>
-						<button type="button" data-lab-memory-filter="responses">Responses</button>
+						<button type="button" class="is-active" data-lab-memory-filter="all" data-i18n="profile.memory_all">All</button>
+						<button type="button" data-lab-memory-filter="pinned" data-i18n="profile.memory_pinned">Pinned</button>
+						<button type="button" data-lab-memory-filter="presets" data-i18n="profile.memory_presets">Presets</button>
+						<button type="button" data-lab-memory-filter="projects" data-i18n="profile.memory_projects">Projects</button>
+						<button type="button" data-lab-memory-filter="responses" data-i18n="profile.memory_responses">Responses</button>
 					</div>
 					<span class="lab-memory-status" data-lab-memory-status aria-live="polite"></span>
 				</div>
@@ -444,13 +444,13 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 			<section class="glass-section purchases-section" id="iconPurchasesSection" style="display:none;">
 				<div class="section-headline">
 					<div>
-						<div class="section-label">Your icon purchases</div>
-						<p class="section-subcopy">Singles and packs unlocked through Stripe checkout.</p>
+						<div class="section-label" data-i18n="profile.icons_title">Your icon purchases</div>
+						<p class="section-subcopy" data-i18n="profile.icons_copy">Individual icons and packs unlocked through Stripe checkout.</p>
 					</div>
-					<a href={ROUTES.iconsStore} class="btn btn--sm btn--ghost">Open Icon Vault</a>
+					<a href={ROUTES.iconsStore} class="btn btn--sm btn--ghost" data-i18n="profile.icons_open">Open Icon Vault</a>
 				</div>
 				<div class="icon-purchases-grid" id="iconPurchasesGrid">
-					<p class="text-muted" style="font-size:.85rem;">Checking icon purchases...</p>
+					<p class="text-muted" style="font-size:.85rem;" data-i18n="profile.icons_checking">Checking icon purchases...</p>
 				</div>
 			</section>
 
@@ -574,6 +574,7 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 
 				// ── Helpers ──────────────────────────────────────────
 				const $ = (id) => document.getElementById(id);
+				const tx = (key, fallback) => window.VxI18n?.t?.(key, fallback) ?? fallback;
 
 				const KEYS = ["volynx_access_token","volynx_refresh_token","volynx_user_email","volynx_session","volynx_post_login_next"];
 
@@ -1371,8 +1372,8 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 						if (!iconPurchaseRows.length) {
 							iconPurchasesGrid.innerHTML = `
 								<div class="icon-purchases-empty">
-									<strong>No icon purchases yet.</strong>
-									<span>Purchased singles and packs will appear here automatically.</span>
+									<strong>${escapeHtml(tx("profile.icons_empty_title", "No icon purchases yet."))}</strong>
+									<span>${escapeHtml(tx("profile.icons_empty_copy", "Purchased individual icons and packs will appear here automatically."))}</span>
 								</div>
 							`;
 							return;
@@ -1385,7 +1386,7 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 						console.error("[profile] icon purchases failed:", error);
 						if (iconPurchasesSection && iconPurchasesGrid) {
 							iconPurchasesSection.style.display = "";
-							iconPurchasesGrid.innerHTML = '<p class="text-muted" style="font-size:.85rem;">Could not load icon purchases.</p>';
+							iconPurchasesGrid.innerHTML = '<p class="text-muted" style="font-size:.85rem;">' + escapeHtml(tx("profile.icons_error", "Could not load icon purchases.")) + '</p>';
 						}
 					}
 				}

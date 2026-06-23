@@ -36,17 +36,17 @@ const footerCopy = {
   },
   pt: {
     brandCaption: "assinatura icônica da plataforma",
-    description: "Sistema de launch para execução, assets premium, kits de produto e entrega.",
+    description: "Sistema de lançamento para ferramentas de execução, recursos premium, kits de produto e entrega.",
     footerLinks: [
       { href: "https://volynx.world/products/", label: "Produtos", external: true },
-      { href: "/dashboard", label: "Dashboard" },
+      { href: "/dashboard", label: "Painel" },
       { href: "/dashboard/purchases", label: "Compras" },
       { href: "/daily", label: "Daily" },
       { href: propertyFlowUrl, label: "PropertyFlow", external: true },
       { href: "/icons-store", label: "Icons Store" },
       { href: "/demo/saas", label: "Demo SaaS" },
-      { href: "/demo/agency", label: "Demo Agency" },
-      { href: "/demo/portfolio", label: "Demo Portfolio" }
+      { href: "/demo/agency", label: "Demonstração para agências" },
+      { href: "/demo/portfolio", label: "Demonstração de portfólio" }
     ],
     legalLinks: [
       { href: "/terms", label: "Termos" },
@@ -71,12 +71,16 @@ export function SiteFooter({ locale = "en", brand = "platform" }: SiteFooterProp
   const isDaily = brand === "daily"
   const brandHref = isDaily ? "/daily" : (locale === "pt" ? "/?lang=pt" : "/")
   const brandLabel = isDaily ? "VOLYNX DAILY" : "VOLYNX OS"
-  const brandCaption = isDaily ? "Personal execution OS" : copy.brandCaption
+  const brandCaption = isDaily
+    ? (locale === "pt" ? "Sistema operacional pessoal" : "Personal execution OS")
+    : copy.brandCaption
   const brandDescription = isDaily
-    ? "Daily workspace for capture, planning, writing, decisions and follow-through."
+    ? (locale === "pt"
+      ? "Área diária para capturar ideias, planejar, escrever, decidir e acompanhar a execução."
+      : "Daily workspace for capture, planning, writing, decisions and follow-through.")
     : copy.description
   const brandIcon = isDaily ? "/assets/brand/daily-icon.webp" : "/assets/brand/vx-new.webp"
-  const brandIconAlt = isDaily ? "Volynx Daily icon" : "VOLYNX OS icon"
+  const brandIconAlt = isDaily ? "VOLYNX Daily icon" : "VOLYNX OS icon"
 
   return (
     <footer className="overflow-hidden border-t border-white/5 py-10">

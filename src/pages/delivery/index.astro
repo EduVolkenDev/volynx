@@ -37,7 +37,7 @@ const deliveryAssistItems = [
             <strong><span class="i18n-en">Payment confirmed.</span><span class="i18n-pt">Pagamento confirmado.</span></strong>
             <span><span class="i18n-en">Your purchase is below. Downloads and access were unlocked automatically.</span><span class="i18n-pt">Sua compra está abaixo. Downloads e acessos foram liberados automaticamente.</span></span>
           </div>
-          <button type="button" class="payment-banner__close" id="paymentBannerClose" aria-label="Dismiss notification">×</button>
+          <button type="button" class="payment-banner__close" id="paymentBannerClose" aria-label="Dismiss notification" data-i18n-aria="delivery.dismiss">×</button>
         </div>
 
         <!-- Payment cancelled banner -->
@@ -46,7 +46,7 @@ const deliveryAssistItems = [
             <strong><span class="i18n-en">Checkout cancelled.</span><span class="i18n-pt">Checkout cancelado.</span></strong>
             <span><span class="i18n-en">No charge was made. You can resume from the catalog whenever you're ready.</span><span class="i18n-pt">Nenhuma cobrança foi feita. Você pode retomar pelo catálogo quando quiser.</span></span>
           </div>
-          <button type="button" class="payment-banner__close" id="paymentCancelledClose" aria-label="Dismiss notification">×</button>
+          <button type="button" class="payment-banner__close" id="paymentCancelledClose" aria-label="Dismiss notification" data-i18n-aria="delivery.dismiss">×</button>
         </div>
 
         <div class="hero-grid delivery-hero-grid">
@@ -152,6 +152,7 @@ const deliveryAssistItems = [
       propertyflowDelivery: "/dashboard/purchases/propertyflow",
       iconsDelivery: "/dashboard/purchases/icons",
     };
+    const tx = (key, fallback) => window.VxI18n?.t?.(key, fallback) ?? fallback;
 
     // ── Auth guard ──────────────────────────────────────────────────────────
     const token = localStorage.getItem('volynx_access_token');
@@ -517,15 +518,15 @@ const deliveryAssistItems = [
       return `
         <article class="panel delivery-card delivery-card--subscription">
           <div class="delivery-card__body">
-            <span class="eyebrow delivery-card__eyebrow">Course access</span>
+            <span class="eyebrow delivery-card__eyebrow">${escapeHtml(tx('delivery.course_access', 'Course access'))}</span>
             <h3 class="delivery-card__name">Dev Journey — ${devJourneyTierLabel(tier)}</h3>
             <dl class="delivery-card__meta">
-              <div><dt>Tier</dt><dd>${devJourneyTierLabel(tier)}</dd></div>
-              <div><dt>Delivery</dt><dd>ZIPs live in the student area</dd></div>
+              <div><dt>${escapeHtml(tx('delivery.tier', 'Tier'))}</dt><dd>${devJourneyTierLabel(tier)}</dd></div>
+              <div><dt>${escapeHtml(tx('delivery.delivery_label', 'Delivery'))}</dt><dd>${escapeHtml(tx('delivery.course_delivery', 'ZIP files are available in the student area'))}</dd></div>
             </dl>
           </div>
           <div class="delivery-card__actions">
-            <a href="/dev-journey/student/" class="button button--gold delivery-card__cta">Open student area</a>
+            <a href="/dev-journey/student/" class="button button--gold delivery-card__cta">${escapeHtml(tx('delivery.open_student', 'Open student area'))}</a>
           </div>
         </article>`;
     }
@@ -539,12 +540,12 @@ const deliveryAssistItems = [
       return `
         <article class="panel delivery-card delivery-card--subscription">
           <div class="delivery-card__body">
-            <span class="eyebrow delivery-card__eyebrow">Subscription</span>
+            <span class="eyebrow delivery-card__eyebrow">${escapeHtml(tx('delivery.subscription', 'Subscription'))}</span>
             <h3 class="delivery-card__name">${label}</h3>
             <dl class="delivery-card__meta">
-              ${created ? `<div><dt>Started</dt><dd>${created}</dd></div>` : ''}
-              ${renews ? `<div><dt>Renews</dt><dd>${renews}</dd></div>` : ''}
-              ${status ? `<div><dt>Status</dt><dd>${status}</dd></div>` : ''}
+              ${created ? `<div><dt>${escapeHtml(tx('delivery.started', 'Started'))}</dt><dd>${created}</dd></div>` : ''}
+              ${renews ? `<div><dt>${escapeHtml(tx('delivery.renews', 'Renews'))}</dt><dd>${renews}</dd></div>` : ''}
+              ${status ? `<div><dt>${escapeHtml(tx('delivery.status_label', 'Status'))}</dt><dd>${status}</dd></div>` : ''}
             </dl>
           </div>
           <div class="delivery-card__actions">
@@ -595,16 +596,16 @@ const deliveryAssistItems = [
       return `
         <article class="panel delivery-card delivery-card--recovery">
           <div class="delivery-card__body">
-            <span class="eyebrow delivery-card__eyebrow">Kit recovery</span>
+            <span class="eyebrow delivery-card__eyebrow">${escapeHtml(tx('delivery.kit_recovery', 'Kit recovery'))}</span>
             <h3 class="delivery-card__name">${label}</h3>
             <dl class="delivery-card__meta">
-              ${created ? `<div><dt>Prepared</dt><dd>${created}</dd></div>` : ''}
-              ${slug ? `<div><dt>Draft</dt><dd>${slug}</dd></div>` : ''}
-              ${status ? `<div><dt>Status</dt><dd>${status}</dd></div>` : ''}
+              ${created ? `<div><dt>${escapeHtml(tx('delivery.prepared', 'Prepared'))}</dt><dd>${created}</dd></div>` : ''}
+              ${slug ? `<div><dt>${escapeHtml(tx('delivery.draft', 'Draft'))}</dt><dd>${slug}</dd></div>` : ''}
+              ${status ? `<div><dt>${escapeHtml(tx('delivery.status_label', 'Status'))}</dt><dd>${status}</dd></div>` : ''}
             </dl>
           </div>
           <div class="delivery-card__actions">
-            <a href="${href}" class="button button--gold delivery-card__cta">Open Builder draft</a>
+            <a href="${href}" class="button button--gold delivery-card__cta">${escapeHtml(tx('delivery.open_builder_draft', 'Open Builder draft'))}</a>
           </div>
         </article>`;
     }
@@ -771,8 +772,8 @@ const deliveryAssistItems = [
             <span class="eyebrow delivery-card__eyebrow">${isCheckoutSmokeProductId(productId) ? 'Checkout verification' : 'Product'}</span>
             <h3 class="delivery-card__name">${label}</h3>
             <dl class="delivery-card__meta">
-              ${date  ? `<div><dt>Purchased</dt><dd>${date}</dd></div>` : ''}
-              ${price ? `<div><dt>Paid</dt><dd>${price}</dd></div>` : ''}
+              ${date  ? `<div><dt>${escapeHtml(tx('delivery.purchased', 'Purchased'))}</dt><dd>${date}</dd></div>` : ''}
+              ${price ? `<div><dt>${escapeHtml(tx('delivery.paid', 'Paid'))}</dt><dd>${price}</dd></div>` : ''}
             </dl>
           </div>
           <div class="delivery-card__actions">

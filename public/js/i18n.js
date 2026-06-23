@@ -92,6 +92,11 @@
       if (Object.prototype.hasOwnProperty.call(dict, key)) el.setAttribute('aria-label', dict[key]);
     });
 
+    document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n-title');
+      if (Object.prototype.hasOwnProperty.call(dict, key)) el.setAttribute('title', dict[key]);
+    });
+
     syncLangUI(next);
 
     try {

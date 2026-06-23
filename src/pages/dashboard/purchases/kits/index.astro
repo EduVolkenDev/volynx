@@ -7,16 +7,16 @@ import PlatformAssistStrip from "../../../../components/PlatformAssistStrip.astr
 import { ROUTES } from "../../../../data/routes";
 
 const assistItems = [
-  { href: ROUTES.builder, label: { en: "Start", pt: "Comece" }, title: { en: "Open the Builder draft", pt: "Abrir o draft no Builder" }, copy: { en: "Your kit is meant to become a site, not sit in a receipt. Start with the visual path first.", pt: "Seu kit foi feito para virar site, nao para ficar parado em um recibo. Comece pelo caminho visual." }, emphasized: true, iconSrc: "/assets/new-builder.webp" },
+  { href: ROUTES.builder, label: { en: "Start", pt: "Começar" }, title: { en: "Open the Builder draft", pt: "Abrir o rascunho no Builder" }, copy: { en: "Your kit is meant to become a site, not sit in a receipt. Start with the visual path first.", pt: "Seu kit foi criado para se tornar um site, não para permanecer em um recibo. Comece pelo fluxo visual." }, emphasized: true, iconSrc: "/assets/new-builder.webp" },
   { href: ROUTES.delivery, label: { en: "Own", pt: "Posse" }, title: { en: "Back to all products", pt: "Voltar aos produtos" }, copy: { en: "Keep every purchase connected across VX, PropertyFlow, icons and kits.", pt: "Mantenha cada compra conectada entre VX, PropertyFlow, icones e kits." }, iconSrc: "/assets/Volynx-OS-Cards/allproducts.webp" },
-  { href: ROUTES.products, label: { en: "Expand", pt: "Expandir" }, title: { en: "Browse more kits", pt: "Ver mais kits" }, copy: { en: "Compare Portfolio, Agency and SaaS systems when you are ready for the next launch.", pt: "Compare Portfolio, Agency e SaaS quando estiver pronto para o proximo lancamento." }, iconSrc: "/assets/Volynx-OS-Cards/kits.webp" },
+  { href: ROUTES.products, label: { en: "Expand", pt: "Expandir" }, title: { en: "Browse more kits", pt: "Ver mais kits" }, copy: { en: "Compare Portfolio, Agency and SaaS systems when you are ready for the next launch.", pt: "Compare os sistemas Portfolio, Agency e SaaS quando estiver pronto para o próximo lançamento." }, iconSrc: "/assets/Volynx-OS-Cards/kits.webp" },
   { href: ROUTES.support, label: { en: "Recover", pt: "Recuperar" }, title: { en: "Support with context", pt: "Suporte com contexto" }, copy: { en: "If a draft, source ZIP or license needs attention, the purchase context stays attached.", pt: "Se um draft, ZIP fonte ou licenca precisar de atencao, o contexto da compra continua junto." }, iconSrc: "/assets/Volynx-OS-Cards/support.webp" },
 ];
 
 const kitValueItems = [
-  { iconSrc: "/assets/Volynx-OS-Cards/kits.webp", label: { en: "Premium structure", pt: "Estrutura premium" }, copy: { en: "Sections, hierarchy and motion decisions already shaped for a serious launch.", pt: "Secoes, hierarquia e decisoes de movimento ja moldadas para um lancamento serio." } },
+  { iconSrc: "/assets/Volynx-OS-Cards/kits.webp", label: { en: "Premium structure", pt: "Estrutura premium" }, copy: { en: "Sections, hierarchy and motion decisions already shaped for a serious launch.", pt: "Seções, hierarquia e decisões de movimento já definidas para um lançamento consistente." } },
   { iconSrc: "/assets/new-builder.webp", label: { en: "Builder-first", pt: "Builder primeiro" }, copy: { en: "No setup ceremony: open the draft, edit visually and move toward publication.", pt: "Sem ritual de instalacao: abra o draft, edite visualmente e avance para a publicacao." } },
-  { iconSrc: "/assets/Volynx-OS-Cards/allproducts.webp", label: { en: "Source included", pt: "Fonte incluido" }, copy: { en: "Advanced source ZIP delivery stays available when you need code-level control.", pt: "A entrega do ZIP fonte continua disponivel quando voce precisa de controle no codigo." } },
+  { iconSrc: "/assets/Volynx-OS-Cards/allproducts.webp", label: { en: "Source included", pt: "Código-fonte incluído" }, copy: { en: "Advanced source ZIP delivery stays available when you need code-level control.", pt: "A entrega do arquivo ZIP com o código-fonte permanece disponível quando você precisar de controle em nível de código." } },
 ];
 ---
 <FlagshipLayout title="Kits — VOLYNX" description="Open your purchased Portfolio, Agency, and SaaS kits in Builder, manage tier licenses, recover preset drafts." pageClass="page-kits-delivery">
@@ -64,7 +64,7 @@ const kitValueItems = [
     <PlatformAssistStrip
       eyebrow={{ en: "What this unlocks", pt: "O que isso libera" }}
       title={{ en: "A kit purchase should feel like opening a production system.", pt: "Comprar um kit precisa parecer abrir um sistema de producao." }}
-      description={{ en: "The delivery screen keeps the premium promise visible: use the kit, recover the files, and keep the launch moving.", pt: "A tela de entrega deixa a promessa premium visivel: use o kit, recupere os arquivos e mantenha o lancamento em movimento." }}
+      description={{ en: "The delivery screen keeps the premium promise visible: use the kit, recover the files, and keep the launch moving.", pt: "A tela de entrega mantém a promessa premium visível: use o kit, recupere os arquivos e avance com o lançamento." }}
       items={assistItems}
     />
 
@@ -91,11 +91,11 @@ const kitValueItems = [
     <section class="page-section">
       <div class="shell">
         <div class="kits-section-head">
-          <span class="eyebrow"><span class="i18n-en">Unlocked for you</span><span class="i18n-pt">Liberado para voce</span></span>
+          <span class="eyebrow"><span class="i18n-en">Unlocked for you</span><span class="i18n-pt">Liberado para você</span></span>
           <h2><span class="i18n-en">Your purchased kits</span><span class="i18n-pt">Seus kits comprados</span></h2>
           <p>
             <span class="i18n-en">Start in Builder for the fastest premium path. Use source ZIP delivery only when you need advanced code handoff.</span>
-            <span class="i18n-pt">Comece pelo Builder para o caminho premium mais rapido. Use o ZIP fonte apenas quando precisar de handoff avancado de codigo.</span>
+            <span class="i18n-pt">Comece pelo Builder para seguir pelo fluxo premium mais rápido. Use o arquivo ZIP com o código-fonte apenas quando precisar de uma entrega técnica avançada.</span>
           </p>
         </div>
 
@@ -410,8 +410,8 @@ const kitValueItems = [
       const description = entitlements?.[addonId]?.description || '';
       const featureCount = Array.isArray(features) ? features.length : 0;
       const valueLine = featureCount > 0
-        ? `<span class="i18n-en">${featureCount} licensed sections and assets are connected to this purchase.</span><span class="i18n-pt">${featureCount} secoes e assets licenciados estao conectados a esta compra.</span>`
-        : `<span class="i18n-en">Builder access and source delivery are connected to this purchase.</span><span class="i18n-pt">Acesso ao Builder e entrega do fonte estao conectados a esta compra.</span>`;
+        ? `<span class="i18n-en">${featureCount} licensed sections and assets are connected to this purchase.</span><span class="i18n-pt">${featureCount} seções e recursos licenciados estão vinculados a esta compra.</span>`
+        : `<span class="i18n-en">Builder access and source delivery are connected to this purchase.</span><span class="i18n-pt">O acesso ao Builder e a entrega do código-fonte estão vinculados a esta compra.</span>`;
 
       // Builder is the premium path for non-technical buyers. Source ZIPs stay
       // available as an advanced fallback for developers and agency handoff.

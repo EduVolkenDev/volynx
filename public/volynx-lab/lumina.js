@@ -17,6 +17,10 @@ const maxHistoryItems = 8;
 let lastSections = [];
 let lastPlainText = "";
 
+function tr(key, fallback) {
+  return window.VxI18n?.t?.(key, fallback) ?? fallback;
+}
+
 const exampleInputs = {
   paper: {
     mode: "deep",
@@ -52,11 +56,13 @@ function setUses(value) {
 function updateCounter() {
   if (!counter) return;
   if (hasPaidPlan()) {
-    counter.textContent = "Pro: uso expandido";
+    counter.textContent = tr("lumina.runtime.pro_usage", "Pro: expanded usage");
     return;
   }
   const remaining = Math.max(0, FREE_LIMIT - getUses());
-  counter.textContent = `Free: ${remaining}/${FREE_LIMIT} usos`;
+  counter.textContent = tr("lumina.runtime.free_usage", "Free: {remaining}/{limit} uses")
+    .replace("{remaining}", remaining)
+    .replace("{limit}", FREE_LIMIT);
 }
 
 function selectHasValue(select, value) {
@@ -104,18 +110,18 @@ function applyLuminaPreset(values = {}) {
     language.value = values.language;
     language.dispatchEvent(new Event("change", { bubbles: true }));
   }
-  setStatus("Preset aplicado", "ok");
+  setStatus(tr("lumina.runtime.preset_applied", "Preset applied"), "ok");
 }
 
 if (window.VxLab?.renderToolPresets) {
   VxLab.renderToolPresets("lumina", {
     anchor: ".lumina-controls",
     apply: applyLuminaPreset,
-    emptyText: "Use Lumina once and your mode preset appears here.",
+    emptyText: tr("lumina.runtime.preset_empty", "Use Lumina once and your mode preset will appear here."),
   });
 }
 window.VxLab?.restorePresetFromUrl?.("lumina", applyLuminaPreset, {
-  onMissing: () => setStatus("Preset Lumina não encontrado neste navegador", "warn"),
+  onMissing: () => setStatus(tr("lumina.runtime.preset_missing", "Lumina preset not found in this browser."), "warn"),
 });
 
 function escapeHtml(value) {
@@ -138,18 +144,20 @@ function localizeTitle(title) {
       "Practical applications": "Aplicações práticas",
       "Limitations or cautions": "Limitações ou cuidados",
       "Questions to keep learning": "Perguntas para continuar aprendendo",
-      "Resposta Lumina": "Resposta Lumina",
+      "Lumina response": "Resposta do Lumina",
+      "Resposta Lumina": "Resposta do Lumina",
     },
     es: {
       "Title": "Título",
       "Essential summary": "Resumen esencial",
       "Simple explanation": "Explicación simple",
       "Important concepts": "Conceptos importantes",
-      "Why this matters": "Por que importa",
-      "Practical applications": "Aplicaciones practicas",
+      "Why this matters": "Por qué importa",
+      "Practical applications": "Aplicaciones prácticas",
       "Limitations or cautions": "Limitaciones o cuidados",
       "Questions to keep learning": "Preguntas para seguir aprendiendo",
-      "Resposta Lumina": "Respuesta Lumina",
+      "Lumina response": "Respuesta de Lumina",
+      "Resposta Lumina": "Respuesta de Lumina",
     },
     en: {},
   };
@@ -185,7 +193,7 @@ function renderCards(sections) {
     <article class="lumina-output-card">
       <div class="lumina-output-card__head">
         <span>${escapeHtml(localizeTitle(section.title))}</span>
-        <button type="button" data-copy-section="${index}">Copiar bloco</button>
+        <button type="button" data-copy-section="${index}">${escapeHtml(tr("lumina.runtime.copy_block", "Copy section"))}</button>
       </div>
       <p>${escapeHtml(section.body)}</p>
     </article>
@@ -200,7 +208,7 @@ function renderHistory() {
   if (!historyList) return;
   const rows = readHistory();
   if (!rows.length) {
-    historyList.innerHTML = '<p class="lumina-history__empty">Nenhuma resposta salva neste navegador ainda.</p>';
+    historyList.innerHTML = `<p class="lumina-history__empty">${escapeHtml(tr("lumina.runtime.history_empty", "No responses have been saved in this browser yet."))}</p>`;
     return;
   }
   historyList.innerHTML = rows.map((row) => {
@@ -208,7 +216,7 @@ function renderHistory() {
     return `
       <button type="button" class="lumina-history__item" data-history-id="${escapeHtml(row.id)}">
         <span>${escapeHtml(row.mode || "Lumina")} · ${escapeHtml(row.language || "pt")} · ${escapeHtml(row.source || "local")}</span>
-        <strong>${escapeHtml(row.title || "Resposta Lumina")}</strong>
+        <strong>${escapeHtml(row.title || tr("lumina.runtime.response_title", "Lumina response"))}</strong>
         <em>${escapeHtml(date)}</em>
       </button>
     `;
@@ -218,7 +226,7 @@ function renderHistory() {
 function saveLuminaHistory(source, sections, selectedMode, selectedLanguage, originalInput) {
   const rows = readHistory();
   const first = sections.find((section) => section.title === "Title") || sections[0];
-  const title = first?.body || first?.title || "Resposta Lumina";
+  const title = first?.body || first?.title || tr("lumina.runtime.response_title", "Lumina response");
   const row = {
     id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
     title: title.slice(0, 90),
@@ -242,7 +250,9 @@ function applyLuminaHistory(row) {
   if (row.language && selectHasValue(language, row.language)) language.value = row.language;
   if (row.input) input.value = row.input;
   renderCards(row.sections || []);
-  setStatus(row.source === "ai" ? "Histórico IA restaurado" : "Histórico local restaurado", "ok");
+  setStatus(row.source === "ai"
+    ? tr("lumina.runtime.ai_history_restored", "AI history restored")
+    : tr("lumina.runtime.local_history_restored", "Local history restored"), "ok");
   return true;
 }
 
@@ -256,7 +266,7 @@ function restoreLuminaHistoryFromUrl() {
   const row = readHistory().find((item) => item?.id === historyId);
   window.VxLab?.clearQueryParam?.("history");
   if (!row) {
-    setStatus("Resposta Lumina não encontrada neste navegador", "warn");
+    setStatus(tr("lumina.runtime.history_missing", "Lumina response not found in this browser."), "warn");
     return false;
   }
   return applyLuminaHistory(row);
@@ -288,7 +298,7 @@ function parseSections(text) {
   }
 
   if (sections.length) return sections;
-  return [{ title: "Resposta Lumina", body: text.trim() }];
+  return [{ title: "Lumina response", body: text.trim() }];
 }
 
 function localLumina(text, selectedMode, selectedLanguage) {
@@ -297,25 +307,68 @@ function localLumina(text, selectedMode, selectedLanguage) {
   const firstSentences = sentences.slice(0, 3).join(" ").trim() || clean.slice(0, 420);
   const words = clean.toLowerCase().match(/[a-zÀ-ÿ0-9]{5,}/g) || [];
   const concepts = Array.from(new Set(words.filter((word) => !["sobre", "porque", "quando", "their", "there", "would", "could", "para", "como", "with", "from"].includes(word)))).slice(0, 8);
-  const modeHint = {
-    clear: "A ideia central foi simplificada para leitura inicial.",
-    deep: "A leitura precisa manter detalhes técnicos e organizar premissas, evidências e consequências.",
-    practical: "O próximo passo é transformar o conteúdo em uma decisão, projeto, estudo ou experimento.",
-    multilingual: "Use esta base para adaptar o conteúdo em português, inglês e espanhol sem perder precisão.",
-    creator: "Este conteúdo pode virar aula, post educativo, roteiro, página explicativa ou material de apoio.",
-  }[selectedMode] || "A ideia central foi simplificada para leitura inicial.";
-
-  const languageName = { pt: "Português", en: "English", es: "Español" }[selectedLanguage] || "Português";
+  const locale = ["pt", "en", "es"].includes(selectedLanguage) ? selectedLanguage : "pt";
+  const copy = {
+    pt: {
+      modeHints: {
+        clear: "A ideia central foi simplificada para uma primeira leitura.",
+        deep: "A análise preserva os detalhes técnicos e organiza premissas, evidências e consequências.",
+        practical: "O próximo passo é transformar o conteúdo em uma decisão, projeto, estudo ou experimento.",
+        multilingual: "Use esta base para adaptar o conteúdo em português, inglês e espanhol sem perder precisão.",
+        creator: "Este conteúdo pode se transformar em aula, publicação educativa, roteiro, página explicativa ou material de apoio.",
+      },
+      draft: "Rascunho local do Lumina",
+      explanation: "Em termos simples, o texto apresenta uma ideia que deve ser compreendida por seu tema principal, pelos conceitos utilizados e pelo impacto que pode gerar.",
+      concepts: "Tema principal, contexto, aplicação e limitações.",
+      matters: "O tema importa porque o conhecimento complexo só se torna útil quando pode ser entendido, compartilhado e aplicado com responsabilidade.",
+      applications: "Crie um resumo de estudo, prepare uma aula, transforme o conteúdo em um guia prático, formule perguntas de pesquisa ou adapte-o para comunicação pública.",
+      cautions: "Este modo local não verifica links, PDFs nem fontes externas. Para uma análise completa em português, use o modo de IA do Lumina.",
+      questions: "Qual é a tese principal? Quais termos precisam de definição? Que evidências sustentam a ideia? Onde isso pode ser aplicado agora?",
+    },
+    en: {
+      modeHints: {
+        clear: "The central idea has been simplified for an initial reading.",
+        deep: "The analysis preserves technical detail while organizing assumptions, evidence and consequences.",
+        practical: "The next step is to turn the content into a decision, project, study or experiment.",
+        multilingual: "Use this foundation to adapt the content into Portuguese, English and Spanish without losing precision.",
+        creator: "This content can become a lesson, educational post, script, explanatory page or supporting material.",
+      },
+      draft: "Lumina local draft",
+      explanation: "In simple terms, the text presents an idea that should be understood through its main theme, the concepts it uses and the impact it may create.",
+      concepts: "Main theme, context, application and limitations.",
+      matters: "This matters because complex knowledge becomes useful only when it can be understood, shared and applied responsibly.",
+      applications: "Create a study summary, prepare a lesson, turn the content into a practical guide, formulate research questions or adapt it for public communication.",
+      cautions: "This local mode does not verify links, PDFs or external sources. For a complete analysis in English, use Lumina's AI mode.",
+      questions: "What is the main thesis? Which terms need a definition? What evidence supports the idea? Where can it be applied now?",
+    },
+    es: {
+      modeHints: {
+        clear: "La idea central se ha simplificado para una primera lectura.",
+        deep: "El análisis conserva los detalles técnicos y organiza premisas, evidencias y consecuencias.",
+        practical: "El siguiente paso es convertir el contenido en una decisión, proyecto, estudio o experimento.",
+        multilingual: "Utiliza esta base para adaptar el contenido al portugués, inglés y español sin perder precisión.",
+        creator: "Este contenido puede convertirse en una clase, publicación educativa, guion, página explicativa o material de apoyo.",
+      },
+      draft: "Borrador local de Lumina",
+      explanation: "En términos sencillos, el texto presenta una idea que debe comprenderse a través de su tema principal, los conceptos utilizados y el impacto que puede generar.",
+      concepts: "Tema principal, contexto, aplicación y limitaciones.",
+      matters: "El tema importa porque el conocimiento complejo solo se vuelve útil cuando puede comprenderse, compartirse y aplicarse de forma responsable.",
+      applications: "Crea un resumen de estudio, prepara una clase, convierte el contenido en una guía práctica, formula preguntas de investigación o adáptalo para la comunicación pública.",
+      cautions: "Este modo local no verifica enlaces, archivos PDF ni fuentes externas. Para un análisis completo en español, utiliza el modo de IA de Lumina.",
+      questions: "¿Cuál es la tesis principal? ¿Qué términos necesitan definición? ¿Qué evidencias respaldan la idea? ¿Dónde puede aplicarse ahora?",
+    },
+  }[locale];
+  const modeHint = copy.modeHints[selectedMode] || copy.modeHints.clear;
 
   return [
-    { title: "Title", body: "Lumina local draft" },
+    { title: "Title", body: copy.draft },
     { title: "Essential summary", body: firstSentences },
-    { title: "Simple explanation", body: `${modeHint} Em termos simples, o texto apresenta uma ideia que precisa ser entendida pelo tema principal, pelos conceitos usados e pelo impacto que pode gerar.` },
-    { title: "Important concepts", body: concepts.length ? concepts.join(", ") : "Tema principal, contexto, aplicação, limites." },
-    { title: "Why this matters", body: "Importa porque conhecimento complexo só se torna útil quando pode ser entendido, compartilhado e aplicado com responsabilidade." },
-    { title: "Practical applications", body: "Criar um resumo de estudo, preparar uma aula, transformar em guia prático, levantar perguntas de pesquisa ou adaptar para comunicação pública." },
-    { title: "Limitations or cautions", body: `Este fallback não verifica links, PDFs ou fontes externas. Para uma análise completa em ${languageName}, publique/ative o modo IA da Lumina.` },
-    { title: "Questions to keep learning", body: "Qual é a tese principal? Quais termos precisam de definição? Que evidências sustentam a ideia? Onde isso pode ser aplicado agora?" },
+    { title: "Simple explanation", body: `${modeHint} ${copy.explanation}` },
+    { title: "Important concepts", body: concepts.length ? concepts.join(", ") : copy.concepts },
+    { title: "Why this matters", body: copy.matters },
+    { title: "Practical applications", body: copy.applications },
+    { title: "Limitations or cautions", body: copy.cautions },
+    { title: "Questions to keep learning", body: copy.questions },
   ];
 }
 
@@ -359,7 +412,7 @@ async function runLumina(nextMode) {
   const text = input.value.trim();
   if (!text) {
     input.focus();
-    setStatus("Cole um conteúdo");
+    setStatus(tr("lumina.runtime.enter_content", "Enter some content"));
     return;
   }
 
@@ -377,7 +430,7 @@ async function runLumina(nextMode) {
   }
 
   actions.forEach((button) => { button.disabled = true; });
-  setStatus("Iluminando com IA...", "loading");
+  setStatus(tr("lumina.runtime.processing", "Illuminating with AI..."), "loading");
   window.VxLab?.track?.("lumina", "process_started", { mode: selectedMode, language: selectedLanguage });
   output.dataset.loading = "true";
 
@@ -386,7 +439,7 @@ async function runLumina(nextMode) {
     if (!hasPaidPlan()) setUses(getUses() + 1);
     renderCards(sections);
     saveLuminaHistory("ai", sections, selectedMode, selectedLanguage, text);
-    setStatus("IA ativa", "ok");
+    setStatus(tr("lumina.runtime.ai_active", "AI active"), "ok");
     if (window.VxLab) {
       VxLab.recordEvent("lumina", "ai", `${selectedMode} · ${selectedLanguage}`);
       VxLab.savePreset("lumina", { mode: selectedMode, language: selectedLanguage });
@@ -395,7 +448,9 @@ async function runLumina(nextMode) {
     const sections = localLumina(text, selectedMode, selectedLanguage);
     renderCards(sections);
     saveLuminaHistory("fallback", sections, selectedMode, selectedLanguage, text);
-    setStatus(error?.message ? `Fallback local: ${error.message}` : "Fallback local", "fallback");
+    setStatus(error?.message
+      ? tr("lumina.runtime.local_fallback_error", "Local fallback: {error}").replace("{error}", error.message)
+      : tr("lumina.runtime.local_fallback", "Local fallback"), "fallback");
     if (window.VxLab) {
       VxLab.recordEvent("lumina", "fallback", `${selectedMode} · ${selectedLanguage}`);
       VxLab.track("lumina", "error", { message: error?.message || "Lumina AI unavailable" });
@@ -418,7 +473,7 @@ examples.forEach((button) => {
     input.value = example.text;
     mode.value = example.mode;
     input.focus();
-    setStatus("Exemplo carregado", "ready");
+    setStatus(tr("lumina.runtime.example_loaded", "Example loaded"), "ready");
     if (window.VxLab) VxLab.track("lumina", "example_loaded", { example: button.dataset.example });
   });
 });
@@ -426,7 +481,9 @@ examples.forEach((button) => {
 copyBtn?.addEventListener("click", async () => {
   if (!lastPlainText) return;
   const ok = await copyText(lastPlainText);
-  setStatus(ok ? "Resposta copiada" : "Clipboard bloqueado pelo browser", ok ? "ok" : "warn");
+  setStatus(ok
+    ? tr("lumina.runtime.response_copied", "Response copied")
+    : tr("lumina.runtime.clipboard_blocked", "Clipboard access was blocked by the browser"), ok ? "ok" : "warn");
   if (ok && window.VxLab) {
     VxLab.recordEvent("lumina", "copy", "Response copied");
   }
@@ -439,7 +496,9 @@ output?.addEventListener("click", async (event) => {
   const section = lastSections[index];
   if (!section) return;
   const ok = await copyText(`${localizeTitle(section.title)}\n${section.body}`);
-  setStatus(ok ? "Bloco copiado" : "Clipboard bloqueado pelo browser", ok ? "ok" : "warn");
+  setStatus(ok
+    ? tr("lumina.runtime.block_copied", "Section copied")
+    : tr("lumina.runtime.clipboard_blocked", "Clipboard access was blocked by the browser"), ok ? "ok" : "warn");
   if (ok && window.VxLab) {
     VxLab.recordEvent("lumina", "copy_block", localizeTitle(section.title));
   }
@@ -456,7 +515,7 @@ exportBtn?.addEventListener("click", () => {
   link.click();
   link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1200);
-  setStatus("Resposta exportada", "ok");
+  setStatus(tr("lumina.runtime.response_exported", "Response exported"), "ok");
   if (window.VxLab) {
     VxLab.recordEvent("lumina", "export", "TXT exported");
     VxLab.notifySuccess?.({ kind: "export", tool: "lumina", event: "lumina_export_success" });
@@ -476,4 +535,9 @@ updateCounter();
 renderHistory();
 restoreLuminaHistoryFromUrl();
 window.addEventListener("vx:plan-ready", updateCounter);
+window.addEventListener("vx:lang-changed", () => {
+  updateCounter();
+  renderHistory();
+  if (lastSections.length) renderCards(lastSections);
+});
 window.VxLab?.track?.("lumina", "tool_open", { surface: "lumina" });
