@@ -3,7 +3,7 @@ import FlagshipLayout from "../layouts/FlagshipLayout.astro";
 import FlagshipHeader from "../components/FlagshipHeader.astro";
 import FlagshipFooter from "../components/FlagshipFooter.astro";
 import PlatformAssistStrip from "../components/PlatformAssistStrip.astro";
-import { ROUTES } from "../data/routes";
+import { ROUTES, checkoutHref } from "../data/routes";
 
 const homeAssistItems = [
   { href: ROUTES.products, label: { en: "Explore", pt: "Explorar" }, title: { en: "Browse products", pt: "Ver produtos" }, copy: { en: "Jump straight into kits, tools, PropertyFlow and the Icons Store.", pt: "Vá direto para kits, ferramentas, PropertyFlow e Icons Store." }, emphasized: true, iconSrc: "/assets/allproducts.webp" },
@@ -422,7 +422,7 @@ const homeAssistItems = [
     </section>
 
 <!-- ═══ DEV JOURNEY MISSION ═══ -->
-    <section class="page-section dj-mission-section reveal" id="dev-journey-mission" style="--d:5;" aria-label="Dev Journey">
+    <section class="page-section dj-mission-section" id="dev-journey-mission" aria-label="Dev Journey">
       <div class="shell">
         <article class="panel dj-mission-panel">
           <div class="dj-mission-copy">
@@ -486,7 +486,7 @@ const homeAssistItems = [
 
           <aside class="dj-mission-floater" aria-hidden="true">
             <span class="dj-mission-floater-glow"></span>
-            <img src="/assets/journeyicon.webp" alt="" class="dj-mission-floater-img" loading="lazy" width="440" height="440" decoding="async" />
+            <img src="/assets/devjourney-banner.webp" alt="" class="dj-mission-floater-img" loading="lazy" width="2508" height="2508" decoding="async" />
           </aside>
         </article>
       </div>
@@ -498,7 +498,7 @@ const homeAssistItems = [
     </div>
 
     <!-- ═══ FEATURED PRODUCTS (editorial) ═══ -->
-    <section class="page-section">
+    <section class="page-section" id="featured-products">
       <div class="shell section-head">
         <span class="eyebrow" data-i18n="home2.eyebrow_featured">Featured now</span>
         <h2 data-i18n="home2.section_featured_title">Commercial products first. Vision immediately after.</h2>
@@ -506,12 +506,25 @@ const homeAssistItems = [
       </div>
       <div class="shell editorial-grid">
         <article class="panel gallery-card gallery-card--xl" style="background-image:url('/assets/newportfolio.webp')">
-          <span class="label" data-i18n="home2.featured_portfolio_label">Flagship kit</span>
+          <span class="label">
+            <span class="i18n-en">Flagship kit · easiest to monetize today</span>
+            <span class="i18n-pt">Kit principal · mais fácil de monetizar hoje</span>
+          </span>
           <h3 data-i18n="home2.featured_portfolio_title">Portfolio Pro Kit</h3>
-          <p data-i18n="home2.featured_portfolio_desc">Launch fast, look expensive and give your personal brand a real operating system.</p>
+          <p>
+            <span class="i18n-en">Launch fast, look expensive and give your personal brand a real operating system. Add icons when you want the portfolio to feel more custom.</span>
+            <span class="i18n-pt">Lance rápido, pareça premium e dê à sua marca pessoal um sistema real. Adicione icons quando quiser deixar o portfolio mais próprio.</span>
+          </p>
           <div class="actions">
+            <a href={checkoutHref("kit_portfolio_commercial", { next: ROUTES.portfolioKit })} class="button button--gold">
+              <span class="i18n-en">Buy Portfolio Pro</span>
+              <span class="i18n-pt">Comprar Portfolio Pro</span>
+            </a>
+            <a href={ROUTES.iconsStore} class="button button--ghost">
+              <span class="i18n-en">Add icons bundle</span>
+              <span class="i18n-pt">Adicionar bundle de icons</span>
+            </a>
             <a href={ROUTES.portfolioKit} class="button button--ghost" data-i18n="home2.featured_portfolio_btn">Open kit</a>
-            <a href={ROUTES.portfolioKitPreview} class="button button--gold" data-i18n="common.preview_unlocks">Preview unlocks</a>
           </div>
         </article>
         <article class="panel gallery-card" style="background-image:url('/assets/newlaunch.webp')">
@@ -1400,7 +1413,213 @@ const homeAssistItems = [
     filter: drop-shadow(0 22px 42px rgba(0, 0, 0, 0.4));
   }
 
+  /* ── Dev Journey mission: platform-specific stage ── */
+  .dj-mission-section {
+    padding-top: clamp(48px, 7vw, 92px);
+    padding-bottom: clamp(48px, 7vw, 92px);
+  }
+  .dj-mission-panel {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, .86fr) minmax(460px, 1fr);
+    align-items: center;
+    gap: clamp(28px, 4.6vw, 64px);
+    padding: clamp(30px, 5vw, 58px);
+    overflow: hidden;
+    isolation: isolate;
+    background:
+      radial-gradient(circle at 12% 16%, rgba(34, 211, 238, .16), transparent 34%),
+      radial-gradient(circle at 86% 72%, rgba(168, 85, 247, .18), transparent 38%),
+      linear-gradient(140deg, rgba(11, 18, 32, .94), rgba(15, 10, 28, .9));
+    border-color: rgba(125, 211, 252, .24);
+    box-shadow:
+      0 28px 84px rgba(0, 0, 0, .42),
+      inset 0 1px 0 rgba(255, 255, 255, .06);
+  }
+  .dj-mission-panel::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: inherit;
+    border: 1px solid rgba(255, 255, 255, .055);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .dj-mission-panel::after {
+    content: "DEV JOURNEY";
+    position: absolute;
+    right: clamp(-28px, -2vw, -12px);
+    bottom: -18px;
+    z-index: 0;
+    font-family: var(--display);
+    font-size: clamp(54px, 10vw, 126px);
+    font-weight: 800;
+    letter-spacing: -.08em;
+    line-height: .8;
+    color: rgba(255, 255, 255, .035);
+    pointer-events: none;
+  }
+  .dj-mission-copy,
+  .dj-mission-floater {
+    position: relative;
+    z-index: 1;
+  }
+  .dj-mission-copy {
+    display: grid;
+    gap: 18px;
+    max-width: 58ch;
+    min-width: 0;
+  }
+  .dj-mission-label {
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .dj-mission-label-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: #67e8f9;
+    box-shadow: 0 0 16px rgba(103, 232, 249, .8);
+  }
+  .dj-mission-title {
+    margin: 0;
+    color: #fff;
+    font-family: var(--display);
+    font-size: clamp(2rem, 4.2vw, 4.8rem);
+    line-height: .95;
+    letter-spacing: -.055em;
+  }
+  .dj-mission-accent {
+    background: linear-gradient(135deg, #fde68a, #67e8f9 46%, #c4b5fd);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .dj-mission-desc {
+    max-width: 58ch;
+    margin: 0;
+    color: rgba(226, 232, 240, .76);
+    font-size: clamp(.98rem, 1.2vw, 1.08rem);
+    line-height: 1.72;
+  }
+  .dj-mission-desc em {
+    color: rgba(253, 230, 138, .92);
+  }
+  .dj-mission-quote {
+    position: relative;
+    margin: 2px 0 0;
+    padding: 18px 20px 18px 28px;
+    border-radius: 20px;
+    border: 1px solid rgba(253, 230, 138, .2);
+    background: linear-gradient(180deg, rgba(253, 230, 138, .08), rgba(255, 255, 255, .025));
+    color: rgba(255, 247, 237, .92);
+    font-size: .95rem;
+    line-height: 1.62;
+  }
+  .dj-mission-quote::before {
+    content: "“";
+    position: absolute;
+    left: 9px;
+    top: 1px;
+    color: rgba(253, 230, 138, .62);
+    font: 42px/1 Georgia, serif;
+  }
+  .dj-mission-quote cite {
+    display: block;
+    margin-top: 8px;
+    color: rgba(253, 230, 138, .74);
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: .04em;
+  }
+  .dj-mission-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .dj-mission-stat {
+    min-width: 0;
+    display: grid;
+    gap: 7px;
+    padding: 15px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, .09);
+    background: rgba(255, 255, 255, .045);
+  }
+  .dj-mission-stat__icon {
+    font-size: 21px;
+    line-height: 1;
+  }
+  .dj-mission-stat strong {
+    color: #fff;
+    font-weight: 800;
+    line-height: 1.18;
+  }
+  .dj-mission-stat > span:not(.dj-mission-stat__icon) {
+    color: rgba(226, 232, 240, .64);
+    font-size: .82rem;
+    line-height: 1.38;
+  }
+  .dj-mission-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 2px;
+  }
+  .dj-mission-floater {
+    justify-self: center;
+    width: min(100%, 650px);
+    min-height: 520px;
+    display: grid;
+    place-items: center;
+    border-radius: 32px;
+    overflow: visible;
+  }
+  .dj-mission-floater-glow {
+    position: absolute;
+    inset: 3%;
+    border-radius: 999px;
+    background:
+      radial-gradient(circle, rgba(34, 211, 238, .42), transparent 57%),
+      radial-gradient(circle at 38% 64%, rgba(168, 85, 247, .34), transparent 60%),
+      radial-gradient(circle at 72% 42%, rgba(253, 230, 138, .16), transparent 52%);
+    filter: blur(38px);
+  }
+  .dj-mission-floater-img {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: min(100%, 640px);
+    height: auto;
+    object-fit: contain;
+    border-radius: 28px;
+    filter:
+      drop-shadow(0 34px 72px rgba(0, 0, 0, .52))
+      drop-shadow(0 0 42px rgba(34, 211, 238, .32))
+      drop-shadow(0 0 30px rgba(168, 85, 247, .2));
+  }
+  .dj-mission-panel:hover .dj-mission-floater-img {
+    transform: translateY(-4px) scale(1.018);
+  }
+
   /* ── Mobile adjustments ── */
+  @media (max-width: 900px) {
+    .dj-mission-panel {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .dj-mission-floater {
+      order: -1;
+      width: min(100%, 680px);
+      min-height: auto;
+      justify-self: center;
+    }
+    .dj-mission-floater-img {
+      width: min(100%, 680px);
+    }
+  }
   @media (max-width: 639px) {
     .hero-v2__desc {
       max-width: 100%;
@@ -1431,6 +1650,22 @@ const homeAssistItems = [
     .principle-panel__art {
       width: min(100%, 180px);
       max-height: 180px;
+    }
+    .dj-mission-panel {
+      padding: 24px;
+    }
+    .dj-mission-title {
+      font-size: clamp(2rem, 12vw, 3.2rem);
+    }
+    .dj-mission-stats {
+      grid-template-columns: 1fr;
+    }
+    .dj-mission-actions {
+      flex-direction: column;
+    }
+    .dj-mission-actions .button {
+      width: 100%;
+      justify-content: center;
     }
   }
 </style>
