@@ -175,6 +175,9 @@
       "dynamic.create_button": "Criar código QR gerenciado",
       "dynamic.creating": "Criando...",
       "dynamic.created": "Código QR dinâmico criado:",
+      "runtime.dynamic_ready": "Código QR dinâmico gerenciado pronto. A exportação agora usa o link curto editável da VOLYNX.",
+      "runtime.dynamic_before_print": "Crie o código QR gerenciado antes de imprimir, para manter futuras edições de destino disponíveis.",
+      "runtime.live_preview": "Prévia em tempo real. A exportação gera o arquivo final na qualidade selecionada.",
       "dynamic.quota_unlimited": "Códigos QR dinâmicos ilimitados",
       "dynamic.quota": "{used}/{limit} códigos QR dinâmicos ativos",
       "dynamic.err_url": "Informe um destino http ou https válido.",
@@ -928,11 +931,11 @@
     const inline = $("qgExampleNotice");
     const text = dynamic
       ? state.dynamicShortUrl
-        ? "Managed dynamic QR ready. Export now uses the editable VOLYNX short link."
-        : "Create the managed QR before printing so future destination edits stay possible."
+        ? tq("runtime.dynamic_ready", "Managed dynamic QR ready. Export now uses the editable VOLYNX short link.")
+        : tq("runtime.dynamic_before_print", "Create the managed QR before printing so future destination edits stay possible.")
       : example
-        ? "Prévia de exemplo: digite seu conteúdo para personalizar."
-        : "Live preview. Export generates the final file at the selected quality.";
+        ? tq("content.example", "Preview example: enter your content to customize it.")
+        : tq("runtime.live_preview", "Live preview. Export generates the final file at the selected quality.");
 
     if (notice) notice.textContent = text;
     if (inline) inline.textContent = text;
