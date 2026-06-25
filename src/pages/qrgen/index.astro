@@ -33,7 +33,7 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
 ---
 
 <FlagshipLayout title="VOLYNX QRGen - Premium QR Code Editor" pageClass="page-qrgen">
-  <FlagshipHeader current="/qrgen/" ctaLabel="Open Lab" ctaI18n="nav.open_lab" ctaHref={ROUTES.lab} />
+  <FlagshipHeader current="/qrgen/" ctaLabel="Platform home" ctaI18n="widget.platform" ctaHref={ROUTES.platform} />
   <LabToolShell active="qr" />
 
   <nav class="qrgen-accountbar" aria-label="QRGen account actions" data-qg-accountbar>
@@ -132,7 +132,7 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
           </div>
 
           <p class="qrgen-help" id="qgExampleNotice" data-qg-i18n="content.example">
-            Preview de exemplo - digite seu conteúdo para personalizar.
+            Prévia de exemplo: digite seu conteúdo para personalizar.
           </p>
         </fieldset>
 
@@ -258,7 +258,7 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
         </div>
 
         <p class="qrgen-preview__note" id="qgPreviewNote" data-qg-i18n="preview.note">
-          Preview de exemplo - digite seu conteúdo para personalizar.
+          Prévia de exemplo: digite seu conteúdo para personalizar.
         </p>
 
         <div class="qrgen-warnings" id="qgWarnings" aria-live="polite"></div>
@@ -374,8 +374,7 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
   }
 
   :global(body.page-qrgen .backdrop),
-  :global(body.page-qrgen .noise),
-  :global(body.page-qrgen #vxHomeBtn) {
+  :global(body.page-qrgen .noise) {
     display: none !important;
   }
 
@@ -396,11 +395,19 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
     will-change: transform;
   }
 
-  :global(body.page-qrgen .vx-topbar),
   .qrgen-accountbar,
   .qrgen-shell {
     position: relative;
     z-index: 1;
+  }
+
+  :global(body.page-qrgen .vx-topbar) {
+    position: relative;
+    z-index: 80;
+  }
+
+  :global(body.page-qrgen #vxHomeBtn) {
+    display: flex !important;
   }
 
   @keyframes gradientShift {
