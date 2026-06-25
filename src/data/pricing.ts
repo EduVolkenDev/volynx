@@ -126,7 +126,7 @@ export const sitePricing = {
       id: 'light',
       label: { pt: 'Classe A — ação leve', en: 'Class A — light action' },
       tokens: '1 token',
-      price: { GBP: 'from £0.44', EUR: 'from €0.51', BRL: 'from R$2.95' },
+      price: { GBP: '£0.44+', EUR: '€0.51+', BRL: 'R$2.95+' },
       examples: {
         pt: ['converter 1 arquivo', 'resize simples', 'QR básico com download padrão'],
         en: ['convert 1 file', 'simple resize', 'basic QR with standard download']
@@ -136,7 +136,7 @@ export const sitePricing = {
       id: 'medium',
       label: { pt: 'Classe B — ação média', en: 'Class B — medium action' },
       tokens: '2 tokens',
-      price: { GBP: 'from £0.88', EUR: 'from €1.02', BRL: 'from R$5.90' },
+      price: { GBP: '£0.88+', EUR: '€1.02+', BRL: 'R$5.90+' },
       examples: {
         pt: ['upscale simples', 'QR com branding', 'lote pequeno'],
         en: ['simple upscale', 'branded QR', 'small batch']
@@ -146,7 +146,7 @@ export const sitePricing = {
       id: 'pro',
       label: { pt: 'Classe C — ação pro', en: 'Class C — pro action' },
       tokens: '4 tokens',
-      price: { GBP: 'from £1.76', EUR: 'from €2.04', BRL: 'from R$11.80' },
+      price: { GBP: '£1.76+', EUR: '€2.04+', BRL: 'R$11.80+' },
       examples: {
         pt: ['iMage Suite completa', 'upscale melhor', 'lote médio'],
         en: ['full iMage Suite', 'better upscale', 'mid-size batch']
@@ -156,7 +156,7 @@ export const sitePricing = {
       id: 'batch',
       label: { pt: 'Classe D — batch / valor comercial', en: 'Class D — batch / commercial value' },
       tokens: '8 tokens',
-      price: { GBP: 'from £3.52', EUR: 'from €4.08', BRL: 'from R$23.60' },
+      price: { GBP: '£3.52+', EUR: '€4.08+', BRL: 'R$23.60+' },
       examples: {
         pt: ['batch grande', 'export premium', 'ação com impacto comercial'],
         en: ['large batch', 'premium export', 'commercial-impact action']
@@ -166,9 +166,9 @@ export const sitePricing = {
       id: 'premium',
       label: { pt: 'Classe E — premium / business action', en: 'Class E — premium / business action' },
       tokens: '12–20 tokens',
-      price: { GBP: 'from £5.28–£8.80', EUR: 'from €6.12–€10.20', BRL: 'from R$35.40–R$59' },
+      price: { GBP: '£5.28–£8.80', EUR: '€6.12–€10.20', BRL: 'R$35.40–R$59' },
       examples: {
-        pt: ['template premium', 'export profissional', 'ação Studio conectada'],
+        pt: ['modelo premium', 'exportação profissional', 'ação Studio conectada'],
         en: ['premium template', 'professional export', 'wired Studio action']
       }
     }
@@ -186,7 +186,7 @@ export const sitePricing = {
       billing: { pt: 'sem custo', en: 'no cost' },
       cta: { pt: 'Começar grátis', en: 'Start free' },
       features: {
-        pt: ['1 draft', 'editor completo', 'preview', 'branding Volynx visível'],
+        pt: ['1 rascunho', 'editor completo', 'prévia', 'marca Volynx visível'],
         en: ['1 draft', 'full editor', 'preview', 'visible Volynx branding']
       }
     },
@@ -236,7 +236,7 @@ export const sitePricing = {
       billing: { pt: '/mês', en: '/month' },
       cta: { pt: 'Assinar Studio', en: 'Get Studio' },
       features: {
-        pt: ['até 10 sites', 'múltiplos custom domains', 'kits premium completos', 'desconto em export package', 'analytics melhorados', 'icons perks maiores'],
+        pt: ['até 10 sites', 'múltiplos domínios personalizados', 'kits premium completos', 'desconto no pacote de exportação', 'analytics melhorados', 'benefícios maiores em ícones'],
         en: ['up to 10 sites', 'multiple custom domains', 'full premium kits', 'discount on export package', 'improved analytics', 'bigger icons perks']
       }
     },
@@ -245,14 +245,14 @@ export const sitePricing = {
       image: '/assets/builderteams.webp',
       name: { pt: 'Builder Teams', en: 'Builder Teams' },
       description: {
-        pt: 'Para operações em equipe com billing central, ativos compartilhados e escala real.',
+        pt: 'Para operações em equipe com cobrança central, recursos compartilhados e escala real.',
         en: 'For team operations with central billing, shared assets, and real scale.'
       },
       price: { GBP: '£118', EUR: '€138', BRL: 'R$749' },
       billing: { pt: '/mês', en: '/month' },
       cta: { pt: 'Falar com a Volynx', en: 'Talk to Volynx' },
       features: {
-        pt: ['25 sites', 'workspace', 'billing central', 'shared assets', 'shared icons pool', 'suporte prioritário'],
+        pt: ['25 sites', 'área de trabalho', 'cobrança central', 'recursos compartilhados', 'biblioteca compartilhada de ícones', 'suporte prioritário'],
         en: ['25 sites', 'workspace', 'central billing', 'shared assets', 'shared icons pool', 'priority support']
       }
     }
@@ -271,7 +271,7 @@ export const sitePricing = {
       cta: { pt: 'Abrir QRGen', en: 'Open QRGen' },
       href: '/qrgen/',
       features: {
-        pt: ['preview ao vivo', 'QR estático', 'cores básicas', '2 exports grátis/dia'],
+        pt: ['prévia ao vivo', 'QR estático', 'cores básicas', '2 exportações grátis/dia'],
         en: ['live preview', 'static QR', 'basic colors', '2 free exports/day']
       }
     },
@@ -379,7 +379,7 @@ export const sitePricing = {
       },
       image: '/assets/flow-starter.webp',
       price: { GBP: '£187', EUR: '€219', BRL: 'R$1.290' },
-      billing: { pt: 'pagamento único · 3 templates', en: 'one-time · 3 templates' },
+      billing: { pt: 'pagamento único · 3 modelos', en: 'one-time · 3 templates' },
       cta: { pt: 'Ver PropertyFlow', en: 'View PropertyFlow' },
       href: '/products/propertyflow/#pricing',
       features: {
@@ -402,11 +402,11 @@ export const sitePricing = {
       },
       image: '/assets/flow-professional.webp',
       price: { GBP: '£447', EUR: '€519', BRL: 'R$3.090' },
-      billing: { pt: 'pagamento único · 6 templates', en: 'one-time · 6 templates' },
+      billing: { pt: 'pagamento único · 6 modelos', en: 'one-time · 6 templates' },
       cta: { pt: 'Ver PropertyFlow', en: 'View PropertyFlow' },
       href: '/products/propertyflow/#pricing',
       features: {
-        pt: ['tudo do Starter', 'integração Supabase', 'dashboard admin', 'guia completo de deploy'],
+        pt: ['tudo do Starter', 'integração Supabase', 'painel admin', 'guia completo de publicação'],
         en: ['everything in Starter', 'Supabase integration', 'admin dashboard', 'full deployment guide']
       },
       note: {
@@ -423,7 +423,7 @@ export const sitePricing = {
       },
       image: '/assets/flow-whitelabel.webp',
       price: { GBP: '£897', EUR: '€1.039', BRL: 'R$6.190' },
-      billing: { pt: 'pagamento único · 15 templates', en: 'one-time · 15 templates' },
+      billing: { pt: 'pagamento único · 15 modelos', en: 'one-time · 15 templates' },
       cta: { pt: 'Ver PropertyFlow', en: 'View PropertyFlow' },
       href: '/products/propertyflow/#pricing',
       features: {
@@ -469,13 +469,13 @@ export const sitePricing = {
       href: '/support/?product=volynx&intent=domain_setup',
       cta: { pt: 'Solicitar setup', en: 'Request setup' },
       note: {
-        pt: 'White-glove. Não é checkout instantâneo.',
+        pt: 'Atendimento concierge. Não é compra instantânea.',
         en: 'White-glove lane. Not an instant checkout.'
       }
     },
     {
       id: 'template-pack',
-      name: { pt: 'Template / kit premium', en: 'Premium template / kit' },
+      name: { pt: 'Modelo / kit premium', en: 'Premium template / kit' },
       description: { pt: 'Kits prontos para páginas premium de conversão.', en: 'Ready-made kits for premium conversion pages.' },
       price: { GBP: '£28', EUR: '€32', BRL: 'R$179' },
       availability: 'coming_soon',
@@ -529,7 +529,7 @@ export const sitePricing = {
       availability: 'coming_soon',
       cta: { pt: 'Em breve', en: 'Coming soon' },
       note: {
-        pt: 'Sem checkout até a entrega pós-compra estar fechada.',
+        pt: 'Sem compra direta até a entrega pós-compra estar fechada.',
         en: 'No checkout until post-purchase delivery is closed.'
       }
     }
@@ -545,7 +545,7 @@ export const sitePricing = {
       cta: { pt: 'Comprar Starter', en: 'Get Starter' },
       href: '/products/propertyflow/#pricing',
       features: {
-        pt: ['3 templates de grid', 'código-fonte React completo', 'catálogo + filtros', 'interface bilíngue (EN/PT)', 'modo de dados estático'],
+        pt: ['3 modelos de grid', 'código-fonte React completo', 'catálogo + filtros', 'interface bilíngue (EN/PT)', 'modo de dados estático'],
         en: ['3 grid templates', 'full React source code', 'property catalogue + filters', 'bilingual interface (EN/PT)', 'static data mode']
       }
     },
@@ -554,28 +554,28 @@ export const sitePricing = {
       badge: { pt: 'Mais popular', en: 'Most popular' },
       featured: true,
       name: { pt: 'PropertyFlow Professional', en: 'PropertyFlow Professional' },
-      description: { pt: 'Tudo do Starter, mais 6 templates, integração Supabase, painel admin, captura de leads.', en: 'Everything in Starter, plus 6 templates, Supabase backend, admin dashboard, lead capture.' },
+      description: { pt: 'Tudo do Starter, mais 6 modelos, integração Supabase, painel admin e captura de leads.', en: 'Everything in Starter, plus 6 templates, Supabase backend, admin dashboard, lead capture.' },
       image: '/assets/flow-professional.webp',
       price: { GBP: '£447', EUR: '€519', BRL: 'R$3.090' },
       billing: { pt: 'pagamento único', en: 'one-time' },
       cta: { pt: 'Comprar Professional', en: 'Get Professional' },
       href: '/products/propertyflow/#pricing',
       features: {
-        pt: ['6 templates de grid', 'tudo do Starter', 'integração com Supabase', 'painel admin', 'galeria + modais', 'captura de leads', 'guia de deploy'],
+        pt: ['6 modelos de grid', 'tudo do Starter', 'integração com Supabase', 'painel admin', 'galeria + modais', 'captura de leads', 'guia de publicação'],
         en: ['6 grid templates', 'everything in Starter', 'Supabase backend integration', 'admin dashboard', 'image gallery + modals', 'enquiry capture system', 'deployment guide']
       }
     },
     {
       id: 'pf_white_label',
       name: { pt: 'PropertyFlow White-Label', en: 'PropertyFlow White-Label' },
-      description: { pt: '15 templates, branding kit, onboarding prioritário, migração de dados, canal dedicado.', en: '15 templates, branding starter kit, priority onboarding, data migration, dedicated support.' },
+      description: { pt: '15 modelos, kit de marca, integração prioritária, migração de dados e canal dedicado.', en: '15 templates, branding starter kit, priority onboarding, data migration, dedicated support.' },
       image: '/assets/flow-whitelabel.webp',
       price: { GBP: '£897', EUR: '€1.039', BRL: 'R$6.190' },
       billing: { pt: 'pagamento único', en: 'one-time' },
       cta: { pt: 'Comprar White-Label', en: 'Get White-Label' },
       href: '/products/propertyflow/#pricing',
       features: {
-        pt: ['15 templates de grid', 'tudo do Professional', 'kit de branding customizado', 'onboarding prioritário', 'suporte de migração de dados', 'canal de suporte dedicado'],
+        pt: ['15 modelos de grid', 'tudo do Professional', 'kit de marca personalizado', 'integração prioritária', 'suporte de migração de dados', 'canal de suporte dedicado'],
         en: ['15 grid templates', 'everything in Professional', 'custom branding starter kit', 'priority onboarding', 'data migration support', 'dedicated support channel']
       }
     }

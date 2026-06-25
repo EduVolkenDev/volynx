@@ -931,7 +931,7 @@
         ? "Managed dynamic QR ready. Export now uses the editable VOLYNX short link."
         : "Create the managed QR before printing so future destination edits stay possible."
       : example
-        ? "Preview de exemplo - digite seu conteúdo para personalizar."
+        ? "Prévia de exemplo: digite seu conteúdo para personalizar."
         : "Live preview. Export generates the final file at the selected quality.";
 
     if (notice) notice.textContent = text;
