@@ -117,6 +117,10 @@ const PLAN_PROFILE_MAP: Record<string, Record<string, string>> = {
   // CVitae
   cvitae_business: { cvitae_plan: "business", plan: "pro" },
 
+  // World
+  world_member: { world_plan: "member", plan: "pro" },
+  world_pro:    { world_plan: "pro",    plan: "pro" },
+
   // Bundles
   bundle_volynx_daily_pro:    { builder_plan: "pro",    daily_plan: "pro",     plan: "pro" },
   bundle_volynx_daily_studio: { builder_plan: "studio", daily_plan: "diamond", plan: "pro" },
@@ -138,6 +142,8 @@ const PLAN_DOWNGRADE_MAP: Record<string, Record<string, string>> = {
   daily_pro:      { daily_plan: "free" },
   daily_diamond:  { daily_plan: "free" },
   cvitae_business: { cvitae_plan: "free" },
+  world_member: { world_plan: "free" },
+  world_pro:    { world_plan: "free" },
   bundle_volynx_daily_pro:    { builder_plan: "free", daily_plan: "free" },
   bundle_volynx_daily_studio: { builder_plan: "free", daily_plan: "free" },
   builder_launch: { builder_plan: "free" },
@@ -188,6 +194,7 @@ async function syncUserSubscriptionEntitlements(userId: string): Promise<void> {
     builder_plan: "free",
     daily_plan: "free",
     cvitae_plan: "free",
+    world_plan: "free",
   };
 
   for (const subscription of activeSubscriptions as Array<{ plan_key?: string | null }>) {

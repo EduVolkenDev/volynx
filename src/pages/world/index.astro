@@ -3,6 +3,17 @@ import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
 import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import FlagshipFooter from "../../components/FlagshipFooter.astro";
 import { ROUTES } from "../../data/routes";
+import { sitePricing } from "../../data/pricing";
+
+const worldPlans = sitePricing.worldPlans;
+const worldMemberPlan = worldPlans.find((plan) => plan.id === "world_member");
+const worldProPlan = worldPlans.find((plan) => plan.id === "world_pro");
+const worldMemberLocalizedPrice = worldMemberPlan
+  ? `${worldMemberPlan.price.EUR}/${worldMemberPlan.price.BRL}`
+  : "€16/R$89";
+const worldProLocalizedPrice = worldProPlan
+  ? `${worldProPlan.price.EUR}/${worldProPlan.price.BRL}`
+  : "€39/R$219";
 ---
 
 <FlagshipLayout
@@ -13,9 +24,10 @@ import { ROUTES } from "../../data/routes";
   <FlagshipHeader current={ROUTES.world} ctaLabel="Join World" ctaHref="#join-world" ctaI18n="nav.world" />
 
   <main>
-    <section class="world-hero">
+    <canvas class="world-webgl" data-world-scene aria-hidden="true"></canvas>
+    <section class="world-hero world-reveal">
       <div class="shell world-hero__grid">
-        <div>
+        <div class="world-hero__copy">
           <span class="world-kicker"><span class="i18n-en">Volynx World · Founding marketplace</span><span class="i18n-pt">Volynx World · Marketplace fundador</span></span>
           <h1>
             <span class="i18n-en">The right professional can change what is possible.</span>
@@ -35,20 +47,20 @@ import { ROUTES } from "../../data/routes";
             <span>VX <span class="i18n-en">founder benefit active</span><span class="i18n-pt">benefício fundador ativo</span></span>
           </div>
         </div>
-        <aside class="world-vision" aria-label="Volynx World professional network preview">
+        <aside class="world-vision world-reveal" style="--reveal-delay: 180ms;">
           <div class="world-orbit" aria-hidden="true">
             <div class="world-orbit__core">
-              <img src="/assets/V.webp" alt="" loading="eager" decoding="async" />
+              <img src="/assets/world/world-network-icon.webp" alt="" loading="eager" decoding="async" />
             </div>
-            <div class="world-orbit__node world-orbit__node--one"><img src="/assets/builder.webp" alt="" loading="lazy" decoding="async" /></div>
-            <div class="world-orbit__node world-orbit__node--two"><img src="/assets/cvitae.webp" alt="" loading="lazy" decoding="async" /></div>
-            <div class="world-orbit__node world-orbit__node--three"><img src="/assets/lumina-icon-transparent.webp" alt="" loading="lazy" decoding="async" /></div>
-            <div class="world-orbit__node world-orbit__node--four"><img src="/assets/propertyflow.webp" alt="" loading="lazy" decoding="async" /></div>
+            <div class="world-orbit__node world-orbit__node--one"><img src="/assets/world/world-profile-icon.webp" alt="" loading="lazy" decoding="async" /></div>
+            <div class="world-orbit__node world-orbit__node--two"><img src="/assets/world/world-service-icon.webp" alt="" loading="lazy" decoding="async" /></div>
+            <div class="world-orbit__node world-orbit__node--three"><img src="/assets/world/world-brief-icon.webp" alt="" loading="lazy" decoding="async" /></div>
+            <div class="world-orbit__node world-orbit__node--four"><img src="/assets/world/world-intelligence-icon.webp" alt="" loading="lazy" decoding="async" /></div>
           </div>
-          <span>WORLD INTELLIGENCE</span>
+          <span id="world-vision-title"><span class="i18n-en">World intelligence</span><span class="i18n-pt">Inteligência World</span></span>
           <strong><span class="i18n-en">Professionals inside the platform, not outside the story.</span><span class="i18n-pt">Profissionais dentro da plataforma, não fora da história.</span></strong>
           <p><span class="i18n-en">World should feel like a premium network layer: discoverable profiles, clear services, private briefs, and platform-native benefits for serious work.</span><span class="i18n-pt">O World precisa parecer uma camada premium de rede: perfis encontráveis, serviços claros, briefings privados e benefícios nativos da plataforma para trabalho sério.</span></p>
-          <div class="world-signal-grid" aria-label="World platform signals">
+          <div class="world-signal-grid">
             <span><b>01</b><em><span class="i18n-en">Public profile</span><span class="i18n-pt">Perfil público</span></em></span>
             <span><b>02</b><em><span class="i18n-en">Service offer</span><span class="i18n-pt">Oferta de serviço</span></em></span>
             <span><b>03</b><em><span class="i18n-en">Private brief</span><span class="i18n-pt">Briefing privado</span></em></span>
@@ -58,7 +70,7 @@ import { ROUTES } from "../../data/routes";
       </div>
     </section>
 
-    <section class="world-section world-section--steps">
+    <section class="world-section world-section--steps world-reveal">
       <div class="shell">
         <div class="world-section__head">
           <div>
@@ -67,14 +79,52 @@ import { ROUTES } from "../../data/routes";
           </div>
         </div>
         <div class="world-steps">
-          <article><span><img src="/assets/flow-professional.webp" alt="" loading="lazy" decoding="async" /></span><strong><span class="i18n-en">Discover by delivery</span><span class="i18n-pt">Encontre pela entrega</span></strong><p><span class="i18n-en">Search professionals by the service, specialty, and outcome you need.</span><span class="i18n-pt">Busque profissionais pelo serviço, especialidade e resultado que você precisa.</span></p></article>
-          <article><span><img src="/assets/contacticon.webp" alt="" loading="lazy" decoding="async" /></span><strong><span class="i18n-en">Send a private brief</span><span class="i18n-pt">Envie um briefing privado</span></strong><p><span class="i18n-en">Share your goal, budget, and timeline directly with the professional.</span><span class="i18n-pt">Compartilhe objetivo, orçamento e prazo diretamente com o profissional.</span></p></article>
-          <article><span><img src="/assets/approval1.webp" alt="" loading="lazy" decoding="async" /></span><strong><span class="i18n-en">Agree and build</span><span class="i18n-pt">Combine e construa</span></strong><p><span class="i18n-en">Both parties define the agreement and delivery independently in this founding release.</span><span class="i18n-pt">As duas partes definem o acordo e a entrega de forma independente neste lançamento fundador.</span></p></article>
+          <article class="world-reveal" style="--reveal-delay: 80ms;"><span><img src="/assets/world/world-discovery-icon.webp" alt="" loading="lazy" decoding="async" /></span><strong><span class="i18n-en">Discover by delivery</span><span class="i18n-pt">Encontre pela entrega</span></strong><p><span class="i18n-en">Search professionals by the service, specialty, and outcome you need.</span><span class="i18n-pt">Busque profissionais pelo serviço, especialidade e resultado que você precisa.</span></p></article>
+          <article class="world-reveal" style="--reveal-delay: 160ms;"><span><img src="/assets/world/world-brief-icon.webp" alt="" loading="lazy" decoding="async" /></span><strong><span class="i18n-en">Send a private brief</span><span class="i18n-pt">Envie um briefing privado</span></strong><p><span class="i18n-en">Share your goal, budget, and timeline directly with the professional.</span><span class="i18n-pt">Compartilhe objetivo, orçamento e prazo diretamente com o profissional.</span></p></article>
+          <article class="world-reveal" style="--reveal-delay: 240ms;"><span><img src="/assets/world/world-strategy-icon.webp" alt="" loading="lazy" decoding="async" /></span><strong><span class="i18n-en">Agree and build</span><span class="i18n-pt">Combine e construa</span></strong><p><span class="i18n-en">Both parties define the agreement and delivery independently in this founding release.</span><span class="i18n-pt">As duas partes definem o acordo e a entrega de forma independente neste lançamento fundador.</span></p></article>
         </div>
       </div>
     </section>
 
-    <section class="world-section world-section--intelligence" aria-labelledby="world-intelligence-title">
+    <section class="world-section world-section--showcase" aria-labelledby="world-showcase-title">
+      <div class="shell">
+        <div class="world-section__head world-reveal">
+          <div>
+            <span class="world-kicker"><span class="i18n-en">Built for serious work</span><span class="i18n-pt">Feito para trabalho sério</span></span>
+            <h2 id="world-showcase-title"><span class="i18n-en">A professional layer that feels alive, not listed.</span><span class="i18n-pt">Uma camada profissional que parece viva, não apenas listada.</span></h2>
+          </div>
+          <p><span class="i18n-en">World uses large visual anchors, private context, and platform signals so every professional presence feels connected to the VOLYNX ecosystem.</span><span class="i18n-pt">O World usa âncoras visuais grandes, contexto privado e sinais da plataforma para que cada presença profissional pareça conectada ao ecossistema VOLYNX.</span></p>
+        </div>
+        <div class="world-showcase">
+          <article class="world-showcase-card world-showcase-card--large world-reveal" style="--reveal-delay: 80ms;">
+            <div class="world-showcase-card__media"><img src="/assets/world/world-profile-icon.webp" alt="" loading="lazy" decoding="async" /></div>
+            <div>
+              <span class="world-kicker"><span class="i18n-en">Professional brand</span><span class="i18n-pt">Marca profissional</span></span>
+              <h3><span class="i18n-en">Presence becomes a signal, not a listing.</span><span class="i18n-pt">Presença vira sinal, não apenas listagem.</span></h3>
+              <p><span class="i18n-en">Specialties, proof, language, availability and services appear as one recognizable professional layer.</span><span class="i18n-pt">Especialidades, prova, idioma, disponibilidade e serviços aparecem como uma camada profissional reconhecível.</span></p>
+            </div>
+          </article>
+          <article class="world-showcase-card world-reveal" style="--reveal-delay: 160ms;">
+            <div class="world-showcase-card__media"><img src="/assets/world/world-brief-icon.webp" alt="" loading="lazy" decoding="async" /></div>
+            <div>
+              <span class="world-kicker"><span class="i18n-en">Private context</span><span class="i18n-pt">Contexto privado</span></span>
+              <h3><span class="i18n-en">Briefs stay intentional.</span><span class="i18n-pt">Briefings continuam intencionais.</span></h3>
+              <p><span class="i18n-en">Requests carry goal, timeline, budget and reply path without turning World into a public inbox.</span><span class="i18n-pt">Solicitações levam objetivo, prazo, orçamento e canal de resposta sem transformar o World em uma caixa pública.</span></p>
+            </div>
+          </article>
+          <article class="world-showcase-card world-reveal" style="--reveal-delay: 240ms;">
+            <div class="world-showcase-card__media"><img src="/assets/world/world-intelligence-icon.webp" alt="" loading="lazy" decoding="async" /></div>
+            <div>
+              <span class="world-kicker"><span class="i18n-en">Intelligence</span><span class="i18n-pt">Inteligência</span></span>
+              <h3><span class="i18n-en">Discovery follows delivery.</span><span class="i18n-pt">A descoberta segue a entrega.</span></h3>
+              <p><span class="i18n-en">Categories, signals and VX benefits make the marketplace easier to understand and easier to trust.</span><span class="i18n-pt">Categorias, sinais e benefícios VX tornam o marketplace mais fácil de entender e confiar.</span></p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="world-section world-section--intelligence world-reveal" aria-labelledby="world-intelligence-title">
       <div class="shell">
         <div class="world-section__head">
           <div>
@@ -83,14 +133,14 @@ import { ROUTES } from "../../data/routes";
           </div>
         </div>
         <div class="world-intelligence">
-          <article><img src="/assets/profile2.jpg" alt="" loading="lazy" decoding="async" /><span><span class="i18n-en">Presence</span><span class="i18n-pt">Presença</span></span><strong><span class="i18n-en">Profiles that feel credible before the first message.</span><span class="i18n-pt">Perfis que passam credibilidade antes da primeira mensagem.</span></strong></article>
-          <article><img src="/assets/products.webp" alt="" loading="lazy" decoding="async" /><span><span class="i18n-en">Offer clarity</span><span class="i18n-pt">Clareza de oferta</span></span><strong><span class="i18n-en">Services packaged by category, price model, delivery and VX benefit.</span><span class="i18n-pt">Serviços empacotados por categoria, preço, entrega e benefício VX.</span></strong></article>
-          <article><img src="/assets/lab-studio-memory.webp" alt="" loading="lazy" decoding="async" /><span><span class="i18n-en">Platform memory</span><span class="i18n-pt">Memória da plataforma</span></span><strong><span class="i18n-en">Private briefs and opportunities stay attached to the professional command layer.</span><span class="i18n-pt">Briefings privados e oportunidades ficam ligados ao comando profissional.</span></strong></article>
+          <article class="world-reveal" style="--reveal-delay: 80ms;"><img src="/assets/world/world-portfolio-icon.webp" alt="" loading="lazy" decoding="async" /><span><span class="i18n-en">Proof</span><span class="i18n-pt">Prova</span></span><strong><span class="i18n-en">Profiles can point to real work, not generic promises.</span><span class="i18n-pt">Perfis podem apontar para trabalho real, não promessas genéricas.</span></strong></article>
+          <article class="world-reveal" style="--reveal-delay: 160ms;"><img src="/assets/world/world-service-icon.webp" alt="" loading="lazy" decoding="async" /><span><span class="i18n-en">Offer clarity</span><span class="i18n-pt">Clareza de oferta</span></span><strong><span class="i18n-en">Services packaged by category, price model, delivery and VX benefit.</span><span class="i18n-pt">Serviços empacotados por categoria, preço, entrega e benefício VX.</span></strong></article>
+          <article class="world-reveal" style="--reveal-delay: 240ms;"><img src="/assets/world/world-intelligence-icon.webp" alt="" loading="lazy" decoding="async" /><span><span class="i18n-en">Platform memory</span><span class="i18n-pt">Memória da plataforma</span></span><strong><span class="i18n-en">Private briefs and opportunities stay attached to the professional command layer.</span><span class="i18n-pt">Briefings privados e oportunidades ficam ligados ao comando profissional.</span></strong></article>
         </div>
       </div>
     </section>
 
-    <section class="world-section" id="marketplace">
+    <section class="world-section world-reveal" id="marketplace">
       <div class="shell">
         <div class="world-section__head">
           <div>
@@ -116,7 +166,92 @@ import { ROUTES } from "../../data/routes";
       </div>
     </section>
 
-    <section class="world-section world-section--panel" id="join-world">
+    <section class="world-section world-section--pricing world-reveal" id="world-pricing" aria-labelledby="world-pricing-title">
+      <div class="shell">
+        <div class="world-section__head world-reveal">
+          <div>
+            <span class="world-kicker"><span class="i18n-en">World plans</span><span class="i18n-pt">Planos World</span></span>
+            <h2 id="world-pricing-title">
+              <span class="i18n-en">Start free. Scale when you're ready.</span>
+              <span class="i18n-pt">Comece grátis. Escale quando estiver pronto.</span>
+            </h2>
+          </div>
+          <p>
+            <span class="i18n-en">Every professional on Volynx World gets a free public presence. Upgrade for unlimited services, visible tier badges, stronger marketplace placement, and email brief notifications.</span>
+            <span class="i18n-pt">Todo profissional no Volynx World tem uma presença pública gratuita. Faça upgrade para serviços ilimitados, badges visíveis de plano, posicionamento melhor no marketplace e notificações de briefings por email.</span>
+          </p>
+        </div>
+        <div class="world-plans">
+          {worldPlans.map((plan, index) => (
+            <article
+              class:list={["world-plan", plan.featured && "world-plan--featured", "world-reveal"]}
+              style={`--reveal-delay: ${80 + index * 80}ms;`}
+            >
+              {plan.badge && (
+                <div class="world-plan__badge">
+                  <span class="i18n-en">{plan.badge.en}</span>
+                  <span class="i18n-pt">{plan.badge.pt}</span>
+                </div>
+              )}
+              <div class="world-plan__header">
+                <h3>
+                  <span class="i18n-en">{plan.name.en}</span>
+                  <span class="i18n-pt">{plan.name.pt}</span>
+                </h3>
+                <div class="world-plan__price">
+                  <strong>{plan.price.GBP}</strong>
+                  <span class="world-plan__billing">
+                    <span class="i18n-en">{plan.billing.en}</span>
+                    <span class="i18n-pt">{plan.billing.pt}</span>
+                  </span>
+                </div>
+                <p class="world-plan__summary">
+                  <span class="i18n-en">{plan.description.en}</span>
+                  <span class="i18n-pt">{plan.description.pt}</span>
+                </p>
+              </div>
+              <ul class="world-plan__features">
+                {plan.features.en.map((featureEn, featureIndex) => (
+                  <li>
+                    <span class="i18n-en">{featureEn}</span>
+                    <span class="i18n-pt">{plan.features.pt[featureIndex]}</span>
+                  </li>
+                ))}
+              </ul>
+              {plan.href ? (
+                <a href={plan.href} class="button button--ghost world-plan__btn">
+                  <span class="i18n-en">{plan.cta.en}</span>
+                  <span class="i18n-pt">{plan.cta.pt}</span>
+                </a>
+              ) : (
+                <button
+                  class:list={[
+                    "world-plan__btn",
+                    "world-checkout-btn",
+                    "button",
+                    plan.featured ? "button--gold" : "button--ghost",
+                  ]}
+                  data-plan={plan.id}
+                >
+                  <span class="i18n-en">{plan.cta.en}</span>
+                  <span class="i18n-pt">{plan.cta.pt}</span>
+                </button>
+              )}
+            </article>
+          ))}
+        </div>
+        <p class="world-pricing-note">
+          <span class="i18n-en">
+            Prices shown in GBP · EUR and BRL at checkout ({worldMemberLocalizedPrice} Member · {worldProLocalizedPrice} Pro)
+          </span>
+          <span class="i18n-pt">
+            Valores em GBP · EUR e BRL disponíveis no checkout ({worldMemberLocalizedPrice} Member · {worldProLocalizedPrice} Pro)
+          </span>
+        </p>
+      </div>
+    </section>
+
+    <section class="world-section world-section--panel world-reveal" id="join-world">
       <div class="shell">
         <div class="world-section__head">
           <div>
@@ -128,9 +263,27 @@ import { ROUTES } from "../../data/routes";
         </div>
 
         <div class="world-manager" id="worldManager" hidden>
+          <section class="world-form world-plan-summary">
+            <div class="world-form__head">
+              <div><span><img src="/assets/world/world-network-icon.webp" alt="" loading="lazy" decoding="async" /></span><h3><span class="i18n-en">World plan control</span><span class="i18n-pt">Controle do plano World</span></h3></div>
+            </div>
+            <p class="world-manager-note" id="worldPlanDescription"></p>
+            <div class="world-plan-summary__grid">
+              <div><small><span class="i18n-en">Current plan</span><span class="i18n-pt">Plano atual</span></small><strong id="worldPlanName"></strong></div>
+              <div><small><span class="i18n-en">Publishing</span><span class="i18n-pt">Publicação</span></small><strong id="worldPlanPublishing"></strong></div>
+              <div><small><span class="i18n-en">Marketplace</span><span class="i18n-pt">Marketplace</span></small><strong id="worldPlanDiscovery"></strong></div>
+              <div><small><span class="i18n-en">Briefs</span><span class="i18n-pt">Briefings</span></small><strong id="worldPlanBriefs"></strong></div>
+            </div>
+            <div class="world-form__actions">
+              <a class="button button--ghost" href="#world-pricing"><span class="i18n-en">Compare plans</span><span class="i18n-pt">Comparar planos</span></a>
+              <button class="button button--gold" id="manageWorldBilling" type="button"><span class="i18n-en">Manage plan</span><span class="i18n-pt">Gerir plano</span></button>
+            </div>
+            <p class="world-form__status" id="worldPlanStatus" aria-live="polite"></p>
+          </section>
+
           <form class="world-form" id="worldProfileForm">
             <div class="world-form__head">
-              <div><span><img src="/assets/profile2.jpg" alt="" loading="lazy" decoding="async" /></span><h3><span class="i18n-en">Professional profile</span><span class="i18n-pt">Perfil profissional</span></h3></div>
+              <div><span><img src="/assets/world/world-profile-icon.webp" alt="" loading="lazy" decoding="async" /></span><h3><span class="i18n-en">Professional profile</span><span class="i18n-pt">Perfil profissional</span></h3></div>
               <label class="world-toggle"><input id="profilePublished" type="checkbox" /><span><span class="i18n-en">Public</span><span class="i18n-pt">Público</span></span></label>
             </div>
             <div class="world-fields">
@@ -149,7 +302,7 @@ import { ROUTES } from "../../data/routes";
           </form>
 
           <form class="world-form" id="worldServiceForm">
-            <div class="world-form__head"><div><span><img src="/assets/products.webp" alt="" loading="lazy" decoding="async" /></span><h3><span class="i18n-en">Publish a service</span><span class="i18n-pt">Publicar um serviço</span></h3></div></div>
+            <div class="world-form__head"><div><span><img src="/assets/world/world-service-icon.webp" alt="" loading="lazy" decoding="async" /></span><h3><span class="i18n-en">Publish a service</span><span class="i18n-pt">Publicar um serviço</span></h3></div></div>
             <div class="world-fields">
               <label class="world-field--full"><span><span class="i18n-en">Service title</span><span class="i18n-pt">Título do serviço</span></span><input id="serviceTitle" maxlength="100" placeholder="Premium landing page design and build" required /></label>
               <label><span><span class="i18n-en">Category</span><span class="i18n-pt">Categoria</span></span><select id="serviceCategory"><option>Web & Technology</option><option>Design & Brand</option><option>Marketing & Growth</option><option>Business & Strategy</option><option>Content & Media</option><option>Other</option></select></label>
@@ -159,15 +312,16 @@ import { ROUTES } from "../../data/routes";
               <label><span><span class="i18n-en">Estimated delivery days</span><span class="i18n-pt">Dias estimados de entrega</span></span><input id="serviceDelivery" type="number" min="1" max="365" /></label>
               <label><span><span class="i18n-en">VX member benefit</span><span class="i18n-pt">Benefício para membros VX</span></span><select id="serviceVx"><option value="0">Not yet</option><option value="5">Up to 5%</option><option value="10">Up to 10%</option><option value="15">Up to 15%</option></select></label>
               <label class="world-field--full"><span><span class="i18n-en">Service description</span><span class="i18n-pt">Descrição do serviço</span></span><textarea id="serviceDescription" minlength="30" maxlength="1200" rows="4" required></textarea></label>
-              <label><span>Status</span><select id="serviceStatus"><option value="published">Published</option><option value="draft">Draft</option><option value="paused">Paused</option></select></label>
+              <label><span><span class="i18n-en">Status</span><span class="i18n-pt">Status</span></span><select id="serviceStatus"><option value="published">Published</option><option value="draft">Draft</option><option value="paused">Paused</option></select></label>
             </div>
             <div class="world-form__actions"><button class="button button--gold" id="serviceSubmit" type="submit"><span class="i18n-en">Add service</span><span class="i18n-pt">Adicionar serviço</span></button><button class="button button--ghost" id="serviceCancelEdit" type="button" hidden><span class="i18n-en">Cancel edit</span><span class="i18n-pt">Cancelar edição</span></button></div>
+            <div class="world-plan-gate" id="servicePlanGate" hidden></div>
             <p class="world-form__status" id="serviceFormStatus" aria-live="polite"></p>
             <div class="world-own-services" id="ownServices"></div>
           </form>
 
           <section class="world-form">
-            <div class="world-form__head"><div><span><img src="/assets/cvitae.webp" alt="" loading="lazy" decoding="async" /></span><h3><span class="i18n-en">World starter benefit</span><span class="i18n-pt">Benefício inicial World</span></h3></div></div>
+            <div class="world-form__head"><div><span><img src="/assets/world/world-portfolio-icon.webp" alt="" loading="lazy" decoding="async" /></span><h3><span class="i18n-en">World starter benefit</span><span class="i18n-pt">Benefício inicial World</span></h3></div></div>
             <p class="world-manager-note"><span class="i18n-en">Publish a real World presence and claim a founding benefit: one premium CVitae template plus 2 VX to start using the platform economy.</span><span class="i18n-pt">Publique uma presença real no World e resgate um benefício fundador: um template premium do CVitae mais 2 VX para começar a usar a economia da plataforma.</span></p>
             <div class="world-benefit" id="starterBenefit"></div>
             <div class="world-benefit__claim" id="starterBenefitClaim">
@@ -179,8 +333,8 @@ import { ROUTES } from "../../data/routes";
           </section>
 
           <section class="world-form">
-            <div class="world-form__head"><div><span><img src="/assets/contacticon.webp" alt="" loading="lazy" decoding="async" /></span><h3><span class="i18n-en">Private opportunities</span><span class="i18n-pt">Oportunidades privadas</span></h3></div></div>
-            <p class="world-manager-note"><span class="i18n-en">Briefs sent to your published services appear here. Contact details stay private between both parties.</span><span class="i18n-pt">Briefings enviados para seus serviços publicados aparecem aqui. Os contatos permanecem privados entre as duas partes.</span></p>
+            <div class="world-form__head"><div><span><img src="/assets/world/world-brief-icon.webp" alt="" loading="lazy" decoding="async" /></span><h3><span class="i18n-en">Private opportunities</span><span class="i18n-pt">Oportunidades privadas</span></h3></div></div>
+            <p class="world-manager-note"><span class="i18n-en">Every brief sent to your published services appears here. Contact details stay private between both parties, and Member/Pro plans also receive email notifications.</span><span class="i18n-pt">Todo briefing enviado para seus serviços publicados aparece aqui. Os contatos permanecem privados entre as duas partes, e os planos Member/Pro também recebem notificações por email.</span></p>
             <div class="world-inquiries" id="receivedInquiries"></div>
           </section>
         </div>
@@ -189,7 +343,7 @@ import { ROUTES } from "../../data/routes";
   </main>
 
   <dialog class="world-dialog" id="inquiryDialog">
-    <form method="dialog" class="world-dialog__close"><button aria-label="Close">×</button></form>
+    <form method="dialog" class="world-dialog__close"><button id="inquiryCloseButton" aria-label="Close">×</button></form>
     <form id="inquiryForm">
       <span class="world-kicker"><span class="i18n-en">Project brief</span><span class="i18n-pt">Briefing do projeto</span></span>
       <h2 id="inquiryTitle"><span class="i18n-en">Request this service</span><span class="i18n-pt">Solicitar este serviço</span></h2>
@@ -211,6 +365,7 @@ import { ROUTES } from "../../data/routes";
 
 <script>
   import { createClient } from "@supabase/supabase-js";
+  import { initWorldScene } from "../../scripts/world-three";
 
   const byId = (id: string) => document.getElementById(id) as HTMLElement | null;
   const value = (id: string) => ((byId(id) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null)?.value || "").trim();
@@ -228,10 +383,72 @@ import { ROUTES } from "../../data/routes";
   let ownServices: any[] = [];
   let receivedInquiries: any[] = [];
   let starterBenefit: any = null;
+  let worldPlan = "free";
   let category = "";
   let selectedService: any = null;
   let editingServiceId = "";
   let marketplaceUnavailable = false;
+  const WORLD_PLAN_PRIORITY: Record<string, number> = { free: 0, member: 1, pro: 2 };
+
+  function normalizeWorldPlan(plan: unknown) {
+    return plan === "member" || plan === "pro" ? plan : "free";
+  }
+
+  function worldPlanRank(plan: unknown) {
+    return WORLD_PLAN_PRIORITY[normalizeWorldPlan(plan)] || 0;
+  }
+
+  function getWorldPlanMeta(plan: unknown) {
+    const normalized = normalizeWorldPlan(plan);
+    if (normalized === "pro") {
+      return {
+        key: "pro",
+        label: text("World Pro", "World Pro"),
+        description: text(
+          "Top priority in discovery, premium spotlight, and email alerts on every brief.",
+          "Prioridade máxima na descoberta, destaque premium e alertas por email em cada briefing.",
+        ),
+        publishing: text("Unlimited published services", "Serviços publicados ilimitados"),
+        discovery: text("Featured above Member and Presence", "Destaque acima de Member e Presence"),
+        briefs: text("Dashboard + email notifications", "Painel + notificações por email"),
+      };
+    }
+    if (normalized === "member") {
+      return {
+        key: "member",
+        label: text("World Member", "World Member"),
+        description: text(
+          "Unlimited services, visible Member badge, and email alerts on every brief.",
+          "Serviços ilimitados, badge Member visível e alertas por email em cada briefing.",
+        ),
+        publishing: text("Unlimited published services", "Serviços publicados ilimitados"),
+        discovery: text("Priority above free profiles", "Prioridade acima de perfis gratuitos"),
+        briefs: text("Dashboard + email notifications", "Painel + notificações por email"),
+      };
+    }
+    return {
+      key: "free",
+      label: text("World Presence", "World Presence"),
+      description: text(
+        "Free public presence with one published service and private briefs in your dashboard.",
+        "Presença pública gratuita com um serviço publicado e briefings privados no seu painel.",
+      ),
+      publishing: text("1 published service", "1 serviço publicado"),
+      discovery: text("Standard marketplace placement", "Posicionamento padrão no marketplace"),
+      briefs: text("Dashboard inbox", "Caixa de entrada no painel"),
+    };
+  }
+
+  function localizeWorldError(message: string) {
+    if (!message) return message;
+    if (message.includes("world_free_service_limit")) {
+      return text(
+        "Free profiles can publish only 1 service. Upgrade to World Member or World Pro to publish more.",
+        "Perfis gratuitos podem publicar apenas 1 serviço. Faça upgrade para World Member ou World Pro para publicar mais.",
+      );
+    }
+    return message;
+  }
 
   function setStatus(id: string, message: string, kind = "") {
     const el = byId(id);
@@ -249,16 +466,47 @@ import { ROUTES } from "../../data/routes";
     return formatted;
   }
 
+  function formatCategory(categoryName: string) {
+    const labels: Record<string, [string, string]> = {
+      "Web & Technology": ["Web & Technology", "Web e Tecnologia"],
+      "Design & Brand": ["Design & Brand", "Design e Marca"],
+      "Marketing & Growth": ["Marketing & Growth", "Marketing e Crescimento"],
+      "Business & Strategy": ["Business & Strategy", "Negócios e Estratégia"],
+      "Content & Media": ["Content & Media", "Conteúdo e Mídia"],
+      Other: ["Other", "Outro"],
+    };
+    const label = labels[categoryName];
+    return label ? text(label[0], label[1]) : categoryName;
+  }
+
+  function formatStatus(status: string) {
+    const labels: Record<string, [string, string]> = {
+      available: ["Available", "Disponível"],
+      limited: ["Limited", "Limitado"],
+      unavailable: ["Unavailable", "Indisponível"],
+      published: ["Published", "Publicado"],
+      draft: ["Draft", "Rascunho"],
+      paused: ["Paused", "Pausado"],
+      new: ["New", "Novo"],
+      reviewing: ["Reviewing", "Em análise"],
+      accepted: ["Accepted", "Aceito"],
+      declined: ["Declined", "Recusado"],
+      closed: ["Closed", "Fechado"],
+    };
+    const label = labels[status];
+    return label ? text(label[0], label[1]) : status;
+  }
+
   function categoryIcon(categoryName: string) {
     const map: Record<string, string> = {
-      "Web & Technology": "/assets/builder.webp",
-      "Design & Brand": "/assets/producticon.webp",
-      "Marketing & Growth": "/assets/scale.webp",
-      "Business & Strategy": "/assets/summary.webp",
-      "Content & Media": "/assets/iconography.webp",
-      "Other": "/assets/V.webp",
+      "Web & Technology": "/assets/world/world-intelligence-icon.webp",
+      "Design & Brand": "/assets/world/world-brand-icon.webp",
+      "Marketing & Growth": "/assets/world/world-growth-icon.webp",
+      "Business & Strategy": "/assets/world/world-strategy-icon.webp",
+      "Content & Media": "/assets/world/world-portfolio-icon.webp",
+      "Other": "/assets/world/world-service-icon.webp",
     };
-    return map[categoryName] || "/assets/V.webp";
+    return map[categoryName] || "/assets/world/world-service-icon.webp";
   }
 
   function updateLocalizedControls() {
@@ -280,16 +528,47 @@ import { ROUTES } from "../../data/routes";
     });
     const status = byId("serviceStatus") as HTMLSelectElement | null;
     if (status) {
+      Array.from(status.options).forEach((option) => { option.textContent = formatStatus(option.value); });
+    }
+    const availability = byId("profileAvailability") as HTMLSelectElement | null;
+    if (availability) Array.from(availability.options).forEach((option) => { option.textContent = formatStatus(option.value); });
+    const categorySelect = byId("serviceCategory") as HTMLSelectElement | null;
+    if (categorySelect) Array.from(categorySelect.options).forEach((option) => { option.textContent = formatCategory(option.value || option.textContent || "Other"); });
+    const pricing = byId("servicePricing") as HTMLSelectElement | null;
+    if (pricing) {
       const labels: Record<string, [string, string]> = {
-        published: ["Published", "Publicado"],
-        draft: ["Draft", "Rascunho"],
-        paused: ["Paused", "Pausado"],
+        quote: ["Request a quote", "Solicitar orçamento"],
+        starting_at: ["Starting at", "A partir de"],
+        fixed: ["Fixed price", "Preço fixo"],
+        hourly: ["Hourly", "Por hora"],
       };
-      Array.from(status.options).forEach((option) => {
+      Array.from(pricing.options).forEach((option) => {
         const label = labels[option.value];
         if (label) option.textContent = text(label[0], label[1]);
       });
     }
+    const vx = byId("serviceVx") as HTMLSelectElement | null;
+    if (vx) {
+      Array.from(vx.options).forEach((option) => {
+        option.textContent = option.value === "0" ? text("Not yet", "Ainda não") : text(`Up to ${option.value}%`, `Até ${option.value}%`);
+      });
+    }
+    const starterTemplate = byId("starterTemplate") as HTMLSelectElement | null;
+    if (starterTemplate) {
+      const labels: Record<string, [string, string]> = {
+        executive: ["Executive", "Executivo"],
+        nordic: ["Nordic", "Nórdico"],
+        developer: ["Developer", "Desenvolvedor"],
+        creative: ["Creative", "Criativo"],
+        timeline: ["Timeline", "Linha do tempo"],
+      };
+      Array.from(starterTemplate.options).forEach((option) => {
+        const label = labels[option.value];
+        if (label) option.textContent = text(label[0], label[1]);
+      });
+    }
+    const close = byId("inquiryCloseButton") as HTMLButtonElement | null;
+    if (close) close.setAttribute("aria-label", text("Close", "Fechar"));
   }
 
   function updateServicePriceControl() {
@@ -300,6 +579,23 @@ import { ROUTES } from "../../data/routes";
     price.required = requiresPrice;
     price.disabled = !requiresPrice;
     if (!requiresPrice) price.value = "";
+  }
+
+  function initWorldReveal() {
+    const nodes = Array.from(document.querySelectorAll<HTMLElement>(".world-reveal:not(.is-visible)"));
+    if (!nodes.length) return;
+    if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      nodes.forEach((node) => node.classList.add("is-visible"));
+      return;
+    }
+    const observer = new IntersectionObserver((entries, instance) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        instance.unobserve(entry.target);
+      });
+    }, { rootMargin: "0px 0px -12% 0px", threshold: 0.12 });
+    nodes.forEach((node) => observer.observe(node));
   }
 
   function renderMarketplace() {
@@ -322,8 +618,9 @@ import { ROUTES } from "../../data/routes";
     if (!grid) return;
     if (!filtered.length) {
       grid.innerHTML = marketplaceUnavailable
-        ? `<article class="world-empty"><strong>${text("Founding profiles are being prepared.", "Os perfis fundadores estão sendo preparados.")}</strong><p>${text("Volynx World is opening its first professional network. Sign in to prepare your presence.", "O Volynx World está abrindo sua primeira rede profissional. Entre para preparar sua presença.")}</p><a class="button button--gold" href="#join-world">${text("Prepare my World profile", "Preparar meu perfil World")}</a></article>`
-        : `<article class="world-empty"><strong>${text("The founding marketplace is open.", "O marketplace fundador está aberto.")}</strong><p>${text("No service matches this search yet. Be one of the first professionals to publish.", "Nenhum serviço corresponde a esta busca ainda. Seja um dos primeiros profissionais a publicar.")}</p><a class="button button--gold" href="#join-world">${text("Join Volynx World", "Entrar no Volynx World")}</a></article>`;
+        ? `<article class="world-empty world-reveal"><img src="/assets/world/world-network-icon.webp" alt="" loading="lazy" decoding="async"><strong>${text("Founding profiles are being prepared.", "Os perfis fundadores estão sendo preparados.")}</strong><p>${text("Volynx World is opening its first professional network. Sign in to prepare your presence.", "O Volynx World está abrindo sua primeira rede profissional. Entre para preparar sua presença.")}</p><a class="button button--gold" href="#join-world">${text("Prepare my World profile", "Preparar meu perfil World")}</a></article>`
+        : `<article class="world-empty world-reveal"><img src="/assets/world/world-discovery-icon.webp" alt="" loading="lazy" decoding="async"><strong>${text("The founding marketplace is open.", "O marketplace fundador está aberto.")}</strong><p>${text("No service matches this search yet. Be one of the first professionals to publish.", "Nenhum serviço corresponde a esta busca ainda. Seja um dos primeiros profissionais a publicar.")}</p><a class="button button--gold" href="#join-world">${text("Join Volynx World", "Entrar no Volynx World")}</a></article>`;
+      requestAnimationFrame(initWorldReveal);
       return;
     }
     grid.innerHTML = filtered.map((service, index) => {
@@ -331,15 +628,24 @@ import { ROUTES } from "../../data/routes";
       const initials = String(profile.display_name || "VW").split(/\s+/).slice(0, 2).map((part: string) => part[0]).join("").toUpperCase();
       const tags = (profile.specialties || []).slice(0, 3).map((tag: string) => `<span>${escapeHtml(tag)}</span>`).join("");
       const icon = categoryIcon(service.category || "Other");
-      return `<article class="world-card">
+      const planMeta = getWorldPlanMeta(service.public_world_plan);
+      const publicBadges = [
+        service.public_world_plan !== "free" ? `<em class="world-card__badge world-card__badge--${planMeta.key}">${escapeHtml(planMeta.label)}</em>` : "",
+        profile.is_verified ? `<em class="world-card__badge world-card__badge--verified">${text("World Verified", "Verificado World")}</em>` : "",
+      ].filter(Boolean).join("");
+      const tierClass = service.public_world_plan === "pro"
+        ? " world-card--pro"
+        : service.public_world_plan === "member"
+          ? " world-card--member"
+          : "";
+      return `<article class="world-card world-reveal${tierClass}">
         <div class="world-card__topline">
           <span class="world-card__icon"><img src="${escapeHtml(icon)}" alt="" loading="lazy" decoding="async"></span>
-          <span class="world-card__category">${escapeHtml(service.category)}</span>
+          <span class="world-card__category">${escapeHtml(formatCategory(service.category || "Other"))}</span>
         </div>
         <div class="world-card__person">
           <div class="world-card__avatar">${profile.avatar_url ? `<img src="${escapeHtml(profile.avatar_url)}" alt="">` : escapeHtml(initials)}</div>
-          <div><a href="/world/profile/?handle=${encodeURIComponent(profile.handle || "")}"><strong>${escapeHtml(profile.display_name)}</strong></a><span>${escapeHtml(profile.headline)}</span></div>
-          ${profile.is_verified ? `<em>World Verified</em>` : ""}
+          <div class="world-card__identity"><a href="/world/profile/?handle=${encodeURIComponent(profile.handle || "")}"><strong>${escapeHtml(profile.display_name)}</strong></a><span>${escapeHtml(profile.headline)}</span><div class="world-card__badges">${publicBadges}</div></div>
         </div>
         <h3>${escapeHtml(service.title)}</h3>
         <p>${escapeHtml(service.description)}</p>
@@ -354,16 +660,17 @@ import { ROUTES } from "../../data/routes";
       </article>`;
     }).join("");
     grid.querySelectorAll<HTMLButtonElement>(".world-request").forEach((button) => button.addEventListener("click", () => openInquiry(filtered[Number(button.dataset.serviceIndex)])));
+    requestAnimationFrame(initWorldReveal);
   }
 
   function renderOwnServices() {
     const target = byId("ownServices");
     if (!target) return;
-    target.innerHTML = ownServices.length ? `<h4>${text("Your services", "Seus serviços")}</h4>` + ownServices.map((service) => `<div class="world-own-service"><span class="world-own-service__icon"><img src="${escapeHtml(categoryIcon(service.category || "Other"))}" alt="" loading="lazy" decoding="async"></span><span><strong>${escapeHtml(service.title)}</strong><small>${escapeHtml(service.status)} · ${escapeHtml(formatPrice(service))}</small></span><div><button type="button" data-edit-service="${escapeHtml(service.id)}">${text("Edit", "Editar")}</button><button type="button" data-toggle-service="${escapeHtml(service.id)}" data-next-status="${service.status === "published" ? "paused" : "published"}">${service.status === "published" ? text("Pause", "Pausar") : text("Publish", "Publicar")}</button><button type="button" data-delete-service="${escapeHtml(service.id)}">${text("Remove", "Remover")}</button></div></div>`).join("") : "";
+    target.innerHTML = ownServices.length ? `<h4>${text("Your services", "Seus serviços")}</h4>` + ownServices.map((service) => `<div class="world-own-service"><span class="world-own-service__icon"><img src="${escapeHtml(categoryIcon(service.category || "Other"))}" alt="" loading="lazy" decoding="async"></span><span><strong>${escapeHtml(service.title)}</strong><small>${escapeHtml(formatStatus(service.status))} · ${escapeHtml(formatPrice(service))}</small></span><div><button type="button" data-edit-service="${escapeHtml(service.id)}">${text("Edit", "Editar")}</button><button type="button" data-toggle-service="${escapeHtml(service.id)}" data-next-status="${service.status === "published" ? "paused" : "published"}">${service.status === "published" ? text("Pause", "Pausar") : text("Publish", "Publicar")}</button><button type="button" data-delete-service="${escapeHtml(service.id)}">${text("Remove", "Remover")}</button></div></div>`).join("") : "";
     target.querySelectorAll<HTMLButtonElement>("[data-edit-service]").forEach((button) => button.addEventListener("click", () => startServiceEdit(button.dataset.editService || "")));
     target.querySelectorAll<HTMLButtonElement>("[data-toggle-service]").forEach((button) => button.addEventListener("click", async () => {
       const { error } = await supabase.from("world_services").update({ status: button.dataset.nextStatus }).eq("id", button.dataset.toggleService);
-      if (error) return setStatus("serviceFormStatus", error.message, "error");
+      if (error) return setStatus("serviceFormStatus", localizeWorldError(error.message), "error");
       await loadOwnWorld();
       await loadMarketplace();
     }));
@@ -374,6 +681,7 @@ import { ROUTES } from "../../data/routes";
       await loadOwnWorld();
       await loadMarketplace();
     }));
+    renderServicePlanGate();
   }
 
   function resetServiceForm() {
@@ -407,11 +715,11 @@ import { ROUTES } from "../../data/routes";
     const target = byId("receivedInquiries");
     if (!target) return;
     target.innerHTML = receivedInquiries.length ? receivedInquiries.map((inquiry) => `<article class="world-inquiry">
-      <div><span>${escapeHtml(inquiry.status)}</span><time>${new Date(inquiry.created_at).toLocaleDateString(isPt() ? "pt-BR" : "en-GB")}</time></div>
+      <div><span>${escapeHtml(formatStatus(inquiry.status))}</span><time>${new Date(inquiry.created_at).toLocaleDateString(isPt() ? "pt-BR" : "en-GB")}</time></div>
       <h4>${escapeHtml(inquiry.subject)}</h4>
       <p>${escapeHtml(inquiry.brief)}</p>
-      <dl><div><dt>${text("Budget", "Orçamento")}</dt><dd>${escapeHtml(inquiry.budget || text("Not specified", "Não informado"))}</dd></div><div><dt>Timeline</dt><dd>${escapeHtml(inquiry.timeline || text("Not specified", "Não informado"))}</dd></div></dl>
-      <div class="world-inquiry__actions"><a class="button button--ghost" href="mailto:${encodeURIComponent(inquiry.reply_email)}?subject=${encodeURIComponent(`Volynx World · ${inquiry.subject}`)}">${text("Reply by email", "Responder por email")}</a><select data-inquiry-status="${escapeHtml(inquiry.id)}"><option value="new" ${inquiry.status === "new" ? "selected" : ""}>New</option><option value="reviewing" ${inquiry.status === "reviewing" ? "selected" : ""}>Reviewing</option><option value="accepted" ${inquiry.status === "accepted" ? "selected" : ""}>Accepted</option><option value="declined" ${inquiry.status === "declined" ? "selected" : ""}>Declined</option><option value="closed" ${inquiry.status === "closed" ? "selected" : ""}>Closed</option></select></div>
+      <dl><div><dt>${text("Budget", "Orçamento")}</dt><dd>${escapeHtml(inquiry.budget || text("Not specified", "Não informado"))}</dd></div><div><dt>${text("Timeline", "Prazo")}</dt><dd>${escapeHtml(inquiry.timeline || text("Not specified", "Não informado"))}</dd></div></dl>
+      <div class="world-inquiry__actions"><a class="button button--ghost" href="mailto:${encodeURIComponent(inquiry.reply_email)}?subject=${encodeURIComponent(`Volynx World · ${inquiry.subject}`)}">${text("Reply by email", "Responder por email")}</a><select data-inquiry-status="${escapeHtml(inquiry.id)}"><option value="new" ${inquiry.status === "new" ? "selected" : ""}>${formatStatus("new")}</option><option value="reviewing" ${inquiry.status === "reviewing" ? "selected" : ""}>${formatStatus("reviewing")}</option><option value="accepted" ${inquiry.status === "accepted" ? "selected" : ""}>${formatStatus("accepted")}</option><option value="declined" ${inquiry.status === "declined" ? "selected" : ""}>${formatStatus("declined")}</option><option value="closed" ${inquiry.status === "closed" ? "selected" : ""}>${formatStatus("closed")}</option></select></div>
     </article>`).join("") : `<p class="world-manager-note">${text("No briefs received yet. Publish a clear service to start being discovered.", "Nenhum briefing recebido ainda. Publique um serviço claro para começar a ser encontrado.")}</p>`;
     target.querySelectorAll<HTMLSelectElement>("[data-inquiry-status]").forEach((select) => select.addEventListener("change", async () => {
       const { error } = await supabase.from("world_inquiries").update({ status: select.value }).eq("id", select.dataset.inquiryStatus);
@@ -420,6 +728,27 @@ import { ROUTES } from "../../data/routes";
         await loadOwnWorld();
       }
     }));
+  }
+
+  function renderWorldPlanSummary() {
+    const meta = getWorldPlanMeta(worldPlan);
+    const name = byId("worldPlanName");
+    const description = byId("worldPlanDescription");
+    const publishing = byId("worldPlanPublishing");
+    const discovery = byId("worldPlanDiscovery");
+    const briefs = byId("worldPlanBriefs");
+    const status = byId("worldPlanStatus");
+    if (!name || !description || !publishing || !discovery || !briefs || !status) return;
+
+    name.textContent = meta.label;
+    description.textContent = meta.description;
+    publishing.textContent = meta.publishing;
+    discovery.textContent = meta.discovery;
+    briefs.textContent = meta.briefs;
+    status.textContent = worldPlan === "free"
+      ? text("Upgrade when you need more services, stronger placement, or email brief alerts.", "Faça upgrade quando precisar de mais serviços, posicionamento melhor ou alertas de briefing por email.")
+      : text("Your billing portal is available here for plan changes, cancellation, and payment method updates.", "Seu portal de cobrança fica disponível aqui para trocar plano, cancelar e atualizar o método de pagamento.");
+    status.dataset.kind = "";
   }
 
   function renderStarterBenefit() {
@@ -458,7 +787,24 @@ import { ROUTES } from "../../data/routes";
       services = [];
       marketplaceUnavailable = true;
     } else {
-      services = data || [];
+      const providerIds = [...new Set((data || []).map((service: any) => service.provider_id).filter(Boolean))];
+      let publicPlans = new Map<string, string>();
+      if (providerIds.length) {
+        const planResult = await supabase.rpc("world_public_membership", { p_user_ids: providerIds });
+        if (!planResult.error) {
+          publicPlans = new Map((planResult.data || []).map((row: any) => [String(row.user_id), normalizeWorldPlan(row.world_plan)]));
+        }
+      }
+      services = (data || [])
+        .map((service: any) => ({
+          ...service,
+          public_world_plan: publicPlans.get(String(service.provider_id)) || "free",
+        }))
+        .sort((a: any, b: any) => (
+          worldPlanRank(b.public_world_plan) - worldPlanRank(a.public_world_plan)
+          || Number(Boolean(b.world_profiles?.is_verified)) - Number(Boolean(a.world_profiles?.is_verified))
+          || new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime()
+        ));
       marketplaceUnavailable = false;
     }
     renderMarketplace();
@@ -478,12 +824,14 @@ import { ROUTES } from "../../data/routes";
 
   async function loadOwnWorld() {
     if (!user) return;
-    const [{ data: profile }, { data: own }, { data: inquiries }, benefitResult] = await Promise.all([
+    const [{ data: profile }, { data: own }, { data: inquiries }, benefitResult, { data: mainProfile }] = await Promise.all([
       supabase.from("world_profiles").select("*").eq("user_id", user.id).maybeSingle(),
       supabase.from("world_services").select("*").eq("provider_id", user.id).order("updated_at", { ascending: false }),
       supabase.from("world_inquiries").select("*").eq("provider_id", user.id).order("created_at", { ascending: false }),
       supabase.from("world_starter_benefits").select("*").eq("user_id", user.id).maybeSingle(),
+      supabase.from("profiles").select("world_plan").eq("id", user.id).maybeSingle(),
     ]);
+    worldPlan = (mainProfile as any)?.world_plan || "free";
     ownProfile = profile || null;
     ownServices = own || [];
     receivedInquiries = inquiries || [];
@@ -501,6 +849,7 @@ import { ROUTES } from "../../data/routes";
       (byId("profilePortfolio") as HTMLInputElement).value = ownProfile.portfolio_url || "";
       (byId("profilePublished") as HTMLInputElement).checked = !!ownProfile.is_published;
     }
+    renderWorldPlanSummary();
     renderOwnServices();
     renderStarterBenefit();
     renderInquiries();
@@ -529,6 +878,7 @@ import { ROUTES } from "../../data/routes";
     updateLocalizedControls();
     renderMarketplace();
     if (user) {
+      renderWorldPlanSummary();
       renderOwnServices();
       renderStarterBenefit();
       renderInquiries();
@@ -625,7 +975,7 @@ import { ROUTES } from "../../data/routes";
     const { error } = editingServiceId
       ? await supabase.from("world_services").update(payload).eq("id", editingServiceId)
       : await supabase.from("world_services").insert(payload);
-    if (error) return setStatus("serviceFormStatus", error.message, "error");
+    if (error) return setStatus("serviceFormStatus", localizeWorldError(error.message), "error");
     resetServiceForm();
     setStatus("serviceFormStatus", text("Service saved on your World profile.", "Serviço salvo no seu perfil World."), "success");
     await loadOwnWorld();
@@ -636,7 +986,7 @@ import { ROUTES } from "../../data/routes";
     event.preventDefault();
     if (!user || !selectedService) return;
     setStatus("inquiryStatus", text("Sending private brief...", "Enviando briefing privado..."));
-    const { error } = await supabase.from("world_inquiries").insert({
+    const { data: insertedInquiry, error } = await supabase.from("world_inquiries").insert({
       client_id: user.id,
       provider_id: selectedService.provider_id,
       service_id: selectedService.id,
@@ -645,13 +995,104 @@ import { ROUTES } from "../../data/routes";
       reply_email: value("inquiryEmail"),
       budget: value("inquiryBudget") || null,
       timeline: value("inquiryTimeline") || null,
-    });
+    }).select("id").single();
     if (error) return setStatus("inquiryStatus", error.message, "error");
     setStatus("inquiryStatus", text("Brief sent. The professional can now review it privately.", "Briefing enviado. O profissional já pode analisá-lo em privado."), "success");
+    if (insertedInquiry?.id && cfg?.functionsUrl) {
+      fetch(`${cfg.functionsUrl}/notify-world-inquiry`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ inquiry_id: insertedInquiry.id }),
+      }).catch(() => {});
+    }
     (byId("inquiryForm") as HTMLFormElement).reset();
   });
 
+  function renderServicePlanGate() {
+    const publishedCount = ownServices.filter((s: any) => s.status === "published").length;
+    const gate = byId("servicePlanGate");
+    if (!gate) return;
+    if (worldPlan === "free" && publishedCount >= 1 && !editingServiceId) {
+      gate.hidden = false;
+      gate.innerHTML = `<p>${text("Free profiles can publish 1 service.", "Perfis gratuitos podem publicar 1 serviço.")} <a href="#world-pricing">${text("Upgrade to World Member →", "Fazer upgrade para World Member →")}</a></p>`;
+      (byId("serviceSubmit") as HTMLButtonElement | null)?.setAttribute("disabled", "true");
+    } else {
+      gate.hidden = true;
+      (byId("serviceSubmit") as HTMLButtonElement | null)?.removeAttribute("disabled");
+    }
+  }
+
+  async function handleWorldBilling() {
+    if (!user || !accessToken) {
+      window.location.href = `/login/?next=${encodeURIComponent("/world/#join-world")}`;
+      return;
+    }
+    if (worldPlan === "free") {
+      byId("world-pricing")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      setStatus("worldPlanStatus", text("Choose Member or Pro to unlock paid World benefits.", "Escolha Member ou Pro para liberar os benefícios pagos do World."));
+      return;
+    }
+    if (!cfg?.functionsUrl) return setStatus("worldPlanStatus", text("Billing is not configured yet.", "A cobrança ainda não está configurada."), "error");
+    const button = byId("manageWorldBilling") as HTMLButtonElement | null;
+    if (button) button.disabled = true;
+    setStatus("worldPlanStatus", text("Opening billing portal...", "Abrindo portal de cobrança..."));
+    try {
+      const response = await fetch(`${cfg.functionsUrl}/create-portal-session`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ return_url: `${window.location.origin}/world/#join-world` }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (response.ok && result.url) {
+        window.location.href = result.url;
+        return;
+      }
+      setStatus("worldPlanStatus", result.error || text("Billing portal unavailable right now.", "Portal de cobrança indisponível agora."), "error");
+    } catch (error) {
+      setStatus("worldPlanStatus", (error as Error)?.message || text("Billing portal unavailable right now.", "Portal de cobrança indisponível agora."), "error");
+    } finally {
+      if (button) button.disabled = false;
+    }
+  }
+
+  async function handleWorldCheckout(plan: string) {
+    if (!user || !accessToken) {
+      window.location.href = `/login/?next=${encodeURIComponent("/world/#world-pricing")}`;
+      return;
+    }
+    if (!cfg?.functionsUrl) return;
+    const currency = (localStorage.getItem("volynx_currency") || "GBP").toUpperCase();
+    const validCurrencies = ["GBP", "EUR", "BRL"];
+    const safeCurrency = validCurrencies.includes(currency) ? currency : "GBP";
+    const lookupKey = `${plan}_${safeCurrency.toLowerCase()}`;
+    const successUrl = `${window.location.origin}/world/?plan_success=1#join-world`;
+    const cancelUrl = `${window.location.origin}/world/#world-pricing`;
+    const buttons = document.querySelectorAll<HTMLButtonElement>(`.world-checkout-btn[data-plan="${plan}"]`);
+    buttons.forEach((btn) => { btn.disabled = true; btn.textContent = text("Redirecting…", "Redirecionando…"); });
+    try {
+      const response = await fetch(`${cfg.functionsUrl}/create-checkout-session`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ lookup_key: lookupKey, success_url: successUrl, cancel_url: cancelUrl }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (result.url) { window.location.href = result.url; return; }
+      buttons.forEach((btn) => { btn.disabled = false; btn.textContent = text("Try again", "Tente novamente"); });
+    } catch {
+      buttons.forEach((btn) => { btn.disabled = false; btn.textContent = text("Try again", "Tente novamente"); });
+    }
+  }
+
+  document.querySelectorAll<HTMLButtonElement>(".world-checkout-btn").forEach((btn) => {
+    btn.addEventListener("click", () => handleWorldCheckout(btn.dataset.plan || ""));
+  });
+  byId("manageWorldBilling")?.addEventListener("click", handleWorldBilling);
+
   async function boot() {
+    initWorldScene();
     cfg = await fetch("/config.json", { cache: "no-store" }).then((response) => response.json());
     supabase = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
     updateLocalizedControls();
@@ -662,12 +1103,31 @@ import { ROUTES } from "../../data/routes";
       byId("worldManager")!.hidden = false;
       byId("worldLoginCta")!.hidden = true;
       await loadOwnWorld();
+      renderServicePlanGate();
+      const successParam = new URLSearchParams(window.location.search).get("plan_success");
+      if (successParam) setStatus("profileFormStatus", text("Plan activated — welcome to World!", "Plano ativado — bem-vindo ao World!"), "success");
     }
+    initWorldReveal();
   }
   boot().catch((error) => setStatus("marketplaceStatus", error?.message || "World could not load.", "error"));
 </script>
 
 <style>
+  :global(.page-world main) { position:relative;isolation:isolate; }
+  .world-webgl {
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+    opacity:.82;
+    background:radial-gradient(circle at 50% 12%,rgba(103,241,209,.045),transparent 46%);
+  }
+  :global(.page-world) { background:#07090f; }
+  @media (prefers-reduced-motion: reduce) {
+    .world-webgl { display:none; }
+  }
   .world-hero { padding: clamp(76px, 10vw, 150px) 0 70px; border-bottom: 1px solid rgba(255,255,255,.08); }
   .world-hero__grid { display:grid; gap:34px; align-items:end; }
   .world-kicker { display:block; color:#ffd76a; font-size:.72rem; font-weight:800; letter-spacing:.18em; text-transform:uppercase; margin-bottom:14px; }
@@ -684,8 +1144,126 @@ import { ROUTES } from "../../data/routes";
   .world-section--panel { background:rgba(255,255,255,.025); border-top:1px solid rgba(255,255,255,.08); }
   .world-section__head { display:flex; align-items:end; justify-content:space-between; gap:24px; margin-bottom:28px; }
   .world-section__head h2 { max-width:760px; margin:0; font-size:clamp(2rem,5vw,4.5rem); line-height:1; letter-spacing:-.05em; }
-  .world-search { min-width:min(100%,360px); color:rgba(255,255,255,.6); font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; }
-  .world-search input,.world-form input,.world-form textarea,.world-form select,.world-dialog input,.world-dialog textarea { width:100%; margin-top:8px; padding:13px 14px; border:1px solid rgba(255,255,255,.12); border-radius:12px; background:rgba(0,0,0,.28); color:#fff; font:inherit; }
+  .world-search {
+    min-width:min(100%,390px);
+    display:grid;
+    gap:12px;
+    position:relative;
+    align-self:end;
+    padding:18px;
+    color:rgba(255,255,255,.72);
+    font-size:.78rem;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.18em;
+    border:1px solid rgba(103,241,209,.18);
+    border-radius:30px 14px 30px 14px;
+    background:
+      linear-gradient(140deg,rgba(14,28,38,.88),rgba(28,18,50,.86)),
+      radial-gradient(circle at 14% 18%,rgba(103,241,209,.12),transparent 34%),
+      radial-gradient(circle at 84% 84%,rgba(131,105,255,.14),transparent 42%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.06),
+      inset 0 0 0 1px rgba(255,255,255,.02),
+      0 20px 42px rgba(0,0,0,.22);
+    overflow:hidden;
+    transition:
+      transform .22s cubic-bezier(.16,1,.3,1),
+      border-color .22s ease,
+      box-shadow .22s ease,
+      background .22s ease;
+  }
+  .world-search::before {
+    content:"";
+    position:absolute;
+    inset:1px;
+    border-radius:inherit;
+    background:linear-gradient(130deg,rgba(103,241,209,.1),transparent 34%,rgba(255,215,106,.05) 72%,transparent 100%);
+    opacity:.9;
+    pointer-events:none;
+  }
+  .world-search:hover {
+    transform:translateY(-1px);
+    border-color:rgba(103,241,209,.3);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.08),
+      inset 0 0 0 1px rgba(103,241,209,.08),
+      0 26px 54px rgba(0,0,0,.26);
+  }
+  .world-search:focus-within {
+    border-color:rgba(103,241,209,.46);
+    box-shadow:
+      inset 0 0 0 1px rgba(103,241,209,.18),
+      inset 0 0 28px rgba(103,241,209,.08),
+      0 30px 62px rgba(0,0,0,.3),
+      0 0 0 1px rgba(103,241,209,.08);
+  }
+  .world-search > span {
+    position:relative;
+    z-index:1;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    line-height:1.35;
+  }
+  .world-search > span::before {
+    content:"";
+    width:10px;
+    height:10px;
+    flex:0 0 auto;
+    border-radius:999px;
+    background:linear-gradient(135deg,#67f1d1,#8aa7ff);
+    box-shadow:0 0 0 6px rgba(103,241,209,.08),0 0 22px rgba(103,241,209,.28);
+  }
+  .world-search input {
+    position:relative;
+    z-index:1;
+    width:100%;
+    margin-top:0;
+    padding:15px 18px;
+    border:1px solid rgba(103,241,209,.18);
+    border-radius:18px;
+    background:rgba(3,8,16,.72);
+    color:#fff;
+    font:inherit;
+    font-size:1rem;
+    line-height:1.35;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.05),
+      inset 0 0 0 1px rgba(255,255,255,.02),
+      0 0 0 0 rgba(103,241,209,0);
+    transition:
+      border-color .2s ease,
+      background .2s ease,
+      box-shadow .2s ease,
+      transform .2s ease;
+  }
+  .world-search input:hover {
+    border-color:rgba(103,241,209,.26);
+    background:rgba(5,10,19,.82);
+  }
+  .world-search input:focus {
+    outline:none;
+    border-color:rgba(103,241,209,.44);
+    background:rgba(5,10,19,.92);
+    box-shadow:
+      inset 0 0 0 1px rgba(103,241,209,.12),
+      0 0 0 4px rgba(103,241,209,.08),
+      0 16px 36px rgba(7,16,34,.28);
+  }
+  .world-search input::placeholder {
+    color:rgba(255,255,255,.38);
+    transition:color .2s ease,transform .2s ease;
+  }
+  .world-search:focus-within input::placeholder {
+    color:rgba(255,255,255,.5);
+    transform:translateX(2px);
+  }
+  .world-search input[type="search"]::-webkit-search-cancel-button {
+    filter:invert(1) opacity(.52);
+    cursor:pointer;
+  }
+  .world-form input,.world-form textarea,.world-form select,.world-dialog input,.world-dialog textarea { width:100%; margin-top:8px; padding:13px 14px; border:1px solid rgba(255,255,255,.12); border-radius:12px; background:rgba(0,0,0,.28); color:#fff; font:inherit; }
   .world-form input:disabled { opacity:.42;cursor:not-allowed; }
   .world-filter-row button { padding:9px 14px; border:1px solid rgba(255,255,255,.12); border-radius:999px; background:transparent; color:rgba(255,255,255,.68); cursor:pointer; }
   .world-filter-row button.is-active { border-color:#ffd76a; color:#ffd76a; background:rgba(255,215,106,.08); }
@@ -705,10 +1283,14 @@ import { ROUTES } from "../../data/routes";
   .world-card__person { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
   .world-card__avatar { width:44px;height:44px;display:grid;place-items:center;flex:0 0 auto;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#ffd76a,#20d9bb);color:#050505;font-weight:900; }
   .world-card__avatar img { width:100%;height:100%;object-fit:cover; }
-  .world-card__person div:nth-child(2) { display:grid;gap:2px; }
+  .world-card__identity { display:grid;gap:4px;min-width:0; }
   .world-card__person a { color:inherit;text-decoration:none; }
   .world-card__person span { color:rgba(255,255,255,.55);font-size:.74rem; }
-  .world-card__person em { margin-left:auto;color:#ffd76a;font-size:.62rem;font-style:normal;text-transform:uppercase; }
+  .world-card__badges { display:flex;gap:6px;flex-wrap:wrap;margin-top:4px; }
+  .world-card__badge { padding:5px 8px;border-radius:999px;font-size:.6rem;font-style:normal;font-weight:800;text-transform:uppercase;letter-spacing:.08em;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:rgba(255,255,255,.82); }
+  .world-card__badge--member { border-color:rgba(103,241,209,.26);background:rgba(103,241,209,.08);color:#67f1d1; }
+  .world-card__badge--pro { border-color:rgba(255,215,106,.3);background:rgba(255,215,106,.1);color:#ffd76a; }
+  .world-card__badge--verified { border-color:rgba(186,142,255,.28);background:rgba(118,0,182,.12);color:#c9a5ff; }
   .world-card__category { color:#ffd76a;font-size:.68rem;text-transform:uppercase;letter-spacing:.12em; }
   .world-card h3 { font-size:1.45rem;line-height:1.1;margin:12px 0; }
   .world-card p { color:rgba(255,255,255,.62);line-height:1.6;font-size:.9rem;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden; }
@@ -724,6 +1306,10 @@ import { ROUTES } from "../../data/routes";
   .world-manager { display:grid;gap:20px; }
   .world-manager[hidden] { display:none!important; }
   .world-form { padding:24px; }
+  .world-plan-summary__grid { display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));margin:18px 0 20px; }
+  .world-plan-summary__grid div { display:grid;gap:6px;padding:14px 16px;border:1px solid rgba(255,255,255,.08);border-radius:18px;background:rgba(0,0,0,.14); }
+  .world-plan-summary__grid small { color:rgba(255,255,255,.45);font-size:.66rem;letter-spacing:.11em;text-transform:uppercase; }
+  .world-plan-summary__grid strong { font-size:1rem;line-height:1.35; }
   .world-form__head { display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:20px; }
   .world-form__head div { display:flex;align-items:center;gap:12px; }
   .world-form__head div>span { display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#ffd76a;color:#090909;font-weight:900; }
@@ -771,6 +1357,1170 @@ import { ROUTES } from "../../data/routes";
   .world-dialog__close { display:flex;justify-content:flex-end; }
   .world-dialog__close button { border:0;background:transparent;color:#fff;font-size:2rem;cursor:pointer; }
   .world-dialog__grid { display:grid;gap:12px; }
-  @media(min-width:760px){.world-hero__grid{grid-template-columns:minmax(0,1.65fr) minmax(290px,.65fr)}.world-steps{grid-template-columns:repeat(3,minmax(0,1fr))}.world-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.world-field--full{grid-column:1/-1}.world-dialog__grid{grid-template-columns:1fr 1fr}}
-  @media(max-width:760px){.world-section__head{align-items:stretch;flex-direction:column}.world-search{width:100%}.world-hero h1{font-size:clamp(2.8rem,16vw,4.6rem)}}
+  .world-hero { position:relative;overflow:hidden; }
+  .world-hero:before { content:"";position:absolute;inset:-18% -12% auto auto;width:min(62vw,760px);height:min(62vw,760px);border-radius:50%;background:radial-gradient(circle,rgba(255,215,106,.16),rgba(103,241,209,.07) 38%,transparent 68%);pointer-events:none; }
+  .world-vision { position:relative;overflow:hidden;border-radius:30px;background:linear-gradient(145deg,rgba(255,215,106,.1),rgba(25,255,207,.055)),rgba(255,255,255,.035);box-shadow:0 28px 90px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.08);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px); }
+  .world-vision:after { content:"";position:absolute;inset:auto -30% -36% 12%;height:220px;background:radial-gradient(circle,rgba(103,241,209,.16),transparent 62%);pointer-events:none; }
+  .world-vision>* { position:relative;z-index:1; }
+  .world-vision p { color:rgba(255,255,255,.66);line-height:1.65; }
+  .world-orbit { min-height:250px;margin-bottom:20px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.08);border-radius:24px;background:radial-gradient(circle at center,rgba(255,215,106,.14),rgba(103,241,209,.05) 44%,rgba(0,0,0,.12)); }
+  .world-orbit:before,.world-orbit:after { content:"";position:absolute;inset:28px;border:1px solid rgba(255,255,255,.09);border-radius:50%; }
+  .world-orbit:after { inset:58px;border-color:rgba(255,215,106,.18); }
+  .world-orbit__core { position:relative;z-index:2;width:110px;height:110px;display:grid;place-items:center;border-radius:32px;background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.05));border:1px solid rgba(255,215,106,.28);box-shadow:0 22px 70px rgba(255,215,106,.16); }
+  .world-orbit__core img { width:100px;height:100px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(255,215,106,.3)); }
+  .world-orbit__node { position:absolute;z-index:2;width:68px;height:68px;display:grid;place-items:center;border-radius:22px;border:1px solid rgba(255,255,255,.12);background:rgba(5,6,10,.84);box-shadow:0 18px 48px rgba(0,0,0,.36),inset 0 1px 0 rgba(255,255,255,.08); }
+  .world-orbit__node img { width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 0 14px rgba(103,241,209,.22)); }
+  .world-orbit__node--one { left:9%;top:20%; }
+  .world-orbit__node--two { right:11%;top:16%; }
+  .world-orbit__node--three { left:18%;bottom:12%; }
+  .world-orbit__node--four { right:14%;bottom:16%; }
+  .world-signal-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:18px; }
+  .world-signal-grid > span { display:grid;gap:4px;padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:16px;background:rgba(0,0,0,.18); }
+  .world-signal-grid > span > b { color:#67f1d1;font-size:.78rem;letter-spacing:.12em; }
+  .world-signal-grid > span > em { color:rgba(255,255,255,.72);font-size:.74rem;font-style:normal;line-height:1.25; }
+  .world-section--intelligence { border-bottom:1px solid rgba(255,255,255,.08);background:radial-gradient(circle at 50% 0,rgba(103,241,209,.08),transparent 40%); }
+  .world-steps article { position:relative;overflow:hidden;border-radius:24px;background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.02));box-shadow:0 18px 60px rgba(0,0,0,.2); }
+  .world-steps article:before { content:"";position:absolute;inset:auto -20% -45% 22%;height:160px;background:radial-gradient(circle,rgba(255,215,106,.12),transparent 62%);pointer-events:none; }
+  .world-steps article>span { position:relative;display:grid;place-items:center;width:64px;height:64px;margin-bottom:22px;border-radius:22px;background:rgba(255,255,255,.08);border:1px solid rgba(255,215,106,.24);box-shadow:inset 0 1px 0 rgba(255,255,255,.1); }
+  .world-steps article>span img { width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 0 14px rgba(255,215,106,.22)); }
+  .world-intelligence { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px; }
+  .world-intelligence article { min-height:300px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;padding:22px;border:1px solid rgba(255,255,255,.1);border-radius:28px;background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.018));box-shadow:0 22px 70px rgba(0,0,0,.22); }
+  .world-intelligence article:before { content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 20%,rgba(0,0,0,.72));z-index:1; }
+  .world-intelligence img { position:absolute;inset:18px 18px auto auto;width:138px;height:138px;object-fit:contain;filter:drop-shadow(0 18px 34px rgba(0,0,0,.34));opacity:.95; }
+  .world-intelligence article > span,.world-intelligence article > strong { position:relative;z-index:2; }
+  .world-intelligence article > span { color:#67f1d1;font-size:.7rem;font-weight:900;letter-spacing:.16em;text-transform:uppercase; }
+  .world-intelligence article > strong { display:block;margin-top:10px;font-size:1.35rem;line-height:1.12;max-width:320px; }
+  .world-filter-row button { background:rgba(255,255,255,.035);transition:transform .18s ease,border-color .18s ease,background .18s ease,color .18s ease; }
+  .world-filter-row button:hover { transform:translateY(-1px);border-color:rgba(103,241,209,.34);color:#fff; }
+  .world-filter-row button.is-active { box-shadow:0 0 0 3px rgba(255,215,106,.06); }
+  .world-card,.world-empty,.world-form { border-radius:26px;box-shadow:0 20px 70px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.05); }
+  .world-card { position:relative;overflow:hidden;min-height:470px;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease; }
+  .world-card:before { content:"";position:absolute;inset:-40% -50% auto auto;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(255,215,106,.13),transparent 68%);pointer-events:none; }
+  .world-card:hover { transform:translateY(-4px);border-color:rgba(255,215,106,.28);box-shadow:0 28px 90px rgba(0,0,0,.32),0 0 44px rgba(255,215,106,.07); }
+  .world-card--member { border-color:rgba(103,241,209,.16);box-shadow:0 20px 70px rgba(0,0,0,.22),0 0 0 1px rgba(103,241,209,.05),inset 0 1px 0 rgba(255,255,255,.05); }
+  .world-card--pro { border-color:rgba(255,215,106,.24);box-shadow:0 28px 90px rgba(0,0,0,.3),0 0 56px rgba(255,215,106,.08),inset 0 1px 0 rgba(255,255,255,.06); }
+  .world-card__topline { position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px; }
+  .world-card__icon { width:62px;height:62px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.11);border-radius:22px;background:rgba(0,0,0,.2); }
+  .world-card__icon img { width:54px;height:54px;object-fit:contain;filter:drop-shadow(0 0 14px rgba(103,241,209,.2)); }
+  .world-card__person { position:relative;z-index:1; }
+  .world-card__avatar { width:48px;height:48px;border-radius:18px;box-shadow:0 12px 30px rgba(103,241,209,.14); }
+  .world-card__category { text-align:right; }
+  .world-card__meta { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
+  .world-card__meta span { display:grid;gap:4px;padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(0,0,0,.14); }
+  .world-card__meta em { color:rgba(255,255,255,.42);font-style:normal;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em; }
+  .world-card__meta strong { color:#fff;font-size:.9rem;line-height:1.2; }
+  .world-card__signal { display:flex;gap:8px;flex-wrap:wrap;margin-bottom:13px; }
+  .world-card__signal span { padding:7px 9px;border:1px solid rgba(103,241,209,.18);border-radius:999px;background:rgba(103,241,209,.065);color:rgba(255,255,255,.72);font-size:.68rem;font-weight:800; }
+  .world-form__head div>span { width:52px;height:52px;flex:0 0 auto;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,215,106,.22);overflow:hidden; }
+  .world-form__head div>span img { width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 0 12px rgba(255,215,106,.18)); }
+  .world-own-service { border-radius:16px;background:rgba(0,0,0,.12); }
+  .world-own-service__icon { width:42px;height:42px;display:grid!important;place-items:center;flex:0 0 auto;border:1px solid rgba(255,255,255,.09);border-radius:15px;background:rgba(255,255,255,.06); }
+  .world-own-service__icon img { width:34px;height:34px;object-fit:contain; }
+
+  .world-reveal { opacity:0;transform:translate3d(0,34px,0) scale(.985);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1);transition-delay:var(--reveal-delay,0ms);will-change:opacity,transform; }
+  .world-reveal.is-visible { opacity:1;transform:translate3d(0,0,0) scale(1); }
+  .world-hero { isolation:isolate;padding:clamp(58px,7vw,112px) 0 clamp(76px,9vw,118px);background:
+    radial-gradient(circle at 84% 18%,rgba(103,241,209,.18),transparent 30%),
+    radial-gradient(circle at 18% 72%,rgba(255,215,106,.11),transparent 34%),
+    linear-gradient(180deg,rgba(255,255,255,.018),rgba(0,0,0,0)); }
+  .world-hero:after { content:"";position:absolute;left:50%;top:52%;z-index:-1;width:min(1050px,92vw);height:min(1050px,92vw);border:1px solid rgba(255,255,255,.07);border-radius:50%;transform:translate(-50%,-50%);mask-image:linear-gradient(180deg,#000,transparent 78%);pointer-events:none; }
+  .world-hero__grid { align-items:start;gap:clamp(34px,6vw,78px); }
+  .world-hero h1 { font-size:clamp(2.8rem,6.25vw,5.9rem); }
+  .world-hero__copy { position:relative;z-index:2; }
+  .world-vision { padding:clamp(24px,3.8vw,46px);border-radius:42px;border-color:rgba(255,255,255,.13);background:
+    linear-gradient(145deg,rgba(255,255,255,.095),rgba(255,255,255,.025)),
+    radial-gradient(circle at 68% 14%,rgba(255,215,106,.16),transparent 28%),
+    radial-gradient(circle at 18% 80%,rgba(103,241,209,.14),transparent 34%);box-shadow:0 44px 120px rgba(0,0,0,.44),0 0 0 1px rgba(255,255,255,.035),inset 0 1px 0 rgba(255,255,255,.12); }
+  .world-vision:before { content:"";position:absolute;inset:20px;border:1px solid rgba(255,255,255,.055);border-radius:32px;pointer-events:none; }
+  .world-orbit { min-height:clamp(380px,39vw,560px);margin:-10px 0 28px;border:0;background:transparent;overflow:visible; }
+  .world-orbit:before { inset:7%;border-color:rgba(255,255,255,.095);box-shadow:0 0 90px rgba(103,241,209,.08); }
+  .world-orbit:after { inset:19%;border-color:rgba(255,215,106,.18); }
+  .world-orbit__core { width:clamp(190px,22vw,290px);height:clamp(190px,22vw,290px);border-radius:44px;background:linear-gradient(145deg,rgba(255,255,255,.13),rgba(255,255,255,.035));border-color:rgba(255,215,106,.32);box-shadow:0 40px 120px rgba(0,0,0,.48),0 0 70px rgba(255,215,106,.12),inset 0 1px 0 rgba(255,255,255,.14); }
+  .world-orbit__core img { width:clamp(178px,21vw,276px);height:clamp(178px,21vw,276px);filter:drop-shadow(0 28px 42px rgba(0,0,0,.44)) drop-shadow(0 0 28px rgba(255,215,106,.24)); }
+  .world-orbit__node { width:clamp(92px,9.5vw,126px);height:clamp(92px,9.5vw,126px);border-radius:30px;background:linear-gradient(145deg,rgba(255,255,255,.105),rgba(5,6,10,.78));box-shadow:0 24px 72px rgba(0,0,0,.46),0 0 40px rgba(103,241,209,.08),inset 0 1px 0 rgba(255,255,255,.13); }
+  .world-orbit__node img { width:86%;height:86%;filter:drop-shadow(0 20px 26px rgba(0,0,0,.38)) drop-shadow(0 0 20px rgba(103,241,209,.2)); }
+  .world-orbit__node--one { left:0;top:14%; }
+  .world-orbit__node--two { right:1%;top:8%; }
+  .world-orbit__node--three { left:8%;bottom:7%; }
+  .world-orbit__node--four { right:7%;bottom:10%; }
+  .world-section--showcase { position:relative;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.08);background:
+    radial-gradient(circle at 18% 12%,rgba(255,215,106,.09),transparent 28%),
+    radial-gradient(circle at 80% 72%,rgba(103,241,209,.08),transparent 34%); }
+  .world-showcase { display:grid;grid-template-columns:1.18fr .82fr;gap:18px;align-items:stretch; }
+  .world-showcase-card { position:relative;min-height:360px;padding:clamp(22px,3vw,34px);border:1px solid rgba(255,255,255,.1);border-radius:34px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(150deg,rgba(255,255,255,.075),rgba(255,255,255,.02));box-shadow:0 32px 100px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.08); }
+  .world-showcase-card--large { grid-row:span 2;min-height:620px; }
+  .world-showcase-card:before { content:"";position:absolute;inset:-20% -18% auto auto;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(255,215,106,.17),transparent 65%);pointer-events:none; }
+  .world-showcase-card__media { position:absolute;right:clamp(6px,3vw,34px);top:clamp(4px,2vw,26px);width:clamp(190px,24vw,340px);height:clamp(190px,24vw,340px);display:grid;place-items:center;opacity:.96; }
+  .world-showcase-card--large .world-showcase-card__media { width:clamp(260px,32vw,480px);height:clamp(260px,32vw,480px);right:clamp(-14px,2vw,24px); }
+  .world-showcase-card__media img { width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 34px 48px rgba(0,0,0,.44)) drop-shadow(0 0 30px rgba(103,241,209,.12)); }
+  .world-showcase-card>div:last-child { position:relative;z-index:1;max-width:520px;padding-top:clamp(170px,22vw,280px); }
+  .world-showcase-card--large>div:last-child { padding-top:clamp(320px,36vw,460px); }
+  .world-showcase-card h3 { margin:0;font-size:clamp(1.7rem,3.5vw,3.7rem);line-height:.96;letter-spacing:-.05em; }
+  .world-showcase-card p { max-width:540px;color:rgba(255,255,255,.62);line-height:1.65; }
+  .world-steps article { min-height:310px;padding:clamp(22px,3vw,32px); }
+  .world-steps article>span { width:clamp(112px,13vw,168px);height:clamp(112px,13vw,168px);margin-bottom:26px;border-radius:34px;background:linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.035)); }
+  .world-steps article>span img { width:94%;height:94%;filter:drop-shadow(0 24px 32px rgba(0,0,0,.38)) drop-shadow(0 0 18px rgba(255,215,106,.18)); }
+  .world-steps strong { font-size:clamp(1.35rem,2vw,1.85rem);line-height:1.05; }
+  .world-intelligence article { min-height:430px;padding:30px;border-radius:34px; }
+  .world-intelligence img { inset:6px 6px auto auto;width:clamp(190px,18vw,260px);height:clamp(190px,18vw,260px);opacity:1;filter:drop-shadow(0 34px 48px rgba(0,0,0,.44)) drop-shadow(0 0 24px rgba(103,241,209,.1)); }
+  .world-intelligence article:before { background:linear-gradient(180deg,transparent 26%,rgba(5,6,10,.84)); }
+  .world-intelligence article > strong { font-size:clamp(1.5rem,2.3vw,2.15rem); }
+  .world-card { min-height:560px;padding:clamp(22px,2.5vw,30px);border-radius:32px;background:
+    linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.018)),
+    radial-gradient(circle at 82% 0,rgba(255,215,106,.09),transparent 30%); }
+  .world-card:before { width:390px;height:390px;inset:-26% -28% auto auto;background:radial-gradient(circle,rgba(255,215,106,.15),rgba(103,241,209,.06) 42%,transparent 70%); }
+  .world-card__topline { align-items:flex-start;margin-bottom:8px;min-height:132px; }
+  .world-card__icon { width:clamp(104px,10vw,138px);height:clamp(104px,10vw,138px);border-radius:34px;background:linear-gradient(145deg,rgba(255,255,255,.105),rgba(0,0,0,.18));box-shadow:0 20px 58px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.1); }
+  .world-card__icon img { width:96%;height:96%;filter:drop-shadow(0 24px 32px rgba(0,0,0,.36)) drop-shadow(0 0 18px rgba(103,241,209,.16)); }
+  .world-card h3 { font-size:clamp(1.55rem,2vw,2.15rem);letter-spacing:-.035em; }
+  .world-empty { position:relative;overflow:hidden;padding:clamp(58px,7vw,92px) 24px; }
+  .world-empty img { width:clamp(190px,25vw,320px);height:clamp(190px,25vw,320px);object-fit:contain;margin:-20px auto 10px;filter:drop-shadow(0 34px 48px rgba(0,0,0,.42)); }
+  .world-form { position:relative;overflow:hidden;border-radius:32px;background:linear-gradient(155deg,rgba(255,255,255,.065),rgba(255,255,255,.018)); }
+  .world-form:before { content:"";position:absolute;right:-110px;top:-130px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(255,215,106,.08),transparent 68%);pointer-events:none; }
+  .world-form>* { position:relative;z-index:1; }
+  .world-form__head div>span { width:clamp(72px,7vw,96px);height:clamp(72px,7vw,96px);border-radius:28px;background:linear-gradient(145deg,rgba(255,255,255,.11),rgba(255,255,255,.035)); }
+  .world-form__head div>span img { width:92%;height:92%;filter:drop-shadow(0 18px 26px rgba(0,0,0,.32)) drop-shadow(0 0 14px rgba(255,215,106,.16)); }
+  .world-benefit__grid>div { border-radius:22px;min-height:150px;padding:20px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(0,0,0,.14)); }
+  .world-benefit__grid span { width:46px;height:46px;border-radius:16px; }
+  .world-own-service__icon { width:58px;height:58px;border-radius:20px; }
+  .world-own-service__icon img { width:52px;height:52px;filter:drop-shadow(0 12px 16px rgba(0,0,0,.26)); }
+  @media (prefers-reduced-motion: reduce) {
+    .world-reveal { opacity:1;transform:none;filter:none;transition:none; }
+    .world-card,.world-filter-row button { transition:none; }
+  }
+  @media(min-width:760px){.world-hero__grid{grid-template-columns:minmax(0,1.05fr) minmax(420px,.82fr)}.world-steps{grid-template-columns:repeat(3,minmax(0,1fr))}.world-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.world-field--full{grid-column:1/-1}.world-dialog__grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:980px){
+    .world-showcase{grid-template-columns:1fr}
+    .world-showcase-card--large{grid-row:auto;min-height:520px}
+    .world-showcase-card{min-height:430px}
+    .world-intelligence{grid-template-columns:1fr}
+    .world-intelligence article{min-height:360px}
+    .world-intelligence img{width:clamp(170px,34vw,240px);height:clamp(170px,34vw,240px)}
+  }
+  @media(max-width:760px){
+    .world-section__head{align-items:stretch;flex-direction:column}
+    .world-search{width:100%;min-width:0;align-self:stretch}
+    .world-hero h1{font-size:clamp(2.8rem,16vw,4.6rem)}
+    .world-vision{border-radius:30px;padding:22px}
+    .world-orbit{min-height:390px}
+    .world-orbit__core{width:220px;height:220px}
+    .world-orbit__core img{width:210px;height:210px}
+    .world-orbit__node{width:92px;height:92px;border-radius:24px}
+    .world-orbit__node--one{left:0;top:8%}
+    .world-orbit__node--two{right:0;top:5%}
+    .world-orbit__node--three{left:3%;bottom:7%}
+    .world-orbit__node--four{right:3%;bottom:8%}
+    .world-showcase-card,.world-showcase-card--large{min-height:430px}
+    .world-showcase-card__media,.world-showcase-card--large .world-showcase-card__media{width:clamp(190px,64vw,290px);height:clamp(190px,64vw,290px);right:-8px;top:8px}
+    .world-showcase-card>div:last-child,.world-showcase-card--large>div:last-child{padding-top:260px}
+    .world-steps article{min-height:280px}
+    .world-steps article>span{width:128px;height:128px}
+    .world-intelligence article{min-height:340px}
+    .world-intelligence img{width:190px;height:190px}
+    .world-card__topline{min-height:120px}
+    .world-card__icon{width:112px;height:112px}
+    .world-signal-grid,.world-card__meta{grid-template-columns:1fr}
+    .world-card__actions{grid-template-columns:1fr}
+    .world-own-service{align-items:flex-start;flex-wrap:wrap}
+    .world-own-service>div{width:100%;justify-content:flex-start}
+  }
+
+  /* Cinematic World pass: fewer boxes, more scene depth, less dead space. */
+  .world-hero {
+    min-height:calc(100vh - 80px);
+    padding:clamp(54px,6vw,92px) 0 clamp(40px,5vw,70px);
+  }
+  .world-hero__grid {
+    align-items:center;
+  }
+  .world-vision {
+    min-height:clamp(560px,66vh,720px);
+    height:clamp(560px,66vh,720px);
+    padding:0;
+  }
+  .world-orbit {
+    position:absolute;
+    inset:0;
+    height:auto;
+    min-height:0;
+    margin:0;
+  }
+  .world-orbit:before {
+    inset:6%;
+  }
+  .world-orbit:after {
+    inset:20%;
+  }
+  .world-orbit__core {
+    width:clamp(250px,23vw,360px);
+    height:clamp(250px,23vw,360px);
+  }
+  .world-orbit__core img {
+    width:94%;
+    height:94%;
+  }
+  .world-orbit__node {
+    width:clamp(94px,8vw,130px);
+    height:clamp(94px,8vw,130px);
+  }
+  .world-vision > span:not(.world-orbit__node),
+  .world-vision > strong,
+  .world-vision > p,
+  .world-signal-grid {
+    position:absolute;
+    z-index:3;
+    left:clamp(24px,3vw,44px);
+    right:clamp(24px,3vw,44px);
+  }
+  .world-vision > span:not(.world-orbit__node) {
+    top:34px;
+    bottom:auto;
+  }
+  .world-vision > strong {
+    display:none;
+  }
+  .world-vision > p {
+    display:none;
+  }
+  .world-signal-grid {
+    bottom:24px;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+  .world-signal-grid > span {
+    padding:10px 12px;
+    background:rgba(0,0,0,.2);
+  }
+  .world-section {
+    padding:clamp(68px,8vw,120px) 0;
+  }
+  .world-section--steps {
+    padding-top:clamp(68px,8vw,118px);
+    background:
+      radial-gradient(circle at 15% 12%,rgba(103,241,209,.08),transparent 30%),
+      linear-gradient(180deg,rgba(255,255,255,.02),transparent);
+  }
+  .world-steps {
+    display:grid;
+    grid-template-columns:1fr;
+    gap:clamp(24px,4vw,58px);
+  }
+  .world-steps article {
+    min-height:min(62vh,600px);
+    display:grid;
+    grid-template-columns:minmax(280px,.92fr) minmax(0,1.08fr);
+    grid-template-rows:auto auto;
+    align-items:center;
+    column-gap:clamp(34px,7vw,110px);
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+    overflow:visible;
+  }
+  .world-steps article:before {
+    inset:50% auto auto 10%;
+    width:min(520px,42vw);
+    height:min(520px,42vw);
+    transform:translateY(-50%);
+    background:radial-gradient(circle,rgba(103,241,209,.12),transparent 67%);
+  }
+  .world-steps article:nth-child(even) {
+    grid-template-columns:minmax(0,1.08fr) minmax(280px,.92fr);
+  }
+  .world-steps article:nth-child(even):before {
+    left:auto;
+    right:8%;
+  }
+  .world-steps article > span {
+    grid-column:1;
+    grid-row:1 / span 2;
+    width:clamp(340px,38vw,620px);
+    height:clamp(340px,38vw,620px);
+    margin:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+  }
+  .world-steps article:nth-child(even) > span {
+    grid-column:2;
+  }
+  .world-steps article > span img {
+    width:100%;
+    height:100%;
+    filter:drop-shadow(0 54px 70px rgba(0,0,0,.48)) drop-shadow(0 0 34px rgba(103,241,209,.16));
+  }
+  .world-steps strong,
+  .world-steps p {
+    grid-column:2;
+    max-width:620px;
+  }
+  .world-steps article:nth-child(even) strong,
+  .world-steps article:nth-child(even) p {
+    grid-column:1;
+  }
+  .world-steps strong {
+    align-self:end;
+    font-size:clamp(2.4rem,5vw,6rem);
+    letter-spacing:-.065em;
+    line-height:.92;
+  }
+  .world-steps p {
+    align-self:start;
+    margin-top:18px;
+    font-size:clamp(1rem,1.25vw,1.25rem);
+    color:rgba(255,255,255,.64);
+  }
+  .world-section--showcase {
+    padding-top:clamp(72px,9vw,138px);
+  }
+  .world-showcase {
+    grid-template-columns:minmax(0,1fr) minmax(360px,.72fr);
+    gap:clamp(22px,3vw,42px);
+  }
+  .world-showcase-card {
+    border-color:rgba(255,255,255,.06);
+    background:transparent;
+    box-shadow:none;
+    border-radius:0;
+    min-height:clamp(360px,42vh,520px);
+  }
+  .world-showcase-card:before {
+    width:min(640px,45vw);
+    height:min(640px,45vw);
+    background:radial-gradient(circle,rgba(103,241,209,.12),transparent 68%);
+  }
+  .world-showcase-card--large {
+    min-height:clamp(560px,70vh,760px);
+  }
+  .world-showcase-card__media,
+  .world-showcase-card--large .world-showcase-card__media {
+    top:0;
+    right:auto;
+    left:50%;
+    transform:translateX(-50%);
+    width:clamp(300px,34vw,620px);
+    height:clamp(300px,34vw,620px);
+  }
+  .world-showcase-card--large .world-showcase-card__media {
+    width:clamp(420px,43vw,780px);
+    height:clamp(420px,43vw,780px);
+  }
+  .world-showcase-card > div:last-child,
+  .world-showcase-card--large > div:last-child {
+    padding-top:clamp(300px,36vw,560px);
+    max-width:720px;
+  }
+  .world-showcase-card:not(.world-showcase-card--large) > div:last-child {
+    padding-top:clamp(250px,26vw,430px);
+  }
+  .world-intelligence {
+    gap:0;
+    border-top:1px solid rgba(255,255,255,.08);
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .world-intelligence article {
+    min-height:clamp(480px,62vh,760px);
+    border:0;
+    border-left:1px solid rgba(255,255,255,.08);
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+  }
+  .world-intelligence article:first-child {
+    border-left:0;
+  }
+  .world-intelligence img {
+    inset:clamp(22px,4vw,58px) auto auto 50%;
+    transform:translateX(-50%);
+    width:clamp(260px,22vw,390px);
+    height:clamp(260px,22vw,390px);
+  }
+  .world-intelligence article > strong {
+    font-size:clamp(1.8rem,3vw,3.4rem);
+    letter-spacing:-.055em;
+  }
+  .world-empty {
+    min-height:clamp(420px,56vh,640px);
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:center;
+    text-align:left;
+    padding-left:clamp(26px,6vw,90px);
+    background:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,.012));
+  }
+  .world-empty img {
+    position:absolute;
+    right:clamp(-60px,2vw,60px);
+    bottom:clamp(-120px,-6vw,-40px);
+    width:clamp(280px,34vw,560px);
+    height:clamp(280px,34vw,560px);
+    margin:0;
+    opacity:.42;
+    transform:rotate(-10deg);
+  }
+  .world-empty strong,
+  .world-empty p,
+  .world-empty a {
+    position:relative;
+    z-index:2;
+    max-width:680px;
+  }
+  .world-section--panel {
+    position:relative;
+    min-height:clamp(560px,68vh,760px);
+    display:grid;
+    align-items:center;
+    overflow:hidden;
+  }
+  .world-section--panel:before {
+    content:"";
+    position:absolute;
+    right:clamp(30px,9vw,170px);
+    top:50%;
+    width:clamp(300px,32vw,560px);
+    height:clamp(300px,32vw,560px);
+    transform:translateY(-50%);
+    background:url("/assets/world/world-portfolio-icon.webp") center / contain no-repeat;
+    filter:drop-shadow(0 46px 70px rgba(0,0,0,.48)) drop-shadow(0 0 34px rgba(103,241,209,.14));
+    opacity:.88;
+    pointer-events:none;
+  }
+  .world-section--panel .world-section__head {
+    position:relative;
+    z-index:2;
+    display:block;
+    max-width:calc(100% - min(44vw,640px));
+  }
+  .world-section--panel .world-section__head .button {
+    margin-top:clamp(22px,3vw,34px);
+  }
+  @media(max-width:980px) {
+    .world-vision {
+      min-height:620px;
+      height:620px;
+    }
+    .world-signal-grid {
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    .world-steps article,
+    .world-steps article:nth-child(even) {
+      min-height:auto;
+      grid-template-columns:1fr;
+      gap:16px;
+    }
+    .world-steps article > span,
+    .world-steps article:nth-child(even) > span,
+    .world-steps strong,
+    .world-steps p,
+    .world-steps article:nth-child(even) strong,
+    .world-steps article:nth-child(even) p {
+      grid-column:1;
+    }
+    .world-steps article > span {
+      width:clamp(260px,76vw,460px);
+      height:clamp(260px,76vw,460px);
+    }
+    .world-showcase {
+      grid-template-columns:1fr;
+    }
+    .world-showcase-card,
+    .world-showcase-card--large {
+      min-height:auto;
+    }
+    .world-showcase-card > div:last-child,
+    .world-showcase-card--large > div:last-child,
+    .world-showcase-card:not(.world-showcase-card--large) > div:last-child {
+      padding-top:clamp(280px,74vw,460px);
+    }
+    .world-section--panel .world-section__head {
+      max-width:100%;
+      padding-bottom:260px;
+    }
+    .world-section--panel:before {
+      top:auto;
+      bottom:32px;
+      right:50%;
+      width:250px;
+      height:250px;
+      transform:translateX(50%);
+    }
+  }
+  @media(max-width:760px) {
+    .world-hero {
+      min-height:auto;
+    }
+    .world-vision > span:not(.world-orbit__node),
+    .world-vision > strong,
+    .world-vision > p,
+    .world-signal-grid {
+      left:22px;
+      right:22px;
+    }
+    .world-vision > span:not(.world-orbit__node) {
+      bottom:260px;
+    }
+    .world-vision > strong {
+      bottom:178px;
+    }
+    .world-vision > p {
+      bottom:104px;
+    }
+    .world-signal-grid {
+      bottom:22px;
+    }
+    .world-intelligence {
+      border:0;
+    }
+    .world-intelligence article {
+      border:0;
+      min-height:440px;
+    }
+    .world-intelligence img {
+      width:220px;
+      height:220px;
+    }
+  }
+
+  /* Tightened cinematic rhythm: slower reveals, visible anchors, fewer empty scroll bands. */
+  .world-reveal {
+    transform:translate3d(0,58px,0) scale(.975);
+    transition-duration:1.25s;
+    transition-timing-function:cubic-bezier(.16,1,.3,1);
+  }
+  .world-reveal.is-visible {
+    transform:translate3d(0,0,0) scale(1);
+  }
+  .world-hero.world-reveal,
+  .world-section.world-reveal {
+    opacity:1;
+    transform:none;
+    transition:none;
+  }
+  .world-section {
+    padding:clamp(54px,6vw,92px) 0;
+  }
+  .world-section--showcase {
+    padding-top:clamp(42px,5vw,76px);
+  }
+  .world-section--showcase .world-section__head {
+    position:relative;
+    min-height:clamp(360px,45vh,520px);
+    align-items:center;
+    margin-bottom:clamp(8px,2vw,28px);
+    overflow:hidden;
+  }
+  .world-section--showcase .world-section__head:after {
+    content:"";
+    position:absolute;
+    right:clamp(18px,7vw,130px);
+    top:50%;
+    width:clamp(240px,28vw,500px);
+    height:clamp(240px,28vw,500px);
+    transform:translateY(-50%) rotate(-5deg);
+    background:url("/assets/world/world-layer-icon.png") center / contain no-repeat;
+    opacity:.72;
+    filter:drop-shadow(0 44px 70px rgba(0,0,0,.5)) drop-shadow(0 0 36px rgba(103,241,209,.14));
+    pointer-events:none;
+  }
+  .world-section--showcase .world-section__head > * {
+    position:relative;
+    z-index:1;
+  }
+  .world-section--showcase .world-section__head h2 {
+    max-width:680px;
+    font-size:clamp(2.6rem,5.1vw,5.6rem);
+  }
+  .world-section--showcase .world-section__head p {
+    max-width:560px;
+    margin-right:min(34vw,520px);
+  }
+  .world-showcase {
+    margin-top:clamp(-42px,-3vw,-14px);
+  }
+  .world-showcase-card,
+  .world-showcase-card--large {
+    min-height:clamp(380px,46vh,560px);
+    border:0;
+    overflow:visible;
+    background:transparent;
+    box-shadow:none;
+  }
+  .world-showcase-card__media,
+  .world-showcase-card--large .world-showcase-card__media {
+    width:clamp(250px,30vw,480px);
+    height:clamp(250px,30vw,480px);
+  }
+  .world-showcase-card--large .world-showcase-card__media {
+    width:clamp(320px,36vw,600px);
+    height:clamp(320px,36vw,600px);
+  }
+  .world-showcase-card > div:last-child,
+  .world-showcase-card--large > div:last-child {
+    padding-top:clamp(250px,30vw,430px);
+  }
+  .world-showcase-card:not(.world-showcase-card--large) > div:last-child {
+    padding-top:clamp(210px,24vw,340px);
+  }
+  .world-steps {
+    gap:clamp(0px,1.5vw,18px);
+  }
+  .world-steps article {
+    min-height:clamp(380px,46vh,460px);
+  }
+  .world-steps article > span {
+    width:clamp(280px,30vw,430px);
+    height:clamp(280px,30vw,430px);
+  }
+  .world-steps strong {
+    font-size:clamp(2.2rem,4.3vw,4.8rem);
+  }
+  .world-intelligence article {
+    min-height:clamp(420px,52vh,620px);
+  }
+  .world-intelligence img {
+    width:clamp(230px,20vw,330px);
+    height:clamp(230px,20vw,330px);
+  }
+  .world-section--panel {
+    min-height:clamp(390px,48vh,540px);
+    padding:clamp(62px,7vw,104px) 0;
+  }
+  .world-section--panel:before {
+    width:clamp(230px,24vw,390px);
+    height:clamp(230px,24vw,390px);
+    right:clamp(42px,12vw,210px);
+    opacity:.62;
+  }
+  .world-section--panel .world-section__head {
+    max-width:min(760px,58vw);
+    margin-bottom:0;
+  }
+  .world-section--panel .world-section__head h2 {
+    font-size:clamp(2.6rem,5vw,5.2rem);
+  }
+  @media(max-width:980px) {
+    .world-section--showcase .world-section__head {
+      min-height:auto;
+      padding-bottom:clamp(260px,58vw,420px);
+    }
+    .world-section--showcase .world-section__head:after {
+      right:50%;
+      top:auto;
+      bottom:0;
+      transform:translateX(50%) rotate(-5deg);
+      width:clamp(240px,66vw,420px);
+      height:clamp(240px,66vw,420px);
+    }
+    .world-section--showcase .world-section__head p {
+      margin-right:0;
+    }
+    .world-showcase {
+      margin-top:0;
+    }
+    .world-showcase-card,
+    .world-showcase-card--large {
+      padding-left:0;
+      padding-right:0;
+    }
+    .world-section--panel {
+      min-height:auto;
+    }
+    .world-section--panel .world-section__head {
+      max-width:100%;
+      padding-bottom:clamp(230px,58vw,330px);
+    }
+    .world-section--panel:before {
+      width:clamp(210px,56vw,330px);
+      height:clamp(210px,56vw,330px);
+    }
+  }
+  @media(min-width:981px) {
+    .world-section--steps {
+      padding:clamp(54px,6vw,88px) 0;
+    }
+    .world-section--steps .world-section__head {
+      margin-bottom:clamp(28px,4vw,52px);
+    }
+    .world-steps {
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:clamp(18px,2.2vw,30px);
+    }
+    .world-steps article,
+    .world-steps article:nth-child(even) {
+      display:flex;
+      flex-direction:column;
+      min-height:clamp(430px,46vw,560px);
+      padding:clamp(22px,2.7vw,34px);
+      border-radius:34px;
+    }
+    .world-steps article > span,
+    .world-steps article:nth-child(even) > span {
+      width:clamp(210px,30vw,400px);
+      height:auto;
+      margin:0 auto clamp(20px,2.5vw,34px);
+    }
+    .world-steps article > span img {
+      width:min(360px,100%);
+      height:auto;
+      filter:drop-shadow(0 54px 70px rgba(0,0,0,.48)) drop-shadow(0 0 34px rgba(103,241,209,.16));
+    }
+    .world-steps strong,
+    .world-steps p,
+    .world-steps article:nth-child(even) strong,
+    .world-steps article:nth-child(even) p {
+      grid-column:auto;
+      max-width:none;
+    }
+    .world-steps strong {
+      font-size:clamp(1.7rem,5vw,3rem);
+      line-height:1;
+      letter-spacing:-.01em;
+      color:transparent;
+      background:linear-gradient(45deg,#7600b6,#48c1ff);
+      -webkit-background-clip:text;
+      background-clip:text;
+      text-align:center;
+      align-self:center;
+    }
+    .world-steps p {
+      font-size:clamp(.92rem,1.5vw,1.54rem);
+      margin-top:14px;
+      text-align:center;
+      border-top:1px inset #ffffff69;
+    }
+    .world-section--showcase {
+      padding-top:0;
+    }
+    .world-section--showcase .world-section__head {
+      display:grid;
+      grid-template-columns:minmax(430px,.9fr) minmax(520px,1.1fr);
+      align-items:center;
+      min-height:clamp(400px,54vh,530px);
+      margin-bottom:clamp(20px,3.4vw,44px);
+      overflow:visible;
+    }
+    .world-section--showcase .world-section__head:after {
+      right:clamp(-110px,-3vw,-42px);
+      width:clamp(680px,52vw,940px);
+      height:clamp(680px,52vw,940px);
+      background-image:url("/assets/world/world-layer-icon.png");
+      opacity:.98;
+      transform:translateY(-35%) rotate(-3deg);
+      filter:drop-shadow(0 72px 112px rgba(0,0,0,.64)) drop-shadow(0 0 84px rgba(103,241,209,.18));
+    }
+    .world-section--showcase .world-section__head > div {
+      max-width:min(660px,42vw);
+    }
+    .world-section--showcase .world-section__head p {
+      grid-column:1;
+      align-self:end;
+      max-width:430px;
+      margin:0 0 clamp(10px,2vh,24px) clamp(170px,14vw,230px);
+      position:relative;
+      right:160px;
+      font-size:clamp(1.18rem,1.3vw,1.3rem);
+    }
+    .world-showcase {
+      display:grid;
+      grid-template-columns:1fr;
+      gap:clamp(10px,1.8vw,24px);
+      margin-top:clamp(-34px,-2vw,-10px);
+    }
+    .world-showcase-card--large {
+      grid-row:auto;
+      transform:none;
+    }
+    .world-showcase-card,
+    .world-showcase-card--large {
+      min-height:clamp(390px,43vh,500px);
+      padding:clamp(18px,2.5vw,34px);
+      display:grid;
+      grid-template-columns:minmax(420px,1.05fr) minmax(360px,.95fr);
+      align-items:center;
+      gap:clamp(24px,5vw,78px);
+      border-radius:0;
+      background:
+        radial-gradient(circle at 24% 50%,rgba(103,241,209,.09),transparent 34%),
+        linear-gradient(90deg,rgba(255,255,255,.018),transparent 54%);
+    }
+    .world-showcase-card:nth-child(even) {
+      grid-template-columns:minmax(360px,.95fr) minmax(420px,1.05fr);
+      background:
+        radial-gradient(circle at 76% 50%,rgba(255,215,106,.08),transparent 34%),
+        linear-gradient(270deg,rgba(255,255,255,.018),transparent 54%);
+    }
+    .world-showcase-card:nth-child(even) .world-showcase-card__media {
+      grid-column:2;
+    }
+    .world-showcase-card:nth-child(even) > div:last-child {
+      grid-column:1;
+      grid-row:1;
+    }
+    .world-showcase-card__media,
+    .world-showcase-card--large .world-showcase-card__media {
+      grid-column:1;
+      grid-row:1;
+      top:auto;
+      left:auto;
+      right:auto;
+      transform:none;
+      width:min(100%,clamp(430px,70vw,700px));
+      height:auto;
+      position:relative;
+      margin:0 auto;
+      scale:1.3;
+    }
+    .world-showcase-card--large .world-showcase-card__media {
+      width:min(100%,clamp(430px,70vw,700px));
+      height:auto;
+    }
+    .world-showcase-card > div:last-child,
+    .world-showcase-card--large > div:last-child,
+    .world-showcase-card:not(.world-showcase-card--large) > div:last-child {
+      max-width:none;
+      padding-top:150px;
+    }
+    .world-showcase-card > div:last-child {
+      grid-column:2;
+      grid-row:1;
+      align-self:center;
+    }
+    .world-showcase-card h3 {
+      max-width:620px;
+      font-size:clamp(2.65rem,4.2vw,5.2rem);
+      line-height:.92;
+    }
+    .world-showcase-card p {
+      max-width:560px;
+      font-size:clamp(1rem,1.15vw,1.18rem);
+      margin-bottom:0;
+    }
+    .world-intelligence article {
+      min-height:clamp(560px,62vh,700px);
+      padding:clamp(24px,2.5vw,38px);
+      justify-content:flex-end;
+      isolation:isolate;
+    }
+    .world-intelligence article:before {
+      background:
+        linear-gradient(180deg,transparent 42%,rgba(5,7,12,.38) 68%,rgba(5,7,12,.94) 100%);
+    }
+    .world-intelligence img {
+      inset:clamp(-42px,-2vw,-18px) auto auto 50%;
+      width:clamp(380px,32vw,540px);
+      height:clamp(380px,32vw,540px);
+      transform:translateX(-50%);
+      filter:drop-shadow(0 48px 70px rgba(0,0,0,.5)) drop-shadow(0 0 34px rgba(103,241,209,.14));
+    }
+    .world-intelligence article > span {
+      align-self:flex-start;
+      padding:10px 16px 8px;
+      border:1px solid rgba(103,241,209,.16);
+      border-bottom:0;
+      border-radius:18px 18px 0 0;
+      background:rgba(8,13,17,.82);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      letter-spacing:.12em;
+    }
+    .world-intelligence article > strong {
+      width:100%;
+      max-width:420px;
+      min-height:118px;
+      margin-top:0;
+      padding:18px 20px 20px;
+      border:1px solid rgba(255,255,255,.09);
+      border-radius:0 24px 24px 24px;
+      background:rgba(8,13,17,.82);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      color:rgba(255,255,255,.88);
+      font-size:clamp(1.3rem,1.7vw,1.75rem);
+      font-weight:650;
+      line-height:1.16;
+      letter-spacing:-.025em;
+      text-transform:none;
+    }
+    .world-section--panel:before {
+      right:clamp(-150px,-5vw,-72px);
+      width:clamp(720px,54vw,1080px);
+      height:clamp(720px,54vw,1080px);
+      opacity:.96;
+      filter:drop-shadow(0 72px 112px rgba(0,0,0,.58)) drop-shadow(0 0 68px rgba(103,241,209,.2));
+    }
+  }
+  @media(max-width:760px) {
+    .world-section--showcase {
+      padding-bottom:clamp(82px,20vw,124px);
+    }
+    .world-section--showcase .world-section__head {
+      display:grid;
+      grid-template-columns:1fr;
+      align-items:start;
+      min-height:auto;
+      padding-bottom:0;
+      margin-bottom:clamp(132px,34vw,188px);
+      overflow:visible;
+    }
+    .world-section--showcase .world-section__head > div {
+      grid-row:1;
+    }
+    .world-section--showcase .world-section__head:after {
+      position:relative;
+      grid-row:2;
+      justify-self:center;
+      right:auto;
+      top:auto;
+      bottom:auto;
+      width:clamp(300px,82vw,430px);
+      height:clamp(300px,82vw,430px);
+      margin:clamp(26px,7vw,40px) auto clamp(28px,8vw,46px);
+      transform:rotate(-5deg);
+      opacity:.9;
+    }
+    .world-section--showcase .world-section__head p {
+      grid-row:3;
+      max-width:100%;
+      margin:0;
+    }
+    .world-section--panel .world-section__head {
+      padding-bottom:clamp(350px,94vw,430px);
+    }
+    .world-section--panel:before {
+      right:50%;
+      bottom:clamp(-34px,-5vw,-14px);
+      width:min(108vw,440px);
+      height:min(108vw,440px);
+      transform:translateX(50%);
+      background-position:center;
+      opacity:.92;
+    }
+  }
+  @media(min-width:761px) and (max-width:1100px) {
+    .world-hero {
+      min-height:auto;
+    }
+    .world-hero__grid {
+      grid-template-columns:1fr;
+      gap:clamp(42px,7vw,72px);
+    }
+    .world-hero__copy {
+      max-width:780px;
+    }
+    .world-vision {
+      width:min(100%,760px);
+      height:clamp(560px,66vw,650px);
+      min-height:0;
+      margin-inline:auto;
+    }
+    .world-vision > .world-orbit {
+      position:absolute;
+      inset:0 0 130px;
+      width:100%;
+      height:auto;
+    }
+    .world-orbit__core {
+      width:clamp(250px,34vw,350px);
+      height:clamp(250px,34vw,350px);
+    }
+    .world-orbit__node {
+      width:clamp(92px,12vw,124px);
+      height:clamp(92px,12vw,124px);
+    }
+    .world-vision > .world-signal-grid {
+      position:absolute;
+      left:clamp(22px,4vw,42px);
+      right:clamp(22px,4vw,42px);
+      bottom:24px;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+  }
+  .world-vision > .world-signal-grid {
+    display:inline-grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-rows:repeat(2,minmax(68px,auto));
+    align-items:stretch;
+    gap:10px;
+    position:absolute;
+  }
+  .world-vision > .world-signal-grid > span {
+    min-width:0;
+    min-height:68px;
+    align-content:center;
+    justify-items:start;
+    padding:10px 12px;
+    background:rgba(0,0,0,.2);
+    box-shadow:inset 0 5px 10px 1px cadetblue, inset 0 0 5px 1px cornflowerblue;
+  }
+  .world-vision span {
+    color:#13f9b3;
+    font-size:.7rem;
+    letter-spacing:.2em;
+    text-shadow:0 0 5px currentColor;
+  }
+  .world-vision > .world-orbit {
+    position:absolute;
+    inset:0;
+    height:400px;
+    min-height:0;
+    margin:0;
+  }
+
+  /* ── World pricing plans ─────────────────────────────────────── */
+  .world-section--pricing {
+    border-top:1px solid rgba(255,255,255,.08);
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:radial-gradient(circle at 50% 0,rgba(255,215,106,.06),transparent 42%);
+    padding-bottom:clamp(124px,14vw,176px);
+  }
+  .world-plans {
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:18px;
+    margin-top:clamp(28px,4vw,44px);
+    align-items:stretch;
+  }
+  .world-plan {
+    position:relative;
+    padding:clamp(22px,3vw,32px);
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:28px;
+    background:linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.018));
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    transition:border-color .2s,box-shadow .2s,transform .22s;
+  }
+  .world-plan:hover {
+    transform:translateY(-3px);
+    border-color:rgba(255,255,255,.18);
+    box-shadow:0 24px 70px rgba(0,0,0,.28);
+  }
+  .world-plan--featured {
+    border-color:rgba(255,215,106,.32);
+    background:linear-gradient(160deg,rgba(255,215,106,.09),rgba(255,255,255,.025));
+    box-shadow:0 0 60px rgba(255,215,106,.07);
+  }
+  .world-plan--featured:hover {
+    border-color:rgba(255,215,106,.55);
+    box-shadow:0 28px 80px rgba(0,0,0,.3),0 0 60px rgba(255,215,106,.1);
+  }
+  .world-plan__badge {
+    position:absolute;
+    top:-13px;
+    left:50%;
+    transform:translateX(-50%);
+    padding:4px 14px;
+    background:#ffd76a;
+    color:#090909;
+    font-size:.62rem;
+    font-weight:900;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .world-plan__header .world-kicker { margin-bottom:8px; }
+  .world-plan__header h3 {
+    margin:0 0 6px;
+    font-size:clamp(1.35rem,2vw,1.75rem);
+    letter-spacing:-.04em;
+  }
+  .world-plan__price {
+    display:flex;
+    align-items:baseline;
+    gap:5px;
+    margin-top:4px;
+  }
+  .world-plan__summary {
+    margin:12px 0 0;
+    color:rgba(255,255,255,.62);
+    font-size:.9rem;
+    line-height:1.5;
+  }
+  .world-plan__price strong {
+    font-size:clamp(2rem,3vw,2.65rem);
+    letter-spacing:-.06em;
+    color:#ffd76a;
+    line-height:1;
+  }
+  .world-plan__billing {
+    color:rgba(255,255,255,.5);
+    font-size:.82rem;
+  }
+  .world-plan__features {
+    flex:1;
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:grid;
+    gap:9px;
+  }
+  .world-plan__features li {
+    display:flex;
+    gap:8px;
+    font-size:.86rem;
+    color:rgba(255,255,255,.7);
+    line-height:1.4;
+  }
+  .world-plan__features li::before {
+    content:"✓";
+    color:#67f1d1;
+    font-weight:900;
+    flex-shrink:0;
+    margin-top:.05em;
+  }
+  .world-plan__features em { font-style:normal;color:#ffd76a; }
+  .world-plan__btn { width:100%;justify-content:center;text-align:center;margin-top:auto; }
+  .world-pricing-note {
+    margin-top:18px;
+    text-align:center;
+    color:rgba(255,255,255,.35);
+    font-size:.72rem;
+  }
+  .world-plan-gate {
+    padding:12px 14px;
+    border-left:2px solid rgba(255,215,106,.55);
+    background:rgba(255,215,106,.04);
+    border-radius:0 10px 10px 0;
+    font-size:.82rem;
+    color:rgba(255,255,255,.65);
+  }
+  .world-plan-gate a { color:#ffd76a; }
+  :global(.page-world .vx-home-btn),
+  :global(.page-world .vx-backtop) {
+    bottom:16px;
+    min-height:36px;
+    font-size:12px;
+  }
+  :global(.page-world .vx-home-btn) {
+    left:16px;
+    padding:8px 13px;
+  }
+  :global(.page-world .vx-backtop) {
+    right:16px;
+    padding:8px 12px;
+  }
+  @media(max-width:980px) {
+    .world-plans { grid-template-columns:1fr;max-width:480px;margin-inline:auto; }
+  }
+  @media(max-width:480px) {
+    .world-section--pricing {
+      padding-bottom:calc(220px + env(safe-area-inset-bottom));
+    }
+    :global(.page-world .vx-cookie__card) {
+      max-height:min(30vh,176px);
+    }
+    :global(.page-world .vx-cookie__text) {
+      -webkit-line-clamp:2;
+    }
+    :global(.page-world .vx-cbtn) {
+      min-height:36px;
+      font-size:9px;
+    }
+  }
 </style>

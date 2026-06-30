@@ -19,7 +19,7 @@ import { ROUTES } from "../../../data/routes";
       <div class="world-profile__identity">
         <div class="world-profile__avatar" id="profileAvatar">VW</div>
         <div>
-          <div class="world-profile__eyebrow"><span id="profileHandle">@professional</span><em id="verifiedBadge" hidden>World Verified</em></div>
+          <div class="world-profile__eyebrow"><span id="profileHandle">@professional</span><em id="profilePlanBadge" hidden></em><em id="verifiedBadge" hidden><span class="i18n-en">World Verified</span><span class="i18n-pt">Verificado World</span></em></div>
           <h1 id="profileName">Professional</h1>
           <p class="world-profile__headline" id="profileHeadline"></p>
           <div class="world-profile__meta"><span id="profileLocation"></span><span id="profileAvailability"></span></div>
@@ -89,6 +89,18 @@ import { ROUTES } from "../../../data/routes";
   let services: any[] = [];
   let selectedService: any = null;
   let profileError = "";
+  let publicWorldPlan = "free";
+
+  function normalizeWorldPlan(plan: unknown) {
+    return plan === "member" || plan === "pro" ? plan : "free";
+  }
+
+  function worldPlanLabel(plan: unknown) {
+    const normalized = normalizeWorldPlan(plan);
+    if (normalized === "pro") return text("World Pro", "World Pro");
+    if (normalized === "member") return text("World Member", "World Member");
+    return "";
+  }
 
   function setState(message: string, kind = "") {
     const state = byId("profileState");
@@ -125,6 +137,11 @@ import { ROUTES } from "../../../data/routes";
     byId("profileBio")!.textContent = profile.bio;
     byId("profileSpecialties")!.textContent = (profile.specialties || []).join(" · ") || text("Not specified", "Não informado");
     byId("profileLanguages")!.textContent = (profile.languages || []).join(" · ") || text("Not specified", "Não informado");
+    const planBadge = byId("profilePlanBadge") as HTMLElement;
+    const plan = normalizeWorldPlan(publicWorldPlan);
+    planBadge.hidden = plan === "free";
+    planBadge.textContent = worldPlanLabel(plan);
+    planBadge.dataset.plan = plan;
     (byId("verifiedBadge") as HTMLElement).hidden = !profile.is_verified;
     if (profile.portfolio_url) {
       const link = byId("portfolioLink") as HTMLAnchorElement;
@@ -215,6 +232,10 @@ import { ROUTES } from "../../../data/routes";
       return renderProfileError();
     }
     profile = data;
+    const planResult = await supabase.rpc("world_public_membership", { p_user_ids: [profile.user_id] });
+    if (!planResult.error) {
+      publicWorldPlan = normalizeWorldPlan(planResult.data?.[0]?.world_plan);
+    }
     const serviceResult = await supabase.from("world_services").select("*").eq("provider_id", profile.user_id).eq("status", "published").order("updated_at", { ascending: false });
     services = serviceResult.data || [];
     document.title = `${profile.display_name} — Volynx World`;
@@ -242,6 +263,8 @@ import { ROUTES } from "../../../data/routes";
   .world-profile__avatar img { width:100%;height:100%;object-fit:cover; }
   .world-profile__eyebrow { display:flex;gap:10px;align-items:center;color:#ffd76a;font-size:.72rem;text-transform:uppercase;letter-spacing:.12em; }
   .world-profile__eyebrow em { padding:5px 8px;border:1px solid rgba(255,215,106,.35);border-radius:999px;font-style:normal; }
+  .world-profile__eyebrow em[data-plan="member"] { border-color:rgba(103,241,209,.28);background:rgba(103,241,209,.08);color:#67f1d1; }
+  .world-profile__eyebrow em[data-plan="pro"] { border-color:rgba(255,215,106,.35);background:rgba(255,215,106,.1);color:#ffd76a; }
   .world-profile h1 { margin:8px 0 4px;font-size:clamp(2.5rem,7vw,6rem);line-height:.95;letter-spacing:-.06em; }
   .world-profile__headline { margin:0;color:rgba(255,255,255,.68);font-size:1.1rem; }
   .world-profile__meta,.world-profile__actions { display:flex;gap:10px;flex-wrap:wrap; }

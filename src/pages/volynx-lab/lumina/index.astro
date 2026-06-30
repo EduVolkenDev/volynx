@@ -69,12 +69,14 @@ const plans = [
 <body class="lumina-page">
   <LabBg />
   <Topbar rightLinks={[{ href: ROUTES.lab, label: "← Lab" }, { href: proHref, label: "Upgrade Pro" }]} />
-  <LabToolShell active="lumina" />
 
   <main class="lumina-shell">
     <section class="lumina-hero" aria-labelledby="lumina-title">
       <div class="lumina-hero__copy">
-        <span class="lumina-pill"><i></i> Volynx Lumina · v0.1</span>
+        <span class="lumina-pill">
+          <img src="/assets/lumina-icon-transparent.webp" alt="" width="4689" height="4784" loading="eager" decoding="async" />
+          Volynx Lumina · v0.1
+        </span>
         <h1 id="lumina-title" data-i18n-html="lumina.hero_title"><span>Conhecimento</span> não é privilégio. <em>É luz.</em></h1>
         <p class="lumina-subtitle" data-i18n="lumina.hero_copy">Transforme conteúdos científicos, técnicos e educacionais em explicações claras, humanas e multilíngues.</p>
         <div class="lumina-hero-actions">
@@ -84,75 +86,21 @@ const plans = [
       </div>
       <div class="lumina-crystal" aria-hidden="true">
         <div class="lumina-crystal__halo"></div>
-        <svg viewBox="0 0 420 480" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <radialGradient id="luminaOrbGrad" cx="38%" cy="30%" r="65%">
-              <stop offset="0%" stop-color="#c0eeff" stop-opacity=".95" />
-              <stop offset="30%" stop-color="#62b8ff" stop-opacity=".8" />
-              <stop offset="60%" stop-color="#1e3a8a" stop-opacity=".9" />
-              <stop offset="100%" stop-color="#071228" stop-opacity=".96" />
-            </radialGradient>
-            <radialGradient id="luminaInnerGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#00d8ff" stop-opacity=".55" />
-              <stop offset="48%" stop-color="#7a35ff" stop-opacity=".28" />
-              <stop offset="100%" stop-color="transparent" stop-opacity="0" />
-            </radialGradient>
-            <linearGradient id="luminaCrystalEdge" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#d6a84f" stop-opacity=".8" />
-              <stop offset="50%" stop-color="#f8faff" stop-opacity=".45" />
-              <stop offset="100%" stop-color="#7a35ff" stop-opacity=".62" />
-            </linearGradient>
-            <linearGradient id="luminaFaceTop" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#e8f6ff" stop-opacity=".9" />
-              <stop offset="100%" stop-color="#4a90d9" stop-opacity=".52" />
-            </linearGradient>
-            <linearGradient id="luminaFaceLeft" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#1e3a8a" stop-opacity=".92" />
-              <stop offset="100%" stop-color="#2a5bb5" stop-opacity=".74" />
-            </linearGradient>
-            <linearGradient id="luminaFaceRight" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#0d2050" stop-opacity=".96" />
-              <stop offset="100%" stop-color="#122a70" stop-opacity=".82" />
-            </linearGradient>
-            <filter id="luminaGlow">
-              <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-              <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
-            </filter>
-            <clipPath id="luminaOrbClip"><ellipse cx="210" cy="210" rx="180" ry="180" /></clipPath>
-          </defs>
-          <ellipse cx="210" cy="440" rx="120" ry="18" fill="rgba(0,0,0,.35)" />
-          <ellipse cx="210" cy="210" rx="180" ry="180" fill="url(#luminaOrbGrad)" />
-          <ellipse cx="210" cy="210" rx="180" ry="180" fill="url(#luminaInnerGlow)" />
-          <ellipse cx="158" cy="155" rx="55" ry="32" fill="rgba(255,255,255,.22)" transform="rotate(-20 158 155)" class="lumina-crystal__blur" />
-          <ellipse cx="148" cy="148" rx="20" ry="10" fill="rgba(255,255,255,.55)" transform="rotate(-20 148 148)" />
-          <g clip-path="url(#luminaOrbClip)" filter="url(#luminaGlow)">
-            <polygon points="210,90 280,170 210,190 140,170" fill="url(#luminaFaceTop)" opacity=".9" stroke="rgba(255,255,255,.3)" stroke-width=".8" />
-            <polygon points="210,190 140,170 130,280 210,310" fill="url(#luminaFaceLeft)" opacity=".85" stroke="rgba(0,216,255,.22)" stroke-width=".8" />
-            <polygon points="210,190 280,170 290,280 210,310" fill="url(#luminaFaceRight)" opacity=".9" stroke="rgba(122,53,255,.32)" stroke-width=".8" />
-            <polygon points="130,280 210,310 290,280 210,330" fill="#0a1840" opacity=".8" stroke="rgba(214,168,79,.25)" stroke-width=".8" />
-            <polygon points="130,280 210,330 210,390" fill="#071228" opacity=".72" stroke="rgba(0,216,255,.15)" stroke-width=".5" />
-            <polygon points="290,280 210,330 210,390" fill="#091530" opacity=".82" stroke="rgba(122,53,255,.16)" stroke-width=".5" />
-            <line x1="210" y1="90" x2="130" y2="280" stroke="url(#luminaCrystalEdge)" stroke-width="1.2" opacity=".72" />
-            <line x1="210" y1="90" x2="290" y2="280" stroke="url(#luminaCrystalEdge)" stroke-width="1.2" opacity=".72" />
-            <line x1="210" y1="90" x2="210" y2="390" stroke="rgba(214,168,79,.42)" stroke-width=".8" opacity=".55" />
-          </g>
-          <ellipse cx="210" cy="210" rx="200" ry="55" fill="none" stroke="rgba(0,216,255,.16)" stroke-width="1" stroke-dasharray="8 6" transform="rotate(-15 210 210)" />
-          <ellipse cx="210" cy="210" rx="200" ry="55" fill="none" stroke="rgba(122,53,255,.12)" stroke-width="1" stroke-dasharray="4 10" transform="rotate(25 210 210)" />
-          <circle cx="90" cy="130" r="2.5" fill="#00d8ff" opacity=".76" />
-          <circle cx="340" cy="95" r="1.8" fill="#d6a84f" opacity=".78" />
-          <circle cx="55" cy="300" r="2.5" fill="#7a35ff" opacity=".82" />
-          <circle cx="360" cy="320" r="1.8" fill="#00d8ff" opacity=".84" />
-          <circle cx="210" cy="50" r="2.5" fill="#d6a84f" opacity=".88" />
-          <circle cx="130" cy="380" r="1.8" fill="#7a35ff" opacity=".9" />
-          <circle cx="300" cy="370" r="2.5" fill="#00d8ff" opacity=".92" />
-          <ellipse cx="210" cy="210" rx="180" ry="180" fill="none" stroke="rgba(0,216,255,.22)" stroke-width="1.5" />
-          <ellipse cx="210" cy="210" rx="176" ry="176" fill="none" stroke="rgba(214,168,79,.12)" stroke-width=".8" />
-        </svg>
+        <img
+          src="/assets/lumina-icon-transparent.webp"
+          alt=""
+          width="4689"
+          height="4784"
+          loading="eager"
+          decoding="async"
+        />
         <span data-i18n="lumina.mode_clear">Claro</span>
         <span data-i18n="lumina.mode_deep">Profundo</span>
         <span data-i18n="lumina.mode_practical">Prático</span>
       </div>
     </section>
+
+    <LabToolShell active="lumina" />
 
     <section class="lumina-workbench" id="lumina-workbench" aria-label="Área de trabalho do Lumina" data-i18n-aria="lumina.workspace_aria">
       <div class="lumina-input-panel">
@@ -405,12 +353,12 @@ const plans = [
     text-transform: uppercase;
   }
 
-  .lumina-pill i {
-    width: 6px;
-    height: 6px;
-    border-radius: 999px;
-    background: var(--lumina-a);
-    box-shadow: 0 0 10px var(--lumina-a);
+  .lumina-pill img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    flex: 0 0 auto;
+    filter: drop-shadow(0 0 12px rgba(0,216,255,.45));
   }
 
   .lumina-hero h1 {
@@ -512,14 +460,12 @@ const plans = [
     background: radial-gradient(ellipse at 50% 50%, rgba(122,53,255,.2) 0%, rgba(0,216,255,.1) 45%, transparent 70%);
   }
 
-  .lumina-crystal svg {
+  .lumina-crystal img {
     width: min(100%, 480px);
+    height: auto;
+    object-fit: contain;
     filter: drop-shadow(0 0 40px rgba(0,216,255,.35)) drop-shadow(0 0 80px rgba(122,53,255,.2));
     animation: luminaFloat 8s ease-in-out infinite;
-  }
-
-  .lumina-crystal__blur {
-    filter: blur(6px);
   }
 
   .lumina-crystal span {
@@ -1229,8 +1175,12 @@ const plans = [
   @media (max-width: 620px) {
     .lumina-shell { width: min(100% - 22px, 1180px); padding-top: 28px; }
     .lumina-hero { min-height: auto; }
-    .lumina-crystal { min-height: 340px; }
+    .lumina-crystal {
+      min-height: 280px;
+      margin-top: 12px;
+    }
     .lumina-crystal__halo { inset: 0; }
+    .lumina-crystal img { width: min(76vw, 300px); }
     .lumina-crystal span { display: none; }
     .lumina-controls,
     .lumina-features,

@@ -459,6 +459,56 @@ export const sitePricing = {
       cta: { pt: 'Assinar Complete', en: 'Get Complete' }
     }
   ],
+  worldPlans: [
+    {
+      id: 'world_free',
+      name: { pt: 'World Presence', en: 'World Presence' },
+      description: {
+        pt: 'Publique um perfil real e comece a ser encontrado — sem custo.',
+        en: 'Publish a real profile and start being discovered — at no cost.'
+      },
+      price: { GBP: '£0', EUR: '€0', BRL: 'R$0' },
+      billing: { pt: 'sem custo', en: 'no cost' },
+      cta: { pt: 'Criar presença', en: 'Start your presence' },
+      href: '#join-world',
+      features: {
+        pt: ['perfil profissional público', '1 serviço publicado', 'listado no marketplace', 'briefings privados ilimitados', 'benefício fundador (CVitae + 2 VX)'],
+        en: ['public professional profile', '1 published service', 'listed in marketplace', 'unlimited private briefs', 'founder benefit (CVitae + 2 VX)']
+      }
+    },
+    {
+      id: 'world_member',
+      badge: { pt: 'Mais popular', en: 'Most popular' },
+      featured: true,
+      name: { pt: 'World Member', en: 'World Member' },
+      description: {
+        pt: 'Para operar com consistência: serviços ilimitados, badge Member e email a cada novo briefing.',
+        en: 'For consistent operation: unlimited services, a Member badge, and email on every new brief.'
+      },
+      price: { GBP: '£14', EUR: '€16', BRL: 'R$89' },
+      billing: { pt: '/mês', en: '/month' },
+      cta: { pt: 'Ser World Member', en: 'Get World Member' },
+      features: {
+        pt: ['tudo do Presence', 'serviços publicados ilimitados', 'badge World Member no perfil e marketplace', 'até 15% de benefício VX para oferecer', 'notificação por email a cada novo briefing', 'prioridade acima de perfis gratuitos'],
+        en: ['everything in Presence', 'unlimited published services', 'World Member badge on profile and marketplace', 'up to 15% VX benefit to offer', 'email notification on every new brief', 'priority above free profiles']
+      }
+    },
+    {
+      id: 'world_pro',
+      name: { pt: 'World Pro', en: 'World Pro' },
+      description: {
+        pt: 'Para visibilidade máxima: destaque premium no marketplace, badge Pro e prioridade total.',
+        en: 'For maximum visibility: premium marketplace spotlight, a Pro badge, and top priority.'
+      },
+      price: { GBP: '£34', EUR: '€39', BRL: 'R$219' },
+      billing: { pt: '/mês', en: '/month' },
+      cta: { pt: 'Ir de World Pro', en: 'Go World Pro' },
+      features: {
+        pt: ['tudo do Member', 'destaque premium acima de Member e Presence', 'badge World Pro no perfil e marketplace', 'tratamento visual premium no card público', 'maior prioridade de descoberta'],
+        en: ['everything in Member', 'premium placement above Member and Presence', 'World Pro badge on profile and marketplace', 'premium spotlight styling on the public card', 'strongest discovery priority']
+      }
+    }
+  ] satisfies Plan[],
   builderAddons: [
     {
       id: 'domain-setup',

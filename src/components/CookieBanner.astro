@@ -48,7 +48,7 @@ import { ROUTES } from "../data/routes";
     inset: auto 16px 16px 16px;
     z-index: 9999;
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: flex-end;
     pointer-events: none;
     opacity: 0;
@@ -63,13 +63,16 @@ import { ROUTES } from "../data/routes";
 
   .vx-cookie__card {
     position: relative;
-    width: min(560px, 100%);
+    width: min(440px, 100%);
     box-sizing: border-box;
-    max-height: min(440px, calc(100svh - 96px));
-    border-radius: 8px;
-    background: rgba(8, 49, 128, 0.95);
-    border: 1px solid rgba(160, 130, 255, 0.2);
-    box-shadow: 0 0 30px white, 0 24px 64px rgba(0, 0, 0, 0.72), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    max-height: min(380px, calc(100svh - 104px));
+    border-radius: 22px;
+    background:
+      linear-gradient(180deg, rgba(8, 18, 46, 0.96), rgba(8, 18, 46, 0.9)),
+      radial-gradient(circle at 16% 12%, rgba(84, 213, 255, 0.14), transparent 42%),
+      radial-gradient(circle at 84% 88%, rgba(255, 212, 88, 0.12), transparent 34%);
+    border: 1px solid rgba(139, 214, 255, 0.18);
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.56), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
     overflow: hidden auto;
@@ -90,14 +93,14 @@ import { ROUTES } from "../data/routes";
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 14px 14px 0;
+    padding: 16px 18px 0;
     position: relative;
   }
   .vx-cookie__badge {
     font-weight: 800;
     letter-spacing: 0.16em;
     font-size: 11px;
-    padding: 8px 10px;
+    padding: 7px 10px;
     border-radius: 999px;
     border: 1px solid rgba(160, 252, 252, 0.22);
     background: rgba(4, 6, 13, 0.45);
@@ -109,21 +112,22 @@ import { ROUTES } from "../data/routes";
     font-weight: 800;
     color: #fff;
     letter-spacing: 0;
+    font-size: 15px;
   }
   .vx-cookie__text {
-    padding: 10px 14px 0;
+    padding: 10px 18px 0;
     margin: 0;
     color: rgba(230, 232, 255, 0.86);
     line-height: 1.5;
-    font-size: 14px;
+    font-size: 13px;
     position: relative;
     overflow-wrap: anywhere;
   }
   .vx-cookie__actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 12px 14px 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.15fr;
+    gap: 8px;
+    padding: 14px 18px 12px;
     position: relative;
   }
 
@@ -133,14 +137,14 @@ import { ROUTES } from "../data/routes";
     letter-spacing: 0;
     text-transform: uppercase;
     font-size: 11px;
-    padding: 10px 14px;
-    border-radius: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.18);
     background: rgba(10, 8, 24, 0.60);
     color: #fff;
     cursor: pointer;
     font-family: inherit;
-    min-height: 44px;
+    min-height: 42px;
     min-width: 44px;
   }
   .vx-cbtn--primary {
@@ -161,15 +165,15 @@ import { ROUTES } from "../data/routes";
 
   .vx-cookie__link {
     display: inline-block;
-    padding: 0 14px 14px;
-    min-height: 44px;
+    padding: 0 18px 14px;
+    min-height: 34px;
     font-size: 12px;
     color: rgba(200, 245, 255, 0.85);
     text-decoration: underline;
     position: relative;
   }
   .vx-cookie__prefs {
-    padding: 0 14px 14px;
+    padding: 0 18px 16px;
     position: relative;
   }
   .vx-cookie__prefsTitle {
@@ -237,10 +241,10 @@ import { ROUTES } from "../data/routes";
     .vx-cookie__card {
       width: calc(100vw - 16px);
       max-width: calc(100vw - 16px);
-      max-height: min(46vh, 260px);
+      max-height: min(38vh, 224px);
       overflow: auto;
-      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.62), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
-      border-radius: 12px;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.54), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+      border-radius: 18px;
     }
     .vx-cookie__head {
       gap: 6px;
@@ -248,38 +252,35 @@ import { ROUTES } from "../data/routes";
       align-items: center;
     }
     .vx-cookie__badge {
-      padding: 4px 8px;
+      padding: 4px 7px;
       font-size: 9px;
       letter-spacing: 0.08em;
-      border-radius: 6px;
+      border-radius: 999px;
     }
     .vx-cookie__title {
-      font-size: 13px;
-      padding-right: 70px;
+      font-size: 12px;
+      padding-right: 68px;
     }
     .vx-cookie__text {
-      padding: 3px 12px 0;
+      padding: 5px 12px 0;
       font-size: 11px;
       line-height: 1.35;
       display: -webkit-box;
-      -webkit-line-clamp: 2;
+      -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
     .vx-cookie__actions {
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.15fr;
       gap: 6px;
-      padding: 7px 12px 10px;
+      padding: 8px 12px 10px;
     }
     .vx-cbtn {
-      flex: 1;
-      padding: 8px 10px;
-      min-height: 42px;
+      padding: 7px 8px;
+      min-height: 38px;
       font-size: 10px;
       letter-spacing: 0.04em;
-    }
-    .vx-cbtn--primary {
-      flex: 1.6;
     }
     .vx-cookie__link {
       position: absolute;
@@ -287,7 +288,7 @@ import { ROUTES } from "../data/routes";
       right: 12px;
       display: inline-flex;
       align-items: center;
-      min-height: 40px;
+      min-height: 30px;
       padding: 0 0 0 10px;
       font-size: 10px;
     }
