@@ -373,6 +373,10 @@ const worldProLocalizedPrice = worldProPlan
   const escapeHtml = (input: unknown) => String(input ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char] || char));
   const isPt = () => document.documentElement.lang.toLowerCase().startsWith("pt");
   const text = (en: string, pt: string) => isPt() ? pt : en;
+  type WorldBridgeWindow = Window & {
+    VxAuthBridge?: { hydrate?: () => void; sync?: () => void };
+    vxEnsureFreshToken?: () => Promise<unknown>;
+  };
 
   let supabase: any;
   let cfg: any = null;
@@ -392,6 +396,57 @@ const worldProLocalizedPrice = worldProPlan
 
   function normalizeWorldPlan(plan: unknown) {
     return plan === "member" || plan === "pro" ? plan : "free";
+  }
+
+  function readStoredWorldSession() {
+    try {
+      const raw = localStorage.getItem("volynx_session");
+      const parsed = raw ? JSON.parse(raw) : {};
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch {
+      return {};
+    }
+  }
+
+  function persistWorldSession(session: any, fallbackRefreshToken = "") {
+    try {
+      const nextAccessToken = String(session?.access_token || "");
+      const nextRefreshToken = String(session?.refresh_token || fallbackRefreshToken || "");
+      const nextEmail = String(session?.user?.email || localStorage.getItem("volynx_user_email") || "");
+      if (!nextAccessToken) return;
+      localStorage.setItem("volynx_access_token", nextAccessToken);
+      if (nextRefreshToken) localStorage.setItem("volynx_refresh_token", nextRefreshToken);
+      if (nextEmail) localStorage.setItem("volynx_user_email", nextEmail);
+      localStorage.setItem("volynx_session", JSON.stringify({
+        access_token: nextAccessToken,
+        refresh_token: nextRefreshToken,
+        expires_at: session?.expires_at ?? null,
+        expires_in: session?.expires_in ?? null,
+        user: session?.user || (nextEmail ? { email: nextEmail } : null),
+      }));
+      (window as WorldBridgeWindow).VxAuthBridge?.sync?.();
+    } catch {}
+  }
+
+  async function refreshWorldSession(refreshToken: string) {
+    if (!cfg?.supabaseUrl || !cfg?.supabaseAnonKey || !refreshToken) return null;
+    try {
+      const response = await fetch(`${String(cfg.supabaseUrl).replace(/\/$/, "")}/auth/v1/token?grant_type=refresh_token`, {
+        method: "POST",
+        headers: {
+          apikey: cfg.supabaseAnonKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+      if (!response.ok) return null;
+      const session = await response.json();
+      if (!session?.access_token) return null;
+      persistWorldSession(session, refreshToken);
+      return session;
+    } catch {
+      return null;
+    }
   }
 
   function worldPlanRank(plan: unknown) {
@@ -811,15 +866,30 @@ const worldProLocalizedPrice = worldProPlan
   }
 
   async function restoreSession() {
-    accessToken = localStorage.getItem("volynx_access_token") || "";
-    const refreshToken = localStorage.getItem("volynx_refresh_token") || "";
-    if (!accessToken || !refreshToken) return;
-    const { error } = await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
-    if (error) return;
-    const { data: sessionData } = await supabase.auth.getSession();
-    accessToken = sessionData?.session?.access_token || accessToken;
-    const { data } = await supabase.auth.getUser();
-    user = data?.user || null;
+    const bridge = window as WorldBridgeWindow;
+    bridge.VxAuthBridge?.hydrate?.();
+
+    let stored = readStoredWorldSession();
+    let nextAccessToken = localStorage.getItem("volynx_access_token") || stored.access_token || "";
+    let nextRefreshToken = localStorage.getItem("volynx_refresh_token") || stored.refresh_token || "";
+
+    if (!nextAccessToken && nextRefreshToken) {
+      await refreshWorldSession(nextRefreshToken);
+    } else if (nextAccessToken && bridge.vxEnsureFreshToken) {
+      await bridge.vxEnsureFreshToken().catch(() => null);
+    }
+
+    stored = readStoredWorldSession();
+    nextAccessToken = localStorage.getItem("volynx_access_token") || stored.access_token || "";
+    nextRefreshToken = localStorage.getItem("volynx_refresh_token") || stored.refresh_token || "";
+
+    if (!nextAccessToken || !nextRefreshToken) return;
+    const { data, error } = await supabase.auth.setSession({ access_token: nextAccessToken, refresh_token: nextRefreshToken });
+    if (error || !data?.session) return;
+
+    persistWorldSession(data.session, nextRefreshToken);
+    accessToken = data.session.access_token || nextAccessToken;
+    user = data.user || data.session.user || null;
   }
 
   async function loadOwnWorld() {
