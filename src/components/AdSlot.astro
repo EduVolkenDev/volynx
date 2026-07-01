@@ -1,0 +1,205 @@
+---
+type AdText = string | { en: string; pt: string };
+
+interface Props {
+  eyebrow?: AdText;
+  title: AdText;
+  description?: AdText;
+  hideForPaid?: boolean;
+}
+
+const {
+  eyebrow = { en: "Sponsored", pt: "Patrocinado" },
+  title,
+  description = "",
+  hideForPaid = true,
+} = Astro.props;
+
+const isBilingual = (v: AdText): v is { en: string; pt: string } =>
+  typeof v === "object" && v !== null && "en" in v && "pt" in v;
+
+const adsenseClient = (import.meta.env.PUBLIC_GOOGLE_ADSENSE_CLIENT || "").trim();
+const adsenseSlot = (import.meta.env.PUBLIC_GOOGLE_ADSENSE_SLOT || "").trim();
+const isLiveAd = Boolean(adsenseClient && adsenseSlot);
+---
+
+<section class:list={["vx-ad-slot", hideForPaid && "vx-ad-slot--hide-paid"]} aria-label="Sponsored placement">
+  <div class="vx-ad-slot__head">
+    <span class="vx-ad-slot__eyebrow">
+      {isBilingual(eyebrow)
+        ? <Fragment><span class="i18n-en">{eyebrow.en}</span><span class="i18n-pt">{eyebrow.pt}</span></Fragment>
+        : eyebrow}
+    </span>
+    <div class="vx-ad-slot__copy">
+      <h2>
+        {isBilingual(title)
+          ? <Fragment><span class="i18n-en">{title.en}</span><span class="i18n-pt">{title.pt}</span></Fragment>
+          : title}
+      </h2>
+      {description && (
+        <p>
+          {isBilingual(description)
+            ? <Fragment><span class="i18n-en">{description.en}</span><span class="i18n-pt">{description.pt}</span></Fragment>
+            : description}
+        </p>
+      )}
+    </div>
+  </div>
+
+  <div class:list={["vx-ad-slot__frame", isLiveAd && "is-live"]} aria-label="Sponsored placement">
+    {isLiveAd ? (
+      <>
+        <ins
+          class="adsbygoogle vx-ad-slot__ins"
+          style="display:block"
+          data-ad-client={adsenseClient}
+          data-ad-slot={adsenseSlot}
+          data-ad-format="auto"
+          data-full-width-responsive="true"
+        ></ins>
+        <script is:inline>
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </>
+    ) : (
+      <div class="vx-ad-slot__preview">
+        <div class="vx-ad-slot__preview-badge">
+          <span class="vx-ad-slot__dot" aria-hidden="true"></span>
+          <span class="i18n-en">Sponsored space</span>
+          <span class="i18n-pt">Espaço patrocinado</span>
+        </div>
+        <strong class="vx-ad-slot__preview-title" data-vx-ad-preview-title>
+          <span class="i18n-en">Reserved space for partner messages and offers.</span>
+          <span class="i18n-pt">Espaço reservado para mensagens e ofertas de parceiros.</span>
+        </strong>
+        <p class="vx-ad-slot__preview-copy" data-vx-ad-preview-copy>
+          <span class="i18n-en">A clean surface for partner messages, offers, and future placements.</span>
+          <span class="i18n-pt">Uma superfície limpa para mensagens de parceiros, ofertas e futuras ativações.</span>
+        </p>
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .vx-ad-slot {
+    display: grid;
+    gap: 16px;
+    padding: clamp(18px, 3vw, 28px);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,.08);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025)),
+      rgba(10, 12, 18, .72);
+    box-shadow: 0 22px 56px rgba(0,0,0,.18);
+  }
+  :global(html[data-tier="member"]) .vx-ad-slot--hide-paid,
+  :global(html[data-tier="studio"]) .vx-ad-slot--hide-paid {
+    display: none;
+  }
+  .vx-ad-slot__head {
+    display: grid;
+    gap: 10px;
+  }
+  .vx-ad-slot__eyebrow {
+    display: inline-flex;
+    width: fit-content;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(244, 210, 122, .18);
+    background: rgba(244, 210, 122, .08);
+    color: rgba(244, 210, 122, .95);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .vx-ad-slot__copy h2 {
+    margin: 0;
+    font-size: clamp(1.25rem, 2.6vw, 1.9rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+  }
+  .vx-ad-slot__copy p {
+    margin: 10px 0 0;
+    max-width: 64ch;
+    color: rgba(255,255,255,.62);
+    line-height: 1.65;
+    font-size: .95rem;
+  }
+  .vx-ad-slot__frame {
+    min-height: 260px;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,.08);
+    background:
+      radial-gradient(circle at 12% 16%, rgba(244,210,122,.12), transparent 32%),
+      radial-gradient(circle at 84% 86%, rgba(88,165,255,.10), transparent 34%),
+      rgba(6, 8, 13, .8);
+    overflow: hidden;
+  }
+  .vx-ad-slot__frame.is-live {
+    display: grid;
+    align-items: center;
+    padding: 6px;
+  }
+  .vx-ad-slot__ins {
+    min-height: 248px;
+  }
+  .vx-ad-slot__preview {
+    display: grid;
+    align-content: center;
+    gap: 14px;
+    min-height: 260px;
+    padding: clamp(18px, 3vw, 28px);
+  }
+  .vx-ad-slot__preview-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.08);
+    color: rgba(255,255,255,.68);
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .vx-ad-slot__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #f4d27a;
+    box-shadow: 0 0 16px rgba(244,210,122,.55);
+  }
+  .vx-ad-slot__preview-title {
+    display: block;
+    max-width: 18ch;
+    color: rgba(255,255,255,.96);
+    font-size: clamp(1.5rem, 3vw, 2.15rem);
+    line-height: 1.08;
+    letter-spacing: -0.04em;
+  }
+  .vx-ad-slot__preview-copy {
+    margin: 0;
+    max-width: 58ch;
+    color: rgba(255,255,255,.68);
+    font-size: .98rem;
+    line-height: 1.7;
+  }
+  @media (min-width: 900px) {
+    .vx-ad-slot {
+      grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+      align-items: stretch;
+    }
+    .vx-ad-slot__head {
+      align-content: start;
+      padding-top: 6px;
+    }
+    .vx-ad-slot__frame {
+      min-height: 280px;
+    }
+  }
+</style>

@@ -3,6 +3,7 @@ import FlagshipLayout from "../layouts/FlagshipLayout.astro";
 import FlagshipHeader from "../components/FlagshipHeader.astro";
 import FlagshipFooter from "../components/FlagshipFooter.astro";
 import PlatformAssistStrip from "../components/PlatformAssistStrip.astro";
+import AdSlot from "../components/AdSlot.astro";
 import { ROUTES, checkoutHref } from "../data/routes";
 
 const homeAssistItems = [
@@ -49,52 +50,52 @@ const homeAssistItems = [
         </div>
 
         <div class="hero-v2__visual">
-          <div class="hero-v2__mockup">
+          <div class="hero-v2__mockup hero-v2__mockup--daily-orbit">
             <div class="hero-v2__mockup-glow" aria-hidden="true"></div>
             <a href="https://daily.volynx.world/" class="hero-v2__mockup-chip" aria-label="Open VOLYNX Daily" data-i18n-aria="home2.mockup_daily_aria">
               <img src="/assets/volynx-daily.webp" alt="VOLYNX Daily" />
             </a>
             <p class="hero-v2__mockup-title" data-i18n="home2.mockup_title">Seu dia mais inteligente e organizado começa aqui</p>
-            <div class="hero-v2__mockup-grid">
-              <a href="https://daily.volynx.world/tools/my-day/" class="hero-v2__mockup-tag">
+            <div class="hero-v2__mockup-grid hero-v2__mockup-grid--orbit" aria-label="VOLYNX Daily tools">
+              <a href="https://daily.volynx.world/tools/my-day/" class="hero-v2__mockup-tag hero-v2__mockup-tag--myday" style="--tag-delay: 120ms;">
                 <img src="/assets/myday.webp" alt="">
                 <span class="hero-v2__tag-copy">
                   <strong>My Day</strong>
                   <span data-i18n="home2.mockup_myday_desc">Planeje prioridades e acompanhe seu foco do dia.</span>
                 </span>
               </a>
-              <a href="https://daily.volynx.world/tools/scanner/" class="hero-v2__mockup-tag">
+              <a href="https://daily.volynx.world/tools/scanner/" class="hero-v2__mockup-tag hero-v2__mockup-tag--scanner" style="--tag-delay: 260ms;">
                 <img src="/assets/scanner.webp" alt="">
                 <span class="hero-v2__tag-copy">
-                  <strong>Smart Scanner</strong>
+                  <strong>Scanner</strong>
                   <span data-i18n="home2.mockup_scanner_desc">Leia arquivos, imagens e notas sem perder contexto.</span>
                 </span>
               </a>
-              <a href="https://daily.volynx.world/tools/summary/" class="hero-v2__mockup-tag">
+              <a href="https://daily.volynx.world/tools/summary/" class="hero-v2__mockup-tag hero-v2__mockup-tag--summary" style="--tag-delay: 400ms;">
                 <img src="/assets/summary.webp" alt="">
                 <span class="hero-v2__tag-copy">
-                  <strong>Universal Summary</strong>
+                  <strong>Summary</strong>
                   <span data-i18n="home2.mockup_summary_desc">Transforme textos longos em resumo claro e acionável.</span>
                 </span>
               </a>
-              <a href="https://daily.volynx.world/tools/vault/" class="hero-v2__mockup-tag">
+              <a href="https://daily.volynx.world/tools/vault/" class="hero-v2__mockup-tag hero-v2__mockup-tag--vault" style="--tag-delay: 540ms;">
                 <img src="/assets/vault.webp" alt="">
                 <span class="hero-v2__tag-copy">
-                  <strong>Smart Vault</strong>
+                  <strong>Vault</strong>
                   <span data-i18n="home2.mockup_vault_desc">Guarde ideias e informações importantes em um só lugar.</span>
                 </span>
               </a>
-              <a href="https://daily.volynx.world/tools/writing/" class="hero-v2__mockup-tag">
+              <a href="https://daily.volynx.world/tools/writing/" class="hero-v2__mockup-tag hero-v2__mockup-tag--writing" style="--tag-delay: 680ms;">
                 <img src="/assets/writing.webp" alt="">
                 <span class="hero-v2__tag-copy">
-                  <strong>Writing Studio</strong>
+                  <strong>Writing</strong>
                   <span data-i18n="home2.mockup_writing_desc">Escreva, revise e refine mensagens com mais rapidez.</span>
                 </span>
               </a>
-              <a href="https://daily.volynx.world/tools/decision/" class="hero-v2__mockup-tag">
+              <a href="https://daily.volynx.world/tools/decision/" class="hero-v2__mockup-tag hero-v2__mockup-tag--decision" style="--tag-delay: 820ms;">
                 <img src="/assets/decision.webp" alt="">
                 <span class="hero-v2__tag-copy">
-                  <strong>Decision Desk</strong>
+                  <strong>Decision</strong>
                   <span data-i18n="home2.mockup_decision_desc">Compare opções e tome decisões com mais clareza.</span>
                 </span>
               </a>
@@ -105,6 +106,16 @@ const homeAssistItems = [
     </section>
 
     <PlatformAssistStrip eyebrow={{ en: "Platform flow", pt: "Fluxo da plataforma" }} title={{ en: "Already inside VOLYNX?", pt: "Já dentro do VOLYNX?" }} description={{ en: "Move between discovery, daily work, purchases and support without hunting through the navigation.", pt: "Navegue entre descoberta, trabalho diário, compras e suporte sem caçar na navegação." }} items={homeAssistItems} />
+
+    <section class="page-section platform-sponsored">
+      <div class="shell">
+        <AdSlot
+          eyebrow={{ en: "Sponsored placement", pt: "Espaço patrocinado" }}
+          title={{ en: "A clean revenue lane for the public side of VOLYNX", pt: "Uma faixa de receita limpa para o lado público da VOLYNX" }}
+          description={{ en: "Reserved for partner messages, offers, and future placements on the public surface of VOLYNX.", pt: "Reservado para mensagens, ofertas e futuras ativações de parceiros na superfície pública da VOLYNX." }}
+        />
+      </div>
+    </section>
 
     <!-- floating: Ecosystem -->
     <div class="section-float section-float--right" aria-hidden="true">
@@ -987,6 +998,226 @@ const homeAssistItems = [
     font-size: .72rem;
     font-weight: 600;
     line-height: 1.25;
+  }
+
+  .hero-v2__mockup--daily-orbit {
+    max-width: 560px;
+    aspect-ratio: 0.92;
+    padding: 0;
+    display: block;
+    border-radius: 42px;
+    border-color: rgba(255,255,255,.14);
+    background:
+      radial-gradient(circle at 50% 40%, rgba(4,255,231,.16), transparent 33%),
+      radial-gradient(circle at 84% 20%, rgba(96,165,250,.18), transparent 34%),
+      linear-gradient(145deg, rgba(255,255,255,.095), rgba(255,255,255,.025) 48%, rgba(3,7,18,.9));
+    box-shadow:
+      0 34px 110px rgba(0,0,0,.58),
+      0 0 78px rgba(4,255,231,.08),
+      inset 0 1px 0 rgba(255,255,255,.12);
+    isolation: isolate;
+  }
+
+  .hero-v2__mockup--daily-orbit::before,
+  .hero-v2__mockup--daily-orbit::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .hero-v2__mockup--daily-orbit::before {
+    inset: 24px;
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 32px;
+  }
+
+  .hero-v2__mockup--daily-orbit::after {
+    inset: 11%;
+    border: 1px solid rgba(255,255,255,.075);
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 72px rgba(255,255,255,.018),
+      0 0 96px rgba(45,212,191,.08);
+    mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 100%);
+  }
+
+  .hero-v2__mockup--daily-orbit .hero-v2__mockup-glow {
+    inset: -28%;
+    opacity: .82;
+    background:
+      radial-gradient(circle at 48% 42%, rgba(4,255,231,.22), transparent 32%),
+      radial-gradient(circle at 22% 78%, rgba(45,212,191,.15), transparent 36%),
+      radial-gradient(circle at 86% 78%, rgba(59,130,246,.18), transparent 38%);
+    filter: blur(3px);
+  }
+
+  .hero-v2__mockup--daily-orbit .hero-v2__mockup-chip {
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    z-index: 2;
+    width: min(270px, 58%);
+    transform: translate(-50%, -50%);
+    filter:
+      drop-shadow(0 34px 54px rgba(0,0,0,.44))
+      drop-shadow(0 0 32px rgba(4,255,231,.16));
+    animation: dailyCoreIn .78s cubic-bezier(.16,1,.3,1) both;
+  }
+
+  .hero-v2__mockup--daily-orbit .hero-v2__mockup-chip::before {
+    content: "";
+    position: absolute;
+    inset: 18%;
+    z-index: -1;
+    border-radius: 34px;
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.1);
+    transform: rotate(45deg);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+  }
+
+  .hero-v2__mockup--daily-orbit .hero-v2__mockup-chip:hover {
+    transform: translate(-50%, -52%) scale(1.025);
+    filter:
+      drop-shadow(0 38px 62px rgba(0,0,0,.48))
+      drop-shadow(0 0 40px rgba(4,255,231,.26));
+  }
+
+  .hero-v2__mockup--daily-orbit .hero-v2__mockup-title {
+    position: absolute;
+    left: clamp(22px, 5vw, 34px);
+    right: clamp(22px, 5vw, 34px);
+    bottom: clamp(18px, 4vw, 26px);
+    z-index: 6;
+    margin: 0;
+    padding: 16px 18px;
+    border: 1px solid rgba(255,255,255,.11);
+    border-radius: 24px;
+    background: rgba(5,8,16,.66);
+    color: rgba(244,244,245,.92);
+    font-size: clamp(.96rem, 1.4vw, 1.14rem);
+    line-height: 1.35;
+    box-shadow: 0 20px 60px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.07);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    animation: dailyPanelIn .72s cubic-bezier(.16,1,.3,1) .94s both;
+  }
+
+  .hero-v2__mockup-grid--orbit {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: block;
+  }
+
+  .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag {
+    --tx: 0;
+    --ty: 0;
+    position: absolute;
+    z-index: 5;
+    width: 132px;
+    min-height: 88px;
+    padding: 10px;
+    border-radius: 24px;
+    display: grid;
+    place-items: center;
+    gap: 6px;
+    text-align: center;
+    background:
+      linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.038)),
+      rgba(3,7,18,.68);
+    border: 1px solid rgba(255,255,255,.13);
+    box-shadow:
+      0 22px 58px rgba(0,0,0,.38),
+      0 0 34px rgba(4,255,231,.08),
+      inset 0 1px 0 rgba(255,255,255,.13);
+    opacity: 0;
+    transform: translate3d(var(--tx), calc(var(--ty) + 18px), 0) scale(.74);
+    animation: dailyNodeIn .64s cubic-bezier(.16,1,.3,1) var(--tag-delay, 0ms) both;
+  }
+
+  .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag:hover {
+    transform: translate3d(var(--tx), calc(var(--ty) - 4px), 0) scale(1.035);
+    background:
+      linear-gradient(145deg, rgba(4,255,231,.16), rgba(96,165,250,.08)),
+      rgba(3,7,18,.78);
+    border-color: rgba(4,255,231,.38);
+    color: #fff;
+    box-shadow:
+      0 28px 70px rgba(0,0,0,.46),
+      0 0 44px rgba(4,255,231,.18),
+      inset 0 1px 0 rgba(255,255,255,.16);
+  }
+
+  .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag img {
+    width: 52px;
+    height: 52px;
+    flex: none;
+    filter:
+      drop-shadow(0 16px 22px rgba(0,0,0,.35))
+      drop-shadow(0 0 18px rgba(4,255,231,.18));
+  }
+
+  .hero-v2__mockup-grid--orbit .hero-v2__tag-copy {
+    display: grid;
+    gap: 0;
+  }
+
+  .hero-v2__mockup-grid--orbit .hero-v2__tag-copy strong {
+    font-size: .72rem;
+    letter-spacing: -.01em;
+    color: rgba(255,255,255,.92);
+  }
+
+  .hero-v2__mockup-grid--orbit .hero-v2__tag-copy span {
+    display: none;
+  }
+
+  .hero-v2__mockup-tag--myday { left: 50%; top: 7%; --tx: -50%; }
+  .hero-v2__mockup-tag--scanner { right: 2%; top: 25%; }
+  .hero-v2__mockup-tag--summary { right: 2%; top: 48%; }
+  .hero-v2__mockup-tag--vault { left: 8%; top: 48%; }
+  .hero-v2__mockup-tag--writing { left: 5%; top: 25%; }
+  .hero-v2__mockup-tag--decision {
+    left: 50%;
+    top: 57%;
+    --tx: -50%;
+    width: 142px;
+    min-height: 88px;
+  }
+
+  @keyframes dailyCoreIn {
+    from { opacity: 0; transform: translate(-50%, -44%) scale(.88); filter: blur(6px); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0); }
+  }
+
+  @keyframes dailyNodeIn {
+    from {
+      opacity: 0;
+      transform: translate3d(var(--tx), calc(var(--ty) + 20px), 0) scale(.74);
+      filter: blur(7px);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(var(--tx), var(--ty), 0) scale(1);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes dailyPanelIn {
+    from { opacity: 0; transform: translateY(18px); filter: blur(6px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-v2__mockup--daily-orbit .hero-v2__mockup-chip,
+    .hero-v2__mockup--daily-orbit .hero-v2__mockup-title,
+    .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag {
+      animation: none;
+      opacity: 1;
+      filter: none;
+    }
   }
 
   /* ── Free value strip ── */

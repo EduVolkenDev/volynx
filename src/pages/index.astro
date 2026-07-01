@@ -499,6 +499,293 @@ const platformSurfaces = [
     transform: translateX(4px);
   }
 
+  /* ── WORLD PREMIUM FEATURE ── */
+  .world-feature {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 0 24px 110px;
+  }
+
+  .world-feature-panel {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(280px, 0.92fr);
+    gap: clamp(34px, 6vw, 74px);
+    align-items: center;
+    padding: clamp(34px, 6vw, 70px);
+    border: 1px solid rgba(201,168,92,0.26);
+    background:
+      radial-gradient(circle at 16% 12%, rgba(201,168,92,0.13), transparent 33%),
+      radial-gradient(circle at 88% 18%, rgba(42,61,110,0.22), transparent 36%),
+      linear-gradient(135deg, rgba(255,255,255,0.045), rgba(201,168,92,0.018) 46%, rgba(6,6,8,0.92));
+    overflow: hidden;
+    isolation: isolate;
+    box-shadow: 0 30px 90px rgba(0,0,0,0.28);
+  }
+
+  .world-feature-panel::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    border: 1px solid rgba(255,255,255,0.045);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .world-feature-panel::after {
+    content: '';
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    right: -180px;
+    bottom: -210px;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(201,168,92,0.17), transparent 68%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .world-feature-copy {
+    position: relative;
+    z-index: 2;
+  }
+
+  .world-feature-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 26px;
+    color: var(--gold);
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+  }
+
+  .world-feature-kicker::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--gold);
+    box-shadow: 0 0 16px rgba(201,168,92,0.62);
+  }
+
+  .world-feature-title {
+    max-width: 650px;
+    margin: 0;
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(34px, 5.8vw, 72px);
+    line-height: 0.96;
+    letter-spacing: -0.045em;
+    color: var(--white);
+  }
+
+  .world-feature-title em {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    color: var(--gold);
+  }
+
+  .world-feature-lead {
+    max-width: 650px;
+    margin: 26px 0 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(21px, 2.8vw, 31px);
+    font-weight: 300;
+    line-height: 1.5;
+    color: var(--cream);
+  }
+
+  .world-feature-lead strong {
+    color: var(--white);
+    font-weight: 600;
+  }
+
+  .world-feature-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 34px;
+  }
+
+  .world-feature-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 50px;
+    padding: 15px 22px;
+    border: 1px solid rgba(201,168,92,0.34);
+    color: var(--gold);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+  }
+
+  .world-feature-btn--primary {
+    background: var(--gold);
+    color: var(--black);
+    border-color: var(--gold);
+  }
+
+  .world-feature-btn:hover {
+    transform: translateY(-1px);
+    border-color: var(--cream);
+    color: var(--cream);
+  }
+
+  .world-feature-btn--primary:hover {
+    background: var(--cream);
+    color: var(--black);
+  }
+
+  .world-feature-proof {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    margin-top: 40px;
+    background: rgba(201,168,92,0.16);
+    border: 1px solid rgba(201,168,92,0.18);
+  }
+
+  .world-feature-proof > span {
+    display: grid;
+    gap: 7px;
+    padding: 17px;
+    background: rgba(6,6,8,0.78);
+  }
+
+  .world-feature-proof strong {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    line-height: 1;
+    color: var(--white);
+  }
+
+  .world-feature-proof small {
+    font-size: 9px;
+    line-height: 1.5;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .world-feature-visual {
+    position: relative;
+    min-height: 410px;
+    display: grid;
+    place-items: center;
+  }
+
+  .world-feature-orbit {
+    position: relative;
+    width: min(360px, 72vw);
+    aspect-ratio: 1;
+    border-radius: 999px;
+    border: 1px solid rgba(201,168,92,0.18);
+    background:
+      radial-gradient(circle at 50% 50%, rgba(201,168,92,0.12), transparent 35%),
+      radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05), transparent 58%);
+  }
+
+  .world-feature-orbit::before,
+  .world-feature-orbit::after {
+    content: '';
+    position: absolute;
+    inset: 13%;
+    border-radius: inherit;
+    border: 1px solid rgba(201,168,92,0.13);
+  }
+
+  .world-feature-orbit::after {
+    inset: 28%;
+    border-color: rgba(255,255,255,0.08);
+  }
+
+  .world-feature-core,
+  .world-feature-node {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(201,168,92,0.24);
+    background: rgba(6,6,8,0.86);
+    box-shadow: 0 18px 48px rgba(0,0,0,0.34);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .world-feature-core {
+    inset: 50%;
+    width: 132px;
+    height: 132px;
+    border-radius: 38px;
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+
+  .world-feature-core img {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    transform: rotate(-45deg);
+    filter: drop-shadow(0 0 18px rgba(201,168,92,0.32));
+  }
+
+  .world-feature-node {
+    width: 76px;
+    height: 76px;
+    border-radius: 24px;
+  }
+
+  .world-feature-node img {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+  }
+
+  .world-feature-node--profile { top: 4%; left: 50%; transform: translateX(-50%); }
+  .world-feature-node--service { right: 2%; top: 48%; transform: translateY(-50%); }
+  .world-feature-node--brief { bottom: 6%; left: 50%; transform: translateX(-50%); }
+  .world-feature-node--intel { left: 2%; top: 48%; transform: translateY(-50%); }
+
+  .world-feature-card {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    max-width: 250px;
+    padding: 18px;
+    border: 1px solid rgba(201,168,92,0.22);
+    background: rgba(6,6,8,0.78);
+    box-shadow: 0 20px 54px rgba(0,0,0,0.32);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .world-feature-card b {
+    display: block;
+    margin-bottom: 8px;
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    color: var(--white);
+  }
+
+  .world-feature-card > span {
+    display: block;
+    font-size: 11px;
+    line-height: 1.65;
+    color: var(--text-muted);
+  }
+
+  html[lang="en"] .world-feature .i18n-pt,
+  html[lang="en-US"] .world-feature .i18n-pt,
+  html[lang="en-us"] .world-feature .i18n-pt,
+  html[lang="pt"] .world-feature .i18n-en,
+  html[lang="pt-BR"] .world-feature .i18n-en,
+  html[lang="pt-br"] .world-feature .i18n-en {
+    display: none !important;
+  }
+
   /* ── DEV JOURNEY ── */
   .dev-journey {
     max-width: 900px;
@@ -863,6 +1150,40 @@ const platformSurfaces = [
     }
     .lang-toggle__text { display: none; }
     .hero-wordmark__img { width: 96px; }
+    .world-feature { padding-bottom: 78px; }
+    .world-feature-panel {
+      grid-template-columns: 1fr;
+      padding: 30px 22px;
+    }
+    .world-feature-actions { flex-direction: column; }
+    .world-feature-btn { width: 100%; }
+    .world-feature-proof { grid-template-columns: 1fr; }
+    .world-feature-visual { min-height: 330px; }
+    .world-feature-node {
+      width: 62px;
+      height: 62px;
+      border-radius: 20px;
+    }
+    .world-feature-node img {
+      width: 34px;
+      height: 34px;
+    }
+    .world-feature-core {
+      width: 112px;
+      height: 112px;
+      border-radius: 32px;
+    }
+    .world-feature-core img {
+      width: 62px;
+      height: 62px;
+    }
+    .world-feature-card {
+      position: relative;
+      right: auto;
+      bottom: auto;
+      max-width: none;
+      margin-top: -20px;
+    }
     .dev-journey { padding-bottom: 72px; }
     .dev-journey-actions { flex-direction: column; }
     .dev-journey-btn { width: 100%; }
@@ -1015,6 +1336,76 @@ const platformSurfaces = [
     <span class="i18n-en">See the full ecosystem</span>
     <span class="tools-seeall__arrow" aria-hidden="true">→</span>
   </a>
+</section>
+
+<!-- WORLD PREMIUM -->
+<section class="world-feature" aria-labelledby="world-feature-title">
+  <article class="world-feature-panel reveal">
+    <div class="world-feature-copy">
+      <div class="world-feature-kicker">
+        <span class="i18n-pt">Volynx World · camada premium</span>
+        <span class="i18n-en">Volynx World · premium layer</span>
+      </div>
+      <h2 class="world-feature-title" id="world-feature-title">
+        <span class="i18n-pt">Um lugar para encontrar pessoas capazes de <em>construir o próximo passo.</em></span>
+        <span class="i18n-en">A place to find people who can <em>build the next step.</em></span>
+      </h2>
+      <p class="world-feature-lead">
+        <span class="i18n-pt">O World transforma a VOLYNX em uma rede de profissionais premium: perfis públicos, serviços claros, briefings privados e presença conectada ao ecossistema.</span>
+        <span class="i18n-en">World turns VOLYNX into a premium professional network: public profiles, clear services, private briefs, and presence connected to the ecosystem.</span>
+      </p>
+      <div class="world-feature-actions">
+        <a class="world-feature-btn world-feature-btn--primary" href={ROUTES.world}>
+          <span class="i18n-pt">Entrar no World</span>
+          <span class="i18n-en">Enter World</span>
+          <span aria-hidden="true">→</span>
+        </a>
+        <a class="world-feature-btn" href={`${ROUTES.world}#join-world`}>
+          <span class="i18n-pt">Criar presença profissional</span>
+          <span class="i18n-en">Create professional presence</span>
+        </a>
+      </div>
+      <div class="world-feature-proof" role="list" aria-label="Volynx World signals">
+        <span role="listitem">
+          <strong>01</strong>
+          <small><span class="i18n-pt">Descoberta por entrega</span><span class="i18n-en">Discovery by delivery</span></small>
+        </span>
+        <span role="listitem">
+          <strong>02</strong>
+          <small><span class="i18n-pt">Briefing privado</span><span class="i18n-en">Private brief</span></small>
+        </span>
+        <span role="listitem">
+          <strong>VX</strong>
+          <small><span class="i18n-pt">Benefícios de membro</span><span class="i18n-en">Member benefits</span></small>
+        </span>
+      </div>
+    </div>
+
+    <div class="world-feature-visual" aria-hidden="true">
+      <div class="world-feature-orbit">
+        <div class="world-feature-core">
+          <img src="/assets/world/world-network-icon.webp" alt="" loading="lazy" decoding="async" />
+        </div>
+        <div class="world-feature-node world-feature-node--profile">
+          <img src="/assets/world/world-profile-icon.webp" alt="" loading="lazy" decoding="async" />
+        </div>
+        <div class="world-feature-node world-feature-node--service">
+          <img src="/assets/world/world-service-icon.webp" alt="" loading="lazy" decoding="async" />
+        </div>
+        <div class="world-feature-node world-feature-node--brief">
+          <img src="/assets/world/world-brief-icon.webp" alt="" loading="lazy" decoding="async" />
+        </div>
+        <div class="world-feature-node world-feature-node--intel">
+          <img src="/assets/world/world-intelligence-icon.webp" alt="" loading="lazy" decoding="async" />
+        </div>
+      </div>
+      <div class="world-feature-card">
+        <b><span class="i18n-pt">Marketplace fundador</span><span class="i18n-en">Founding marketplace</span></b>
+        <span class="i18n-pt">Profissionais, serviços e oportunidades aparecem como uma camada viva da plataforma.</span>
+        <span class="i18n-en">Professionals, services, and opportunities appear as a living layer of the platform.</span>
+      </div>
+    </div>
+  </article>
 </section>
 
 <!-- DEV JOURNEY -->

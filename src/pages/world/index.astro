@@ -681,11 +681,19 @@ const worldProLocalizedPrice = worldProPlan
     grid.innerHTML = filtered.map((service, index) => {
       const profile = service.world_profiles || {};
       const initials = String(profile.display_name || "VW").split(/\s+/).slice(0, 2).map((part: string) => part[0]).join("").toUpperCase();
+      const bio = String(profile.bio || "").trim();
+      const headline = String(profile.headline || "").trim();
+      const handle = String(profile.handle || "").trim();
+      const availability = ({
+        available: text("Available", "Disponível"),
+        limited: text("Limited availability", "Disponibilidade limitada"),
+        unavailable: text("Currently unavailable", "Indisponível no momento"),
+      } as Record<string, string>)[String(profile.availability || "").toLowerCase()] || String(profile.availability || text("Available", "Disponível"));
       const tags = (profile.specialties || []).slice(0, 3).map((tag: string) => `<span>${escapeHtml(tag)}</span>`).join("");
       const icon = categoryIcon(service.category || "Other");
       const planMeta = getWorldPlanMeta(service.public_world_plan);
       const publicBadges = [
-        service.public_world_plan !== "free" ? `<em class="world-card__badge world-card__badge--${planMeta.key}">${escapeHtml(planMeta.label)}</em>` : "",
+        `<em class="world-card__badge world-card__badge--${planMeta.key}">${escapeHtml(planMeta.label)}</em>`,
         profile.is_verified ? `<em class="world-card__badge world-card__badge--verified">${text("World Verified", "Verificado World")}</em>` : "",
       ].filter(Boolean).join("");
       const tierClass = service.public_world_plan === "pro"
@@ -695,23 +703,35 @@ const worldProLocalizedPrice = worldProPlan
           : "";
       return `<article class="world-card world-reveal${tierClass}">
         <div class="world-card__topline">
-          <span class="world-card__icon"><img src="${escapeHtml(icon)}" alt="" loading="lazy" decoding="async"></span>
           <span class="world-card__category">${escapeHtml(formatCategory(service.category || "Other"))}</span>
+          <div class="world-card__badges">${publicBadges}</div>
         </div>
-        <div class="world-card__person">
-          <div class="world-card__avatar">${profile.avatar_url ? `<img src="${escapeHtml(profile.avatar_url)}" alt="">` : escapeHtml(initials)}</div>
-          <div class="world-card__identity"><a href="/world/profile/?handle=${encodeURIComponent(profile.handle || "")}"><strong>${escapeHtml(profile.display_name)}</strong></a><span>${escapeHtml(profile.headline)}</span><div class="world-card__badges">${publicBadges}</div></div>
+        <div class="world-card__hero">
+          <div class="world-card__media">
+            <div class="world-card__portrait">${profile.avatar_url ? `<img src="${escapeHtml(profile.avatar_url)}" alt="${escapeHtml(profile.display_name)}">` : escapeHtml(initials)}</div>
+          </div>
+          <div class="world-card__identity">
+            ${handle ? `<span class="world-card__handle">@${escapeHtml(handle)}</span>` : ""}
+            <a href="/world/profile/?handle=${encodeURIComponent(profile.handle || "")}"><strong>${escapeHtml(profile.display_name)}</strong></a>
+            ${headline ? `<span class="world-card__headline">${escapeHtml(headline)}</span>` : ""}
+            <div class="world-card__signal"><span>${escapeHtml(profile.location || text("Remote", "Remoto"))}</span><span>${escapeHtml(availability)}</span></div>
+            ${bio ? `<p class="world-card__bio">${escapeHtml(bio)}</p>` : ""}
+          </div>
         </div>
-        <h3>${escapeHtml(service.title)}</h3>
-        <p>${escapeHtml(service.description)}</p>
-        <div class="world-card__tags">${tags}</div>
-        <div class="world-card__meta">
-          <span><em>${text("Investment", "Investimento")}</em><strong>${escapeHtml(formatPrice(service))}</strong></span>
-          <span><em>${text("Delivery", "Entrega")}</em><strong>${service.delivery_days ? `${escapeHtml(service.delivery_days)} ${text("days", "dias")}` : text("By brief", "Por briefing")}</strong></span>
+        <div class="world-card__service">
+          <div class="world-card__service-head">
+            <h3>${escapeHtml(service.title)}</h3>
+            <span class="world-card__icon" aria-hidden="true"><img src="${escapeHtml(icon)}" alt="" loading="lazy" decoding="async"></span>
+          </div>
+          <p class="world-card__description">${escapeHtml(service.description)}</p>
+          ${tags ? `<div class="world-card__tags">${tags}</div>` : ""}
+          <div class="world-card__meta">
+            <span><em>${text("Investment", "Investimento")}</em><strong>${escapeHtml(formatPrice(service))}</strong></span>
+            <span><em>${text("Delivery", "Entrega")}</em><strong>${service.delivery_days ? `${escapeHtml(service.delivery_days)} ${text("days", "dias")}` : text("By brief", "Por briefing")}</strong></span>
+          </div>
+          ${service.vx_discount_pct > 0 ? `<div class="world-card__vx">VX · ${text("Member benefit up to", "Benefício para membros de até")} ${escapeHtml(service.vx_discount_pct)}%</div>` : ""}
         </div>
-        ${service.vx_discount_pct > 0 ? `<div class="world-card__vx">VX · ${text("Member benefit up to", "Benefício para membros de até")} ${escapeHtml(service.vx_discount_pct)}%</div>` : ""}
-        <div class="world-card__signal"><span>${text("Private brief", "Briefing privado")}</span><span>${text("Founder layer", "Camada fundadora")}</span></div>
-        <div class="world-card__actions"><a class="button button--ghost" href="/world/profile/?handle=${encodeURIComponent(profile.handle || "")}">${text("View profile", "Ver perfil")}</a><button class="button button--gold world-request" type="button" data-service-index="${index}">${text("Request", "Solicitar")}</button></div>
+        <div class="world-card__actions"><button class="button button--gold world-request" type="button" data-service-index="${index}">${text("Request", "Solicitar")}</button><a class="button button--ghost" href="/world/profile/?handle=${encodeURIComponent(profile.handle || "")}">${text("View profile", "Ver perfil")}</a></div>
       </article>`;
     }).join("");
     grid.querySelectorAll<HTMLButtonElement>(".world-request").forEach((button) => button.addEventListener("click", () => openInquiry(filtered[Number(button.dataset.serviceIndex)])));
@@ -1350,12 +1370,15 @@ const worldProLocalizedPrice = worldProPlan
   .world-grid { display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr)); }
   .world-card,.world-empty,.world-form { border:1px solid rgba(255,255,255,.1); border-radius:22px; background:linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.018)); }
   .world-card { padding:22px; display:flex; flex-direction:column; min-height:440px; }
-  .world-card__person { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
+  .world-card__hero { display:grid; grid-template-columns:clamp(106px,10vw,148px) minmax(0,1fr); gap:16px; align-items:start; margin-bottom:18px; }
+  .world-card__portrait { width:clamp(106px,10vw,148px); aspect-ratio:1; display:grid; place-items:center; overflow:hidden; border-radius:28px; background:linear-gradient(145deg,rgba(255,215,106,.18),rgba(32,217,187,.08)); box-shadow:0 18px 46px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.08); }
+  .world-card__portrait img { width:100%;height:100%;object-fit:cover; }
   .world-card__avatar { width:44px;height:44px;display:grid;place-items:center;flex:0 0 auto;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#ffd76a,#20d9bb);color:#050505;font-weight:900; }
   .world-card__avatar img { width:100%;height:100%;object-fit:cover; }
-  .world-card__identity { display:grid;gap:4px;min-width:0; }
-  .world-card__person a { color:inherit;text-decoration:none; }
-  .world-card__person span { color:rgba(255,255,255,.55);font-size:.74rem; }
+  .world-card__identity { display:grid;gap:8px;min-width:0;align-content:start; }
+  .world-card__identity a { color:inherit;text-decoration:none; }
+  .world-card__identity a strong { display:block;font-size:clamp(1.15rem,1.5vw,1.55rem);line-height:1.02;letter-spacing:-.03em; }
+  .world-card__identity > span { color:rgba(255,255,255,.6);font-size:.86rem;line-height:1.5; }
   .world-card__badges { display:flex;gap:6px;flex-wrap:wrap;margin-top:4px; }
   .world-card__badge { padding:5px 8px;border-radius:999px;font-size:.6rem;font-style:normal;font-weight:800;text-transform:uppercase;letter-spacing:.08em;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:rgba(255,255,255,.82); }
   .world-card__badge--member { border-color:rgba(103,241,209,.26);background:rgba(103,241,209,.08);color:#67f1d1; }
@@ -1363,7 +1386,8 @@ const worldProLocalizedPrice = worldProPlan
   .world-card__badge--verified { border-color:rgba(186,142,255,.28);background:rgba(118,0,182,.12);color:#c9a5ff; }
   .world-card__category { color:#ffd76a;font-size:.68rem;text-transform:uppercase;letter-spacing:.12em; }
   .world-card h3 { font-size:1.45rem;line-height:1.1;margin:12px 0; }
-  .world-card p { color:rgba(255,255,255,.62);line-height:1.6;font-size:.9rem;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden; }
+  .world-card__bio { margin:0 0 14px;color:rgba(255,255,255,.68);line-height:1.6;font-size:.92rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden; }
+  .world-card__description { color:rgba(255,255,255,.62);line-height:1.6;font-size:.9rem;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden; }
   .world-card__tags { display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 20px; }
   .world-card__tags span { padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.06);font-size:.68rem;color:rgba(255,255,255,.68); }
   .world-card__meta { display:flex;justify-content:space-between;gap:12px;margin-top:auto;padding:15px 0;border-top:1px solid rgba(255,255,255,.08);font-size:.8rem; }
@@ -1524,13 +1548,13 @@ const worldProLocalizedPrice = worldProPlan
   .world-showcase-card--large .world-showcase-card__media { width:clamp(260px,32vw,480px);height:clamp(260px,32vw,480px);right:clamp(-14px,2vw,24px); }
   .world-showcase-card__media img { width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 34px 48px rgba(0,0,0,.44)) drop-shadow(0 0 30px rgba(103,241,209,.12)); }
   .world-showcase-card>div:last-child { position:relative;z-index:1;max-width:520px;padding-top:clamp(170px,22vw,280px); }
-  .world-showcase-card--large>div:last-child { padding-top:clamp(320px,36vw,460px); }
+  .world-showcase-card--large>div:last-child { padding-top:clamp(300px,34vw,430px); }
   .world-showcase-card h3 { margin:0;font-size:clamp(1.7rem,3.5vw,3.7rem);line-height:.96;letter-spacing:-.05em; }
   .world-showcase-card p { max-width:540px;color:rgba(255,255,255,.62);line-height:1.65; }
-  .world-steps article { min-height:310px;padding:clamp(22px,3vw,32px); }
+  .world-steps article { min-height:320px;padding:clamp(22px,3vw,32px); }
   .world-steps article>span { width:clamp(112px,13vw,168px);height:clamp(112px,13vw,168px);margin-bottom:26px;border-radius:34px;background:linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.035)); }
-  .world-steps article>span img { width:94%;height:94%;filter:drop-shadow(0 24px 32px rgba(0,0,0,.38)) drop-shadow(0 0 18px rgba(255,215,106,.18)); }
-  .world-steps strong { font-size:clamp(1.35rem,2vw,1.85rem);line-height:1.05; }
+  .world-steps article>span img { width:min(92%, 340px);height:auto;filter:drop-shadow(0 24px 32px rgba(0,0,0,.38)) drop-shadow(0 0 18px rgba(255,215,106,.18)); }
+  .world-steps strong { font-size:clamp(1.35rem,2vw,1.85rem);line-height:1.16; }
   .world-intelligence article { min-height:430px;padding:30px;border-radius:34px; }
   .world-intelligence img { inset:6px 6px auto auto;width:clamp(190px,18vw,260px);height:clamp(190px,18vw,260px);opacity:1;filter:drop-shadow(0 34px 48px rgba(0,0,0,.44)) drop-shadow(0 0 24px rgba(103,241,209,.1)); }
   .world-intelligence article:before { background:linear-gradient(180deg,transparent 26%,rgba(5,6,10,.84)); }
@@ -1542,6 +1566,11 @@ const worldProLocalizedPrice = worldProPlan
   .world-card__topline { align-items:flex-start;margin-bottom:8px;min-height:132px; }
   .world-card__icon { width:clamp(104px,10vw,138px);height:clamp(104px,10vw,138px);border-radius:34px;background:linear-gradient(145deg,rgba(255,255,255,.105),rgba(0,0,0,.18));box-shadow:0 20px 58px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.1); }
   .world-card__icon img { width:96%;height:96%;filter:drop-shadow(0 24px 32px rgba(0,0,0,.36)) drop-shadow(0 0 18px rgba(103,241,209,.16)); }
+  .world-card__hero { grid-template-columns:clamp(132px,12vw,186px) minmax(0,1fr); gap:18px; margin-bottom:20px; }
+  .world-card__portrait { width:clamp(132px,12vw,186px); border-radius:34px; }
+  .world-card__identity a strong { font-size:clamp(1.35rem,1.8vw,1.95rem); }
+  .world-card__identity > span { font-size:.92rem; }
+  .world-card__bio { font-size:1rem;-webkit-line-clamp:4;margin-bottom:16px; }
   .world-card h3 { font-size:clamp(1.55rem,2vw,2.15rem);letter-spacing:-.035em; }
   .world-empty { position:relative;overflow:hidden;padding:clamp(58px,7vw,92px) 24px; }
   .world-empty img { width:clamp(190px,25vw,320px);height:clamp(190px,25vw,320px);object-fit:contain;margin:-20px auto 10px;filter:drop-shadow(0 34px 48px rgba(0,0,0,.42)); }
@@ -1583,11 +1612,13 @@ const worldProLocalizedPrice = worldProPlan
     .world-showcase-card,.world-showcase-card--large{min-height:430px}
     .world-showcase-card__media,.world-showcase-card--large .world-showcase-card__media{width:clamp(190px,64vw,290px);height:clamp(190px,64vw,290px);right:-8px;top:8px}
     .world-showcase-card>div:last-child,.world-showcase-card--large>div:last-child{padding-top:260px}
-    .world-steps article{min-height:280px}
+    .world-steps article{min-height:320px}
     .world-steps article>span{width:128px;height:128px}
     .world-intelligence article{min-height:340px}
     .world-intelligence img{width:190px;height:190px}
     .world-card__topline{min-height:120px}
+    .world-card__hero{grid-template-columns:1fr;gap:14px}
+    .world-card__portrait{width:112px;border-radius:28px}
     .world-card__icon{width:112px;height:112px}
     .world-signal-grid,.world-card__meta{grid-template-columns:1fr}
     .world-card__actions{grid-template-columns:1fr}
@@ -1990,7 +2021,7 @@ const worldProLocalizedPrice = worldProPlan
     width:clamp(240px,28vw,500px);
     height:clamp(240px,28vw,500px);
     transform:translateY(-50%) rotate(-5deg);
-    background:url("/assets/world/world-layer-icon.png") center / contain no-repeat;
+    background:url("/assets/world/world-layer-icon.webp") center / contain no-repeat;
     opacity:.72;
     filter:drop-shadow(0 44px 70px rgba(0,0,0,.5)) drop-shadow(0 0 36px rgba(103,241,209,.14));
     pointer-events:none;
@@ -2134,7 +2165,7 @@ const worldProLocalizedPrice = worldProPlan
       margin:0 auto clamp(20px,2.5vw,34px);
     }
     .world-steps article > span img {
-      width:min(360px,100%);
+      width:min(340px,100%);
       height:auto;
       filter:drop-shadow(0 54px 70px rgba(0,0,0,.48)) drop-shadow(0 0 34px rgba(103,241,209,.16));
     }
@@ -2147,7 +2178,7 @@ const worldProLocalizedPrice = worldProPlan
     }
     .world-steps strong {
       font-size:clamp(1.7rem,5vw,3rem);
-      line-height:1;
+      line-height:1.08;
       letter-spacing:-.01em;
       color:transparent;
       background:linear-gradient(45deg,#7600b6,#48c1ff);
@@ -2155,6 +2186,7 @@ const worldProLocalizedPrice = worldProPlan
       background-clip:text;
       text-align:center;
       align-self:center;
+      padding-bottom:0.08em;
     }
     .world-steps p {
       font-size:clamp(.92rem,1.5vw,1.54rem);
@@ -2177,7 +2209,7 @@ const worldProLocalizedPrice = worldProPlan
       right:clamp(-110px,-3vw,-42px);
       width:clamp(680px,52vw,940px);
       height:clamp(680px,52vw,940px);
-      background-image:url("/assets/world/world-layer-icon.png");
+      background-image:url("/assets/world/world-layer-icon.webp");
       opacity:.98;
       transform:translateY(-35%) rotate(-3deg);
       filter:drop-shadow(0 72px 112px rgba(0,0,0,.64)) drop-shadow(0 0 84px rgba(103,241,209,.18));
@@ -2591,6 +2623,545 @@ const worldProLocalizedPrice = worldProPlan
     :global(.page-world .vx-cbtn) {
       min-height:36px;
       font-size:9px;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Marketplace cards are injected via innerHTML, so Astro-scoped selectors do not reach them. */
+  .page-world #worldGrid .world-reveal {
+    opacity: 0;
+    transform: translate3d(0, 34px, 0) scale(.985);
+    transition: opacity .7s ease, transform .7s cubic-bezier(.2, .8, .2, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+
+  .page-world #worldGrid .world-reveal.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  .page-world #worldGrid .world-card,
+  .page-world #worldGrid .world-empty {
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 36px;
+    box-shadow: 0 26px 84px rgba(0, 0, 0, .24), inset 0 1px 0 rgba(255, 255, 255, .06);
+  }
+
+  .page-world #worldGrid .world-card {
+    --world-card-accent: rgba(103, 241, 209, .42);
+    --world-card-accent-soft: rgba(103, 241, 209, .12);
+    --world-card-gold: rgba(255, 215, 106, .14);
+    position: relative;
+    overflow: hidden;
+    min-height: 620px;
+    padding: clamp(24px, 2.8vw, 34px);
+    display: flex;
+    flex-direction: column;
+    transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+    background:
+      linear-gradient(155deg, rgba(255, 255, 255, .085), rgba(255, 255, 255, .015)),
+      radial-gradient(circle at 100% 0, var(--world-card-gold), transparent 30%),
+      radial-gradient(circle at 0 100%, var(--world-card-accent-soft), transparent 36%);
+  }
+
+  .page-world #worldGrid .world-card::before {
+    content: "";
+    position: absolute;
+    inset: -28% -24% auto auto;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 215, 106, .16), rgba(103, 241, 209, .07) 42%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .page-world #worldGrid .world-card::after {
+    content: "";
+    position: absolute;
+    inset: 14px;
+    border: 1px solid rgba(255, 255, 255, .05);
+    border-radius: 28px;
+    pointer-events: none;
+  }
+
+  .page-world #worldGrid .world-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 215, 106, .28);
+    box-shadow: 0 34px 110px rgba(0, 0, 0, .34), 0 0 54px rgba(255, 215, 106, .08);
+  }
+
+  .page-world #worldGrid .world-card--member {
+    --world-card-accent: rgba(103, 241, 209, .52);
+    --world-card-accent-soft: rgba(103, 241, 209, .14);
+    --world-card-gold: rgba(103, 241, 209, .10);
+    border-color: rgba(103, 241, 209, .18);
+    box-shadow: 0 26px 84px rgba(0, 0, 0, .24), 0 0 0 1px rgba(103, 241, 209, .06), inset 0 1px 0 rgba(255, 255, 255, .05);
+  }
+
+  .page-world #worldGrid .world-card--member {
+    background:
+      linear-gradient(155deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .02)),
+      radial-gradient(circle at 100% 0, rgba(103, 241, 209, .11), transparent 30%),
+      radial-gradient(circle at 0 100%, rgba(103, 241, 209, .14), transparent 36%);
+  }
+
+  .page-world #worldGrid .world-card--pro {
+    --world-card-accent: rgba(255, 215, 106, .6);
+    --world-card-accent-soft: rgba(255, 215, 106, .16);
+    --world-card-gold: rgba(255, 215, 106, .22);
+    border-color: rgba(255, 215, 106, .26);
+    box-shadow: 0 34px 110px rgba(0, 0, 0, .32), 0 0 64px rgba(255, 215, 106, .1), inset 0 1px 0 rgba(255, 255, 255, .06);
+    background:
+      linear-gradient(155deg, rgba(255, 255, 255, .095), rgba(255, 255, 255, .02)),
+      radial-gradient(circle at 100% 0, rgba(255, 215, 106, .2), transparent 32%),
+      radial-gradient(circle at 0 100%, rgba(255, 215, 106, .09), transparent 40%);
+  }
+
+  .page-world #worldGrid .world-card__topline {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 22px;
+  }
+
+  .page-world #worldGrid .world-card__category {
+    color: #ffd76a;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 215, 106, .18);
+    background: rgba(255, 215, 106, .07);
+    font-size: .68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+  }
+
+  .page-world #worldGrid .world-card__hero {
+    display: grid;
+    grid-template-columns: clamp(154px, 13vw, 208px) minmax(0, 1fr);
+    gap: clamp(20px, 2.4vw, 28px);
+    align-items: start;
+    margin-bottom: 24px;
+  }
+
+  .page-world #worldGrid .world-card__media {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: clamp(170px, 16vw, 220px);
+  }
+
+  .page-world #worldGrid .world-card__media::before {
+    content: "";
+    position: absolute;
+    inset: auto 10% 8% 10%;
+    height: 24px;
+    border-radius: 999px;
+    background: radial-gradient(circle, var(--world-card-accent-soft), transparent 72%);
+    filter: blur(10px);
+    pointer-events: none;
+  }
+
+  .page-world #worldGrid .world-card__portrait {
+    position: relative;
+    z-index: 1;
+    width: clamp(154px, 13vw, 208px);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 38px;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, .11), rgba(0, 0, 0, .12)),
+      radial-gradient(circle at 80% 15%, var(--world-card-gold), transparent 28%);
+    box-shadow: 0 22px 56px rgba(0, 0, 0, .32), inset 0 1px 0 rgba(255, 255, 255, .09);
+    color: #f5f7fc;
+    font-weight: 900;
+    font-size: clamp(2rem, 3vw, 2.8rem);
+    letter-spacing: -.04em;
+  }
+
+  .page-world #worldGrid .world-card__portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .page-world #worldGrid .world-card__icon {
+    width: clamp(76px, 7vw, 112px);
+    height: clamp(76px, 7vw, 112px);
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, .14);
+    border-radius: 28px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, .11), rgba(0, 0, 0, .22));
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .34), 0 0 26px rgba(103, 241, 209, .08), inset 0 1px 0 rgba(255, 255, 255, .11);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .page-world #worldGrid .world-card__icon img {
+    width: 92%;
+    height: 92%;
+    object-fit: contain;
+    filter: drop-shadow(0 20px 28px rgba(0, 0, 0, .36)) drop-shadow(0 0 14px rgba(103, 241, 209, .14));
+  }
+
+  .page-world #worldGrid .world-card__identity {
+    display: grid;
+    gap: 10px;
+    min-width: 0;
+    align-content: start;
+  }
+
+  .page-world #worldGrid .world-card__identity a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .page-world #worldGrid .world-card__identity a strong {
+    display: block;
+    font-size: clamp(1.5rem, 1.95vw, 2.15rem);
+    line-height: .98;
+    letter-spacing: -.045em;
+  }
+
+  .page-world #worldGrid .world-card__handle {
+    color: rgba(255, 255, 255, .42);
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+  }
+
+  .page-world #worldGrid .world-card__headline {
+    color: rgba(255, 255, 255, .7);
+    font-size: .96rem;
+    line-height: 1.5;
+  }
+
+  .page-world #worldGrid .world-card__badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .page-world #worldGrid .world-card__badge {
+    padding: 7px 10px;
+    border-radius: 999px;
+    font-size: .62rem;
+    font-style: normal;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    border: 1px solid rgba(255, 255, 255, .12);
+    background: rgba(255, 255, 255, .07);
+    color: rgba(255, 255, 255, .82);
+  }
+
+  .page-world #worldGrid .world-card__badge--free {
+    border-color: rgba(255, 255, 255, .12);
+    background: rgba(255, 255, 255, .06);
+    color: rgba(255, 255, 255, .8);
+  }
+
+  .page-world #worldGrid .world-card__badge--member {
+    border-color: rgba(103, 241, 209, .26);
+    background: rgba(103, 241, 209, .08);
+    color: #67f1d1;
+  }
+
+  .page-world #worldGrid .world-card__badge--pro {
+    border-color: rgba(255, 215, 106, .3);
+    background: rgba(255, 215, 106, .1);
+    color: #ffd76a;
+  }
+
+  .page-world #worldGrid .world-card__badge--verified {
+    border-color: rgba(186, 142, 255, .28);
+    background: rgba(118, 0, 182, .12);
+    color: #c9a5ff;
+  }
+
+  .page-world #worldGrid .world-card__signal {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 2px;
+  }
+
+  .page-world #worldGrid .world-card__signal span {
+    padding: 8px 10px;
+    border: 1px solid rgba(255, 255, 255, .09);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .05);
+    color: rgba(255, 255, 255, .74);
+    font-size: .68rem;
+    font-weight: 800;
+  }
+
+  .page-world #worldGrid .world-card__bio {
+    margin: 2px 0 0;
+    color: rgba(255, 255, 255, .62);
+    line-height: 1.6;
+    font-size: .94rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .page-world #worldGrid .world-card__service {
+    position: relative;
+    z-index: 1;
+    margin-top: auto;
+    padding: 20px 18px 18px;
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 28px;
+    background:
+      linear-gradient(160deg, rgba(0, 0, 0, .22), rgba(255, 255, 255, .04)),
+      radial-gradient(circle at 100% 0, var(--world-card-accent-soft), transparent 28%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05);
+  }
+
+  .page-world #worldGrid .world-card__service-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 16px;
+    align-items: start;
+    margin-bottom: 12px;
+  }
+
+  .page-world #worldGrid .world-card__service::before {
+    content: "";
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--world-card-accent), transparent);
+    opacity: .75;
+  }
+
+  .page-world #worldGrid .world-card h3 {
+    margin: 0;
+    font-size: clamp(1.7rem, 2.2vw, 2.35rem);
+    line-height: .98;
+    letter-spacing: -.05em;
+    max-width: 16ch;
+  }
+
+  .page-world #worldGrid .world-card__description {
+    color: rgba(255, 255, 255, .62);
+    line-height: 1.68;
+    font-size: .92rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .page-world #worldGrid .world-card__tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 14px 0 18px;
+  }
+
+  .page-world #worldGrid .world-card__tags span {
+    padding: 7px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, .07);
+    background: rgba(255, 255, 255, .05);
+    font-size: .68rem;
+    color: rgba(255, 255, 255, .68);
+  }
+
+  .page-world #worldGrid .world-card__meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 0;
+    padding: 16px 0 0;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+    font-size: .8rem;
+  }
+
+  .page-world #worldGrid .world-card__meta span {
+    display: grid;
+    gap: 4px;
+    padding: 13px 12px;
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 18px;
+    background: rgba(0, 0, 0, .16);
+    color: rgba(255, 255, 255, .55);
+  }
+
+  .page-world #worldGrid .world-card__meta em {
+    color: rgba(255, 255, 255, .42);
+    font-style: normal;
+    font-size: .62rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+  }
+
+  .page-world #worldGrid .world-card__meta strong {
+    color: #fff;
+    font-size: .9rem;
+    line-height: 1.2;
+  }
+
+  .page-world #worldGrid .world-card__vx {
+    margin-top: 14px;
+    color: color-mix(in srgb, var(--world-card-accent) 84%, white 16%);
+    font-size: .72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .11em;
+  }
+
+  .page-world #worldGrid .world-card__actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, .88fr);
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .page-world #worldGrid .world-empty {
+    position: relative;
+    grid-column: 1 / -1;
+    min-height: clamp(420px, 56vh, 640px);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    text-align: left;
+    overflow: hidden;
+    padding: clamp(58px, 7vw, 92px) 24px clamp(58px, 7vw, 92px) clamp(26px, 6vw, 90px);
+    background: linear-gradient(135deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .012));
+  }
+
+  .page-world #worldGrid .world-empty img {
+    position: absolute;
+    right: clamp(-60px, 2vw, 60px);
+    bottom: clamp(-120px, -6vw, -40px);
+    width: clamp(280px, 34vw, 560px);
+    height: clamp(280px, 34vw, 560px);
+    margin: 0;
+    object-fit: contain;
+    opacity: .42;
+    transform: rotate(-10deg);
+    filter: drop-shadow(0 34px 48px rgba(0, 0, 0, .42));
+  }
+
+  .page-world #worldGrid .world-empty strong,
+  .page-world #worldGrid .world-empty p,
+  .page-world #worldGrid .world-empty a {
+    position: relative;
+    z-index: 2;
+    max-width: 680px;
+  }
+
+  .page-world #worldGrid .world-empty strong {
+    display: block;
+    font-size: clamp(2rem, 4vw, 3.3rem);
+    line-height: .98;
+    letter-spacing: -.045em;
+  }
+
+  .page-world #worldGrid .world-empty p {
+    color: rgba(255, 255, 255, .6);
+    line-height: 1.7;
+  }
+
+  @media (max-width: 760px) {
+    .page-world #worldGrid .world-card {
+      min-height: 0;
+      padding: 20px;
+    }
+
+    .page-world #worldGrid .world-card::after {
+      inset: 10px;
+      border-radius: 24px;
+    }
+
+    .page-world #worldGrid .world-card__topline {
+      align-items: flex-start;
+      flex-direction: column;
+      margin-bottom: 18px;
+    }
+
+    .page-world #worldGrid .world-card__hero {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .page-world #worldGrid .world-card__media {
+      justify-content: start;
+      min-height: 152px;
+    }
+
+    .page-world #worldGrid .world-card__portrait {
+      width: 132px;
+      border-radius: 32px;
+      font-size: 2rem;
+    }
+
+    .page-world #worldGrid .world-card__icon {
+      width: 84px;
+      height: 84px;
+      border-radius: 24px;
+    }
+
+    .page-world #worldGrid .world-card__service-head {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .page-world #worldGrid .world-card__service-head .world-card__icon {
+      justify-self: start;
+    }
+
+    .page-world #worldGrid .world-card__meta,
+    .page-world #worldGrid .world-card__actions {
+      grid-template-columns: 1fr;
+    }
+
+    .page-world #worldGrid .world-empty {
+      min-height: 340px;
+      padding: 34px 22px 210px;
+      align-items: center;
+      text-align: center;
+    }
+
+    .page-world #worldGrid .world-empty img {
+      right: 50%;
+      bottom: -18px;
+      transform: translateX(50%) rotate(-8deg);
+      width: min(74vw, 320px);
+      height: min(74vw, 320px);
+      opacity: .34;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-world #worldGrid .world-reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+      will-change: auto;
+    }
+
+    .page-world #worldGrid .world-card {
+      transition: none;
     }
   }
 </style>
