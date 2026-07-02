@@ -327,7 +327,7 @@ a, button{ touch-action: manipulation; }
 .hero-copy p{
   max-width: 64ch;
   font-size: clamp(1rem, 1.85vw, 1.14rem);
-  line-height: 1.78;
+  line-height: 1.46;
   color: var(--muted);
 }
 .hero-actions{
@@ -364,13 +364,20 @@ a, button{ touch-action: manipulation; }
   box-shadow: var(--shadow);
 }
 .hero-card, .panel, .form-card{
-  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.025));
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.025)),
+    rgba(6, 9, 18, .68);
   border-radius: var(--radius);
   padding: 22px;
 }
 .panel--pro{
   background: linear-gradient(180deg, rgba(243,225,160,.10), rgba(255,255,255,.03));
   border-color: rgba(243,225,160,.18);
+}
+.product-card--iconic,
+.product-card--iconic.panel--pro{
+  background: linear-gradient(-10deg, rgb(10 157 205 / 56%), rgb(90 8 162 / 87%));
+  box-shadow: 0 0 13px 2px inset rgba(255,255,255,.82), var(--shadow);
 }
 
 /* ── Hero Showcase (multi-asset composition) ─────────────────────── */
@@ -427,7 +434,12 @@ a, button{ touch-action: manipulation; }
   opacity: 0.88;
   transform: scale(1.05) rotate(-2deg);
 }
-.has-card-asset > *:not(.card-asset){ position: relative; z-index: 1; }
+.has-card-asset > *:not(.card-asset){
+  position: relative;
+  z-index: 1;
+  font-size: 20px;
+  display: grid;
+}
 
 @media (min-width: 640px){
   .card-asset{
@@ -527,7 +539,7 @@ a, button{ touch-action: manipulation; }
 }
 .glass-card--metric p{
   color: var(--muted);
-  line-height: 1.7;
+  line-height: 1.42;
   margin: 0;
 }
 
@@ -541,7 +553,7 @@ a, button{ touch-action: manipulation; }
 .section-head{
   display: grid;
   gap: 12px;
-  margin-bottom: 28px;
+  margin-bottom: clamp(22px, 3vw, 36px);
 }
 .section-head--split{ gap: 18px; }
 
@@ -575,15 +587,22 @@ a, button{ touch-action: manipulation; }
   font-family: var(--display);
   font-size: clamp(2rem, 4vw, 3.7rem);
   font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -.025em;
+  line-height: 1.02;
+  letter-spacing: 0;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  background-image: linear-gradient(165deg, purple 15%, white 50%, cadetblue 56%);
+  -webkit-text-fill-color: transparent;
 }
 .section-head p{
-  margin: 0;
+  margin: 30px auto;
   max-width: 68ch;
   font-size: 1.3rem;
-  line-height: 1.58;
+  line-height: 1.48;
   color: white;
+  border-left: 2px inset rgba(255,255,255,.52);
+  padding: 20px;
 }
 
 /* ── Grids ────────────────────────────────────────────────────────── */
@@ -600,15 +619,22 @@ a, button{ touch-action: manipulation; }
   font-family: var(--display);
   font-size: 1.4rem;
   font-weight: 700;
-  letter-spacing: -.03em;
-  margin: 10px 0 8px;
+  letter-spacing: 0;
+  margin: 40px auto;
+  text-align: center;
+  border-radius: 20px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  padding: 20px;
+  box-shadow: 0 0 10px 2px inset aqua;
+  background: #00000078;
 }
 .feature-card p, .product-card p, .tool-card p, .hub-card p,
 .principle-panel p, .spotlight-card p, .product-vision p, .price-card p,
 .gallery-card p, .pricing-card p,
 .eyebrow-copy, .detail-list li{
   color: floralwhite;
-  line-height: 1.72;
+  line-height: 1.42;
 }
 
 /* ── Detail List ─────────────────────────────────────────────────── */
@@ -617,7 +643,12 @@ a, button{ touch-action: manipulation; }
   gap: 10px;
   list-style: none;
   margin: 20px auto;
-  padding: 0;
+  background: #21474f6b;
+  padding: 30px;
+  border-radius: 25px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px black;
 }
 .detail-list li{
   position: relative;
@@ -740,7 +771,7 @@ a, button{ touch-action: manipulation; }
 }
 .callout p{
   color: var(--muted);
-  line-height: 1.75;
+  line-height: 1.44;
   margin: 0;
 }
 .callout--split{ align-items: start; }
@@ -763,7 +794,7 @@ a, button{ touch-action: manipulation; }
 .stat-block span{
   color: var(--muted);
   font-size: .96rem;
-  line-height: 1.6;
+  line-height: 1.36;
 }
 
 /* ── Chips & Metrics ─────────────────────────────────────────────── */
@@ -1011,7 +1042,7 @@ a, button{ touch-action: manipulation; }
 .icons-store-copy p{
   color: var(--muted);
   max-width: 48ch;
-  line-height: 1.7;
+  line-height: 1.42;
 }
 .icons-store-stats{
   display: flex;
@@ -1037,6 +1068,9 @@ a, button{ touch-action: manipulation; }
   display: flex;
   align-items: center;
   justify-content: center;
+  width: min(100%, 460px);
+  min-height: 360px;
+  margin-inline: auto;
 }
 .icons-preview-grid{
   display: grid;

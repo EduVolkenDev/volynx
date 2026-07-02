@@ -305,10 +305,10 @@ const designBriefHref = `${ROUTES.contact}?product=design-studio&intent=brand-di
         <div class="ds-tracer-tool" data-reveal>
           <div class="ds-tracer-tool__head">
             <div>
-              <span class="ds-kicker" data-i18n="ds.tracer_tool_kicker">Vector trace MVP</span>
+              <span class="ds-kicker" data-i18n="ds.tracer_tool_kicker">VTracer spline engine</span>
               <h3 data-i18n="ds.tracer_tool_title">Converta um logo em SVG</h3>
             </div>
-            <span class="ds-tracer-badge">SVG PATH</span>
+            <span class="ds-tracer-badge">WASM · SPLINE</span>
           </div>
 
           <label class="ds-tracer-drop" for="signaTracerFile" id="signaTracerDrop">
@@ -319,12 +319,24 @@ const designBriefHref = `${ROUTES.contact}?product=design-studio&intent=brand-di
 
           <div class="ds-tracer-controls" aria-label="Signa Tracer controls" data-i18n-aria="ds.tracer_controls_aria">
             <label>
-              <span data-i18n="ds.tracer_threshold">Threshold</span>
-              <input id="signaTracerThreshold" type="range" min="20" max="235" value="132" />
+              <span><span data-i18n="ds.tracer_threshold">Contraste</span> <output id="signaTracerThresholdValue">132</output></span>
+              <input id="signaTracerThreshold" type="range" min="20" max="235" value="132" aria-describedby="signaTracerThresholdValue" />
             </label>
             <label>
-              <span data-i18n="ds.tracer_detail">Detalhe</span>
-              <input id="signaTracerDetail" type="range" min="48" max="220" value="128" />
+              <span><span data-i18n="ds.tracer_smoothing">Suavização</span> <output id="signaTracerSmoothingValue">6</output></span>
+              <input id="signaTracerSmoothing" type="range" min="2" max="12" value="6" aria-describedby="signaTracerSmoothingValue" />
+            </label>
+            <label>
+              <span><span data-i18n="ds.tracer_noise">Remover ruído</span> <output id="signaTracerNoiseValue">4 px</output></span>
+              <input id="signaTracerNoise" type="range" min="0" max="24" value="4" aria-describedby="signaTracerNoiseValue" />
+            </label>
+            <label>
+              <span data-i18n="ds.tracer_precision">Precisão</span>
+              <select id="signaTracerDetail">
+                <option value="640" data-i18n="ds.tracer_precision_balanced">Balanceada</option>
+                <option value="1024" selected data-i18n="ds.tracer_precision_high">Alta</option>
+                <option value="1600" data-i18n="ds.tracer_precision_ultra">Ultra</option>
+              </select>
             </label>
             <label class="ds-tracer-toggle">
               <input id="signaTracerInvert" type="checkbox" />
@@ -345,7 +357,9 @@ const designBriefHref = `${ROUTES.contact}?product=design-studio&intent=brand-di
 
           <div class="ds-tracer-output">
             <p id="signaTracerStatus" data-i18n="ds.tracer_status_empty">Selecione uma imagem para gerar paths SVG reais.</p>
-            <button id="signaTracerDownload" class="ds-btn ds-btn--primary" type="button" disabled data-i18n="ds.tracer_download">Baixar SVG vetorial</button>
+            <button id="signaTracerDownload" class="ds-btn ds-btn--primary" type="button" disabled>
+              <span data-i18n="ds.tracer_download">Baixar SVG vetorial</span>
+            </button>
           </div>
         </div>
       </div>
@@ -1587,7 +1601,7 @@ const designBriefHref = `${ROUTES.contact}?product=design-studio&intent=brand-di
 
   .ds-tracer-controls {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 12px;
     margin-top: 18px;
   }
@@ -1602,6 +1616,14 @@ const designBriefHref = `${ROUTES.contact}?product=design-studio&intent=brand-di
     background: rgba(255,255,255,0.055);
   }
 
+  .ds-tracer-controls label:nth-child(-n + 3) {
+    grid-column: span 2;
+  }
+
+  .ds-tracer-controls label:nth-child(n + 4) {
+    grid-column: span 3;
+  }
+
   .ds-tracer-controls label > span {
     color: rgba(236, 247, 255, 0.68);
     font-size: 11px;
@@ -1610,9 +1632,24 @@ const designBriefHref = `${ROUTES.contact}?product=design-studio&intent=brand-di
     text-transform: uppercase;
   }
 
+  .ds-tracer-controls output {
+    color: var(--ds-gold);
+    font: inherit;
+  }
+
   .ds-tracer-controls input[type="range"] {
     width: 100%;
     accent-color: var(--ds-cyan);
+  }
+
+  .ds-tracer-controls select {
+    width: 100%;
+    min-height: 36px;
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 10px;
+    padding: 6px 10px;
+    color: var(--ds-ink);
+    background: #09131c;
   }
 
   .ds-tracer-toggle {
@@ -1675,12 +1712,13 @@ const designBriefHref = `${ROUTES.contact}?product=design-studio&intent=brand-di
     place-items: center;
     overflow: hidden;
     padding: 16px;
+    background-color: #f5f7f8;
   }
 
   .ds-tracer-svg-preview svg {
     width: 100%;
+    height: 100%;
     max-height: 190px;
-    color: var(--ds-ink);
   }
 
   .ds-tracer-output {
@@ -2182,6 +2220,8 @@ const designBriefHref = `${ROUTES.contact}?product=design-studio&intent=brand-di
 </style>
 
 <script>
+  import { BinaryImageConverter } from "vectortracer";
+
   (() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const revealEls = Array.from(document.querySelectorAll("[data-reveal]"));
@@ -2226,6 +2266,11 @@ const designBriefHref = `${ROUTES.contact}?product=design-studio&intent=brand-di
     const tracerFile = document.getElementById("signaTracerFile");
     const tracerDrop = document.getElementById("signaTracerDrop");
     const tracerThreshold = document.getElementById("signaTracerThreshold");
+    const tracerThresholdValue = document.getElementById("signaTracerThresholdValue");
+    const tracerSmoothing = document.getElementById("signaTracerSmoothing");
+    const tracerSmoothingValue = document.getElementById("signaTracerSmoothingValue");
+    const tracerNoise = document.getElementById("signaTracerNoise");
+    const tracerNoiseValue = document.getElementById("signaTracerNoiseValue");
     const tracerDetail = document.getElementById("signaTracerDetail");
     const tracerInvert = document.getElementById("signaTracerInvert");
     const tracerCanvas = document.getElementById("signaTracerCanvas");
@@ -2235,6 +2280,8 @@ const designBriefHref = `${ROUTES.contact}?product=design-studio&intent=brand-di
     let tracerImage = null;
     let tracerSvg = "";
     let tracerFileName = "signa-tracer-mark";
+    let tracerRenderId = 0;
+    let tracerTimer = 0;
 
     const dsText = (key, fallback) => {
       const table = window.VX_TRANS?.[document.documentElement.lang || "pt"] || window.VX_TRANS?.pt || {};
@@ -2282,7 +2329,7 @@ const designBriefHref = `${ROUTES.contact}?product=design-studio&intent=brand-di
       const canvas = tracerCanvas;
       const ctx = canvas.getContext("2d", { willReadFrequently: true });
       if (!ctx) return null;
-      const maxSide = Number(tracerDetail?.value || 128);
+      const maxSide = Number(tracerDetail?.value || 1024);
       const scale = Math.min(maxSide / tracerImage.width, maxSide / tracerImage.height, 1);
       const width = Math.max(1, Math.round(tracerImage.width * scale));
       const height = Math.max(1, Math.round(tracerImage.height * scale));
@@ -2295,57 +2342,137 @@ const designBriefHref = `${ROUTES.contact}?product=design-studio&intent=brand-di
       return { canvas, ctx, width, height };
     };
 
-    const traceToSvg = () => {
+    const createBinaryImage = (image, threshold, invert) => {
+      const data = new Uint8ClampedArray(image.data.length);
+      for (let i = 0; i < image.data.length; i += 4) {
+        const alpha = image.data[i + 3] / 255;
+        const luma = ((image.data[i] * 0.299) + (image.data[i + 1] * 0.587) + (image.data[i + 2] * 0.114)) * alpha + (255 * (1 - alpha));
+        const marked = invert ? luma > threshold : luma < threshold;
+        const value = marked ? 0 : 255;
+        data[i] = value;
+        data[i + 1] = value;
+        data[i + 2] = value;
+        data[i + 3] = 255;
+      }
+      return new ImageData(data, image.width, image.height);
+    };
+
+    const shouldInvertFromBorder = (image) => {
+      const { data, width, height } = image;
+      const step = Math.max(1, Math.floor(Math.min(width, height) / 80));
+      let total = 0;
+      let samples = 0;
+      const sample = (x, y) => {
+        const i = (y * width + x) * 4;
+        const alpha = data[i + 3] / 255;
+        total += (((data[i] * 0.299) + (data[i + 1] * 0.587) + (data[i + 2] * 0.114)) * alpha) + (255 * (1 - alpha));
+        samples += 1;
+      };
+      for (let x = 0; x < width; x += step) {
+        sample(x, 0);
+        if (height > 1) sample(x, height - 1);
+      }
+      for (let y = step; y < height - 1; y += step) {
+        sample(0, y);
+        if (width > 1) sample(width - 1, y);
+      }
+      return samples > 0 && (total / samples) < 118;
+    };
+
+    const vectorizeImage = (imageData, converterOptions, options, renderId) => new Promise((resolve, reject) => {
+      let converter;
+      try {
+        converter = new BinaryImageConverter(imageData, converterOptions, options);
+        converter.init();
+      } catch (error) {
+        reject(error);
+        return;
+      }
+
+      const tick = () => {
+        if (renderId !== tracerRenderId) {
+          converter.free();
+          resolve("");
+          return;
+        }
+        try {
+          if (converter.tick()) {
+            const result = converter.getResult();
+            converter.free();
+            resolve(result);
+            return;
+          }
+          window.setTimeout(tick, 0);
+        } catch (error) {
+          converter.free();
+          reject(error);
+        }
+      };
+      window.setTimeout(tick, 0);
+    });
+
+    const traceToSvg = async () => {
       const source = drawTracerSource();
       if (!source || !tracerPreview || !tracerDownload) return;
       const { ctx, width, height } = source;
       const image = ctx.getImageData(0, 0, width, height);
       const threshold = Number(tracerThreshold?.value || 132);
       const invert = Boolean(tracerInvert?.checked);
-      const segments = [];
-      let activePixels = 0;
+      const renderId = ++tracerRenderId;
+      tracerDownload.disabled = true;
+      setTracerStatus("ds.tracer_status_processing", "Tracing contours and fitting Bézier curves...");
 
-      for (let y = 0; y < height; y += 1) {
-        let start = -1;
-        for (let x = 0; x <= width; x += 1) {
-          let marked = false;
-          if (x < width) {
-            const i = (y * width + x) * 4;
-            const alpha = image.data[i + 3] / 255;
-            const luma = (image.data[i] * 0.299) + (image.data[i + 1] * 0.587) + (image.data[i + 2] * 0.114);
-            marked = alpha > 0.08 && (invert ? luma > threshold : luma < threshold);
-          }
+      try {
+        const binaryImage = createBinaryImage(image, threshold, invert);
+        const smoothing = Number(tracerSmoothing?.value || 6);
+        const noise = Number(tracerNoise?.value || 4);
+        const rawSvg = await vectorizeImage(binaryImage, {
+          debug: false,
+          mode: "spline",
+          cornerThreshold: 60,
+          lengthThreshold: smoothing,
+          maxIterations: 10,
+          spliceThreshold: 45,
+          filterSpeckle: noise,
+          pathPrecision: 2
+        }, {
+          invert: false,
+          pathFill: "#101418",
+          backgroundColor: "none",
+          attributes: ` role="img" aria-label="${escapeSvg(`${tracerFileName} Signa Tracer vector`)}"`,
+          scale: 1
+        }, renderId);
 
-          if (marked && start < 0) {
-            start = x;
-          } else if ((!marked || x === width) && start >= 0) {
-            segments.push(`M${start} ${y}H${x}V${y + 1}H${start}Z`);
-            activePixels += x - start;
-            start = -1;
-          }
+        if (!rawSvg || renderId !== tracerRenderId) return;
+        const parsed = new DOMParser().parseFromString(rawSvg, "image/svg+xml");
+        const svgNode = parsed.documentElement;
+        const paths = svgNode.querySelectorAll("path").length;
+        if (svgNode.nodeName === "parsererror" || !paths) {
+          throw new Error("Empty vector output.");
         }
-      }
-
-      if (!segments.length) {
+        svgNode.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        svgNode.setAttribute("width", String(width));
+        svgNode.setAttribute("height", String(height));
+        svgNode.setAttribute("viewBox", `0 0 ${width} ${height}`);
+        svgNode.removeAttribute("style");
+        const title = parsed.createElementNS("http://www.w3.org/2000/svg", "title");
+        title.textContent = `${tracerFileName} Signa Tracer vector`;
+        svgNode.prepend(title);
+        tracerSvg = new XMLSerializer().serializeToString(svgNode);
+        tracerPreview.innerHTML = tracerSvg;
+        tracerDownload.disabled = false;
+        const message = dsText(
+          "ds.tracer_status_ready",
+          "Premium vector ready: {paths} editable paths with Bézier curves."
+        ).replace("{paths}", String(paths));
+        tracerStatus.textContent = message;
+      } catch (error) {
+        console.error("[Signa Tracer]", error);
         tracerSvg = "";
         tracerPreview.innerHTML = "";
         tracerDownload.disabled = true;
-        setTracerStatus("ds.tracer_status_empty_trace", "No vector shape found. Adjust threshold or invert the mark.");
-        return;
+        setTracerStatus("ds.tracer_status_empty_trace", "No clean contour found. Adjust contrast, noise removal or invert the mark.");
       }
-
-      const title = escapeSvg(`${tracerFileName} Signa Tracer vector`);
-      tracerSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="${title}"><title>${title}</title><path fill="currentColor" d="${segments.join("")}"/></svg>`;
-      tracerPreview.innerHTML = tracerSvg;
-      tracerDownload.disabled = false;
-      const coverage = Math.round((activePixels / (width * height)) * 100);
-      const message = dsText(
-        "ds.tracer_status_ready",
-        "Vector SVG ready: {paths} path runs, {coverage}% mark coverage."
-      )
-        .replace("{paths}", String(segments.length))
-        .replace("{coverage}", String(coverage));
-      tracerStatus.textContent = message;
     };
 
     const handleTracerFile = async (file) => {
@@ -2353,7 +2480,12 @@ const designBriefHref = `${ROUTES.contact}?product=design-studio&intent=brand-di
       try {
         tracerFileName = slugFileName(file.name);
         tracerImage = await loadTracerImage(file);
-        traceToSvg();
+        const source = drawTracerSource();
+        if (source && tracerInvert) {
+          const sourceImage = source.ctx.getImageData(0, 0, source.width, source.height);
+          tracerInvert.checked = shouldInvertFromBorder(sourceImage);
+        }
+        await traceToSvg();
       } catch {
         tracerSvg = "";
         if (tracerPreview) tracerPreview.innerHTML = "";
@@ -2367,14 +2499,29 @@ const designBriefHref = `${ROUTES.contact}?product=design-studio&intent=brand-di
       handleTracerFile(file);
     });
 
-    [tracerThreshold, tracerDetail, tracerInvert].forEach((control) => {
-      control?.addEventListener("input", () => {
+    const syncTracerControlValues = () => {
+      if (tracerThresholdValue) tracerThresholdValue.textContent = tracerThreshold?.value || "132";
+      if (tracerSmoothingValue) tracerSmoothingValue.textContent = tracerSmoothing?.value || "6";
+      if (tracerNoiseValue) tracerNoiseValue.textContent = `${tracerNoise?.value || "4"} px`;
+    };
+
+    const scheduleTrace = () => {
+      syncTracerControlValues();
+      window.clearTimeout(tracerTimer);
+      tracerTimer = window.setTimeout(() => {
         if (tracerImage) traceToSvg();
+      }, 180);
+    };
+
+    [tracerThreshold, tracerSmoothing, tracerNoise, tracerDetail, tracerInvert].forEach((control) => {
+      control?.addEventListener("input", () => {
+        scheduleTrace();
       });
       control?.addEventListener("change", () => {
-        if (tracerImage) traceToSvg();
+        scheduleTrace();
       });
     });
+    syncTracerControlValues();
 
     tracerDrop?.addEventListener("dragover", (event) => {
       event.preventDefault();

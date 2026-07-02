@@ -50,12 +50,14 @@ const homeAssistItems = [
         </div>
 
         <div class="hero-v2__visual">
-          <div class="hero-v2__mockup hero-v2__mockup--daily-orbit">
+          <div class="hero-v2__mockup hero-v2__mockup--daily-grid">
             <div class="hero-v2__mockup-glow" aria-hidden="true"></div>
-            <a href="https://daily.volynx.world/" class="hero-v2__mockup-chip" aria-label="Open VOLYNX Daily" data-i18n-aria="home2.mockup_daily_aria">
-              <img src="/assets/volynx-daily.webp" alt="VOLYNX Daily" />
-            </a>
-            <p class="hero-v2__mockup-title" data-i18n="home2.mockup_title">Seu dia mais inteligente e organizado começa aqui</p>
+            <div class="hero-v2__mockup-brand">
+              <a href="https://daily.volynx.world/" class="hero-v2__mockup-chip" aria-label="Open VOLYNX Daily" data-i18n-aria="home2.mockup_daily_aria">
+                <img src="/assets/volynx-daily.webp" alt="VOLYNX Daily" />
+              </a>
+              <p class="hero-v2__mockup-title" data-i18n="home2.mockup_title">Seu dia mais inteligente e organizado começa aqui</p>
+            </div>
             <div class="hero-v2__mockup-grid hero-v2__mockup-grid--orbit" aria-label="VOLYNX Daily tools">
               <a href="https://daily.volynx.world/tools/my-day/" class="hero-v2__mockup-tag hero-v2__mockup-tag--myday" style="--tag-delay: 120ms;">
                 <img src="/assets/myday.webp" alt="">
@@ -808,7 +810,7 @@ const homeAssistItems = [
 
   .hero-v2__desc {
     font-size: clamp(1rem, 1.7vw, 1.18rem);
-    line-height: 1.65;
+    line-height: 1.42;
     color: rgba(209, 215, 230, 0.78);
     margin: 0 0 36px;
     max-width: min(100%, 54ch);
@@ -886,17 +888,18 @@ const homeAssistItems = [
   }
   .hero-v2__mockup {
     position: relative;
-  width: 100%;
-  max-width: 500px;
-  aspect-ratio: 4 / 5;
-  border-radius: 32px;
-  border: 1px solid rgba(244,244,245,0.1);
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
-  justify-content: end;
-  box-shadow: 0 30px 80px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.05);
-  overflow: hidden;
+    width: 100%;
+    max-width: 540px;
+    min-height: 760px;
+    border-radius: 32px;
+    border: 1px solid rgba(244,244,245,0.1);
+    padding: 24px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    align-content: start;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.05);
+    overflow: hidden;
   }
   .hero-v2__mockup-glow {
     position: absolute;
@@ -911,36 +914,48 @@ const homeAssistItems = [
     0%, 100% { transform: translate(0, 0); }
     50% { transform: translate(-10px, 10px); }
   }
+  .hero-v2__mockup-brand {
+    grid-column: 1 / -1;
+    position: relative;
+    z-index: 2;
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    padding: 4px 0 6px;
+  }
+
   .hero-v2__mockup-chip {
-    max-width: 100%;
     display: block;
-    width: 460px;
-    height: auto;
+    width: min(480px, 90vw);
+    max-height: 250px;
     margin: 0 auto;
     padding: 0;
     text-decoration: none;
     transition: transform .25s ease, filter .25s ease;
   }
   .hero-v2__mockup-chip img {
-    max-width: 100%;
+    width: 100%;
     height: auto;
+    object-fit: contain;
     display: block;
+    transform: scale(1.24);
+    transform-origin: center center;
   }
   .hero-v2__mockup-chip:hover {
     transform: translateY(-2px) scale(1.02);
     filter: drop-shadow(0 8px 24px rgba(4, 255, 231, 0.25));
   }
 
- 
   .hero-v2__mockup-title {
-   position: relative;
-  z-index: 2;
-  max-width: 74%;
-  font-size: 1.52rem;
-  font-weight: 700;
-  color: #04ffe7;
-  line-height: 1.25;
-  margin: -10px auto 58px auto;
+    position: relative;
+    z-index: 2;
+    max-width: 24ch;
+    margin: 0;
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: #e9f9f7;
+    line-height: 1.22;
+    text-align: center;
   }
 
   .hero-v2__mockup-grid {
@@ -948,12 +963,12 @@ const homeAssistItems = [
     z-index: 2;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 12px;
   }
   .hero-v2__mockup-tag {
     min-width: 0;
-    padding: 14px 15px;
-    border-radius: 20px;
+    padding: 12px 12px 11px;
+    border-radius: 24px;
     background: rgba(244,244,245,0.04);
     border: 1px solid rgba(244,244,245,0.08);
     color: rgba(244,244,245,0.85);
@@ -961,7 +976,7 @@ const homeAssistItems = [
     display: flex;
     position: relative;
     align-items: flex-start;
-    gap: 9px;
+    gap: 8px;
     text-decoration: none;
     cursor: pointer;
     transition: transform .2s ease, background .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
@@ -978,34 +993,33 @@ const homeAssistItems = [
     outline-offset: 2px;
   }
   .hero-v2__mockup-tag img {
-    width: 58px;
-    height: 58px;
-    flex: 0 0 58px;
+    width: 54px;
+    height: 54px;
+    flex: 0 0 54px;
     object-fit: contain;
   }
   .hero-v2__tag-copy {
     min-width: 0;
     display: grid;
-    gap: 4px;
+    gap: 5px;
   }
   .hero-v2__tag-copy strong {
     color: rgba(244,244,245,0.92);
-    font-size: 1rem;
+    font-size: .88rem;
     font-weight: 850;
     line-height: 1.05;
   }
   .hero-v2__tag-copy span {
     color: rgba(220, 230, 255, 0.58);
-    font-size: .8rem;
+    font-size: .67rem;
     font-weight: 600;
     line-height: 1.35;
   }
 
-  .hero-v2__mockup--daily-orbit {
-    max-width: 640px;
-    aspect-ratio: 0.98;
-    padding: 0;
-    display: block;
+  .hero-v2__mockup--daily-grid {
+    max-width: 520px;
+    min-height: 565px;
+    padding: 16px;
     border-radius: 42px;
     border-color: rgba(255,255,255,.14);
     background:
@@ -1019,21 +1033,21 @@ const homeAssistItems = [
     isolation: isolate;
   }
 
-  .hero-v2__mockup--daily-orbit::before,
-  .hero-v2__mockup--daily-orbit::after {
+  .hero-v2__mockup--daily-grid::before,
+  .hero-v2__mockup--daily-grid::after {
     content: "";
     position: absolute;
     pointer-events: none;
     z-index: 0;
   }
 
-  .hero-v2__mockup--daily-orbit::before {
+  .hero-v2__mockup--daily-grid::before {
     inset: 20px;
     border: 1px solid rgba(255,255,255,.06);
     border-radius: 32px;
   }
 
-  .hero-v2__mockup--daily-orbit::after {
+  .hero-v2__mockup--daily-grid::after {
     inset: 9%;
     border: 1px solid rgba(255,255,255,.075);
     border-radius: 50%;
@@ -1043,7 +1057,7 @@ const homeAssistItems = [
     mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 100%);
   }
 
-  .hero-v2__mockup--daily-orbit .hero-v2__mockup-glow {
+  .hero-v2__mockup--daily-grid .hero-v2__mockup-glow {
     inset: -28%;
     opacity: .82;
     background:
@@ -1053,77 +1067,44 @@ const homeAssistItems = [
     filter: blur(3px);
   }
 
-  .hero-v2__mockup--daily-orbit .hero-v2__mockup-chip {
-    position: absolute;
-    left: 50%;
-    top: 40%;
+  .hero-v2__mockup--daily-grid .hero-v2__mockup-chip {
     z-index: 2;
-    width: min(340px, 66%);
-    transform: translate(-50%, -50%);
+    width: min(500px, 92vw);
+    position: relative;
+    transform: none;
     filter:
       drop-shadow(0 34px 54px rgba(0,0,0,.44))
       drop-shadow(0 0 32px rgba(4,255,231,.16));
     animation: dailyCoreIn .78s cubic-bezier(.16,1,.3,1) both;
   }
 
-  .hero-v2__mockup--daily-orbit .hero-v2__mockup-chip::before {
-    content: "";
-    position: absolute;
-    inset: 18%;
-    z-index: -1;
-    border-radius: 34px;
-    background: rgba(255,255,255,.08);
-    border: 1px solid rgba(255,255,255,.1);
-    transform: rotate(45deg);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
-  }
-
-  .hero-v2__mockup--daily-orbit .hero-v2__mockup-chip:hover {
-    transform: translate(-50%, -52%) scale(1.025);
+  .hero-v2__mockup--daily-grid .hero-v2__mockup-chip:hover {
+    transform: translateY(-2px) scale(1.025);
     filter:
       drop-shadow(0 38px 62px rgba(0,0,0,.48))
       drop-shadow(0 0 40px rgba(4,255,231,.26));
   }
 
-  .hero-v2__mockup--daily-orbit .hero-v2__mockup-title {
-    position: absolute;
-    left: clamp(22px, 5vw, 34px);
-    right: clamp(22px, 5vw, 34px);
-    bottom: clamp(18px, 4vw, 26px);
-    z-index: 6;
-    margin: 0;
-    padding: 18px 20px;
-    border: 1px solid rgba(255,255,255,.11);
-    border-radius: 24px;
-    background: rgba(5,8,16,.66);
-    color: rgba(244,244,245,.92);
-    font-size: clamp(1.02rem, 1.45vw, 1.2rem);
-    line-height: 1.35;
-    box-shadow: 0 20px 60px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.07);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    animation: dailyPanelIn .72s cubic-bezier(.16,1,.3,1) .94s both;
-  }
-
   .hero-v2__mockup-grid--orbit {
-    position: absolute;
-    inset: 0;
-    z-index: 5;
-    display: block;
+    position: relative;
+    z-index: 2;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    align-items: stretch;
+    display: grid;
   }
 
   .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag {
-    --tx: 0;
-    --ty: 0;
-    position: absolute;
+    position: relative;
     z-index: 5;
-    width: 160px;
-    min-height: 118px;
-    padding: 14px 14px 13px;
-    border-radius: 28px;
+    width: 100%;
+    min-height: 108px;
+    padding: 11px 11px 10px;
+    border-radius: 24px;
     display: grid;
     place-items: center;
-    gap: 8px;
+    gap: 10px;
     text-align: center;
     background:
       linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.038)),
@@ -1134,12 +1115,12 @@ const homeAssistItems = [
       0 0 34px rgba(4,255,231,.08),
       inset 0 1px 0 rgba(255,255,255,.13);
     opacity: 0;
-    transform: translate3d(var(--tx), calc(var(--ty) + 18px), 0) scale(.74);
-    animation: dailyNodeIn .64s cubic-bezier(.16,1,.3,1) var(--tag-delay, 0ms) both;
+    transform: translateY(14px) scale(.98);
+    animation: dailyCardIn .64s cubic-bezier(.16,1,.3,1) var(--tag-delay, 0ms) both;
   }
 
   .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag:hover {
-    transform: translate3d(var(--tx), calc(var(--ty) - 4px), 0) scale(1.035);
+    transform: translateY(-2px) scale(1.02);
     background:
       linear-gradient(145deg, rgba(4,255,231,.16), rgba(96,165,250,.08)),
       rgba(3,7,18,.78);
@@ -1152,8 +1133,8 @@ const homeAssistItems = [
   }
 
   .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag img {
-    width: 64px;
-    height: 64px;
+    width: 60px;
+    height: 60px;
     flex: none;
     filter:
       drop-shadow(0 16px 22px rgba(0,0,0,.35))
@@ -1162,47 +1143,60 @@ const homeAssistItems = [
 
   .hero-v2__mockup-grid--orbit .hero-v2__tag-copy {
     display: grid;
-    gap: 0;
+    gap: 4px;
   }
 
   .hero-v2__mockup-grid--orbit .hero-v2__tag-copy strong {
-    font-size: .86rem;
+    font-size: .82rem;
     letter-spacing: -.01em;
     color: rgba(255,255,255,.92);
   }
 
   .hero-v2__mockup-grid--orbit .hero-v2__tag-copy span {
     display: block;
-    font-size: .72rem;
+    font-size: .62rem;
+    line-height: 1.28;
   }
 
-  .hero-v2__mockup-tag--myday { left: 50%; top: 4%; --tx: -50%; }
-  .hero-v2__mockup-tag--scanner { right: 0; top: 22%; }
-  .hero-v2__mockup-tag--summary { right: 0; top: 49%; }
-  .hero-v2__mockup-tag--vault { left: 0; top: 49%; }
-  .hero-v2__mockup-tag--writing { left: 0; top: 22%; }
+  .hero-v2__mockup-tag--myday,
+  .hero-v2__mockup-tag--scanner,
+  .hero-v2__mockup-tag--summary,
+  .hero-v2__mockup-tag--vault,
+  .hero-v2__mockup-tag--writing,
   .hero-v2__mockup-tag--decision {
-    left: 50%;
-    top: 60%;
-    --tx: -50%;
-    width: 166px;
-    min-height: 118px;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
   }
 
   @keyframes dailyCoreIn {
-    from { opacity: 0; transform: translate(-50%, -44%) scale(.88); filter: blur(6px); }
-    to { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0); }
+    from { opacity: 0; transform: translateY(18px) scale(.9); filter: blur(6px); }
+    to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
   }
 
   @keyframes dailyNodeIn {
     from {
       opacity: 0;
-      transform: translate3d(var(--tx), calc(var(--ty) + 20px), 0) scale(.74);
+      transform: translateY(16px) scale(.92);
       filter: blur(7px);
     }
     to {
       opacity: 1;
-      transform: translate3d(var(--tx), var(--ty), 0) scale(1);
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes dailyCardIn {
+    from {
+      opacity: 0;
+      transform: translateY(18px) scale(.96);
+      filter: blur(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
       filter: blur(0);
     }
   }
@@ -1213,8 +1207,8 @@ const homeAssistItems = [
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .hero-v2__mockup--daily-orbit .hero-v2__mockup-chip,
-    .hero-v2__mockup--daily-orbit .hero-v2__mockup-title,
+    .hero-v2__mockup--daily-grid .hero-v2__mockup-chip,
+    .hero-v2__mockup--daily-grid .hero-v2__mockup-title,
     .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag {
       animation: none;
       opacity: 1;
@@ -1471,11 +1465,15 @@ const homeAssistItems = [
     align-items: center;
   }
   .icons-store-preview {
-    min-height: 320px;
+    position: relative;
+    width: min(100%, 460px);
+    min-height: 360px;
+    margin-inline: auto;
+    right: auto;
   }
   .icons-store-scene {
     position: relative;
-    width: min(100%, 430px);
+    width: min(100%, 460px);
     aspect-ratio: 1 / 1;
     margin-inline: auto;
   }
@@ -1515,9 +1513,10 @@ const homeAssistItems = [
     inset: auto;
     width: 210px;
     height: 210px;
-    left: 50%;
+    left: 40%;
     top: 48%;
     transform: translate(-50%, -50%);
+    margin: 0 auto;
     z-index: 3;
   }
   .icons-store-scene__card--top {
@@ -1735,7 +1734,7 @@ const homeAssistItems = [
     margin: 0;
     color: rgba(226, 232, 240, .76);
     font-size: clamp(.98rem, 1.2vw, 1.08rem);
-    line-height: 1.72;
+    line-height: 1.42;
   }
   .dj-mission-desc em {
     color: rgba(253, 230, 138, .92);
@@ -1749,7 +1748,7 @@ const homeAssistItems = [
     background: linear-gradient(180deg, rgba(253, 230, 138, .08), rgba(255, 255, 255, .025));
     color: rgba(255, 247, 237, .92);
     font-size: .95rem;
-    line-height: 1.62;
+    line-height: 1.38;
   }
   .dj-mission-quote::before {
     content: "“";
@@ -1854,6 +1853,36 @@ const homeAssistItems = [
     }
   }
   @media (max-width: 639px) {
+    .hero-v2__mockup--daily-grid {
+      min-height: auto;
+      padding: 18px;
+      grid-template-columns: 1fr;
+    }
+    .hero-v2__mockup-brand,
+    .hero-v2__mockup-grid--orbit {
+      grid-column: 1 / -1;
+    }
+    .hero-v2__mockup-chip {
+      width: min(280px, 82vw);
+    }
+    .hero-v2__mockup-title {
+      font-size: 1.08rem;
+      max-width: 20ch;
+    }
+    .hero-v2__mockup-grid--orbit {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag {
+      min-height: 128px;
+    }
+    .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag img {
+      width: 56px;
+      height: 56px;
+    }
+    .hero-v2__mockup-grid--orbit .hero-v2__tag-copy strong {
+      font-size: .94rem;
+    }
     .hero-v2__desc {
       max-width: 100%;
       font-size: .96rem;
