@@ -13,6 +13,11 @@
   ],
   "scripts": {
     "dev": "astro dev",
+    "lab:assets:sync": "node scripts/sync-lab-assets.mjs",
+    "lab:assets:check": "node scripts/check-lab-assets.mjs",
+    "models:sync": "npm run lab:assets:sync",
+    "predev": "npm run lab:assets:sync",
+    "prebuild": "npm run lab:assets:sync",
     "dev:volynx-os": "npm run dev --workspace volynx-os",
     "devjourney:package": "node scripts/package-devjourney.mjs",
     "devjourney:publish": "node scripts/publish-devjourney-deliverables.mjs",
@@ -33,14 +38,20 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.99.0",
+    "@tensorflow/tfjs": "^4.11.0",
+    "@upscalerjs/esrgan-slim": "^1.0.0",
     "astro": "^5.17.1",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "heic2any": "^0.0.4",
     "jszip": "^3.10.1",
+    "onnxruntime-web": "^1.21.0",
     "qr-code-styling": "^1.6.0-rc.1",
+    "qrcode": "^1.5.3",
     "stripe": "^20.3.1",
     "three": "^0.180.0",
+    "upscaler": "^1.0.0",
     "vectortracer": "^0.1.2"
   },
   "engines": {

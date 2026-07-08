@@ -3,6 +3,7 @@ import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
 import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import FlagshipFooter from "../../components/FlagshipFooter.astro";
 import LabToolShell from "../../components/LabToolShell.astro";
+import "../../styles/lab-runtime-status.css";
 import { sitePricing } from "../../data/pricing";
 import { ROUTES, checkoutHref } from "../../data/routes";
 
@@ -251,6 +252,11 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
             <h2 data-qg-i18n="preview.title">Every change updates instantly.</h2>
           </div>
           <span class="qrgen-health" id="qgHealthBadge">Ready</span>
+          <div class="lab-runtime-mini qrgen-runtime-mini" data-lab-runtime-mini data-lab-runtime-tool="qrGen" data-state="checking" aria-live="polite">
+            <span class="lab-runtime-mini__dot" aria-hidden="true"></span>
+            <span class="lab-runtime-mini__label" data-lab-runtime-mini-label>Local QR renderer</span>
+            <strong class="lab-runtime-mini__state" data-lab-runtime-mini-state data-i18n="lab2.runtime_checking">Checking</strong>
+          </div>
         </div>
 
         <div class="qrgen-stage" aria-live="polite">
@@ -349,10 +355,11 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
 
   <FlagshipFooter />
 
-  <script is:inline src="https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  <script is:inline src="/vendor/qr-code-styling-1.9.2/qr-code-styling.js"></script>
   <script is:inline src="/js/vx-plan.js"></script>
   <script is:inline src="/js/vx-auth-bridge.js"></script>
   <script is:inline src="/scripts/vx-lab-workspace.js?v=20260621-modal-system"></script>
+  <script is:inline src="/js/vx-lab-runtime.js"></script>
   <script is:inline set:html={`window.VOLYNX_QRGEN_PLANS = ${JSON.stringify(qrgenPlanPayload)};`}></script>
   <script is:inline src="/scripts/kit-checkout.js" defer></script>
   <script is:inline src="/scripts/qrgen-editor.js?v=20260525-qrgen-production"></script>

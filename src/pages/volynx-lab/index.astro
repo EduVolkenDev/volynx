@@ -135,6 +135,36 @@ const memorySteps = [
       </div>
     </section>
 
+    <section class="page-section lab-runtime-section" aria-label="Lab runtime health">
+      <div class="shell lab-runtime" data-lab-runtime>
+        <div class="lab-runtime__head">
+          <div>
+            <span class="kicker" data-i18n="lab2.runtime_kicker">Runtime foundation</span>
+            <h2 data-i18n="lab2.runtime_title">Local engines, visible quality.</h2>
+            <p data-i18n="lab2.runtime_desc">Core Lab libraries and AI runtimes are versioned, self-hosted and checked from one manifest before the tools run.</p>
+          </div>
+          <span class="lab-runtime__badge" data-lab-runtime-badge data-state="checking" data-i18n="lab2.runtime_checking">Checking</span>
+        </div>
+        <div class="lab-runtime__grid">
+          <article>
+            <span data-i18n="lab2.runtime_local_label">Self-hosted assets</span>
+            <strong data-lab-runtime-count>--</strong>
+            <p data-i18n="lab2.runtime_local_desc">No third-party CDN is required for the main Lab runtime path.</p>
+          </article>
+          <article>
+            <span data-i18n="lab2.runtime_ai_label">AI image stack</span>
+            <strong data-lab-runtime-ai>--</strong>
+            <p data-i18n="lab2.runtime_ai_desc">Upscale and background removal load local model/runtime files.</p>
+          </article>
+          <article>
+            <span data-i18n="lab2.runtime_export_label">Export engine</span>
+            <strong data-lab-runtime-export>--</strong>
+            <p data-i18n="lab2.runtime_export_desc">ZIP, HEIC conversion and QR rendering stay inside the VOLYNX asset pipeline.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <section class="page-section lab-flow-section" aria-label="Lab workflow">
       <div class="shell lab-flow">
         <div class="lab-flow__copy">
@@ -265,10 +295,105 @@ const memorySteps = [
   </main>
   <script is:inline src="/js/vx-auth-bridge.js"></script>
   <script is:inline src="/scripts/vx-lab-workspace.js?v=20260621-modal-system"></script>
+  <script is:inline src="/js/vx-lab-runtime.js"></script>
   <FlagshipFooter />
 </FlagshipLayout>
 
 <style is:global>
+  .page-lab .lab-runtime-section {
+    padding-top: 10px;
+  }
+  .page-lab .lab-runtime {
+    display: grid;
+    gap: 18px;
+    padding: 22px;
+    border: 1px solid rgba(125,249,255,.16);
+    border-radius: 8px;
+    background:
+      radial-gradient(circle at top right, rgba(125,249,255,.14), transparent 38%),
+      linear-gradient(135deg, rgba(255,255,255,.065), rgba(255,255,255,.028));
+    box-shadow: 0 24px 80px rgba(0,0,0,.24);
+  }
+  .page-lab .lab-runtime__head {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 18px;
+  }
+  .page-lab .lab-runtime__head h2 {
+    margin: 6px 0 8px;
+    font-size: clamp(28px, 4vw, 48px);
+    line-height: 1;
+    letter-spacing: 0;
+  }
+  .page-lab .lab-runtime__head p {
+    max-width: 760px;
+    margin: 0;
+    color: rgba(255,255,255,.66);
+    line-height: 1.6;
+  }
+  .page-lab .lab-runtime__badge {
+    min-height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 999px;
+    background: rgba(255,255,255,.06);
+    color: rgba(255,255,255,.78);
+    font-size: 11px;
+    font-weight: 950;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .page-lab .lab-runtime__badge[data-state="ready"] {
+    border-color: rgba(84,255,173,.24);
+    background: rgba(84,255,173,.10);
+    color: rgba(177,255,216,.96);
+  }
+  .page-lab .lab-runtime__badge[data-state="partial"],
+  .page-lab .lab-runtime__badge[data-state="warning"] {
+    border-color: rgba(255,180,0,.24);
+    background: rgba(255,180,0,.09);
+    color: rgba(255,225,150,.96);
+  }
+  .page-lab .lab-runtime__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .page-lab .lab-runtime__grid article {
+    min-height: 148px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 8px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025)),
+      rgba(0,0,0,.08);
+  }
+  .page-lab .lab-runtime__grid span {
+    color: rgba(125,249,255,.74);
+    font-size: 10px;
+    font-weight: 950;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+  .page-lab .lab-runtime__grid strong {
+    color: rgba(255,255,255,.94);
+    font-size: clamp(24px, 3vw, 34px);
+    line-height: 1;
+  }
+  .page-lab .lab-runtime__grid p {
+    margin: auto 0 0;
+    color: rgba(255,255,255,.58);
+    font-size: 12px;
+    line-height: 1.48;
+  }
   .page-lab .lab-flow-section {
     padding-top: 12px;
   }
@@ -715,6 +840,12 @@ const memorySteps = [
     }
   }
   @media (max-width: 900px) {
+    .page-lab .lab-runtime__head {
+      flex-direction: column;
+    }
+    .page-lab .lab-runtime__grid {
+      grid-template-columns: 1fr;
+    }
     .page-lab .lab-flow,
     .page-lab .lab-workflow {
       grid-template-columns: 1fr;

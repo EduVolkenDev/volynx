@@ -1,5 +1,6 @@
 ---
 import "../../../styles/converter.css";
+import "../../../styles/lab-runtime-status.css";
 import LabBg from "../../../components/LabBg.astro";
 import FaviconHead from "../../../components/FaviconHead.astro";
 import PageWidgets from "../../../components/PageWidgets.astro";
@@ -47,6 +48,11 @@ const pageDescription = "Free image converter — convert to WebP, JPG, PNG or A
     <section class="card" aria-label="Image converter">
       <div class="card__head">
         <h2 data-i18n="converter.title">Converter</h2>
+        <div class="lab-runtime-mini" data-lab-runtime-mini data-lab-runtime-tool="converter" data-state="checking" aria-live="polite">
+          <span class="lab-runtime-mini__dot" aria-hidden="true"></span>
+          <span class="lab-runtime-mini__label" data-lab-runtime-mini-label>Local converter</span>
+          <strong class="lab-runtime-mini__state" data-lab-runtime-mini-state data-i18n="lab2.runtime_checking">Checking</strong>
+        </div>
       </div>
 
       <div id="drop" class="drop" role="region" aria-label="Drop zone">
@@ -105,7 +111,10 @@ const pageDescription = "Free image converter — convert to WebP, JPG, PNG or A
   <script is:inline src="/js/vx-file-metrics.js"></script>
   <script is:inline src="/js/vx-auth-bridge.js"></script>
   <script is:inline src="/scripts/vx-lab-workspace.js?v=20260621-modal-system"></script>
-  <Fragment set:html={'<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js" defer></script><script type="module" src="/volynx-lab/app.js"></script>'} />
+  <script is:inline src="/js/vx-lab-runtime.js"></script>
+  <script is:inline src="/vendor/jszip-3.10.1/jszip.min.js" defer></script>
+  <script is:inline src="/vendor/heic2any-0.0.4/heic2any.min.js" defer></script>
+  <script is:inline type="module" src="/volynx-lab/app.js"></script>
 
   <LabUpgradeBanner />
   <SiteFooter />

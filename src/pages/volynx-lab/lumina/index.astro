@@ -11,14 +11,14 @@ import { ROUTES, checkoutHref } from "../../../data/routes";
 const proHref = checkoutHref("volynx_pro", { currency: "gbp", next: ROUTES.labLumina });
 
 const features = [
-  ["Simplificar conhecimento", "Transforma textos densos, acadêmicos ou técnicos em linguagem clara e direta, sem perder precisão.", "cyan"],
-  ["Analisar artigos", "Extrai ideias centrais, métodos, conclusões e limites de papers, relatórios e publicações.", "violet"],
-  ["Traduzir e adaptar", "Adapta contexto, exemplos e idioma para públicos em português, inglês e espanhol.", "blue"],
-  ["Criar guias práticos", "Converte qualquer conhecimento em roteiros de ação, checklists e próximos passos concretos.", "gold"],
-  ["Comparar ideias", "Coloca conceitos e abordagens lado a lado para revelar diferenças, convergências e riscos.", "cyan"],
-  ["Explorar temas", "Organiza qualquer área do conhecimento com contexto, perguntas e conexões multidisciplinares.", "violet"],
-  ["Gerar conteúdo educativo", "Produz posts, aulas, roteiros, apresentações e materiais didáticos a partir de uma fonte.", "blue"],
-  ["Verificar cuidados", "Sinaliza incompletude, incerteza e pontos que precisam de verificação externa.", "gold"],
+  ["Simplificar conhecimento", "Transforma textos densos, acadêmicos ou técnicos em linguagem clara e direta, sem perder precisão.", "cyan", "/assets/lumina/optimized/lumina-glass8.webp"],
+  ["Analisar artigos", "Extrai ideias centrais, métodos, conclusões e limites de papers, relatórios e publicações.", "violet", "/assets/lumina/optimized/lumina-glass7.webp"],
+  ["Traduzir e adaptar", "Adapta contexto, exemplos e idioma para públicos em português, inglês e espanhol.", "blue", "/assets/lumina/optimized/lumina-glass6.webp"],
+  ["Criar guias práticos", "Converte qualquer conhecimento em roteiros de ação, checklists e próximos passos concretos.", "gold", "/assets/lumina/optimized/lumina-glass5.webp"],
+  ["Comparar ideias", "Coloca conceitos e abordagens lado a lado para revelar diferenças, convergências e riscos.", "cyan", "/assets/lumina/optimized/lumina-glass4.webp"],
+  ["Explorar temas", "Organiza qualquer área do conhecimento com contexto, perguntas e conexões multidisciplinares.", "violet", "/assets/lumina/optimized/lumina-glass3.webp"],
+  ["Gerar conteúdo educativo", "Produz posts, aulas, roteiros, apresentações e materiais didáticos a partir de uma fonte.", "blue", "/assets/lumina/optimized/lumina-glass2.webp"],
+  ["Verificar cuidados", "Sinaliza incompletude, incerteza e pontos que precisam de verificação externa.", "gold", "/assets/lumina/optimized/lumina-glass1.webp"],
 ];
 
 const plans = [
@@ -54,6 +54,14 @@ const plans = [
       "Exportação e trilhas de estudo como próximos upgrades",
     ],
   },
+];
+
+const modes = [
+  ["Modo Claro", "Simplicidade que ilumina", "Explica de forma simples, direta e humana.", "/assets/lumina/modes/optimized/lumina-icon-mode2.webp"],
+  ["Modo Profundo", "Análise sem superficialidade", "Mantém a complexidade, mas organiza melhor.", "/assets/lumina/modes/optimized/lumina-icon-mode1.webp"],
+  ["Modo Prático", "Conhecimento em ação", "Transforma conhecimento em plano, decisão e próximos passos.", "/assets/lumina/modes/optimized/lumina-icon-mode4.webp"],
+  ["Modo Multilíngue", "Sem fronteiras de idioma", "Traduz e adapta o conteúdo sem perder contexto.", "/assets/lumina/modes/optimized/lumina-icon-mode3.webp"],
+  ["Modo Criador", "Conhecimento que se transforma", "Transforma estudos em post, aula, roteiro ou página.", "/assets/lumina/modes/optimized/lumina-icon-mode5.webp"],
 ];
 ---
 
@@ -185,13 +193,10 @@ const plans = [
         <p data-i18n="lumina.features_copy">Da simplificação à criação: um conjunto coeso de capacidades para transformar conhecimento em clareza.</p>
       </div>
       <div class="lumina-features">
-        {features.map(([title, copy, tone], index) => (
+        {features.map(([title, copy, tone, icon], index) => (
           <article class:list={["lumina-feature", `lumina-feature--${tone}`]}>
             <div class="lumina-feature__icon" aria-hidden="true">
-              <svg viewBox="0 0 32 32" fill="none">
-                <path d="M16 4L28 10V22L16 28L4 22V10L16 4Z" stroke="currentColor" stroke-width="1.5" fill="currentColor" fill-opacity=".08" />
-                <circle cx="16" cy="16" r="4" fill="currentColor" fill-opacity=".82" />
-              </svg>
+              <img src={icon} alt="" loading="lazy" decoding="async" />
             </div>
             <h3 data-i18n={`lumina.feature_${index + 1}_title`}>{title}</h3>
             <p data-i18n={`lumina.feature_${index + 1}_copy`}>{copy}</p>
@@ -201,14 +206,11 @@ const plans = [
     </section>
 
     <section class="lumina-modes" aria-label="Lumina modes">
-      {[
-        ["Modo Claro", "Simplicidade que ilumina", "Explica de forma simples, direta e humana."],
-        ["Modo Profundo", "Análise sem superficialidade", "Mantém a complexidade, mas organiza melhor."],
-        ["Modo Prático", "Conhecimento em ação", "Transforma conhecimento em plano, decisão e próximos passos."],
-        ["Modo Multilíngue", "Sem fronteiras de idioma", "Traduz e adapta o conteúdo sem perder contexto."],
-        ["Modo Criador", "Conhecimento que se transforma", "Transforma estudos em post, aula, roteiro ou página."],
-      ].map(([title, subtitle, copy], index) => (
+      {modes.map(([title, subtitle, copy, icon], index) => (
         <article>
+          <div class="lumina-mode-icon" aria-hidden="true">
+            <img src={icon} alt="" loading="lazy" decoding="async" />
+          </div>
           <h3 data-i18n={`lumina.mode_card_${index + 1}_title`}>{title}</h3>
           <strong data-i18n={`lumina.mode_card_${index + 1}_subtitle`}>{subtitle}</strong>
           <p data-i18n={`lumina.mode_card_${index + 1}_copy`}>{copy}</p>
@@ -232,7 +234,10 @@ const plans = [
             <p data-i18n={`lumina.plan_${plan.tone}_copy`}>{plan.description}</p>
             <ul>
               {plan.features.map((item, index) => (
-                <li><span aria-hidden="true"></span><span data-i18n={`lumina.plan_${plan.tone}_feature_${index + 1}`}>{item}</span></li>
+                <li>
+                  <span class="lumina-plan__dot" aria-hidden="true"></span>
+                  <span class="lumina-plan__feature" data-i18n={`lumina.plan_${plan.tone}_feature_${index + 1}`}>{item}</span>
+                </li>
               ))}
             </ul>
             <a href={plan.href} class:list={["lumina-btn", plan.tone === "pro" ? "lumina-btn--gold" : "lumina-btn--ghost"]} data-i18n={`lumina.plan_${plan.tone}_cta`}>{plan.cta}</a>
@@ -872,8 +877,8 @@ const plans = [
   }
 
   .lumina-feature {
-    padding: 22px;
-    min-height: 230px;
+    padding: 20px;
+    min-height: 268px;
     transition: transform .24s ease, border-color .24s ease, background .24s ease, box-shadow .24s ease;
   }
 
@@ -885,25 +890,44 @@ const plans = [
   }
 
   .lumina-feature__icon {
-    width: 52px;
-    height: 52px;
+    position: relative;
+    width: 118px;
+    height: 106px;
     display: grid;
     place-items: center;
-    margin-bottom: 18px;
+    margin: -12px 0 6px -16px;
     border-radius: 8px;
     color: var(--lumina-a);
-    border: 1px solid rgba(0,216,255,.18);
-    background: rgba(0,216,255,.08);
+    border: 0;
+    background: radial-gradient(circle at 50% 52%, rgba(0,216,255,.18), transparent 68%);
+    overflow: visible;
   }
 
-  .lumina-feature__icon svg {
-    width: 32px;
-    height: 32px;
+  .lumina-feature__icon img {
+    width: 118px;
+    height: 118px;
+    object-fit: contain;
+    display: block;
+    filter:
+      drop-shadow(0 18px 24px rgba(0,0,0,.28))
+      drop-shadow(0 0 16px rgba(0,216,255,.22));
   }
 
-  .lumina-feature--violet .lumina-feature__icon { color: var(--lumina-c); border-color: rgba(122,53,255,.2); background: rgba(122,53,255,.09); }
-  .lumina-feature--blue .lumina-feature__icon { color: var(--lumina-blue); border-color: rgba(30,107,255,.22); background: rgba(30,107,255,.09); }
-  .lumina-feature--gold .lumina-feature__icon { color: var(--lumina-b); border-color: rgba(214,168,79,.22); background: rgba(214,168,79,.08); }
+  .lumina-feature--violet .lumina-feature__icon { color: var(--lumina-c); background: radial-gradient(circle at 50% 52%, rgba(122,53,255,.2), transparent 68%); }
+  .lumina-feature--blue .lumina-feature__icon { color: var(--lumina-blue); background: radial-gradient(circle at 50% 52%, rgba(30,107,255,.18), transparent 68%); }
+  .lumina-feature--gold .lumina-feature__icon { color: var(--lumina-b); background: radial-gradient(circle at 50% 52%, rgba(214,168,79,.18), transparent 68%); }
+
+  .lumina-feature--violet .lumina-feature__icon img {
+    filter: drop-shadow(0 18px 24px rgba(0,0,0,.28)) drop-shadow(0 0 16px rgba(122,53,255,.24));
+  }
+
+  .lumina-feature--blue .lumina-feature__icon img {
+    filter: drop-shadow(0 18px 24px rgba(0,0,0,.28)) drop-shadow(0 0 16px rgba(30,107,255,.22));
+  }
+
+  .lumina-feature--gold .lumina-feature__icon img {
+    filter: drop-shadow(0 18px 24px rgba(0,0,0,.28)) drop-shadow(0 0 16px rgba(214,168,79,.22));
+  }
 
   .lumina-feature h3 {
     margin: 0 0 10px;
@@ -929,10 +953,32 @@ const plans = [
 
   .lumina-modes article {
     padding: 22px;
-    min-height: 180px;
+    min-height: 292px;
     background:
       linear-gradient(135deg, rgba(0,216,255,.045), rgba(122,53,255,.045)),
       rgba(6,20,46,.64);
+  }
+
+  :global(.lumina-mode-icon) {
+    width: 116px;
+    height: 116px;
+    display: grid;
+    place-items: center;
+    margin: -10px 0 8px -14px;
+    background: radial-gradient(circle at 50% 52%, rgba(0,216,255,.16), transparent 68%);
+    overflow: hidden;
+  }
+
+  :global(.lumina-mode-icon img) {
+    width: 116px !important;
+    height: 116px !important;
+    max-width: 116px !important;
+    max-height: 116px !important;
+    object-fit: contain;
+    display: block;
+    filter:
+      drop-shadow(0 18px 24px rgba(0,0,0,.28))
+      drop-shadow(0 0 18px rgba(0,216,255,.24));
   }
 
   .lumina-modes h3 {
@@ -1035,7 +1081,7 @@ const plans = [
     font-size: 14px;
   }
 
-  .lumina-plan li span {
+  .lumina-plan__dot {
     width: 16px;
     height: 16px;
     margin-top: 2px;
@@ -1044,7 +1090,22 @@ const plans = [
     background: radial-gradient(circle, var(--lumina-a) 0 32%, rgba(0,216,255,.13) 35%);
   }
 
-  .lumina-plan--pro li span {
+  .lumina-plan li .lumina-plan__feature {
+    display: block;
+    min-width: 0;
+    width: auto;
+    height: auto;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: rgba(255,255,255,.76);
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
+  }
+
+  .lumina-plan--pro .lumina-plan__dot {
     border-color: rgba(122,53,255,.38);
     background: radial-gradient(circle, var(--lumina-c) 0 32%, rgba(122,53,255,.15) 35%);
   }
@@ -1198,6 +1259,34 @@ const plans = [
     .lumina-output-actions button {
       min-height: 44px;
       width: 100%;
+    }
+    .lumina-feature {
+      min-height: 0;
+      padding: 18px;
+    }
+    .lumina-feature__icon {
+      width: 100px;
+      height: 92px;
+      margin: -10px 0 4px -12px;
+    }
+    .lumina-feature__icon img {
+      width: 100px;
+      height: 100px;
+    }
+    .lumina-modes article {
+      min-height: 0;
+      padding: 18px;
+    }
+    :global(.lumina-mode-icon) {
+      width: 104px;
+      height: 104px;
+      margin: -8px 0 6px -12px;
+    }
+    :global(.lumina-mode-icon img) {
+      width: 104px !important;
+      height: 104px !important;
+      max-width: 104px !important;
+      max-height: 104px !important;
     }
   }
 </style>

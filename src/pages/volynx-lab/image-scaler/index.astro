@@ -1,5 +1,6 @@
 ---
 import "../../../styles/image-scaler.css";
+import "../../../styles/lab-runtime-status.css";
 import LabBg from "../../../components/LabBg.astro";
 import FaviconHead from "../../../components/FaviconHead.astro";
 import PageWidgets from "../../../components/PageWidgets.astro";
@@ -48,6 +49,11 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
       <div class="card">
         <div class="cardHead">
           <h2 data-i18n="scaler.card_upload">Upload &amp; Settings</h2>
+          <div class="lab-runtime-mini" data-lab-runtime-mini data-lab-runtime-tool="imageScaler" data-state="checking" aria-live="polite">
+            <span class="lab-runtime-mini__dot" aria-hidden="true"></span>
+            <span class="lab-runtime-mini__label" data-lab-runtime-mini-label>Local scaler</span>
+            <strong class="lab-runtime-mini__state" data-lab-runtime-mini-state data-i18n="lab2.runtime_checking">Checking</strong>
+          </div>
           <label id="pickBtn" for="file" class="btn secondary" role="button" tabindex="0" data-i18n="scaler.btn_select" style="cursor:pointer;display:inline-flex;align-items:center;justify-content:center;">Select</label>
           <input id="file" type="file" accept="image/*" multiple aria-label="Select images" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;overflow:hidden;" />
         </div>
@@ -114,7 +120,8 @@ const pageDescription = "Upscale images 2×, 3× or 4× directly in your browser
   <script is:inline src="/js/vx-file-metrics.js"></script>
   <script is:inline src="/js/vx-auth-bridge.js"></script>
   <script is:inline src="/scripts/vx-lab-workspace.js?v=20260621-modal-system"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script is:inline src="/js/vx-lab-runtime.js"></script>
+  <script is:inline src="/vendor/jszip-3.10.1/jszip.min.js"></script>
 
   <script is:inline>
     const FREE_LIMIT = 5;

@@ -68,6 +68,59 @@ const pricingAssistItems = [
 
     <PlatformAssistStrip eyebrow={{ en: "Decision support", pt: "Apoio à decisão" }} title={{ en: "Pricing is one step, not the whole journey.", pt: "Pricing é um passo, não a jornada inteira." }} description={{ en: "Stay close to the operational paths while you compare plans, bundles and VX.", pt: "Fique perto dos caminhos operacionais enquanto compara planos, bundles e VX." }} items={pricingAssistItems} />
 
+    <!-- ═══ FASTEST PAID PATHS ═══ -->
+    <section class="page-section revenue-funnel-section" aria-label="Fastest VOLYNX paid paths">
+      <div class="shell revenue-funnel">
+        <div class="revenue-funnel__intro">
+          <span class="eyebrow"><span class="i18n-en">Start monetizing the ecosystem</span><span class="i18n-pt">Comece pelo caminho monetizável</span></span>
+          <h2><span class="i18n-en">If you want the shortest path to value, choose one of these.</span><span class="i18n-pt">Se você quer o caminho mais curto para valor, escolha um destes.</span></h2>
+          <p><span class="i18n-en">These offers are already connected to the checkout system. No waitlist, no fake CTA, no manual promise hidden behind a button.</span><span class="i18n-pt">Estas ofertas já estão conectadas ao checkout. Sem lista de espera, sem CTA falso, sem promessa manual escondida no botão.</span></p>
+        </div>
+
+        <div class="revenue-funnel__cards">
+          <a href={checkoutHref("bundle_volynx_daily_pro", { next: `${ROUTES.pricing}#bundles` })} class="revenue-funnel-card revenue-funnel-card--featured vx-checkout-btn" data-lookup="bundle_volynx_daily_pro">
+            <span class="revenue-funnel-card__badge"><span class="i18n-en">Best recurring path</span><span class="i18n-pt">Melhor recorrência</span></span>
+            <img src="/assets/bundle.webp" alt="" loading="lazy" decoding="async" />
+            <strong>VOLYNX Essential</strong>
+            <small>Builder Pro + Daily Pro</small>
+            <p><span class="i18n-en">The cleanest subscription for creators who need publishing plus daily execution.</span><span class="i18n-pt">A assinatura mais clara para criadores que precisam publicar e executar todos os dias.</span></p>
+            <span class="revenue-funnel-card__price">£35 / month</span>
+            <span class="revenue-funnel-card__cta"><span class="i18n-en">Activate Essential</span><span class="i18n-pt">Ativar Essential</span> →</span>
+          </a>
+
+          <a href={checkoutHref("builder_pro", { next: `${ROUTES.pricing}#plans` })} class="revenue-funnel-card vx-checkout-btn" data-lookup="builder_pro">
+            <span class="revenue-funnel-card__badge"><span class="i18n-en">Publish sites</span><span class="i18n-pt">Publicar sites</span></span>
+            <img src="/assets/builderpro.webp" alt="" loading="lazy" decoding="async" />
+            <strong>Builder Pro</strong>
+            <small>Custom domain + premium kits</small>
+            <p><span class="i18n-en">For users who are blocked by launch, domain, branding or professional presentation.</span><span class="i18n-pt">Para quem está travado por lançamento, domínio, branding ou apresentação profissional.</span></p>
+            <span class="revenue-funnel-card__price">£24 / month</span>
+            <span class="revenue-funnel-card__cta"><span class="i18n-en">Upgrade Builder</span><span class="i18n-pt">Atualizar Builder</span> →</span>
+          </a>
+
+          <a href={checkoutHref("cvitae_business", { next: `${ROUTES.pricing}#cvitae` })} class="revenue-funnel-card vx-checkout-btn" data-lookup="cvitae_business">
+            <span class="revenue-funnel-card__badge"><span class="i18n-en">Career ROI</span><span class="i18n-pt">ROI de carreira</span></span>
+            <img src="/assets/cvitae.webp" alt="" loading="lazy" decoding="async" />
+            <strong>CVitae Business</strong>
+            <small>Unlimited CV workflow</small>
+            <p><span class="i18n-en">For professionals who need unlimited CVs, templates and export-ready career assets.</span><span class="i18n-pt">Para profissionais que precisam de CVs ilimitados, templates e ativos de carreira prontos para exportar.</span></p>
+            <span class="revenue-funnel-card__price">£15 / month</span>
+            <span class="revenue-funnel-card__cta"><span class="i18n-en">Activate Business</span><span class="i18n-pt">Ativar Business</span> →</span>
+          </a>
+
+          <a href={checkoutHref("tokens_core", { next: `${ROUTES.pricing}#vx-packs` })} class="revenue-funnel-card vx-checkout-btn" data-lookup="tokens_core">
+            <span class="revenue-funnel-card__badge"><span class="i18n-en">One-time capacity</span><span class="i18n-pt">Capacidade avulsa</span></span>
+            <img src="/assets/VX4.webp" alt="" loading="lazy" decoding="async" />
+            <strong>32 VX Core</strong>
+            <small>No subscription change</small>
+            <p><span class="i18n-en">For users who only need enabled premium actions: exports, templates and selected Studio capacity.</span><span class="i18n-pt">Para quem só precisa de ações premium habilitadas: exports, templates e capacidade Studio selecionada.</span></p>
+            <span class="revenue-funnel-card__price">£18 one-time</span>
+            <span class="revenue-funnel-card__cta"><span class="i18n-en">Buy VX</span><span class="i18n-pt">Comprar VX</span> →</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
     <!-- ═══ CURRENCY BAR (lang toggle removed — already in topbar) ═══ -->
     <section class="page-section" style="padding-top:32px;">
       <div class="shell">
@@ -381,6 +434,77 @@ const pricingAssistItems = [
       </div>
     </section>
 
+    <!-- ═══ GUIDED SUITES / CONTEXTUAL CROSS-SELL ═══ -->
+    <section id="guided-suites" class="page-section suite-section">
+      <div class="shell section-head">
+        <span class="eyebrow"><span class="i18n-en">Guided suites</span><span class="i18n-pt">Suites guiadas</span></span>
+        <h2><span class="i18n-en">Recommended product combinations without new Stripe complexity.</span><span class="i18n-pt">Combinações recomendadas sem criar complexidade nova no Stripe.</span></h2>
+        <p><span class="i18n-en">These are commercial paths, not fake bundled products. Start with the checkout-ready item, then add the supporting tools that increase value.</span><span class="i18n-pt">Estes são caminhos comerciais, não bundles falsos. Comece pelo item pronto para checkout e depois adicione as ferramentas que aumentam o valor.</span></p>
+      </div>
+
+      <div class="shell suite-grid">
+        <article class="suite-card suite-card--creator">
+          <span class="suite-card__label"><span class="i18n-en">For creators</span><span class="i18n-pt">Para creators</span></span>
+          <h3>VOLYNX Creator Suite</h3>
+          <p><span class="i18n-en">Builder Pro + Daily Pro + CVitae Business. Use Essential as the first recurring step, then add CVitae when career assets matter.</span><span class="i18n-pt">Builder Pro + Daily Pro + CVitae Business. Use Essential como primeira recorrência e adicione CVitae quando ativos de carreira importarem.</span></p>
+          <div class="suite-card__stack">
+            <span>Builder Pro</span>
+            <span>Daily Pro</span>
+            <span>CVitae Business</span>
+          </div>
+          <a href={checkoutHref("bundle_volynx_daily_pro", { next: `${ROUTES.pricing}#guided-suites` })} class="button button--gold vx-checkout-btn" data-lookup="bundle_volynx_daily_pro">
+            <span class="i18n-en">Start with Essential</span>
+            <span class="i18n-pt">Começar com Essential</span>
+          </a>
+        </article>
+
+        <article class="suite-card suite-card--realestate">
+          <span class="suite-card__label"><span class="i18n-en">For real estate</span><span class="i18n-pt">Para imobiliário</span></span>
+          <h3>Real Estate Visual Suite</h3>
+          <p><span class="i18n-en">PropertyFlow + Icons Premium + Lumina. The strongest niche path: a real property platform plus better visual assets.</span><span class="i18n-pt">PropertyFlow + Icons Premium + Lumina. O caminho de nicho mais forte: plataforma imobiliária real com ativos visuais melhores.</span></p>
+          <div class="suite-card__stack">
+            <span>PropertyFlow Professional</span>
+            <span>Icons Premium</span>
+            <span>Lumina</span>
+          </div>
+          <a href={checkoutHref("pf_professional", { next: `${ROUTES.pricing}#guided-suites` })} class="button button--gold vx-checkout-btn" data-lookup="pf_professional">
+            <span class="i18n-en">Start with PropertyFlow</span>
+            <span class="i18n-pt">Começar pelo PropertyFlow</span>
+          </a>
+        </article>
+
+        <article class="suite-card suite-card--freelancer">
+          <span class="suite-card__label"><span class="i18n-en">For freelancers</span><span class="i18n-pt">Para freelancers</span></span>
+          <h3>Freelancer Pro</h3>
+          <p><span class="i18n-en">Builder Pro + CVitae Business + Icons. A credible public presence, a strong CV, and better branded assets.</span><span class="i18n-pt">Builder Pro + CVitae Business + Icons. Presença pública confiável, CV forte e ativos visuais melhores.</span></p>
+          <div class="suite-card__stack">
+            <span>Builder Pro</span>
+            <span>CVitae Business</span>
+            <span>Icons Store</span>
+          </div>
+          <a href={checkoutHref("builder_pro", { next: `${ROUTES.pricing}#guided-suites` })} class="button button--gold vx-checkout-btn" data-lookup="builder_pro">
+            <span class="i18n-en">Start with Builder</span>
+            <span class="i18n-pt">Começar pelo Builder</span>
+          </a>
+        </article>
+
+        <article class="suite-card suite-card--agency">
+          <span class="suite-card__label"><span class="i18n-en">For agencies</span><span class="i18n-pt">Para imobiliárias/agências</span></span>
+          <h3>Imobiliária Starter</h3>
+          <p><span class="i18n-en">PropertyFlow Professional + Builder + VX. Start with the one-time platform, then add publishing and premium capacity.</span><span class="i18n-pt">PropertyFlow Professional + Builder + VX. Comece pela plataforma avulsa e adicione publicação e capacidade premium.</span></p>
+          <div class="suite-card__stack">
+            <span>PropertyFlow Professional</span>
+            <span>Builder Pro</span>
+            <span>VX Core</span>
+          </div>
+          <a href={checkoutHref("pf_professional", { next: `${ROUTES.pricing}#guided-suites` })} class="button button--gold vx-checkout-btn" data-lookup="pf_professional">
+            <span class="i18n-en">Buy PropertyFlow</span>
+            <span class="i18n-pt">Comprar PropertyFlow</span>
+          </a>
+        </article>
+      </div>
+    </section>
+
     <!-- ═══ BUNDLES ═══ -->
     <section id="bundles" class="page-section">
       <div class="shell section-head">
@@ -388,24 +512,39 @@ const pricingAssistItems = [
         <h2><span class="i18n-en">Use more than one product? Bundle and save.</span><span class="i18n-pt">Usa mais de um produto? Combine e economize.</span></h2>
         <p><span class="i18n-en">Bundles combine subscriptions and capacity more efficiently for users living inside the full ecosystem.</span><span class="i18n-pt">Bundles unem assinatura e capacidade de forma mais eficiente para quem vive o ecossistema completo.</span></p>
       </div>
-      <div class="shell grid-2" style="max-width:720px;gap:16px;">
+      <div class="shell bundle-upgrade-grid">
         {sitePricing.bundles.map((b) => (
-          <div class="panel" style="padding:24px;border-color:rgba(109,94,252,.2);background:rgba(109,94,252,.03);">
-            {b.badge && <span style="display:inline-block;margin-bottom:8px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(109,94,252,.12);color:#C4B5FD;"><span class="i18n-en">{b.badge.en}</span><span class="i18n-pt">{b.badge.pt}</span></span>}
-            <strong style="display:block;font-size:1.1rem;"><span class="i18n-en">{b.name.en}</span><span class="i18n-pt">{b.name.pt}</span></strong>
-            <p style="margin:4px 0;color:var(--muted);font-size:13px;"><span class="i18n-en">{b.includes.en}</span><span class="i18n-pt">{b.includes.pt}</span></p>
-            <div style="font-size:1.3rem;font-weight:700;margin:8px 0;">
-              <span class="vx-price" data-currency="GBP">{b.price.GBP}</span>
-              <span class="vx-price vx-price--hidden" data-currency="EUR">{b.price.EUR}</span>
-              <span class="vx-price vx-price--hidden" data-currency="BRL">{b.price.BRL}</span>
-              <span style="font-size:13px;font-weight:400;"><span class="i18n-en">{b.billing.en}</span><span class="i18n-pt">{b.billing.pt}</span></span>
+          <article class={`bundle-upgrade-card ${b.id === 'bundle_complete' ? 'bundle-upgrade-card--complete' : 'bundle-upgrade-card--essential'}`}>
+            <div class="bundle-upgrade-card__top">
+              <span class="bundle-upgrade-card__badge">
+                {b.badge
+                  ? <><span class="i18n-en">{b.badge.en}</span><span class="i18n-pt">{b.badge.pt}</span></>
+                  : <><span class="i18n-en">For creators</span><span class="i18n-pt">Para creators</span></>
+                }
+              </span>
+              <span class="bundle-upgrade-card__saving"><span class="i18n-en">{b.savings.en}</span><span class="i18n-pt">{b.savings.pt}</span></span>
             </div>
-            <p style="margin:0 0 12px;color:var(--muted);font-size:12px;"><span class="i18n-en">{b.savings.en}</span><span class="i18n-pt">{b.savings.pt}</span></p>
-            <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.5;"><span class="i18n-en">{b.description.en}</span><span class="i18n-pt">{b.description.pt}</span></p>
+            <h3><span class="i18n-en">{b.name.en}</span><span class="i18n-pt">{b.name.pt}</span></h3>
+            <p class="bundle-upgrade-card__includes"><span class="i18n-en">{b.includes.en}</span><span class="i18n-pt">{b.includes.pt}</span></p>
+            <p class="bundle-upgrade-card__desc"><span class="i18n-en">{b.description.en}</span><span class="i18n-pt">{b.description.pt}</span></p>
+            <div class="bundle-upgrade-card__chips">
+              {b.id === 'bundle_complete'
+                ? <><span>Builder Studio</span><span>Daily Diamond</span><span><span class="i18n-en">Power workflow</span><span class="i18n-pt">Fluxo intenso</span></span></>
+                : <><span>Builder Pro</span><span>Daily Pro</span><span><span class="i18n-en">Best first subscription</span><span class="i18n-pt">Melhor primeira assinatura</span></span></>
+              }
+            </div>
+            <div class="bundle-upgrade-card__price">
+              <strong>
+                <span class="vx-price" data-currency="GBP">{b.price.GBP}</span>
+                <span class="vx-price vx-price--hidden" data-currency="EUR">{b.price.EUR}</span>
+                <span class="vx-price vx-price--hidden" data-currency="BRL">{b.price.BRL}</span>
+              </strong>
+              <span><span class="i18n-en">{b.billing.en}</span><span class="i18n-pt">{b.billing.pt}</span></span>
+            </div>
             <a href={checkoutHref(bundleLookupById[b.id], { next: `${ROUTES.pricing}#bundles` })} class="bundle-card__cta" data-bundle-key={bundleLookupById[b.id]}>
               <span class="i18n-en">{b.cta.en}</span><span class="i18n-pt">{b.cta.pt}</span>
             </a>
-          </div>
+          </article>
         ))}
       </div>
       <div class="shell">
@@ -421,6 +560,28 @@ const pricingAssistItems = [
       <div class="shell section-head">
         <span class="eyebrow">VX Packs</span>
         <h2><span class="i18n-en">Flexible capacity to do more, export more, and scale without friction.</span><span class="i18n-pt">Capacidade flexível para usar mais, exportar mais e evoluir sem fricção.</span></h2>
+      </div>
+      <div class="shell vx-acceptance-grid">
+        <article class="vx-acceptance-card vx-acceptance-card--yes">
+          <span class="vx-acceptance-card__status"><span class="i18n-en">VX enabled</span><span class="i18n-pt">VX habilitado</span></span>
+          <strong>CVitae</strong>
+          <p><span class="i18n-en">Professional exports and premium templates where the product shows VX.</span><span class="i18n-pt">Exportações profissionais e modelos premium onde o produto mostra VX.</span></p>
+        </article>
+        <article class="vx-acceptance-card vx-acceptance-card--yes">
+          <span class="vx-acceptance-card__status"><span class="i18n-en">Selected actions</span><span class="i18n-pt">Ações selecionadas</span></span>
+          <strong>Studio / Lab</strong>
+          <p><span class="i18n-en">Use VX only when an action explicitly asks for VX before running.</span><span class="i18n-pt">Use VX apenas quando uma ação pedir VX explicitamente antes de executar.</span></p>
+        </article>
+        <article class="vx-acceptance-card vx-acceptance-card--plan">
+          <span class="vx-acceptance-card__status"><span class="i18n-en">Plan-gated</span><span class="i18n-pt">Por plano</span></span>
+          <strong>QRGen HD / SVG</strong>
+          <p><span class="i18n-en">Premium QR exports are unlocked by VOLYNX plan tiers today, not by VX checkout.</span><span class="i18n-pt">Exports premium de QR são liberados por planos VOLYNX hoje, não por checkout VX.</span></p>
+        </article>
+        <article class="vx-acceptance-card vx-acceptance-card--stripe">
+          <span class="vx-acceptance-card__status"><span class="i18n-en">Stripe checkout</span><span class="i18n-pt">Checkout Stripe</span></span>
+          <strong><span class="i18n-en">Kits / PropertyFlow</span><span class="i18n-pt">Kits / PropertyFlow</span></strong>
+          <p><span class="i18n-en">One-time products and subscriptions stay on Stripe for clean fulfillment.</span><span class="i18n-pt">Produtos avulsos e assinaturas continuam no Stripe para entrega limpa.</span></p>
+        </article>
       </div>
       <div class="shell grid-2">
         {sitePricing.tokenPacks.map((pack) => (
@@ -492,6 +653,276 @@ const pricingAssistItems = [
   </main>
 
   <style>
+    .revenue-funnel-section {
+      padding-top: clamp(30px, 4vw, 54px);
+      padding-bottom: clamp(26px, 3vw, 44px);
+    }
+
+    .revenue-funnel {
+      position: relative;
+      display: grid;
+      gap: clamp(22px, 3vw, 34px);
+      padding: clamp(24px, 4vw, 42px);
+      border-radius: clamp(26px, 4vw, 42px);
+      border: 1px solid rgba(196, 181, 253, .18);
+      background:
+        radial-gradient(circle at 8% 0%, rgba(96, 165, 250, .16), transparent 36%),
+        radial-gradient(circle at 100% 18%, rgba(168, 85, 247, .18), transparent 38%),
+        linear-gradient(145deg, rgba(5, 8, 22, .94), rgba(10, 14, 32, .78));
+      box-shadow: 0 32px 92px rgba(0, 0, 0, .44), inset 0 1px 0 rgba(255, 255, 255, .08);
+      overflow: hidden;
+    }
+
+    .revenue-funnel__intro {
+      max-width: 860px;
+    }
+
+    .revenue-funnel__intro h2 {
+      margin: 14px 0 12px;
+      font-family: var(--display);
+      font-size: clamp(2rem, 4vw, 4.25rem);
+      line-height: .98;
+      letter-spacing: -.055em;
+      color: #fff;
+    }
+
+    .revenue-funnel__intro p {
+      margin: 0;
+      max-width: 76ch;
+      color: rgba(226, 232, 240, .76);
+      font-size: clamp(1rem, 1.35vw, 1.12rem);
+      line-height: 1.55;
+    }
+
+    .revenue-funnel__cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(225px, 1fr));
+      gap: 16px;
+    }
+
+    .revenue-funnel-card {
+      position: relative;
+      display: flex;
+      min-width: 0;
+      min-height: 100%;
+      flex-direction: column;
+      padding: 22px;
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, .09);
+      background:
+        linear-gradient(160deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .018)),
+        rgba(3, 7, 18, .48);
+      color: inherit;
+      text-decoration: none;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+      overflow: hidden;
+    }
+
+    .revenue-funnel-card--featured {
+      border-color: rgba(94, 234, 212, .34);
+      background:
+        radial-gradient(circle at 50% -10%, rgba(94, 234, 212, .18), transparent 52%),
+        linear-gradient(160deg, rgba(109, 94, 252, .25), rgba(3, 7, 18, .58));
+    }
+
+    .revenue-funnel-card__badge {
+      align-self: flex-start;
+      display: inline-flex;
+      margin-bottom: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: #5eead4;
+      background: rgba(94, 234, 212, .09);
+      border: 1px solid rgba(94, 234, 212, .20);
+      font-size: .68rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .revenue-funnel-card img {
+      width: 104px;
+      height: 104px;
+      object-fit: contain;
+      margin: -4px auto 10px;
+      filter: drop-shadow(0 18px 34px rgba(0, 0, 0, .46));
+    }
+
+    .revenue-funnel-card strong {
+      color: #fff;
+      font-family: var(--display);
+      font-size: clamp(1.25rem, 1.8vw, 1.65rem);
+      line-height: 1.04;
+      letter-spacing: -.035em;
+    }
+
+    .revenue-funnel-card small {
+      margin-top: 5px;
+      color: rgba(196, 181, 253, .78);
+      font-size: .82rem;
+      font-weight: 800;
+    }
+
+    .revenue-funnel-card p {
+      margin: 14px 0 18px;
+      color: rgba(226, 232, 240, .70);
+      font-size: .93rem;
+      line-height: 1.5;
+    }
+
+    .revenue-funnel-card__price {
+      margin-top: auto;
+      color: #fff;
+      font-weight: 900;
+      font-size: 1.02rem;
+    }
+
+    .revenue-funnel-card__cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      margin-top: 14px;
+      padding: 11px 14px;
+      border-radius: 999px;
+      color: #020617;
+      background: linear-gradient(135deg, #fff, #9ff8ef);
+      font-size: .86rem;
+      font-weight: 900;
+      box-shadow: 0 14px 30px rgba(45, 212, 191, .18);
+    }
+
+    @media (min-width: 1120px) {
+      .revenue-funnel__cards {
+        grid-template-columns: 1.15fr repeat(3, .95fr);
+      }
+    }
+
+    @media (hover: hover) {
+      .revenue-funnel-card {
+        transition: transform .24s ease, border-color .24s ease, box-shadow .24s ease;
+      }
+
+      .revenue-funnel-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(94, 234, 212, .30);
+        box-shadow: 0 24px 64px rgba(0, 0, 0, .38), inset 0 1px 0 rgba(255, 255, 255, .08);
+      }
+    }
+
+    .suite-section {
+      padding-top: clamp(48px, 6vw, 82px);
+      padding-bottom: clamp(48px, 6vw, 86px);
+    }
+
+    .suite-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 18px;
+    }
+
+    .suite-card {
+      position: relative;
+      display: flex;
+      min-height: 100%;
+      flex-direction: column;
+      padding: clamp(22px, 2.6vw, 30px);
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, .09);
+      background:
+        linear-gradient(160deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .018)),
+        rgba(4, 8, 20, .56);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .suite-card::before {
+      content: "";
+      position: absolute;
+      inset: -38% -20% auto;
+      height: 60%;
+      z-index: -1;
+      filter: blur(42px);
+      opacity: .64;
+      pointer-events: none;
+    }
+
+    .suite-card--creator::before { background: radial-gradient(circle, rgba(94, 234, 212, .24), transparent 68%); }
+    .suite-card--realestate::before { background: radial-gradient(circle, rgba(214, 179, 106, .24), transparent 68%); }
+    .suite-card--freelancer::before { background: radial-gradient(circle, rgba(244, 114, 182, .20), transparent 68%); }
+    .suite-card--agency::before { background: radial-gradient(circle, rgba(168, 85, 247, .24), transparent 68%); }
+
+    .suite-card__label {
+      align-self: flex-start;
+      display: inline-flex;
+      margin-bottom: 14px;
+      padding: 6px 11px;
+      border-radius: 999px;
+      color: #5eead4;
+      background: rgba(94, 234, 212, .09);
+      border: 1px solid rgba(94, 234, 212, .20);
+      font-size: .7rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .suite-card h3 {
+      margin: 0 0 12px;
+      color: #fff;
+      font-family: var(--display);
+      font-size: clamp(1.35rem, 2vw, 1.85rem);
+      line-height: 1.02;
+      letter-spacing: -.04em;
+    }
+
+    .suite-card p {
+      margin: 0 0 18px;
+      color: rgba(226, 232, 240, .72);
+      font-size: .94rem;
+      line-height: 1.5;
+    }
+
+    .suite-card__stack {
+      display: grid;
+      gap: 8px;
+      margin: 0 0 20px;
+    }
+
+    .suite-card__stack span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255, 255, 255, .78);
+      font-size: .88rem;
+      line-height: 1.35;
+    }
+
+    .suite-card__stack span::before {
+      content: "✓";
+      color: #5eead4;
+      font-weight: 900;
+    }
+
+    .suite-card :global(.button) {
+      width: 100%;
+      justify-content: center;
+      margin-top: auto;
+    }
+
+    @media (hover: hover) {
+      .suite-card {
+        transition: transform .24s ease, border-color .24s ease, box-shadow .24s ease;
+      }
+
+      .suite-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(94, 234, 212, .30);
+        box-shadow: 0 24px 64px rgba(0, 0, 0, .36), inset 0 1px 0 rgba(255, 255, 255, .08);
+      }
+    }
+
     .page-pricing .hero-copy h1 {
       margin: 12px auto 16px;
     }
@@ -715,8 +1146,187 @@ const pricingAssistItems = [
       0%, 100% { opacity: 1; transform: scale(1); }
       50%      { opacity: .35; transform: scale(.7); }
     }
-    .bundle-card__cta { display:flex; align-items:center; justify-content:center; width:100%; min-height:44px; margin-top:16px; padding:12px; border-radius:8px; border:1px solid rgba(196,181,253,.28); background:rgba(196,181,253,.1); color:#C4B5FD; font-weight:700; font-size:14px; cursor:pointer; transition:all .2s; }
-    .bundle-card__cta:hover { background:rgba(196,181,253,.18); border-color:rgba(196,181,253,.42); color:#fff; }
+    .bundle-upgrade-grid {
+      max-width: 1040px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+    }
+    .bundle-upgrade-card {
+      position: relative;
+      display: flex;
+      min-height: 100%;
+      flex-direction: column;
+      padding: clamp(24px, 3vw, 34px);
+      border-radius: 30px;
+      border: 1px solid rgba(196,181,253,.18);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(196,181,253,.14), transparent 45%),
+        linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.018)),
+        rgba(4, 8, 20, .58);
+      box-shadow: 0 26px 72px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.06);
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .bundle-upgrade-card--complete {
+      border-color: rgba(94, 234, 212, .24);
+      background:
+        radial-gradient(circle at 45% 0%, rgba(94,234,212,.16), transparent 48%),
+        radial-gradient(circle at 100% 0%, rgba(168,85,247,.16), transparent 48%),
+        linear-gradient(160deg, rgba(255,255,255,.075), rgba(255,255,255,.018)),
+        rgba(4, 8, 20, .60);
+    }
+    .bundle-upgrade-card__top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .bundle-upgrade-card__badge,
+    .bundle-upgrade-card__saving {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 11px;
+      border-radius: 999px;
+      font-size: .7rem;
+      font-weight: 900;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+    .bundle-upgrade-card__badge {
+      color: #5eead4;
+      background: rgba(94,234,212,.09);
+      border: 1px solid rgba(94,234,212,.20);
+    }
+    .bundle-upgrade-card__saving {
+      color: #c4b5fd;
+      background: rgba(196,181,253,.09);
+      border: 1px solid rgba(196,181,253,.18);
+    }
+    .bundle-upgrade-card h3 {
+      margin: 0 0 8px;
+      color: #fff;
+      font-family: var(--display);
+      font-size: clamp(1.7rem, 2.7vw, 2.65rem);
+      line-height: .98;
+      letter-spacing: -.05em;
+    }
+    .bundle-upgrade-card__includes {
+      margin: 0 0 14px;
+      color: rgba(196,181,253,.86);
+      font-size: .95rem;
+      font-weight: 900;
+    }
+    .bundle-upgrade-card__desc {
+      margin: 0 0 18px;
+      color: rgba(226,232,240,.72);
+      font-size: .95rem;
+      line-height: 1.5;
+    }
+    .bundle-upgrade-card__chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 22px;
+    }
+    .bundle-upgrade-card__chips span {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      color: rgba(255,255,255,.78);
+      background: rgba(255,255,255,.055);
+      border: 1px solid rgba(255,255,255,.08);
+      font-size: .78rem;
+      font-weight: 800;
+    }
+    .bundle-upgrade-card__price {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin: auto 0 16px;
+    }
+    .bundle-upgrade-card__price strong {
+      color: #fff;
+      font-size: clamp(1.6rem, 2.6vw, 2.45rem);
+      letter-spacing: -.04em;
+    }
+    .bundle-upgrade-card__price > span {
+      color: rgba(255,255,255,.58);
+      font-size: .9rem;
+      font-weight: 700;
+    }
+    .bundle-card__cta {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:100%;
+      min-height:46px;
+      margin-top:0;
+      padding:12px 16px;
+      border-radius:999px;
+      border:1px solid rgba(94,234,212,.34);
+      background:linear-gradient(135deg, rgba(255,255,255,.95), rgba(159,248,239,.92));
+      color:#020617;
+      font-weight:900;
+      font-size:14px;
+      cursor:pointer;
+      text-decoration:none;
+      box-shadow: 0 14px 32px rgba(45,212,191,.18);
+      transition:transform .2s ease, box-shadow .2s ease, filter .2s ease;
+    }
+    .bundle-card__cta:hover {
+      color:#020617;
+      filter: brightness(1.04);
+      transform: translateY(-2px);
+      box-shadow: 0 18px 42px rgba(45,212,191,.25);
+    }
+    .vx-acceptance-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .vx-acceptance-card {
+      position: relative;
+      padding: 18px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: linear-gradient(160deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
+      overflow: hidden;
+    }
+    .vx-acceptance-card--yes { border-color: rgba(52,211,153,.18); }
+    .vx-acceptance-card--plan { border-color: rgba(96,165,250,.18); }
+    .vx-acceptance-card--stripe { border-color: rgba(196,181,253,.18); }
+    .vx-acceptance-card__status {
+      display: inline-flex;
+      margin-bottom: 10px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      color: #5eead4;
+      background: rgba(94,234,212,.08);
+      border: 1px solid rgba(94,234,212,.18);
+      font-size: .66rem;
+      font-weight: 900;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+    .vx-acceptance-card strong {
+      display: block;
+      color: #fff;
+      font-family: var(--display);
+      font-size: 1.18rem;
+      letter-spacing: -.035em;
+      line-height: 1.05;
+    }
+    .vx-acceptance-card p {
+      margin: 9px 0 0;
+      color: rgba(226,232,240,.68);
+      font-size: .86rem;
+      line-height: 1.45;
+    }
     .vx-price--hidden, .pricing-card__price--hidden { display:none !important; }
     .cvitae-mini-icon { width: 86px; height: 86px; object-fit: contain; margin: 0 0 14px; filter: drop-shadow(0 16px 32px rgba(0,0,0,.38)); }
     .cvitae-actions { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-top:20px; }

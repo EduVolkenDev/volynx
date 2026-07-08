@@ -1,4 +1,4 @@
-import QRCodeStyling from "https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js";
+import QRCodeStyling from "qr-code-styling";
 
 let qrCode = null;
 

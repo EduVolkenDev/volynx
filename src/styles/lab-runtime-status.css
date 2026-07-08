@@ -1,0 +1,108 @@
+.lab-runtime-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  max-width: 100%;
+  padding: 6px 9px;
+  border: 1px solid rgba(125, 249, 255, .16);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .22);
+  color: rgba(255, 255, 255, .72);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
+}
+
+.lab-runtime-mini__dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .4);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, .06);
+}
+
+.lab-runtime-mini__label,
+.lab-runtime-mini__state {
+  min-width: 0;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.lab-runtime-mini__label {
+  color: rgba(255, 255, 255, .52);
+}
+
+.lab-runtime-mini__state {
+  color: rgba(255, 255, 255, .86);
+}
+
+.lab-runtime-mini[data-state="ready"] {
+  border-color: rgba(84, 255, 173, .24);
+  background: rgba(84, 255, 173, .08);
+}
+
+.lab-runtime-mini[data-state="ready"] .lab-runtime-mini__dot {
+  background: rgb(84, 255, 173);
+  box-shadow: 0 0 0 3px rgba(84, 255, 173, .12), 0 0 16px rgba(84, 255, 173, .32);
+}
+
+.lab-runtime-mini[data-state="partial"],
+.lab-runtime-mini[data-state="warning"] {
+  border-color: rgba(255, 180, 0, .24);
+  background: rgba(255, 180, 0, .08);
+}
+
+.lab-runtime-mini[data-state="partial"] .lab-runtime-mini__dot,
+.lab-runtime-mini[data-state="warning"] .lab-runtime-mini__dot {
+  background: rgb(255, 202, 92);
+  box-shadow: 0 0 0 3px rgba(255, 202, 92, .12), 0 0 16px rgba(255, 202, 92, .26);
+}
+
+.card__head:has(.lab-runtime-mini),
+.cardHead:has(.lab-runtime-mini) {
+  height: auto;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.card__head:has(.lab-runtime-mini) h2,
+.cardHead:has(.lab-runtime-mini) h2,
+.cardHead:has(.lab-runtime-mini) strong {
+  min-width: 0;
+}
+
+.card__head .lab-runtime-mini,
+.cardHead .lab-runtime-mini,
+.qrgen-runtime-mini {
+  margin-left: auto;
+}
+
+.qrgen-preview__head:has(.qrgen-runtime-mini) {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 560px) {
+  .lab-runtime-mini {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .card__head .lab-runtime-mini,
+  .cardHead .lab-runtime-mini,
+  .qrgen-runtime-mini {
+    margin-left: 0;
+  }
+
+  .lab-runtime-mini__label,
+  .lab-runtime-mini__state {
+    font-size: 9px;
+  }
+}

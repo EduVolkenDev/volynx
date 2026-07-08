@@ -161,11 +161,11 @@ window.VxTokens = (function () {
     } catch(_) { return; }
     if (!userId) return;
 
-    // Lazy-load supabase-js from CDN if not already loaded
+    // Lazy-load the bundled Supabase UMD fallback if not already loaded.
     if (typeof window.supabase === 'undefined' || !window.supabase.createClient) {
       await new Promise(function(resolve, reject) {
         var script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js';
+        script.src = '/vendor/supabase-js-2.101.1/supabase.js';
         script.onload = resolve;
         script.onerror = reject;
         document.head.appendChild(script);

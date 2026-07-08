@@ -109,6 +109,162 @@ const homeAssistItems = [
 
     <PlatformAssistStrip eyebrow={{ en: "Platform flow", pt: "Fluxo da plataforma" }} title={{ en: "Already inside VOLYNX?", pt: "Já dentro do VOLYNX?" }} description={{ en: "Move between discovery, daily work, purchases and support without hunting through the navigation.", pt: "Navegue entre descoberta, trabalho diário, compras e suporte sem caçar na navegação." }} items={homeAssistItems} />
 
+    <!-- ═══ REVENUE NOW ═══ -->
+    <section class="page-section revenue-now-section" aria-label="Buy-ready VOLYNX offers">
+      <div class="shell revenue-now">
+        <div class="revenue-now__head">
+          <span class="label label--pro">
+            <span class="i18n-en">Ready to monetize today</span>
+            <span class="i18n-pt">Pronto para monetizar hoje</span>
+          </span>
+          <h2>
+            <span class="i18n-en">Buy-ready paths are now one click from checkout.</span>
+            <span class="i18n-pt">Os caminhos prontos para compra estão a um clique.</span>
+          </h2>
+          <p>
+            <span class="i18n-en">Start free if you are exploring. If you need capacity, publishing, or a product kit today, these routes already use the live VOLYNX checkout bridge.</span>
+            <span class="i18n-pt">Comece grátis se estiver explorando. Se você precisa de capacidade, publicação ou um kit hoje, estes caminhos já usam o checkout real da VOLYNX.</span>
+          </p>
+        </div>
+
+        <div class="revenue-now__grid">
+          <article class="revenue-card revenue-card--primary">
+            <img src="/assets/bundle.webp" alt="" class="revenue-card__icon" loading="lazy" decoding="async" />
+            <span class="revenue-card__kicker">Best first subscription</span>
+            <h3>VOLYNX Essential</h3>
+            <p><span class="i18n-en">Builder Pro + Daily Pro in one subscription. The clearest recurring offer for creators who build and operate daily.</span><span class="i18n-pt">Builder Pro + Daily Pro em uma assinatura. A oferta recorrente mais clara para criadores que constroem e operam diariamente.</span></p>
+            <strong class="revenue-card__price"><span class="i18n-en">£35 / month</span><span class="i18n-pt">£35 / mês</span></strong>
+            <a href={checkoutHref("bundle_volynx_daily_pro", { next: ROUTES.platform })} class="button button--gold vx-checkout-btn" data-lookup="bundle_volynx_daily_pro">
+              <span class="i18n-en">Get Essential</span>
+              <span class="i18n-pt">Assinar Essential</span>
+            </a>
+          </article>
+
+          <article class="revenue-card">
+            <img src="/assets/builderpro.webp" alt="" class="revenue-card__icon" loading="lazy" decoding="async" />
+            <span class="revenue-card__kicker">Publish</span>
+            <h3>Builder Pro</h3>
+            <p><span class="i18n-en">Custom domain, selected premium kits, priority publish capacity and no VOLYNX branding.</span><span class="i18n-pt">Domínio próprio, kits premium selecionados, prioridade de publicação e remoção da marca VOLYNX.</span></p>
+            <strong class="revenue-card__price"><span class="i18n-en">£24 / month</span><span class="i18n-pt">£24 / mês</span></strong>
+            <a href={checkoutHref("builder_pro", { next: ROUTES.builder })} class="button button--ghost vx-checkout-btn" data-lookup="builder_pro">
+              <span class="i18n-en">Upgrade Builder</span>
+              <span class="i18n-pt">Atualizar Builder</span>
+            </a>
+          </article>
+
+          <article class="revenue-card">
+            <img src="/assets/VX4.webp" alt="" class="revenue-card__icon" loading="lazy" decoding="async" />
+            <span class="revenue-card__kicker">Capacity</span>
+            <h3>32 VX Core</h3>
+            <p><span class="i18n-en">One-time premium capacity for eligible exports, templates and selected Studio actions. No subscription change.</span><span class="i18n-pt">Capacidade premium avulsa para exports, templates e ações Studio elegíveis. Sem trocar assinatura.</span></p>
+            <strong class="revenue-card__price"><span class="i18n-en">£18 one-time</span><span class="i18n-pt">£18 único</span></strong>
+            <a href={checkoutHref("tokens_core", { next: `${ROUTES.pricing}#vx-packs` })} class="button button--ghost vx-checkout-btn" data-lookup="tokens_core">
+              <span class="i18n-en">Buy VX</span>
+              <span class="i18n-pt">Comprar VX</span>
+            </a>
+          </article>
+
+          <article class="revenue-card">
+            <img src="/assets/newportfolio.webp" alt="" class="revenue-card__icon revenue-card__icon--wide" loading="lazy" decoding="async" />
+            <span class="revenue-card__kicker">One-time kit</span>
+            <h3>Portfolio Pro Kit</h3>
+            <p><span class="i18n-en">A direct product path for users who want one premium asset now instead of a subscription first.</span><span class="i18n-pt">Um caminho direto para quem quer um ativo premium agora, antes de uma assinatura.</span></p>
+            <strong class="revenue-card__price"><span class="i18n-en">One-time checkout</span><span class="i18n-pt">Checkout avulso</span></strong>
+            <a href={checkoutHref("kit_portfolio_commercial", { next: ROUTES.portfolioKit })} class="button button--ghost vx-checkout-btn" data-lookup="kit_portfolio_commercial">
+              <span class="i18n-en">Buy kit</span>
+              <span class="i18n-pt">Comprar kit</span>
+            </a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ CHOOSE YOUR PATH ═══ -->
+    <section class="page-section pathfinder-section" id="choose-path" aria-label="Choose your VOLYNX path">
+      <div class="shell pathfinder">
+        <div class="pathfinder__intro">
+          <span class="label label--pro">
+            <span class="i18n-en">Choose your path</span>
+            <span class="i18n-pt">Escolha seu caminho</span>
+          </span>
+          <h2>
+            <span class="i18n-en">One ecosystem. Multiple ways to create results.</span>
+            <span class="i18n-pt">Um ecossistema. Várias formas de gerar resultado.</span>
+          </h2>
+          <p>
+            <span class="i18n-en">Start from the outcome, not from the tool list. VOLYNX routes each profile to the product mix most likely to produce value today.</span>
+            <span class="i18n-pt">Comece pelo resultado, não pela lista de ferramentas. A VOLYNX direciona cada perfil para a combinação com maior chance de gerar valor hoje.</span>
+          </p>
+        </div>
+
+        <div class="pathfinder__grid">
+          <article class="path-card path-card--creator">
+            <img src="/assets/golaunch.webp" alt="" class="path-card__icon" loading="lazy" decoding="async" />
+            <span class="path-card__persona">Creator</span>
+            <h3><span class="i18n-en">Launch, publish and run your day.</span><span class="i18n-pt">Lance, publique e organize seu dia.</span></h3>
+            <p><span class="i18n-en">Best fit: Builder Pro + Daily Pro. The existing Essential bundle is the cleanest first paid step.</span><span class="i18n-pt">Melhor encaixe: Builder Pro + Daily Pro. O bundle Essential já é o primeiro passo pago mais claro.</span></p>
+            <ul>
+              <li>Builder Pro</li>
+              <li>Daily Pro</li>
+              <li><span class="i18n-en">Portfolio kit optional</span><span class="i18n-pt">Portfolio opcional</span></li>
+            </ul>
+            <a href={checkoutHref("bundle_volynx_daily_pro", { next: `${ROUTES.platform}#choose-path` })} class="button button--gold vx-checkout-btn" data-lookup="bundle_volynx_daily_pro">
+              <span class="i18n-en">Activate Essential</span>
+              <span class="i18n-pt">Ativar Essential</span>
+            </a>
+          </article>
+
+          <article class="path-card path-card--freelancer">
+            <img src="/assets/cvitae.webp" alt="" class="path-card__icon" loading="lazy" decoding="async" />
+            <span class="path-card__persona">Freelancer Premium</span>
+            <h3><span class="i18n-en">Look credible before the first conversation.</span><span class="i18n-pt">Pareça confiável antes da primeira conversa.</span></h3>
+            <p><span class="i18n-en">Best fit: CVitae Business + Builder Pro + Icons. Start by upgrading the career asset, then add the public presence.</span><span class="i18n-pt">Melhor encaixe: CVitae Business + Builder Pro + Icons. Comece pelo ativo de carreira e depois adicione presença pública.</span></p>
+            <ul>
+              <li>CVitae Business</li>
+              <li>Builder Pro</li>
+              <li>Icons Store</li>
+            </ul>
+            <a href={checkoutHref("cvitae_business", { next: `${ROUTES.platform}#choose-path` })} class="button button--gold vx-checkout-btn" data-lookup="cvitae_business">
+              <span class="i18n-en">Start with CVitae</span>
+              <span class="i18n-pt">Começar pelo CVitae</span>
+            </a>
+          </article>
+
+          <article class="path-card path-card--realestate">
+            <img src="/assets/newproperty.webp" alt="" class="path-card__icon path-card__icon--wide" loading="lazy" decoding="async" />
+            <span class="path-card__persona"><span class="i18n-en">Real Estate</span><span class="i18n-pt">Imobiliário</span></span>
+            <h3><span class="i18n-en">Sell listings with a sharper digital surface.</span><span class="i18n-pt">Venda imóveis com uma presença digital mais forte.</span></h3>
+            <p><span class="i18n-en">Best fit: PropertyFlow Professional + premium icons + Lumina. This is the strongest niche path today.</span><span class="i18n-pt">Melhor encaixe: PropertyFlow Professional + icons premium + Lumina. É o caminho de nicho mais forte agora.</span></p>
+            <ul>
+              <li>PropertyFlow Professional</li>
+              <li>Icons Premium</li>
+              <li>Lumina Presets</li>
+            </ul>
+            <a href={checkoutHref("pf_professional", { next: `${ROUTES.platform}#choose-path` })} class="button button--gold vx-checkout-btn" data-lookup="pf_professional">
+              <span class="i18n-en">Buy PropertyFlow</span>
+              <span class="i18n-pt">Comprar PropertyFlow</span>
+            </a>
+          </article>
+
+          <article class="path-card path-card--team">
+            <img src="/assets/builderteams.webp" alt="" class="path-card__icon" loading="lazy" decoding="async" />
+            <span class="path-card__persona"><span class="i18n-en">Small Business / Team</span><span class="i18n-pt">Small Business / Equipe</span></span>
+            <h3><span class="i18n-en">Operate with publishing, workflow and capacity together.</span><span class="i18n-pt">Opere com publicação, fluxo e capacidade juntos.</span></h3>
+            <p><span class="i18n-en">Best fit: Builder Studio + Daily Diamond. Complete is the strongest existing ecosystem bundle.</span><span class="i18n-pt">Melhor encaixe: Builder Studio + Daily Diamond. Complete é o bundle existente mais forte do ecossistema.</span></p>
+            <ul>
+              <li>Builder Studio</li>
+              <li>Daily Diamond</li>
+              <li><span class="i18n-en">Priority capacity</span><span class="i18n-pt">Capacidade prioritária</span></li>
+            </ul>
+            <a href={checkoutHref("bundle_volynx_daily_studio", { next: `${ROUTES.platform}#choose-path` })} class="button button--gold vx-checkout-btn" data-lookup="bundle_volynx_daily_studio">
+              <span class="i18n-en">Activate Complete</span>
+              <span class="i18n-pt">Ativar Complete</span>
+            </a>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <section class="page-section platform-sponsored">
       <div class="shell">
         <AdSlot
@@ -297,7 +453,7 @@ const homeAssistItems = [
     </script>
 
     <!-- ═══ ECOSYSTEM ═══ -->
-    <section id="ecosystem" class="page-section">
+    <section id="ecosystem" class="page-section platform-reveal" data-platform-reveal>
       <div class="shell section-head section-head--split">
         <div>
           <span class="eyebrow" data-i18n="home2.eyebrow_ecosystem">What Volynx is</span>
@@ -305,8 +461,8 @@ const homeAssistItems = [
         </div>
         <p data-i18n="home2.section_ecosystem_desc">Four products with one account, one token system, and a shared commitment to premium quality.</p>
       </div>
-      <div class="shell grid-3">
-        <article class="panel feature-card premium-frame panel--pro has-card-asset">
+      <div class="shell ecosystem-showcase">
+        <article class="panel feature-card premium-frame panel--pro has-card-asset ecosystem-card ecosystem-card--builder">
           <img src="/assets/builder.webp" alt="" class="card-asset" loading="lazy" />
           <a href={ROUTES.builder} class="label label--pro" data-i18n="home2.card_builder_label">Flagship</a>
           <h3 data-i18n="home2.card_builder_title">VOLYNX Builder</h3>
@@ -316,8 +472,13 @@ const homeAssistItems = [
             <li data-i18n="home2.card_builder_item2">Premium kits for portfolios, agencies, SaaS</li>
             <li data-i18n="home2.card_builder_item3">Publish to subdomain or custom domain</li>
           </ul>
+          <a href={ROUTES.builder} class="ecosystem-card__cta">
+            <span class="i18n-en">Open Builder</span>
+            <span class="i18n-pt">Abrir Builder</span>
+            <span aria-hidden="true">↗</span>
+          </a>
         </article>
-        <article class="panel feature-card premium-frame has-card-asset">
+        <article class="panel feature-card premium-frame has-card-asset ecosystem-card ecosystem-card--daily">
           <img src="/assets/daily-icon.webp" alt="" class="card-asset" loading="lazy" />
           <a href={ROUTES.daily} class="label" data-i18n="home2.card_daily_label">Daily tools</a>
           <h3 data-i18n="home2.card_daily_title">VOLYNX Daily</h3>
@@ -327,23 +488,79 @@ const homeAssistItems = [
             <li data-i18n="home2.card_daily_item2">Cloud sync on Pro, unlimited on Diamond</li>
             <li data-i18n="home2.card_daily_item3">Broader audience: not just devs</li>
           </ul>
+          <a href={ROUTES.daily} class="ecosystem-card__cta">
+            <span class="i18n-en">Open Daily</span>
+            <span class="i18n-pt">Abrir Daily</span>
+            <span aria-hidden="true">↗</span>
+          </a>
         </article>
-        <article class="panel feature-card premium-frame has-card-asset">
-          <img src="/assets/cvitae.webp" alt="" class="card-asset" loading="lazy" />
-          <a href={ROUTES.cvitae} class="label" data-i18n="home2.card_cvitae_label">Career & AI</a>
-          <h3 data-i18n="home2.card_cvitae_title">CVitae by VOLYNX</h3>
-          <p data-i18n="home2.card_cvitae_desc">Create a sharper CV with guided sections, live preview, CVitae AI, and premium templates. Build for free, then use VX for exports or Business for unlimited use.</p>
-          <ul class="detail-list">
-            <li data-i18n="home2.card_cvitae_item1">Free editor with guided CV structure</li>
-            <li data-i18n="home2.card_cvitae_item2">CVitae AI, live preview and premium templates</li>
-            <li data-i18n="home2.card_cvitae_item3">2 VX exports or Business unlimited</li>
-          </ul>
+        <article class="panel feature-card premium-frame ecosystem-card ecosystem-card--cvitae">
+          <div class="ecosystem-card__copy">
+            <div class="ecosystem-card__heading">
+              <img src="/assets/cvitae.webp" alt="" class="ecosystem-card__mark" loading="lazy" />
+              <div>
+                <a href={ROUTES.cvitae} class="label" data-i18n="home2.card_cvitae_label">Career & AI</a>
+                <h3 data-i18n="home2.card_cvitae_title">CVitae by VOLYNX</h3>
+              </div>
+            </div>
+            <p data-i18n="home2.card_cvitae_desc">Create a sharper CV with guided sections, live preview, CVitae AI, and premium templates. Build for free, then use VX for exports or Business for unlimited use.</p>
+            <ul class="detail-list">
+              <li data-i18n="home2.card_cvitae_item1">Free editor with guided CV structure</li>
+              <li data-i18n="home2.card_cvitae_item2">CVitae AI, live preview and premium templates</li>
+              <li data-i18n="home2.card_cvitae_item3">2 VX exports or Business unlimited</li>
+            </ul>
+            <div class="ecosystem-card__actions">
+              <a href={ROUTES.cvitae} class="button button--gold">
+                <span class="i18n-en">Build your CV free</span>
+                <span class="i18n-pt">Criar CV grátis</span>
+              </a>
+              <a href={`${ROUTES.pricing}#cvitae`} class="button button--ghost">
+                <span class="i18n-en">Compare CVitae plans</span>
+                <span class="i18n-pt">Comparar planos CVitae</span>
+              </a>
+            </div>
+          </div>
+          <div class="cvitae-product-demo" aria-hidden="true">
+            <div class="cvitae-product-demo__bar">
+              <span></span><span></span><span></span>
+              <strong>CVitae Studio</strong>
+              <em>Live preview</em>
+            </div>
+            <div class="cvitae-product-demo__workspace">
+              <div class="cvitae-product-demo__editor">
+                <span class="cvitae-product-demo__step">01 · Profile</span>
+                <div class="cvitae-product-demo__field cvitae-product-demo__field--strong"></div>
+                <div class="cvitae-product-demo__field"></div>
+                <span class="cvitae-product-demo__step">02 · Experience</span>
+                <div class="cvitae-product-demo__field"></div>
+                <div class="cvitae-product-demo__field cvitae-product-demo__field--short"></div>
+                <div class="cvitae-product-demo__ai">✦ CVitae AI</div>
+              </div>
+              <div class="cvitae-product-demo__paper">
+                <div class="cvitae-product-demo__paper-head">
+                  <span></span>
+                  <div><strong>Alex Morgan</strong><small>Product Designer</small></div>
+                </div>
+                <div class="cvitae-product-demo__line cvitae-product-demo__line--title"></div>
+                <div class="cvitae-product-demo__line"></div>
+                <div class="cvitae-product-demo__line cvitae-product-demo__line--wide"></div>
+                <div class="cvitae-product-demo__line"></div>
+                <div class="cvitae-product-demo__line cvitae-product-demo__line--title"></div>
+                <div class="cvitae-product-demo__line cvitae-product-demo__line--wide"></div>
+                <div class="cvitae-product-demo__line"></div>
+              </div>
+            </div>
+            <div class="cvitae-product-demo__status">
+              <span>✓ Autosaved</span>
+              <strong>92% profile strength</strong>
+            </div>
+          </div>
         </article>
       </div>
     </section>
 
     <!-- ═══ FREE VALUE STRIP ═══ -->
-    <section class="page-section free-strip-section">
+    <section class="page-section free-strip-section platform-reveal" data-platform-reveal>
       <div class="shell">
         <div class="panel free-strip free-strip--with-visual">
           <div class="free-strip__visual" aria-hidden="true">
@@ -394,7 +611,7 @@ const homeAssistItems = [
     </section>
 
     <!-- ═══ LAB — Free Tools ═══ -->
-    <section class="page-section lab-section">
+    <section class="page-section lab-section platform-reveal" data-platform-reveal>
       <div class="shell section-head section-head--split">
         <div>
           <span class="eyebrow" data-i18n="home2.lab_eyebrow">VOLYNX Lab · always free</span>
@@ -435,7 +652,7 @@ const homeAssistItems = [
     </section>
 
 <!-- ═══ DEV JOURNEY MISSION ═══ -->
-    <section class="page-section dj-mission-section" id="dev-journey-mission" aria-label="Dev Journey">
+    <section class="page-section dj-mission-section platform-reveal" id="dev-journey-mission" aria-label="Dev Journey" data-platform-reveal>
       <div class="shell">
         <article class="panel dj-mission-panel">
           <div class="dj-mission-copy">
@@ -511,7 +728,7 @@ const homeAssistItems = [
     </div>
 
     <!-- ═══ FEATURED PRODUCTS (editorial) ═══ -->
-    <section class="page-section" id="featured-products">
+    <section class="page-section platform-reveal" id="featured-products" data-platform-reveal>
       <div class="shell section-head">
         <span class="eyebrow" data-i18n="home2.eyebrow_featured">Featured now</span>
         <h2 data-i18n="home2.section_featured_title">Commercial products first. Vision immediately after.</h2>
@@ -576,7 +793,7 @@ const homeAssistItems = [
     </section>
 
     <!-- ═══ ICONS STORE (featured product) ═══ -->
-    <section class="page-section">
+    <section class="page-section platform-reveal" data-platform-reveal>
       <div class="shell">
         <article class="panel panel--pro icons-store-showcase">
           <div class="icons-store-copy">
@@ -626,7 +843,7 @@ const homeAssistItems = [
     </div>
 
     <!-- ═══ PRINCIPLES ═══ -->
-    <section class="page-section">
+    <section class="page-section platform-reveal" data-platform-reveal>
       <div class="shell section-head">
         <span class="eyebrow" data-i18n="home2.eyebrow_principles">Operating philosophy</span>
         <h2 data-i18n="home2.section_principles_title">Premium direction needs principles, not decoration.</h2>
@@ -677,7 +894,7 @@ const homeAssistItems = [
     </div>
 
     <!-- ═══ R&D PORTFOLIO ═══ -->
-    <section class="page-section">
+    <section class="page-section platform-reveal" data-platform-reveal>
       <div class="shell section-head section-head--split">
         <div>
           <span class="eyebrow" data-i18n="home2.eyebrow_rnd">VOLYNX Vision</span>
@@ -713,7 +930,7 @@ const homeAssistItems = [
     </div>
 
     <!-- ═══ FINAL CTA ═══ -->
-    <section class="page-section page-section--last">
+    <section class="page-section page-section--last platform-reveal" data-platform-reveal>
       <div class="shell callout callout--heroic panel panel--pro">
         <div>
           <span class="label label--pro" data-i18n="home2.cta_label">From free to pro</span>
@@ -727,11 +944,740 @@ const homeAssistItems = [
       </div>
     </section>
 
+    <script is:inline>
+      (function () {
+        var nodes = Array.prototype.slice.call(document.querySelectorAll("[data-platform-reveal]"));
+        if (!nodes.length) return;
+
+        var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (reduceMotion || !("IntersectionObserver" in window)) {
+          nodes.forEach(function (node) { node.classList.add("is-visible"); });
+          return;
+        }
+
+        var viewportFloor = window.innerHeight * 0.82;
+        nodes.forEach(function (node) {
+          if (node.getBoundingClientRect().top > viewportFloor) node.setAttribute("data-reveal-ready", "");
+          else node.classList.add("is-visible");
+        });
+
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          });
+        }, { rootMargin: "0px 0px -10% 0px", threshold: 0.08 });
+
+        nodes.forEach(function (node) {
+          if (node.hasAttribute("data-reveal-ready")) observer.observe(node);
+        });
+      })();
+    </script>
+
   </main>
   <FlagshipFooter />
 </FlagshipLayout>
 
 <style>
+  /* ═══ PLATFORM RHYTHM + REUSABLE PREMIUM MOTION ═══ */
+  .revenue-now-section {
+    padding-top: clamp(30px, 5vw, 58px);
+    padding-bottom: clamp(28px, 4vw, 48px);
+  }
+
+  .revenue-now {
+    position: relative;
+    display: grid;
+    gap: clamp(22px, 3vw, 34px);
+    padding: clamp(24px, 4vw, 42px);
+    border-radius: clamp(28px, 4vw, 42px);
+    border: 1px solid rgba(94, 234, 212, .18);
+    background:
+      radial-gradient(circle at 0% 0%, rgba(45, 212, 191, .18), transparent 34%),
+      radial-gradient(circle at 86% 8%, rgba(168, 85, 247, .20), transparent 34%),
+      linear-gradient(145deg, rgba(8, 12, 28, .92), rgba(10, 16, 34, .78));
+    box-shadow: 0 32px 100px rgba(0, 0, 0, .42), inset 0 1px 0 rgba(255, 255, 255, .08);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .revenue-now::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: inherit;
+    border: 1px solid rgba(255, 255, 255, .055);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .revenue-now__head {
+    max-width: 820px;
+  }
+
+  .revenue-now__head h2 {
+    margin: 14px 0 12px;
+    font-family: var(--display);
+    font-size: clamp(2rem, 4vw, 4.4rem);
+    line-height: .98;
+    letter-spacing: -.055em;
+    color: #fff;
+  }
+
+  .revenue-now__head p {
+    margin: 0;
+    max-width: 76ch;
+    color: rgba(226, 232, 240, .78);
+    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    line-height: 1.58;
+  }
+
+  .revenue-now__grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  }
+
+  .revenue-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    padding: 22px;
+    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, .09);
+    background:
+      linear-gradient(160deg, rgba(255, 255, 255, .075), rgba(255, 255, 255, .018)),
+      rgba(4, 8, 20, .48);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+    overflow: hidden;
+  }
+
+  .revenue-card--primary {
+    border-color: rgba(94, 234, 212, .32);
+    background:
+      radial-gradient(circle at 50% 0%, rgba(94, 234, 212, .18), transparent 48%),
+      linear-gradient(160deg, rgba(124, 58, 237, .23), rgba(4, 8, 20, .56));
+  }
+
+  .revenue-card__icon {
+    width: 104px;
+    height: 104px;
+    object-fit: contain;
+    margin: -8px auto 8px;
+    filter: drop-shadow(0 18px 34px rgba(0, 0, 0, .45));
+  }
+
+  .revenue-card__icon--wide {
+    width: 132px;
+    object-fit: cover;
+    border-radius: 20px;
+  }
+
+  .revenue-card__kicker {
+    margin: 0 0 10px;
+    color: #5eead4;
+    font-size: .72rem;
+    font-weight: 900;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+
+  .revenue-card h3 {
+    margin: 0 0 8px;
+    color: #fff;
+    font-family: var(--display);
+    font-size: clamp(1.3rem, 2vw, 1.75rem);
+    line-height: 1.04;
+    letter-spacing: -.035em;
+  }
+
+  .revenue-card p {
+    margin: 0 0 18px;
+    color: rgba(226, 232, 240, .7);
+    font-size: .94rem;
+    line-height: 1.5;
+  }
+
+  .revenue-card__price {
+    margin: auto 0 16px;
+    color: #fff;
+    font-size: 1.05rem;
+  }
+
+  .revenue-card :global(.button) {
+    width: 100%;
+    justify-content: center;
+  }
+
+  @media (min-width: 1080px) {
+    .revenue-now__grid {
+      grid-template-columns: 1.16fr repeat(3, .95fr);
+    }
+  }
+
+  @media (hover: hover) {
+    .revenue-card {
+      transition: transform .26s ease, border-color .26s ease, box-shadow .26s ease;
+    }
+
+    .revenue-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(94, 234, 212, .28);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, .38), inset 0 1px 0 rgba(255, 255, 255, .08);
+    }
+  }
+
+  .pathfinder-section {
+    padding-top: clamp(36px, 5vw, 64px);
+    padding-bottom: clamp(42px, 6vw, 78px);
+  }
+
+  .pathfinder {
+    display: grid;
+    gap: clamp(24px, 3vw, 38px);
+  }
+
+  .pathfinder__intro {
+    max-width: 900px;
+  }
+
+  .pathfinder__intro h2 {
+    margin: 14px 0 12px;
+    color: #fff;
+    font-family: var(--display);
+    font-size: clamp(2.1rem, 4.4vw, 4.8rem);
+    line-height: .96;
+    letter-spacing: -.058em;
+  }
+
+  .pathfinder__intro p {
+    margin: 0;
+    max-width: 72ch;
+    color: rgba(226, 232, 240, .74);
+    font-size: clamp(1rem, 1.35vw, 1.15rem);
+    line-height: 1.56;
+  }
+
+  .pathfinder__grid {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+
+  .path-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    padding: clamp(22px, 2.4vw, 30px);
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, .09);
+    background:
+      linear-gradient(155deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .018)),
+      rgba(4, 8, 20, .52);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .path-card::before {
+    content: "";
+    position: absolute;
+    inset: -30% -20% auto;
+    height: 58%;
+    z-index: -1;
+    opacity: .6;
+    filter: blur(42px);
+    pointer-events: none;
+  }
+
+  .path-card--creator::before { background: radial-gradient(circle, rgba(94, 234, 212, .24), transparent 66%); }
+  .path-card--freelancer::before { background: radial-gradient(circle, rgba(244, 114, 182, .20), transparent 66%); }
+  .path-card--realestate::before { background: radial-gradient(circle, rgba(214, 179, 106, .22), transparent 66%); }
+  .path-card--team::before { background: radial-gradient(circle, rgba(168, 85, 247, .24), transparent 66%); }
+
+  .path-card__icon {
+    width: 118px;
+    height: 118px;
+    object-fit: contain;
+    margin: -6px auto 14px;
+    filter: drop-shadow(0 18px 34px rgba(0, 0, 0, .46));
+  }
+
+  .path-card__icon--wide {
+    width: 148px;
+    border-radius: 22px;
+    object-fit: cover;
+  }
+
+  .path-card__persona {
+    display: inline-flex;
+    align-self: flex-start;
+    margin-bottom: 12px;
+    padding: 6px 11px;
+    border-radius: 999px;
+    color: #5eead4;
+    background: rgba(94, 234, 212, .09);
+    border: 1px solid rgba(94, 234, 212, .22);
+    font-size: .72rem;
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .path-card h3 {
+    margin: 0 0 12px;
+    color: #fff;
+    font-family: var(--display);
+    font-size: clamp(1.35rem, 2vw, 1.85rem);
+    line-height: 1.02;
+    letter-spacing: -.04em;
+  }
+
+  .path-card p {
+    margin: 0 0 16px;
+    color: rgba(226, 232, 240, .72);
+    font-size: .95rem;
+    line-height: 1.5;
+  }
+
+  .path-card ul {
+    display: grid;
+    gap: 8px;
+    margin: 0 0 20px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .path-card li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, .76);
+    font-size: .88rem;
+    line-height: 1.35;
+  }
+
+  .path-card li::before {
+    content: "✓";
+    color: #5eead4;
+    font-weight: 900;
+  }
+
+  .path-card :global(.button) {
+    width: 100%;
+    justify-content: center;
+    margin-top: auto;
+  }
+
+  @media (hover: hover) {
+    .path-card {
+      transition: transform .26s ease, border-color .26s ease, box-shadow .26s ease;
+    }
+
+    .path-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(94, 234, 212, .28);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, .36), inset 0 1px 0 rgba(255, 255, 255, .08);
+    }
+  }
+
+  :global(body.page-home) .page-section {
+    padding-top: clamp(48px, 6.5vw, 88px);
+  }
+  :global(body.page-home) .platform-sponsored,
+  :global(body.page-home) .redeem-section {
+    padding-top: clamp(30px, 4vw, 56px);
+  }
+  :global(body.page-home) .section-head {
+    margin-bottom: clamp(24px, 3vw, 38px);
+  }
+  :global(body.page-home) .section-head p {
+    margin: 16px 0 0;
+    max-width: 62ch;
+    padding: 0;
+    border-left: 0;
+    background: none;
+    box-shadow: none;
+    color: rgba(226, 232, 240, .72);
+    font-size: clamp(.98rem, 1.35vw, 1.12rem);
+    line-height: 1.5;
+    font-weight: 500;
+    text-shadow: none;
+  }
+  :global(body.page-home) .section-head--split p {
+    margin: 0;
+  }
+  :global(body.page-home) .gallery-card h3,
+  :global(body.page-home) .principle-panel h3,
+  :global(body.page-home) .product-vision h3,
+  :global(body.page-home) .spotlight-card h3 {
+    width: auto;
+    margin: 16px 0 10px;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    text-align: left;
+  }
+
+  .platform-reveal[data-reveal-ready] {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  .platform-reveal[data-reveal-ready].is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity .7s cubic-bezier(.22, 1, .36, 1),
+      transform .7s cubic-bezier(.22, 1, .36, 1);
+  }
+
+  /* ═══ ECOSYSTEM — PRODUCT-LED COMPOSITION ═══ */
+  .ecosystem-showcase {
+    display: grid;
+    gap: clamp(16px, 2vw, 24px);
+  }
+  .ecosystem-card {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    padding: clamp(22px, 3vw, 32px);
+    background:
+      radial-gradient(circle at 100% 0%, rgba(96, 165, 250, .11), transparent 36%),
+      linear-gradient(155deg, rgba(255,255,255,.065), rgba(255,255,255,.018)),
+      var(--surface-glass);
+    border-color: rgba(148, 163, 184, .14);
+    box-shadow: var(--shadow-premium), inset 0 1px 0 rgba(255,255,255,.055);
+    transition:
+      transform var(--transition-premium),
+      border-color var(--transition-premium),
+      box-shadow var(--transition-premium);
+  }
+  .ecosystem-card--builder {
+    background:
+      radial-gradient(circle at 100% 0%, rgba(245, 197, 66, .13), transparent 38%),
+      linear-gradient(155deg, rgba(255,255,255,.065), rgba(255,255,255,.018)),
+      var(--surface-glass);
+  }
+  .ecosystem-card--daily {
+    background:
+      radial-gradient(circle at 100% 0%, rgba(34, 211, 238, .12), transparent 38%),
+      linear-gradient(155deg, rgba(255,255,255,.065), rgba(255,255,255,.018)),
+      var(--surface-glass);
+  }
+  .ecosystem-card > .card-asset {
+    width: clamp(88px, 10vw, 126px);
+    height: clamp(88px, 10vw, 126px);
+    opacity: .92;
+  }
+  .ecosystem-card h3 {
+    width: auto;
+    margin: 16px 0 10px;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    text-align: left;
+    font-size: clamp(1.35rem, 2.2vw, 2rem);
+    letter-spacing: -.03em;
+  }
+  .ecosystem-card p {
+    margin: 0;
+    max-width: 58ch;
+    color: rgba(226, 232, 240, .72);
+    font-size: .96rem;
+    line-height: 1.5;
+  }
+  .ecosystem-card .detail-list {
+    gap: 9px;
+    margin: 20px 0 0;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    font-weight: 650;
+    letter-spacing: 0;
+    text-shadow: none;
+  }
+  .ecosystem-card .detail-list li {
+    color: rgba(226, 232, 240, .72);
+    font-size: .87rem;
+    line-height: 1.4;
+  }
+  .ecosystem-card__cta {
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 22px;
+    color: #dff8ff;
+    font-size: .86rem;
+    font-weight: 800;
+    text-decoration: none;
+  }
+  .ecosystem-card__cta span[aria-hidden="true"] {
+    transition: transform var(--transition-premium);
+  }
+  .ecosystem-card__cta:focus-visible {
+    outline: 2px solid rgba(34, 211, 238, .72);
+    outline-offset: 5px;
+    border-radius: 4px;
+  }
+  .ecosystem-card--cvitae {
+    display: grid;
+    gap: clamp(24px, 4vw, 44px);
+    align-items: center;
+    background:
+      radial-gradient(circle at 88% 15%, rgba(168, 85, 247, .2), transparent 33%),
+      radial-gradient(circle at 55% 92%, rgba(34, 211, 238, .1), transparent 34%),
+      linear-gradient(145deg, rgba(14, 20, 43, .96), rgba(17, 8, 33, .94));
+    border-color: rgba(192, 132, 252, .22);
+  }
+  .ecosystem-card__copy {
+    min-width: 0;
+  }
+  .ecosystem-card__heading {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .ecosystem-card__heading h3 {
+    margin-top: 10px;
+  }
+  .ecosystem-card__mark {
+    width: clamp(76px, 8vw, 104px);
+    height: clamp(76px, 8vw, 104px);
+    object-fit: contain;
+    flex: 0 0 auto;
+    filter: drop-shadow(0 18px 32px rgba(168, 85, 247, .26));
+  }
+  .ecosystem-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .cvitae-product-demo {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid rgba(216, 180, 254, .18);
+    border-radius: 24px;
+    background: rgba(3, 7, 18, .82);
+    box-shadow:
+      0 28px 70px rgba(0, 0, 0, .42),
+      inset 0 1px 0 rgba(255,255,255,.055);
+    transform: perspective(1100px) rotateY(-2deg) rotateX(1deg);
+  }
+  .cvitae-product-demo__bar {
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 14px;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+    background: rgba(255,255,255,.035);
+    color: rgba(226, 232, 240, .58);
+    font-size: .66rem;
+  }
+  .cvitae-product-demo__bar > span {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.2);
+  }
+  .cvitae-product-demo__bar strong {
+    margin-left: 5px;
+    color: rgba(255,255,255,.78);
+    letter-spacing: .04em;
+  }
+  .cvitae-product-demo__bar em {
+    margin-left: auto;
+    color: #67e8f9;
+    font-style: normal;
+  }
+  .cvitae-product-demo__workspace {
+    display: grid;
+    grid-template-columns: minmax(100px, .75fr) minmax(150px, 1.25fr);
+    min-height: 330px;
+  }
+  .cvitae-product-demo__editor {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 11px;
+    padding: 20px 16px;
+    border-right: 1px solid rgba(255,255,255,.07);
+    background: linear-gradient(180deg, rgba(15, 23, 42, .9), rgba(8, 12, 24, .94));
+  }
+  .cvitae-product-demo__step {
+    margin-top: 5px;
+    color: rgba(196, 181, 253, .78);
+    font-size: .62rem;
+    font-weight: 800;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+  }
+  .cvitae-product-demo__field {
+    height: 30px;
+    border: 1px solid rgba(148, 163, 184, .12);
+    border-radius: 8px;
+    background: rgba(255,255,255,.035);
+  }
+  .cvitae-product-demo__field--strong {
+    border-color: rgba(34, 211, 238, .26);
+    box-shadow: 0 0 0 3px rgba(34, 211, 238, .045);
+  }
+  .cvitae-product-demo__field--short {
+    width: 72%;
+  }
+  .cvitae-product-demo__ai {
+    width: fit-content;
+    margin-top: 6px;
+    padding: 8px 10px;
+    border: 1px solid rgba(192, 132, 252, .22);
+    border-radius: 999px;
+    background: rgba(168, 85, 247, .09);
+    color: #ddd6fe;
+    font-size: .62rem;
+    font-weight: 800;
+  }
+  .cvitae-product-demo__paper {
+    width: min(82%, 250px);
+    min-height: 282px;
+    align-self: center;
+    justify-self: center;
+    padding: 22px;
+    border-radius: 3px;
+    background: #f8fafc;
+    box-shadow: 0 18px 44px rgba(0,0,0,.34);
+  }
+  .cvitae-product-demo__paper-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .cvitae-product-demo__paper-head > span {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    background: linear-gradient(145deg, #a855f7, #22d3ee);
+  }
+  .cvitae-product-demo__paper-head div {
+    display: grid;
+    gap: 4px;
+  }
+  .cvitae-product-demo__paper-head strong {
+    color: #111827;
+    font: 800 .68rem/1 var(--font-body);
+  }
+  .cvitae-product-demo__paper-head small {
+    color: #64748b;
+    font: 600 .5rem/1 var(--font-body);
+  }
+  .cvitae-product-demo__line {
+    width: 76%;
+    height: 5px;
+    margin-top: 9px;
+    border-radius: 999px;
+    background: #dbe3ee;
+  }
+  .cvitae-product-demo__line--wide { width: 100%; }
+  .cvitae-product-demo__line--title {
+    width: 42%;
+    height: 7px;
+    margin-top: 18px;
+    background: #7c3aed;
+  }
+  .cvitae-product-demo__status {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 14px;
+    border-top: 1px solid rgba(255,255,255,.07);
+    color: rgba(226, 232, 240, .58);
+    font-size: .63rem;
+  }
+  .cvitae-product-demo__status span { color: #5eead4; }
+  .cvitae-product-demo__status strong { color: rgba(255,255,255,.76); }
+
+  @media (min-width: 1080px) {
+    .ecosystem-showcase {
+      grid-template-columns: minmax(300px, .82fr) minmax(0, 1.45fr);
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+    }
+    .ecosystem-card--builder { grid-column: 1; grid-row: 1; }
+    .ecosystem-card--daily { grid-column: 1; grid-row: 2; }
+    .ecosystem-card--cvitae {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      grid-template-rows: auto auto;
+    }
+  }
+
+  @media (hover: hover) {
+    .ecosystem-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(96, 165, 250, .34);
+      box-shadow: var(--shadow-premium-hover), inset 0 1px 0 rgba(255,255,255,.075);
+    }
+    .ecosystem-card--cvitae:hover { border-color: rgba(192, 132, 252, .42); }
+    .ecosystem-card__cta:hover span[aria-hidden="true"] { transform: translate(3px, -3px); }
+  }
+
+  @media (max-width: 639px) {
+    .ecosystem-card__heading {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+    .ecosystem-card__actions {
+      flex-direction: column;
+    }
+    .ecosystem-card__actions .button {
+      width: 100%;
+    }
+    .cvitae-product-demo {
+      transform: none;
+    }
+    .cvitae-product-demo__workspace {
+      grid-template-columns: 1fr;
+    }
+    .cvitae-product-demo__editor {
+      display: none;
+    }
+    .cvitae-product-demo__paper {
+      min-height: 250px;
+      margin: 22px auto;
+    }
+    .cvitae-product-demo__status {
+      flex-wrap: wrap;
+      padding-block: 10px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .platform-reveal[data-reveal-ready],
+    .platform-reveal[data-reveal-ready].is-visible {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    .ecosystem-card,
+    .ecosystem-card__cta span[aria-hidden="true"] {
+      transition: none;
+    }
+  }
+
   /* ═══ HERO V2 — Premium Emotional ═══ */
   .hero-v2 {
     position: relative;

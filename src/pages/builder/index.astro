@@ -43,6 +43,22 @@ import PageWidgets from "../../components/PageWidgets.astro";
         <p class="hero__sub" data-i18n="builder.subtitle">
           Create and publish premium websites with guided flows, live preview, custom domains and production-ready structure.
         </p>
+        <div class="builder-hero-actions">
+          <a href="#app" class="btn btn--primary builder-hero-cta">
+            <span class="i18n-en">Start building</span>
+            <span class="i18n-pt">Começar a construir</span>
+            <span aria-hidden="true">→</span>
+          </a>
+          <a href="/products/" class="btn btn--ghost builder-hero-cta">
+            <span class="i18n-en">Explore premium kits</span>
+            <span class="i18n-pt">Explorar kits premium</span>
+          </a>
+        </div>
+        <div class="builder-hero-proof" aria-label="Builder product capabilities">
+          <span><b aria-hidden="true">✓</b><span class="i18n-en">Guided editor</span><span class="i18n-pt">Editor guiado</span></span>
+          <span><b aria-hidden="true">✓</b><span class="i18n-en">Live preview</span><span class="i18n-pt">Preview ao vivo</span></span>
+          <span><b aria-hidden="true">✓</b><span class="i18n-en">One-click publish</span><span class="i18n-pt">Publicação em um clique</span></span>
+        </div>
       </div>
       <div class="builder-hero-visual" aria-hidden="true">
         <img src="/assets/hero-builder.webp" alt="" class="builder-hero-icon" width="1103" height="1186" loading="eager" />
@@ -55,6 +71,11 @@ import PageWidgets from "../../components/PageWidgets.astro";
 
     <!-- AUTH PANEL (shown when logged out) -->
     <div class="panel auth-panel" id="authPanel">
+      <div class="auth-panel__status">
+        <span class="auth-panel__status-dot" aria-hidden="true"></span>
+        <span class="i18n-en">Secure workspace access</span>
+        <span class="i18n-pt">Acesso seguro ao workspace</span>
+      </div>
       <div class="panel__icon" aria-hidden="true">⚡</div>
       <h2 class="panel__title" data-i18n="builder.auth.title">Sign in to Builder</h2>
       <p class="panel__sub" data-i18n="builder.auth.subtitle">Enter your email — we'll send a magic link. No password needed.</p>
@@ -70,6 +91,11 @@ import PageWidgets from "../../components/PageWidgets.astro";
         <button class="btn btn--primary" id="sendLink" data-i18n="builder.auth.cta">Get magic link</button>
         <p class="auth-msg" id="authMsg"></p>
       </div>
+      <p class="auth-panel__note">
+        <span aria-hidden="true">⌁</span>
+        <span class="i18n-en">No password. Your projects remain tied to your VOLYNX account.</span>
+        <span class="i18n-pt">Sem senha. Seus projetos permanecem vinculados à sua conta VOLYNX.</span>
+      </p>
     </div>
 
     <!-- BUILDER WORKSPACE (shown when logged in) -->
@@ -2222,7 +2248,10 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     --accent: #7DD3FC;
     --card-bg: rgba(231, 238, 247, .04);
     --card-border: rgba(231, 238, 247, .10);
-    --r: 8px;
+    --r: 22px;
+    --builder-glass: rgba(7, 12, 28, .76);
+    --builder-shadow: 0 26px 72px rgba(0, 0, 0, .38);
+    --builder-ease: .35s cubic-bezier(.22, 1, .36, 1);
   }
 
   *, *::before, *::after { box-sizing: border-box; }
@@ -2237,7 +2266,10 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     margin: 0;
     font-family: "Orbitron", ui-sans-serif, system-ui, sans-serif;
     color: var(--fg);
-    background: transparent;
+    background:
+      radial-gradient(circle at 18% 14%, rgba(34, 211, 238, .055), transparent 32%),
+      radial-gradient(circle at 82% 30%, rgba(168, 85, 247, .06), transparent 34%),
+      transparent;
     min-height: 100vh;
     overflow-x: hidden;
   }
@@ -2252,7 +2284,7 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
 
   /* HERO */
   .hero {
-    padding: 56px 24px 40px;
+    padding: clamp(34px, 5vw, 64px) 24px clamp(22px, 3vw, 36px);
     max-width: 1200px;
     margin: 0 auto;
   }
@@ -2319,18 +2351,45 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     margin: 0;
     font-size: clamp(14px, 2vw, 16px);
     color: var(--mut);
-    line-height: 1.7;
+    line-height: 1.5;
+    max-width: 58ch;
+  }
+  .builder-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 26px;
+  }
+  .builder-hero-cta {
+    min-width: 178px;
+    border-radius: 999px;
+  }
+  .builder-hero-proof {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+    margin-top: 22px;
+    color: rgba(231, 238, 247, .58);
+    font: 600 11px/1.4 ui-sans-serif, system-ui, sans-serif;
+  }
+  .builder-hero-proof > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .builder-hero-proof b {
+    color: #5eead4;
   }
   .builder-hero-visual {
     display: none;
-    min-height: clamp(380px, 38vw, 660px);
-    align-items: end;
+    min-height: clamp(330px, 32vw, 500px);
+    align-items: center;
     justify-items: end;
     overflow: visible;
     pointer-events: none;
   }
   .builder-hero-icon {
-    width: min(100%, 560px);
+    width: min(100%, 500px);
     height: auto;
     margin: 0 -12px -18px 0;
     filter: drop-shadow(0 28px 72px rgba(0,0,0,.44));
@@ -2350,14 +2409,19 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
 
   /* AUTH PANEL */
   .panel {
-    max-width: 440px;
-    margin: 0 auto 60px;
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
+    max-width: 480px;
+    margin: 0 auto 64px;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(125, 211, 252, .11), transparent 38%),
+      linear-gradient(155deg, rgba(255,255,255,.065), rgba(255,255,255,.018)),
+      var(--builder-glass);
+    border: 1px solid rgba(125, 211, 252, .17);
     border-radius: var(--r);
-    padding: 36px 32px;
+    padding: 34px 32px 28px;
     text-align: center;
-    backdrop-filter: blur(16px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: var(--builder-shadow), inset 0 1px 0 rgba(255,255,255,.06);
   }
 
   .panel__icon { font-size: 36px; margin-bottom: 16px; }
@@ -2375,6 +2439,36 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     color: var(--mut);
     min-height: 18px;
     margin: 0;
+  }
+  .auth-panel__status {
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 auto 18px;
+    padding: 7px 11px;
+    border: 1px solid rgba(94, 234, 212, .2);
+    border-radius: 999px;
+    background: rgba(45, 212, 191, .07);
+    color: rgba(204, 251, 241, .78);
+    font: 700 10px/1 ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .auth-panel__status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #5eead4;
+    box-shadow: 0 0 10px rgba(94, 234, 212, .72);
+  }
+  .auth-panel__note {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+    margin: 14px 0 0;
+    color: rgba(231, 238, 247, .46);
+    font: 500 11px/1.45 ui-sans-serif, system-ui, sans-serif;
   }
 
   /* SESSION BAR */
@@ -3163,6 +3257,19 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     .builder-hero-visual { display: grid; }
   }
 
+  @media (hover: hover) {
+    .builder-hero-cta {
+      transition:
+        transform var(--builder-ease),
+        border-color var(--builder-ease),
+        box-shadow var(--builder-ease),
+        background var(--builder-ease);
+    }
+    .builder-hero-cta:hover {
+      transform: translateY(-2px);
+    }
+  }
+
   @media (min-width: 960px) {
     #tabPreview { display: none; }
   }
@@ -3186,9 +3293,58 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
 
   /* Mobile */
   @media (max-width: 680px) {
+    .vx-topbar {
+      width: calc(100% - 24px);
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 8px;
+      padding: 14px 0 10px;
+    }
+    body .vx-topbar .vx-topbar-brand {
+      grid-column: 1;
+      grid-row: 1;
+      order: 0;
+      justify-self: start;
+      margin: 0;
+      gap: 7px;
+    }
+    body .vx-topbar .vx-topbar-icon {
+      width: 34px;
+      height: 34px;
+    }
+    body .vx-topbar .vx-topbar-wordmark {
+      width: 92px;
+      max-height: 34px;
+    }
+    body .vx-topbar .vx-topbar-left {
+      grid-column: 2;
+      grid-row: 1;
+      justify-self: end;
+      gap: 6px;
+    }
+    body .vx-topbar .vx-topbar-left a {
+      min-height: 40px;
+      font-size: .64rem;
+    }
+    body .vx-topbar .vx-topbar-right {
+      grid-column: 3;
+      grid-row: 1;
+      justify-self: end;
+    }
+    body .vx-topbar .vx-topbar-right a {
+      min-height: 40px;
+      font-size: .74rem;
+    }
+    body .vx-topbar .vx-topbar-lang {
+      min-width: 40px;
+      min-height: 40px;
+      padding: 6px 8px;
+    }
     .hero { padding: 40px 16px 28px; }
     .hero__title { font-size: 34px; }
     .panel { padding: 28px 20px; }
+    .builder-hero-actions { flex-direction: column; }
+    .builder-hero-cta { width: 100%; }
+    .builder-hero-proof { gap: 9px 14px; }
     .card { padding: 16px; max-width: 100%; box-sizing: border-box; }
     .json-editor { min-height: 220px; }
     .editor-header { flex-direction: column; align-items: flex-start; gap: 10px; }

@@ -1,5 +1,6 @@
 ---
 import "../../../styles/image-suite.css";
+import "../../../styles/lab-runtime-status.css";
 import LabBg from "../../../components/LabBg.astro";
 import FaviconHead from "../../../components/FaviconHead.astro";
 import PageWidgets from "../../../components/PageWidgets.astro";
@@ -48,6 +49,11 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
       <div class="card">
         <div class="cardHead">
           <strong data-i18n="suite.card_upload">Upload &amp; Config</strong>
+          <div class="lab-runtime-mini" data-lab-runtime-mini data-lab-runtime-tool="imageSuite" data-state="checking" aria-live="polite">
+            <span class="lab-runtime-mini__dot" aria-hidden="true"></span>
+            <span class="lab-runtime-mini__label" data-lab-runtime-mini-label>Local AI stack</span>
+            <strong class="lab-runtime-mini__state" data-lab-runtime-mini-state data-i18n="lab2.runtime_checking">Checking</strong>
+          </div>
           <label
             id="pickBtn"
             for="file"
@@ -154,6 +160,27 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
 
           <div id="proStatus" class="pro-status" aria-live="polite"></div>
 
+          <section class="engine-panel" aria-labelledby="engineTitle">
+            <div class="engine-panel__head">
+              <strong id="engineTitle" data-i18n="suite.engine_title">Local engine</strong>
+              <span id="engineBadge" class="engine-badge" data-state="checking" data-i18n="suite.engine_checking">Checking...</span>
+            </div>
+            <dl class="engine-list">
+              <div>
+                <dt data-i18n="suite.engine_ai">AI upscale</dt>
+                <dd id="aiEngineStatus" data-i18n="suite.engine_ai_pending">Local model ready on first use</dd>
+              </div>
+              <div>
+                <dt data-i18n="suite.engine_zip">Batch ZIP</dt>
+                <dd id="zipEngineStatus" data-i18n="suite.engine_zip_pending">Local exporter ready</dd>
+              </div>
+              <div>
+                <dt data-i18n="suite.engine_bg">Remove BG</dt>
+                <dd id="bgEngineStatus" data-i18n="suite.engine_bg_pending">Local model, runtime check pending</dd>
+              </div>
+            </dl>
+          </section>
+
           <div class="kpis">
             <div class="kpi">
               <strong data-i18n="suite.original_label">Original</strong>
@@ -183,9 +210,10 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
     </div>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script is:inline src="/vendor/jszip-3.10.1/jszip.min.js"></script>
   <script is:inline src="/js/vx-auth-bridge.js"></script>
   <script is:inline src="/scripts/vx-lab-workspace.js?v=20260621-modal-system"></script>
+  <script is:inline src="/js/vx-lab-runtime.js"></script>
 
   <script is:inline>
     const FREE_LIMIT = 3;
@@ -194,13 +222,14 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
     // Replaces the previous @imgly/background-removal (AGPL-3.0) integration so the
     // pipeline stays commercial-safe without paying a copyleft license fee.
     const ORT_VERSION = "1.21.0";
-    const ORT_BASE = `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ORT_VERSION}/dist/`;
+    const ORT_BASE = `/vendor/onnxruntime-web-${ORT_VERSION}/`;
     const BG_MODEL_URL = "/models/u2netp.onnx";
     const BG_MODEL_INPUT_SIZE = 320;
     const BG_REMOVAL_META = {
       model: "u2netp",
       lib: `onnxruntime-web@${ORT_VERSION} + u2netp (Apache-2.0)`
     };
+    const LAB_ASSET_MANIFEST_URL = "/lab-assets.json";
     const ENCODE_TIMEOUT_MS = 12000;
     // License keys removed — plan is checked server-side via check-permission API
 
@@ -349,6 +378,10 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
     const outMeta = $("outMeta");
     const proStatus = $("proStatus");
     const resultHint = $("resultHint");
+    const engineBadge = $("engineBadge");
+    const aiEngineStatus = $("aiEngineStatus");
+    const zipEngineStatus = $("zipEngineStatus");
+    const bgEngineStatus = $("bgEngineStatus");
 
     function suiteReturnPath() {
       return window.VxLab
@@ -380,6 +413,133 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
         return Object.prototype.hasOwnProperty.call(replacements, token) ? replacements[token] : `{${token}}`;
       });
     }
+
+    const LAB_ASSET_DEFAULTS = {
+      imageSuite: {
+        zip: {
+          local: true,
+          script: { url: "/vendor/jszip-3.10.1/jszip.min.js" },
+        },
+        aiUpscale: {
+          local: true,
+          engine: "UpscalerJS",
+          model: "ESRGAN Slim 2x",
+          runtime: {
+            tf: { url: "/vendor/upscaler-1.0.0-tfjs-4.11.0/tf.min.js" },
+            modelDefinition: { url: "/vendor/upscaler-1.0.0-tfjs-4.11.0/esrgan-slim-2x.min.js" },
+            upscaler: { url: "/vendor/upscaler-1.0.0-tfjs-4.11.0/upscaler.min.js" },
+          },
+          modelFiles: {
+            model: { url: "/models/esrgan-slim-1.0.0-x2/model.json" },
+          },
+        },
+        backgroundRemoval: {
+          localModel: true,
+          localRuntime: true,
+          runtimeBase: ORT_BASE,
+          modelFile: { url: BG_MODEL_URL },
+        },
+      },
+    };
+    let labAssetManifestPromise = null;
+
+    function mergeLabAssetManifest(manifest) {
+      return {
+        imageSuite: {
+          ...LAB_ASSET_DEFAULTS.imageSuite,
+          ...(manifest?.imageSuite || {}),
+          zip: {
+            ...LAB_ASSET_DEFAULTS.imageSuite.zip,
+            ...(manifest?.imageSuite?.zip || {}),
+          },
+          aiUpscale: {
+            ...LAB_ASSET_DEFAULTS.imageSuite.aiUpscale,
+            ...(manifest?.imageSuite?.aiUpscale || {}),
+            runtime: {
+              ...LAB_ASSET_DEFAULTS.imageSuite.aiUpscale.runtime,
+              ...(manifest?.imageSuite?.aiUpscale?.runtime || {}),
+            },
+            modelFiles: {
+              ...LAB_ASSET_DEFAULTS.imageSuite.aiUpscale.modelFiles,
+              ...(manifest?.imageSuite?.aiUpscale?.modelFiles || {}),
+            },
+          },
+          backgroundRemoval: {
+            ...LAB_ASSET_DEFAULTS.imageSuite.backgroundRemoval,
+            ...(manifest?.imageSuite?.backgroundRemoval || {}),
+          },
+        },
+      };
+    }
+
+    async function getLabAssetManifest() {
+      if (labAssetManifestPromise) return labAssetManifestPromise;
+      labAssetManifestPromise = fetch(LAB_ASSET_MANIFEST_URL, { cache: "no-store" })
+        .then((res) => {
+          if (!res.ok) throw new Error(`Lab asset manifest unavailable: ${res.status}`);
+          return res.json();
+        })
+        .then(mergeLabAssetManifest)
+        .catch((error) => {
+          console.warn("[iMage Suite] Using built-in Lab asset defaults.", error);
+          return mergeLabAssetManifest(null);
+        });
+      return labAssetManifestPromise;
+    }
+
+    function formatEngineSize(bytes) {
+      const value = Number(bytes);
+      if (!Number.isFinite(value) || value <= 0) return "";
+      return ` · ${formatBytesLabel(value)}`;
+    }
+
+    function setEngineState(state, key, fallback) {
+      if (!engineBadge) return;
+      engineBadge.removeAttribute("data-i18n");
+      engineBadge.dataset.state = state;
+      engineBadge.textContent = t(key, fallback);
+    }
+
+    function renderEngineDiagnostics(manifest) {
+      const suite = manifest?.imageSuite || LAB_ASSET_DEFAULTS.imageSuite;
+      if (aiEngineStatus) {
+        aiEngineStatus.removeAttribute("data-i18n");
+        const modelBytes = suite.aiUpscale?.modelFiles?.shard?.bytes || suite.aiUpscale?.modelFiles?.model?.bytes;
+        aiEngineStatus.textContent = suite.aiUpscale?.local
+          ? copy("suite.engine_ai_ready", "{engine} local · {model}{size}", {
+              engine: suite.aiUpscale.engine || "UpscalerJS",
+              model: suite.aiUpscale.model || "ESRGAN Slim 2x",
+              size: formatEngineSize(modelBytes),
+            })
+          : t("suite.engine_remote_runtime", "Uses an external runtime");
+      }
+      if (zipEngineStatus) {
+        zipEngineStatus.removeAttribute("data-i18n");
+        zipEngineStatus.textContent = suite.zip?.local
+          ? copy("suite.engine_zip_ready", "Local JSZip exporter{size}", {
+              size: formatEngineSize(suite.zip?.script?.bytes),
+            })
+          : t("suite.engine_remote_runtime", "Uses an external runtime");
+      }
+      if (bgEngineStatus) {
+        bgEngineStatus.removeAttribute("data-i18n");
+        if (suite.backgroundRemoval?.localRuntime) {
+          bgEngineStatus.textContent = t("suite.engine_bg_ready", "Local model and runtime");
+        } else if (suite.backgroundRemoval?.localModel) {
+          bgEngineStatus.textContent = t("suite.engine_bg_partial", "Local model; runtime currently loads from CDN");
+        } else {
+          bgEngineStatus.textContent = t("suite.engine_remote_runtime", "Uses an external runtime");
+        }
+      }
+      const fullyLocal = Boolean(suite.aiUpscale?.local && suite.zip?.local && suite.backgroundRemoval?.localRuntime);
+      setEngineState(
+        fullyLocal ? "ready" : "partial",
+        fullyLocal ? "suite.engine_ready" : "suite.engine_partial",
+        fullyLocal ? "Local" : "Mostly local"
+      );
+    }
+
+    getLabAssetManifest().then(renderEngineDiagnostics);
 
     function fileCountLabel(count) {
       const noun = t(count === 1 ? "suite.file_one" : "suite.file_other", count === 1 ? "file" : "files");
@@ -416,6 +576,11 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
       } else {
         const deltaLabel = formatDeltaLabel(result.inputBytes, result.blob.size);
         if (deltaLabel) parts.push(deltaLabel);
+      }
+      if (result.upscaleMode === "ai") {
+        parts.push(t("suite.meta_ai_enhanced", "AI enhanced"));
+      } else if (result.upscaleMode === "standard") {
+        parts.push(t("suite.meta_standard_resize", "standard resize"));
       }
       return parts.join(" • ");
     }
@@ -557,6 +722,17 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
       });
     }
 
+    function loadScriptOnce(src) {
+      if (document.querySelector(`script[src="${src}"]`)) return Promise.resolve();
+      return new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = src;
+        script.onload = resolve;
+        script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+        document.head.appendChild(script);
+      });
+    }
+
     async function surfaceToBlob(surface, mime, quality) {
       if (typeof surface.convertToBlob === "function") {
         try {
@@ -583,11 +759,13 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
 
     async function loadOrtOnce() {
       if (_ortRuntime) return _ortRuntime;
-      await loadScriptOnce(`${ORT_BASE}ort.min.js`);
+      const manifest = await getLabAssetManifest();
+      const runtimeBase = manifest.imageSuite.backgroundRemoval?.runtimeBase || ORT_BASE;
+      await loadScriptOnce(`${runtimeBase}ort.min.js`);
       if (!window.ort) throw new Error("onnxruntime-web failed to load");
       // Pin WASM artifacts to the same CDN folder so dev + prod resolve them
       // without needing a Vite plugin or local copy.
-      window.ort.env.wasm.wasmPaths = ORT_BASE;
+      window.ort.env.wasm.wasmPaths = runtimeBase;
       _ortRuntime = window.ort;
       return _ortRuntime;
     }
@@ -621,8 +799,10 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
     async function loadBgSession() {
       if (_bgSession) return _bgSession;
       const ort = await loadOrtOnce();
+      const manifest = await getLabAssetManifest();
+      const bgModelUrl = manifest.imageSuite.backgroundRemoval?.modelFile?.url || BG_MODEL_URL;
       updateProgressUI(0, "fetch:model");
-      const modelBytes = await fetchModelWithProgress(BG_MODEL_URL, (pct) => {
+      const modelBytes = await fetchModelWithProgress(bgModelUrl, (pct) => {
         updateProgressUI(pct, "fetch:model");
       });
       updateProgressUI(98, "fetch:model");
@@ -925,36 +1105,48 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
       syncRunAvailability();
     }
 
-    // ── AI Upscaler (Real-ESRGAN via UpscalerJS + TF.js, lazy-loaded) ──────────
+    // ── AI Upscaler (ESRGAN Slim via bundled UpscalerJS + local model) ─────────
     let _aiUpscaler = null;
-
-    function loadScriptOnce(src) {
-      if (document.querySelector(`script[src="${src}"]`)) return Promise.resolve();
-      return new Promise((res, rej) => {
-        const s = document.createElement('script');
-        s.src = src; s.onload = res; s.onerror = rej;
-        document.head.appendChild(s);
-      });
-    }
-
+    let _aiUpscalerPromise = null;
     async function initAIUpscaler() {
       if (_aiUpscaler) return _aiUpscaler;
-      setDropMessage('Loading AI model (first time ~3 MB, cached after)…');
-      await loadScriptOnce('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js');
-      await loadScriptOnce('https://cdn.jsdelivr.net/npm/upscaler@1.0.0-beta.19/dist/browser/umd/upscaler.min.js');
-      _aiUpscaler = new window.Upscaler({
-        model: {
-          path: 'https://cdn.jsdelivr.net/npm/@upscalerjs/esrgan-slim@1.0.0-beta.1/models/2x/model.json',
-          scale: 2
+      if (_aiUpscalerPromise) return _aiUpscalerPromise;
+
+      setDropMessage(t("suite.ai_model_loading", "Loading the local AI model for the first run..."));
+      updateProgressUI(0, "model");
+
+      _aiUpscalerPromise = getLabAssetManifest()
+        .then((manifest) => {
+          const ai = manifest.imageSuite.aiUpscale || LAB_ASSET_DEFAULTS.imageSuite.aiUpscale;
+          return loadScriptOnce(ai.runtime.tf.url)
+            .then(() => loadScriptOnce(ai.runtime.modelDefinition.url))
+            .then(() => loadScriptOnce(ai.runtime.upscaler.url))
+            .then(() => ai);
+        })
+        .then((ai) => {
+        if (!window.Upscaler || !window.ESRGANSlim2x) {
+          throw new Error("The local AI runtime did not initialize.");
         }
+        const model = {
+          ...window.ESRGANSlim2x,
+          path: ai.modelFiles.model.url,
+        };
+        _aiUpscaler = new window.Upscaler({ model });
+        setEngineState("ready", "suite.engine_ready", "Local");
+        return _aiUpscaler;
+      }).catch((error) => {
+        _aiUpscalerPromise = null;
+        setEngineState("warning", "suite.engine_fallback", "Fallback");
+        throw error;
       });
-      return _aiUpscaler;
+
+      return _aiUpscalerPromise;
     }
 
     async function aiUpscaleToCanvas(img, targetScale) {
       try {
         const upscaler = await initAIUpscaler();
-        setDropMessage('AI upscaling… 0%');
+        setDropMessage(t("suite.ai_upscaling_start", "AI enhancement started..."));
         updateProgressUI(0, 'upscale');
         const base64 = await upscaler.upscale(img, {
           output: 'base64',
@@ -984,10 +1176,18 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
           ctx2.imageSmoothingQuality = 'high';
           ctx2.drawImage(upscaledImg, 0, 0, canvas.width, canvas.height);
         }
-        return canvas;
+        return {
+          canvas,
+          mode: "ai",
+          error: null,
+        };
       } catch (e) {
-        console.warn('[AI upscale] failed, falling back to canvas:', e);
-        return null;
+        console.warn('[iMage Suite] AI upscale unavailable; using standard high-quality resize.', e);
+        return {
+          canvas: null,
+          mode: "standard",
+          error: e instanceof Error ? e.message : String(e),
+        };
       }
     }
     // ────────────────────────────────────────────────────────────────────────────
@@ -1115,19 +1315,21 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
       else if (tool !== "upscale") updateProgressUI(0, "scale");
 
       if (tool === "upscale") {
-        const aiCanvas = await aiUpscaleToCanvas(img, scale);
-        if (aiCanvas) {
-          canvas.width = aiCanvas.width;
-          canvas.height = aiCanvas.height;
-          ctx.drawImage(aiCanvas, 0, 0);
+        const upscaleResult = await aiUpscaleToCanvas(img, scale);
+        if (upscaleResult.canvas) {
+          canvas.width = upscaleResult.canvas.width;
+          canvas.height = upscaleResult.canvas.height;
+          ctx.drawImage(upscaleResult.canvas, 0, 0);
         } else {
-          // Fallback: canvas interpolation
+          // Explicit fallback: high-quality browser interpolation, not AI.
           canvas.width = w * scale;
           canvas.height = h * scale;
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = "high";
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         }
+        canvas.dataset.upscaleMode = upscaleResult.mode;
+        canvas.dataset.upscaleError = upscaleResult.error || "";
       } else {
         canvas.width = w;
         canvas.height = h;
@@ -1171,6 +1373,8 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
         extension: kept
           ? (fileExtFromName(file.name) || mimeToExtension(finalMime, file.name))
           : mimeToExtension(finalMime, file.name),
+        upscaleMode: tool === "upscale" ? (canvas.dataset.upscaleMode || "standard") : null,
+        upscaleError: tool === "upscale" ? (canvas.dataset.upscaleError || null) : null,
       };
     }
 
@@ -1417,6 +1621,7 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
         const M = window.VxFileMetrics;
         const keptCount = processedResults.filter((result) => result.keptOriginal).length;
         const fallbackResults = processedResults.filter((result) => result.encodeFallback);
+        const standardUpscaleResults = processedResults.filter((result) => result.upscaleMode === "standard");
         if (processedResults.length === 1) {
           outMeta.textContent = formatSingleResultMeta(processedResults[0]);
         } else {
@@ -1433,6 +1638,9 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
               keptCount === 1 ? "1 kept original" : "{count} kept original",
               { count: keptCount }
             )}`;
+          }
+          if (tool === "upscale" && standardUpscaleResults.length === 0) {
+            metaText += ` • ${t("suite.meta_ai_enhanced", "AI enhanced")}`;
           }
           outMeta.textContent = metaText;
         }
@@ -1484,6 +1692,22 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
               )
             );
           }
+        } else if (standardUpscaleResults.length > 0) {
+          setResultHint(
+            copy(
+              standardUpscaleResults.length === 1
+                ? "suite.ai_fallback_one"
+                : "suite.ai_fallback_many",
+              standardUpscaleResults.length === 1
+                ? "The AI engine was unavailable, so this file used standard high-quality resizing."
+                : "The AI engine was unavailable, so {count} files used standard high-quality resizing.",
+              { count: standardUpscaleResults.length }
+            ),
+            "warning"
+          );
+          setDropMessage(copy("suite.ai_fallback_done", "Completed with standard resize: {files}", {
+            files: fileCountLabel(processedResults.length),
+          }));
         } else if (fallbackResults.length > 0) {
           const firstFallback = fallbackResults[0];
           setResultHint(encodeFallbackMessage(firstFallback.requestedMime, firstFallback.mimeType), "warning");
