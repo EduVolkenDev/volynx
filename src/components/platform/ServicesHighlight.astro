@@ -1,0 +1,202 @@
+---
+import { ROUTES } from "../../data/routes";
+---
+
+<section class="page-section platform-reveal services-highlight" id="services-highlight" data-platform-reveal>
+  <div class="shell">
+    <article class="panel panel--pro services-highlight__card">
+      <div class="services-highlight__content">
+        <span class="label label--pro services-highlight__label">
+          <span class="i18n-en">VOLYNX Services</span>
+          <span class="i18n-pt">Serviços VOLYNX</span>
+        </span>
+
+        <h2 class="services-highlight__title">
+          <span class="i18n-en">Digital presence built to carry the business.</span>
+          <span class="i18n-pt">Presença digital feita para sustentar o negócio.</span>
+        </h2>
+
+        <p class="services-highlight__description">
+          <span class="i18n-en">Websites, visual identity and technical execution for businesses that need their digital surface to match what they deliver.</span>
+          <span class="i18n-pt">Sites, identidade visual e execução técnica para negócios que precisam de uma presença digital à altura do que entregam.</span>
+        </p>
+
+        <a class="button button--gold services-highlight__cta" href={ROUTES.services}>
+          <span class="i18n-en">Explore VOLYNX Services</span>
+          <span class="i18n-pt">Conhecer os Serviços VOLYNX</span>
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+
+      <div class="services-highlight__visual" aria-hidden="true">
+        <div class="services-highlight__visual-glow"></div>
+        <div class="services-highlight__visual-frame">
+          <img src="/assets/tailormade.webp" alt="" loading="lazy" decoding="async" width="1881" height="1881" />
+        </div>
+        <div class="services-highlight__signals">
+          <span>Strategy</span>
+          <span>Identity</span>
+          <span>Build</span>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<style>
+  .services-highlight__card {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr);
+    gap: clamp(24px, 5vw, 72px);
+    align-items: center;
+    overflow: hidden;
+    isolation: isolate;
+    padding: clamp(24px, 5vw, 56px);
+    background:
+      radial-gradient(circle at 5% 0%, rgba(243, 225, 160, .14), transparent 36%),
+      linear-gradient(145deg, rgba(243, 225, 160, .08), rgba(7, 12, 28, .88));
+    border-color: rgba(243, 225, 160, .24);
+    box-shadow: var(--shadow-premium), inset 0 1px 0 rgba(255, 255, 255, .08);
+  }
+
+  .services-highlight__card::after {
+    content: "";
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    right: -190px;
+    bottom: -240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(177, 150, 255, .16), transparent 68%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .services-highlight__content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .services-highlight__label {
+    margin-bottom: 22px;
+  }
+
+  .services-highlight__title {
+    max-width: 700px;
+    margin: 0;
+    color: var(--text);
+    font-family: var(--display);
+    font-size: clamp(2rem, 4.2vw, 4.6rem);
+    line-height: .98;
+    letter-spacing: -.06em;
+  }
+
+  .services-highlight__description {
+    max-width: 620px;
+    margin: 22px 0 0;
+    color: var(--muted);
+    font-size: clamp(1rem, 1.45vw, 1.18rem);
+    line-height: 1.58;
+  }
+
+  .services-highlight__cta {
+    margin-top: 28px;
+  }
+
+  .services-highlight__visual {
+    position: relative;
+    min-height: 340px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(243, 225, 160, .18);
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(circle at 50% 42%, rgba(243, 225, 160, .16), transparent 34%),
+      radial-gradient(circle at 60% 70%, rgba(177, 150, 255, .18), transparent 56%),
+      rgba(4, 5, 10, .38);
+    overflow: hidden;
+  }
+
+  .services-highlight__visual-glow {
+    position: absolute;
+    inset: 16%;
+    border: 1px solid rgba(243, 225, 160, .16);
+    border-radius: 50%;
+    box-shadow: 0 0 64px rgba(243, 225, 160, .12);
+  }
+
+  .services-highlight__visual-frame {
+    position: relative;
+    width: min(330px, 76%);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    transform: rotate(-4deg);
+    z-index: 1;
+  }
+
+  .services-highlight__visual-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 24px 38px rgba(0, 0, 0, .46));
+  }
+
+  .services-highlight__signals {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 18px;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 7px;
+  }
+
+  .services-highlight__signals span {
+    padding: 20px 40px;
+    border: 1px solid rgba(243, 225, 160, .2);
+    border-radius: 20px;
+    text-align: center;
+    line-break: auto;
+    font-size: 16px !important;
+    background: #00000094;
+    color: var(--gold);
+    font-weight: 300;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  @media (max-width: 760px) {
+    .services-highlight__card {
+      grid-template-columns: 1fr;
+    }
+
+    .services-highlight__visual {
+      min-height: 270px;
+    }
+
+    .services-highlight__visual-frame {
+      width: min(260px, 72%);
+    }
+
+    .services-highlight__signals {
+      left: 14px;
+      right: 14px;
+      bottom: 14px;
+    }
+
+    .services-highlight__signals span {
+      flex: 0 1 auto;
+      max-width: 100%;
+    }
+
+    .services-highlight__cta {
+      width: 100%;
+    }
+  }
+</style>
