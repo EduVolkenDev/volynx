@@ -3,6 +3,7 @@ import FlagshipLayout from "../layouts/FlagshipLayout.astro";
 import FlagshipHeader from "../components/FlagshipHeader.astro";
 import FlagshipFooter from "../components/FlagshipFooter.astro";
 import PlatformAssistStrip from "../components/PlatformAssistStrip.astro";
+import WorldFeature from "../components/platform/WorldFeature.astro";
 import AdSlot from "../components/AdSlot.astro";
 import { ROUTES, checkoutHref } from "../data/routes";
 
@@ -378,8 +379,8 @@ const homeAssistItems = [
           var token = getToken();
           if (!token) {
             // Not logged in: bounce to login, preserve code via query param
-            var next = "/platform/&code=" + encodeURIComponent(code);
-            location.assign("/login/?next=" + encodeURIComponent("/platform/?code=" + code));
+            var next = "/?code=" + encodeURIComponent(code);
+            location.assign("/login/?next=" + encodeURIComponent("/?code=" + code));
             return;
           }
 
@@ -650,6 +651,8 @@ const homeAssistItems = [
         <a href={ROUTES.iconsStore} class="button button--ghost" data-i18n="home2.lab_btn_icons">Browse Icons Store</a>
       </div>
     </section>
+
+    <WorldFeature />
 
 <!-- ═══ DEV JOURNEY MISSION ═══ -->
     <section class="page-section dj-mission-section platform-reveal" id="dev-journey-mission" aria-label="Dev Journey" data-platform-reveal>
@@ -1200,16 +1203,16 @@ const homeAssistItems = [
 
   .path-card__icon {
     width: 118px;
-    height: 118px;
+    height: 400px;
     object-fit: contain;
-    margin: -6px auto 14px;
+    margin: -50px 20px -40px;
     filter: drop-shadow(0 18px 34px rgba(0, 0, 0, .46));
   }
 
   .path-card__icon--wide {
-    width: 148px;
+    width: 200px;
     border-radius: 22px;
-    object-fit: cover;
+    object-fit: contain;
   }
 
   .path-card__persona {
@@ -1302,13 +1305,13 @@ const homeAssistItems = [
     background: none;
     box-shadow: none;
     color: rgba(226, 232, 240, .72);
-    font-size: clamp(.98rem, 1.35vw, 1.12rem);
+    font-size: clamp(.98rem, 1.35vw, 1.42rem);
     line-height: 1.5;
     font-weight: 500;
     text-shadow: none;
   }
   :global(body.page-home) .section-head--split p {
-    margin: 0;
+    margin: auto auto;
   }
   :global(body.page-home) .gallery-card h3,
   :global(body.page-home) .principle-panel h3,
@@ -1371,8 +1374,8 @@ const homeAssistItems = [
       var(--surface-glass);
   }
   .ecosystem-card > .card-asset {
-    width: clamp(88px, 10vw, 126px);
-    height: clamp(88px, 10vw, 126px);
+    width: clamp(88px, 10vw, 170px);
+    height: auto;
     opacity: .92;
   }
   .ecosystem-card h3 {

@@ -129,6 +129,20 @@ import { ROUTES } from "../../data/routes";
     return { href: "/pricing/", label: FALLBACK_LABELS.pricing };
   }
 
+  function successPathForLookup(lookup) {
+    const key = String(lookup || "").toLowerCase().replace(/_(gbp|eur|brl)$/i, "");
+    if (key.startsWith("kit_")) {
+      return "/dashboard/purchases/kits/?payment=success&session_id={CHECKOUT_SESSION_ID}";
+    }
+    if (key.startsWith("pf_")) {
+      return "/dashboard/purchases/propertyflow/?payment=success&session_id={CHECKOUT_SESSION_ID}";
+    }
+    if (key.startsWith("icons_")) {
+      return "/dashboard/purchases/icons/?payment=success&session_id={CHECKOUT_SESSION_ID}";
+    }
+    return "/delivery/?payment=success";
+  }
+
   async function loadConfig() {
     const res = await fetch("/config.json", { cache: "no-store" });
     return res.json();
@@ -232,6 +246,7 @@ import { ROUTES } from "../../data/routes";
       const cancelPath = sanitizeInternalPath(requestedNext) || fallback.href;
       const cancelUrl = new URL(cancelPath, window.location.origin);
       cancelUrl.searchParams.set("payment", "cancelled");
+      const successUrl = `${window.location.origin}${successPathForLookup(lookupBase)}`;
 
       const res = await fetch(`${apiBase}/create-checkout-session`, {
         method: "POST",
@@ -241,7 +256,7 @@ import { ROUTES } from "../../data/routes";
         },
         body: JSON.stringify({
           lookup_key: lookupKey,
-          success_url: `${window.location.origin}/delivery/?payment=success`,
+          success_url: successUrl,
           cancel_url: cancelUrl.toString(),
         }),
       });

@@ -120,6 +120,29 @@ const kitValueItems = [
           <a href={ROUTES.products} class="button button--gold"><span class="i18n-en">Browse Portfolio · Agency · SaaS</span><span class="i18n-pt">Ver Portfolio · Agency · SaaS</span></a>
         </div>
 
+        <!-- Fresh checkout / webhook pending state -->
+        <div id="kitsPending" class="kits-state kits-state--pending" style="display:none;">
+          <p class="kits-state__label">
+            <span class="i18n-en">Your checkout is confirmed. We are preparing the kit card.</span>
+            <span class="i18n-pt">Seu checkout foi confirmado. Estamos preparando o card do kit.</span>
+          </p>
+          <p class="kits-state__hint">
+            <span class="i18n-en">This can take a few seconds while Stripe and VOLYNX sync the Builder draft and protected source delivery.</span>
+            <span class="i18n-pt">Isso pode levar alguns segundos enquanto Stripe e VOLYNX sincronizam o draft no Builder e a entrega protegida do fonte.</span>
+          </p>
+          <div class="kits-state__actions">
+            <button type="button" class="button button--gold" id="kitsPendingRetry">
+              <span class="i18n-en">Check again</span><span class="i18n-pt">Verificar novamente</span>
+            </button>
+            <a href={ROUTES.portfolioKitPreview} class="button button--ghost">
+              <span class="i18n-en">View a kit demo</span><span class="i18n-pt">Ver demo de um kit</span>
+            </a>
+            <a href={ROUTES.support + "?product=kits&intent=checkout-pending"} class="button button--ghost">
+              <span class="i18n-en">Open support</span><span class="i18n-pt">Abrir suporte</span>
+            </a>
+          </div>
+        </div>
+
         <!-- Purchase grid -->
         <div id="kitsGrid" class="kits-grid" style="display:none;" aria-live="polite"></div>
 
@@ -631,7 +654,13 @@ const kitValueItems = [
         hide('kitsLoading');
 
         if (kitRows.length === 0) {
-          show('kitsEmpty');
+          if (requestedSessionId) {
+            show('kitsPending');
+            const retry = document.getElementById('kitsPendingRetry');
+            if (retry) retry.addEventListener('click', () => window.location.reload(), { once: true });
+          } else {
+            show('kitsEmpty');
+          }
           return;
         }
 

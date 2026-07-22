@@ -7,7 +7,7 @@
 export const ROUTES = {
   // ── Core ──────────────────────────────
   home: "/",
-  platform: "/platform/",
+  platform: "/",
   world: "/world/",
   about: "/about/",
   contact: "/contact/",
@@ -89,7 +89,7 @@ export const ROUTES = {
   tiktokLanding: "/tiktok/",
 
   // ── Other ─────────────────────────────
-  launch2026: "/launch-2026/",
+  launch2026: "/volynx-launch/",
   devJourney: "/dev-journey/",
   devJourneyStudent: "/dev-journey/student/",
   devJourneyChecklist: "/dev-journey/checklist/",
