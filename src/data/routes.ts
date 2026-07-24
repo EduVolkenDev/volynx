@@ -42,7 +42,7 @@ export const ROUTES = {
   saasSystemPreview: "/products/saas-landing-system/preview/",
   propertyflow: "/products/propertyflow/",
   iconsStore: "/products/volynx-icons-store/",
-  landingExpress: "/products/saas-landing-system/",
+  landingExpress: "/landing/",
 
   // ── Services ──────────────────────────
   services: "/services/",

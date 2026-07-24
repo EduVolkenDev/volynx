@@ -95,6 +95,8 @@ const title = "Contact & Sales — VOLYNX";
             <label for="project_type" data-i18n="contact.type">Project type</label>
             <select id="project_type" name="project_type">
               <option value="" data-i18n="contact.opt_select_type">Select a type...</option>
+              <option value="conversion-fix" data-i18n="contact.opt_conversion_fix">Website Conversion Fix</option>
+              <option value="landing-express" data-i18n="contact.opt_landing_express">Landing Express</option>
               <option value="landing-page" data-i18n="contact.opt_landing">Landing Page</option>
               <option value="portfolio" data-i18n="contact.opt_portfolio">Portfolio Site</option>
               <option value="saas-landing" data-i18n="contact.opt_saas">SaaS Landing System</option>
@@ -121,6 +123,8 @@ const title = "Contact & Sales — VOLYNX";
               <label for="timeline" data-i18n="contact.timeline">Timeline</label>
               <select id="timeline" name="timeline">
                 <option value="" data-i18n="contact.opt_select_timeline">Select timeline...</option>
+                <option value="48h" data-i18n="contact.opt_48h">48-hour fix</option>
+                <option value="48-72h" data-i18n="contact.opt_48_72h">48–72 hour landing</option>
                 <option value="asap" data-i18n="contact.opt_asap">ASAP</option>
                 <option value="1-2mo" data-i18n="contact.opt_1to2">1–2 months</option>
                 <option value="3-6mo" data-i18n="contact.opt_3to6">3–6 months</option>
@@ -561,6 +565,16 @@ const title = "Contact & Sales — VOLYNX";
   (function () {
     var form = document.getElementById('contactForm');
     if (!form) return;
+
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('intent') === 'conversion-fix' || params.get('intent') === 'landing-express') {
+      var isLandingExpress = params.get('intent') === 'landing-express';
+      form.project_type.value = isLandingExpress ? 'landing-express' : 'conversion-fix';
+      form.timeline.value = isLandingExpress ? '48-72h' : '48h';
+      form.brief.value = isLandingExpress
+        ? 'Business / offer:\nMain audience:\nWhat should the landing page make visitors do?:'
+        : 'Website URL:\nBusiness goal:\nWhat feels unclear or is not converting:';
+    }
 
     var submitBtn = form.querySelector('.submit-btn');
     var originalBtnText = submitBtn ? submitBtn.textContent : 'Send brief →';
