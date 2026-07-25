@@ -223,7 +223,7 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
       <div class="shell grid-3 svc-plans-grid">
 
         <!-- Essential -->
-        <article class="panel svc-tier-card svc-plan-card">
+        <article class="panel svc-tier-card svc-tier-card--launch svc-plan-card">
           <div class="svc-tier-card__visual" aria-hidden="true">
             <img src="/assets/starter.webp" alt="" class="svc-tier-card__asset" loading="lazy" />
           </div>
@@ -248,7 +248,7 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
         </article>
 
         <!-- Growth -->
-        <article class="panel panel--pro svc-tier-card svc-tier-card--featured svc-plan-card">
+        <article class="panel panel--pro svc-tier-card svc-tier-card--growth svc-tier-card--featured svc-plan-card">
           <div class="svc-tier-card__visual" aria-hidden="true">
             <img src="/assets/pro.webp" alt="" class="svc-tier-card__asset" loading="lazy" />
           </div>
@@ -273,7 +273,7 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
         </article>
 
         <!-- Premium -->
-        <article class="panel svc-tier-card svc-plan-card">
+        <article class="panel svc-tier-card svc-tier-card--flagship svc-plan-card">
           <div class="svc-tier-card__visual" aria-hidden="true">
             <img src="/assets/elite.webp" alt="" class="svc-tier-card__asset" loading="lazy" />
           </div>
@@ -579,11 +579,15 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
   }
   .svc-stat-icon {
     width: 230px;
-    height: 100%;
+    height: 220px;
     margin: 0 auto;
     object-fit: contain;
     filter: drop-shadow(0 14px 28px rgba(0,0,0,.28));
+    animation: svc-stat-drift 8s ease-in-out infinite;
   }
+  .svc-stat-card:nth-child(2) .svc-stat-icon { animation-delay: -2s; }
+  .svc-stat-card:nth-child(3) .svc-stat-icon { animation-delay: -4s; }
+  .svc-stat-card:nth-child(4) .svc-stat-icon { animation-delay: -6s; }
 
   /* Fast entry offer */
   .svc-entry-section { padding-top: clamp(24px, 4vw, 48px); }
@@ -683,33 +687,77 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
       inset 0 1px 0 rgba(255,255,255,.1);
   }
   .svc-tier-card__visual {
+    position: relative;
     display: grid;
     place-items: center;
-    height: 210px;
-    padding: 14px;
+    height: 300px;
+    padding: 12px;
     overflow: hidden;
     border-bottom: 1px solid rgba(255,255,255,.09);
     background:
       radial-gradient(circle at 50% 42%, rgba(139,250,240,.13), transparent 62%),
       linear-gradient(180deg, rgba(255,255,255,.045), rgba(0,0,0,.08));
   }
+  .svc-tier-card__visual::before,
+  .svc-tier-card__visual::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+  }
+  .svc-tier-card__visual::before {
+    inset: 14% 20%;
+    border-radius: 50%;
+    background: rgba(139,250,240,.16);
+    filter: blur(34px);
+    opacity: .8;
+  }
+  .svc-tier-card__visual::after {
+    inset: 12px;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 18px;
+    box-shadow: inset 0 0 28px rgba(139,250,240,.06);
+  }
   .svc-tier-card--featured .svc-tier-card__visual {
     background:
       radial-gradient(circle at 50% 42%, rgba(243,225,160,.18), transparent 62%),
       linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.08));
   }
+  .svc-tier-card--featured .svc-tier-card__visual::before {
+    background: rgba(243,225,160,.2);
+  }
   .svc-tier-card__asset {
+    position: relative;
+    z-index: 1;
     display: block;
-    width: min(86%, 230px);
-    height: 190px;
+    width: min(100%, 330px);
+    height: 282px;
     object-fit: contain;
-    opacity: .92;
-    filter: drop-shadow(0 18px 30px rgba(0,0,0,.38));
+    opacity: .98;
+    filter:
+      drop-shadow(0 22px 28px rgba(0,0,0,.48))
+      drop-shadow(0 0 22px rgba(139,250,240,.22));
+    transform-origin: 50% 60%;
     transition: transform .35s ease, filter .35s ease;
   }
+  .svc-tier-card--launch .svc-tier-card__asset {
+    transform: translate3d(-6px, 3px, 0) scale(1.03);
+  }
+  .svc-tier-card--growth .svc-tier-card__asset {
+    transform: translate3d(5px, -2px, 0) scale(1.08);
+    filter:
+      drop-shadow(0 24px 32px rgba(0,0,0,.5))
+      drop-shadow(0 0 30px rgba(243,225,160,.3));
+  }
+  .svc-tier-card--flagship .svc-tier-card__asset {
+    transform: translate3d(4px, 2px, 0) scale(1.05);
+    filter:
+      drop-shadow(0 22px 30px rgba(0,0,0,.5))
+      drop-shadow(0 0 28px rgba(167,126,255,.28));
+  }
   .svc-tier-card:hover .svc-tier-card__asset {
-    transform: translateY(-4px) scale(1.035);
-    filter: drop-shadow(0 24px 38px rgba(0,0,0,.48));
+    filter:
+      drop-shadow(0 28px 42px rgba(0,0,0,.54))
+      drop-shadow(0 0 34px rgba(139,250,240,.34));
   }
   .svc-tier-card__body {
     display: flex;
@@ -800,9 +848,9 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
     margin-bottom: 10px;
   }
   .svc-card-icon {
-    width: clamp(66px, 20vw, 200px);
-    height: auto;
-    min-width: clamp(66px, 7vw, 82px);
+    width: clamp(132px, 12vw, 176px);
+    height: clamp(132px, 12vw, 176px);
+    min-width: clamp(132px, 12vw, 176px);
     border-radius: 22px;
     display: grid;
     place-items: center;
@@ -826,15 +874,16 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
     height: 100%;
     object-fit: contain;
     filter: drop-shadow(0 14px 28px rgba(0,0,0,.28));
+    animation: svc-icon-drift-a 8s ease-in-out infinite;
   }
   .svc-plan-card--process .svc-card-top {
     align-items: flex-start;
     margin-bottom: 16px;
   }
   .svc-card-icon--process {
-    width: clamp(118px, 12vw, 154px);
-    height: clamp(118px, 12vw, 154px);
-    min-width: clamp(118px, 12vw, 154px);
+    width: clamp(174px, 15vw, 208px);
+    height: clamp(174px, 15vw, 208px);
+    min-width: clamp(174px, 15vw, 208px);
     padding: 0;
     border-radius: 26px;
     background:
@@ -855,6 +904,16 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
     transform: translateY(-4px) scale(1.04);
     filter: drop-shadow(0 28px 48px rgba(0,0,0,.46));
   }
+  .svc-plan-card--process:nth-child(2) .svc-card-icon img,
+  .svc-addon:nth-child(2) .svc-card-icon img { animation-name: svc-icon-drift-b; animation-delay: -2s; }
+  .svc-plan-card--process:nth-child(3) .svc-card-icon img,
+  .svc-addon:nth-child(3) .svc-card-icon img { animation-name: svc-icon-drift-c; animation-delay: -4s; }
+  .svc-plan-card--process:nth-child(4) .svc-card-icon img,
+  .svc-addon:nth-child(4) .svc-card-icon img { animation-name: svc-icon-drift-b; animation-delay: -6s; }
+  .svc-plan-card--process:nth-child(5) .svc-card-icon img,
+  .svc-addon:nth-child(5) .svc-card-icon img { animation-name: svc-icon-drift-c; animation-delay: -1s; }
+  .svc-plan-card--process:nth-child(6) .svc-card-icon img,
+  .svc-addon:nth-child(6) .svc-card-icon img { animation-name: svc-icon-drift-a; animation-delay: -3s; }
 
   /* Add-ons */
   .svc-addon {
@@ -863,9 +922,9 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
     gap: 10px;
   }
   .svc-card-icon--addon {
-    width: clamp(96px, 20vw, 200px);
-    height: auto;
-    min-width: clamp(96px, 9vw, 124px);
+    width: clamp(158px, 14vw, 190px);
+    height: clamp(158px, 14vw, 190px);
+    min-width: clamp(158px, 14vw, 190px);
     padding: 0;
     border-radius: 24px;
     background:
@@ -881,6 +940,11 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
     margin: -4%;
     filter: drop-shadow(0 20px 34px rgba(0,0,0,.34));
   }
+  .svc-addon .svc-card-icon:not(.svc-card-icon--addon) {
+    width: clamp(142px, 13vw, 178px);
+    height: clamp(142px, 13vw, 178px);
+    min-width: clamp(142px, 13vw, 178px);
+  }
   .svc-addon h3 { margin: 0; font-size: 1.15rem; }
   .svc-addon p { flex: 1; margin: 0; font-size: .9rem; line-height: 1.6; color: var(--muted, rgba(209,215,230,.74)); }
   .svc-addon .button { margin-top: auto; align-self: flex-start; }
@@ -895,7 +959,7 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
     position: relative;
     display: grid;
     place-items: end center;
-    min-height: clamp(144px, 17vw, 196px);
+    min-height: clamp(214px, 22vw, 258px);
     margin: -4px -2px 2px;
     padding: 12px 14px 18px;
     border-radius: 24px;
@@ -919,26 +983,32 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
   .svc-card-showcase img {
     position: relative;
     z-index: 1;
-    max-width: min(240px, 82%);
-    max-height: 170px;
+    max-width: min(330px, 92%);
+    max-height: 232px;
     width: auto;
     height: auto;
     object-fit: contain;
     filter: drop-shadow(0 24px 44px rgba(0,0,0,.38));
+    animation: svc-showcase-drift-a 9s ease-in-out infinite;
   }
-.svc-card-showcase--small {
-    min-height: 126px;
+  .svc-route-grid .svc-showcase-card:nth-child(2) .svc-card-showcase img { animation-name: svc-showcase-drift-b; animation-delay: -3s; }
+  .svc-route-grid .svc-showcase-card:nth-child(3) .svc-card-showcase img { animation-name: svc-showcase-drift-c; animation-delay: -5s; }
+  .svc-route-grid .svc-showcase-card:nth-child(1) .svc-card-showcase img { transform: rotate(-6deg) translateX(-8px) scale(1.08); }
+  .svc-route-grid .svc-showcase-card:nth-child(2) .svc-card-showcase img { transform: rotate(5deg) translateX(8px) scale(1.12); }
+  .svc-route-grid .svc-showcase-card:nth-child(3) .svc-card-showcase img { transform: rotate(-4deg) translateX(6px) scale(1.08); }
+  .svc-card-showcase--small {
+    min-height: 190px;
     place-items: center;
   }
   .svc-card-showcase--small img {
-    max-width: 400px;
+    max-width: 360px;
     max-height: 100%;
     width: 100%;
     height: auto;
     object-fit: contain;
   }
   .svc-card-showcase--wide {
-    min-height: clamp(176px, 22vw, 228px);
+    min-height: clamp(230px, 25vw, 290px);
     padding: 0;
     place-items: stretch;
   }
@@ -949,6 +1019,39 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
     height: 100%;
     object-fit: cover;
     border-radius: 24px;
+  }
+  @keyframes svc-stat-drift {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg); }
+    50% { transform: translate3d(0, -8px, 0) rotate(2deg); }
+  }
+  @keyframes svc-icon-drift-a {
+    0%, 100% { transform: translate3d(-2px, 2px, 0) rotate(-2deg); }
+    50% { transform: translate3d(4px, -7px, 0) rotate(2deg); }
+  }
+  @keyframes svc-icon-drift-b {
+    0%, 100% { transform: translate3d(3px, 1px, 0) rotate(2deg); }
+    50% { transform: translate3d(-4px, -6px, 0) rotate(-2deg); }
+  }
+  @keyframes svc-icon-drift-c {
+    0%, 100% { transform: translate3d(0, -2px, 0) rotate(-3deg); }
+    50% { transform: translate3d(5px, 5px, 0) rotate(1deg); }
+  }
+  @keyframes svc-showcase-drift-a {
+    0%, 100% { transform: rotate(-6deg) translate3d(-8px, 4px, 0) scale(1.08); }
+    50% { transform: rotate(-2deg) translate3d(2px, -8px, 0) scale(1.12); }
+  }
+  @keyframes svc-showcase-drift-b {
+    0%, 100% { transform: rotate(5deg) translate3d(8px, 2px, 0) scale(1.12); }
+    50% { transform: rotate(1deg) translate3d(-4px, -8px, 0) scale(1.16); }
+  }
+  @keyframes svc-showcase-drift-c {
+    0%, 100% { transform: rotate(-4deg) translate3d(6px, 4px, 0) scale(1.08); }
+    50% { transform: rotate(-8deg) translate3d(-5px, -6px, 0) scale(1.13); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .svc-stat-icon,
+    .svc-card-icon img,
+    .svc-card-showcase img { animation: none; }
   }
   .svc-why-card h3 { margin: 0 0 12px; }
   .svc-why-card .detail-list {
@@ -1105,42 +1208,64 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
       text-align: center;
     }
     .svc-stat-icon {
-      width: 200px;
+      width: 180px;
       height: auto;
     }
     .svc-card-icon {
-      width: 64px;
-      height: 64px;
-      min-width: 64px;
-      border-radius: 18px;
-    }
-    .svc-card-icon--process {
-      width: 130px;
-      height: 130px;
-      min-width: 130px;
-      border-radius: 24px;
-    }
-    .svc-card-icon--addon {
-      width: 112px;
-      height: 112px;
-      min-width: 112px;
+      width: 128px;
+      height: 128px;
+      min-width: 128px;
       border-radius: 22px;
     }
+    .svc-card-icon--process {
+      width: 154px;
+      height: 154px;
+      min-width: 154px;
+      border-radius: 26px;
+    }
+    .svc-card-icon--addon {
+      width: 144px;
+      height: 144px;
+      min-width: 144px;
+      border-radius: 24px;
+    }
+    .svc-addon .svc-card-icon:not(.svc-card-icon--addon) {
+      width: 128px;
+      height: 128px;
+      min-width: 128px;
+    }
     .svc-card-showcase {
-      min-height: 128px;
-      padding: 10px 12px 16px;
+      min-height: 190px;
+      padding: 10px 12px 18px;
     }
     .svc-card-showcase img {
-      max-width: min(210px, 78%);
-      max-height: 128px;
+      max-width: min(300px, 92%);
+      max-height: 190px;
     }
     .svc-card-showcase--wide {
-      min-height: 168px;
+      min-height: 214px;
     }
     .svc-card-showcase--small img {
-      max-width: 118px;
-      max-height: 92px;
+      max-width: 260px;
+      max-height: 174px;
     }
+    .svc-tier-card__visual {
+      height: 270px;
+      padding: 10px;
+    }
+    .svc-tier-card__visual::after {
+      inset: 10px;
+      border-radius: 16px;
+    }
+    .svc-tier-card__asset {
+      width: min(100%, 310px);
+      height: 252px;
+    }
+    .svc-tier-card__body { padding: 22px 20px 20px; }
+    .svc-tier-card .svc-plan-actions {
+      flex-direction: column;
+    }
+    .svc-tier-card .svc-plan-actions .button { width: 100%; }
     .svc-entry-card { grid-template-columns: 1fr; gap: 22px; padding: 22px; }
     .svc-entry-points { grid-template-columns: 1fr; }
     .svc-entry-action { padding: 20px 16px; }
