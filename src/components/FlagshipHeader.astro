@@ -1,6 +1,9 @@
 ---
 import { ROUTES } from "../data/routes";
 
+const navIconThumb = (src: string) =>
+  src.replace("/assets/", "/assets/nav-icons/").replace(/\.(webp|png|jpe?g)$/i, ".webp");
+
 const navGroups = [
   {
     key: "volynx",
@@ -108,7 +111,7 @@ const { current = "", brandHref = ROUTES.platform, ctaHref = ROUTES.pricing, cta
             <div class="vx-mega__grid">
               {group.items.map((item) => (
                 <a href={item.href} class="vx-mega-item">
-                  <span class="vx-mega-item__icon"><img src={item.icon} alt="" loading="lazy" decoding="async" /></span>
+                  <span class="vx-mega-item__icon"><img data-vx-lazy-nav-icon={navIconThumb(item.icon)} alt="" width="32" height="32" decoding="async" /></span>
                   <span class="vx-mega-item__copy"><strong><span class="i18n-en">{item.label}</span><span class="i18n-pt">{item.labelPt || item.label}</span></strong><span><span class="i18n-en">{item.detail}</span><span class="i18n-pt">{item.detailPt}</span></span></span>
                   <span class="vx-mega-item__arrow" aria-hidden="true">↗</span>
                 </a>
@@ -199,7 +202,7 @@ const { current = "", brandHref = ROUTES.platform, ctaHref = ROUTES.pricing, cta
           </a>
           {group.items.map((item) => (
             <a href={item.href} class="vx-mobile-group__item">
-              <span class="vx-mobile-group__icon"><img src={item.icon} alt="" loading="lazy" decoding="async" /></span>
+              <span class="vx-mobile-group__icon"><img data-vx-lazy-nav-icon={navIconThumb(item.icon)} alt="" width="32" height="32" decoding="async" /></span>
               <span><strong><span class="i18n-en">{item.label}</span><span class="i18n-pt">{item.labelPt || item.label}</span></strong><small><span class="i18n-en">{item.detail}</span><span class="i18n-pt">{item.detailPt}</span></small></span>
             </a>
           ))}
@@ -994,6 +997,25 @@ const { current = "", brandHref = ROUTES.platform, ctaHref = ROUTES.pricing, cta
 </style>
 
 <script>
+  // Menu artwork is intentionally hydrated only when a menu becomes visible.
+  // The source files are premium artwork, but several are far larger than the
+  // 32px slot they occupy and should never block the initial homepage render.
+  function hydrateNavIcons(scope: ParentNode | null = document) {
+    if (!scope) return;
+    scope.querySelectorAll<HTMLImageElement>("img[data-vx-lazy-nav-icon]").forEach((img) => {
+      if (img.getAttribute("src")) return;
+      const src = img.dataset.vxLazyNavIcon;
+      if (!src) return;
+      img.src = src;
+      img.removeAttribute("data-vx-lazy-nav-icon");
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-vx-nav-group]").forEach((group) => {
+    group.addEventListener("mouseenter", () => hydrateNavIcons(group), { once: true });
+    group.addEventListener("focusin", () => hydrateNavIcons(group), { once: true });
+  });
+
   // Burger
   const btn = document.getElementById("mobileMenuBtn");
   const nav = document.getElementById("mobileNav");
@@ -1020,6 +1042,7 @@ const { current = "", brandHref = ROUTES.platform, ctaHref = ROUTES.pricing, cta
       });
       group.classList.toggle("is-open", willOpen);
       trigger.setAttribute("aria-expanded", String(willOpen));
+      if (willOpen) hydrateNavIcons(group);
       if (panel) panel.hidden = !willOpen;
     });
   });
