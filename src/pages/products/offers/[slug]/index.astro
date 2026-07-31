@@ -1,0 +1,14 @@
+---
+import ProductOfferPreviewPage from "../../../../components/ProductOfferPreviewPage.astro";
+import { productOfferPreviewBySlug, productOfferPreviews } from "../../../../data/product-offers";
+
+export function getStaticPaths() {
+  return productOfferPreviews.map((offer) => ({ params: { slug: offer.slug }, props: { offer } }));
+}
+
+const { slug } = Astro.params;
+const offer = Astro.props.offer || productOfferPreviewBySlug[slug || ""];
+if (!offer) throw new Error(`Unknown product offer: ${slug}`);
+---
+
+<ProductOfferPreviewPage offer={offer} />

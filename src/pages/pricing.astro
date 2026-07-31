@@ -8,7 +8,7 @@ import ToolUsageCard from "../components/pricing/ToolUsageCard.astro";
 import AddonCard from "../components/pricing/AddonCard.astro";
 import PlatformAssistStrip from "../components/PlatformAssistStrip.astro";
 import { sitePricing } from "../data/pricing";
-import { ROUTES, checkoutHref } from "../data/routes";
+import { ROUTES, productPreviewHref } from "../data/routes";
 
 const lang = Astro.url.searchParams.get('lang') === 'pt' ? 'pt' : 'en';
 const currencyParam = Astro.url.searchParams.get('currency') || '';
@@ -78,44 +78,44 @@ const pricingAssistItems = [
         </div>
 
         <div class="revenue-funnel__cards">
-          <a href={checkoutHref("bundle_volynx_daily_pro", { next: `${ROUTES.pricing}#bundles` })} class="revenue-funnel-card revenue-funnel-card--featured vx-checkout-btn" data-lookup="bundle_volynx_daily_pro">
+          <a href={productPreviewHref("bundle_volynx_daily_pro")} class="revenue-funnel-card revenue-funnel-card--featured">
             <span class="revenue-funnel-card__badge"><span class="i18n-en">Best recurring path</span><span class="i18n-pt">Melhor recorrência</span></span>
             <img src="/assets/bundle.webp" alt="" loading="lazy" decoding="async" />
             <strong>VOLYNX Essential</strong>
             <small>Builder Pro + Daily Pro</small>
             <p><span class="i18n-en">The cleanest subscription for creators who need publishing plus daily execution.</span><span class="i18n-pt">A assinatura mais clara para criadores que precisam publicar e executar todos os dias.</span></p>
             <span class="revenue-funnel-card__price">£35 / month</span>
-            <span class="revenue-funnel-card__cta"><span class="i18n-en">Activate Essential</span><span class="i18n-pt">Ativar Essential</span> →</span>
+            <span class="revenue-funnel-card__cta"><span class="i18n-en">View Essential</span><span class="i18n-pt">Ver Essential</span> →</span>
           </a>
 
-          <a href={checkoutHref("builder_pro", { next: `${ROUTES.pricing}#plans` })} class="revenue-funnel-card vx-checkout-btn" data-lookup="builder_pro">
+          <a href={productPreviewHref("builder_pro")} class="revenue-funnel-card">
             <span class="revenue-funnel-card__badge"><span class="i18n-en">Publish sites</span><span class="i18n-pt">Publicar sites</span></span>
             <img src="/assets/builderpro.webp" alt="" loading="lazy" decoding="async" />
             <strong>Builder Pro</strong>
             <small>Custom domain + premium kits</small>
             <p><span class="i18n-en">For users who are blocked by launch, domain, branding or professional presentation.</span><span class="i18n-pt">Para quem está travado por lançamento, domínio, branding ou apresentação profissional.</span></p>
             <span class="revenue-funnel-card__price">£24 / month</span>
-            <span class="revenue-funnel-card__cta"><span class="i18n-en">Upgrade Builder</span><span class="i18n-pt">Atualizar Builder</span> →</span>
+            <span class="revenue-funnel-card__cta"><span class="i18n-en">View Builder Pro</span><span class="i18n-pt">Ver Builder Pro</span> →</span>
           </a>
 
-          <a href={checkoutHref("cvitae_business", { next: `${ROUTES.pricing}#cvitae` })} class="revenue-funnel-card vx-checkout-btn" data-lookup="cvitae_business">
+          <a href={productPreviewHref("cvitae_business")} class="revenue-funnel-card">
             <span class="revenue-funnel-card__badge"><span class="i18n-en">Career ROI</span><span class="i18n-pt">ROI de carreira</span></span>
             <img src="/assets/cvitae.webp" alt="" loading="lazy" decoding="async" />
             <strong>CVitae Business</strong>
             <small>Unlimited CV workflow</small>
             <p><span class="i18n-en">For professionals who need unlimited CVs, templates and export-ready career assets.</span><span class="i18n-pt">Para profissionais que precisam de CVs ilimitados, templates e ativos de carreira prontos para exportar.</span></p>
             <span class="revenue-funnel-card__price">£15 / month</span>
-            <span class="revenue-funnel-card__cta"><span class="i18n-en">Activate Business</span><span class="i18n-pt">Ativar Business</span> →</span>
+            <span class="revenue-funnel-card__cta"><span class="i18n-en">View Business</span><span class="i18n-pt">Ver Business</span> →</span>
           </a>
 
-          <a href={checkoutHref("tokens_core", { next: `${ROUTES.pricing}#vx-packs` })} class="revenue-funnel-card vx-checkout-btn" data-lookup="tokens_core">
+          <a href={productPreviewHref("tokens_core")} class="revenue-funnel-card">
             <span class="revenue-funnel-card__badge"><span class="i18n-en">One-time capacity</span><span class="i18n-pt">Capacidade avulsa</span></span>
             <img src="/assets/VX4.webp" alt="" loading="lazy" decoding="async" />
             <strong>32 VX Core</strong>
             <small>No subscription change</small>
             <p><span class="i18n-en">For users who only need enabled premium actions: exports, templates and selected Studio capacity.</span><span class="i18n-pt">Para quem só precisa de ações premium habilitadas: exports, templates e capacidade Studio selecionada.</span></p>
             <span class="revenue-funnel-card__price">£18 one-time</span>
-            <span class="revenue-funnel-card__cta"><span class="i18n-en">Buy VX</span><span class="i18n-pt">Comprar VX</span> →</span>
+            <span class="revenue-funnel-card__cta"><span class="i18n-en">Review VX pack</span><span class="i18n-pt">Ver pacote VX</span> →</span>
           </a>
         </div>
       </div>
@@ -281,7 +281,7 @@ const pricingAssistItems = [
       </div>
       <div class="shell pricing-grid pricing-grid--plans">
         {sitePricing.builderPlans.map((plan) => (
-          <PricingCard plan={plan} locale={lang} currency={currency} />
+          <PricingCard plan={plan} locale={lang} currency={currency} previewSlug="qrgen-pro" />
         ))}
       </div>
       <div class="shell">
@@ -387,7 +387,7 @@ const pricingAssistItems = [
         <div class="cvitae-actions">
           <a class="button button--ghost" href={`${ROUTES.cvitae}/editor/`}><span class="i18n-en">Open CVitae</span><span class="i18n-pt">Abrir CVitae</span></a>
           <a class="button button--ghost" href={ROUTES.recarregar}><span class="i18n-en">Get VX</span><span class="i18n-pt">Comprar VX</span></a>
-          <a class="button button--gold" id="cvitaeBusinessBtn" href={checkoutHref("cvitae_business", { next: `${ROUTES.pricing}#cvitae` })}><span class="i18n-en">Activate Business</span><span class="i18n-pt">Ativar Business</span></a>
+          <a class="button button--gold" href={productPreviewHref("cvitae_business")}><span class="i18n-en">View Business</span><span class="i18n-pt">Ver Business</span></a>
         </div>
       </div>
     </section>
@@ -452,9 +452,9 @@ const pricingAssistItems = [
             <span>Daily Pro</span>
             <span>CVitae Business</span>
           </div>
-          <a href={checkoutHref("bundle_volynx_daily_pro", { next: `${ROUTES.pricing}#guided-suites` })} class="button button--gold vx-checkout-btn" data-lookup="bundle_volynx_daily_pro">
-            <span class="i18n-en">Start with Essential</span>
-            <span class="i18n-pt">Começar com Essential</span>
+          <a href={productPreviewHref("bundle_volynx_daily_pro")} class="button button--gold">
+            <span class="i18n-en">View Essential</span>
+            <span class="i18n-pt">Ver Essential</span>
           </a>
         </article>
 
@@ -467,9 +467,9 @@ const pricingAssistItems = [
             <span>Icons Premium</span>
             <span>Lumina</span>
           </div>
-          <a href={checkoutHref("pf_professional", { next: `${ROUTES.pricing}#guided-suites` })} class="button button--gold vx-checkout-btn" data-lookup="pf_professional">
-            <span class="i18n-en">Start with PropertyFlow</span>
-            <span class="i18n-pt">Começar pelo PropertyFlow</span>
+          <a href={ROUTES.propertyflow} class="button button--gold">
+            <span class="i18n-en">View PropertyFlow</span>
+            <span class="i18n-pt">Ver PropertyFlow</span>
           </a>
         </article>
 
@@ -482,9 +482,9 @@ const pricingAssistItems = [
             <span>CVitae Business</span>
             <span>Icons Store</span>
           </div>
-          <a href={checkoutHref("builder_pro", { next: `${ROUTES.pricing}#guided-suites` })} class="button button--gold vx-checkout-btn" data-lookup="builder_pro">
-            <span class="i18n-en">Start with Builder</span>
-            <span class="i18n-pt">Começar pelo Builder</span>
+          <a href={productPreviewHref("builder_pro")} class="button button--gold">
+            <span class="i18n-en">View Builder Pro</span>
+            <span class="i18n-pt">Ver Builder Pro</span>
           </a>
         </article>
 
@@ -497,9 +497,9 @@ const pricingAssistItems = [
             <span>Builder Pro</span>
             <span>VX Core</span>
           </div>
-          <a href={checkoutHref("pf_professional", { next: `${ROUTES.pricing}#guided-suites` })} class="button button--gold vx-checkout-btn" data-lookup="pf_professional">
-            <span class="i18n-en">Buy PropertyFlow</span>
-            <span class="i18n-pt">Comprar PropertyFlow</span>
+          <a href={ROUTES.propertyflow} class="button button--gold">
+            <span class="i18n-en">View PropertyFlow</span>
+            <span class="i18n-pt">Ver PropertyFlow</span>
           </a>
         </article>
       </div>
@@ -541,8 +541,8 @@ const pricingAssistItems = [
               </strong>
               <span><span class="i18n-en">{b.billing.en}</span><span class="i18n-pt">{b.billing.pt}</span></span>
             </div>
-            <a href={checkoutHref(bundleLookupById[b.id], { next: `${ROUTES.pricing}#bundles` })} class="bundle-card__cta" data-bundle-key={bundleLookupById[b.id]}>
-              <span class="i18n-en">{b.cta.en}</span><span class="i18n-pt">{b.cta.pt}</span>
+            <a href={productPreviewHref(bundleLookupById[b.id])} class="bundle-card__cta" data-preview="true">
+              <span class="i18n-en">View bundle</span><span class="i18n-pt">Ver bundle</span>
             </a>
           </article>
         ))}
@@ -2238,6 +2238,7 @@ const pricingAssistItems = [
 
       function resolveCheckout(target) {
         if (!target) return null;
+        if (target.getAttribute('data-preview') === 'true') return null;
 
         if (target.id === 'cvitaeBusinessBtn') {
           return {
@@ -2509,6 +2510,7 @@ const pricingAssistItems = [
     };
 
     document.querySelectorAll('.pricing-card__cta').forEach((btn) => {
+      if (btn.dataset.preview === 'true') return;
       const card = btn.closest('.pricing-card');
       const planId = card?.getAttribute('data-plan') || '';
       const freeHref = FREE_PLAN_HREFS[planId];
@@ -2543,6 +2545,7 @@ const pricingAssistItems = [
 
     // ── Bundles: checkout via Stripe ──
     document.querySelectorAll('.bundle-card__cta').forEach(btn => {
+      if (btn.dataset.preview === 'true') return;
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
         if (!token) { if (window.VxReturn) window.VxReturn.redirectToLogin(); else window.location.href = '/login/?next=/pricing/'; return; }
@@ -2566,6 +2569,7 @@ const pricingAssistItems = [
 
     // ── Token pack: Stripe checkout (card) ──
     document.querySelectorAll('.token-card__cta').forEach((btn) => {
+      if (btn.dataset.preview === 'true') return;
       const card = btn.closest('.token-card');
       const packId = card?.getAttribute('data-pack-id') || '';
       const packKey = TOKEN_PACK_LOOKUP_PREFIX[packId];
@@ -2597,6 +2601,7 @@ const pricingAssistItems = [
     }
 
     document.querySelectorAll('.token-card__pix').forEach(btn => {
+      if (btn.dataset.preview === 'true') return;
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
         if (!token) { if (window.VxReturn) window.VxReturn.redirectToLogin(); else window.location.href = '/login/?next=/pricing/'; return; }

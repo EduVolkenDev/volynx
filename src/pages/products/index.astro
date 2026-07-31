@@ -4,7 +4,7 @@ import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import FlagshipFooter from "../../components/FlagshipFooter.astro";
 import PlatformAssistStrip from "../../components/PlatformAssistStrip.astro";
 import { sitePricing } from "../../data/pricing";
-import { ROUTES, checkoutHref } from "../../data/routes";
+import { ROUTES, productPreviewHref } from "../../data/routes";
 
 const currencyParam = Astro.url.searchParams.get('currency') || '';
 const currentCurrency = (['GBP', 'EUR', 'BRL'] as const).includes(currencyParam as any) ? currencyParam as 'GBP'|'EUR'|'BRL' : 'GBP';
@@ -28,17 +28,12 @@ type BuyReadyOffer = {
   image: string;
   featured?: boolean;
   checkout?: boolean;
+  previewSlug?: string;
 };
 
-const buyReadyNext = `${ROUTES.products}#buy-now`;
 const checkoutOffer = (offer: Omit<BuyReadyOffer, 'href'> & { next?: string }): BuyReadyOffer => {
-  const { next, ...item } = offer;
-  const needsStoreContext = item.lookup.startsWith('icons_pack_');
-  return {
-    ...item,
-    href: needsStoreContext ? ROUTES.iconsStore : checkoutHref(item.lookup, { next: next || buyReadyNext }),
-    checkout: !needsStoreContext,
-  };
+  const { next: _next, ...item } = offer;
+  return { ...item, href: productPreviewHref(item.lookup, item.previewSlug), checkout: false };
 };
 
 const buyReadySections = [
@@ -55,6 +50,7 @@ const buyReadySections = [
         price: { GBP: '£24', EUR: '€28', BRL: 'R$149' },
         billing: { en: '/month', pt: '/mês' },
         lookup: 'builder_pro',
+        previewSlug: 'qrgen-pro',
         cta: { en: 'Buy QRGen Pro', pt: 'Comprar QRGen Pro' },
         image: '/assets/newqrgen.webp',
         featured: true,
@@ -368,7 +364,7 @@ const buyReadySections = [
         lookup: 'icons_pack_mixed',
         next: ROUTES.iconsStore,
         cta: { en: 'Choose pack', pt: 'Escolher pack' },
-        image: '/assets/icons-store-logo.webp',
+        image: '/assets/mixed-pack.webp',
       }),
       checkoutOffer({
         label: { en: 'Icon pack', pt: 'Pack de ícones' },
@@ -379,7 +375,7 @@ const buyReadySections = [
         lookup: 'icons_pack_premium',
         next: ROUTES.iconsStore,
         cta: { en: 'Choose pack', pt: 'Escolher pack' },
-        image: '/assets/icons-store-logo.webp',
+        image: '/assets/premium-pack.webp',
         featured: true,
       }),
       checkoutOffer({
@@ -391,7 +387,7 @@ const buyReadySections = [
         lookup: 'icons_pack_hyper',
         next: ROUTES.iconsStore,
         cta: { en: 'Choose pack', pt: 'Escolher pack' },
-        image: '/assets/icons-store-logo.webp',
+        image: '/assets/hyper-pack.webp',
       }),
     ],
   },
@@ -402,7 +398,7 @@ const buyReadyOfferCount = buyReadySections.reduce((total, section) => total + s
 const productAssistItems = [
   { href: ROUTES.pricing, label: { en: "Compare", pt: "Comparar" }, title: { en: "See pricing", pt: "Ver preços" }, copy: { en: "Compare Builder, Daily, bundles and VX without leaving the platform flow.", pt: "Compare Builder, Daily, pacotes e VX sem sair do fluxo da plataforma." }, emphasized: true, iconSrc: "/assets/newpricing1.webp" },
   { href: ROUTES.delivery, label: { en: "Post-purchase", pt: "Pós-compra" }, title: { en: "My products", pt: "Meus produtos" }, copy: { en: "Already bought something? Reopen access, delivery and product recovery here.", pt: "Já comprou algo? Reabra acesso, entrega e recuperação de produto aqui." }, iconSrc: "/assets/mybox.webp" },
-  { href: ROUTES.support, label: { en: "Support", pt: "Suporte" }, title: { en: "Need launch help?", pt: "Precisa de ajuda no lançamento?" }, copy: { en: "Route delivery, billing and access issues from the same ecosystem path.", pt: "Direcione entrega, cobrança e acesso pelo mesmo caminho do ecossistema." }, iconSrc: "/assets/support.webp" },
+  { href: ROUTES.support, label: { en: "Support", pt: "Suporte" }, title: { en: "Need launch help?", pt: "Precisa de ajuda no lançamento?" }, copy: { en: "Route delivery, billing and access issues from the same ecosystem path.", pt: "Direcione entrega, cobrança e acesso pelo mesmo caminho do ecossistema." }, iconSrc: "/assets/support-gold.webp" },
   { href: ROUTES.daily, label: { en: "Workspace", pt: "Área de trabalho" }, title: { en: "Open Daily", pt: "Abrir Daily" }, copy: { en: "Jump from buying tools into the daily workspace where they connect back to use.", pt: "Saia da vitrine de ferramentas direto para a área diária onde elas se conectam ao uso." }, iconSrc: "/assets/daily-icon.webp" },
 ];
 ---
@@ -465,10 +461,9 @@ const productAssistItems = [
                   </div>
                   <a
                     href={offer.href}
-                    class:list={["button", "button--gold", "buy-ready-card__cta", offer.checkout !== false && "vx-checkout-btn"]}
-                    data-lookup={offer.checkout !== false ? offer.lookup : undefined}
-                    data-label={offer.cta.en}
-                  ><span class="i18n-en">{offer.cta.en}</span><span class="i18n-pt">{offer.cta.pt}</span></a>
+                    class="button button--gold buy-ready-card__cta"
+                    data-preview="true"
+                  ><span class="i18n-en">View product</span><span class="i18n-pt">Ver produto</span></a>
                 </article>
               ))}
             </div>
@@ -595,11 +590,10 @@ const productAssistItems = [
               </ul>
               {qrgenLookupByPlan[plan.id] && (
                 <a
-                  href={checkoutHref(qrgenLookupByPlan[plan.id], { next: `${ROUTES.products}#qrgen` })}
-                  class="button button--gold vx-checkout-btn qr-product-plan__cta"
-                  data-lookup={qrgenLookupByPlan[plan.id]}
-                  data-label={plan.cta.en}
-                ><span class="i18n-en">{plan.cta.en}</span><span class="i18n-pt">{plan.cta.pt}</span></a>
+                  href={productPreviewHref(qrgenLookupByPlan[plan.id], 'qrgen-pro')}
+                  class="button button--gold qr-product-plan__cta"
+                  data-preview="true"
+                ><span class="i18n-en">View QRGen plan</span><span class="i18n-pt">Ver plano QRGen</span></a>
               )}
             </article>
           ))}
@@ -632,7 +626,7 @@ const productAssistItems = [
           <div class="actions"><a href={ROUTES.lab} class="button button--ghost" data-i18n="prod.tool_lab_btn">Open Lab</a></div>
         </article>
         <article class="panel product-card product-card--iconic">
-          <img src="/assets/education.webp" alt="" class="product-card__float-icon" />
+          <img src="/assets/lumina/lumina-icon-transparent.webp" alt="" class="product-card__float-icon" />
           <div class="head-row">
             <div><span class="label label--free">Knowledge tool</span><h3>Volynx Lumina</h3></div>
           </div>

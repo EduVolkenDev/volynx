@@ -1,0 +1,98 @@
+---
+import FlagshipLayout from "../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "./FlagshipHeader.astro";
+import FlagshipFooter from "./FlagshipFooter.astro";
+import { ROUTES, checkoutHref } from "../data/routes";
+import type { ProductOfferPreview } from "../data/product-offers";
+
+interface Props { offer: ProductOfferPreview; }
+const { offer } = Astro.props;
+const checkoutUrl = checkoutHref(offer.lookup, { next: `/products/offers/${offer.slug}/` });
+---
+
+<FlagshipLayout title={`${offer.name.en} — Product preview | VOLYNX`} description={offer.summary.en} pageClass="page-product-offer">
+  <FlagshipHeader current={ROUTES.products} ctaLabel="Back to products" ctaHref={ROUTES.products} />
+  <main>
+    <section class="offer-preview-hero">
+      <div class="shell offer-preview-hero__grid">
+        <div class="offer-preview-copy">
+          <span class="kicker"><span class="i18n-en">{offer.eyebrow.en}</span><span class="i18n-pt">{offer.eyebrow.pt}</span></span>
+          <h1><span class="i18n-en">{offer.title.en}</span><span class="i18n-pt">{offer.title.pt}</span></h1>
+          <p class="offer-preview-summary"><span class="i18n-en">{offer.summary.en}</span><span class="i18n-pt">{offer.summary.pt}</span></p>
+          <div class="offer-preview-actions">
+            <a href="#offer-decision" class="button button--gold">
+              <span class="i18n-en">See what you get</span><span class="i18n-pt">Ver o que você recebe</span>
+            </a>
+            <a href={ROUTES.products} class="button button--ghost"><span class="i18n-en">Back to product catalog</span><span class="i18n-pt">Voltar ao catálogo</span></a>
+          </div>
+          <p class="offer-preview-reassurance"><span class="i18n-en">You are reviewing the product before checkout. No payment is started from this page until you choose to continue.</span><span class="i18n-pt">Você está revisando o produto antes do checkout. Nenhum pagamento começa nesta página até você escolher continuar.</span></p>
+        </div>
+        <div class="offer-preview-art panel" aria-label={offer.name.en}>
+          <img src={offer.image} alt={offer.name.en} loading="eager" decoding="async" />
+          <span class="offer-preview-art__glow" aria-hidden="true"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section page-section--tight">
+      <div class="shell offer-preview-metrics">
+        {offer.metrics.map((item) => (
+          <article class="panel offer-preview-metric"><strong>{item.value}</strong><span><span class="i18n-en">{item.label.en}</span><span class="i18n-pt">{item.label.pt}</span></span></article>
+        ))}
+      </div>
+    </section>
+
+    <section class="page-section">
+      <div class="shell section-head">
+        <span class="eyebrow"><span class="i18n-en">Before you decide</span><span class="i18n-pt">Antes de decidir</span></span>
+        <h2><span class="i18n-en">See what you are buying, then choose the next step.</span><span class="i18n-pt">Veja o que está comprando e então escolha o próximo passo.</span></h2>
+      </div>
+      <div class="shell offer-preview-columns">
+        <article class="panel offer-preview-stack">
+          <span class="label"><span class="i18n-en">What you get</span><span class="i18n-pt">O que você recebe</span></span>
+          <ul>{offer.whatYouGet.map((item) => <li><span class="i18n-en">{item.en}</span><span class="i18n-pt">{item.pt}</span></li>)}</ul>
+        </article>
+        <article class="panel offer-preview-stack">
+          <span class="label label--pro"><span class="i18n-en">Best for</span><span class="i18n-pt">Para quem é</span></span>
+          <ul>{offer.bestFor.map((item) => <li><span class="i18n-en">{item.en}</span><span class="i18n-pt">{item.pt}</span></li>)}</ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="offer-decision" class="page-section page-section--last">
+      <div class="shell offer-preview-decision panel panel--pro">
+        <div><span class="eyebrow"><span class="i18n-en">Make an informed choice</span><span class="i18n-pt">Escolha com clareza</span></span><p><span class="i18n-en">{offer.decisionNote.en}</span><span class="i18n-pt">{offer.decisionNote.pt}</span></p></div>
+        <div class="offer-preview-decision__price"><span><span class="i18n-en">{offer.format.en}</span><span class="i18n-pt">{offer.format.pt}</span></span><strong>{offer.price.en}</strong></div>
+        <a href={checkoutUrl} class="button button--gold vx-checkout-btn" data-lookup={offer.lookup} data-label={offer.checkoutLabel.en}><span class="i18n-en">{offer.checkoutLabel.en}</span><span class="i18n-pt">{offer.checkoutLabel.pt}</span></a>
+      </div>
+    </section>
+  </main>
+  <FlagshipFooter />
+</FlagshipLayout>
+
+<style>
+  .page-product-offer .offer-preview-hero { padding: clamp(52px, 8vw, 112px) 0 54px; }
+  .offer-preview-hero__grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.8fr); gap:clamp(32px,7vw,96px); align-items:center; }
+  .offer-preview-copy h1 { max-width:760px; margin:16px 0 20px; font-size:clamp(2.8rem,6vw,6.4rem); line-height:.98; letter-spacing:-.045em; }
+  .offer-preview-summary { max-width:680px; color:var(--muted,rgba(209,215,230,.74)); font-size:clamp(1rem,1.5vw,1.25rem); line-height:1.65; }
+  .offer-preview-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:28px; }
+  .offer-preview-reassurance { max-width:620px; margin-top:18px; color:rgba(255,255,255,.52); font-size:.82rem; line-height:1.55; }
+  .offer-preview-art { position:relative; min-height:430px; display:grid; place-items:center; overflow:hidden; border:1px solid rgba(139,250,240,.2); background:radial-gradient(circle at 50% 30%,rgba(139,250,240,.17),transparent 55%),rgba(255,255,255,.035); }
+  .offer-preview-art img { position:relative; z-index:1; width:min(100%,480px); height:auto; object-fit:contain; filter:drop-shadow(0 24px 40px rgba(0,0,0,.48)); }
+  .offer-preview-art__glow { position:absolute; width:70%; aspect-ratio:1; border-radius:50%; background:rgba(168,85,247,.2); filter:blur(60px); }
+  .offer-preview-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+  .offer-preview-metric { display:grid; gap:6px; padding:22px; text-align:center; background:rgba(255,255,255,.035); }
+  .offer-preview-metric strong { color:#fff; font-size:clamp(1.7rem,3vw,2.6rem); line-height:1; }
+  .offer-preview-metric span { color:rgba(255,255,255,.58); font-size:.8rem; text-transform:uppercase; letter-spacing:.1em; }
+  .offer-preview-columns { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+  .offer-preview-stack { padding:clamp(22px,4vw,38px); }
+  .offer-preview-stack ul { display:grid; gap:14px; margin:22px 0 0; padding:0; list-style:none; }
+  .offer-preview-stack li { position:relative; padding-left:26px; color:rgba(255,255,255,.74); line-height:1.55; }
+  .offer-preview-stack li::before { content:'✓'; position:absolute; left:0; color:#8bfaf0; font-weight:800; }
+  .offer-preview-decision { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:24px; align-items:center; padding:clamp(24px,4vw,42px); }
+  .offer-preview-decision p { max-width:700px; margin:12px 0 0; color:rgba(255,255,255,.7); line-height:1.55; }
+  .offer-preview-decision__price { display:grid; gap:5px; text-align:right; white-space:nowrap; }
+  .offer-preview-decision__price span { color:rgba(255,255,255,.56); font-size:.72rem; text-transform:uppercase; letter-spacing:.12em; }
+  .offer-preview-decision__price strong { color:#fff; font-size:1.6rem; }
+  @media (max-width: 780px) { .offer-preview-hero__grid,.offer-preview-columns { grid-template-columns:1fr; } .offer-preview-art { min-height:300px; order:-1; } .offer-preview-metrics { grid-template-columns:1fr; } .offer-preview-decision { grid-template-columns:1fr; } .offer-preview-decision__price { text-align:left; } }
+</style>

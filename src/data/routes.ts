@@ -110,6 +110,44 @@ export const ROUTES = {
   email: "mailto:hello@volynx.world",
 } as const;
 
+/**
+ * Public product decision pages. A discovery CTA should land here before it
+ * can enter checkout; the pages either render a tailored offer preview or
+ * hand off to an existing product/kit page that already contains its demo.
+ */
+const PRODUCT_PREVIEW_ROUTES: Record<string, string> = {
+  bundle_volynx_daily_pro: "/products/offers/volynx-essential/",
+  bundle_volynx_daily_studio: "/products/offers/volynx-complete/",
+  builder_launch: "/products/offers/builder-launch/",
+  builder_pro: "/products/offers/builder-pro/",
+  builder_studio: "/products/offers/builder-studio/",
+  builder_teams: "/products/offers/builder-teams/",
+  studio_pro: "/products/offers/studio-pro/",
+  daily_pro: "/products/offers/daily-pro/",
+  daily_diamond: "/products/offers/daily-diamond/",
+  cvitae_business: "/products/offers/cvitae-business/",
+  tokens_starter: "/products/offers/vx-starter/",
+  tokens_core: "/products/offers/vx-core/",
+  tokens_pro: "/products/offers/vx-pro/",
+  tokens_scale: "/products/offers/vx-scale/",
+
+  kit_portfolio_personal: ROUTES.portfolioKitPreview,
+  kit_portfolio_commercial: ROUTES.portfolioKitPreview,
+  kit_portfolio_studio: ROUTES.portfolioKitPreview,
+  kit_agency_personal: ROUTES.agencyKitPreview,
+  kit_agency_commercial: ROUTES.agencyKitPreview,
+  kit_agency_studio: ROUTES.agencyKitPreview,
+  kit_saas_personal: ROUTES.saasSystemPreview,
+  kit_saas_commercial: ROUTES.saasSystemPreview,
+  kit_saas_studio: ROUTES.saasSystemPreview,
+  pf_starter: ROUTES.propertyflow,
+  pf_professional: ROUTES.propertyflow,
+  pf_white_label: ROUTES.propertyflow,
+  icons_pack_mixed: ROUTES.iconsStore,
+  icons_pack_premium: ROUTES.iconsStore,
+  icons_pack_hyper: ROUTES.iconsStore,
+};
+
 export type RouteKey = keyof typeof ROUTES;
 
 export function checkoutHref(
@@ -130,4 +168,9 @@ export function checkoutHref(
   }
 
   return `${ROUTES.checkout}?${params.toString()}`;
+}
+
+export function productPreviewHref(lookupKey: string, previewSlug?: string) {
+  if (previewSlug) return `/products/offers/${previewSlug}/`;
+  return PRODUCT_PREVIEW_ROUTES[lookupKey] || ROUTES.products;
 }

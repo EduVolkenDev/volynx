@@ -103,9 +103,15 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
                   <input id="qrSlug" type="text" maxlength="32" placeholder="optional" data-i18n-placeholder="admin.codes.ph_optional" />
                 </label>
               </div>
-              <label class="codes-check">
-                <input id="qrNeverExpires" type="checkbox" checked />
-                <span data-i18n="admin.codes.never_expires">Never expires</span>
+              <label>
+                <span data-i18n="admin.codes.qr_validity">QR validity</span>
+                <select id="qrValidity">
+                  <option value="1m" data-i18n="admin.codes.qr_validity_1_month" selected>1 month</option>
+                  <option value="3m" data-i18n="admin.codes.qr_validity_3_months">3 months</option>
+                  <option value="6m" data-i18n="admin.codes.qr_validity_6_months">6 months</option>
+                  <option value="1y" data-i18n="admin.codes.qr_validity_1_year">1 year</option>
+                  <option value="never" data-i18n="admin.codes.never_expires">Never expires</option>
+                </select>
               </label>
               <button id="qrCreateBtn" class="codes-btn primary" type="submit" data-i18n="admin.codes.create_qr">Create QR</button>
               <p id="qrCreateMsg" class="codes-msg" aria-live="polite"></p>
@@ -241,7 +247,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
 
   <script is:inline src="/js/vx-auth-bridge.js"></script>
   <script is:inline src="/js/vx-token-refresh.js?v=20260515-codes-console"></script>
-  <script type="module">
+  <script>
     import QRCode from "qrcode";
 
     const QR_HOST = "https://qr.volynx.world";
@@ -272,7 +278,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       qrTarget: $("qrTarget"),
       qrLabel: $("qrLabel"),
       qrSlug: $("qrSlug"),
-      qrNeverExpires: $("qrNeverExpires"),
+      qrValidity: $("qrValidity"),
       qrCreateBtn: $("qrCreateBtn"),
       qrCreateMsg: $("qrCreateMsg"),
       qrResult: $("qrResult"),
@@ -454,6 +460,38 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       return String(value || "").trim().replace(/[^a-zA-Z0-9_-]/g, "");
     }
 
+    function addCalendarMonths(date, months) {
+      const next = new Date(date);
+      const day = next.getUTCDate();
+      next.setUTCDate(1);
+      next.setUTCMonth(next.getUTCMonth() + months);
+      const lastDay = new Date(Date.UTC(next.getUTCFullYear(), next.getUTCMonth() + 1, 0)).getUTCDate();
+      next.setUTCDate(Math.min(day, lastDay));
+      return next;
+    }
+
+    function qrValidityDates(value) {
+      if (value === "never") return { expires_at: null, grace_until: null };
+      const months = { "1m": 1, "3m": 3, "6m": 6, "1y": 12 }[value] || 1;
+      const expiresAt = addCalendarMonths(new Date(), months);
+      const graceUntil = new Date(expiresAt);
+      graceUntil.setUTCDate(graceUntil.getUTCDate() + 7);
+      return { expires_at: expiresAt.toISOString(), grace_until: graceUntil.toISOString() };
+    }
+
+    function qrValidityOptions(selected = "1m") {
+      const options = [
+        ["1m", "admin.codes.qr_validity_1_month", "1 month"],
+        ["3m", "admin.codes.qr_validity_3_months", "3 months"],
+        ["6m", "admin.codes.qr_validity_6_months", "6 months"],
+        ["1y", "admin.codes.qr_validity_1_year", "1 year"],
+        ["never", "admin.codes.never_expires", "Never expires"],
+      ];
+      return options.map(([value, key, fallback]) => (
+        `<option value="${value}" ${value === selected ? "selected" : ""}>${escapeHtml(t(key, fallback))}</option>`
+      )).join("");
+    }
+
     function normalizeTargetUrl(value) {
       const raw = String(value || "").trim();
       if (!raw) return "";
@@ -526,6 +564,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
         const target = normalizeTargetUrl(el.qrTarget.value);
         const label = el.qrLabel.value.trim();
         const requestedSlug = normalizeSlug(el.qrSlug.value);
+        const validity = qrValidityDates(el.qrValidity.value);
         el.qrTarget.value = target;
         if (!isValidHttpUrl(target)) {
           el.qrTarget.focus({ preventScroll: true });
@@ -547,7 +586,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
                 slug,
                 target_url: target,
                 label: label || null,
-                ...(el.qrNeverExpires.checked ? { expires_at: null, grace_until: null } : {}),
+                ...validity,
               }),
             });
             created = rows?.[0] || null;
@@ -560,7 +599,7 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
         }
         if (!created) throw new Error(t("admin.codes.err_create_qr", "Could not create QR."));
 
-        if (el.qrNeverExpires.checked && isAdmin) {
+        if (validity.expires_at === null && isAdmin) {
           await rpc("admin_update_qr_validity", {
             p_qr_id: created.id,
             p_status: "active",
@@ -657,6 +696,15 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
               <span>${escapeHtml(t("admin.codes.scan_count", "{count} scans", { count: Number(qr.scan_count || 0) }))}</span>
               <span>${qr.expires_at ? escapeHtml(t("admin.codes.expires_date", "Expires {date}", { date: new Date(qr.expires_at).toLocaleDateString() })) : escapeHtml(t("admin.codes.never_expires", "Never expires"))}</span>
               <span>${qr.grace_until ? escapeHtml(t("admin.codes.grace_date", "Grace {date}", { date: new Date(qr.grace_until).toLocaleDateString() })) : escapeHtml(t("admin.codes.no_grace_limit", "No grace limit"))}</span>
+            </div>
+            <div class="codes-row-validity">
+              <label>
+                <span>${escapeHtml(t("admin.codes.change_validity", "Change validity"))}</span>
+                <select data-qr-validity aria-label="${escapeHtml(t("admin.codes.change_validity", "Change validity"))}">
+                  ${qrValidityOptions()}
+                </select>
+              </label>
+              <button class="codes-btn ghost" type="button" data-qr-action="set-validity">${escapeHtml(t("admin.codes.apply_validity", "Apply validity"))}</button>
             </div>
             <div class="codes-row-actions">
               <button class="codes-btn primary" type="button" data-qr-action="save-destination">${escapeHtml(t("admin.codes.save_destination", "Save destination"))}</button>
@@ -800,6 +848,17 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
         } else if (button.dataset.qrAction === "founder-control") {
           const changed = await updateQrFounderControl(qr);
           if (!changed) return;
+        } else if (button.dataset.qrAction === "set-validity") {
+          const selectedValidity = row.querySelector("[data-qr-validity]")?.value || "1m";
+          const validity = qrValidityDates(selectedValidity);
+          await rpc("admin_update_qr_validity", {
+            p_qr_id: id,
+            p_status: qr.status === "admin_blocked" ? "admin_blocked" : qr.status === "paused" ? "paused" : "active",
+            p_expires_at: validity.expires_at,
+            p_grace_until: validity.grace_until,
+            p_clear_expiry: validity.expires_at === null,
+            p_clear_grace: validity.grace_until === null,
+          });
         } else if (button.dataset.qrAction === "never") {
           await rpc("admin_update_qr_validity", {
             p_qr_id: id,
@@ -2066,6 +2125,46 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       font-style: italic;
     }
 
+    :global(.codes-rows .codes-row-validity) {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) auto;
+      gap: 8px;
+      align-items: end;
+      grid-column: 1 / -1;
+      margin-top: 2px;
+    }
+
+    :global(.codes-rows .codes-row-validity label) {
+      display: grid;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    :global(.codes-rows .codes-row-validity span) {
+      color: rgba(255,255,255,.55);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    :global(.codes-rows .codes-row-validity select) {
+      width: 100%;
+      min-height: 40px;
+      border-radius: 7px;
+      border: 1px solid rgba(125,249,255,.2);
+      background: linear-gradient(135deg, rgba(10,88,64,.42), rgba(6,32,28,.82));
+      color: #fff;
+      padding: 7px 10px;
+      font: inherit;
+      font-size: 13px;
+      outline: none;
+      box-shadow: 0 0 10px rgba(28,255,0,.12), inset 0 0 10px 1px rgba(255,255,255,.1);
+    }
+
+    :global(.codes-rows .codes-row-validity select:focus) {
+      border-color: rgba(125,249,255,.5);
+      box-shadow: 0 0 0 3px rgba(125,249,255,.08), 0 0 14px rgba(28,255,0,.16), inset 0 0 10px 1px rgba(255,255,255,.16);
+    }
+
     :global(.codes-rows .codes-pill) {
       display: inline-flex;
       align-items: center;
@@ -2242,6 +2341,12 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       }
       .codes-row-meta {
         white-space: normal;
+      }
+      :global(.codes-rows .codes-row-validity) {
+        grid-template-columns: 1fr;
+      }
+      :global(.codes-rows .codes-row-validity .codes-btn) {
+        width: 100%;
       }
       .codes-row-actions,
       :global(.codes-rows .codes-row-actions) {

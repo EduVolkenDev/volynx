@@ -1250,6 +1250,47 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
       }
     }
 
+    function compressionQualityCandidates(quality) {
+      const requested = Math.max(0.3, Math.min(1, Number(quality) || 0.85));
+      const candidates = [requested];
+
+      // Already-compressed images can be larger after a second encode at the
+      // requested quality. Step down conservatively until there is a real
+      // saving, while keeping the user-selected quality as the first choice.
+      for (let candidate = requested - 0.1; candidate > 0.3; candidate -= 0.1) {
+        candidates.push(Number(candidate.toFixed(2)));
+      }
+      if (requested > 0.3) candidates.push(0.3);
+
+      return [...new Set(candidates)];
+    }
+
+    async function encodeCompression(canvas, mime, quality, inputBytes) {
+      const lossyMime = mime === "image/webp" || mime === "image/jpeg";
+      const candidates = lossyMime ? compressionQualityCandidates(quality) : [quality];
+      let smallest = null;
+
+      for (const candidate of candidates) {
+        const encoded = await encodeCanvasWithFallback(canvas, mime, candidate);
+        const result = {
+          ...encoded,
+          quality: candidate,
+          qualityAdjusted: candidate !== Number(quality),
+        };
+
+        if (!smallest || encoded.blob.size < smallest.blob.size) {
+          smallest = result;
+        }
+
+        // Stop at the first effective result so we preserve as much quality
+        // as possible instead of blindly selecting the smallest encode.
+        if (encoded.blob.size < inputBytes) return result;
+        if (!lossyMime || encoded.mime !== mime) break;
+      }
+
+      return smallest;
+    }
+
     function encodeFallbackMessage(requestedMime, actualMime) {
       return `Your browser could not finish ${mimeToExtension(requestedMime).toUpperCase()} encoding, so iMage Suite exported ${mimeToExtension(actualMime).toUpperCase()} instead.`;
     }
@@ -1338,11 +1379,15 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
 
       updateProgressUI(70, "encode");
       const requestedSvg = mime === "image/svg+xml";
-      const encoded = await encodeCanvasWithFallback(
-        canvas,
-        requestedSvg ? "image/png" : mime,
-        tool === "compress" ? quality : 0.95
-      );
+      const encoded = tool === "compress"
+        ? requestedSvg
+          ? await encodeCanvasWithFallback(canvas, "image/png", 1)
+          : await encodeCompression(canvas, mime, quality, file.size)
+        : await encodeCanvasWithFallback(
+            canvas,
+            requestedSvg ? "image/png" : mime,
+            0.95
+          );
       const blob = requestedSvg
         ? await createEmbeddedSvgBlob(encoded.blob, canvas.width, canvas.height, `${baseName} image export`)
         : encoded.blob;
@@ -1368,6 +1413,8 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
         inputBytes: file.size,
         keptOriginal: kept,
         encodeFallback: !requestedSvg && !kept && encoded.fallback,
+        compressionQuality: tool === "compress" ? encoded.quality : null,
+        compressionQualityAdjusted: tool === "compress" && Boolean(encoded.qualityAdjusted),
         requestedMime: requestedSvg ? "image/svg+xml" : (encoded.requestedMime || mime),
         mimeType: finalMime,
         extension: kept
@@ -1620,6 +1667,7 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
         const totalInBytes = processedResults.reduce((sum, result) => sum + result.inputBytes, 0);
         const M = window.VxFileMetrics;
         const keptCount = processedResults.filter((result) => result.keptOriginal).length;
+        const adjustedCompressionResults = processedResults.filter((result) => result.compressionQualityAdjusted);
         const fallbackResults = processedResults.filter((result) => result.encodeFallback);
         const standardUpscaleResults = processedResults.filter((result) => result.upscaleMode === "standard");
         if (processedResults.length === 1) {
@@ -1692,6 +1740,26 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
               )
             );
           }
+        } else if (tool === "compress" && adjustedCompressionResults.length > 0) {
+          const firstAdjusted = adjustedCompressionResults[0];
+          setResultHint(
+            copy(
+              adjustedCompressionResults.length === 1
+                ? "suite.compress_notice_adjusted_one"
+                : "suite.compress_notice_adjusted_many",
+              adjustedCompressionResults.length === 1
+                ? "Quality was adjusted to {quality} to create a smaller file."
+                : "Quality was adjusted for {count} files to create smaller outputs.",
+              {
+                quality: firstAdjusted.compressionQuality.toFixed(2),
+                count: adjustedCompressionResults.length,
+              }
+            ),
+            "info"
+          );
+          setDropMessage(copy("suite.drop_done", "{files} processed successfully", {
+            files: fileCountLabel(processedResults.length),
+          }));
         } else if (standardUpscaleResults.length > 0) {
           setResultHint(
             copy(

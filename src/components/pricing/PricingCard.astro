@@ -1,7 +1,7 @@
 ---
-import { ROUTES, checkoutHref } from "../../data/routes";
+import { ROUTES, productPreviewHref } from "../../data/routes";
 
-const { plan, locale, currency } = Astro.props;
+const { plan, locale, currency, previewSlug } = Astro.props;
 const currencies = ['GBP', 'EUR', 'BRL'] as const;
 const planLookupPrefix = ({
   launch: 'builder_launch',
@@ -15,7 +15,7 @@ const freePlanHref = ({
   free: ROUTES.builder,
   daily_free: ROUTES.daily,
 } as Record<string, string>)[plan.id];
-const ctaHref = plan.href || freePlanHref || (planLookupPrefix ? checkoutHref(planLookupPrefix, { next: ROUTES.pricing }) : ROUTES.support);
+const ctaHref = plan.href || freePlanHref || (planLookupPrefix ? productPreviewHref(planLookupPrefix, previewSlug) : ROUTES.support);
 ---
 <article class={`pricing-card ${plan.featured ? 'pricing-card--featured' : ''}${plan.image ? ' has-card-asset' : ''}`} data-plan={plan.id}>
   {plan.image && <img src={plan.image} alt="" class="card-asset" loading="lazy" />}
@@ -39,10 +39,14 @@ const ctaHref = plan.href || freePlanHref || (planLookupPrefix ? checkoutHref(pl
   </ul>
   <a
     href={ctaHref}
-    class={`pricing-card__cta ${plan.featured ? 'pricing-card__cta--primary' : ''} ${planLookupPrefix ? 'vx-checkout-btn' : ''}`}
-    data-lookup={planLookupPrefix || undefined}
-    data-label={planLookupPrefix ? plan.cta.en : undefined}
-  ><span class="i18n-en">{plan.cta.en}</span><span class="i18n-pt">{plan.cta.pt}</span></a>
+    class={`pricing-card__cta ${plan.featured ? 'pricing-card__cta--primary' : ''}`}
+    data-preview={planLookupPrefix ? 'true' : undefined}
+  >
+    {planLookupPrefix
+      ? <><span class="i18n-en">View plan</span><span class="i18n-pt">Ver plano</span></>
+      : <><span class="i18n-en">{plan.cta.en}</span><span class="i18n-pt">{plan.cta.pt}</span></>
+    }
+  </a>
 </article>
 
 <style>

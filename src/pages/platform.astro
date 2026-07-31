@@ -6,7 +6,18 @@ import PlatformAssistStrip from "../components/PlatformAssistStrip.astro";
 import ServicesHighlight from "../components/platform/ServicesHighlight.astro";
 import WorldFeature from "../components/platform/WorldFeature.astro";
 import AdSlot from "../components/AdSlot.astro";
-import { ROUTES, checkoutHref } from "../data/routes";
+import { ROUTES, productPreviewHref } from "../data/routes";
+import { productOfferPreviewBySlug } from "../data/product-offers";
+
+const officialProductImages = {
+  essential: productOfferPreviewBySlug["volynx-essential"].image,
+  complete: productOfferPreviewBySlug["volynx-complete"].image,
+  builderPro: productOfferPreviewBySlug["builder-pro"].image,
+  cvitaeBusiness: productOfferPreviewBySlug["cvitae-business"].image,
+  vxCore: productOfferPreviewBySlug["vx-core"].image,
+  portfolioCommercial: "/assets/kits/portfolio-commercial.webp",
+  propertyflowProfessional: "/assets/flow-professional.webp",
+} as const;
 
 const homeAssistItems = [
   { href: ROUTES.products, label: { en: "Explore", pt: "Explorar" }, title: { en: "Browse products", pt: "Ver produtos" }, copy: { en: "Jump straight into kits, tools, PropertyFlow and the Icons Store.", pt: "Vá direto para kits, ferramentas, PropertyFlow e Icons Store." }, emphasized: true, iconSrc: "/assets/allproducts.webp" },
@@ -120,61 +131,61 @@ const homeAssistItems = [
             <span class="i18n-pt">Pronto para monetizar hoje</span>
           </span>
           <h2>
-            <span class="i18n-en">Buy-ready paths are now one click from checkout.</span>
-            <span class="i18n-pt">Os caminhos prontos para compra estão a um clique.</span>
+            <span class="i18n-en">Every paid path starts with a product page, not a surprise checkout.</span>
+            <span class="i18n-pt">Todo caminho pago começa por uma página de produto, não por um checkout surpresa.</span>
           </h2>
           <p>
-            <span class="i18n-en">Start free if you are exploring. If you need capacity, publishing, or a product kit today, these routes already use the live VOLYNX checkout bridge.</span>
-            <span class="i18n-pt">Comece grátis se estiver explorando. Se você precisa de capacidade, publicação ou um kit hoje, estes caminhos já usam o checkout real da VOLYNX.</span>
+            <span class="i18n-en">Explore the deliverables, fit and limits first. Checkout only appears after you understand the product you are choosing.</span>
+            <span class="i18n-pt">Veja entregas, adequação e limites primeiro. O checkout só aparece depois que você entende o produto escolhido.</span>
           </p>
         </div>
 
         <div class="revenue-now__grid">
           <article class="revenue-card revenue-card--primary">
-            <img src="/assets/bundle.webp" alt="" class="revenue-card__icon" loading="lazy" decoding="async" />
+            <img src={officialProductImages.essential} alt="" class="revenue-card__icon" loading="lazy" decoding="async" />
             <span class="revenue-card__kicker">Best first subscription</span>
             <h3>VOLYNX Essential</h3>
             <p><span class="i18n-en">Builder Pro + Daily Pro in one subscription. The clearest recurring offer for creators who build and operate daily.</span><span class="i18n-pt">Builder Pro + Daily Pro em uma assinatura. A oferta recorrente mais clara para criadores que constroem e operam diariamente.</span></p>
             <strong class="revenue-card__price"><span class="i18n-en">£35 / month</span><span class="i18n-pt">£35 / mês</span></strong>
-            <a href={checkoutHref("bundle_volynx_daily_pro", { next: ROUTES.platform })} class="button button--gold vx-checkout-btn" data-lookup="bundle_volynx_daily_pro">
-              <span class="i18n-en">Get Essential</span>
-              <span class="i18n-pt">Assinar Essential</span>
+            <a href={productPreviewHref("bundle_volynx_daily_pro")} class="button button--gold">
+              <span class="i18n-en">View Essential</span>
+              <span class="i18n-pt">Ver Essential</span>
             </a>
           </article>
 
           <article class="revenue-card">
-            <img src="/assets/builderpro.webp" alt="" class="revenue-card__icon" loading="lazy" decoding="async" />
+            <img src={officialProductImages.builderPro} alt="" class="revenue-card__icon" loading="lazy" decoding="async" />
             <span class="revenue-card__kicker">Publish</span>
             <h3>Builder Pro</h3>
             <p><span class="i18n-en">Custom domain, selected premium kits, priority publish capacity and no VOLYNX branding.</span><span class="i18n-pt">Domínio próprio, kits premium selecionados, prioridade de publicação e remoção da marca VOLYNX.</span></p>
             <strong class="revenue-card__price"><span class="i18n-en">£24 / month</span><span class="i18n-pt">£24 / mês</span></strong>
-            <a href={checkoutHref("builder_pro", { next: ROUTES.builder })} class="button button--ghost vx-checkout-btn" data-lookup="builder_pro">
-              <span class="i18n-en">Upgrade Builder</span>
-              <span class="i18n-pt">Atualizar Builder</span>
+            <a href={productPreviewHref("builder_pro")} class="button button--ghost">
+              <span class="i18n-en">View Builder Pro</span>
+              <span class="i18n-pt">Ver Builder Pro</span>
             </a>
           </article>
 
           <article class="revenue-card">
-            <img src="/assets/VX4.webp" alt="" class="revenue-card__icon" loading="lazy" decoding="async" />
+            <img src={officialProductImages.vxCore} alt="" class="revenue-card__icon" loading="lazy" decoding="async" />
             <span class="revenue-card__kicker">Capacity</span>
             <h3>32 VX Core</h3>
             <p><span class="i18n-en">One-time premium capacity for eligible exports, templates and selected Studio actions. No subscription change.</span><span class="i18n-pt">Capacidade premium avulsa para exports, templates e ações Studio elegíveis. Sem trocar assinatura.</span></p>
             <strong class="revenue-card__price"><span class="i18n-en">£18 one-time</span><span class="i18n-pt">£18 único</span></strong>
-            <a href={checkoutHref("tokens_core", { next: `${ROUTES.pricing}#vx-packs` })} class="button button--ghost vx-checkout-btn" data-lookup="tokens_core">
-              <span class="i18n-en">Buy VX</span>
-              <span class="i18n-pt">Comprar VX</span>
+            <a href={productPreviewHref("tokens_core")} class="button button--ghost">
+              <span class="i18n-en">Review VX Core</span>
+              <span class="i18n-pt">Ver VX Core</span>
             </a>
           </article>
 
           <article class="revenue-card">
-            <img src="/assets/newportfolio.webp" alt="" class="revenue-card__icon revenue-card__icon--wide" loading="lazy" decoding="async" />
+            <img src={officialProductImages.portfolioCommercial} alt="" class="revenue-card__icon revenue-card__icon--wide" loading="lazy" decoding="async" />
             <span class="revenue-card__kicker">One-time kit</span>
             <h3>Portfolio Pro Kit</h3>
             <p><span class="i18n-en">A direct product path for users who want one premium asset now instead of a subscription first.</span><span class="i18n-pt">Um caminho direto para quem quer um ativo premium agora, antes de uma assinatura.</span></p>
             <strong class="revenue-card__price"><span class="i18n-en">One-time checkout</span><span class="i18n-pt">Checkout avulso</span></strong>
-            <a href={checkoutHref("kit_portfolio_commercial", { next: ROUTES.portfolioKit })} class="button button--ghost vx-checkout-btn" data-lookup="kit_portfolio_commercial">
-              <span class="i18n-en">Buy kit</span>
-              <span class="i18n-pt">Comprar kit</span>
+            <a href={productPreviewHref("kit_portfolio_commercial")} class="button button--ghost">
+              <span class="i18n-en">View the kit</span>
+              <span class="i18n-pt">Ver o kit</span>
             </a>
           </article>
         </div>
@@ -201,7 +212,7 @@ const homeAssistItems = [
 
         <div class="pathfinder__grid">
           <article class="path-card path-card--creator">
-            <img src="/assets/golaunch.webp" alt="" class="path-card__icon" loading="lazy" decoding="async" />
+            <img src={officialProductImages.essential} alt="" class="path-card__icon" loading="lazy" decoding="async" />
             <span class="path-card__persona">Creator</span>
             <h3><span class="i18n-en">Launch, publish and run your day.</span><span class="i18n-pt">Lance, publique e organize seu dia.</span></h3>
             <p><span class="i18n-en">Best fit: Builder Pro + Daily Pro. The existing Essential bundle is the cleanest first paid step.</span><span class="i18n-pt">Melhor encaixe: Builder Pro + Daily Pro. O bundle Essential já é o primeiro passo pago mais claro.</span></p>
@@ -210,14 +221,14 @@ const homeAssistItems = [
               <li>Daily Pro</li>
               <li><span class="i18n-en">Portfolio kit optional</span><span class="i18n-pt">Portfolio opcional</span></li>
             </ul>
-            <a href={checkoutHref("bundle_volynx_daily_pro", { next: `${ROUTES.platform}#choose-path` })} class="button button--gold vx-checkout-btn" data-lookup="bundle_volynx_daily_pro">
-              <span class="i18n-en">Activate Essential</span>
-              <span class="i18n-pt">Ativar Essential</span>
+            <a href={productPreviewHref("bundle_volynx_daily_pro")} class="button button--gold">
+              <span class="i18n-en">View Essential</span>
+              <span class="i18n-pt">Ver Essential</span>
             </a>
           </article>
 
           <article class="path-card path-card--freelancer">
-            <img src="/assets/cvitae.webp" alt="" class="path-card__icon" loading="lazy" decoding="async" />
+            <img src={officialProductImages.cvitaeBusiness} alt="" class="path-card__icon" loading="lazy" decoding="async" />
             <span class="path-card__persona">Freelancer Premium</span>
             <h3><span class="i18n-en">Look credible before the first conversation.</span><span class="i18n-pt">Pareça confiável antes da primeira conversa.</span></h3>
             <p><span class="i18n-en">Best fit: CVitae Business + Builder Pro + Icons. Start by upgrading the career asset, then add the public presence.</span><span class="i18n-pt">Melhor encaixe: CVitae Business + Builder Pro + Icons. Comece pelo ativo de carreira e depois adicione presença pública.</span></p>
@@ -226,14 +237,14 @@ const homeAssistItems = [
               <li>Builder Pro</li>
               <li>Icons Store</li>
             </ul>
-            <a href={checkoutHref("cvitae_business", { next: `${ROUTES.platform}#choose-path` })} class="button button--gold vx-checkout-btn" data-lookup="cvitae_business">
-              <span class="i18n-en">Start with CVitae</span>
-              <span class="i18n-pt">Começar pelo CVitae</span>
+            <a href={productPreviewHref("cvitae_business")} class="button button--gold">
+              <span class="i18n-en">View CVitae Business</span>
+              <span class="i18n-pt">Ver CVitae Business</span>
             </a>
           </article>
 
           <article class="path-card path-card--realestate">
-            <img src="/assets/newproperty.webp" alt="" class="path-card__icon path-card__icon--wide" loading="lazy" decoding="async" />
+            <img src={officialProductImages.propertyflowProfessional} alt="" class="path-card__icon path-card__icon--wide" loading="lazy" decoding="async" />
             <span class="path-card__persona"><span class="i18n-en">Real Estate</span><span class="i18n-pt">Imobiliário</span></span>
             <h3><span class="i18n-en">Sell listings with a sharper digital surface.</span><span class="i18n-pt">Venda imóveis com uma presença digital mais forte.</span></h3>
             <p><span class="i18n-en">Best fit: PropertyFlow Professional + premium icons + Lumina. This is the strongest niche path today.</span><span class="i18n-pt">Melhor encaixe: PropertyFlow Professional + icons premium + Lumina. É o caminho de nicho mais forte agora.</span></p>
@@ -242,14 +253,14 @@ const homeAssistItems = [
               <li>Icons Premium</li>
               <li>Lumina Presets</li>
             </ul>
-            <a href={checkoutHref("pf_professional", { next: `${ROUTES.platform}#choose-path` })} class="button button--gold vx-checkout-btn" data-lookup="pf_professional">
-              <span class="i18n-en">Buy PropertyFlow</span>
-              <span class="i18n-pt">Comprar PropertyFlow</span>
+            <a href={productPreviewHref("pf_professional")} class="button button--gold">
+              <span class="i18n-en">View PropertyFlow</span>
+              <span class="i18n-pt">Ver PropertyFlow</span>
             </a>
           </article>
 
           <article class="path-card path-card--team">
-            <img src="/assets/builderteams.webp" alt="" class="path-card__icon" loading="lazy" decoding="async" />
+            <img src={officialProductImages.complete} alt="" class="path-card__icon" loading="lazy" decoding="async" />
             <span class="path-card__persona"><span class="i18n-en">Small Business / Team</span><span class="i18n-pt">Small Business / Equipe</span></span>
             <h3><span class="i18n-en">Operate with publishing, workflow and capacity together.</span><span class="i18n-pt">Opere com publicação, fluxo e capacidade juntos.</span></h3>
             <p><span class="i18n-en">Best fit: Builder Studio + Daily Diamond. Complete is the strongest existing ecosystem bundle.</span><span class="i18n-pt">Melhor encaixe: Builder Studio + Daily Diamond. Complete é o bundle existente mais forte do ecossistema.</span></p>
@@ -258,9 +269,9 @@ const homeAssistItems = [
               <li>Daily Diamond</li>
               <li><span class="i18n-en">Priority capacity</span><span class="i18n-pt">Capacidade prioritária</span></li>
             </ul>
-            <a href={checkoutHref("bundle_volynx_daily_studio", { next: `${ROUTES.platform}#choose-path` })} class="button button--gold vx-checkout-btn" data-lookup="bundle_volynx_daily_studio">
-              <span class="i18n-en">Activate Complete</span>
-              <span class="i18n-pt">Ativar Complete</span>
+            <a href={productPreviewHref("bundle_volynx_daily_studio")} class="button button--gold">
+              <span class="i18n-en">View Complete</span>
+              <span class="i18n-pt">Ver Complete</span>
             </a>
           </article>
         </div>
@@ -752,9 +763,9 @@ const homeAssistItems = [
             <span class="i18n-pt">Lance rápido, pareça premium e dê à sua marca pessoal um sistema real. Adicione icons quando quiser deixar o portfolio mais próprio.</span>
           </p>
           <div class="actions">
-            <a href={checkoutHref("kit_portfolio_commercial", { next: ROUTES.portfolioKit })} class="button button--gold">
-              <span class="i18n-en">Buy Portfolio Pro</span>
-              <span class="i18n-pt">Comprar Portfolio Pro</span>
+            <a href={productPreviewHref("kit_portfolio_commercial")} class="button button--gold">
+              <span class="i18n-en">View Portfolio Pro</span>
+              <span class="i18n-pt">Ver Portfolio Pro</span>
             </a>
             <a href={ROUTES.iconsStore} class="button button--ghost">
               <span class="i18n-en">Add icons bundle</span>
