@@ -64,6 +64,28 @@ const FOLDER_MANIFEST = {
   "soft-orange":           { name: "Soft Orange",      category: "draw",       plan: "standard" },
   "soft-red":              { name: "Soft Red",         category: "pink",       plan: "standard" },
   "vintage-premium":       { name: "Vintage",          category: "futuristic", plan: "premium" },
+
+  // New Icons implementation intake. These packs are intentionally premium
+  // until product/pricing metadata is assigned explicitly; new assets must
+  // never become free storefront inventory by accident.
+  "BWicons1-new":           { name: "BW Icons I",        category: "simple",      plan: "premium" },
+  "BWicons2-new":           { name: "BW Icons II",       category: "simple",      plan: "premium" },
+  "colored-icons":          { name: "Colored Icons",     category: "futuristic",  plan: "premium" },
+  "colorfull-icon":         { name: "Colorful Icons",    category: "futuristic",  plan: "premium" },
+  "fancy-new-polygons-multicolor": { name: "Fancy Polygons", category: "futuristic", plan: "premium" },
+  "flat icons 1":           { name: "Flat Icons",        category: "simple",      plan: "premium" },
+  "giant-metal-icons1":     { name: "Giant Metal Icons", category: "metal",       plan: "premium" },
+  "giant-polygons":         { name: "Giant Polygons",    category: "futuristic",  plan: "premium" },
+  "metal-icons-refactored3": { name: "Metal Icons III",  category: "metal",       plan: "premium" },
+  "metal-icons-refactored3_11(1)": { name: "Metal Icons III Variant", category: "metal", plan: "premium" },
+  "new-polygon-small":      { name: "Polygon Small",     category: "futuristic",  plan: "premium" },
+  "new-polygons":           { name: "New Polygons",      category: "futuristic",  plan: "premium" },
+  "old-gold-icons":         { name: "Old Gold Icons",    category: "metal",       plan: "premium" },
+  "red-premium-icons":      { name: "Red Premium Icons", category: "pink",        plan: "premium" },
+  "sharpd-icons":           { name: "Sharp Icons",       category: "futuristic",  plan: "premium" },
+  "wood-icons":             { name: "Wood Icons",        category: "draw",        plan: "premium" },
+  "wood-icons(1)":          { name: "Wood Icons II",     category: "draw",        plan: "premium" },
+  "wood-icons(2)":          { name: "Wood Icons III",    category: "draw",        plan: "premium" },
 };
 
 // ── Walk files in a single folder (no recursion) ──────────────────────────

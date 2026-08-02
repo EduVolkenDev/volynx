@@ -189,7 +189,7 @@ export const productOfferPreviews: ProductOfferPreview[] = [
     slug: "vx-scale", lookup: "tokens_scale", name: bi("VX Scale", "VX Scale"), eyebrow: bi("One-time capacity", "Capacidade avulsa"),
     title: bi("A deeper capacity reserve for heavy premium usage.", "Uma reserva maior para uso premium intenso."),
     summary: bi("The largest VX lane for teams and operators who have already validated their premium workflow.", "A maior faixa de VX para equipes e operadores que já validaram seu fluxo premium."),
-    image: "/assets/vx4.webp", price: bi("From £120", "A partir de £120"), format: bi("One-time", "Pagamento único"),
+    image: "/assets/VX4.webp", price: bi("From £120", "A partir de £120"), format: bi("One-time", "Pagamento único"),
     metrics: [metric("High", "capacity", "capacidade"), metric("No", "expiry", "expiração"), metric("Priority", "workflow", "fluxo prioritário")],
     whatYouGet: [bi("The largest one-time VX balance.", "O maior saldo VX avulso."), bi("Capacity for supported high-volume actions.", "Capacidade para ações compatíveis em alto volume."), bi("A single balance with no recurring subscription.", "Um saldo único sem assinatura recorrente.")],
     bestFor: [bi("Teams and established users with a measurable premium usage need.", "Equipes e usuários estabelecidos com necessidade mensurável de uso premium.")],
