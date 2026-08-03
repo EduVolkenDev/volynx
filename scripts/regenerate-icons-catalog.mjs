@@ -23,6 +23,8 @@ import path from "node:path";
 const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const iconsRoot = path.join(repoRoot, "public/assets/icons-store");
 const catalogPath = path.join(iconsRoot, "catalog.json");
+const pricingPath = path.join(repoRoot, "src/data/icon-pricing.json");
+const pricingConfig = JSON.parse(fs.readFileSync(pricingPath, "utf8"));
 
 const DRY_RUN = process.argv.includes("--dry-run");
 
@@ -44,7 +46,7 @@ const FOLDER_MANIFEST = {
   "daily-poligon-free":    { name: "Daily Polygon",    category: "daily",      plan: "free" },
   "daily3Dpremium":        { name: "Daily 3D",         category: "daily",      plan: "premium" },
   "glow-premium":          { name: "Glow",             category: "futuristic", plan: "standard" },
-  "golden-icons":          { name: "Golden Icons",     category: "metal",      plan: "free" },
+  "golden-icons":          { name: "Golden Icons",     category: "metal",      plan: "premium" },
   "Hyper-Icons-Premium":   { name: "Hyper Icons",      category: "futuristic", plan: "premium" },
   "Icons-Glass-Premium":   { name: "Glass Icons",      category: "futuristic", plan: "premium" },
   "icons-tech-free":       { name: "Tech Icons",       category: "futuristic", plan: "free" },
@@ -77,7 +79,6 @@ const FOLDER_MANIFEST = {
   "giant-metal-icons1":     { name: "Giant Metal Icons", category: "metal",       plan: "premium" },
   "giant-polygons":         { name: "Giant Polygons",    category: "futuristic",  plan: "premium" },
   "metal-icons-refactored3": { name: "Metal Icons III",  category: "metal",       plan: "premium" },
-  "metal-icons-refactored3_11(1)": { name: "Metal Icons III Variant", category: "metal", plan: "premium" },
   "new-polygon-small":      { name: "Polygon Small",     category: "futuristic",  plan: "premium" },
   "new-polygons":           { name: "New Polygons",      category: "futuristic",  plan: "premium" },
   "old-gold-icons":         { name: "Old Gold Icons",    category: "metal",       plan: "premium" },
@@ -140,6 +141,7 @@ function main() {
 
     for (const file of files) {
       idx++;
+      const pricing = pricingConfig.collections[manifestEntry.name] || {};
       const id = `${slugify(folderName)}-${slugify(path.basename(file, path.extname(file)))}-${idx}`;
       catalog.push({
         id,
@@ -149,6 +151,10 @@ function main() {
         category: manifestEntry.category,
         collection: manifestEntry.name,
         plan: manifestEntry.plan,
+        packLookup: pricing.packLookup || "",
+        singleLookup: pricing.singleLookup || "",
+        singleEligible: Boolean(pricing.singleEligible),
+        qualityBand: pricing.qualityBand || "unclassified",
       });
     }
     report.included.push({ folder: folderName, name: manifestEntry.name, count: files.length, plan: manifestEntry.plan });

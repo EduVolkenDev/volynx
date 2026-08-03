@@ -143,8 +143,11 @@ const PRODUCT_PREVIEW_ROUTES: Record<string, string> = {
   pf_starter: ROUTES.propertyflow,
   pf_professional: ROUTES.propertyflow,
   pf_white_label: ROUTES.propertyflow,
+  icons_pack_entry: ROUTES.iconsStore,
   icons_pack_mixed: ROUTES.iconsStore,
+  icons_pack_curated: ROUTES.iconsStore,
   icons_pack_premium: ROUTES.iconsStore,
+  icons_pack_signature: ROUTES.iconsStore,
   icons_pack_hyper: ROUTES.iconsStore,
 };
 
