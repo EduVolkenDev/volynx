@@ -666,8 +666,8 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
               ${founderManaged ? `<span class="codes-pill codes-pill--founder">${escapeHtml(t("admin.codes.founder_managed", "Founder managed"))}</span>` : ""}
               <strong>${escapeHtml(qr.label || qr.slug)}</strong>
               <code>${escapeHtml(shortUrl)}</code>
-              <span>${escapeHtml(t("admin.codes.owner", "Owner"))}: ${escapeHtml(qr.owner_email || qr.owner_id || t("admin.codes.unknown", "unknown"))}</span>
-              <a href="${escapeHtml(qr.target_url)}" target="_blank" rel="noopener">${escapeHtml(qr.target_url)}</a>
+              <span class="codes-row-owner">${escapeHtml(t("admin.codes.owner", "Owner"))}: ${escapeHtml(qr.owner_email || qr.owner_id || t("admin.codes.unknown", "unknown"))}</span>
+              <a class="codes-row-target" href="${escapeHtml(qr.target_url)}" target="_blank" rel="noopener">${escapeHtml(qr.target_url)}</a>
             </div>
             <div class="codes-row-edit" aria-label="${escapeHtml(t("admin.codes.edit_qr_destination", "Edit QR destination"))}">
               <label>
@@ -2214,6 +2214,207 @@ const description = "Unified admin console for dynamic QR codes, voucher links a
       justify-content: flex-end;
       padding-top: 14px;
       border-top: 1px solid rgba(125,249,255,.1);
+    }
+
+    /* Premium QR inventory treatment: clearer hierarchy, calmer glow, stronger object framing. */
+    :global(.codes-rows .codes-row) {
+      padding: 26px;
+      border-radius: 24px;
+      border-color: rgba(166, 205, 220, .16);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.055), rgba(255,255,255,.018) 48%, rgba(5,12,17,.92)),
+        radial-gradient(circle at 94% 8%, rgba(125,249,255,.1), transparent 28%),
+        #080c11;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.07),
+        inset 0 0 40px rgba(125,249,255,.025),
+        0 24px 70px rgba(0,0,0,.28);
+    }
+
+    :global(.codes-rows .codes-row:hover) {
+      border-color: rgba(125,249,255,.3);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.07), rgba(255,255,255,.022) 48%, rgba(5,12,17,.94)),
+        radial-gradient(circle at 94% 8%, rgba(125,249,255,.14), transparent 28%),
+        #080c11;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.09),
+        0 28px 80px rgba(0,0,0,.34),
+        0 0 34px rgba(125,249,255,.06);
+    }
+
+    :global(.codes-rows .codes-row--qr) {
+      grid-template-columns: minmax(0, 1fr) 222px;
+      gap: 28px;
+    }
+
+    :global(.codes-rows .codes-row-main) {
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 10px 16px;
+      font-size: 1rem;
+      align-content: start;
+    }
+
+    :global(.codes-rows .codes-row-main > .codes-pill) {
+      grid-row: 1;
+      min-width: 0;
+      border-radius: 999px;
+      padding: 7px 11px;
+      letter-spacing: .1em;
+    }
+
+    :global(.codes-rows .codes-row-main > strong) {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      margin-top: 2px;
+      color: #f5fbff;
+      font-size: clamp(1.35rem, 2vw, 1.8rem);
+      font-weight: 800;
+      letter-spacing: -.025em;
+    }
+
+    :global(.codes-rows .codes-row-main > code) {
+      grid-column: 1 / -1;
+      grid-row: 3;
+      border: 1px solid rgba(125,249,255,.12);
+      border-radius: 12px;
+      background: rgba(125,249,255,.065);
+      padding: 9px 12px;
+      font-size: .9rem;
+      font-weight: 700;
+      letter-spacing: .01em;
+    }
+
+    :global(.codes-rows .codes-row-owner) {
+      grid-column: 1 / -1;
+      color: rgba(232,240,246,.62) !important;
+      font-size: .86rem;
+      line-height: 1.4;
+    }
+
+    :global(.codes-rows .codes-row-target) {
+      grid-column: 1 / -1;
+      color: rgba(125,249,255,.68) !important;
+      font-size: .9rem;
+      line-height: 1.45;
+    }
+
+    :global(.codes-rows .codes-row-edit) {
+      gap: 14px;
+    }
+
+    :global(.codes-rows .codes-row-edit label) {
+      gap: 7px;
+    }
+
+    :global(.codes-rows .codes-row-edit input) {
+      max-width: none;
+      margin: 0;
+      border: 1px solid rgba(125,249,255,.12);
+      border-radius: 11px;
+      background: rgba(3,13,18,.66);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    :global(.codes-rows .codes-row--qr .codes-row-edit label:nth-child(3)) {
+      margin: 0;
+      width: auto;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      align-items: stretch;
+      text-align: left;
+    }
+
+    :global(.codes-rows .codes-row-qr-preview) {
+      width: 222px;
+      height: 222px;
+      padding: 16px;
+      border-radius: 24px;
+      background:
+        linear-gradient(145deg, #ffffff, #e9f3f5 62%, #c8dadd),
+        #fff;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.8),
+        0 18px 40px rgba(0,0,0,.35),
+        0 0 28px rgba(125,249,255,.1);
+    }
+
+    :global(.codes-rows .codes-row-qr-preview canvas) {
+      width: 190px !important;
+      height: 190px !important;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 10px;
+    }
+
+    :global(.codes-rows .codes-row-meta) {
+      gap: 10px;
+      margin: 18px 0 6px;
+    }
+
+    :global(.codes-rows .codes-row-meta span) {
+      padding: 8px 11px;
+      border: 1px solid rgba(125,249,255,.1);
+      border-radius: 11px;
+      background: rgba(125,249,255,.055);
+      box-shadow: none;
+      color: rgba(232,246,249,.76);
+      font-size: 11px;
+      font-style: normal;
+      font-weight: 750;
+      letter-spacing: .01em;
+    }
+
+    :global(.codes-rows .codes-row-validity) {
+      gap: 12px;
+      margin-top: 12px;
+      padding: 15px;
+      border: 1px solid rgba(125,249,255,.12);
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(125,249,255,.055), rgba(255,255,255,.018));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    :global(.codes-rows .codes-row-validity select) {
+      border-color: rgba(125,249,255,.18);
+      border-radius: 10px;
+      background: rgba(3,13,18,.72);
+      box-shadow: none;
+    }
+
+    :global(.codes-rows .codes-row-actions) {
+      gap: 9px;
+      justify-content: flex-start;
+      padding-top: 20px;
+      border-top-color: rgba(166,205,220,.11);
+    }
+
+    :global(.codes-rows .codes-row-actions .codes-btn) {
+      min-height: 38px;
+      padding: 9px 13px;
+      border-radius: 11px;
+      font-size: 12px;
+      letter-spacing: .005em;
+    }
+
+    :global(.codes-rows .codes-pill--active) {
+      color: #baf9dc;
+      background: rgba(39,145,103,.16);
+      text-shadow: none;
+      border: 1px solid rgba(111,238,174,.34);
+      box-shadow: 0 0 18px rgba(111,238,174,.08);
+    }
+
+    :global(.codes-rows .codes-pill--founder) {
+      border: 1px solid rgba(192,119,255,.34);
+      background: linear-gradient(135deg, rgba(104,38,158,.42), rgba(29,16,59,.68));
+      color: #dfc7ff;
+      text-shadow: none;
+      box-shadow: 0 0 22px rgba(173,15,255,.14), inset 0 1px 0 rgba(255,255,255,.08);
     }
 
     :global(.codes-rows .codes-btn) {

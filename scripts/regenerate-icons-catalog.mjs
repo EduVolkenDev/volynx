@@ -75,7 +75,7 @@ const FOLDER_MANIFEST = {
   "colored-icons":          { name: "Colored Icons",     category: "futuristic",  plan: "premium" },
   "colorfull-icon":         { name: "Colorful Icons",    category: "futuristic",  plan: "premium" },
   "fancy-new-polygons-multicolor": { name: "Fancy Polygons", category: "futuristic", plan: "premium" },
-  "flat icons 1":           { name: "Flat Icons",        category: "simple",      plan: "premium" },
+  "flat icons 1":           { name: "Flat Icons",        category: "simple",      plan: "premium", itemLabelPrefix: "Flat Icon" },
   "giant-metal-icons1":     { name: "Giant Metal Icons", category: "metal",       plan: "premium" },
   "giant-polygons":         { name: "Giant Polygons",    category: "futuristic",  plan: "premium" },
   "metal-icons-refactored3": { name: "Metal Icons III",  category: "metal",       plan: "premium" },
@@ -139,13 +139,15 @@ function main() {
       continue;
     }
 
-    for (const file of files) {
+    for (const [fileIndex, file] of files.entries()) {
       idx++;
       const pricing = pricingConfig.collections[manifestEntry.name] || {};
       const id = `${slugify(folderName)}-${slugify(path.basename(file, path.extname(file)))}-${idx}`;
       catalog.push({
         id,
-        name: prettifyLabel(file),
+        name: manifestEntry.itemLabelPrefix
+          ? `${manifestEntry.itemLabelPrefix} ${fileIndex + 1}`
+          : prettifyLabel(file),
         file,
         path: `/assets/icons-store/${folderName}/${file}`,
         category: manifestEntry.category,
