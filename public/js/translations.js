@@ -157,7 +157,7 @@ window.VX_TRANS = {
     "widget.tokens": "VX",
     "widget.recharge": "Get VX",
     "widget.home":  "← Home",
-    "widget.platform": "← Platform",
+    "widget.platform": "← Core",
 
     /* === SITE FOOTER === */
     "footer.home":       "Home",
@@ -2030,9 +2030,9 @@ window.VX_TRANS = {
     "devhub2.doc_saas_title": "SaaS Landing System",
     "devhub2.docs_eyebrow": "Product documentation",
     "devhub2.docs_title": "Kit documentation and setup guides",
-    "devhub2.hero_desc": "Access production-ready starter systems, premium assets and exclusive Pro tools. Every resource is built to solve real problems — no clutter, no compromise.",
-    "devhub2.hero_kicker": "For devs, by devs",
-    "devhub2.hero_title": "Everything you need to build, ship, and scale — curated for developers who value quality.",
+    "devhub2.hero_desc": "The Dev Hub is where VOLYNX turns direction into production: tools, systems, products, learning and support connected in one operating layer.",
+    "devhub2.hero_kicker": "Execution layer of VOLYNX",
+    "devhub2.hero_title": "Build, ship and extend the work that started with a clear intention.",
     "devhub2.open_builder": "Open Builder",
     "devhub2.portfolio_kit": "Portfolio Kit",
     "devhub2.premium_assets": "Premium Assets",
@@ -3411,7 +3411,7 @@ window.VX_TRANS = {
     "builder.ph_ex_slug": "my-brand",
     /* header / footer / banner aria */
     "aria.ecosystem_home": "VOLYNX Ecosystem home",
-    "aria.platform_home": "VOLYNX platform home",
+    "aria.platform_home": "VOLYNX Core home",
     "aria.primary_nav": "Primary",
     "aria.vx_balance": "VX balance",
     "aria.toggle_lang": "Toggle language",
@@ -3632,7 +3632,7 @@ window.VX_TRANS = {
     "widget.tokens": "VX",
     "widget.recharge": "Comprar VX",
     "widget.home":  "← Início",
-    "widget.platform": "← Plataforma",
+    "widget.platform": "← Core",
 
     /* === SITE FOOTER === */
     "footer.home":       "Início",
@@ -5505,9 +5505,9 @@ window.VX_TRANS = {
     "devhub2.doc_saas_title": "Sistema de Landing SaaS",
     "devhub2.docs_eyebrow": "Documentação do produto",
     "devhub2.docs_title": "Documentação de kits e guias de setup",
-    "devhub2.hero_desc": "Acesse sistemas iniciais prontos para produção, ativos premium e ferramentas exclusivas Pro. Cada recurso foi criado para resolver problemas reais — sem poluição, sem compromissos.",
-    "devhub2.hero_kicker": "Para devs, feito por devs",
-    "devhub2.hero_title": "Tudo que você precisa para construir, lançar e escalar — selecionado para devs que se importam com qualidade.",
+    "devhub2.hero_desc": "O Dev Hub é onde a VOLYNX transforma direção em produção: ferramentas, sistemas, produtos, aprendizado e suporte conectados em uma única camada operacional.",
+    "devhub2.hero_kicker": "Camada de execução da VOLYNX",
+    "devhub2.hero_title": "Construa, lance e amplie o trabalho que começou com uma intenção clara.",
     "devhub2.open_builder": "Acessar Builder",
     "devhub2.portfolio_kit": "Portfolio Kit",
     "devhub2.premium_assets": "Ativos Premium",
@@ -6895,7 +6895,7 @@ window.VX_TRANS = {
     "builder.ph_ex_slug": "minha-marca",
     /* header / footer / banner aria */
     "aria.ecosystem_home": "Início do ecossistema VOLYNX",
-    "aria.platform_home": "Início da plataforma VOLYNX",
+    "aria.platform_home": "Início do Core VOLYNX",
     "aria.primary_nav": "Principal",
     "aria.vx_balance": "Saldo VX",
     "aria.toggle_lang": "Alternar idioma",

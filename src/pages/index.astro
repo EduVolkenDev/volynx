@@ -1,16 +1,17 @@
 ---
-import PlatformHome from "./platform.astro";
+import CorePreview from "./core-preview/index.astro";
+import { ROUTES } from "../data/routes";
 ---
 
-<script is:inline>
+<script is:inline define:vars={{ launchPath: ROUTES.launch2026 }}>
   (function () {
     try {
       var launchSeenKey = "volynx_launch_seen_v2";
       if (localStorage.getItem(launchSeenKey) !== "1") {
-        window.location.replace("/volynx-launch/");
+        window.location.replace(launchPath);
       }
     } catch (_) {}
   })();
 </script>
 
-<PlatformHome />
+<CorePreview />
