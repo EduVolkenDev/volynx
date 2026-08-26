@@ -186,6 +186,37 @@ const modes = [
       </div>
     </section>
 
+    <section class="lumina-story" aria-labelledby="lumina-story-title">
+      <div class="lumina-story__intro">
+        <span class="lumina-kicker">Lumina / fluxo</span>
+        <h2 id="lumina-story-title">
+          <span class="i18n-pt">Da matéria bruta a um mapa de clareza.</span>
+          <span class="i18n-en">From raw material to a map of clarity.</span>
+        </h2>
+        <p>
+          <span class="i18n-pt">Traga uma ideia, um arquivo ou uma pergunta. A Lumina organiza o que está disperso e devolve uma direção que você consegue usar.</span>
+          <span class="i18n-en">Bring an idea, a file, or a question. Lumina organizes what is scattered and returns a direction you can use.</span>
+        </p>
+      </div>
+      <div class="lumina-story__stage">
+        <figure class="lumina-story__scene lumina-story__scene--input">
+          <img src="/assets/lumina/uploadorwrite.webp" alt="" loading="lazy" decoding="async" />
+          <figcaption>
+            <span class="i18n-pt">01 · Trazer o que você tem</span>
+            <span class="i18n-en">01 · Bring what you have</span>
+          </figcaption>
+        </figure>
+        <div class="lumina-story__bridge" aria-hidden="true"><span>lumina</span></div>
+        <figure class="lumina-story__scene lumina-story__scene--output">
+          <img src="/assets/lumina/resumeinprofile.webp" alt="" loading="lazy" decoding="async" />
+          <figcaption>
+            <span class="i18n-pt">02 · Sair com um mapa</span>
+            <span class="i18n-en">02 · Leave with a map</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
     <section class="lumina-section" id="funcionalidades">
       <div class="lumina-section-head">
         <span class="lumina-kicker" data-i18n="lumina.features_kicker">Capacidades</span>
@@ -194,28 +225,39 @@ const modes = [
       </div>
       <div class="lumina-features">
         {features.map(([title, copy, tone, icon], index) => (
-          <article class:list={["lumina-feature", `lumina-feature--${tone}`]}>
+          <article class:list={["lumina-feature", `lumina-feature--${tone}`, index === 0 ? "lumina-feature--lead" : "lumina-feature--satellite"]}>
             <div class="lumina-feature__icon" aria-hidden="true">
               <img src={icon} alt="" loading="lazy" decoding="async" />
             </div>
-            <h3 data-i18n={`lumina.feature_${index + 1}_title`}>{title}</h3>
-            <p data-i18n={`lumina.feature_${index + 1}_copy`}>{copy}</p>
+            <div class="lumina-feature__copy">
+              <h3 data-i18n={`lumina.feature_${index + 1}_title`}>{title}</h3>
+              <p data-i18n={`lumina.feature_${index + 1}_copy`}>{copy}</p>
+            </div>
           </article>
         ))}
       </div>
     </section>
 
-    <section class="lumina-modes" aria-label="Lumina modes">
-      {modes.map(([title, subtitle, copy, icon], index) => (
-        <article>
-          <div class="lumina-mode-icon" aria-hidden="true">
-            <img src={icon} alt="" loading="lazy" decoding="async" />
-          </div>
-          <h3 data-i18n={`lumina.mode_card_${index + 1}_title`}>{title}</h3>
-          <strong data-i18n={`lumina.mode_card_${index + 1}_subtitle`}>{subtitle}</strong>
-          <p data-i18n={`lumina.mode_card_${index + 1}_copy`}>{copy}</p>
-        </article>
-      ))}
+    <section class="lumina-modes" aria-labelledby="modes-title">
+      <div class="lumina-modes__intro">
+        <span class="lumina-kicker">Lumina / modos</span>
+        <h2 id="modes-title">
+          <span class="i18n-pt">A mesma luz. Cinco formas de pensar.</span>
+          <span class="i18n-en">The same light. Five ways to think.</span>
+        </h2>
+      </div>
+      <div class="lumina-modes__rail">
+        {modes.map(([title, subtitle, copy, icon], index) => (
+          <article class:list={["lumina-mode", index === 0 ? "lumina-mode--lead" : ""]}>
+            <div class="lumina-mode-icon" aria-hidden="true">
+              <img src={icon} alt="" loading="lazy" decoding="async" />
+            </div>
+            <h3 data-i18n={`lumina.mode_card_${index + 1}_title`}>{title}</h3>
+            <strong data-i18n={`lumina.mode_card_${index + 1}_subtitle`}>{subtitle}</strong>
+            <p data-i18n={`lumina.mode_card_${index + 1}_copy`}>{copy}</p>
+          </article>
+        ))}
+      </div>
     </section>
 
     <section class="lumina-plans" id="planos">
@@ -1216,6 +1258,286 @@ const modes = [
     50% { box-shadow: 0 0 76px rgba(0,216,255,.3), 0 30px 100px rgba(122,53,255,.18); }
   }
 
+  /* Organic editorial composition: fewer shells, larger visual anchors. */
+  .lumina-workbench {
+    position: relative;
+    gap: 0;
+    padding: 14px;
+    border: 1px solid rgba(125,249,255,.16);
+    border-radius: 46px 18px 58px 24px;
+    background:
+      radial-gradient(circle at 12% 18%, rgba(0,216,255,.1), transparent 32%),
+      radial-gradient(circle at 92% 80%, rgba(122,53,255,.12), transparent 36%),
+      rgba(6,20,46,.45);
+    box-shadow: 0 34px 100px rgba(0,0,0,.28);
+  }
+
+  .lumina-input-panel,
+  .lumina-result-panel {
+    height: 100%;
+    border-color: rgba(255,255,255,.1);
+    box-shadow: none;
+    background: rgba(3,10,27,.48);
+  }
+
+  .lumina-input-panel { border-radius: 34px 12px 12px 42px; }
+  .lumina-result-panel { border-radius: 12px 40px 42px 12px; }
+
+  .lumina-story {
+    position: relative;
+    margin-top: clamp(110px, 14vw, 190px);
+    scroll-margin-top: 110px;
+  }
+
+  .lumina-story__intro {
+    position: relative;
+    z-index: 2;
+    max-width: 610px;
+    margin-left: clamp(8px, 8vw, 118px);
+  }
+
+  .lumina-story__intro h2,
+  .lumina-modes__intro h2 {
+    margin: 12px 0 16px;
+    color: #fff;
+    font-size: clamp(38px, 6vw, 78px);
+    line-height: .98;
+    letter-spacing: -.035em;
+  }
+
+  .lumina-story__intro p {
+    max-width: 500px;
+    margin: 0;
+    color: rgba(255,255,255,.62);
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  .lumina-story__stage {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+    gap: clamp(8px, 4vw, 58px);
+    align-items: end;
+    min-height: 560px;
+    margin-top: -12px;
+  }
+
+  .lumina-story__scene { position: relative; margin: 0; }
+
+  .lumina-story__scene img {
+    display: block;
+    width: min(100%, 500px);
+    height: auto;
+    filter: drop-shadow(0 34px 38px rgba(0,0,0,.48));
+  }
+
+  .lumina-story__scene--input {
+    justify-self: end;
+    transform: translateY(44px) rotate(-5deg);
+  }
+
+  .lumina-story__scene--output {
+    justify-self: start;
+    transform: translateY(-12px) rotate(5deg);
+  }
+
+  .lumina-story__scene--input img {
+    filter: drop-shadow(0 32px 34px rgba(0,0,0,.54)) drop-shadow(0 0 40px rgba(214,168,79,.12));
+  }
+
+  .lumina-story__scene--output img {
+    width: min(100%, 530px);
+    filter: drop-shadow(0 32px 34px rgba(0,0,0,.54)) drop-shadow(0 0 54px rgba(122,53,255,.16));
+  }
+
+  .lumina-story__scene figcaption {
+    position: absolute;
+    right: 8%;
+    bottom: 4%;
+    padding: 9px 14px;
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 999px;
+    background: rgba(3,8,20,.72);
+    color: rgba(255,255,255,.78);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    backdrop-filter: blur(14px);
+  }
+
+  .lumina-story__bridge {
+    position: absolute;
+    left: 42%;
+    top: 47%;
+    width: 22%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,216,255,.8), rgba(214,168,79,.75), transparent);
+    transform: rotate(-12deg);
+    box-shadow: 0 0 22px rgba(0,216,255,.38);
+  }
+
+  .lumina-story__bridge::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: -3px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--lumina-a);
+    box-shadow: 0 0 18px var(--lumina-a);
+  }
+
+  .lumina-story__bridge span {
+    position: absolute;
+    left: 42%;
+    top: -24px;
+    color: rgba(255,255,255,.4);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+  }
+
+  .lumina-features {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 0 clamp(14px, 2.3vw, 32px);
+    align-items: start;
+  }
+
+  .lumina-feature {
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    transition: transform .3s ease;
+  }
+
+  .lumina-feature--lead {
+    grid-column: span 6;
+    grid-row: span 2;
+    min-height: 560px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(24px, 4vw, 46px);
+    border: 1px solid rgba(0,216,255,.2);
+    border-radius: 48% 16% 42% 22%;
+    background:
+      radial-gradient(circle at 72% 24%, rgba(122,53,255,.22), transparent 33%),
+      radial-gradient(circle at 20% 86%, rgba(0,216,255,.16), transparent 40%),
+      rgba(6,20,46,.5);
+    overflow: hidden;
+  }
+
+  .lumina-feature--lead:hover { transform: translateY(-6px) rotate(-.5deg); }
+
+  .lumina-feature--satellite {
+    grid-column: span 3;
+    min-height: 220px;
+    padding: 24px 8px 22px;
+    border-top: 1px solid var(--lumina-line);
+  }
+
+  .lumina-feature--satellite:nth-child(odd) { transform: translateY(34px); }
+  .lumina-feature--satellite:hover { transform: translateY(26px); }
+
+  .lumina-feature__icon {
+    width: 118px;
+    height: 106px;
+    margin: -12px 0 6px -16px;
+    border-radius: 0;
+    background: radial-gradient(circle at 50% 52%, rgba(0,216,255,.18), transparent 68%);
+  }
+
+  .lumina-feature--lead .lumina-feature__icon {
+    width: min(62%, 270px);
+    height: min(42vw, 270px);
+    margin: -18px 0 0 auto;
+  }
+
+  .lumina-feature--lead .lumina-feature__icon img {
+    width: min(100%, 270px);
+    height: min(100%, 270px);
+  }
+
+  .lumina-feature--satellite .lumina-feature__icon img { width: 92px; height: 92px; }
+  .lumina-feature__copy { max-width: 300px; }
+  .lumina-feature--lead .lumina-feature__copy { max-width: 390px; }
+  .lumina-feature h3 { font-size: 18px; }
+  .lumina-feature--lead h3 { font-size: clamp(26px, 3vw, 42px); line-height: 1.02; }
+
+  .lumina-modes {
+    display: block;
+    margin-top: clamp(110px, 14vw, 180px);
+    padding: clamp(26px, 4vw, 44px) 0 0;
+    border-top: 1px solid var(--lumina-line);
+  }
+
+  .lumina-modes__intro { max-width: 700px; margin-bottom: 36px; }
+  .lumina-modes__intro h2 { max-width: 620px; margin-bottom: 0; }
+
+  .lumina-modes__rail {
+    display: grid;
+    grid-template-columns: 1.25fr repeat(4, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .lumina-modes article {
+    min-height: 260px;
+    padding: 24px 18px 18px;
+    border: 0;
+    border-left: 1px solid var(--lumina-line);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .lumina-modes article:first-child { border-left: 0; }
+  .lumina-modes article:nth-child(even) { transform: translateY(24px); }
+  .lumina-modes article:hover { transform: translateY(-4px); }
+  .lumina-modes article:nth-child(even):hover { transform: translateY(18px); }
+  .lumina-modes .lumina-mode--lead { padding-left: 0; }
+
+  .lumina-modes .lumina-mode--lead .lumina-mode-icon,
+  .lumina-modes .lumina-mode--lead .lumina-mode-icon img {
+    width: 160px !important;
+    height: 160px !important;
+    max-width: 160px !important;
+    max-height: 160px !important;
+  }
+
+  .lumina-stats {
+    border: 0;
+    border-top: 1px solid var(--lumina-line);
+    border-bottom: 1px solid var(--lumina-line);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .lumina-manifesto {
+    border-radius: 58px 16px 64px 18px;
+    border-color: rgba(214,168,79,.16);
+    background:
+      radial-gradient(circle at 86% 18%, rgba(214,168,79,.12), transparent 32%),
+      radial-gradient(circle at 12% 82%, rgba(122,53,255,.14), transparent 36%),
+      rgba(6,20,46,.48);
+  }
+
+  .lumina-final > div {
+    border-radius: 50% 16% 44% 20%;
+    border-color: rgba(0,216,255,.18);
+  }
+
   @media (max-width: 980px) {
     .lumina-hero,
     .lumina-workbench {
@@ -1288,5 +1610,74 @@ const modes = [
       max-width: 104px !important;
       max-height: 104px !important;
     }
+  }
+
+  @media (max-width: 980px) {
+    .lumina-story__stage {
+      min-height: 480px;
+      margin-top: 18px;
+    }
+
+    .lumina-feature--lead { grid-column: span 2; }
+    .lumina-feature--satellite { grid-column: span 1; }
+    .lumina-modes__rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .lumina-modes article:nth-child(3) { border-left: 0; }
+  }
+
+  @media (max-width: 620px) {
+    .lumina-workbench {
+      padding: 8px;
+      border-radius: 28px 14px 34px 16px;
+    }
+
+    .lumina-input-panel,
+    .lumina-result-panel {
+      height: auto;
+      border-radius: 22px;
+    }
+
+    .lumina-story { margin-top: 92px; }
+    .lumina-story__intro { margin-left: 0; }
+    .lumina-story__intro h2,
+    .lumina-modes__intro h2 { font-size: clamp(36px, 12vw, 54px); }
+
+    .lumina-story__stage {
+      display: block;
+      min-height: 0;
+      margin-top: 20px;
+    }
+
+    .lumina-story__scene--input,
+    .lumina-story__scene--output {
+      width: 86%;
+      transform: none;
+    }
+
+    .lumina-story__scene--input { margin-left: auto; }
+    .lumina-story__scene--output { margin: -18px auto 0 0; }
+    .lumina-story__scene figcaption { right: 3%; bottom: 5%; }
+    .lumina-story__bridge { left: 32%; top: 48%; width: 36%; }
+
+    .lumina-feature--lead {
+      grid-column: 1;
+      grid-row: auto;
+      min-height: 420px;
+      border-radius: 38% 14% 34% 16%;
+    }
+
+    .lumina-feature--satellite {
+      grid-column: 1;
+      min-height: 0;
+      transform: none !important;
+    }
+
+    .lumina-feature--satellite:hover { transform: translateY(-4px) !important; }
+    .lumina-modes__rail { grid-template-columns: 1fr; }
+    .lumina-modes article,
+    .lumina-modes article:nth-child(even) { border-left: 0; border-top: 1px solid var(--lumina-line); transform: none; }
+    .lumina-modes article:first-child { border-top: 0; }
+    .lumina-modes article:hover,
+    .lumina-modes article:nth-child(even):hover { transform: translateY(-4px); }
+    .lumina-modes .lumina-mode--lead { padding-left: 0; }
   }
 </style>
