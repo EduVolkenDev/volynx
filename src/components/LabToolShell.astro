@@ -12,43 +12,43 @@ const { active = "home" } = Astro.props;
 
 const shellByTool: Record<ToolKey, { title: string; copy: string; states: string[]; cta: string; ctaHref: string }> = {
   home: {
-    title: "Lab OS",
-    copy: "One workspace for local tools, AI tools, saved presets and plan-aware exports.",
-    states: ["Free", "Pro", "VX ready", "Local-first"],
-    cta: "Open profile memory",
+    title: "VOLYNX Lab",
+    copy: "Your toolkit for browser tools, AI tools, saved presets and exports.",
+    states: ["Free", "Pro", "VX on selected actions", "Runs locally"],
+    cta: "Open your saved work",
     ctaHref: ROUTES.profile,
   },
   converter: {
-    title: "Converter workspace",
+    title: "Converter",
     copy: "Free browser conversion with ZIP export, saved presets and Pro limits when volume grows.",
     states: ["Free", "Local", "ZIP", "Presets"],
-    cta: "Upgrade capacity",
+    cta: "Explore plans",
     ctaHref: ROUTES.pricing,
   },
   scaler: {
-    title: "Image Scaler workspace",
-    copy: "Local upscale with saved scale presets, clear login return and Pro capacity path.",
-    states: ["Free", "Local", "Preview", "Pro capacity"],
-    cta: "Upgrade capacity",
+    title: "Image Scaler",
+    copy: "Local upscale with saved scale presets, clear results and Pro features for larger projects.",
+    states: ["Free", "Local", "Preview", "Pro features"],
+    cta: "Explore plans",
     ctaHref: ROUTES.pricing,
   },
   suite: {
-    title: "iMage Suite workspace",
-    copy: "A production recipe surface for upscale, compress, convert and Pro background removal.",
+    title: "iMage Suite",
+    copy: "Reusable image tools for upscaling, compression, conversion and background removal.",
     states: ["Free", "Pro", "Local AI", "Recipes"],
     cta: "Open Studio Pro",
     ctaHref: ROUTES.studio,
   },
   lumina: {
-    title: "Lumina workspace",
-    copy: "AI when available, explicit local fallback, reusable answers and profile history.",
+    title: "Lumina",
+    copy: "Clear explanations, local fallback, reusable answers and profile history.",
     states: ["Free", "AI", "Local fallback", "Export"],
     cta: "Upgrade Lumina",
     ctaHref: ROUTES.pricing,
   },
   qr: {
-    title: "QRGen workspace",
-    copy: "The Lab benchmark: saved projects, strong preview, managed QR path and plan-gated exports.",
+    title: "QRGen",
+    copy: "Create branded QR projects with strong previews and premium export options.",
     states: ["Free", "Launch", "Pro", "Projects"],
     cta: "Compare QRGen plans",
     ctaHref: ROUTES.pricing,
@@ -58,7 +58,7 @@ const shellByTool: Record<ToolKey, { title: string; copy: string; states: string
 const shell = shellByTool[active] || shellByTool.home;
 ---
 
-<section class="vx-lab-shell" aria-label="VOLYNX Lab workspace">
+<section class="vx-lab-shell" aria-label="VOLYNX Lab tools">
   <LabToolSwitcher active={active} />
   <div class="vx-lab-shell__bar">
     <div class="vx-lab-shell__copy">
@@ -74,10 +74,10 @@ const shell = shellByTool[active] || shellByTool.home;
       <a href={shell.ctaHref} data-i18n={`lab_shell.${active}_cta`}>{shell.cta}</a>
     </div>
   </div>
-  <div class="vx-lab-shell__legend" aria-label="Plan legend">
-    <span><b data-i18n="lab_shell.legend_free_label">Free</b><em data-i18n="lab_shell.legend_free_desc">daily/local starter limits</em></span>
+  <div class="vx-lab-shell__legend" aria-label="Tool access">
+    <span><b data-i18n="lab_shell.legend_free_label">Free</b><em data-i18n="lab_shell.legend_free_desc">starter limits may apply</em></span>
     <span><b>Pro</b><em data-i18n="lab_shell.legend_pro_desc">higher limits and premium exports</em></span>
-    <span><b>VX</b><em data-i18n="lab_shell.legend_vx_desc">only when a token action is wired</em></span>
+    <span><b>VX</b><em data-i18n="lab_shell.legend_vx_desc">available for selected actions</em></span>
     <span><b>Local</b><em data-i18n="lab_shell.legend_local_desc">runs in this browser when possible</em></span>
   </div>
 </section>

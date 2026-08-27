@@ -111,8 +111,8 @@ export const kitPreviews: KitPreview[] = [
         pt: "9 seções polidas — hero, sobre, grid de projetos, timeline de experiência, skills, depoimentos, CTA, contato, footer.",
       },
       {
-        en: "Auto-loaded into Builder on checkout — no setup, no zip extracting.",
-        pt: "Carregado automaticamente no Builder após o checkout — sem setup, sem extrair zip.",
+        en: "Loaded into Builder after purchase — ready to customise without a complicated setup.",
+        pt: "Carregado no Builder após a compra — pronto para personalizar sem uma configuração complicada.",
       },
       {
         en: "Edit content inline — name, bio, projects, skills — without touching code.",
@@ -144,8 +144,8 @@ export const kitPreviews: KitPreview[] = [
     steps: [
       {
         title: {
-          en: "1. Buy a tier",
-          pt: "1. Compre um tier",
+          en: "1. Choose a plan",
+          pt: "1. Escolha um plano",
         },
         copy: {
           en: "Starter for personal use, Pro for client-facing freelance work, Studio for full case-study + dark/light mode coverage.",
@@ -180,8 +180,8 @@ export const kitPreviews: KitPreview[] = [
           pt: "Posso usar para trabalho freelancer pago?",
         },
         answer: {
-          en: "Yes on Pro and Studio tiers. Starter is for personal use only — see the licensing block on the product page.",
-          pt: "Sim nos tiers Pro e Studio. O Starter é só para uso pessoal — veja o bloco de licenciamento na página do produto.",
+          en: "Yes on Pro and Studio plans. Starter is for personal use only — see the licence details on the product page.",
+          pt: "Sim nos planos Pro e Studio. O Starter é apenas para uso pessoal — veja os detalhes da licença na página do produto.",
         },
       },
       {
@@ -281,8 +281,8 @@ export const kitPreviews: KitPreview[] = [
         pt: "Checklist de onboarding + 5 templates base de e-mail (kickoff, update semanal, blocker, handoff, wrap-up).",
       },
       {
-        en: "Auto-loaded into Builder on checkout — site goes live the same day you buy.",
-        pt: "Carregado automaticamente no Builder no checkout — site no ar no mesmo dia da compra.",
+        en: "Loaded into Builder after purchase — your site can be live the same day.",
+        pt: "Carregado no Builder após a compra — seu site pode estar no ar no mesmo dia.",
       },
     ],
     whoItsFor: [
@@ -295,15 +295,15 @@ export const kitPreviews: KitPreview[] = [
         pt: "Consultores que perdem deals em conversa de escopo e querem um sistema de fechamento que faz o trabalho pesado.",
       },
       {
-        en: "Solo operators who need 'the boring docs' (proposal, SOW, onboarding) ready before they pitch the next client.",
+        en: "Solo founders who want proposals, onboarding and client materials ready before the next pitch.",
         pt: "Profissionais solo que precisam dos 'docs chatos' (proposta, SOW, onboarding) prontos antes de ofertar o próximo cliente.",
       },
     ],
     steps: [
       {
         title: {
-          en: "1. Pick the tier that fits",
-          pt: "1. Escolha o tier certo",
+          en: "1. Pick the plan that fits",
+          pt: "1. Escolha o plano certo",
         },
         copy: {
           en: "Starter for solo freelancers, Pro for client-delivery agencies, Studio for full case-study + proposal templates.",
@@ -338,8 +338,8 @@ export const kitPreviews: KitPreview[] = [
           pt: "Posso usar para trabalho de entrega ao cliente?",
         },
         answer: {
-          en: "Yes on Pro and Studio tiers. Starter is single-agency use only. Studio also includes the right to deliver client sites built on the kit.",
-          pt: "Sim nos tiers Pro e Studio. O Starter é só para uso da própria agência. O Studio também inclui o direito de entregar sites de cliente construídos com o kit.",
+          en: "Yes on Pro and Studio plans. Starter is for use by your own agency. Studio also includes the right to deliver client sites built with the kit.",
+          pt: "Sim nos planos Pro e Studio. O Starter é para uso da sua própria agência. O Studio também inclui o direito de entregar sites de clientes construídos com o kit.",
         },
       },
       {
@@ -376,8 +376,8 @@ export const kitPreviews: KitPreview[] = [
       pt: "Uma landing page que vende seu produto, não a lista de features.",
     },
     summary: {
-      en: "Conversion-focused sections, pricing structure with 3 lanes, FAQ, social proof and a copy framework you fill in instead of writing from scratch — built for SaaS launches that need to convert visitors fast.",
-      pt: "Seções focadas em conversão, estrutura de pricing com 3 lanes, FAQ, prova social e um framework de copy pra você preencher em vez de escrever do zero — feito para lançamentos SaaS que precisam converter rápido.",
+      en: "Conversion-focused sections, a clear three-plan pricing area, FAQ, social proof and a copy framework you can fill in instead of writing from scratch — built for SaaS launches that need to convert visitors fast.",
+      pt: "Seções focadas em conversão, uma área de preços com três planos, FAQ, prova social e um framework de copy para preencher em vez de escrever do zero — feito para lançamentos SaaS que precisam converter rápido.",
     },
     art: "/assets/saasbig.webp",
     route: ROUTES.saasSystemPreview,
@@ -385,7 +385,7 @@ export const kitPreviews: KitPreview[] = [
     docsAnchor: "saas-system",
     metrics: [
       { value: "12", label: { en: "Sections", pt: "Seções" } },
-      { value: "3", label: { en: "Pricing lanes", pt: "Lanes de pricing" } },
+      { value: "3", label: { en: "Pricing plans", pt: "Planos de preço" } },
       { value: "Fast", label: { en: "Lighthouse", pt: "Lighthouse" } },
       { value: "SEO", label: { en: "Ready", pt: "Pronto" } },
     ],
@@ -406,8 +406,8 @@ export const kitPreviews: KitPreview[] = [
           pt: "Lógica de pricing que não atira no próprio pé",
         },
         copy: {
-          en: "3-lane pricing with anchor pricing, recommended-tier framing and a clear monthly/annual toggle — set up so users self-select the right plan.",
-          pt: "Pricing em 3 lanes com âncora de preço, framing de tier recomendado e toggle mensal/anual claro — montado pra usuário se auto-selecionar no plano certo.",
+        en: "Three-plan pricing with clear comparisons, a recommended option and a monthly/annual toggle — designed to make the right choice easier.",
+        pt: "Preços em três planos, comparações claras, uma opção recomendada e toggle mensal/anual — pensado para facilitar a escolha.",
         },
       },
       {
@@ -423,24 +423,24 @@ export const kitPreviews: KitPreview[] = [
     ],
     whatYouGet: [
       {
-        en: "12 conversion-focused sections — hero, social proof, problem, features, pricing, testimonials, FAQ, CTA, footer (and more on Studio tier).",
-        pt: "12 seções focadas em conversão — hero, prova social, problema, features, pricing, depoimentos, FAQ, CTA, footer (e mais no tier Studio).",
+        en: "12 conversion-focused sections — hero, social proof, problem, features, pricing, testimonials, FAQ, CTA, footer (and more on the Studio plan).",
+        pt: "12 seções focadas em conversão — hero, prova social, problema, features, preços, depoimentos, FAQ, CTA, footer (e mais no plano Studio).",
       },
       {
         en: "Copy framework — fill-in-the-blanks for benefits, objections and proof, written to convert without sounding generic.",
         pt: "Framework de copy — preencher-os-vazios pra benefícios, objeções e prova, escrito pra converter sem soar genérico.",
       },
       {
-        en: "3-tier pricing component with anchor pricing, recommended-tier highlight and monthly/annual toggle.",
-        pt: "Componente de pricing em 3 tiers com âncora de preço, destaque de tier recomendado e toggle mensal/anual.",
+        en: "Three-plan pricing component with a recommended option and monthly/annual toggle.",
+        pt: "Componente de preços em três planos, com opção recomendada e toggle mensal/anual.",
       },
       {
         en: "FAQ section pre-loaded with the 5 questions every SaaS prospect asks before paying.",
         pt: "Seção de FAQ pré-carregada com as 5 perguntas que todo prospect SaaS faz antes de pagar.",
       },
       {
-        en: "Auto-loaded into Builder on checkout. Edit copy + colors, hit publish, your landing is live.",
-        pt: "Carregado automaticamente no Builder no checkout. Edite copy + cores, clique em publicar, sua landing fica no ar.",
+        en: "Loaded into Builder after purchase. Edit the copy and colours, publish, and your landing page is live.",
+        pt: "Carregado no Builder após a compra. Edite o texto e as cores, publique e coloque sua landing page no ar.",
       },
     ],
     whoItsFor: [
@@ -460,8 +460,8 @@ export const kitPreviews: KitPreview[] = [
     steps: [
       {
         title: {
-          en: "1. Buy the tier you need",
-          pt: "1. Compre o tier que precisa",
+          en: "1. Choose the plan you need",
+          pt: "1. Escolha o plano de que precisa",
         },
         copy: {
           en: "Launch for lean MVPs, Growth for SaaS with traction, Scale for full SaaS with case studies and dark/light mode.",
@@ -474,8 +474,8 @@ export const kitPreviews: KitPreview[] = [
           pt: "2. Coloque sua copy no framework",
         },
         copy: {
-          en: "Hero headline, problem statement, 3 features, pricing tiers, FAQ — every field has placeholder copy you replace.",
-          pt: "Headline do hero, statement do problema, 3 features, tiers de pricing, FAQ — cada campo tem copy placeholder pra você substituir.",
+        en: "Hero headline, problem statement, three features, pricing plans and FAQ — every field has starter copy you can replace.",
+        pt: "Headline do hero, problema, três features, planos de preço e FAQ — cada campo tem um texto inicial que você pode substituir.",
         },
       },
       {
@@ -506,8 +506,8 @@ export const kitPreviews: KitPreview[] = [
           pt: "Posso publicar em Cloudflare Pages ou Vercel?",
         },
         answer: {
-          en: "Yes. Hit publish in Builder for the volynx.world subdomain (instant), or export the static HTML and host anywhere on Pro+ tiers.",
-          pt: "Sim. Clique em publicar no Builder para o subdomínio volynx.world (instantâneo), ou exporte o HTML estático e hospede em qualquer lugar nos tiers Pro+.",
+        en: "Yes. Publish in Builder to the volynx.world subdomain, or export the static HTML and host it anywhere on Pro+ plans.",
+        pt: "Sim. Publique no Builder para o subdomínio volynx.world ou exporte o HTML estático e hospede onde quiser nos planos Pro+.",
         },
       },
       {

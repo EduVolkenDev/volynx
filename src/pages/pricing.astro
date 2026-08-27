@@ -15,14 +15,14 @@ const currencyParam = Astro.url.searchParams.get('currency') || '';
 const currency = (['GBP', 'EUR', 'BRL'] as const).includes(currencyParam as any) ? currencyParam as 'GBP'|'EUR'|'BRL' : 'GBP';
 
 const faqs = [
-  { qKey: "price.faq_q1", aKey: "price.faq_a1", qFallback: "How does VOLYNX pricing work?", aFallback: "Plans unlock access to product features. VX is separate premium capacity for enabled actions, not a replacement for Stripe checkout. Bundles save money when you use more than one product." },
-  { qKey: "price.faq_q2", aKey: "price.faq_a2", qFallback: "What is VX?", aFallback: "VX is your premium usage capacity inside VOLYNX. Buy once, use where the product explicitly supports VX, such as CVitae exports/templates and selected Studio actions. VX never expires." },
-  { qKey: "price.faq_q3", aKey: "price.faq_a3", qFallback: "Can I use VX across different products?", aFallback: "Yes, where VX is enabled. Not every product accepts VX at checkout; product purchases still use Stripe unless the page says otherwise." },
+  { qKey: "price.faq_q1", aKey: "price.faq_a1", qFallback: "How does VOLYNX pricing work?", aFallback: "Plans unlock access to product features. VX adds premium usage for selected actions, while bundles save money when you use more than one product." },
+  { qKey: "price.faq_q2", aKey: "price.faq_a2", qFallback: "What is VX?", aFallback: "VX is premium usage inside VOLYNX. Buy once and use it where the product explicitly supports VX, such as CVitae exports/templates and selected Studio actions. VX never expires." },
+  { qKey: "price.faq_q3", aKey: "price.faq_a3", qFallback: "Can I use VX across different products?", aFallback: "Yes, wherever the product says VX is available. Product subscriptions and one-time purchases are shown separately on their product pages." },
   { qKey: "price.faq_q4", aKey: "price.faq_a4", qFallback: "Do I need a subscription to export from CVitae?", aFallback: "No. CVitae is free to build, preview, and improve with AI. Use 2 VX for a clean PDF export or unlock premium templates with VX. Business is optional for professionals who need unlimited exports and templates." },
   { qKey: "price.faq_q5", aKey: "price.faq_a5", qFallback: "How do bundles work?", aFallback: "Bundles combine two or more VOLYNX products into a single subscription at a combined lower price. Access updates automatically across all included products." },
-  { qKey: "price.faq_q6", aKey: "price.faq_a6", qFallback: "What's the difference between a plan and a VX pack?", aFallback: "A plan is a recurring subscription that unlocks ongoing access. A VX pack is a one-time purchase that adds premium usage capacity. Use them separately or together." },
+  { qKey: "price.faq_q6", aKey: "price.faq_a6", qFallback: "What's the difference between a plan and a VX pack?", aFallback: "A plan is a recurring subscription that unlocks ongoing access. A VX pack is a one-time purchase that adds premium usage for selected features. Use them separately or together." },
   { qKey: "price.faq_q7", aKey: "price.faq_a7", qFallback: "Can I change or cancel my plan anytime?", aFallback: "Yes. Upgrade, downgrade or cancel from your account dashboard. Billing adjusts automatically." },
-  { qKey: "price.faq_q8", aKey: "price.faq_a8", qFallback: "Can I buy extra VX without changing my plan?", aFallback: "Yes. VX packs are always available and add capacity to your account without touching your subscription." },
+  { qKey: "price.faq_q8", aKey: "price.faq_a8", qFallback: "Can I buy extra VX without changing my plan?", aFallback: "Yes. VX packs add premium usage to your account without changing your subscription." },
 ];
 
 const bundleLookupById = {
@@ -33,8 +33,8 @@ const bundleLookupById = {
 const pricingAssistItems = [
   { href: ROUTES.products, label: { en: "Catalog", pt: "Catálogo" }, title: { en: "Browse products", pt: "Ver produtos" }, copy: { en: "Go back to kits, tools and product pages while comparing plans.", pt: "Volte para kits, ferramentas e páginas de produto enquanto compara planos." }, emphasized: true, iconSrc: "/assets/allproducts.webp" },
   { href: ROUTES.delivery, label: { en: "Post-purchase", pt: "Pós-compra" }, title: { en: "My products", pt: "Meus produtos" }, copy: { en: "If checkout already happened, reopen delivery and access instead of staying stuck in pricing.", pt: "Se a compra já aconteceu, reabra entrega e acesso em vez de ficar preso nos preços." }, iconSrc: "/assets/mybox.webp" },
-  { href: ROUTES.support, label: { en: "Support", pt: "Suporte" }, title: { en: "Open support", pt: "Abrir suporte" }, copy: { en: "Use the support lane for billing, launch and access questions tied to a purchase.", pt: "Use a faixa de suporte para questões de cobrança, lançamento e acesso ligadas a uma compra." }, iconSrc: "/assets/support.webp" },
-  { href: ROUTES.daily, label: { en: "Workspace", pt: "Área de trabalho" }, title: { en: "See Daily live", pt: "Ver Daily ao vivo" }, copy: { en: "Jump into the live workspace while evaluating Daily and bundle value.", pt: "Entre na área de trabalho ao vivo enquanto avalia Daily e o valor do pacote." }, iconSrc: "/assets/daily-icon.webp" },
+  { href: ROUTES.support, label: { en: "Support", pt: "Suporte" }, title: { en: "Open support", pt: "Abrir suporte" }, copy: { en: "Get help with billing, launch and access questions tied to a purchase.", pt: "Receba ajuda com questões de cobrança, lançamento e acesso ligadas a uma compra." }, iconSrc: "/assets/support.webp" },
+  { href: ROUTES.daily, label: { en: "Daily", pt: "Daily" }, title: { en: "See Daily live", pt: "Ver Daily ao vivo" }, copy: { en: "See how Daily brings planning, notes and decisions together.", pt: "Veja como o Daily reúne planejamento, notas e decisões." }, iconSrc: "/assets/daily-icon.webp" },
 ];
 ---
 <FlagshipLayout title="Pricing — VOLYNX" pageClass="page-pricing">
@@ -52,8 +52,8 @@ const pricingAssistItems = [
       <div class="shell hero-grid hero-grid--pricing">
         <div class="hero-copy">
           <span class="kicker" data-i18n="price.hero_kicker">Ecosystem pricing</span>
-          <h1 class="vx-hero-shimmer" data-i18n="price.hero_title">One ecosystem. Clear pricing. Premium capacity at every tier.</h1>
-          <p data-i18n="price.hero_desc">Subscribe to what you use, bundle products to save, or add VX for enabled premium actions. One account. One ecosystem. No fake payment paths.</p>
+          <h1 class="vx-hero-shimmer" data-i18n="price.hero_title">One ecosystem. Clear pricing. More power when you need it.</h1>
+          <p data-i18n="price.hero_desc">Choose what you use, combine products to save, or add VX for selected premium actions. One account. One connected experience.</p>
           <p class="hero-subcopy"><span class="i18n-en">VOLYNX connects Builder, Daily, and CVitae into one unified experience. Plans unlock product access. VX covers enabled add-ons like CVitae exports/templates and selected Studio actions.</span><span class="i18n-pt">A VOLYNX une Builder, Daily e CVitae em uma experiência única. Planos liberam acesso aos produtos. VX cobre complementos habilitados, como exportações e modelos do CVitae, além de ações Studio selecionadas.</span></p>
           <div class="hero-actions">
             <a href="#plans" class="button button--gold" data-i18n="price.hero_cta1">View plans</a>
@@ -66,7 +66,7 @@ const pricingAssistItems = [
       </div>
     </section>
 
-    <PlatformAssistStrip eyebrow={{ en: "Decision support", pt: "Apoio à decisão" }} title={{ en: "Pricing is one step, not the whole journey.", pt: "Pricing é um passo, não a jornada inteira." }} description={{ en: "Stay close to the operational paths while you compare plans, bundles and VX.", pt: "Fique perto dos caminhos operacionais enquanto compara planos, bundles e VX." }} items={pricingAssistItems} />
+    <PlatformAssistStrip eyebrow={{ en: "Decision support", pt: "Apoio à decisão" }} title={{ en: "Pricing is one step, not the whole journey.", pt: "Pricing é um passo, não a jornada inteira." }} description={{ en: "Compare plans, bundles and VX with the products and support you may need next.", pt: "Compare planos, bundles e VX com os produtos e o suporte de que você pode precisar depois." }} items={pricingAssistItems} />
 
     <!-- ═══ FASTEST PAID PATHS ═══ -->
     <section class="page-section revenue-funnel-section" aria-label="Fastest VOLYNX paid paths">
@@ -74,7 +74,7 @@ const pricingAssistItems = [
         <div class="revenue-funnel__intro">
           <span class="eyebrow"><span class="i18n-en">Start monetizing the ecosystem</span><span class="i18n-pt">Comece pelo caminho monetizável</span></span>
           <h2><span class="i18n-en">If you want the shortest path to value, choose one of these.</span><span class="i18n-pt">Se você quer o caminho mais curto para valor, escolha um destes.</span></h2>
-          <p><span class="i18n-en">These offers are already connected to the checkout system. No waitlist, no fake CTA, no manual promise hidden behind a button.</span><span class="i18n-pt">Estas ofertas já estão conectadas ao checkout. Sem lista de espera, sem CTA falso, sem promessa manual escondida no botão.</span></p>
+          <p><span class="i18n-en">These options are available now, with clear pricing and a direct next step.</span><span class="i18n-pt">Estas opções estão disponíveis agora, com preços claros e um próximo passo direto.</span></p>
         </div>
 
         <div class="revenue-funnel__cards">
@@ -109,11 +109,11 @@ const pricingAssistItems = [
           </a>
 
           <a href={productPreviewHref("tokens_core")} class="revenue-funnel-card">
-            <span class="revenue-funnel-card__badge"><span class="i18n-en">One-time capacity</span><span class="i18n-pt">Capacidade avulsa</span></span>
+            <span class="revenue-funnel-card__badge"><span class="i18n-en">One-time VX pack</span><span class="i18n-pt">Pack VX avulso</span></span>
             <img src="/assets/VX4.webp" alt="" loading="lazy" decoding="async" />
             <strong>32 VX Core</strong>
             <small>No subscription change</small>
-            <p><span class="i18n-en">For users who only need enabled premium actions: exports, templates and selected Studio capacity.</span><span class="i18n-pt">Para quem só precisa de ações premium habilitadas: exports, templates e capacidade Studio selecionada.</span></p>
+            <p><span class="i18n-en">For users who need extra VX for selected exports, templates and Studio features.</span><span class="i18n-pt">Para quem precisa de VX extra para exportações, modelos e recursos Studio selecionados.</span></p>
             <span class="revenue-funnel-card__price">£18 one-time</span>
             <span class="revenue-funnel-card__cta"><span class="i18n-en">Review VX pack</span><span class="i18n-pt">Ver pacote VX</span> →</span>
           </a>
@@ -179,7 +179,7 @@ const pricingAssistItems = [
       <div class="shell section-head">
         <span class="eyebrow"><span class="i18n-en">How it works</span><span class="i18n-pt">Como funciona</span></span>
         <h2><span class="i18n-en">How VOLYNX pricing works</span><span class="i18n-pt">Como a economia VOLYNX funciona</span></h2>
-        <p><span class="i18n-en">Your plan unlocks product access and feature availability. VX is separate premium capacity for enabled actions, not a replacement for Stripe checkout.</span><span class="i18n-pt">Seu plano libera acesso às ferramentas e recursos do produto. VX é capacidade premium separada para ações habilitadas, não substitui o checkout Stripe.</span></p>
+        <p><span class="i18n-en">Your plan unlocks product access and features. VX adds premium usage for selected actions when the product says it is available.</span><span class="i18n-pt">Seu plano libera acesso às ferramentas e recursos do produto. VX adiciona uso premium para ações selecionadas quando o produto informar que está disponível.</span></p>
       </div>
       <div class="shell how-grid">
         <div class="how-card how-card--plan">
@@ -199,7 +199,7 @@ const pricingAssistItems = [
           <div class="how-card__equation">
             <strong>VX</strong>
             <span class="how-eq">=</span>
-            <span class="how-val"><span class="i18n-en">capacity</span><span class="i18n-pt">capacidade</span></span>
+            <span class="how-val"><span class="i18n-en">premium usage</span><span class="i18n-pt">uso premium</span></span>
           </div>
         </div>
         <div class="how-card how-card--bundle">
@@ -247,7 +247,7 @@ const pricingAssistItems = [
                 <img src="/assets/updatetopro.webp" alt="" loading="lazy" decoding="async" aria-hidden="true" />
               </div>
               <h3><span class="i18n-en">Go Pro when ready</span><span class="i18n-pt">Vá de Pro quando estiver pronto</span></h3>
-              <p><span class="i18n-en">Builder Pro (£24) for publishing sites. Daily Pro (£14) for smarter daily tools. Or bundle Essential (£35) to save. Pro feels different — faster, cleaner, with real capacity.</span><span class="i18n-pt">Builder Pro (£24) para publicar sites. Daily Pro (£14) para ferramentas diárias mais inteligentes. Ou bundle Essential (£35) para economizar. Pro parece diferente — mais rápido, mais limpo, com capacidade real.</span></p>
+              <p><span class="i18n-en">Builder Pro (£24) for publishing sites. Daily Pro (£14) for smarter daily tools. Or bundle Essential (£35) to save. Pro feels different — faster, cleaner, with more room to work.</span><span class="i18n-pt">Builder Pro (£24) para publicar sites. Daily Pro (£14) para ferramentas diárias mais inteligentes. Ou bundle Essential (£35) para economizar. Pro parece diferente — mais rápido, mais limpo, com mais espaço para trabalhar.</span></p>
             </div>
             <div class="guidance-card">
               <div class="guidance-card-icon">
@@ -277,7 +277,7 @@ const pricingAssistItems = [
       <div class="shell section-head">
         <span class="eyebrow"><span class="i18n-en">The Builder</span><span class="i18n-pt">O Builder</span></span>
         <h2>VOLYNX Builder</h2>
-        <p><span class="i18n-en">Create, refine, and publish premium sites with more control, better presentation, and real delivery capacity.</span><span class="i18n-pt">Crie, refine e publique sites premium com mais controle, melhor apresentação e capacidade real de entrega.</span></p>
+        <p><span class="i18n-en">Create, refine, and publish premium sites with more control, better presentation, and a smoother publishing experience.</span><span class="i18n-pt">Crie, refine e publique sites premium com mais controle, melhor apresentação e uma experiência de publicação mais fluida.</span></p>
       </div>
       <div class="shell pricing-grid pricing-grid--plans">
         {sitePricing.builderPlans.map((plan) => (
@@ -327,8 +327,8 @@ const pricingAssistItems = [
       <div class="shell comparison">
         <div class="comparison-row"><strong data-i18n="price.comp_memory">Workflow memory</strong><span class="check" data-i18n="price.comp_free_memory">No memory</span><span class="check pro" data-i18n="price.comp_pro_memory">Presets, history, reusable recipes</span></div>
         <div class="comparison-row"><strong data-i18n="price.comp_quality">Output quality</strong><span class="check" data-i18n="price.comp_free_quality">Basic modes</span><span class="check pro" data-i18n="price.comp_pro_quality">Premium modes, stronger exports</span></div>
-        <div class="comparison-row"><strong data-i18n="price.comp_speed">Comfort and speed</strong><span class="check" data-i18n="price.comp_free_speed">Manual repetition</span><span class="check pro" data-i18n="price.comp_pro_speed">Queues, defaults, faster decision loops</span></div>
-        <div class="comparison-row"><strong data-i18n="price.comp_status">Status</strong><span class="check" data-i18n="price.comp_free_status">Discovery mode</span><span class="check pro" data-i18n="price.comp_pro_status">Pro workspace and priority access</span></div>
+        <div class="comparison-row"><strong data-i18n="price.comp_speed">Comfort and speed</strong><span class="check" data-i18n="price.comp_free_speed">More hands-on work</span><span class="check pro" data-i18n="price.comp_pro_speed">Queues, defaults, faster decision loops</span></div>
+        <div class="comparison-row"><strong data-i18n="price.comp_status">Status</strong><span class="check" data-i18n="price.comp_free_status">Explore the basics</span><span class="check pro" data-i18n="price.comp_pro_status">Pro toolkit and priority access</span></div>
       </div>
     </section>
 
@@ -439,7 +439,7 @@ const pricingAssistItems = [
       <div class="shell section-head">
         <span class="eyebrow"><span class="i18n-en">Guided suites</span><span class="i18n-pt">Suites guiadas</span></span>
         <h2><span class="i18n-en">Recommended product combinations without new Stripe complexity.</span><span class="i18n-pt">Combinações recomendadas sem criar complexidade nova no Stripe.</span></h2>
-        <p><span class="i18n-en">These are commercial paths, not fake bundled products. Start with the checkout-ready item, then add the supporting tools that increase value.</span><span class="i18n-pt">Estes são caminhos comerciais, não bundles falsos. Comece pelo item pronto para checkout e depois adicione as ferramentas que aumentam o valor.</span></p>
+        <p><span class="i18n-en">These combinations bring complementary products together. Start with the option that fits you, then add the tools that increase its value.</span><span class="i18n-pt">Estas combinações reúnem produtos complementares. Comece pela opção que combina com você e depois adicione as ferramentas que aumentam o valor.</span></p>
       </div>
 
       <div class="shell suite-grid">
@@ -491,7 +491,7 @@ const pricingAssistItems = [
         <article class="suite-card suite-card--agency">
           <span class="suite-card__label"><span class="i18n-en">For agencies</span><span class="i18n-pt">Para imobiliárias/agências</span></span>
           <h3>Imobiliária Starter</h3>
-          <p><span class="i18n-en">PropertyFlow Professional + Builder + VX. Start with the one-time platform, then add publishing and premium capacity.</span><span class="i18n-pt">PropertyFlow Professional + Builder + VX. Comece pela plataforma avulsa e adicione publicação e capacidade premium.</span></p>
+        <p><span class="i18n-en">PropertyFlow Professional + Builder + VX. Start with the one-time platform, then add publishing and premium usage.</span><span class="i18n-pt">PropertyFlow Professional + Builder + VX. Comece pela plataforma avulsa e adicione publicação e uso premium.</span></p>
           <div class="suite-card__stack">
             <span>PropertyFlow Professional</span>
             <span>Builder Pro</span>
@@ -510,7 +510,7 @@ const pricingAssistItems = [
       <div class="shell section-head">
         <span class="eyebrow"><span class="i18n-en">Save with bundles</span><span class="i18n-pt">Economize com bundles</span></span>
         <h2><span class="i18n-en">Use more than one product? Bundle and save.</span><span class="i18n-pt">Usa mais de um produto? Combine e economize.</span></h2>
-        <p><span class="i18n-en">Bundles combine subscriptions and capacity more efficiently for users living inside the full ecosystem.</span><span class="i18n-pt">Bundles unem assinatura e capacidade de forma mais eficiente para quem vive o ecossistema completo.</span></p>
+        <p><span class="i18n-en">Bundles combine subscriptions and features at a better price for users who want the full ecosystem.</span><span class="i18n-pt">Bundles unem assinaturas e recursos por um preço melhor para quem quer o ecossistema completo.</span></p>
       </div>
       <div class="shell bundle-upgrade-grid">
         {sitePricing.bundles.map((b) => (
@@ -555,11 +555,11 @@ const pricingAssistItems = [
     <!-- ═══ VX PACKS ═══ -->
     <section id="vx-packs" class="page-section">
       <div class="shell vx-lead">
-        <p><span class="i18n-en"><strong>VX is your premium usage capacity inside VOLYNX.</strong><br />Use VX where the product explicitly supports it: CVitae exports/templates and selected Studio actions today. Buy once. It never expires.</span><span class="i18n-pt"><strong>VX é a capacidade premium de uso dentro da VOLYNX.</strong><br />Use VX onde o produto informa suporte explícito: exportações e modelos do CVitae, além de ações Studio selecionadas hoje. Compre uma vez. Não expira.</span></p>
+        <p><span class="i18n-en"><strong>VX is premium usage inside VOLYNX.</strong><br />Use VX where the product explicitly supports it: CVitae exports/templates and selected Studio actions today. Buy once. It never expires.</span><span class="i18n-pt"><strong>VX é uso premium dentro da VOLYNX.</strong><br />Use VX onde o produto informa suporte explícito: exportações e modelos do CVitae, além de ações Studio selecionadas hoje. Compre uma vez. Não expira.</span></p>
       </div>
       <div class="shell section-head">
         <span class="eyebrow">VX Packs</span>
-        <h2><span class="i18n-en">Flexible capacity to do more, export more, and scale without friction.</span><span class="i18n-pt">Capacidade flexível para usar mais, exportar mais e evoluir sem fricção.</span></h2>
+        <h2><span class="i18n-en">More room to do more, export more, and scale without friction.</span><span class="i18n-pt">Mais espaço para usar mais, exportar mais e evoluir sem fricção.</span></h2>
       </div>
       <div class="shell vx-acceptance-grid">
         <article class="vx-acceptance-card vx-acceptance-card--yes">
@@ -573,14 +573,14 @@ const pricingAssistItems = [
           <p><span class="i18n-en">Use VX only when an action explicitly asks for VX before running.</span><span class="i18n-pt">Use VX apenas quando uma ação pedir VX explicitamente antes de executar.</span></p>
         </article>
         <article class="vx-acceptance-card vx-acceptance-card--plan">
-          <span class="vx-acceptance-card__status"><span class="i18n-en">Plan-gated</span><span class="i18n-pt">Por plano</span></span>
+          <span class="vx-acceptance-card__status"><span class="i18n-en">Included with a plan</span><span class="i18n-pt">Incluído no plano</span></span>
           <strong>QRGen HD / SVG</strong>
           <p><span class="i18n-en">Premium QR exports are unlocked by VOLYNX plan tiers today, not by VX checkout.</span><span class="i18n-pt">Exports premium de QR são liberados por planos VOLYNX hoje, não por checkout VX.</span></p>
         </article>
         <article class="vx-acceptance-card vx-acceptance-card--stripe">
           <span class="vx-acceptance-card__status"><span class="i18n-en">Stripe checkout</span><span class="i18n-pt">Checkout Stripe</span></span>
           <strong><span class="i18n-en">Kits / PropertyFlow</span><span class="i18n-pt">Kits / PropertyFlow</span></strong>
-          <p><span class="i18n-en">One-time products and subscriptions stay on Stripe for clean fulfillment.</span><span class="i18n-pt">Produtos avulsos e assinaturas continuam no Stripe para entrega limpa.</span></p>
+        <p><span class="i18n-en">One-time products and subscriptions are charged securely through Stripe.</span><span class="i18n-pt">Produtos avulsos e assinaturas são cobrados com segurança pelo Stripe.</span></p>
         </article>
       </div>
       <div class="shell grid-2">
@@ -589,7 +589,7 @@ const pricingAssistItems = [
         ))}
       </div>
       <div class="shell">
-        <div class="checkout-support"><span class="i18n-en"><strong>You are purchasing VX.</strong> VX is your premium usage capacity inside VOLYNX. Use VX only in eligible product actions that explicitly show VX. One-time purchase. No expiry.</span><span class="i18n-pt"><strong>Você está comprando VX.</strong> VX é sua capacidade premium de uso dentro da VOLYNX. Use VX apenas em ações elegíveis que mostram VX explicitamente. Compra avulsa. Sem expiração.</span></div>
+        <div class="checkout-support"><span class="i18n-en"><strong>You are purchasing VX.</strong> VX is premium usage inside VOLYNX. Use VX where the product explicitly shows it. One-time purchase. No expiry.</span><span class="i18n-pt"><strong>Você está comprando VX.</strong> VX é uso premium dentro da VOLYNX. Use-o onde o produto mostrar essa opção. Compra avulsa. Sem expiração.</span></div>
       </div>
     </section>
 
@@ -619,16 +619,16 @@ const pricingAssistItems = [
           ))}
       </div>
       <div class="shell">
-        <div class="checkout-support"><span class="i18n-en"><strong>You are adding an extra to your plan.</strong> This add-on expands your capacity or unlocks an extra feature without requiring an immediate plan change.</span><span class="i18n-pt"><strong>Você está adicionando um extra ao seu plano.</strong> Este add-on amplia sua capacidade ou desbloqueia um recurso complementar sem exigir troca imediata de plano.</span></div>
+        <div class="checkout-support"><span class="i18n-en"><strong>You are adding an extra to your plan.</strong> This add-on gives you more room to work or unlocks an extra feature without requiring an immediate plan change.</span><span class="i18n-pt"><strong>Você está adicionando um extra ao seu plano.</strong> Este add-on dá mais espaço para trabalhar ou desbloqueia um recurso complementar sem exigir troca imediata de plano.</span></div>
       </div>
       <div class="shell" style="max-width:760px;">
-        <div class="checkout-support"><span class="i18n-en"><strong>Add-ons are staged intentionally.</strong> Assisted domain setup opens a white-glove support lane. The remaining add-ons stay disabled until autonomous fulfillment is real.</span><span class="i18n-pt"><strong>Os complementos estão em lançamento controlado.</strong> A configuração assistida de domínio abre um fluxo de suporte concierge. Os demais continuam desativados até a entrega autônoma existir de verdade.</span></div>
+        <div class="checkout-support"><span class="i18n-en"><strong>Some extras are being prepared.</strong> Assisted domain setup is available through our support team; the other extras will appear here when ready.</span><span class="i18n-pt"><strong>Alguns extras estão sendo preparados.</strong> A configuração assistida de domínio está disponível pelo nosso suporte; os demais aparecerão aqui quando estiverem prontos.</span></div>
       </div>
       <div class="shell">
         <div class="trust-block">
           <div class="trust-block__item"><span class="i18n-en">One account for the full ecosystem</span><span class="i18n-pt">Uma conta para todo o ecossistema</span></div>
           <div class="trust-block__item"><span class="i18n-en">Access unlocked by plan</span><span class="i18n-pt">Acesso liberado pelo plano</span></div>
-          <div class="trust-block__item"><span class="i18n-en">Premium capacity via VX</span><span class="i18n-pt">Capacidade premium via VX</span></div>
+          <div class="trust-block__item"><span class="i18n-en">Premium usage via VX</span><span class="i18n-pt">Uso premium via VX</span></div>
           <div class="trust-block__item"><span class="i18n-en">Change, expand, or bundle anytime</span><span class="i18n-pt">Altere, amplie ou combine quando quiser</span></div>
         </div>
       </div>

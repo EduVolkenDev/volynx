@@ -519,8 +519,8 @@ export const sitePricing = {
       href: '/support/?product=volynx&intent=domain_setup',
       cta: { pt: 'Solicitar setup', en: 'Request setup' },
       note: {
-        pt: 'Atendimento concierge. Não é compra instantânea.',
-        en: 'White-glove lane. Not an instant checkout.'
+        pt: 'Atendimento personalizado. Não é uma compra instantânea.',
+        en: 'Personal help from our team. Not an instant purchase.'
       }
     },
     {
@@ -531,8 +531,8 @@ export const sitePricing = {
       availability: 'coming_soon',
       cta: { pt: 'Em breve', en: 'Coming soon' },
       note: {
-        pt: 'Desativado até o fulfillment autônomo existir.',
-        en: 'Disabled until autonomous fulfillment ships.'
+        pt: 'Disponível em breve, assim que estiver pronto para uso.',
+        en: 'Available soon, once it is ready to use.'
       }
     },
     {
@@ -543,8 +543,8 @@ export const sitePricing = {
       availability: 'coming_soon',
       cta: { pt: 'Em breve', en: 'Coming soon' },
       note: {
-        pt: 'Volta quando a entrega estiver realmente automatizada.',
-        en: 'Returns when delivery is genuinely automated.'
+        pt: 'Estamos preparando uma experiência de exportação mais completa.',
+        en: 'We’re preparing a more complete export experience.'
       }
     },
     {
@@ -555,8 +555,8 @@ export const sitePricing = {
       availability: 'coming_soon',
       cta: { pt: 'Em breve', en: 'Coming soon' },
       note: {
-        pt: 'Oculto até o slot extra refletir de verdade no produto.',
-        en: 'Hidden until the extra slot truly changes product capacity.'
+        pt: 'Disponível em breve para quem precisa de mais sites.',
+        en: 'Available soon for customers who need more sites.'
       }
     },
     {
@@ -567,8 +567,8 @@ export const sitePricing = {
       availability: 'coming_soon',
       cta: { pt: 'Em breve', en: 'Coming soon' },
       note: {
-        pt: 'Ative só quando o publish bilíngue estiver conectado.',
-        en: 'Only activate when bilingual publish is wired end to end.'
+        pt: 'Estamos finalizando a publicação bilíngue.',
+        en: 'We’re finalising bilingual publishing.'
       }
     },
     {
@@ -579,8 +579,8 @@ export const sitePricing = {
       availability: 'coming_soon',
       cta: { pt: 'Em breve', en: 'Coming soon' },
       note: {
-        pt: 'Sem compra direta até a entrega pós-compra estar fechada.',
-        en: 'No checkout until post-purchase delivery is closed.'
+        pt: 'Enquanto isso, explore as coleções disponíveis na Icons Store.',
+        en: 'In the meantime, explore the collections available in the Icons Store.'
       }
     }
   ] satisfies BuilderAddon[],
