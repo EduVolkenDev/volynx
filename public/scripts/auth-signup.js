@@ -56,6 +56,12 @@ function setMsg(el, text, kind) {
   if (kind) el.classList.add(kind);
 }
 
+function escapeHtml(value) {
+  const element = document.createElement("div");
+  element.textContent = String(value ?? "");
+  return element.innerHTML;
+}
+
 function persistSession(session, email) {
   localStorage.setItem("volynx_access_token", session.access_token || "");
   localStorage.setItem("volynx_refresh_token", session.refresh_token || "");
@@ -83,7 +89,8 @@ function showCheckEmail(email) {
   if (checkMsg) {
     const template = checkMsg.getAttribute("data-i18n-template") || checkMsg.innerHTML;
     checkMsg.setAttribute("data-i18n-template", template);
-    checkMsg.innerHTML = template.replace("{email}", email);
+    checkMsg.removeAttribute("data-i18n-html");
+    checkMsg.innerHTML = template.replace("{email}", escapeHtml(email));
   }
 }
 
