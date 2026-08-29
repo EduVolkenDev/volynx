@@ -45,6 +45,26 @@ export const DEVJOURNEY_CURRICULUM = [
         stuckPt: "Se o navegador mostrar uma página vazia, confira se o arquivo se chama index.html, foi salvo e está na mesma pasta aberta.",
         exerciseEn: "Change the heading to include your name and one reason you want to learn programming.",
         exercisePt: "Altere o título para incluir seu nome e um motivo pelo qual quer aprender programação.",
+        sandbox: {
+          html: `<!doctype html>
+<main>
+  <h1>Meu primeiro projeto</h1>
+  <p>Estou começando minha jornada como programador.</p>
+</main>`,
+          css: `body {
+  margin: 0;
+  padding: 2rem;
+  font-family: system-ui, sans-serif;
+  background: #10101c;
+  color: #f8f7ff;
+}
+
+main {
+  max-width: 38rem;
+  margin: 0 auto;
+}`,
+          js: "",
+        },
       },
       {
         id: "B0-L01",
@@ -74,6 +94,24 @@ export const DEVJOURNEY_CURRICULUM = [
         stuckPt: "Abrir o arquivo com duplo clique basta para HTML básico. Use o Live Server quando a aula usar fetch, JSON ou módulos.",
         exerciseEn: "Write down the local URL shown by Live Server and explain, in one sentence, why the server is needed.",
         exercisePt: "Anote a URL local mostrada pelo Live Server e explique, em uma frase, por que o servidor é necessário.",
+        sandbox: {
+          html: `<!doctype html>
+<main>
+  <h1>Servidor local ativo</h1>
+  <p id="status">Edite o HTML, CSS ou JavaScript e execute.</p>
+</main>`,
+          css: `body {
+  margin: 0;
+  padding: 2rem;
+  font-family: system-ui, sans-serif;
+  background: #10101c;
+  color: #f8f7ff;
+}
+
+main { max-width: 38rem; margin: 0 auto; }`,
+          js: `const status = document.querySelector("#status");
+if (status) status.textContent = "A página foi renderizada com sucesso.";`,
+        },
       },
       {
         id: "B0-L02",
@@ -147,6 +185,34 @@ export const DEVJOURNEY_CURRICULUM = [
         stuckPt: "Se tudo parece texto simples, isso é esperado. HTML decide o que o conteúdo é; CSS decide como ele aparece.",
         exerciseEn: "Replace the example content with a mini profile: name, goal, three skills you want to learn and one link.",
         exercisePt: "Troque o conteúdo de exemplo por um mini perfil: nome, objetivo, três habilidades que quer aprender e um link.",
+        sandbox: {
+          html: `<!doctype html>
+<header>
+  <strong>Dev Journey</strong>
+</header>
+<main>
+  <h1>Meu mini perfil</h1>
+  <p>Estou aprendendo a construir para a web.</p>
+  <h2>Próximos passos</h2>
+  <ul>
+    <li>Praticar HTML</li>
+    <li>Publicar meu projeto</li>
+  </ul>
+</main>
+<footer>Construído por mim.</footer>`,
+          css: `body {
+  margin: 0;
+  padding: 2rem;
+  font-family: system-ui, sans-serif;
+  background: #10101c;
+  color: #f8f7ff;
+}
+
+main, header, footer { max-width: 38rem; margin: 0 auto; }
+header { padding-bottom: 2rem; color: #8cffd2; }
+footer { padding-top: 2rem; color: #aaa6bd; }`,
+          js: "",
+        },
       },
       {
         id: "B1-L02",
@@ -178,6 +244,29 @@ export const DEVJOURNEY_CURRICULUM = [
         stuckPt: "Comece com uma coluna. Adicione complexidade apenas quando o conteúdo precisar; responsividade também é uma decisão de conteúdo.",
         exerciseEn: "Add a card grid that becomes one column under 720px and verify it with keyboard navigation.",
         exercisePt: "Adicione uma grade de cards que vire uma coluna abaixo de 720px e verifique a navegação pelo teclado.",
+        sandbox: {
+          html: `<main>
+  <h1>Grade responsiva</h1>
+  <div class="cards">
+    <article><h2>HTML</h2><p>Estrutura.</p></article>
+    <article><h2>CSS</h2><p>Apresentação.</p></article>
+    <article><h2>JS</h2><p>Interação.</p></article>
+  </div>
+</main>`,
+          css: `body {
+  margin: 0;
+  padding: 2rem;
+  font-family: system-ui, sans-serif;
+  background: #10101c;
+  color: #f8f7ff;
+}
+
+main { max-width: 48rem; margin: 0 auto; }
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+article { padding: 1rem; border: 1px solid #3a3a53; border-radius: .8rem; background: #1b1b2b; }
+@media (max-width: 720px) { .cards { grid-template-columns: 1fr; } }`,
+          js: "",
+        },
       },
       {
         id: "B1-L03",
@@ -251,6 +340,30 @@ export const DEVJOURNEY_CURRICULUM = [
         stuckPt: "Leia a condição em voz alta. Se não consegue dizer o que ela significa em linguagem comum, simplifique a regra primeiro.",
         exerciseEn: "Build a small eligibility message with a valid path, an invalid path and a visible explanation for each.",
         exercisePt: "Crie uma pequena mensagem de elegibilidade com caminho válido, inválido e explicação visível para cada um.",
+        sandbox: {
+          html: `<!doctype html>
+<main>
+  <h1>Meu painel</h1>
+  <button id="action" type="button">Ver mensagem</button>
+  <p id="feedback" aria-live="polite">Nenhuma ação executada.</p>
+</main>`,
+          css: `body {
+  margin: 0;
+  padding: 2rem;
+  font-family: system-ui, sans-serif;
+  background: #10101c;
+  color: #f8f7ff;
+}
+
+main { max-width: 38rem; margin: 0 auto; }
+button { padding: .7rem 1rem; border-radius: .6rem; border: 0; cursor: pointer; }`,
+          js: `const button = document.querySelector("#action");
+const feedback = document.querySelector("#feedback");
+
+button?.addEventListener("click", () => {
+  feedback.textContent = "A interação funcionou.";
+});`,
+        },
       },
       {
         id: "B2-L02",

@@ -1,0 +1,157 @@
+---
+const { lessonId, sandbox } = Astro.props;
+const hasCss = Boolean(sandbox?.css?.trim());
+const hasJs = Boolean(sandbox?.js?.trim());
+---
+
+<section class="djs-sandbox" data-sandbox={lessonId} aria-labelledby={`sandbox-title-${lessonId}`}>
+  <div class="djs-sandbox__header">
+    <div>
+      <span class="djs-sandbox__eyebrow">
+        <span class="i18n-en">Practice lab</span>
+        <span class="i18n-pt">Laboratório de prática</span>
+      </span>
+      <h4 id={`sandbox-title-${lessonId}`}>
+        <span class="i18n-en">Run your version here</span>
+        <span class="i18n-pt">Execute sua versão aqui</span>
+      </h4>
+      <p>
+        <span class="i18n-en">Edit the starter, run it, then compare the result with the lesson goal.</span>
+        <span class="i18n-pt">Edite o starter, execute e compare o resultado com o objetivo da aula.</span>
+      </p>
+    </div>
+    <div class="djs-sandbox__actions">
+      <button type="button" class="djs-sandbox__button djs-sandbox__button--secondary" data-sandbox-reset={lessonId}>
+        <span class="i18n-en">Reset</span><span class="i18n-pt">Resetar</span>
+      </button>
+      <button type="button" class="djs-sandbox__button" data-sandbox-run={lessonId}>
+        <span aria-hidden="true">▶</span> <span class="i18n-en">Run preview</span><span class="i18n-pt">Executar preview</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="djs-sandbox__workspace">
+    <div class="djs-sandbox__editor" role="group" aria-label={`Code editor for ${lessonId}`}>
+      <div class="djs-sandbox__editor-tabs" role="tablist" aria-label="Code files">
+        <button type="button" class="djs-sandbox__tab is-active" role="tab" aria-selected="true" data-sandbox-tab="html" data-sandbox-id={lessonId}>index.html</button>
+        {hasCss && <button type="button" class="djs-sandbox__tab" role="tab" aria-selected="false" data-sandbox-tab="css" data-sandbox-id={lessonId}>style.css</button>}
+        {hasJs && <button type="button" class="djs-sandbox__tab" role="tab" aria-selected="false" data-sandbox-tab="js" data-sandbox-id={lessonId}>script.js</button>}
+      </div>
+      <label class="sr-only" for={`sandbox-html-${lessonId}`}>HTML editor</label>
+      <textarea id={`sandbox-html-${lessonId}`} class="djs-sandbox__textarea" data-sandbox-editor="html" data-sandbox-id={lessonId} spellcheck="false" autocapitalize="off" autocomplete="off">{sandbox.html}</textarea>
+      {hasCss && <textarea class="djs-sandbox__textarea is-hidden" data-sandbox-editor="css" data-sandbox-id={lessonId} spellcheck="false" autocapitalize="off" autocomplete="off">{sandbox.css}</textarea>}
+      {hasJs && <textarea class="djs-sandbox__textarea is-hidden" data-sandbox-editor="js" data-sandbox-id={lessonId} spellcheck="false" autocapitalize="off" autocomplete="off">{sandbox.js}</textarea>}
+    </div>
+    <div class="djs-sandbox__preview-wrap">
+      <div class="djs-sandbox__preview-head">
+        <span><span class="djs-sandbox__live-dot" aria-hidden="true"></span><span class="i18n-en">Preview</span><span class="i18n-pt">Preview</span></span>
+        <span class="djs-sandbox__status" data-sandbox-status={lessonId} role="status" aria-live="polite">
+          <span class="i18n-en">Ready</span><span class="i18n-pt">Pronto</span>
+        </span>
+      </div>
+      <iframe class="djs-sandbox__iframe" title={`Live preview for ${lessonId}`} data-sandbox-preview={lessonId} sandbox="allow-scripts"></iframe>
+    </div>
+  </div>
+  <p class="djs-sandbox__note">
+    <span aria-hidden="true">◇</span>
+    <span class="i18n-en">This preview runs in an isolated browser frame. Nothing is sent to the server.</span>
+    <span class="i18n-pt">Este preview roda em um frame isolado do navegador. Nada é enviado ao servidor.</span>
+  </p>
+</section>
+
+<script is:inline>
+  (function () {
+    var sandboxes = Array.prototype.slice.call(document.querySelectorAll('[data-sandbox]'));
+    if (!sandboxes.length) return;
+
+    function getEditor(root, kind) {
+      return root.querySelector('[data-sandbox-editor="' + kind + '"]');
+    }
+
+    function escapeScript(value) {
+      return String(value || '').replace(/<\/script/gi, '<\\/script');
+    }
+
+    function buildDocument(root) {
+      var html = getEditor(root, 'html')?.value || '';
+      var css = getEditor(root, 'css')?.value || '';
+      var js = escapeScript(getEditor(root, 'js')?.value || '');
+      return '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'; script-src \'unsafe-inline\'; img-src data: https:; font-src data: https:;"><style>' + css + '</style></head><body>' + html + '<script>' + js + '<\\/script></body></html>';
+    }
+
+    function setStatus(root, messageEn, messagePt) {
+      var status = root.querySelector('[data-sandbox-status]');
+      if (!status) return;
+      status.setAttribute('aria-label', messageEn + ' / ' + messagePt);
+      var en = status.querySelector('.i18n-en');
+      var pt = status.querySelector('.i18n-pt');
+      if (en) en.textContent = messageEn;
+      if (pt) pt.textContent = messagePt;
+    }
+
+    function run(root) {
+      var frame = root.querySelector('[data-sandbox-preview]');
+      if (!frame) return;
+      frame.srcdoc = buildDocument(root);
+      setStatus(root, 'Preview updated', 'Preview atualizado');
+    }
+
+    sandboxes.forEach(function (root) {
+      var id = root.getAttribute('data-sandbox');
+      var tabs = Array.prototype.slice.call(root.querySelectorAll('[data-sandbox-tab]'));
+      var editors = Array.prototype.slice.call(root.querySelectorAll('[data-sandbox-editor]'));
+      var resetValues = {};
+      editors.forEach(function (editor) { resetValues[editor.getAttribute('data-sandbox-editor')] = editor.value; });
+
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var kind = tab.getAttribute('data-sandbox-tab');
+          tabs.forEach(function (item) { var active = item === tab; item.classList.toggle('is-active', active); item.setAttribute('aria-selected', String(active)); });
+          editors.forEach(function (editor) { editor.classList.toggle('is-hidden', editor.getAttribute('data-sandbox-editor') !== kind); });
+          var editor = getEditor(root, kind);
+          if (editor) editor.focus();
+        });
+      });
+      root.querySelector('[data-sandbox-run="' + id + '"]')?.addEventListener('click', function () { run(root); });
+      root.querySelector('[data-sandbox-reset="' + id + '"]')?.addEventListener('click', function () {
+        editors.forEach(function (editor) { editor.value = resetValues[editor.getAttribute('data-sandbox-editor')] || ''; });
+        run(root);
+        setStatus(root, 'Starter restored', 'Starter restaurado');
+      });
+      editors.forEach(function (editor) {
+        editor.addEventListener('keydown', function (event) {
+          if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') { event.preventDefault(); run(root); }
+          if (event.key === 'Tab') { event.preventDefault(); var start = editor.selectionStart; editor.setRangeText('  ', start, editor.selectionEnd, 'end'); }
+        });
+      });
+      run(root);
+    });
+  })();
+</script>
+
+<style>
+  .djs-sandbox { margin-top: 20px; padding: 16px; border: 1px solid rgba(0,219,255,.25); border-radius: 16px; background: rgba(5,8,20,.52); }
+  .djs-sandbox__header { display: flex; justify-content: space-between; gap: 16px; align-items: start; margin-bottom: 14px; }
+  .djs-sandbox__eyebrow { color: rgba(0,219,255,.9); font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+  .djs-sandbox h4 { margin: 5px 0 4px; color: #fff; font-size: 16px; }
+  .djs-sandbox__header p { margin: 0; color: rgba(255,255,255,.6); font-size: 12.5px; line-height: 1.5; }
+  .djs-sandbox__actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: end; }
+  .djs-sandbox__button { display: inline-flex; align-items: center; gap: 5px; padding: 8px 11px; border: 1px solid rgba(0,219,255,.35); border-radius: 9px; color: #07121d; background: #8cffd2; cursor: pointer; font: inherit; font-size: 11px; font-weight: 800; }
+  .djs-sandbox__button:hover, .djs-sandbox__button:focus-visible { filter: brightness(1.08); }
+  .djs-sandbox__button--secondary { color: rgba(255,255,255,.75); background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.18); }
+  .djs-sandbox__workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .djs-sandbox__editor, .djs-sandbox__preview-wrap { min-width: 0; overflow: hidden; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; background: #0d0e18; }
+  .djs-sandbox__editor-tabs { display: flex; gap: 2px; padding: 7px; border-bottom: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.035); }
+  .djs-sandbox__tab { padding: 6px 9px; border: 0; border-radius: 7px; color: rgba(255,255,255,.5); background: transparent; cursor: pointer; font: inherit; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 10px; }
+  .djs-sandbox__tab.is-active, .djs-sandbox__tab:hover, .djs-sandbox__tab:focus-visible { color: #fff; background: rgba(0,219,255,.13); }
+  .djs-sandbox__textarea { display: block; width: 100%; min-height: 280px; padding: 14px; border: 0; outline: 0; resize: vertical; color: #d9f7ff; background: #0d0e18; font: 12px/1.65 ui-monospace, SFMono-Regular, Consolas, monospace; tab-size: 2; }
+  .djs-sandbox__textarea:focus { box-shadow: inset 0 0 0 2px rgba(0,219,255,.35); }
+  .djs-sandbox__preview-head { display: flex; justify-content: space-between; gap: 10px; align-items: center; min-height: 40px; padding: 7px 10px; border-bottom: 1px solid rgba(255,255,255,.1); color: rgba(255,255,255,.72); font-size: 11px; }
+  .djs-sandbox__live-dot { display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: #8cffd2; box-shadow: 0 0 0 3px rgba(140,255,210,.1); }
+  .djs-sandbox__status { color: rgba(140,255,210,.75); font-size: 10px; }
+  .djs-sandbox__iframe { display: block; width: 100%; min-height: 328px; border: 0; background: #10101c; }
+  .djs-sandbox__note { display: flex; gap: 7px; margin: 11px 0 0; color: rgba(255,255,255,.46); font-size: 10.5px; line-height: 1.5; }
+  .djs-sandbox__note > span:first-child { color: rgba(0,219,255,.8); }
+  .is-hidden { display: none !important; }
+  @media (max-width: 720px) { .djs-sandbox__header { flex-direction: column; } .djs-sandbox__actions { justify-content: start; } .djs-sandbox__workspace { grid-template-columns: 1fr; } .djs-sandbox__textarea { min-height: 230px; } .djs-sandbox__iframe { min-height: 260px; } }
+</style>

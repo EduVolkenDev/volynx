@@ -1,5 +1,6 @@
 ---
 import { DEVJOURNEY_CURRICULUM, DEVJOURNEY_LESSONS } from "../data/devjourney-curriculum.js";
+import DevJourneyExerciseSandbox from "./DevJourneyExerciseSandbox.astro";
 
 const firstLesson = DEVJOURNEY_LESSONS[0];
 ---
@@ -125,6 +126,7 @@ const firstLesson = DEVJOURNEY_LESSONS[0];
             </div>
             <span class="djl-exercise__mark"><span class="i18n-en">Build → verify → explain</span><span class="i18n-pt">Construa → verifique → explique</span></span>
           </section>
+          {lesson.sandbox && <DevJourneyExerciseSandbox lessonId={lesson.id} sandbox={lesson.sandbox} />}
         </article>
       ))}
     </div>

@@ -41,7 +41,7 @@ const title = "Sign Up — VOLYNX";
 
             <label class="field">
               <span data-i18n="signup.username">Username</span>
-              <input type="text" id="username" name="username" autocomplete="username" required placeholder="edudev" data-i18n-placeholder="signup.username_ph" pattern="[a-z0-9_]{3,30}" title="3-30 characters, lowercase letters, numbers and underscores only" />
+              <input type="text" id="username" name="username" autocomplete="username" required placeholder="Choose a username" data-i18n-placeholder="signup.username_ph" pattern="[a-z0-9_]{3,30}" title="3-30 characters, lowercase letters, numbers and underscores only" />
             </label>
 
             <label class="field">
@@ -80,6 +80,10 @@ const title = "Sign Up — VOLYNX";
           <p class="check-hint" data-i18n="signup.check_hint">
             Didn't receive it? Check your spam folder or try signing up again.
           </p>
+          <p id="checkStatus" class="check-status" role="status" aria-live="polite"></p>
+          <button id="resendBtn" class="btn secondary" type="button" hidden>
+            <span data-i18n="signup.resend">Resend confirmation email</span>
+          </button>
           <a class="btn primary" href={ROUTES.login} data-i18n="signup.check_login">Go to login</a>
         </div>
 
@@ -197,6 +201,13 @@ const title = "Sign Up — VOLYNX";
     margin: 0 0 20px;
     font-size: 13px;
     color: rgba(255,255,255,.5);
+    line-height: 1.5;
+  }
+  .check-status{
+    min-height: 18px;
+    margin: 0 0 8px;
+    color: rgba(140,255,210,.92);
+    font-size: 13px;
     line-height: 1.5;
   }
   .check-email .btn{

@@ -3,7 +3,7 @@
  * VOLYNX — Dev Journey ZIP packager
  *
  * Generates clean, public-ready ZIPs of the Dev Journey kits.
- * Source folders live OUTSIDE the repo (under ~/DevJourney-Formated-Final and ~/Downloads).
+ * Source folders live OUTSIDE the repo (the supplied course folders in ~ and ~/Downloads).
  * Output ZIPs land in ./dist-deliverables/  (NOT in public/, NOT committed to git).
  *
  * Usage:
@@ -32,7 +32,19 @@ import { fileURLToPath } from "node:url";
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const REPO_ROOT = join(__dirname, "..");
 const HOME = homedir();
-const DJ_PRO_BUNDLE_ROOT = join(HOME, "Downloads/dev-journey-pro-and-bundle");
+
+function firstExisting(...paths) {
+  return paths.find((candidate) => existsSync(candidate)) || paths[0];
+}
+
+const DJ_PRO_BUNDLE_ROOT = firstExisting(
+  join(HOME, "dev-journey-pro-and-bundle"),
+  join(HOME, "Downloads/dev-journey-pro-and-bundle"),
+);
+const DJ_SOCIAL_ROOT = firstExisting(
+  join(HOME, "DevJourney_SOCIAL_Hotmart_Kit_v1"),
+  join(HOME, "DevJourney-Formated-Final/HOTMART PRODUCT/DevJourney_SOCIAL_Hotmart_Kit_v1"),
+);
 const COURSE_UPDATED_AT = "2026-05-06";
 const COMMON_TRACK_EXTRAS = [
   {
@@ -82,7 +94,7 @@ const TIERS = {
     label: "Social Sprint",
     sources: [
       // Best-package source per project memory (audit 2026-05-04)
-      join(HOME, "DevJourney-Formated-Final/HOTMART PRODUCT/DevJourney_SOCIAL_Hotmart_Kit_v1"),
+      DJ_SOCIAL_ROOT,
     ],
     extraFiles: [],
     readme: socialReadme(),
@@ -430,7 +442,7 @@ function tierPathSummary(tierKey) {
 2. Bloco 1: HTML + CSS + primeiro comportamento visível.
 3. Bloco 2: JavaScript, DOM, validação e JSON.
 4. Publicação: suba o projeto em GitHub Pages, Netlify, Vercel ou outro host estático.
-5. Registro: mantenha repo, URL live e README prontos para revisão manual.`;
+5. Envio: mantenha repo, URL live e README prontos para a validação automática.`;
   }
 
   if (tierKey === "pro") {
@@ -440,7 +452,7 @@ function tierPathSummary(tierKey) {
 2. Blocos 1 e 2: revise fundamentos e use os starters como base.
 3. Bloco 3: abra o projeto React com Vite, rode localmente e avance por features pequenas.
 4. Publicação: publique o app e atualize README com repo + URL live.
-5. Registro: mantenha repo, URL live e evidências prontos para revisão manual.`;
+5. Envio: mantenha repo, URL live e evidências prontos para a validação automática.`;
   }
 
   return `## Ordem recomendada — Bundle Track
@@ -522,7 +534,7 @@ A VOLYNX já está no ar, então a fonte oficial do curso agora é a plataforma:
 
 Se algum PDF antigo ou material dentro do ZIP mencionar um fluxo diferente, Hotmart, formulário já ativo ou outro caminho legado, considere este arquivo e a Área do Aluno como a versão atual.
 
-O Dev Journey é autoguiado, mas não é solto: você trabalha com arquivos, checklists, projeto publicado e revisão manual quando a etapa de submissão estiver ativa.
+O Dev Journey é autoguiado, mas não é solto: você trabalha com arquivos, checklists, projeto publicado e uma submissão verificável.
 
 ## Status atual
 
@@ -530,8 +542,8 @@ O Dev Journey é autoguiado, mas não é solto: você trabalha com arquivos, che
 - Pro e Bundle: liberados por tier da conta.
 - Progresso: salvo no checklist online quando você está logado.
 - Downloads: feitos pelo vault da Área do Aluno.
-- Certificação: revisão manual. A automação completa de validação entra em fase pós-lançamento.
-- Submissão formal: a Área do Aluno mostra o status atual. Se estiver marcada como Fase 2, mantenha repo + URL live prontos e use o suporte quando precisar solicitar revisão.
+- Certificação: validação automática de repositório, workflow, execução bem-sucedida e URL publicada.
+- Submissão formal: a Área do Aluno mostra cada verificação e emite um ID público quando tudo passar.
 `,
     },
     {
@@ -656,7 +668,7 @@ Atualizado em ${COURSE_UPDATED_AT}.
 
 ## O que preparar
 
-Para qualquer revisão manual, deixe pronto:
+Para a validação, deixe pronto:
 
 - Nome completo usado na conta VOLYNX.
 - Email da conta VOLYNX.
@@ -667,16 +679,12 @@ Para qualquer revisão manual, deixe pronto:
 - Checklist online marcado apenas com itens que funcionam.
 - Observação curta dizendo onde você travou ou o que quer que seja revisado.
 
-## Status honesto da submissão
+## Como a validação funciona
 
-A certificação existe como revisão manual, mas a pipeline automática de validação está em fase pós-lançamento.
-
-Se a Área do Aluno mostrar "Fase 2" ou "Em breve" no card de submissão, isso significa:
-
-1. Continue estudando normalmente.
-2. Publique o projeto.
-3. Mantenha repo + URL live prontos.
-4. Use o suporte se precisar solicitar revisão antes do formulário final estar ativo.
+1. Envie um repositório público do GitHub e a URL HTTPS publicada.
+2. O sistema verifica README.md, workflow em \`.github/workflows/\`, uma execução concluída com sucesso e a resposta da URL publicada.
+3. Se algo falhar, o resultado volta com a correção exata necessária.
+4. Quando tudo passar, a Área do Aluno mostra o ID e o fingerprint do certificado verificável.
 
 ## Critério mínimo de revisão
 
@@ -717,7 +725,7 @@ Este pacote contém:
 2. Siga \`00_START_HERE/01-ORDEM-DE-ESTUDO.md\`
 3. Rode o setup por \`00_START_HERE/02-SETUP-ATUALIZADO.md\`
 4. Use o checklist online em https://volynx.world/dev-journey/checklist/
-5. Quando terminar, deixe repo + URL live prontos. A revisão/certificação é manual; a Área do Aluno mostra quando a submissão formal estiver ativa.
+5. Quando terminar, envie repo + URL live pela Área do Aluno e corrija qualquer requisito indicado pelo validador.
 
 ## Suporte
 
@@ -755,7 +763,7 @@ Este pacote contém:
 3. Rode o setup por \`00_START_HERE/02-SETUP-ATUALIZADO.md\`
 4. Passe pelos PDFs do Bloco 0 antes de abrir o React starter
 5. Use os projetos starter como base e evolua até o app React
-6. Quando terminar, deixe repo + URL live prontos para revisão manual pela Área do Aluno/Suporte
+6. Quando terminar, envie repo + URL live pela Área do Aluno e acompanhe a validação
 
 ## Suporte
 
@@ -796,7 +804,7 @@ Este pacote contém:
 4. Siga a ordem natural dos PDFs: fundamentos, React, API e deploy
 5. Abra os projetos de \`Projetos/ProBundle-Projects/\` conforme avançar
 6. Use o \`Arsenal/\` como biblioteca prática para acelerar seus entregáveis
-7. Ao finalizar, deixe repo + URL live prontos para revisão manual e certificação
+7. Ao finalizar, envie repo + URL live e conclua a validação para receber o certificado
 
 ## Suporte
 

@@ -1,0 +1,159 @@
+---
+import "../../../styles/volynx-devjourney.css";
+import FaviconHead from "../../../components/FaviconHead.astro";
+import TierAttrInit from "../../../components/TierAttrInit.astro";
+import VxHeader from "../../../components/VxHeader.astro";
+import VxFooter from "../../../components/VxFooter.astro";
+import PageWidgets from "../../../components/PageWidgets.astro";
+import { ROUTES } from "../../../data/routes";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#080610" />
+    <title>Submit project • Dev Journey • VOLYNX</title>
+    <meta name="description" content="Submit your Dev Journey project for automated validation and certificate issuance." />
+    <meta name="robots" content="noindex,nofollow" />
+    <FaviconHead />
+    <TierAttrInit />
+  </head>
+  <body>
+    <div class="dust" aria-hidden="true"></div>
+    <a class="skip" href="#content"><span class="i18n-en">Skip to content</span><span class="i18n-pt">Pular para o conteúdo</span></a>
+    <VxHeader primaryCtaLabel="Student area" primaryCtaI18n="djs.student_area" primaryCtaHref={ROUTES.devJourneyStudent} />
+    <PageWidgets hideUtilBar />
+
+    <main id="content" class="djc-submit-page">
+      <div class="container">
+        <header class="djc-submit-hero">
+          <div>
+            <span class="kicker"><span class="i18n-en">Dev Journey · final lane</span><span class="i18n-pt">Dev Journey · faixa final</span></span>
+            <h1><span class="i18n-en">Submit the work you can stand behind.</span><span class="i18n-pt">Envie o trabalho que você consegue defender.</span></h1>
+            <p><span class="i18n-en">The validator checks the public proof around your project, tells you exactly what is missing, and issues a verifiable certificate when every requirement passes.</span><span class="i18n-pt">A validação verifica as provas públicas do seu projeto, mostra exatamente o que falta e emite um certificado verificável quando todos os requisitos passam.</span></p>
+          </div>
+          <div class="djc-submit-mark" aria-hidden="true"><img src="/assets/devjourney/devjourneyicon18.webp" alt="" width="160" height="160" /></div>
+        </header>
+
+        <section id="djcLoggedOut" class="djc-auth-card" hidden>
+          <h2><span class="i18n-en">Sign in to submit</span><span class="i18n-pt">Entre para enviar</span></h2>
+          <p><span class="i18n-en">Your submission belongs to your student account, so sign in before sending it.</span><span class="i18n-pt">Sua submissão fica ligada à sua conta de aluno, então entre antes de enviar.</span></p>
+          <a class="btn primary" href={`${ROUTES.login}?next=${encodeURIComponent(ROUTES.devJourneySubmit)}`}><span class="i18n-en">Sign in</span><span class="i18n-pt">Entrar</span></a>
+        </section>
+
+        <section id="djcLoggedIn" class="djc-submit-layout" hidden>
+          <div class="djc-submit-main">
+            <form id="djcSubmitForm" class="djc-form" novalidate>
+              <div class="djc-form-head"><div><span class="eyebrow"><span class="i18n-en">Project submission</span><span class="i18n-pt">Submissão do projeto</span></span><h2><span class="i18n-en">Give the validator two doors in.</span><span class="i18n-pt">Dê ao validador duas portas de entrada.</span></h2></div><span id="djcTier" class="djc-tier-badge">Social</span></div>
+              <label for="djcRepo"><span class="i18n-en">Public repository URL</span><span class="i18n-pt">URL pública do repositório</span><span class="djc-required">*</span></label>
+              <input id="djcRepo" name="repo_url" type="url" inputmode="url" autocomplete="url" placeholder="https://github.com/you/project" required />
+              <small><span class="i18n-en">Use a public GitHub repository. README.md and .github/workflows/ are checked automatically.</span><span class="i18n-pt">Use um repositório público no GitHub. README.md e .github/workflows/ são verificados automaticamente.</span></small>
+              <label for="djcLive"><span class="i18n-en">Published project URL</span><span class="i18n-pt">URL publicada do projeto</span><span class="djc-required">*</span></label>
+              <input id="djcLive" name="live_url" type="url" inputmode="url" autocomplete="url" placeholder="https://your-project.example" required />
+              <small><span class="i18n-en">It must be reachable from the public internet over HTTPS.</span><span class="i18n-pt">Ela precisa estar acessível pela internet pública via HTTPS.</span></small>
+              <label for="djcNotes"><span class="i18n-en">A note for your future self <em>(optional)</em></span><span class="i18n-pt">Uma nota para seu futuro eu <em>(opcional)</em></span></label>
+              <textarea id="djcNotes" name="notes" rows="4" maxlength="2000" placeholder="What did you learn? What would you improve next?"></textarea>
+              <button class="btn primary djc-submit-button" id="djcSubmitButton" type="submit"><span class="i18n-en">Run validation</span><span class="i18n-pt">Executar validação</span><span aria-hidden="true">→</span></button>
+              <p id="djcFormStatus" class="djc-form-status" role="status" aria-live="polite"></p>
+            </form>
+          </div>
+
+          <aside class="djc-requirements">
+            <span class="eyebrow"><span class="i18n-en">Before you submit</span><span class="i18n-pt">Antes de enviar</span></span>
+            <h2><span class="i18n-en">A clear finish line.</span><span class="i18n-pt">Uma linha de chegada clara.</span></h2>
+            <ol>
+              <li><strong>01</strong><span><b>Public repo</b><small>Readable project structure and a useful README.</small></span></li>
+              <li><strong>02</strong><span><b>Workflow</b><small>A file inside <code>.github/workflows/</code>.</small></span></li>
+              <li><strong>03</strong><span><b>Green run</b><small>At least one completed successful GitHub Actions run.</small></span></li>
+              <li><strong>04</strong><span><b>Live proof</b><small>Your published project responds over HTTPS.</small></span></li>
+            </ol>
+            <a class="djc-text-link" href={ROUTES.devJourneyChecklist}><span class="i18n-en">Open the checklist →</span><span class="i18n-pt">Abrir o checklist →</span></a>
+          </aside>
+        </section>
+
+        <section id="djcResult" class="djc-result" hidden aria-live="polite">
+          <div class="djc-result-head"><div><span id="djcResultKicker" class="eyebrow">Validation result</span><h2 id="djcResultTitle">Your project has been checked.</h2></div><span id="djcResultBadge" class="djc-status-badge"></span></div>
+          <div id="djcChecks" class="djc-check-list"></div>
+          <div id="djcCertificate" class="djc-certificate" hidden></div>
+        </section>
+      </div>
+    </main>
+    <VxFooter />
+
+    <script is:inline>
+      (function () {
+        var FN = 'https://zdmpzrderifgqmqivjoy.supabase.co/functions/v1/devjourney-submit';
+        var loggedOut = document.getElementById('djcLoggedOut');
+        var loggedIn = document.getElementById('djcLoggedIn');
+        var form = document.getElementById('djcSubmitForm');
+        var result = document.getElementById('djcResult');
+        var status = document.getElementById('djcFormStatus');
+        var button = document.getElementById('djcSubmitButton');
+        function token() { try { return localStorage.getItem('volynx_access_token') || ''; } catch (_) { return ''; } }
+        function showState() { var isAuthed = Boolean(token()); if (loggedOut) loggedOut.hidden = isAuthed; if (loggedIn) loggedIn.hidden = !isAuthed; if (!isAuthed) return; loadStatus(); }
+        function text(node, value) { if (node) node.textContent = value || ''; }
+        function setFormStatus(message, kind) { text(status, message); if (status) status.dataset.state = kind || ''; }
+        function loadStatus() { fetch(FN, { method: 'POST', headers: { Authorization: 'Bearer ' + token(), 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'status' }) }).then(function (r) { return r.json(); }).then(function (data) { if (data.submission) render(data.submission); }).catch(function () {}); }
+        function render(submission) {
+          if (!submission) return;
+          if (document.getElementById('djcRepo')) document.getElementById('djcRepo').value = submission.repo_url || '';
+          if (document.getElementById('djcLive')) document.getElementById('djcLive').value = submission.live_url || '';
+          renderResult(submission);
+        }
+        function renderResult(submission) {
+          result.hidden = false;
+          var approved = submission.status === 'approved';
+          text(document.getElementById('djcResultTitle'), approved ? 'Certificate issued. Keep building.' : 'A few things need your attention.');
+          var badge = document.getElementById('djcResultBadge'); text(badge, approved ? 'Approved' : 'Needs changes'); badge.dataset.state = approved ? 'approved' : 'changes';
+          var list = document.getElementById('djcChecks'); list.textContent = '';
+          var checks = submission.validation && Array.isArray(submission.validation.checks) ? submission.validation.checks : [];
+          checks.forEach(function (check) { var item = document.createElement('div'); item.className = 'djc-check'; item.dataset.state = check.ok ? 'ok' : 'fail'; var mark = document.createElement('span'); mark.className = 'djc-check-mark'; mark.textContent = check.ok ? '✓' : '!'; var copy = document.createElement('span'); var title = document.createElement('strong'); title.textContent = check.label || 'Check'; var detail = document.createElement('small'); detail.textContent = check.detail || (check.ok ? 'Passed.' : 'Needs attention.'); copy.append(title, detail); item.append(mark, copy); list.append(item); });
+          var cert = document.getElementById('djcCertificate'); cert.hidden = !approved; cert.textContent = '';
+          if (approved) { var title = document.createElement('strong'); title.textContent = 'VX Dev Journey certificate'; var id = document.createElement('code'); id.textContent = submission.certificate_id; var link = document.createElement('a'); link.href = '/dev-journey/verify/?id=' + encodeURIComponent(submission.certificate_id); link.textContent = 'Verify certificate →'; cert.append(title, id, link); }
+        }
+        form && form.addEventListener('submit', function (event) { event.preventDefault(); var repo = document.getElementById('djcRepo').value.trim(); var live = document.getElementById('djcLive').value.trim(); if (!repo || !live) { setFormStatus('Add both URLs before running validation.', 'error'); return; } button.disabled = true; setFormStatus('Checking your public proof…', 'busy'); fetch(FN, { method: 'POST', headers: { Authorization: 'Bearer ' + token(), 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'submit', repo_url: repo, live_url: live, notes: document.getElementById('djcNotes').value.trim() }) }).then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); }).then(function (payload) { if (!payload.ok || !payload.data.ok) throw new Error(payload.data.error || 'Validation could not run.'); setFormStatus(payload.data.message || 'Validation complete.', 'success'); renderResult(payload.data.submission); }).catch(function (error) { setFormStatus(error.message || 'Validation could not run.', 'error'); }).finally(function () { button.disabled = false; }); });
+        showState();
+      })();
+    </script>
+  </body>
+</html>
+
+<style>
+  .djc-submit-layout[hidden], .djc-auth-card[hidden], .djc-result[hidden], .djc-certificate[hidden] { display:none !important; }
+  .djc-submit-page { padding: 112px 0 80px; }
+  .djc-submit-hero { display:flex; justify-content:space-between; gap:32px; align-items:center; padding:32px; border:1px solid rgba(0,219,255,.2); border-radius:24px; background:linear-gradient(130deg,rgba(0,219,255,.09),rgba(243,225,160,.06)); }
+  .djc-submit-hero h1 { max-width: 14ch; margin:10px 0 14px; font-size:clamp(34px,6vw,66px); line-height:.98; }
+  .djc-submit-hero p { max-width:62ch; margin:0; color:rgba(255,255,255,.7); line-height:1.7; }
+  .djc-submit-mark { display:grid; place-items:center; min-width:190px; height:190px; border-radius:50%; background:radial-gradient(circle,rgba(140,255,210,.2),transparent 68%); }
+  .djc-submit-mark img { width:160px; height:160px; object-fit:contain; }
+  .djc-auth-card, .djc-submit-layout { margin-top:20px; }
+  .djc-auth-card { max-width:620px; padding:28px; border:1px solid rgba(255,255,255,.12); border-radius:18px; background:rgba(255,255,255,.04); }
+  .djc-auth-card h2, .djc-form h2, .djc-requirements h2 { margin:8px 0; font-size:clamp(24px,3vw,34px); }
+  .djc-auth-card p { margin:0 0 20px; color:rgba(255,255,255,.68); line-height:1.6; }
+  .djc-submit-layout { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(260px,.7fr); gap:20px; align-items:start; }
+  .djc-form, .djc-requirements, .djc-result { padding:clamp(22px,3vw,34px); border:1px solid rgba(255,255,255,.12); border-radius:20px; background:rgba(255,255,255,.04); }
+  .djc-form-head, .djc-result-head { display:flex; justify-content:space-between; gap:18px; align-items:start; margin-bottom:26px; }
+  .djc-tier-badge, .djc-status-badge { padding:8px 12px; border:1px solid rgba(243,225,160,.3); border-radius:99px; color:#f3e1a0; font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; white-space:nowrap; }
+  .djc-form label { display:block; margin:18px 0 7px; color:rgba(255,255,255,.9); font-size:13px; font-weight:700; }
+  .djc-required { margin-left:4px; color:#ffb878; }
+  .djc-form input, .djc-form textarea { display:block; width:100%; box-sizing:border-box; border:1px solid rgba(255,255,255,.16); border-radius:11px; padding:13px 14px; color:#fff; background:rgba(8,6,16,.7); font:inherit; }
+  .djc-form input:focus, .djc-form textarea:focus { outline:2px solid rgba(0,219,255,.8); outline-offset:2px; }
+  .djc-form small { display:block; margin-top:7px; color:rgba(255,255,255,.5); line-height:1.5; }
+  .djc-submit-button { display:flex; gap:10px; align-items:center; margin-top:24px; }
+  .djc-submit-button:disabled { cursor:wait; opacity:.6; }
+  .djc-form-status { min-height:22px; margin:14px 0 0; color:rgba(255,255,255,.65); font-size:13px; line-height:1.5; }
+  .djc-form-status[data-state="error"] { color:#ffb878; } .djc-form-status[data-state="success"] { color:#8cffd2; }
+  .djc-requirements { background:linear-gradient(145deg,rgba(140,255,210,.07),rgba(255,255,255,.03)); }
+  .djc-requirements ol { display:grid; gap:14px; margin:26px 0; padding:0; list-style:none; }
+  .djc-requirements li { display:grid; grid-template-columns:34px 1fr; gap:10px; align-items:start; }
+  .djc-requirements li > strong { color:#8cffd2; font-size:12px; letter-spacing:.1em; }
+  .djc-requirements b { display:block; color:#fff; font-size:14px; } .djc-requirements small { display:block; margin-top:4px; color:rgba(255,255,255,.57); line-height:1.45; }
+  .djc-text-link { color:#8cffd2; font-size:13px; font-weight:700; text-decoration:none; }
+  .djc-result { margin-top:20px; } .djc-result h2 { margin:8px 0 0; font-size:clamp(24px,3vw,36px); }
+  .djc-status-badge[data-state="approved"] { border-color:rgba(140,255,210,.35); color:#8cffd2; background:rgba(140,255,210,.08); } .djc-status-badge[data-state="changes"] { border-color:rgba(255,184,120,.35); color:#ffb878; background:rgba(255,184,120,.08); }
+  .djc-check-list { display:grid; gap:9px; } .djc-check { display:flex; gap:12px; align-items:flex-start; padding:12px; border:1px solid rgba(255,255,255,.1); border-radius:12px; background:rgba(255,255,255,.03); } .djc-check-mark { display:grid; place-items:center; width:22px; height:22px; flex:0 0 22px; border-radius:50%; color:#080610; background:#ffb878; font-weight:900; } .djc-check[data-state="ok"] .djc-check-mark { background:#8cffd2; } .djc-check strong, .djc-check small { display:block; } .djc-check small { margin-top:3px; color:rgba(255,255,255,.56); line-height:1.45; }
+  .djc-certificate { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-top:20px; padding:16px; border:1px solid rgba(243,225,160,.28); border-radius:13px; background:rgba(243,225,160,.06); } .djc-certificate strong { color:#f3e1a0; } .djc-certificate code { color:rgba(255,255,255,.7); } .djc-certificate a { margin-left:auto; color:#8cffd2; font-weight:700; text-decoration:none; }
+  @media (max-width:760px) { .djc-submit-hero { align-items:start; padding:24px; } .djc-submit-mark { display:none; } .djc-submit-layout { grid-template-columns:1fr; } .djc-form-head, .djc-result-head { flex-direction:column; } .djc-certificate a { margin-left:0; width:100%; } }
+</style>

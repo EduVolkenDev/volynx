@@ -71,13 +71,13 @@ Deno.serve(async (req: Request) => {
 
     const { data: profile, error: profErr } = await supabase
       .from("profiles")
-      .select("plan, builder_plan, daily_plan, cvitae_plan, daily_plan_expires_at, icon_pack_grants, is_black_diamond, avatar_id, token_balance, org_id, is_admin")
+      .select("plan, builder_plan, daily_plan, cvitae_plan, devjourney_tier, daily_plan_expires_at, icon_pack_grants, is_black_diamond, avatar_id, token_balance, org_id, is_admin")
       .eq("id", user.id)
       .single();
 
     if (profErr || !profile) {
       return json({
-        plan: "free", builder_plan: "free", daily_plan: "free", cvitae_plan: "free",
+        plan: "free", builder_plan: "free", daily_plan: "free", cvitae_plan: "free", devjourney_tier: "social",
         product: productKey,
         allowed: true, limit: 5, used: 0, remaining: 5,
         useLocalStorage: true, pro_features: [],
@@ -96,6 +96,7 @@ Deno.serve(async (req: Request) => {
         builder_plan: profile.builder_plan || "studio",
         daily_plan: profile.daily_plan || "diamond",
         cvitae_plan: profile.cvitae_plan || "business",
+        devjourney_tier: profile.devjourney_tier || "social",
         daily_plan_expires_at: null,
         daily_plan_expired: false,
         icon_pack_grants: Array.isArray(profile.icon_pack_grants) ? profile.icon_pack_grants : [],
@@ -171,6 +172,7 @@ Deno.serve(async (req: Request) => {
         builder_plan: builderPlan,
         daily_plan: dailyPlan,
         cvitae_plan: cvitaePlan,
+        devjourney_tier: profile.devjourney_tier || "social",
         daily_plan_expires_at: expiresAt,
         daily_plan_expired: dailyPlanExpired,
         icon_pack_grants: Array.isArray(profile.icon_pack_grants) ? profile.icon_pack_grants : [],
@@ -197,6 +199,7 @@ Deno.serve(async (req: Request) => {
         builder_plan: builderPlan,
         daily_plan: dailyPlan,
         cvitae_plan: cvitaePlan,
+        devjourney_tier: profile.devjourney_tier || "social",
         daily_plan_expires_at: expiresAt,
         daily_plan_expired: dailyPlanExpired,
         icon_pack_grants: Array.isArray(profile.icon_pack_grants) ? profile.icon_pack_grants : [],
@@ -232,6 +235,7 @@ Deno.serve(async (req: Request) => {
       builder_plan: builderPlan,
       daily_plan: dailyPlan,
       cvitae_plan: cvitaePlan,
+      devjourney_tier: profile.devjourney_tier || "social",
       daily_plan_expires_at: expiresAt,
       daily_plan_expired: dailyPlanExpired,
       icon_pack_grants: Array.isArray(profile.icon_pack_grants) ? profile.icon_pack_grants : [],
@@ -250,7 +254,7 @@ Deno.serve(async (req: Request) => {
   } catch (err) {
     console.error("[check-permission] Error:", err);
     return json({
-      plan: "free", builder_plan: "free", daily_plan: "free", cvitae_plan: "free",
+      plan: "free", builder_plan: "free", daily_plan: "free", cvitae_plan: "free", devjourney_tier: "social",
       allowed: true, limit: 5, used: 0, remaining: 5,
       useLocalStorage: true, pro_features: [],
     }, 500);

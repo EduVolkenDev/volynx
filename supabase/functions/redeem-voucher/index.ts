@@ -155,6 +155,9 @@ Deno.serve(async (req: Request) => {
     if (grants.builder_plan) profileUpdates.builder_plan = grants.builder_plan;
     if (grants.daily_plan) profileUpdates.daily_plan = grants.daily_plan;
     if (grants.plan) profileUpdates.plan = grants.plan;
+    if (grants.devjourney_tier && ["social", "pro", "bundle"].includes(String(grants.devjourney_tier).toLowerCase())) {
+      profileUpdates.devjourney_tier = String(grants.devjourney_tier).toLowerCase();
+    }
 
     // Badge grants
     if (isBlackDiamondGrant) {

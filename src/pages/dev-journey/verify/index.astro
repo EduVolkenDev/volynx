@@ -1,0 +1,35 @@
+---
+import "../../../styles/volynx-devjourney.css";
+import FaviconHead from "../../../components/FaviconHead.astro";
+import TierAttrInit from "../../../components/TierAttrInit.astro";
+import VxHeader from "../../../components/VxHeader.astro";
+import VxFooter from "../../../components/VxFooter.astro";
+import PageWidgets from "../../../components/PageWidgets.astro";
+import { ROUTES } from "../../../data/routes";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="theme-color" content="#080610" />
+    <title>Verify certificate • Dev Journey • VOLYNX</title>
+    <meta name="description" content="Verify a VOLYNX Dev Journey certificate." />
+    <FaviconHead /><TierAttrInit />
+  </head>
+  <body>
+    <div class="dust" aria-hidden="true"></div><a class="skip" href="#content">Skip to content</a><VxHeader primaryCtaLabel="Submit project" primaryCtaHref={ROUTES.devJourneySubmit} /><PageWidgets hideUtilBar />
+    <main id="content" class="djv-page"><div class="container">
+      <header class="djv-hero"><span class="kicker">Dev Journey · public record</span><h1>Proof you can inspect.</h1><p>Enter a certificate ID to see the public validation record. No private student data is exposed here.</p></header>
+      <form id="djvForm" class="djv-form"><label for="djvId">Certificate ID</label><div class="djv-input-row"><input id="djvId" type="text" autocomplete="off" spellcheck="false" placeholder="VX-DJ-2026-ABC123" required /><button class="btn primary" type="submit">Verify →</button></div><p id="djvStatus" role="status" aria-live="polite"></p></form>
+      <section id="djvResult" class="djv-result" hidden aria-live="polite"><div class="djv-result-head"><div><span class="eyebrow">Certificate record</span><h2 id="djvTitle">Certificate valid</h2></div><span class="djv-valid">Verified</span></div><dl id="djvDetails"></dl><a id="djvRepo" class="djv-link" target="_blank" rel="noopener noreferrer" hidden>Open project repository ↗</a><a id="djvLive" class="djv-link" target="_blank" rel="noopener noreferrer" hidden>Open published project ↗</a></section>
+    </div></main><VxFooter />
+    <script is:inline>
+      (function () { var FN = 'https://zdmpzrderifgqmqivjoy.supabase.co/functions/v1/devjourney-submit'; var form = document.getElementById('djvForm'); var input = document.getElementById('djvId'); var status = document.getElementById('djvStatus'); var result = document.getElementById('djvResult'); var params = new URLSearchParams(location.search); if (params.get('id')) input.value = params.get('id'); function setStatus(v, bad) { status.textContent = v || ''; status.dataset.state = bad ? 'error' : ''; } function row(label, value) { var dt = document.createElement('dt'); dt.textContent = label; var dd = document.createElement('dd'); dd.textContent = value || '—'; return [dt, dd]; } function show(cert) { result.hidden = false; var details = document.getElementById('djvDetails'); details.textContent = ''; [['Learner', cert.student_name], ['Certificate ID', cert.certificate_id], ['Track', cert.tier], ['Issued', cert.submitted_at ? new Date(cert.submitted_at).toLocaleDateString() : '—'], ['Fingerprint', cert.fingerprint]].forEach(function (pair) { var nodes = row(pair[0], pair[1]); details.append(nodes[0], nodes[1]); }); [['djvRepo', cert.repo_url], ['djvLive', cert.live_url]].forEach(function (pair) { var link = document.getElementById(pair[0]); if (pair[1]) { link.href = pair[1]; link.hidden = false; } }); } form.addEventListener('submit', function (event) { event.preventDefault(); var id = input.value.trim().toUpperCase(); if (!/^VX-DJ-[0-9]{4}-[A-Z0-9]{6}$/.test(id)) { result.hidden = true; setStatus('Enter a certificate ID in the format VX-DJ-2026-ABC123.', true); return; } setStatus('Checking the public record…'); fetch(FN, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'verify', certificate_id: id }) }).then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); }).then(function (payload) { if (!payload.ok || !payload.data.ok) throw new Error('Certificate not found.'); history.replaceState({}, '', '?id=' + encodeURIComponent(id)); setStatus('Certificate verified.'); show(payload.data.certificate); }).catch(function (error) { result.hidden = true; setStatus(error.message || 'Certificate not found.', true); }); }); if (input.value) form.requestSubmit(); })();
+    </script>
+  </body>
+</html>
+
+<style>
+  .djv-result[hidden], .djv-link[hidden] { display:none !important; }
+  .djv-page { padding:112px 0 90px; } .djv-hero { padding:34px 0 26px; } .djv-hero h1 { max-width:12ch; margin:10px 0 14px; font-size:clamp(40px,7vw,76px); line-height:.95; } .djv-hero p { max-width:56ch; margin:0; color:rgba(255,255,255,.68); line-height:1.7; } .djv-form, .djv-result { max-width:760px; padding:24px; border:1px solid rgba(255,255,255,.12); border-radius:18px; background:rgba(255,255,255,.04); } .djv-form label { display:block; margin-bottom:8px; font-size:13px; font-weight:700; } .djv-input-row { display:flex; gap:10px; } .djv-input-row input { min-width:0; flex:1; border:1px solid rgba(255,255,255,.16); border-radius:11px; padding:13px 14px; color:#fff; background:rgba(8,6,16,.7); font:inherit; } .djv-input-row input:focus { outline:2px solid rgba(0,219,255,.8); outline-offset:2px; } #djvStatus { min-height:20px; margin:12px 0 0; color:rgba(255,255,255,.62); font-size:13px; } #djvStatus[data-state="error"] { color:#ffb878; } .djv-result { margin-top:18px; } .djv-result-head { display:flex; justify-content:space-between; gap:16px; align-items:start; margin-bottom:20px; } .djv-result h2 { margin:8px 0 0; font-size:clamp(26px,4vw,42px); } .djv-valid { padding:8px 12px; border:1px solid rgba(140,255,210,.3); border-radius:99px; color:#8cffd2; background:rgba(140,255,210,.08); font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; } .djv-result dl { display:grid; grid-template-columns:150px 1fr; margin:0 0 20px; } .djv-result dt, .djv-result dd { padding:12px 0; border-bottom:1px solid rgba(255,255,255,.1); } .djv-result dt { color:rgba(255,255,255,.48); font-size:12px; } .djv-result dd { margin:0; color:rgba(255,255,255,.88); overflow-wrap:anywhere; } .djv-link { display:inline-block; margin:7px 12px 0 0; color:#8cffd2; font-size:13px; font-weight:700; text-decoration:none; } @media (max-width:560px) { .djv-input-row { flex-direction:column; } .djv-result dl { grid-template-columns:1fr; } .djv-result dt { padding-bottom:3px; border:0; } .djv-result dd { padding-top:0; } }
+</style>
