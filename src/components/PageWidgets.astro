@@ -1,8 +1,8 @@
 ---
 import CookieBanner from "./CookieBanner.astro";
 import { ROUTES } from "../data/routes";
-interface Props { hideUtilBar?: boolean; }
-const { hideUtilBar = false } = Astro.props;
+interface Props { hideUtilBar?: boolean; includeCookieBanner?: boolean; }
+const { hideUtilBar = false, includeCookieBanner = true } = Astro.props;
 const isHome = Astro.url.pathname === "/" || Astro.url.pathname === "";
 const isAuth = ["/login/", "/signup/", "/auth/"].some(p => Astro.url.pathname.startsWith(p));
 const isProfile = Astro.url.pathname.startsWith("/profile");
@@ -41,7 +41,7 @@ const isProfile = Astro.url.pathname.startsWith("/profile");
   ↑
 </button>
 
-<CookieBanner />
+{includeCookieBanner && <CookieBanner />}
 
 <style>
   :global(html[lang="en"] .i18n-pt),

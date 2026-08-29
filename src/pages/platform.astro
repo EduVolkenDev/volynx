@@ -477,7 +477,7 @@ const homeAssistItems = [
       </div>
       <div class="shell ecosystem-showcase">
         <article class="panel feature-card premium-frame panel--pro has-card-asset ecosystem-card ecosystem-card--builder">
-          <img src="/assets/builder.webp" alt="" class="card-asset" loading="lazy" />
+          <img src="/assets/new-builder-icon.webp" alt="" class="card-asset" loading="lazy" />
           <a href={ROUTES.builder} class="label label--pro" data-i18n="home2.card_builder_label">Flagship</a>
           <h3 data-i18n="home2.card_builder_title">VOLYNX Builder</h3>
           <p data-i18n="home2.card_builder_desc">Create and publish premium sites with no-code, premium kits and custom domains using a professional toolkit.</p>
@@ -2101,25 +2101,33 @@ const homeAssistItems = [
     position: relative;
     z-index: 5;
     width: 100%;
-    min-height: 108px;
-    padding: 11px 11px 10px;
+    min-height: 126px;
+    padding: 14px 18px 14px 92px;
     border-radius: 24px;
     display: grid;
-    place-items: center;
-    gap: 10px;
-    text-align: center;
+    place-items: center end;
+    gap: 8px;
+    text-align: right;
     background:
-      linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.038)),
+      linear-gradient(135deg, rgba(148,136,234,.23), rgba(255,255,255,.09) 52%, rgba(3,7,18,.74)),
       rgba(3,7,18,.68);
-    border: 1px solid rgba(255,255,255,.13);
+    border: 2px solid rgba(255,255,255,.34);
     box-shadow:
       0 22px 58px rgba(0,0,0,.38),
       0 0 34px rgba(4,255,231,.08),
       inset 0 1px 0 rgba(255,255,255,.13);
+    overflow: visible;
     opacity: 0;
     transform: translateY(14px) scale(.98);
     animation: dailyCardIn .64s cubic-bezier(.16,1,.3,1) var(--tag-delay, 0ms) both;
   }
+
+  .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag--myday { --icon-rotate: -8deg; }
+  .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag--scanner { --icon-rotate: 7deg; }
+  .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag--summary { --icon-rotate: -5deg; }
+  .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag--vault { --icon-rotate: 8deg; }
+  .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag--writing { --icon-rotate: -7deg; }
+  .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag--decision { --icon-rotate: 5deg; }
 
   .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag:hover {
     transform: translateY(-2px) scale(1.02);
@@ -2135,12 +2143,39 @@ const homeAssistItems = [
   }
 
   .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag img {
-    width: 60px;
-    height: 60px;
+    position: absolute;
+    left: -34px;
+    top: 50%;
+    width: 116px;
+    height: 116px;
     flex: none;
+    z-index: 2;
     filter:
-      drop-shadow(0 16px 22px rgba(0,0,0,.35))
-      drop-shadow(0 0 18px rgba(4,255,231,.18));
+      drop-shadow(0 18px 24px rgba(0,0,0,.40))
+      drop-shadow(0 0 22px rgba(4,255,231,.20));
+    transform: translateY(-50%) rotate(var(--icon-rotate, 0deg)) scale(1.08);
+    transform-origin: center;
+    animation: dailyIconFloat 5.8s ease-in-out calc(var(--tag-delay, 0ms) + 900ms) infinite;
+    transition: filter .25s ease, scale .25s ease;
+  }
+
+  .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag:nth-child(even) {
+    padding-right: 92px;
+    padding-left: 18px;
+    text-align: left;
+    place-items: center start;
+  }
+
+  .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag:nth-child(even) img {
+    left: auto;
+    right: -34px;
+  }
+
+  .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag:hover img {
+    filter:
+      drop-shadow(0 22px 30px rgba(0,0,0,.44))
+      drop-shadow(0 0 30px rgba(4,255,231,.30));
+    scale: 1.12;
   }
 
   .hero-v2__mockup-grid--orbit .hero-v2__tag-copy {
@@ -2201,6 +2236,11 @@ const homeAssistItems = [
       transform: translateY(0) scale(1);
       filter: blur(0);
     }
+  }
+
+  @keyframes dailyIconFloat {
+    0%, 100% { transform: translateY(-50%) rotate(var(--icon-rotate, 0deg)) scale(1.08); }
+    50% { transform: translateY(calc(-50% - 7px)) rotate(calc(var(--icon-rotate, 0deg) + 2deg)) scale(1.11); }
   }
 
   @keyframes dailyPanelIn {
@@ -2879,8 +2919,8 @@ const homeAssistItems = [
       min-height: 128px;
     }
     .hero-v2__mockup-grid--orbit .hero-v2__mockup-tag img {
-      width: 56px;
-      height: 56px;
+      width: 92px;
+      height: 92px;
     }
     .hero-v2__mockup-grid--orbit .hero-v2__tag-copy strong {
       font-size: .94rem;

@@ -1,0 +1,290 @@
+---
+import { DEVJOURNEY_CURRICULUM, DEVJOURNEY_LESSONS } from "../data/devjourney-curriculum.js";
+
+const firstLesson = DEVJOURNEY_LESSONS[0];
+---
+
+<section class="djl-room" id="learning" aria-labelledby="djlTitle">
+  <div class="djl-room__header">
+    <div>
+      <span class="kicker">
+        <span class="i18n-en">Your learning path</span>
+        <span class="i18n-pt">Seu caminho de aprendizagem</span>
+      </span>
+      <h2 id="djlTitle">
+        <span class="i18n-en">One lesson at a time. Always know what comes next.</span>
+        <span class="i18n-pt">Uma aula por vez. Sempre saiba o que vem depois.</span>
+      </h2>
+      <p class="djl-room__intro">
+        <span class="i18n-en">Read the goal, follow the steps, compare the expected result and mark the checkpoint only when it works.</span>
+        <span class="i18n-pt">Leia o objetivo, siga os passos, compare o resultado esperado e marque o checkpoint somente quando funcionar.</span>
+      </p>
+    </div>
+    <div class="djl-progress" aria-live="polite">
+      <span class="djl-progress__label">
+        <span class="i18n-en">Path progress</span>
+        <span class="i18n-pt">Progresso da trilha</span>
+      </span>
+      <strong id="djlProgressValue">0%</strong>
+      <div class="djl-progress__track"><span id="djlProgressBar"></span></div>
+      <span id="djlProgressMeta" class="djl-progress__meta">0 / {DEVJOURNEY_LESSONS.length}</span>
+    </div>
+  </div>
+
+  <div class="djl-layout">
+    <nav class="djl-curriculum" aria-label="Dev Journey curriculum">
+      <div class="djl-curriculum__top">
+        <span class="i18n-en">Curriculum</span><span class="i18n-pt">Currículo</span>
+        <span class="djl-curriculum__hint"><span class="i18n-en">Social unlocked</span><span class="i18n-pt">Social liberado</span></span>
+      </div>
+      {DEVJOURNEY_CURRICULUM.map((block) => (
+        <div class:list={["djl-block", block.tier !== "social" && "djl-block--locked"]} data-tier-required={block.tier !== "social" ? block.tier : undefined}>
+          <div class="djl-block__heading">
+            <span class="djl-block__number">{block.number}</span>
+            <div>
+              <strong><span class="i18n-en">{block.titleEn}</span><span class="i18n-pt">{block.titlePt}</span></strong>
+              <small><span class="i18n-en">{block.summaryEn}</span><span class="i18n-pt">{block.summaryPt}</span></small>
+            </div>
+            {block.tier !== "social" && <span class="djl-lock" aria-label={`Requires ${block.tier}`}>⌁</span>}
+          </div>
+          <div class="djl-block__lessons">
+            {block.lessons.map((lesson, index) => (
+              <button
+                class:list={["djl-lesson-nav", index === 0 && block.id === firstLesson.blockId && "is-active"]}
+                type="button"
+                data-lesson-id={lesson.id}
+                data-tier-required={block.tier !== "social" ? block.tier : undefined}
+                disabled={block.tier !== "social"}
+                aria-current={lesson.id === firstLesson.id ? "step" : undefined}
+              >
+                <span class="djl-lesson-nav__state" aria-hidden="true"></span>
+                <span class="djl-lesson-nav__copy">
+                  <span class="djl-lesson-nav__id">{lesson.id}</span>
+                  <span><span class="i18n-en">{lesson.titleEn}</span><span class="i18n-pt">{lesson.titlePt}</span></span>
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+    </nav>
+
+    <div class="djl-content">
+      <div class="djl-mobile-context" aria-live="polite">
+        <span class="i18n-en">Now studying</span><span class="i18n-pt">Estudando agora</span>
+        <strong id="djlMobileLesson">{firstLesson.id}</strong>
+      </div>
+      {DEVJOURNEY_LESSONS.map((lesson, index) => (
+        <article class:list={["djl-lesson-panel", index !== 0 && "is-hidden"]} data-lesson-panel={lesson.id} data-tier-required={lesson.tier !== "social" ? lesson.tier : undefined}>
+          <header class="djl-lesson-head">
+            <div>
+              <div class="djl-lesson-kicker"><span>{lesson.id}</span><span aria-hidden="true">·</span><span><span class="i18n-en">{lesson.kindEn}</span><span class="i18n-pt">{lesson.kindPt}</span></span></div>
+              <h3><span class="i18n-en">{lesson.titleEn}</span><span class="i18n-pt">{lesson.titlePt}</span></h3>
+              <p class="djl-lesson-duration"><span aria-hidden="true">◷</span> <span class="i18n-en">{lesson.durationEn}</span><span class="i18n-pt">{lesson.durationPt}</span></p>
+            </div>
+            <button class="djl-complete" type="button" data-complete-lesson={lesson.id} aria-pressed="false">
+              <span class="djl-complete__dot" aria-hidden="true">✓</span>
+              <span class="i18n-en">Mark complete</span><span class="i18n-pt">Marcar como concluída</span>
+            </button>
+          </header>
+
+          <div class="djl-lesson-grid">
+            <section class="djl-card djl-card--goal">
+              <span class="djl-card__label"><span class="i18n-en">Goal</span><span class="i18n-pt">Objetivo</span></span>
+              <p><span class="i18n-en">{lesson.objectiveEn}</span><span class="i18n-pt">{lesson.objectivePt}</span></p>
+            </section>
+            <section class="djl-card">
+              <span class="djl-card__label"><span class="i18n-en">Before you begin</span><span class="i18n-pt">Antes de começar</span></span>
+              <p><span class="i18n-en">{lesson.beforeEn}</span><span class="i18n-pt">{lesson.beforePt}</span></p>
+            </section>
+          </div>
+
+          <section class="djl-section-block">
+            <div class="djl-section-title"><span class="djl-section-number">01</span><h4><span class="i18n-en">Do this</span><span class="i18n-pt">Faça assim</span></h4></div>
+            <ol class="djl-steps">
+              {lesson.stepsEn.map((step, stepIndex) => <li><span class="i18n-en">{step}</span><span class="i18n-pt">{lesson.stepsPt[stepIndex]}</span></li>)}
+            </ol>
+          </section>
+
+          <div class="djl-lesson-grid djl-lesson-grid--lower">
+            <section class="djl-card djl-card--expected">
+              <span class="djl-card__label"><span class="i18n-en">What you should see</span><span class="i18n-pt">O que você deve ver</span></span>
+              <p><span class="i18n-en">{lesson.expectedEn}</span><span class="i18n-pt">{lesson.expectedPt}</span></p>
+            </section>
+            <section class="djl-card djl-card--stuck">
+              <span class="djl-card__label"><span class="i18n-en">If you get stuck</span><span class="i18n-pt">Se der erro</span></span>
+              <p><span class="i18n-en">{lesson.stuckEn}</span><span class="i18n-pt">{lesson.stuckPt}</span></p>
+            </section>
+          </div>
+
+          <section class="djl-exercise">
+            <div>
+              <span class="djl-card__label"><span class="i18n-en">Your practice</span><span class="i18n-pt">Sua prática</span></span>
+              <h4><span class="i18n-en">Make it yours</span><span class="i18n-pt">Faça do seu jeito</span></h4>
+              <p><span class="i18n-en">{lesson.exerciseEn}</span><span class="i18n-pt">{lesson.exercisePt}</span></p>
+            </div>
+            <span class="djl-exercise__mark"><span class="i18n-en">Build → verify → explain</span><span class="i18n-pt">Construa → verifique → explique</span></span>
+          </section>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    var root = document.getElementById('learning');
+    if (!root) return;
+    var key = 'volynx_devjourney_lessons';
+    var navItems = Array.prototype.slice.call(root.querySelectorAll('[data-lesson-id]'));
+    var panels = Array.prototype.slice.call(root.querySelectorAll('[data-lesson-panel]'));
+    var completeButtons = Array.prototype.slice.call(root.querySelectorAll('[data-complete-lesson]'));
+    var progressValue = document.getElementById('djlProgressValue');
+    var progressBar = document.getElementById('djlProgressBar');
+    var progressMeta = document.getElementById('djlProgressMeta');
+    var mobileLesson = document.getElementById('djlMobileLesson');
+    var total = completeButtons.length;
+    var completed = {};
+
+    try { completed = JSON.parse(localStorage.getItem(key) || '{}') || {}; } catch (_) { completed = {}; }
+
+    function save() {
+      try { localStorage.setItem(key, JSON.stringify(completed)); } catch (_) {}
+    }
+
+    function updateProgress() {
+      var count = Object.keys(completed).filter(function (id) { return completed[id]; }).length;
+      var percent = total ? Math.round((count / total) * 100) : 0;
+      if (progressValue) progressValue.textContent = percent + '%';
+      if (progressBar) progressBar.style.width = percent + '%';
+      if (progressMeta) progressMeta.textContent = count + ' / ' + total;
+    }
+
+    function paintCompletion() {
+      completeButtons.forEach(function (button) {
+        var id = button.getAttribute('data-complete-lesson');
+        var isComplete = Boolean(completed[id]);
+        button.classList.toggle('is-complete', isComplete);
+        button.setAttribute('aria-pressed', String(isComplete));
+        var text = button.querySelector('.i18n-en');
+        var textPt = button.querySelector('.i18n-pt');
+        if (text) text.textContent = isComplete ? 'Completed' : 'Mark complete';
+        if (textPt) textPt.textContent = isComplete ? 'Concluída' : 'Marcar como concluída';
+      });
+      navItems.forEach(function (item) {
+        var state = item.querySelector('.djl-lesson-nav__state');
+        if (state) state.textContent = completed[item.getAttribute('data-lesson-id')] ? '✓' : '';
+        item.classList.toggle('is-complete', Boolean(completed[item.getAttribute('data-lesson-id')]));
+      });
+      updateProgress();
+    }
+
+    function openLesson(id) {
+      var target = panels.find(function (panel) { return panel.getAttribute('data-lesson-panel') === id; });
+      if (!target || target.hasAttribute('data-tier-required') && target.classList.contains('djl-is-locked')) return;
+      panels.forEach(function (panel) { panel.classList.toggle('is-hidden', panel !== target); });
+      navItems.forEach(function (item) {
+        var active = item.getAttribute('data-lesson-id') === id;
+        item.classList.toggle('is-active', active);
+        if (active) item.setAttribute('aria-current', 'step'); else item.removeAttribute('aria-current');
+      });
+      if (mobileLesson) mobileLesson.textContent = id;
+    }
+
+    navItems.forEach(function (item) {
+      item.addEventListener('click', function () {
+        if (!item.disabled) openLesson(item.getAttribute('data-lesson-id'));
+      });
+    });
+    completeButtons.forEach(function (button) {
+      button.addEventListener('click', function () {
+        var id = button.getAttribute('data-complete-lesson');
+        completed[id] = !completed[id];
+        save();
+        paintCompletion();
+      });
+    });
+    paintCompletion();
+
+    window.addEventListener('volynx:devjourney:tier', function (event) {
+      var rank = { social: 0, pro: 1, bundle: 2 };
+      var tier = String(event.detail || 'social').toLowerCase();
+      root.querySelectorAll('[data-tier-required]').forEach(function (node) {
+        var required = node.getAttribute('data-tier-required');
+        var allowed = (rank[tier] || 0) >= (rank[required] || 0);
+        node.classList.toggle('djl-is-locked', !allowed);
+        if (node.classList.contains('djl-block')) node.classList.toggle('djl-block--locked', !allowed);
+        if (node.matches('button')) node.disabled = !allowed;
+        var lock = node.querySelector('.djl-lock');
+        if (lock) lock.hidden = allowed;
+      });
+    });
+  })();
+</script>
+
+<style>
+  .djl-room { margin: 38px 0 42px; }
+  .djl-room__header { display: flex; justify-content: space-between; gap: 28px; align-items: end; margin-bottom: 18px; }
+  .djl-room__header h2 { margin: 7px 0 8px; max-width: 27ch; font-size: clamp(24px, 3vw, 36px); line-height: 1.08; }
+  .djl-room__intro { max-width: 62ch; margin: 0; color: rgba(255,255,255,.68); line-height: 1.65; font-size: 14px; }
+  .djl-progress { width: min(230px, 100%); padding: 14px; border: 1px solid rgba(140,255,210,.2); border-radius: 14px; background: rgba(140,255,210,.05); flex: 0 0 auto; }
+  .djl-progress__label, .djl-progress__meta { display: block; color: rgba(255,255,255,.58); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; }
+  .djl-progress strong { display: block; margin: 3px 0 8px; color: #f3e1a0; font-size: 24px; }
+  .djl-progress__track { height: 6px; border-radius: 99px; overflow: hidden; background: rgba(255,255,255,.1); }
+  .djl-progress__track span { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #8cffd2, #00dbff); transition: width .25s ease; }
+  .djl-layout { display: grid; grid-template-columns: minmax(230px, .72fr) minmax(0, 1.7fr); gap: 16px; align-items: start; }
+  .djl-curriculum, .djl-content { min-width: 0; border: 1px solid rgba(255,255,255,.1); border-radius: 18px; background: rgba(255,255,255,.035); }
+  .djl-curriculum { position: sticky; top: 24px; padding: 14px; max-height: min(720px, calc(100vh - 48px)); overflow: auto; }
+  .djl-curriculum__top { display: flex; justify-content: space-between; gap: 8px; margin: 2px 3px 12px; color: #fff; font-size: 13px; font-weight: 700; }
+  .djl-curriculum__hint { color: rgba(140,255,210,.8); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+  .djl-block { padding: 12px 0 9px; border-top: 1px solid rgba(255,255,255,.08); }
+  .djl-block:first-of-type { border-top: 0; }
+  .djl-block__heading { display: grid; grid-template-columns: 28px minmax(0,1fr) 18px; gap: 9px; align-items: start; margin-bottom: 8px; }
+  .djl-block__number { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 9px; color: #080610; background: #f3e1a0; font-size: 11px; font-weight: 800; }
+  .djl-block--locked .djl-block__number { opacity: .5; }
+  .djl-block__heading strong { display: block; color: rgba(255,255,255,.92); font-size: 12px; }
+  .djl-block__heading small { display: block; margin-top: 3px; color: rgba(255,255,255,.48); font-size: 10.5px; line-height: 1.4; }
+  .djl-lock { color: rgba(255,255,255,.4); font-size: 16px; transform: rotate(45deg); }
+  .djl-block__lessons { display: grid; gap: 3px; }
+  .djl-lesson-nav { display: grid; grid-template-columns: 14px minmax(0,1fr); gap: 8px; align-items: start; width: 100%; padding: 8px 8px; border: 1px solid transparent; border-radius: 10px; color: rgba(255,255,255,.62); background: transparent; text-align: left; cursor: pointer; font: inherit; }
+  .djl-lesson-nav:hover, .djl-lesson-nav:focus-visible { border-color: rgba(0,219,255,.25); background: rgba(0,219,255,.06); color: #fff; }
+  .djl-lesson-nav.is-active { border-color: rgba(0,219,255,.35); background: rgba(0,219,255,.1); color: #fff; }
+  .djl-lesson-nav:disabled { cursor: not-allowed; opacity: .42; }
+  .djl-lesson-nav__state { display: grid; place-items: center; width: 14px; height: 14px; margin-top: 2px; border: 1px solid rgba(255,255,255,.25); border-radius: 50%; color: #080610; background: transparent; font-size: 9px; font-weight: 900; }
+  .djl-lesson-nav.is-complete .djl-lesson-nav__state { border-color: #8cffd2; background: #8cffd2; }
+  .djl-lesson-nav__copy { display: grid; gap: 2px; font-size: 11.5px; line-height: 1.35; }
+  .djl-lesson-nav__id { color: rgba(255,255,255,.38); font-size: 9px; letter-spacing: .08em; }
+  .djl-content { padding: clamp(18px, 3vw, 28px); }
+  .djl-mobile-context { display: none; }
+  .djl-lesson-panel.is-hidden { display: none; }
+  .djl-lesson-head { display: flex; justify-content: space-between; gap: 16px; align-items: start; padding-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,.1); }
+  .djl-lesson-kicker { display: flex; gap: 8px; color: rgba(0,219,255,.82); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  .djl-lesson-head h3 { margin: 7px 0 5px; font-size: clamp(22px, 3vw, 30px); line-height: 1.1; }
+  .djl-lesson-duration { margin: 0; color: rgba(255,255,255,.52); font-size: 12px; }
+  .djl-complete { display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; border: 1px solid rgba(140,255,210,.3); border-radius: 99px; color: rgba(140,255,210,.9); background: rgba(140,255,210,.07); cursor: pointer; font: inherit; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .djl-complete:hover, .djl-complete:focus-visible { background: rgba(140,255,210,.15); }
+  .djl-complete.is-complete { color: #080610; background: #8cffd2; border-color: #8cffd2; }
+  .djl-complete__dot { display: grid; place-items: center; width: 16px; height: 16px; border: 1px solid currentColor; border-radius: 50%; font-size: 10px; }
+  .djl-lesson-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; margin-top: 18px; }
+  .djl-card { padding: 15px; border: 1px solid rgba(255,255,255,.1); border-radius: 13px; background: rgba(255,255,255,.035); }
+  .djl-card--goal { border-color: rgba(243,225,160,.24); background: rgba(243,225,160,.06); }
+  .djl-card--expected { border-color: rgba(140,255,210,.2); background: rgba(140,255,210,.045); }
+  .djl-card--stuck { border-color: rgba(255,186,120,.2); background: rgba(255,186,120,.04); }
+  .djl-card__label { display: block; margin-bottom: 7px; color: #f3e1a0; font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+  .djl-card p { margin: 0; color: rgba(255,255,255,.72); font-size: 13px; line-height: 1.6; }
+  .djl-section-block { margin-top: 22px; }
+  .djl-section-title { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; }
+  .djl-section-number { color: rgba(0,219,255,.85); font-size: 11px; font-weight: 800; letter-spacing: .1em; }
+  .djl-section-title h4, .djl-exercise h4 { margin: 0; color: #fff; font-size: 16px; }
+  .djl-steps { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; counter-reset: djl-step; }
+  .djl-steps li { display: grid; grid-template-columns: 26px minmax(0,1fr); gap: 10px; align-items: start; color: rgba(255,255,255,.78); font-size: 13.5px; line-height: 1.6; counter-increment: djl-step; }
+  .djl-steps li::before { content: counter(djl-step); display: grid; place-items: center; width: 24px; height: 24px; border-radius: 8px; color: rgba(0,219,255,.95); background: rgba(0,219,255,.1); font-size: 11px; font-weight: 800; }
+  .djl-lesson-grid--lower { margin-top: 20px; }
+  .djl-exercise { display: flex; justify-content: space-between; gap: 16px; align-items: end; margin-top: 20px; padding: 17px; border: 1px solid rgba(0,219,255,.25); border-radius: 14px; background: linear-gradient(120deg, rgba(0,219,255,.09), rgba(167,139,250,.06)); }
+  .djl-exercise .djl-card__label { color: rgba(0,219,255,.95); }
+  .djl-exercise p { max-width: 62ch; margin: 7px 0 0; color: rgba(255,255,255,.78); font-size: 13px; line-height: 1.6; }
+  .djl-exercise__mark { color: rgba(255,255,255,.5); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+  @media (max-width: 850px) { .djl-room__header { align-items: start; flex-direction: column; } .djl-progress { width: 100%; } .djl-layout { grid-template-columns: 1fr; } .djl-curriculum { position: static; max-height: none; } }
+  @media (max-width: 560px) { .djl-content { padding: 16px; } .djl-lesson-head { flex-direction: column; } .djl-complete { width: 100%; justify-content: center; } .djl-lesson-grid { grid-template-columns: 1fr; } .djl-exercise { align-items: start; flex-direction: column; } .djl-exercise__mark { white-space: normal; } }
+  @media (prefers-reduced-motion: reduce) { .djl-progress__track span { transition: none; } }
+</style>

@@ -1,8 +1,19 @@
 ---
 import FaviconHead from "../../components/FaviconHead.astro";
+import CoreIcon from "../../components/CoreIcon.astro";
 import { ROUTES } from "../../data/routes";
 
 const devHubHref = ROUTES.devHub;
+const platformHref = ROUTES.platform;
+
+const ecosystemSurfaces = [
+  { name: "Builder", icon: "builder" as const, href: ROUTES.builder, label: { en: "Build and publish", pt: "Construir e publicar" }, copy: { en: "Turn an idea into a clear public site, campaign or product page.", pt: "Transforme uma ideia em um site, campanha ou página de produto clara." }, tone: "cyan" },
+  { name: "Daily", icon: "daily" as const, href: ROUTES.daily, label: { en: "Plan and focus", pt: "Planejar e focar" }, copy: { en: "Keep the next actions, context and routines visible while the work moves.", pt: "Mantenha ações, contexto e rotinas visíveis enquanto o trabalho avança." }, tone: "violet" },
+  { name: "Lab", icon: "lab" as const, href: ROUTES.lab, label: { en: "Make and refine", pt: "Criar e refinar" }, copy: { en: "Prepare images, QR projects and creative assets in the browser.", pt: "Prepare imagens, projetos QR e ativos criativos no navegador." }, tone: "gold" },
+  { name: "World", icon: "world" as const, href: ROUTES.world, label: { en: "Connect and discover", pt: "Conectar e descobrir" }, copy: { en: "Find people, opportunities and resources around meaningful work.", pt: "Encontre pessoas, oportunidades e recursos para trabalhos relevantes." }, tone: "cyan" },
+  { name: "Services", icon: "services" as const, href: ROUTES.services, label: { en: "Work with an expert", pt: "Trabalhar com especialistas" }, copy: { en: "Add strategy, design and implementation when the project needs a human partner.", pt: "Adicione estratégia, design e implementação quando o projeto precisar de parceria humana." }, tone: "violet" },
+  { name: "Dev Journey", icon: "journey" as const, href: ROUTES.devJourney, label: { en: "Learn by building", pt: "Aprender construindo" }, copy: { en: "Move from understanding to a real project with a guided, practical track.", pt: "Passe do entendimento a um projeto real com uma trilha prática e guiada." }, tone: "gold" },
+];
 ---
 
 <!doctype html>
@@ -28,6 +39,7 @@ const devHubHref = ROUTES.devHub;
         <a href="#pathways" data-en="Explore" data-pt="Explorar">Explorar</a>
         <a href={ROUTES.manifesto} data-en="Vision" data-pt="Visão">Visão</a>
         <a href={devHubHref} data-en="Dev Hub" data-pt="Dev Hub">Dev Hub</a>
+        <a class="core-nav-platform" href={platformHref} data-en="Platform" data-pt="Plataforma">Plataforma</a>
       </nav>
       <button class="language" type="button" data-language-toggle aria-label="Mudar idioma">PT / EN</button>
     </header>
@@ -47,18 +59,40 @@ const devHubHref = ROUTES.devHub;
             <a class="button button--primary" href="#begin" data-en="Start with your intention" data-pt="Começar pela sua intenção">Começar pela sua intenção</a>
             <a class="button button--quiet" href={ROUTES.manifesto} data-en="Understand the vision" data-pt="Entender a visão">Entender a visão</a>
           </div>
+          <a class="legacy-entry" href={platformHref}>
+            <span class="legacy-entry__signal" aria-hidden="true"></span>
+            <span data-en="Already know VOLYNX? Open your workspace" data-pt="Já conhece a VOLYNX? Abrir seu espaço">Já conhece a VOLYNX? Abrir seu espaço</span>
+            <span aria-hidden="true">↗</span>
+          </a>
           <p class="hero__trust" data-en="No empty promises. One clear next step." data-pt="Sem promessas vazias. Um próximo passo claro.">Sem promessas vazias. Um próximo passo claro.</p>
         </div>
 
-        <div class="signal-stage reveal reveal--late" aria-label="VOLYNX Core signal">
+        <div class="signal-stage reveal reveal--late" aria-label="VOLYNX Core signal" data-signal-stage>
           <div class="signal-stage__halo signal-stage__halo--outer"></div>
           <div class="signal-stage__halo signal-stage__halo--inner"></div>
           <div class="signal-stage__axis signal-stage__axis--one"></div>
           <div class="signal-stage__axis signal-stage__axis--two"></div>
+          <svg class="signal-stage__constellation" viewBox="0 0 520 520" aria-hidden="true" focusable="false">
+            <path d="M260 260 260 50M260 260 470 260M260 260 260 470M260 260 50 260" />
+            <circle cx="260" cy="260" r="207" />
+          </svg>
+          <a class="orbit-node orbit-node--build" href={ROUTES.builder} data-signal-en="Build" data-signal-pt="Construir" aria-label="Abrir Builder">
+            <span class="orbit-node__icon"><CoreIcon name="builder" size={25} /></span><span data-en="Build" data-pt="Construir">Construir</span>
+          </a>
+          <a class="orbit-node orbit-node--operate" href={ROUTES.daily} data-signal-en="Plan" data-signal-pt="Planejar" aria-label="Abrir Daily">
+            <span class="orbit-node__icon"><CoreIcon name="daily" size={25} /></span><span data-en="Plan" data-pt="Planejar">Planejar</span>
+          </a>
+          <a class="orbit-node orbit-node--make" href={ROUTES.lab} data-signal-en="Create" data-signal-pt="Criar" aria-label="Abrir Lab">
+            <span class="orbit-node__icon"><CoreIcon name="lab" size={25} /></span><span data-en="Create" data-pt="Criar">Criar</span>
+          </a>
+          <a class="orbit-node orbit-node--connect" href={ROUTES.world} data-signal-en="Discover" data-signal-pt="Descobrir" aria-label="Abrir World">
+            <span class="orbit-node__icon"><CoreIcon name="world" size={25} /></span><span data-en="Discover" data-pt="Descobrir">Descobrir</span>
+          </a>
           <div class="signal-stage__core">
             <img src="/assets/V.webp" alt="" width="70" height="70" />
             <span>CORE</span>
           </div>
+          <p class="signal-stage__caption" data-en="Choose where to begin" data-pt="Escolha por onde começar">Escolha por onde começar</p>
           <div class="signal-label signal-label--top"><span>01</span><b data-en="INTENTION" data-pt="INTENÇÃO">INTENÇÃO</b></div>
           <div class="signal-label signal-label--right"><span>02</span><b data-en="ACTION" data-pt="AÇÃO">AÇÃO</b></div>
           <div class="signal-label signal-label--bottom"><span>03</span><b data-en="EVIDENCE" data-pt="EVIDÊNCIA">EVIDÊNCIA</b></div>
@@ -72,7 +106,7 @@ const devHubHref = ROUTES.devHub;
             <h2 id="begin-title" data-en="What are you trying to make possible?" data-pt="O que você está tentando tornar possível?">O que você está tentando tornar possível?</h2>
           </div>
           <div class="intro__body">
-            <p data-en="The first VOLYNX experience should not make you learn a catalogue. It should help you clarify the work in front of you." data-pt="A primeira experiência VOLYNX não deve obrigar você a aprender um catálogo. Ela deve ajudar a esclarecer o trabalho que está diante de você.">A primeira experiência VOLYNX não deve obrigar você a aprender um catálogo. Ela deve ajudar a esclarecer o trabalho que está diante de você.</p>
+            <p data-en="You do not need to understand everything at once. Start with the challenge in front of you, and we will help you find the right next step." data-pt="Você não precisa entender tudo de uma vez. Comece pelo desafio à sua frente, e ajudaremos a encontrar o próximo passo.">Você não precisa entender tudo de uma vez. Comece pelo desafio à sua frente, e ajudaremos a encontrar o próximo passo.</p>
             <a class="text-link" href="#pathways" data-en="See the paths →" data-pt="Ver os caminhos →">Ver os caminhos →</a>
           </div>
         </div>
@@ -80,7 +114,7 @@ const devHubHref = ROUTES.devHub;
 
       <section class="pathways core-shell" id="pathways" aria-labelledby="pathways-title">
         <div class="section-heading reveal">
-          <div class="section-kicker"><span>02</span><span data-en="A connected system" data-pt="Um sistema conectado">Um sistema conectado</span></div>
+          <div class="section-kicker"><span>02</span><span data-en="Everything in one place" data-pt="Tudo em um só lugar">Tudo em um só lugar</span></div>
           <h2 id="pathways-title" data-en="From intention to a real next move." data-pt="Da intenção ao próximo movimento real.">Da intenção ao próximo movimento real.</h2>
         </div>
         <div class="path-grid">
@@ -93,8 +127,8 @@ const devHubHref = ROUTES.devHub;
           <article class="path-card path-card--action reveal reveal--late">
             <div class="path-card__number">02</div>
             <p class="path-card__label" data-en="Build" data-pt="Construir">Construir</p>
-            <h3 data-en="Use the right capability." data-pt="Usar a capacidade certa.">Usar a capacidade certa.</h3>
-            <p data-en="Move into the Dev Hub only when a tool helps: Builder, Daily, Lab, Services or an existing VOLYNX product." data-pt="Entre no Dev Hub quando uma ferramenta ajudar: Builder, Daily, Lab, Services ou um produto VOLYNX existente.">Entre no Dev Hub quando uma ferramenta ajudar: Builder, Daily, Lab, Services ou um produto VOLYNX existente.</p>
+            <h3 data-en="Take the next step." data-pt="Dar o próximo passo.">Dar o próximo passo.</h3>
+            <p data-en="Explore Builder, Daily, Lab, Services and other VOLYNX products whenever one can help you move forward." data-pt="Explore Builder, Daily, Lab, Services e outros produtos VOLYNX sempre que algum deles puder ajudar você a avançar.">Explore Builder, Daily, Lab, Services e outros produtos VOLYNX sempre que algum deles puder ajudar você a avançar.</p>
           </article>
           <article class="path-card path-card--evidence reveal reveal--later">
             <div class="path-card__number">03</div>
@@ -107,22 +141,40 @@ const devHubHref = ROUTES.devHub;
 
       <section class="handoff core-shell reveal" aria-labelledby="handoff-title">
         <div class="handoff__copy">
-          <div class="section-kicker"><span>03</span><span data-en="The Dev Hub underneath" data-pt="O Dev Hub por baixo">O Dev Hub por baixo</span></div>
-          <h2 id="handoff-title" data-en="The vision gets you moving. The Dev Hub helps you ship." data-pt="A visão coloca você em movimento. O Dev Hub ajuda você a entregar.">A visão coloca você em movimento. O Dev Hub ajuda você a entregar.</h2>
-          <p data-en="The tools already built by VOLYNX become part of the new experience — available when useful, never forced as the starting point." data-pt="As ferramentas que a VOLYNX já construiu passam a fazer parte da nova experiência — disponíveis quando ajudam, nunca impostas como ponto de partida.">As ferramentas que a VOLYNX já construiu passam a fazer parte da nova experiência — disponíveis quando ajudam, nunca impostas como ponto de partida.</p>
-          <a class="text-link" href={devHubHref} data-en="Enter the existing Dev Hub →" data-pt="Entrar no Dev Hub atual →">Entrar no Dev Hub atual →</a>
+          <div class="section-kicker"><span>03</span><span data-en="Inside the VOLYNX ecosystem" data-pt="Dentro do ecossistema VOLYNX">Dentro do ecossistema VOLYNX</span></div>
+          <h2 id="handoff-title" data-en="From ideas to useful digital work." data-pt="Da ideia a um trabalho digital que faz diferença.">Da ideia a um trabalho digital que faz diferença.</h2>
+          <p data-en="Builder, Daily, Lab and World come together when they help you move a project forward." data-pt="Builder, Daily, Lab e World se conectam quando ajudam você a avançar um projeto.">Builder, Daily, Lab e World se conectam quando ajudam você a avançar um projeto.</p>
+          <a class="text-link" href={devHubHref} data-en="Explore VOLYNX tools →" data-pt="Explorar ferramentas VOLYNX →">Explorar ferramentas VOLYNX →</a>
         </div>
         <div class="hub-list">
-          <a href={ROUTES.builder}><span>BUILD</span><strong>Builder</strong><small data-en="Create and publish" data-pt="Criar e publicar">Criar e publicar</small></a>
-          <a href={ROUTES.daily}><span>OPERATE</span><strong>Daily</strong><small data-en="Plan and focus" data-pt="Planejar e focar">Planejar e focar</small></a>
-          <a href={ROUTES.lab}><span>MAKE</span><strong>Lab</strong><small data-en="Create locally" data-pt="Criar localmente">Criar localmente</small></a>
-          <a href={ROUTES.world}><span>CONNECT</span><strong>World</strong><small data-en="Find people and resources" data-pt="Encontrar pessoas e recursos">Encontrar pessoas e recursos</small></a>
+          <a href={ROUTES.builder}><span data-en="CREATE" data-pt="CRIAR">CRIAR</span><strong>Builder</strong><small data-en="Create and publish" data-pt="Criar e publicar">Criar e publicar</small></a>
+          <a href={ROUTES.daily}><span data-en="PLAN" data-pt="PLANEJAR">PLANEJAR</span><strong>Daily</strong><small data-en="Plan and focus" data-pt="Planejar e focar">Planejar e focar</small></a>
+          <a href={ROUTES.lab}><span data-en="REFINE" data-pt="REFINAR">REFINAR</span><strong>Lab</strong><small data-en="Create locally" data-pt="Criar localmente">Criar localmente</small></a>
+          <a href={ROUTES.world}><span data-en="DISCOVER" data-pt="DESCOBRIR">DESCOBRIR</span><strong>World</strong><small data-en="Find people and resources" data-pt="Encontrar pessoas e recursos">Encontrar pessoas e recursos</small></a>
+        </div>
+      </section>
+
+      <section class="ecosystem core-shell reveal" id="ecosystem" aria-labelledby="ecosystem-title">
+        <div class="section-heading">
+          <div class="section-kicker"><span>04</span><span data-en="The universe in motion" data-pt="O universo em movimento">O universo em movimento</span></div>
+          <h2 id="ecosystem-title" data-en="One intention. Many ways to make it real." data-pt="Uma intenção. Muitos caminhos para torná-la real.">Uma intenção. Muitos caminhos para torná-la real.</h2>
+          <p data-en="VOLYNX is not a catalogue to memorise. Each layer appears when it can make the next step clearer, faster or more human." data-pt="A VOLYNX não é um catálogo para decorar. Cada camada aparece quando pode tornar o próximo passo mais claro, rápido ou humano.">A VOLYNX não é um catálogo para decorar. Cada camada aparece quando pode tornar o próximo passo mais claro, rápido ou humano.</p>
+        </div>
+        <div class="surface-grid">
+          {ecosystemSurfaces.map((surface) => (
+            <a class:list={["surface-card", `surface-card--${surface.tone}`]} href={surface.href}>
+              <span class="surface-card__icon"><CoreIcon name={surface.icon} size={28} /></span>
+              <span class="surface-card__meta"><span>{surface.name}</span><span aria-hidden="true">↗</span></span>
+              <strong><span class="i18n-en">{surface.label.en}</span><span class="i18n-pt">{surface.label.pt}</span></strong>
+              <span class="surface-card__copy"><span class="i18n-en">{surface.copy.en}</span><span class="i18n-pt">{surface.copy.pt}</span></span>
+            </a>
+          ))}
         </div>
       </section>
 
       <section class="future core-shell reveal" aria-labelledby="future-title">
         <div class="section-heading">
-          <div class="section-kicker"><span>04</span><span data-en="Research directions" data-pt="Direções de pesquisa">Direções de pesquisa</span></div>
+          <div class="section-kicker"><span>05</span><span data-en="Research directions" data-pt="Direções de pesquisa">Direções de pesquisa</span></div>
           <h2 id="future-title" data-en="The future is a direction, not a claim." data-pt="O futuro é uma direção, não uma promessa.">O futuro é uma direção, não uma promessa.</h2>
           <p data-en="These ideas remain signals of where VOLYNX can go. They become products only when a real problem, safe boundary and measurable outcome are clear." data-pt="Estas ideias continuam sinalizando para onde a VOLYNX pode ir. Só se tornam produtos quando houver problema real, limite seguro e resultado mensurável.">Estas ideias continuam sinalizando para onde a VOLYNX pode ir. Só se tornam produtos quando houver problema real, limite seguro e resultado mensurável.</p>
         </div>
@@ -135,18 +187,19 @@ const devHubHref = ROUTES.devHub;
 
       <section class="closing core-shell reveal" aria-labelledby="closing-title">
         <div class="closing__mark" aria-hidden="true"><img src="/assets/V.webp" alt="" width="56" height="56" /></div>
-        <p class="eyebrow" data-en="A first Core direction" data-pt="Uma primeira direção para o Core">Uma primeira direção para o Core</p>
+        <p class="eyebrow" data-en="Where VOLYNX is heading" data-pt="Para onde a VOLYNX está indo">Para onde a VOLYNX está indo</p>
         <h2 id="closing-title" data-en="Build what makes a better future more possible." data-pt="Construa o que torna um futuro melhor mais possível.">Construa o que torna um futuro melhor mais possível.</h2>
         <div class="closing__actions">
           <a class="button button--primary" href="#begin" data-en="Begin the journey" data-pt="Começar a jornada">Começar a jornada</a>
+          <a class="button button--quiet" href={platformHref} data-en="Enter the existing platform" data-pt="Entrar na plataforma atual">Entrar na plataforma atual</a>
           <a class="button button--quiet" href={ROUTES.launch2026} data-en="See the original story" data-pt="Ver a história original">Ver a história original</a>
         </div>
       </section>
     </main>
 
     <footer class="core-footer core-shell">
-      <span>VOLYNX / CORE PREVIEW</span>
-      <span data-en="A new layer. Existing work preserved." data-pt="Uma nova camada. O trabalho existente preservado.">Uma nova camada. O trabalho existente preservado.</span>
+      <span>VOLYNX / CORE</span>
+      <span data-en="One connected experience. Built to keep evolving." data-pt="Uma experiência conectada. Feita para evoluir.">Uma experiência conectada. Feita para evoluir.</span>
     </footer>
 
     <script is:inline>
@@ -167,6 +220,29 @@ const devHubHref = ROUTES.devHub;
         toggle?.addEventListener("click", () => setLanguage(root.lang.startsWith("pt") ? "en" : "pt"));
 
         const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+        const signalStage = document.querySelector("[data-signal-stage]");
+        const signalCaption = document.querySelector("[data-signal-stage] .signal-stage__caption");
+        const orbitNodes = document.querySelectorAll("[data-signal-stage] .orbit-node");
+        const setSignalCaption = (node) => {
+          if (!signalCaption || !node) return;
+          const languageKey = root.lang.startsWith("pt") ? "signalPt" : "signalEn";
+          signalCaption.textContent = node.dataset[languageKey] || signalCaption.textContent;
+        };
+        orbitNodes.forEach((node) => {
+          node.addEventListener("pointerenter", () => setSignalCaption(node));
+          node.addEventListener("focus", () => setSignalCaption(node));
+        });
+        signalStage?.addEventListener("pointermove", (event) => {
+          if (reduceMotion) return;
+          const rect = signalStage.getBoundingClientRect();
+          signalStage.style.setProperty("--pointer-x", ((event.clientX - rect.left) / rect.width - .5).toFixed(3));
+          signalStage.style.setProperty("--pointer-y", ((event.clientY - rect.top) / rect.height - .5).toFixed(3));
+        });
+        signalStage?.addEventListener("pointerleave", () => {
+          signalStage.style.setProperty("--pointer-x", "0");
+          signalStage.style.setProperty("--pointer-y", "0");
+          if (signalCaption) signalCaption.textContent = root.lang.startsWith("pt") ? signalCaption.dataset.pt : signalCaption.dataset.en;
+        });
         const reveals = document.querySelectorAll(".reveal");
         if (reduceMotion || !("IntersectionObserver" in window)) {
           reveals.forEach((node) => node.classList.add("is-visible"));
@@ -181,7 +257,7 @@ const devHubHref = ROUTES.devHub;
           reveals.forEach((node) => observer.observe(node));
         }
       })();
-    </script>
+      </script>
   </body>
 </html>
 
@@ -216,6 +292,7 @@ const devHubHref = ROUTES.devHub;
   nav { display: flex; align-items: center; gap: 26px; color: var(--muted); font-size: .78rem; letter-spacing: .09em; text-transform: uppercase; }
   nav a, .language { transition: color .2s ease, border-color .2s ease; }
   nav a:hover, nav a:focus-visible { color: var(--ink); }
+  .core-nav-platform { color: var(--gold); }
   .language { border: 1px solid var(--line); border-radius: 999px; padding: 9px 13px; color: var(--muted); background: rgba(255,255,255,.035); cursor: pointer; font-size: .7rem; letter-spacing: .12em; }
   .language:hover, .language:focus-visible { color: var(--ink); border-color: rgba(233,215,165,.55); }
   .hero { min-height: 760px; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(380px, .95fr); align-items: center; gap: clamp(42px, 8vw, 120px); padding-top: 64px; padding-bottom: 86px; }
@@ -233,17 +310,35 @@ const devHubHref = ROUTES.devHub;
   .button--quiet { border: 1px solid var(--line); color: var(--ink); background: rgba(255,255,255,.035); }
   .button--quiet:hover, .button--quiet:focus-visible { border-color: rgba(167,139,250,.7); background: rgba(167,139,250,.09); }
   .hero__trust { margin: 22px 0 0; color: var(--soft); font-size: .77rem; letter-spacing: .07em; }
-  .signal-stage { position: relative; min-height: 540px; display: grid; place-items: center; isolation: isolate; }
-  .signal-stage::before { content: ""; position: absolute; width: 46%; aspect-ratio: 1; border-radius: 50%; background: rgba(110,231,249,.10); filter: blur(55px); z-index: -1; }
+  .legacy-entry { display: inline-flex; align-items: center; gap: 10px; margin-top: 24px; color: var(--gold); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; transition: color .22s ease, transform .22s ease; }
+  .legacy-entry:hover, .legacy-entry:focus-visible { color: var(--cyan); transform: translateX(3px); }
+  .legacy-entry__signal { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; background: var(--gold); box-shadow: 0 0 16px rgba(233,215,165,.65); }
+  .signal-stage { position: relative; min-height: 540px; display: grid; place-items: center; isolation: isolate; overflow: hidden; }
+  .signal-stage::before { content: ""; position: absolute; width: 46%; aspect-ratio: 1; border-radius: 50%; background: rgba(110,231,249,.10); filter: blur(55px); z-index: -1; transform: translate(calc(var(--pointer-x, 0) * 18px), calc(var(--pointer-y, 0) * 18px)); transition: transform .6s cubic-bezier(.2,.7,.2,1); }
   .signal-stage__halo { position: absolute; border: 1px solid rgba(167,139,250,.35); border-radius: 50%; transform: rotate(-24deg); }
   .signal-stage__halo--outer { width: min(500px, 90%); aspect-ratio: 1; box-shadow: inset 0 0 80px rgba(124,58,237,.07), 0 0 60px rgba(124,58,237,.10); }
   .signal-stage__halo--inner { width: 63%; aspect-ratio: 1; border-color: rgba(110,231,249,.42); transform: rotate(32deg); }
   .signal-stage__axis { position: absolute; width: 1px; height: 86%; background: linear-gradient(180deg, transparent, rgba(255,255,255,.25), transparent); }
   .signal-stage__axis--one { transform: rotate(62deg); }
   .signal-stage__axis--two { transform: rotate(-62deg); }
-  .signal-stage__core { width: 150px; height: 150px; display: grid; place-items: center; align-content: center; gap: 6px; border: 1px solid rgba(233,215,165,.65); border-radius: 50%; background: radial-gradient(circle at 35% 25%, rgba(255,255,255,.30), rgba(21,14,40,.92) 58%); box-shadow: 0 0 0 12px rgba(167,139,250,.05), 0 0 70px rgba(167,139,250,.32), inset 0 0 32px rgba(110,231,249,.18); }
+  .signal-stage__constellation { position: absolute; width: min(520px, 100%); height: auto; overflow: visible; opacity: .42; transform: rotate(-11deg); animation: constellation-drift 28s linear infinite; }
+  .signal-stage__constellation path, .signal-stage__constellation circle { stroke: rgba(110,231,249,.45); stroke-width: 1; vector-effect: non-scaling-stroke; fill: none; stroke-dasharray: 2 10; }
+  .signal-stage__core { width: 150px; height: 150px; display: grid; place-items: center; align-content: center; gap: 6px; border: 1px solid rgba(233,215,165,.65); border-radius: 50%; background: radial-gradient(circle at 35% 25%, rgba(255,255,255,.30), rgba(21,14,40,.92) 58%); box-shadow: 0 0 0 12px rgba(167,139,250,.05), 0 0 70px rgba(167,139,250,.32), inset 0 0 32px rgba(110,231,249,.18); transform: translate(calc(var(--pointer-x, 0) * 8px), calc(var(--pointer-y, 0) * 8px)); transition: transform .45s cubic-bezier(.2,.7,.2,1), box-shadow .3s ease; z-index: 2; }
   .signal-stage__core img { object-fit: contain; filter: brightness(1.5) drop-shadow(0 0 14px rgba(255,255,255,.7)); }
   .signal-stage__core span { color: var(--gold); font-size: .55rem; letter-spacing: .26em; }
+  .signal-stage__caption { position: absolute; left: 50%; bottom: 17%; z-index: 2; width: max-content; max-width: 90%; margin: 0; color: var(--soft); font-size: .63rem; letter-spacing: .11em; text-align: center; text-transform: uppercase; transform: translateX(-50%); }
+  .orbit-node { position: absolute; z-index: 3; display: inline-flex; align-items: center; gap: 8px; padding: 7px 10px 7px 7px; border: 1px solid rgba(255,255,255,.16); border-radius: 999px; color: var(--muted); background: rgba(3,4,11,.72); backdrop-filter: blur(12px); font-size: .62rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; transition: color .22s ease, border-color .22s ease, background .22s ease, transform .22s ease; }
+  .orbit-node:hover, .orbit-node:focus-visible { color: var(--ink); border-color: var(--gold); background: rgba(233,215,165,.1); transform: translateY(-3px); }
+  .orbit-node--build { top: 4%; left: 50%; transform: translateX(-50%); }
+  .orbit-node--build:hover, .orbit-node--build:focus-visible { transform: translate(-50%, -3px); }
+  .orbit-node--operate { top: 50%; right: -1%; transform: translateY(-50%); }
+  .orbit-node--operate:hover, .orbit-node--operate:focus-visible { transform: translateY(calc(-50% - 3px)); }
+  .orbit-node--make { bottom: 4%; left: 50%; transform: translateX(-50%); }
+  .orbit-node--make:hover, .orbit-node--make:focus-visible { transform: translate(-50%, -3px); }
+  .orbit-node--connect { top: 50%; left: -1%; transform: translateY(-50%); }
+  .orbit-node--connect:hover, .orbit-node--connect:focus-visible { transform: translateY(calc(-50% - 3px)); }
+  .orbit-node__icon { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; color: var(--cyan); background: rgba(110,231,249,.1); }
+  .orbit-node--operate .orbit-node__icon, .orbit-node--connect .orbit-node__icon { color: var(--violet); background: rgba(167,139,250,.12); }
   .signal-label { position: absolute; display: grid; gap: 4px; color: var(--soft); font-size: .58rem; letter-spacing: .2em; }
   .signal-label span { color: var(--cyan); }
   .signal-label b { color: var(--ink); font-size: .67rem; font-weight: 800; }
@@ -276,6 +371,19 @@ const devHubHref = ROUTES.devHub;
   .hub-list span { color: var(--cyan); font-size: .61rem; letter-spacing: .16em; }
   .hub-list strong { font-size: 1.7rem; letter-spacing: -.04em; }
   .hub-list small { color: var(--muted); font-size: .76rem; }
+  .ecosystem { padding: 126px 0 136px; border-bottom: 1px solid var(--line); }
+  .surface-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .surface-card { position: relative; min-height: 220px; display: flex; flex-direction: column; gap: 13px; padding: 22px; overflow: hidden; border: 1px solid var(--line); border-radius: 22px 6px 22px 6px; background: linear-gradient(145deg, rgba(255,255,255,.065), rgba(255,255,255,.015)); transition: transform .3s ease, border-color .3s ease, background .3s ease; }
+  .surface-card::after { content: ""; position: absolute; width: 100px; height: 100px; right: -34px; bottom: -46px; border-radius: 50%; background: currentColor; opacity: .08; filter: blur(4px); transition: transform .3s ease; }
+  .surface-card:hover, .surface-card:focus-visible { transform: translateY(-5px); border-color: currentColor; background: linear-gradient(145deg, rgba(255,255,255,.1), rgba(255,255,255,.025)); }
+  .surface-card:hover::after, .surface-card:focus-visible::after { transform: scale(1.5); }
+  .surface-card--cyan { color: var(--cyan); }
+  .surface-card--violet { color: var(--violet); }
+  .surface-card--gold { color: var(--gold); }
+  .surface-card__icon { width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 15px 5px 15px 5px; background: rgba(255,255,255,.04); }
+  .surface-card__meta { display: flex; justify-content: space-between; color: currentColor; font-size: .62rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+  .surface-card strong { color: var(--ink); font-size: 1.35rem; letter-spacing: -.04em; }
+  .surface-card__copy { max-width: 32ch; color: var(--muted); font-size: .82rem; line-height: 1.6; }
   .future { padding: 144px 0; }
   .section-heading > p { max-width: 670px; margin: 20px 0 0; }
   .future-grid article { padding: 22px; border-top: 1px solid var(--line); }
@@ -291,11 +399,13 @@ const devHubHref = ROUTES.devHub;
   .reveal--late { transition-delay: .12s; }
   .reveal--later { transition-delay: .22s; }
   .reveal.is-visible { opacity: 1; transform: none; }
+  @keyframes constellation-drift { from { transform: rotate(-11deg); } to { transform: rotate(349deg); } }
   :focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
     .reveal { opacity: 1; transform: none; }
+    .signal-stage__constellation { animation: none; }
   }
   @media (max-width: 860px) {
     .hero, .intro__grid, .handoff { grid-template-columns: 1fr; }
@@ -316,12 +426,17 @@ const devHubHref = ROUTES.devHub;
     .signal-stage__core { width: 112px; height: 112px; }
     .signal-stage__core img { width: 52px; height: 52px; }
     .signal-stage__halo--outer { width: 82%; }
+    .signal-stage__caption { bottom: 12%; font-size: .56rem; }
     .signal-label--top { left: 18%; }
     .signal-label--right { right: 0; }
-    .path-grid, .future-grid, .hub-list { grid-template-columns: 1fr; }
+    .path-grid, .future-grid, .hub-list, .surface-grid { grid-template-columns: 1fr; }
     .path-card { min-height: 270px; }
     .intro, .pathways, .future, .closing { padding-bottom: 92px; }
     .handoff { padding: 56px 0; }
     .core-footer { flex-direction: column; }
+    .core-nav-platform { color: var(--muted); }
+    .orbit-node { font-size: .56rem; }
+    .orbit-node--operate { right: 0; }
+    .orbit-node--connect { left: 0; }
   }
 </style>

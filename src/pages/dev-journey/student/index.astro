@@ -5,6 +5,7 @@ import TierAttrInit from "../../../components/TierAttrInit.astro";
 import VxHeader from "../../../components/VxHeader.astro";
 import VxFooter from "../../../components/VxFooter.astro";
 import PageWidgets from "../../../components/PageWidgets.astro";
+import DevJourneyLessonRoom from "../../../components/DevJourneyLessonRoom.astro";
 import { ROUTES } from "../../../data/routes";
 import { DEVJOURNEY_DELIVERABLES } from "../../../data/devjourney-deliverables.js";
 ---
@@ -97,6 +98,8 @@ import { DEVJOURNEY_DELIVERABLES } from "../../../data/devjourney-deliverables.j
             <img src="/assets/devjourney/devjourneyicon1.webp" alt="" class="djs-hero-bg-art" loading="lazy" decoding="async" aria-hidden="true" />
           </article>
         </section>
+
+        <DevJourneyLessonRoom />
 
         <!-- Quick actions -->
         <div class="djs-quick-grid">
@@ -351,6 +354,7 @@ import { DEVJOURNEY_DELIVERABLES } from "../../../data/devjourney-deliverables.j
           var tier = (data.tier || 'social').toLowerCase();
           tierEl.dataset.tier = tier;
           tierLabel.textContent = tier.charAt(0).toUpperCase() + tier.slice(1);
+          window.dispatchEvent(new CustomEvent('volynx:devjourney:tier', { detail: tier }));
 
           // Unlock material blocks based on tier
           var rank = { social: 0, pro: 1, bundle: 2 };
