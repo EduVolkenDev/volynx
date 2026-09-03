@@ -168,7 +168,7 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
               <select id="qgColorMode" name="colorMode">
                 <option value="solid" data-qg-i18n="style.color_solid">Solid</option>
                 <option value="gradient" data-plan-required="launch" data-qg-i18n="style.color_gradient">Gradient - Launch</option>
-                <option value="metallic" data-qg-i18n="style.color_metallic">Metallic</option>
+                <option value="metallic" data-plan-required="pro" data-qg-i18n="style.color_metallic">Metallic - Pro</option>
               </select>
             </label>
 
@@ -227,8 +227,8 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
 
           <label class="qrgen-field" for="qgLogo">
             <span data-qg-i18n="brand.logo">Center logo</span>
-            <input id="qgLogo" name="logo" type="file" accept="image/*" />
-            <small data-qg-i18n="brand.logo_note">Logo export is a QRGen Pro feature. You can preview it here.</small>
+            <input id="qgLogo" name="logo" type="file" accept="image/*" data-plan-required="pro" />
+            <small data-qg-i18n="brand.logo_note">Logo export is a QRGen Pro feature. It is hidden from the Free preview.</small>
           </label>
 
           <div class="qrgen-grid qrgen-grid--two">
@@ -261,6 +261,13 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
 
         <div class="qrgen-stage" aria-live="polite">
           <div id="qgPreview" class="qrgen-preview-box"></div>
+        </div>
+
+        <div class="qrgen-preview-gate" id="qgPreviewGate" hidden role="status" aria-live="polite">
+          <span class="qrgen-preview-gate__eyebrow" id="qgPreviewGateEyebrow">Limited preview</span>
+          <strong id="qgPreviewGateTitle">Premium features are hidden from the Free preview.</strong>
+          <p id="qgPreviewGateCopy">This preview stays basic. Upgrade to apply the selected feature and export it.</p>
+          <a class="qrgen-link-button" id="qgPreviewGateCta" href="/pricing/#qrgen-plans">View plans</a>
         </div>
 
         <p class="qrgen-preview__note" id="qgPreviewNote" data-qg-i18n="preview.note">
@@ -769,6 +776,58 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
   .qrgen-field select:focus {
     border-color: rgba(125,249,255,.7);
     box-shadow: 0 0 0 3px rgba(125,249,255,.10);
+  }
+
+  .qrgen-field input:disabled,
+  .qrgen-field select:disabled,
+  .qrgen-field input[type="file"]:disabled {
+    cursor: not-allowed;
+    opacity: .62;
+  }
+
+  .qrgen-field input.is-locked,
+  .qrgen-field select.is-locked {
+    border-color: rgba(245,196,81,.28);
+  }
+
+  .qrgen-preview-gate {
+    display: grid;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 14px 16px;
+    border: 1px solid rgba(245,196,81,.28);
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(245,196,81,.12), rgba(255,255,255,.035));
+  }
+
+  .qrgen-preview-gate[hidden] {
+    display: none !important;
+  }
+
+  .qrgen-preview-gate__eyebrow {
+    color: #fde68a;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .qrgen-preview-gate strong {
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  .qrgen-preview-gate p {
+    margin: 0;
+    color: rgba(226,232,240,.68);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .qrgen-preview-gate .qrgen-link-button {
+    width: fit-content;
+    margin-top: 4px;
   }
 
   .qrgen-field small,

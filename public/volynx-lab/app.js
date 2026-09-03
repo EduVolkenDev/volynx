@@ -54,9 +54,14 @@ async function checkPermission(toolName, count) {
         if (!perm.useLocalStorage) {
           return { allowed: perm.remaining === -1 || perm.remaining >= count, plan: perm.plan, remaining: perm.remaining, limit: perm.limit, source: 'server' };
         }
+        return { allowed: false, plan: 'unknown', remaining: 0, limit: 0, source: 'error', error: 'permission_unavailable' };
       }
-    } catch (_) {}
+    } catch (_) {
+      return { allowed: false, plan: 'unknown', remaining: 0, limit: 0, source: 'error', error: 'permission_unavailable' };
+    }
   }
+
+  if (token) return { allowed: false, plan: 'unknown', remaining: 0, limit: 0, source: 'error', error: 'permission_unavailable' };
 
   // Fallback: localStorage
   const usage = getLocalUsage();
@@ -252,6 +257,12 @@ convertBtn.addEventListener('click', async () => {
   const perm = await checkPermission('converter', files.length);
   if (!perm.allowed) {
     window.dispatchEvent(new Event('vx:usage-updated'));
+
+    if (perm.error === 'permission_unavailable') {
+      labNotify('Permission check unavailable', 'We could not verify your plan. Nothing was converted; please try again in a moment.', 'error');
+      convertBtn.disabled = false;
+      return;
+    }
 
     if (window.VxLab?.shouldSendToLogin(perm)) {
       VxLab.confirmLogin(

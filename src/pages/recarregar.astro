@@ -48,7 +48,7 @@ const t = {
     pill: 'Adicione VX com bônus',
     title: 'Adicione VX',
     titleAccent: 'e acelere',
-    subtitle: 'Quanto mais você usa, mais rápido você cresce. Cada pack tem bônus exclusivo e Pix instantâneo.',
+    subtitle: 'Quanto mais você usa, mais rápido você cresce. Cada pack tem bônus exclusivo e checkout seguro.',
     ofYourChoice: 'packs premium',
     pixBadge: '⚡ Pix instantâneo',
     stripeBadge: 'Cartão internacional',
@@ -62,13 +62,13 @@ const t = {
     footerNote: 'Todos os packs incluem Power User badge quando você acumula 100+ VX. Um único saldo aparece na conta e funciona nas áreas com VX habilitado.',
     from: 'Era',
     currencyLabel: 'Moeda',
-    currencyHint: 'Escolha a moeda para cartão. Pix fica em BRL.',
+    currencyHint: 'Escolha a moeda para o pagamento com cartão.',
   },
   en: {
     pill: 'Add VX with bonus',
     title: 'Add VX',
     titleAccent: 'and scale',
-    subtitle: 'The more you use, the faster you grow. Every pack ships with an exclusive bonus and instant Pix.',
+    subtitle: 'The more you use, the faster you grow. Every pack ships with an exclusive bonus and secure checkout.',
     ofYourChoice: 'premium packs',
     pixBadge: '⚡ Instant Pix',
     stripeBadge: 'International card',
@@ -82,12 +82,12 @@ const t = {
     footerNote: 'Every pack includes a Power User badge when you reach 100+ VX. One balance appears in your account and works in VX-enabled areas.',
     from: 'Was',
     currencyLabel: 'Currency',
-    currencyHint: 'Choose card currency. Pix stays in BRL.',
+    currencyHint: 'Choose the currency for card checkout.',
   }
 };
 const L = t[lang];
 ---
-<FlagshipLayout title="Comprar VX — VOLYNX" description="Adicione VX com Pix instantâneo ou cartão. Bônus exclusivos em cada pack." pageClass="page-recarregar">
+<FlagshipLayout title="Comprar VX — VOLYNX" description="Adicione VX com checkout seguro por cartão. Bônus exclusivos em cada pack." pageClass="page-recarregar">
   <script is:inline>
     /* Sync ?lang= URL param with global volynx_lang in localStorage.
        This page is SSR'd per-language, so a mismatch must trigger a reload. */
@@ -137,7 +137,7 @@ const L = t[lang];
             <p class="rec-subtitle">{L.subtitle}</p>
 
             <div class="rec-methods">
-              <span class="rec-method-pill rec-method-pill--pix">{L.pixBadge}</span>
+              <span class="rec-method-pill rec-method-pill--pix" data-pix-ui hidden>{L.pixBadge}</span>
               <span class="rec-method-pill">{L.stripeBadge}</span>
             </div>
           </div>
@@ -206,7 +206,7 @@ const L = t[lang];
           </div>
 
           <div class={`rec-card-actions ${currency !== 'BRL' ? 'rec-card-actions--single' : ''}`}>
-            <button class={`rec-btn rec-btn--pix ${currency !== 'BRL' ? 'rec-btn--hidden' : ''}`} data-buy-pix={`tokens_${pack.id}_brl`} type="button">
+            <button class="rec-btn rec-btn--pix rec-btn--hidden" data-pix-ui data-buy-pix={`tokens_${pack.id}_brl`} type="button">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M17.7 6.3c-1.2-1.2-2.8-1.8-4.5-1.8s-3.3.6-4.5 1.8L5.4 9.6l2.1 2.1 3.3-3.3c.6-.6 1.4-.9 2.4-.9s1.8.3 2.4.9l3.3 3.3 2.1-2.1-3.3-3.3z" fill="currentColor"/><path d="M6.3 17.7c1.2 1.2 2.8 1.8 4.5 1.8s3.3-.6 4.5-1.8l3.3-3.3-2.1-2.1-3.3 3.3c-.6.6-1.4.9-2.4.9s-1.8-.3-2.4-.9l-3.3-3.3-2.1 2.1 3.3 3.3z" fill="currentColor"/></svg>
               {L.buyPix}
             </button>
@@ -223,7 +223,7 @@ const L = t[lang];
         <div class="rec-trust-icon">✓</div>
         <div>
           <strong>{L.trustBilling}</strong>
-          <p>{lang === 'pt' ? 'Cartoes e Pix via Stripe. Fluxo seguro com verificacao automatica.' : 'Cards and Pix via Stripe. Secure flow with automated verification.'}</p>
+          <p>{lang === 'pt' ? 'Pagamentos com cartão via Stripe. Fluxo seguro com verificação automática.' : 'Card payments via Stripe. Secure flow with automated verification.'}</p>
         </div>
       </div>
       <div class="rec-trust-item">
@@ -306,7 +306,7 @@ const L = t[lang];
           actions.classList.toggle('rec-card-actions--single', target !== 'BRL');
         });
         document.querySelectorAll('[data-buy-pix]').forEach(function(btn) {
-          btn.classList.toggle('rec-btn--hidden', target !== 'BRL');
+          btn.classList.toggle('rec-btn--hidden', target !== 'BRL' || window.__volynxPixEnabled !== true);
         });
 
         var url = new URL(window.location.href);
@@ -322,13 +322,24 @@ const L = t[lang];
         });
       });
 
-      // Load config
-      fetch('/config.json', { cache: 'no-store' }).then(function(r) { return r.json(); }).then(function(c) { cfg = c; }).catch(function(){});
+      // Load config and reveal Pix only when Stripe has enabled it.
+      fetch('/config.json', { cache: 'no-store' })
+        .then(function(r) { return r.ok ? r.json() : {}; })
+        .then(function(c) {
+          cfg = c;
+          window.__volynxPixEnabled = c.pixEnabled === true;
+          document.querySelectorAll('[data-pix-ui]').forEach(function(el) {
+            el.hidden = !window.__volynxPixEnabled;
+          });
+          applyCurrency(currentCurrency());
+        })
+        .catch(function(){});
 
       // Pix buttons
       document.querySelectorAll('[data-buy-pix]').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
           e.preventDefault();
+          if (window.__volynxPixEnabled !== true) return;
           if (!token) { window.location.href = loginHref(); return; }
           var lookup = btn.getAttribute('data-buy-pix');
           if (!lookup || !window.VxPix) return;

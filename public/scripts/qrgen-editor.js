@@ -5,7 +5,7 @@
   const DEFAULT_DATA = "https://volynx.world";
   const QRGEN_STORAGE_KEY = "volynx_qrgen_projects_v1";
   const USAGE_STORAGE_KEY = "volynx_qrgen_exports_v1";
-  const FREE_EXPORT_LIMIT = 2;
+  const FREE_EXPORT_LIMIT = 3;
   const SAVE_LIMIT_FREE = 3;
   const VX_SVG_EXPORT_COST = 4;
   const DEBOUNCE_MS = 190;
@@ -36,7 +36,7 @@
       name: "QRGen Free",
       price: { GBP: "£0", EUR: "€0", BRL: "R$0" },
       copy: "For fast static QR drafts and standard PNGs.",
-      features: ["Live preview", "Static QR", "Basic colors", "2 free exports/day"],
+      features: ["Live preview", "Static QR", "Basic colors", "3 free exports/week"],
       cta: "Open QRGen",
       href: "/qrgen/",
       lookupKey: ""
@@ -136,7 +136,7 @@
       "style.color_mode": "Modo de cor",
       "style.color_solid": "Sólida",
       "style.color_gradient": "Gradiente - Launch",
-      "style.color_metallic": "Metálico",
+      "style.color_metallic": "Metálico - Pro",
       "style.metallic_preset": "Acabamento metálico",
       "style.metallic_chrome": "Cromo",
       "style.metallic_gold": "Ouro",
@@ -150,12 +150,17 @@
       "style.margin": "Margem segura",
       "brand.legend": "Marca e segurança de impressão",
       "brand.logo": "Logotipo central",
-      "brand.logo_note": "A exportação com logotipo é um recurso do QRGen Pro. Você pode visualizá-la aqui.",
+      "brand.logo_note": "A exportação com logotipo é um recurso do QRGen Pro. Ela fica oculta na prévia Free.",
       "brand.logo_size": "Tamanho do logotipo",
       "brand.logo_margin": "Margem do logotipo",
       "preview.kicker": "Prévia em tempo real",
       "preview.title": "Cada alteração é exibida imediatamente.",
       "preview.note": "Prévia de exemplo: insira seu conteúdo para personalizar.",
+      "preview.locked_kicker": "Prévia limitada",
+      "preview.locked_title": "Os recursos premium ficam ocultos na prévia Free.",
+      "preview.locked_copy": "Esta prévia permanece básica. Faça upgrade para aplicar o recurso selecionado e exportá-lo.",
+      "preview.locked_cta": "Ver planos",
+      "preview.locked_message": "Este recurso premium está oculto na prévia Free. Faça upgrade para aplicá-lo.",
       "export.kicker": "Exportação",
       "export.note": "Para impressão em grande formato, prefira SVG ou PNG em alta resolução.",
       "export.format": "Formato",
@@ -214,7 +219,7 @@
       "plans.free.f1": "Prévia em tempo real",
       "plans.free.f2": "Código QR estático",
       "plans.free.f3": "Cores básicas",
-      "plans.free.f4": "2 exportações gratuitas por dia",
+      "plans.free.f4": "3 exportações gratuitas por semana",
       "plans.launch.copy": "Para campanhas que precisam de arquivos em alta resolução.",
       "plans.launch.f1": "PNG HD",
       "plans.launch.f2": "Mais projetos salvos",
@@ -254,8 +259,11 @@
     return Array.from((root || document).querySelectorAll(selector));
   }
 
-  function todayKey() {
+  function weekKey() {
     const d = new Date();
+    const day = d.getDay();
+    const daysFromMonday = day === 0 ? -6 : 1 - day;
+    d.setDate(d.getDate() + daysFromMonday);
     return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
   }
 
@@ -293,6 +301,7 @@
     }
     document.documentElement.setAttribute("data-qrgen-plan", currentPlan);
     document.documentElement.setAttribute("data-qrgen-admin", isAdminBypass ? "1" : "0");
+    updatePlanLocks();
   }
 
   function decodeJwtPayload(token) {
@@ -437,8 +446,7 @@
         currentPlan = "studio";
       } else {
         remoteAdminBypass = false;
-        const resolved = bestPlan(profile.plan, profile.builder_plan);
-        remotePlan = PLAN_ORDER[resolved] > PLAN_ORDER[currentPlan] ? resolved : currentPlan;
+        remotePlan = normalizePlan(profile.builder_plan);
       }
 
       refreshPlan();
@@ -525,7 +533,7 @@
     if (!supabaseUrl || !supabaseAnonKey) return;
     const normalizedCfg = { supabaseUrl, supabaseAnonKey };
     const profile = await fetchQrProfile(normalizedCfg, session);
-    const resolvedPlan = bestPlan(profile.plan, profile.builder_plan);
+    const resolvedPlan = normalizePlan(profile.builder_plan);
     const limit = profile.is_admin || profile.is_black_diamond ? -1 : (PLAN_LIMITS[resolvedPlan] ?? PLAN_LIMITS.free);
     const used = await fetchActiveQrCount(normalizedCfg, session);
     updateDynamicQuota(used, limit);
@@ -847,33 +855,50 @@
     return { gradient: makeGradient(state.dotColor, state.dotColor2) };
   }
 
+  function getPreviewState(state) {
+    if (isAdminBypass || detectAdminHint()) return state;
+    const preview = { ...state };
+
+    if (!canAccess("launch") && preview.colorMode === "gradient") preview.colorMode = "solid";
+    if (!canAccess("pro") && preview.colorMode === "metallic") preview.colorMode = "solid";
+    if (!canAccess("launch") && preview.dotsType === "classy") preview.dotsType = "rounded";
+    if (!canAccess("pro") && preview.dotsType === "extra-rounded") preview.dotsType = "rounded";
+    if (!canAccess("pro") && preview.cornerStyle === "dot") preview.cornerStyle = "extra-rounded";
+    if (!canAccess("pro")) {
+      preview.logoDataUrl = "";
+      preview.transparent = false;
+    }
+    return preview;
+  }
+
   function buildQrOptions(state, context) {
     const mode = context?.mode || "preview";
-    const size = context?.size || (mode === "preview" ? state.previewSize : state.exportSize);
-    const bg = state.transparent && mode === "export" ? "rgba(255,255,255,0)" : state.bgColor;
-    const data = getQrData(state, mode);
-    const colorOptions = colorOptionsForState(state);
+    const sourceState = mode === "preview" ? getPreviewState(state) : state;
+    const size = context?.size || (mode === "preview" ? sourceState.previewSize : sourceState.exportSize);
+    const bg = sourceState.transparent && mode === "export" ? "rgba(255,255,255,0)" : sourceState.bgColor;
+    const data = getQrData(sourceState, mode);
+    const colorOptions = colorOptionsForState(sourceState);
 
     return {
       width: size,
       height: size,
       type: context?.type || "canvas",
       data,
-      margin: state.margin,
-      image: state.logoDataUrl || undefined,
+      margin: sourceState.margin,
+      image: sourceState.logoDataUrl || undefined,
       qrOptions: {
-        errorCorrectionLevel: state.errorCorrection || "H"
+        errorCorrectionLevel: sourceState.errorCorrection || "H"
       },
       dotsOptions: {
-        type: state.dotsType,
+        type: sourceState.dotsType,
         ...colorOptions
       },
       cornersSquareOptions: {
-        type: state.cornerStyle || "extra-rounded",
+        type: sourceState.cornerStyle || "extra-rounded",
         ...colorOptions
       },
       cornersDotOptions: {
-        type: state.cornerStyle === "dot" ? "dot" : "square",
+        type: sourceState.cornerStyle === "dot" ? "dot" : "square",
         ...colorOptions
       },
       backgroundOptions: {
@@ -881,8 +906,8 @@
       },
       imageOptions: {
         crossOrigin: "anonymous",
-        margin: state.logoMargin,
-        imageSize: state.logoSize
+        margin: sourceState.logoMargin,
+        imageSize: sourceState.logoSize
       }
     };
   }
@@ -922,6 +947,7 @@
     box.classList.remove("is-updating");
     updateNotices(state);
     updateLocks();
+    updatePreviewGate(state);
   }
 
   function updateNotices(state) {
@@ -940,7 +966,7 @@
     if (notice) notice.textContent = text;
     if (inline) inline.textContent = text;
 
-    const warnings = buildWarnings(state);
+    const warnings = buildWarnings(getPreviewState(state));
     renderWarnings(warnings);
 
     const health = $("qgHealthBadge");
@@ -1008,13 +1034,17 @@
     if (!message || document.activeElement === message) return;
     if (message.textContent.trim()) return;
     if (selectedLocks.length) {
-      setMessage(`${selectedLocks[0].label} is available on QRGen ${PLAN_LABELS[selectedLocks[0].plan]}. You can preview it here.`, "warn", false);
+      setMessage(`${selectedLocks[0].label} is available on QRGen ${PLAN_LABELS[selectedLocks[0].plan]}. ${tq("preview.locked_message", "This premium feature is hidden from the Free preview. Upgrade to apply it.")}`, "warn", false);
     }
   }
 
   function getSelectedLockedFeatures(state) {
     const locks = [];
+    if (state.dotsType === "classy" && !canAccess("launch")) locks.push({ plan: "launch", label: "Classy dot style" });
+    if (state.dotsType === "extra-rounded" && !canAccess("pro")) locks.push({ plan: "pro", label: "Extra-rounded dot style" });
+    if (state.cornerStyle === "dot" && !canAccess("pro")) locks.push({ plan: "pro", label: "Dot corner style" });
     if (state.colorMode === "gradient" && !canAccess("launch")) locks.push({ plan: "launch", label: "Gradient styles" });
+    if (state.colorMode === "metallic" && !canAccess("pro")) locks.push({ plan: "pro", label: "Metallic styles" });
     if (state.exportFormat === "png-hd" && !canAccess("launch")) locks.push({ plan: "launch", label: "HD PNG export" });
     if (state.exportFormat === "svg" && !canAccess("pro")) locks.push({ plan: "pro", label: "SVG export" });
     if (state.exportSize >= 2048 && !canAccess("launch")) locks.push({ plan: "launch", label: "2048px export" });
@@ -1022,6 +1052,185 @@
     if (state.transparent && !canAccess("pro")) locks.push({ plan: "pro", label: "Transparent background" });
     if (state.logoDataUrl && !canAccess("pro")) locks.push({ plan: "pro", label: "Logo export" });
     return locks;
+  }
+
+  function isPremiumExportRequest(state) {
+    return state.exportFormat === "png-hd"
+      || state.exportFormat === "svg"
+      || state.exportSize >= 2048
+      || state.colorMode === "gradient"
+      || state.colorMode === "metallic"
+      || state.dotsType === "classy"
+      || state.dotsType === "extra-rounded"
+      || state.cornerStyle === "dot"
+      || state.transparent
+      || Boolean(state.logoDataUrl);
+  }
+
+  async function requestPremiumExport(state) {
+    const session = await ensureSession();
+    if (!session) {
+      setMessage(getLang() === "pt"
+        ? "Entre na sua conta para confirmar a autorização desta exportação premium."
+        : "Sign in to confirm authorization for this premium export.", "warn", false);
+      window.VxLab?.confirmLogin?.(
+        window.VxLab?.currentReturnPath?.() || "/qrgen/",
+        getLang() === "pt"
+          ? "Entre para exportar recursos premium. Você voltará ao QRGen depois do login."
+          : "Sign in to export premium features. You will return to QRGen after login."
+      );
+      return false;
+    }
+
+    const cfg = await loadConfig();
+    const functionsUrl = String(cfg.functionsUrl || `${String(cfg.supabaseUrl || "").replace(/\/$/, "")}/functions/v1`).replace(/\/$/, "");
+    if (!functionsUrl || functionsUrl === "/functions/v1") {
+      setMessage(getLang() === "pt"
+        ? "Não foi possível confirmar a autorização premium. Tente novamente em instantes."
+        : "Premium authorization could not be confirmed. Please try again in a moment.", "err", false);
+      return false;
+    }
+
+    try {
+      const response = await fetch(`${functionsUrl}/qrgen-export`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          request: {
+            content: getQrData(state, "export"),
+            mode: state.mode,
+            dynamicShortUrl: state.dynamicShortUrl,
+            format: state.exportFormat,
+            exportFormat: state.exportFormat,
+            exportSize: state.exportSize,
+            margin: state.margin,
+            colorMode: state.colorMode,
+            dotColor: state.dotColor,
+            dotColor2: state.dotColor2,
+            metallicPreset: state.metallicPreset,
+            bgColor: state.bgColor,
+            dotsType: state.dotsType,
+            cornerStyle: state.cornerStyle,
+            transparent: state.transparent,
+            logoDataUrl: state.logoDataUrl,
+            logoSize: state.logoSize,
+            logoMargin: state.logoMargin,
+          },
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        if (data.error === "plan_required") {
+          const required = PLAN_LABELS[normalizePlan(data.required_plan)] || "paid plan";
+          const message = getLang() === "pt"
+            ? `Esta exportação exige QRGen ${required}. O arquivo premium não foi gerado.`
+            : `This export requires QRGen ${required}. The premium file was not generated.`;
+          setMessage(message, "warn", false);
+          window.VxLab?.confirmUpgrade?.(`${message}\n\n${getLang() === "pt" ? "Clique em OK para ver os planos." : "Click OK to view plans."}`);
+        } else {
+          setMessage(getLang() === "pt"
+            ? "Não foi possível confirmar sua autorização premium. Nenhum arquivo foi gerado."
+            : "Premium authorization could not be confirmed. No file was generated.", "err", false);
+        }
+        return false;
+      }
+
+      if (!data.ok || !data.svg) throw new Error("Invalid premium export response");
+      const output = state.exportFormat === "svg"
+        ? new Blob([data.svg], { type: "image/svg+xml;charset=utf-8" })
+        : await svgToPngBlob(data.svg, Number(data.size) || state.exportSize);
+      saveBlob(output, data.filename || `volynx-qrgen-premium.${state.exportFormat === "svg" ? "svg" : "png"}`);
+      if (window.VxLab) {
+        VxLab.recordEvent("qr-gen", "export", `${state.exportFormat.toUpperCase()} premium export authorized by server`);
+        VxLab.savePreset("qr-gen", {
+          mode: state.mode,
+          format: state.exportFormat,
+          color: state.colorMode,
+          size: String(state.exportSize),
+          payment: "plan/server-authorized",
+        });
+      }
+      setMessage(getLang() === "pt" ? "Exportação premium concluída. Teste o QR antes de enviar para impressão." : "Premium export complete. Test the QR before sending to print.", "ok");
+      showExportSuccess();
+      return true;
+    } catch (error) {
+      console.error("[qrgen] premium export failed", error);
+      setMessage(getLang() === "pt"
+        ? "A exportação premium está indisponível. Nenhum arquivo foi gerado. Tente novamente."
+        : "Premium export is unavailable. No file was generated. Please try again.", "err", false);
+      return false;
+    }
+  }
+
+  function svgToPngBlob(svg, size) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }));
+      const image = new Image();
+      image.onload = () => {
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = size;
+          canvas.height = size;
+          canvas.getContext("2d").drawImage(image, 0, 0, size, size);
+          canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("PNG conversion failed")), "image/png");
+        } catch (error) {
+          reject(error);
+        } finally {
+          URL.revokeObjectURL(url);
+        }
+      };
+      image.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error("Premium SVG could not be rasterized"));
+      };
+      image.src = url;
+    });
+  }
+
+  function updatePreviewGate(state) {
+    const gate = $("qgPreviewGate");
+    if (!gate) return;
+    const locked = getSelectedLockedFeatures(state);
+    gate.hidden = !locked.length;
+    if (!locked.length) return;
+
+    const kicker = $("qgPreviewGateEyebrow");
+    const title = $("qgPreviewGateTitle");
+    const copy = $("qgPreviewGateCopy");
+    const cta = $("qgPreviewGateCta");
+    if (kicker) kicker.textContent = tq("preview.locked_kicker", "Limited preview");
+    if (title) title.textContent = tq("preview.locked_title", "Premium features are hidden from the Free preview.");
+    if (copy) copy.textContent = tq("preview.locked_copy", "This preview stays basic. Upgrade to apply the selected feature and export it.");
+    if (cta) {
+      cta.textContent = tq("preview.locked_cta", "View plans");
+      cta.href = "/pricing/#qrgen-plans";
+    }
+  }
+
+  function updatePlanLocks() {
+    qa("[data-plan-required]").forEach((el) => {
+      const required = normalizePlan(el.getAttribute("data-plan-required"));
+      const locked = !canAccess(required);
+      el.disabled = locked;
+      el.classList.toggle("is-locked", locked);
+      if (locked) el.title = `QRGen ${PLAN_LABELS[required]} required`;
+      else el.removeAttribute("title");
+    });
+
+    ["qgDotsType", "qgCornerStyle", "qgColorMode", "qgExportFormat", "qgExportSize"].forEach((id) => {
+      const select = $(id);
+      const selected = select?.selectedOptions?.[0];
+      if (!select || !selected?.disabled) return;
+      const fallback = Array.from(select.options).find((option) => !option.disabled);
+      if (fallback) select.value = fallback.value;
+    });
+
+    const transparent = $("qgTransparent");
+    if (transparent && !canAccess("pro")) transparent.checked = false;
+    updateConditionalControls();
   }
 
   function validateExport(state) {
@@ -1056,17 +1265,16 @@
         ok: false,
         kind: "warn",
         action: window.VxLab?.hasAccessToken() ? "upgrade" : "login",
-        message: `Free export limit reached for today (${FREE_EXPORT_LIMIT}). QRGen Launch unlocks a production workflow.`
+        message: `Free export limit reached for this week (${FREE_EXPORT_LIMIT}). QRGen Launch unlocks a production workflow.`
       };
     }
     return { ok: true };
   }
 
   function canUseVxForLockedExport(state, locked) {
-    return state.exportFormat === "svg"
-      && Array.isArray(locked)
-      && locked.length === 1
-      && locked[0].label === "SVG export";
+    // Keep the one-off VX path closed until it can receive the same
+    // server-authorized export receipt as plan-based premium exports.
+    return false;
   }
 
   async function spendVxForSvgExport(state) {
@@ -1106,12 +1314,12 @@
   function getUsage() {
     try {
       const raw = localStorage.getItem(USAGE_STORAGE_KEY);
-      const today = todayKey();
-      if (!raw) return { date: today, used: 0 };
+      const week = weekKey();
+      if (!raw) return { week, used: 0 };
       const parsed = JSON.parse(raw);
-      return parsed.date === today ? parsed : { date: today, used: 0 };
+      return parsed.week === week ? parsed : { week, used: 0 };
     } catch (_) {
-      return { date: todayKey(), used: 0 };
+      return { week: weekKey(), used: 0 };
     }
   }
 
@@ -1159,6 +1367,10 @@
         await exportQrFile(state, { vxCost: VX_SVG_EXPORT_COST });
         return;
       }
+      if (validation.action === "upgrade" && isPremiumExportRequest(state)) {
+        await requestPremiumExport(state);
+        return;
+      }
       if (validation.action === "login" && window.VxLab) {
         VxLab.confirmLogin(
           VxLab.currentReturnPath(),
@@ -1175,6 +1387,10 @@
       return;
     }
 
+    if (isPremiumExportRequest(state)) {
+      await requestPremiumExport(state);
+      return;
+    }
     await exportQrFile(state);
   }
 

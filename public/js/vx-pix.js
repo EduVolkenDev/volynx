@@ -12,13 +12,12 @@ window.VxPix = (function () {
     return localStorage.getItem('volynx_access_token') || '';
   }
 
-  async function getApiBase() {
+  async function getApiConfig() {
     try {
       var res = await fetch('/config.json', { cache: 'no-store' });
-      var cfg = await res.json();
-      return (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
+      return await res.json();
     } catch (_) {
-      return '';
+      return {};
     }
   }
 
@@ -31,12 +30,14 @@ window.VxPix = (function () {
       title: 'Opening Pix checkout',
       detail: 'Stripe will show the Pix QR code and confirm the payment securely.',
       error: 'Could not start Pix checkout. Try again.',
+      unavailable: 'Pix is not available for this account yet.',
       close: 'Close',
     },
     pt: {
       title: 'Abrindo checkout Pix',
       detail: 'A Stripe vai mostrar o QR code Pix e confirmar o pagamento com segurança.',
       error: 'Não foi possível iniciar o Pix. Tente novamente.',
+      unavailable: 'O Pix ainda não está disponível para esta conta.',
       close: 'Fechar',
     },
   };
@@ -99,7 +100,13 @@ window.VxPix = (function () {
       return;
     }
 
-    var apiBase = await getApiBase();
+    var cfg = await getApiConfig();
+    if (cfg.pixEnabled !== true) {
+      showModal({ error: t('unavailable') });
+      return;
+    }
+
+    var apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
     if (!apiBase) {
       showModal({ error: 'API not configured' });
       return;

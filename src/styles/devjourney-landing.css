@@ -121,6 +121,7 @@ body.page-dev-journey {
 .dj-system__art {
   position: relative;
   width: min(100%, 300px);
+  height: auto;
   z-index: 1;
   filter: drop-shadow(0 26px 42px rgba(0, 0, 0, 0.32));
   animation: dj-float 8s ease-in-out infinite;
@@ -640,5 +641,2690 @@ body.page-dev-journey {
   .dj-card-art,
   .dj-card-art--feature {
     max-height: 142px;
+  }
+}
+
+/* ── Curriculum refinement -----------------------------------------
+   Keep the roadmap calm and scannable while letting the page-level
+   galaxy atmosphere show through the section edges. */
+.page-dev-journey .dj-curriculum-section {
+  position: relative;
+  isolation: isolate;
+  padding-top: clamp(72px, 9vw, 124px);
+  overflow: clip;
+}
+
+.page-dev-journey .dj-curriculum-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(177, 150, 255, .12), transparent 28%),
+    radial-gradient(circle at 88% 58%, rgba(139, 250, 240, .08), transparent 28%),
+    linear-gradient(180deg, rgba(4, 5, 12, .16), rgba(4, 5, 12, .56));
+}
+
+.page-dev-journey .dj-curriculum-head {
+  gap: clamp(24px, 5vw, 72px);
+  align-items: end;
+}
+
+.page-dev-journey .dj-curriculum-head > div {
+  min-width: 0;
+}
+
+.page-dev-journey .dj-curriculum-head h2 {
+  max-width: 13ch;
+  font-size: clamp(2.15rem, 4.4vw, 3.85rem);
+  line-height: 1.02;
+}
+
+.page-dev-journey .dj-curriculum-head p {
+  margin: 0;
+  max-width: 52ch;
+  padding: 0 0 0 20px;
+  border-left: 2px solid rgba(139, 250, 240, .34);
+  color: rgba(244, 246, 255, .78);
+  font-size: clamp(.98rem, 1.35vw, 1.12rem);
+  line-height: 1.7;
+}
+
+.page-dev-journey .dj-filter {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 520px;
+  margin-top: 22px;
+}
+
+.page-dev-journey .dj-filter__btn {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 14px;
+  border-color: rgba(255, 255, 255, .12);
+  background: rgba(8, 10, 22, .52);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05);
+}
+
+.page-dev-journey .dj-filter__btn.is-active {
+  border-color: rgba(139, 250, 240, .38);
+  background: linear-gradient(135deg, rgba(139, 250, 240, .16), rgba(177, 150, 255, .12));
+  box-shadow: 0 0 24px rgba(139, 250, 240, .08), inset 0 1px 0 rgba(255, 255, 255, .10);
+}
+
+.page-dev-journey .dj-roadmap {
+  position: relative;
+  z-index: 1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.page-dev-journey .dj-track-card,
+.page-dev-journey .dj-track-card--bundle,
+.page-dev-journey .dj-track-card--arsenal {
+  grid-column: auto;
+  min-width: 0;
+  min-height: 100%;
+  padding: 20px;
+  gap: 14px;
+  border-radius: 26px;
+  border-color: rgba(255, 255, 255, .11);
+  background:
+    linear-gradient(180deg, rgba(19, 22, 42, .76), rgba(7, 9, 20, .78)),
+    rgba(8, 10, 22, .56);
+  box-shadow: 0 22px 56px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .06);
+}
+
+.page-dev-journey .dj-track-card:hover {
+  border-color: rgba(139, 250, 240, .28);
+  box-shadow: 0 28px 64px rgba(0, 0, 0, .28), 0 0 30px rgba(139, 250, 240, .06), inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+
+.page-dev-journey .dj-track-card--pro {
+  border-color: rgba(139, 250, 240, .24);
+  background: linear-gradient(180deg, rgba(12, 51, 61, .72), rgba(7, 9, 20, .82));
+}
+
+.page-dev-journey .dj-track-card--bundle,
+.page-dev-journey .dj-track-card--arsenal {
+  border-color: rgba(243, 225, 160, .22);
+  background: linear-gradient(180deg, rgba(51, 42, 38, .70), rgba(9, 9, 20, .84));
+}
+
+.page-dev-journey .dj-track-card__top {
+  min-height: 74px;
+  align-content: flex-start;
+}
+
+.page-dev-journey .dj-track-card__num {
+  padding-top: 8px;
+}
+
+.page-dev-journey .dj-track-card__badge {
+  max-width: 100%;
+  text-align: center;
+}
+
+.page-dev-journey .dj-plan-chip {
+  flex-basis: 100%;
+  width: fit-content;
+  max-width: 100%;
+  margin-left: 0;
+  min-height: 34px;
+  padding: 7px 11px;
+  font-size: .7rem;
+}
+
+.page-dev-journey .dj-card-art-shell--roadmap {
+  height: 176px;
+  min-height: 176px;
+  padding: 12px;
+  border-radius: 21px;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(139, 250, 240, .14), transparent 56%),
+    linear-gradient(180deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .025));
+}
+
+.page-dev-journey .dj-card-art {
+  width: min(100%, 184px);
+  max-height: 166px;
+}
+
+.page-dev-journey .dj-card-art--wide {
+  width: min(100%, 244px);
+  max-height: 158px;
+}
+
+.page-dev-journey .dj-track-card h3 {
+  max-width: 24ch;
+  font-size: clamp(1.18rem, 1.65vw, 1.5rem);
+  line-height: 1.12;
+  letter-spacing: 0;
+}
+
+.page-dev-journey .dj-track-card p {
+  color: rgba(233, 237, 250, .70);
+  font-size: .94rem;
+  line-height: 1.62;
+}
+
+.page-dev-journey .dj-track-card .detail-list {
+  width: 100%;
+  margin: auto 0 0;
+  padding: 14px 15px;
+  gap: 9px;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 18px;
+  background: rgba(4, 6, 15, .38);
+  font-size: .80rem;
+  font-weight: 600;
+  letter-spacing: .01em;
+  line-height: 1.46;
+  text-shadow: none;
+}
+
+@media (min-width: 1024px) {
+  .page-dev-journey .dj-curriculum-head {
+    grid-template-columns: minmax(0, 1.08fr) minmax(320px, .92fr);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .page-dev-journey .dj-curriculum-head {
+    grid-template-columns: 1fr;
+  }
+
+  .page-dev-journey .dj-roadmap {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .page-dev-journey .dj-curriculum-section {
+    padding-top: 68px;
+  }
+
+  .page-dev-journey .dj-curriculum-head p {
+    padding: 16px 0 0;
+    border-top: 1px solid rgba(139, 250, 240, .26);
+    border-left: 0;
+  }
+
+  .page-dev-journey .dj-roadmap {
+    grid-template-columns: 1fr;
+  }
+
+  .page-dev-journey .dj-track-card__top {
+    min-height: 0;
+  }
+
+  .page-dev-journey .dj-card-art-shell--roadmap {
+    height: 156px;
+    min-height: 156px;
+  }
+}
+
+/* ── Dev Journey composition pass ----------------------------------
+   Keep the premium assets prominent without turning every section into
+   a full-height nested panel, especially on narrow screens. */
+.page-dev-journey .dj-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: clamp(26px, 4vw, 42px);
+  border-color: rgba(255, 255, 255, .11);
+  background:
+    radial-gradient(circle at 82% 16%, rgba(139, 250, 240, .12), transparent 28%),
+    radial-gradient(circle at 6% 92%, rgba(177, 150, 255, .13), transparent 34%),
+    linear-gradient(135deg, rgba(18, 21, 37, .88), rgba(7, 9, 18, .78));
+  box-shadow: 0 30px 90px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+
+.page-dev-journey .dj-hero::before {
+  content: "";
+  position: absolute;
+  width: 42%;
+  aspect-ratio: 1;
+  right: 7%;
+  top: 4%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139, 250, 240, .12), transparent 68%);
+  filter: blur(18px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.page-dev-journey .dj-hero__copy,
+.page-dev-journey .dj-system {
+  position: relative;
+  z-index: 1;
+}
+
+.page-dev-journey .dj-system {
+  align-content: start;
+  padding: 8px 0 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.page-dev-journey .dj-system__art-shell {
+  min-height: clamp(260px, 30vw, 360px);
+  border: 0;
+  background:
+    radial-gradient(circle at 50% 44%, rgba(139, 250, 240, .15), transparent 52%),
+    radial-gradient(circle at 50% 90%, rgba(243, 225, 160, .12), transparent 42%);
+}
+
+.page-dev-journey .dj-system__art {
+  width: min(100%, 370px);
+}
+
+.page-dev-journey .dj-system__links {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.page-dev-journey .dj-system__link {
+  min-width: 0;
+  padding: 13px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .035);
+}
+
+.page-dev-journey .platform-assist {
+  padding-top: clamp(16px, 2.4vw, 24px);
+}
+
+.page-dev-journey .platform-assist__frame {
+  border-radius: clamp(26px, 4vw, 38px);
+  padding: clamp(20px, 3vw, 30px);
+  background:
+    radial-gradient(circle at 8% 100%, rgba(177, 150, 255, .10), transparent 30%),
+    linear-gradient(135deg, rgba(19, 23, 41, .76), rgba(7, 10, 19, .70));
+  box-shadow: 0 26px 74px rgba(0, 0, 0, .20), inset 0 1px 0 rgba(255, 255, 255, .07);
+}
+
+.page-dev-journey .platform-assist__head {
+  grid-template-columns: minmax(180px, .48fr) minmax(0, 1.52fr);
+  align-items: end;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.page-dev-journey .platform-assist__head h2 {
+  max-width: 30ch;
+}
+
+.page-dev-journey .platform-assist__grid {
+  grid-template-columns: minmax(1.3fr, 1.3fr) repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.page-dev-journey .platform-assist__card,
+.page-dev-journey .platform-assist__card.has-art {
+  min-height: 0 !important;
+  padding: 14px;
+  gap: 13px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .035);
+}
+
+.page-dev-journey .platform-assist__card.is-emphasized {
+  background: linear-gradient(160deg, rgba(45, 212, 191, .10), rgba(255, 255, 255, .035));
+}
+
+.page-dev-journey .platform-assist__art-shell {
+  min-height: 150px !important;
+  padding: 4px;
+  border-radius: 16px;
+  border-color: rgba(255, 255, 255, .07);
+  background: rgba(6, 10, 24, .42);
+}
+
+.page-dev-journey .platform-assist__art {
+  width: min(100%, 190px);
+  max-height: 164px !important;
+}
+
+.page-dev-journey .platform-assist__copy {
+  gap: 6px;
+}
+
+.page-dev-journey .platform-assist__card p {
+  line-height: 1.5;
+}
+
+@media (max-width: 1099px) and (min-width: 768px) {
+  .page-dev-journey .platform-assist__head {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .page-dev-journey .platform-assist__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .page-dev-journey .dj-hero h1 {
+    max-width: 14ch;
+    font-size: clamp(2.55rem, 4.7vw, 4rem);
+  }
+}
+
+@media (max-width: 767px) {
+  .page-dev-journey .dj-hero {
+    gap: 20px;
+    padding: 18px;
+    border-radius: 28px;
+  }
+
+  .page-dev-journey .dj-hero h1 {
+    max-width: 15ch;
+    font-size: clamp(2rem, 10.5vw, 3rem);
+    line-height: .98;
+  }
+
+  .page-dev-journey .dj-lead {
+    font-size: .98rem;
+    line-height: 1.58;
+  }
+
+  .page-dev-journey .dj-hero__notice {
+    gap: 6px;
+    padding: 14px 15px;
+    border-radius: 18px;
+  }
+
+  .page-dev-journey .dj-hero__notice span {
+    line-height: 1.52;
+  }
+
+  .page-dev-journey .dj-hero__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .page-dev-journey .dj-hero__actions .button {
+    width: 100%;
+    min-height: 44px;
+    padding-inline: 10px;
+  }
+
+  .page-dev-journey .dj-hero__actions .button--gold {
+    grid-column: 1 / -1;
+  }
+
+  .page-dev-journey .dj-hero__stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 0;
+  }
+
+  .page-dev-journey .dj-hero__stats > div {
+    min-width: 0;
+    padding: 10px 8px;
+    border-radius: 14px;
+  }
+
+  .page-dev-journey .dj-hero__stats strong {
+    font-size: .72rem;
+    line-height: 1.2;
+  }
+
+  .page-dev-journey .dj-hero__stats span {
+    font-size: .68rem;
+    line-height: 1.35;
+  }
+
+  .page-dev-journey .dj-system {
+    grid-template-columns: 104px minmax(0, 1fr);
+    gap: 8px 14px;
+    padding-top: 2px;
+  }
+
+  .page-dev-journey .dj-system__art-shell {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    min-height: 104px;
+    padding: 0;
+  }
+
+  .page-dev-journey .dj-system__art {
+    width: 118px;
+  }
+
+  .page-dev-journey .dj-system .eyebrow {
+    align-self: end;
+    font-size: .65rem;
+  }
+
+  .page-dev-journey .dj-system h2 {
+    align-self: center;
+    font-size: 1.18rem;
+    line-height: 1.08;
+  }
+
+  .page-dev-journey .dj-system p {
+    align-self: start;
+    font-size: .78rem;
+    line-height: 1.42;
+  }
+
+  .page-dev-journey .dj-system__links {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .page-dev-journey .dj-system__link {
+    padding: 10px 9px;
+    border-radius: 13px;
+  }
+
+  .page-dev-journey .dj-system__link strong {
+    font-size: .75rem;
+  }
+
+  .page-dev-journey .dj-system__link span {
+    font-size: .66rem;
+    line-height: 1.35;
+  }
+
+  .page-dev-journey .platform-assist__frame {
+    padding: 16px;
+    border-radius: 26px;
+  }
+
+  .page-dev-journey .platform-assist__head {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .page-dev-journey .platform-assist__head h2 {
+    font-size: 1.35rem;
+  }
+
+  .page-dev-journey .platform-assist__head p {
+    margin-top: 6px;
+    font-size: .84rem;
+    line-height: 1.5;
+  }
+
+  .page-dev-journey .platform-assist__grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .page-dev-journey .platform-assist__card,
+  .page-dev-journey .platform-assist__card.has-art {
+    display: grid;
+    grid-template-columns: 94px minmax(0, 1fr);
+    align-items: center;
+    min-height: 0;
+    padding: 11px;
+    gap: 12px;
+    border-radius: 17px;
+  }
+
+  .page-dev-journey .platform-assist__art-shell {
+    grid-row: 1;
+    min-height: 94px !important;
+    padding: 2px;
+    border-radius: 13px;
+  }
+
+  .page-dev-journey .platform-assist__art {
+    width: 100%;
+    max-height: 94px !important;
+  }
+
+  .page-dev-journey .platform-assist__copy {
+    min-width: 0;
+  }
+
+  .page-dev-journey .platform-assist__label {
+    font-size: .64rem;
+  }
+
+  .page-dev-journey .platform-assist__card strong {
+    font-size: .92rem;
+  }
+
+  .page-dev-journey .platform-assist__card p {
+    font-size: .76rem;
+    line-height: 1.42;
+  }
+}
+
+/* ── Dev Journey open composition -----------------------------------
+   Fewer framed layers: assets sit in the card space instead of inside
+   smaller cards, with stronger scale and balanced text/art rhythm. */
+.page-dev-journey .dj-system,
+.page-dev-journey .platform-assist__card.has-art,
+.page-dev-journey .dj-track-card,
+.page-dev-journey .dj-step-card,
+.page-dev-journey .dj-project-card,
+.page-dev-journey .dj-plan-card,
+.page-dev-journey .dj-next-card {
+  overflow: hidden;
+}
+
+.page-dev-journey .dj-system__art-shell,
+.page-dev-journey .platform-assist__art-shell,
+.page-dev-journey .dj-card-art-shell {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.page-dev-journey .dj-system__art-shell::after,
+.page-dev-journey .platform-assist__art-shell::before,
+.page-dev-journey .dj-card-art-shell::before {
+  opacity: .95;
+}
+
+.page-dev-journey .platform-assist__frame {
+  padding: clamp(24px, 3.8vw, 42px);
+}
+
+.page-dev-journey .platform-assist__grid {
+  gap: 14px;
+}
+
+.page-dev-journey .platform-assist__card,
+.page-dev-journey .platform-assist__card.has-art {
+  display: grid;
+  align-items: center;
+  align-content: center;
+  justify-content: space-between;
+  min-height: 250px !important;
+  padding: clamp(18px, 2.1vw, 26px);
+  gap: clamp(12px, 1.8vw, 22px);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 86% 18%, rgba(139, 250, 240, .12), transparent 36%),
+    rgba(255, 255, 255, .028);
+}
+
+.page-dev-journey .platform-assist__card.has-art {
+  grid-template-rows: minmax(122px, 1fr) auto;
+}
+
+.page-dev-journey .platform-assist__art-shell {
+  min-height: clamp(126px, 14vw, 180px) !important;
+  padding: 0;
+}
+
+.page-dev-journey .platform-assist__art {
+  width: min(122%, 260px);
+  max-height: 220px !important;
+  transform: translateY(-8px) scale(1.14);
+  filter: saturate(1.1) brightness(1.05) drop-shadow(0 24px 34px rgba(0, 0, 0, .34));
+}
+
+.page-dev-journey .platform-assist__card:hover .platform-assist__art {
+  transform: translateY(-12px) scale(1.2);
+}
+
+.page-dev-journey .platform-assist__copy {
+  align-self: center;
+}
+
+.page-dev-journey .dj-track-card,
+.page-dev-journey .dj-track-card--bundle,
+.page-dev-journey .dj-track-card--arsenal {
+  display: grid;
+  grid-template-rows: auto minmax(170px, 1fr) auto auto;
+  align-content: center;
+  justify-content: space-between;
+  padding: clamp(18px, 2vw, 26px);
+  gap: 12px;
+  border-radius: 20px;
+}
+
+.page-dev-journey .dj-card-art-shell--roadmap {
+  height: clamp(178px, 16vw, 230px);
+  min-height: clamp(178px, 16vw, 230px);
+  padding: 0;
+}
+
+.page-dev-journey .dj-track-card .dj-card-art {
+  width: min(128%, 276px);
+  max-height: 244px;
+  transform: translateY(-8px) scale(1.16);
+  filter: saturate(1.08) brightness(1.04) drop-shadow(0 28px 36px rgba(0, 0, 0, .34));
+}
+
+.page-dev-journey .dj-track-card .dj-card-art--wide {
+  width: min(138%, 340px);
+  max-height: 230px;
+}
+
+.page-dev-journey .dj-track-card:hover .dj-card-art {
+  transform: translateY(-14px) scale(1.22);
+}
+
+.page-dev-journey .dj-track-card .detail-list {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.page-dev-journey .dj-method-grid,
+.page-dev-journey #projects .grid-3,
+.page-dev-journey .dj-upgrade-grid,
+.page-dev-journey #whats-next .grid-3 {
+  gap: clamp(14px, 2vw, 22px);
+}
+
+.page-dev-journey .dj-step-card,
+.page-dev-journey .dj-project-card,
+.page-dev-journey .dj-plan-card {
+  align-content: center;
+  justify-content: space-between;
+  min-height: clamp(320px, 29vw, 400px);
+  padding: clamp(18px, 2.2vw, 26px);
+  border-radius: 20px;
+}
+
+.page-dev-journey .dj-card-art-shell--feature,
+.page-dev-journey .dj-card-art-shell--plan {
+  min-height: clamp(170px, 17vw, 230px);
+  padding: 0;
+}
+
+.page-dev-journey .dj-card-art--feature,
+.page-dev-journey .dj-plan-card .dj-card-art {
+  width: min(126%, 290px);
+  max-height: 246px;
+  transform: translateY(-10px) scale(1.15);
+}
+
+.page-dev-journey .dj-step-card:hover .dj-card-art--feature,
+.page-dev-journey .dj-project-card:hover .dj-card-art--feature,
+.page-dev-journey .dj-plan-card:hover .dj-card-art {
+  transform: translateY(-16px) scale(1.21);
+}
+
+.page-dev-journey .dj-next-card {
+  position: relative;
+  justify-content: space-between;
+  min-height: 270px;
+  padding: clamp(18px, 2.2vw, 26px);
+  border-radius: 20px;
+}
+
+.page-dev-journey .dj-next-card .card-asset {
+  width: min(52%, 260px);
+  max-width: 280px;
+  top: -28px;
+  right: -32px;
+  opacity: .88;
+  transform: scale(1.12);
+}
+
+@media (min-width: 1100px) {
+  .page-dev-journey .platform-assist__card.has-art {
+    grid-template-rows: minmax(152px, 1fr) auto;
+  }
+
+  .page-dev-journey .platform-assist__art {
+    width: min(136%, 292px);
+    max-height: 250px !important;
+  }
+}
+
+@media (max-width: 899px) {
+  .page-dev-journey .dj-track-card,
+  .page-dev-journey .dj-step-card,
+  .page-dev-journey .dj-project-card,
+  .page-dev-journey .dj-plan-card {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .page-dev-journey .platform-assist__card,
+  .page-dev-journey .platform-assist__card.has-art {
+    grid-template-columns: minmax(106px, .42fr) minmax(0, .58fr);
+    grid-template-rows: auto;
+    min-height: 136px !important;
+    padding: 14px 16px;
+    gap: 14px;
+  }
+
+  .page-dev-journey .platform-assist__art-shell {
+    min-height: 118px !important;
+  }
+
+  .page-dev-journey .platform-assist__art {
+    width: 146px;
+    max-height: 142px !important;
+    transform: translateX(-10px) scale(1.12);
+  }
+
+  .page-dev-journey .platform-assist__card:hover .platform-assist__art {
+    transform: translateX(-12px) translateY(-3px) scale(1.16);
+  }
+
+  .page-dev-journey .dj-track-card,
+  .page-dev-journey .dj-track-card--bundle,
+  .page-dev-journey .dj-track-card--arsenal {
+    grid-template-rows: auto auto auto auto;
+    padding: 18px;
+  }
+
+  .page-dev-journey .dj-card-art-shell--roadmap,
+  .page-dev-journey .dj-card-art-shell--feature,
+  .page-dev-journey .dj-card-art-shell--plan {
+    min-height: 150px;
+    height: auto;
+  }
+
+  .page-dev-journey .dj-track-card .dj-card-art,
+  .page-dev-journey .dj-card-art--feature,
+  .page-dev-journey .dj-plan-card .dj-card-art {
+    width: min(118%, 230px);
+    max-height: 196px;
+  }
+
+  .page-dev-journey .dj-next-card .card-asset {
+    width: min(54%, 210px);
+    top: -22px;
+    right: -26px;
+  }
+}
+
+/* ── Dev Journey anti-nesting polish --------------------------------
+   Prefer one composed surface per item: asset and copy share the same
+   space instead of separate boxed thumbnails inside boxed cards. */
+.page-dev-journey .platform-assist__grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.page-dev-journey .platform-assist__card,
+.page-dev-journey .platform-assist__card.has-art {
+  grid-template-columns: minmax(150px, .42fr) minmax(0, .58fr);
+  grid-template-rows: auto;
+  min-height: 190px !important;
+}
+
+.page-dev-journey .platform-assist__art-shell {
+  min-height: 156px !important;
+  justify-content: center;
+}
+
+.page-dev-journey .platform-assist__copy {
+  display: flex;
+  min-width: 0;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.page-dev-journey .platform-assist__art {
+  width: min(148%, 310px);
+  max-height: 260px !important;
+}
+
+.page-dev-journey .dj-method-grid,
+.page-dev-journey #projects .grid-3 {
+  grid-template-columns: 1fr;
+}
+
+.page-dev-journey .dj-step-card,
+.page-dev-journey .dj-project-card {
+  display: grid;
+  grid-template-columns: minmax(180px, .42fr) minmax(0, .58fr);
+  grid-template-areas:
+    "art title"
+    "art copy";
+  align-items: center;
+  align-content: center;
+  justify-content: space-between;
+  min-height: 210px;
+  padding: clamp(20px, 2.6vw, 34px);
+  gap: clamp(18px, 3vw, 42px);
+  background:
+    radial-gradient(circle at 17% 50%, rgba(139, 250, 240, .12), transparent 32%),
+    linear-gradient(135deg, rgba(255, 255, 255, .055), rgba(255, 255, 255, .018)),
+    rgba(6, 9, 18, .54);
+}
+
+.page-dev-journey .dj-step-card .dj-card-art-shell,
+.page-dev-journey .dj-project-card .dj-card-art-shell {
+  grid-area: art;
+  min-height: 174px;
+  justify-content: center;
+}
+
+.page-dev-journey .dj-step-card h3,
+.page-dev-journey .dj-project-card h3,
+.page-dev-journey .dj-plan-card h3,
+.page-dev-journey .dj-next-card h3 {
+  font-family: var(--display);
+  font-size: clamp(1.35rem, 2.2vw, 2rem);
+  line-height: 1.04;
+  letter-spacing: 0;
+  text-align: left;
+}
+
+.page-dev-journey .dj-step-card h3,
+.page-dev-journey .dj-project-card h3 {
+  grid-area: title;
+  align-self: end;
+  justify-self: stretch;
+  width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.page-dev-journey .dj-step-card p,
+.page-dev-journey .dj-project-card p {
+  grid-area: copy;
+  align-self: start;
+  max-width: 54ch;
+  color: rgba(244, 246, 255, .70);
+  line-height: 1.58;
+}
+
+.page-dev-journey .dj-step-card .dj-card-art--feature,
+.page-dev-journey .dj-project-card .dj-card-art--feature {
+  width: min(154%, 330px);
+  max-height: 278px;
+  transform: translateX(-10px) scale(1.16);
+}
+
+.page-dev-journey .dj-step-card:hover .dj-card-art--feature,
+.page-dev-journey .dj-project-card:hover .dj-card-art--feature {
+  transform: translateX(-16px) translateY(-6px) scale(1.23);
+}
+
+.page-dev-journey .dj-upgrade-grid {
+  grid-template-columns: 1fr;
+}
+
+.page-dev-journey .dj-plan-card {
+  display: grid;
+  grid-template-columns: minmax(190px, .34fr) minmax(0, .18fr) minmax(0, .48fr);
+  grid-template-areas:
+    "art label perks"
+    "art price perks"
+    "art tagline cta";
+  align-items: center;
+  align-content: center;
+  justify-content: space-between;
+  min-height: 230px;
+  padding: clamp(20px, 2.8vw, 36px);
+  gap: clamp(14px, 2.6vw, 34px);
+}
+
+.page-dev-journey .dj-plan-card .dj-card-art-shell {
+  grid-area: art;
+  min-height: 190px;
+}
+
+.page-dev-journey .dj-plan-card .label {
+  grid-area: label;
+  width: fit-content;
+}
+
+.page-dev-journey .dj-plan-card__price {
+  grid-area: price;
+}
+
+.page-dev-journey .dj-plan-card__tagline {
+  grid-area: tagline;
+}
+
+.page-dev-journey .dj-plan-card .detail-list {
+  grid-area: perks;
+  align-self: center;
+  margin: 0;
+}
+
+.page-dev-journey .dj-plan-card .button {
+  grid-area: cta;
+  width: fit-content;
+}
+
+.page-dev-journey .dj-plan-card .dj-card-art {
+  width: min(148%, 340px);
+  max-height: 286px;
+  transform: translateX(-14px) scale(1.16);
+}
+
+.page-dev-journey .dj-plan-card:hover .dj-card-art {
+  transform: translateX(-20px) translateY(-8px) scale(1.23);
+}
+
+@media (max-width: 1023px) {
+  .page-dev-journey .platform-assist__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .page-dev-journey .platform-assist__card,
+  .page-dev-journey .platform-assist__card.has-art {
+    grid-template-columns: minmax(116px, .42fr) minmax(0, .58fr);
+    min-height: 142px !important;
+  }
+
+  .page-dev-journey .dj-step-card,
+  .page-dev-journey .dj-project-card {
+    grid-template-columns: minmax(112px, .42fr) minmax(0, .58fr);
+    grid-template-areas:
+      "art title"
+      "art copy";
+    min-height: 156px;
+    padding: 16px;
+    gap: 14px;
+  }
+
+  .page-dev-journey .dj-step-card .dj-card-art-shell,
+  .page-dev-journey .dj-project-card .dj-card-art-shell {
+    min-height: 130px;
+  }
+
+  .page-dev-journey .dj-step-card h3,
+  .page-dev-journey .dj-project-card h3,
+  .page-dev-journey .dj-plan-card h3,
+  .page-dev-journey .dj-next-card h3 {
+    font-size: clamp(1.05rem, 5.8vw, 1.32rem);
+    line-height: 1.08;
+  }
+
+  .page-dev-journey .dj-step-card p,
+  .page-dev-journey .dj-project-card p {
+    font-size: .78rem;
+    line-height: 1.42;
+  }
+
+  .page-dev-journey .dj-step-card .dj-card-art--feature,
+  .page-dev-journey .dj-project-card .dj-card-art--feature {
+    width: 160px;
+    max-height: 150px;
+    transform: translateX(-16px) scale(1.12);
+  }
+
+  .page-dev-journey .dj-plan-card {
+    grid-template-columns: minmax(112px, .38fr) minmax(0, .62fr);
+    grid-template-areas:
+      "art label"
+      "art price"
+      "art tagline"
+      "perks perks"
+      "cta cta";
+    min-height: 0;
+    padding: 16px;
+    gap: 12px 14px;
+  }
+
+  .page-dev-journey .dj-plan-card .dj-card-art-shell {
+    min-height: 132px;
+  }
+
+  .page-dev-journey .dj-plan-card .dj-card-art {
+    width: 172px;
+    max-height: 160px;
+    transform: translateX(-22px) scale(1.1);
+  }
+
+  .page-dev-journey .dj-plan-card .detail-list {
+    margin-top: 4px;
+  }
+
+  .page-dev-journey .dj-plan-card .button {
+    width: 100%;
+  }
+}
+
+/* ── Oversized asset direction --------------------------------------
+   Final product-direction layer: icons should feel bigger than their
+   boxes, with the card acting as a stage instead of a clipping mask. */
+.page-dev-journey .platform-assist__frame,
+.page-dev-journey .platform-assist__grid,
+.page-dev-journey .platform-assist__card,
+.page-dev-journey .platform-assist__card.has-art,
+.page-dev-journey .dj-roadmap,
+.page-dev-journey .dj-track-card,
+.page-dev-journey .dj-step-card,
+.page-dev-journey .dj-project-card,
+.page-dev-journey .dj-upgrade-grid,
+.page-dev-journey .dj-plan-card {
+  overflow: visible;
+}
+
+.page-dev-journey .platform-assist__card,
+.page-dev-journey .dj-track-card,
+.page-dev-journey .dj-step-card,
+.page-dev-journey .dj-project-card,
+.page-dev-journey .dj-plan-card {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+}
+
+.page-dev-journey .platform-assist__art-shell,
+.page-dev-journey .dj-card-art-shell {
+  overflow: visible;
+  z-index: 0;
+}
+
+.page-dev-journey .platform-assist__copy,
+.page-dev-journey .dj-track-card__top,
+.page-dev-journey .dj-track-card h3,
+.page-dev-journey .dj-track-card p,
+.page-dev-journey .dj-track-card .detail-list,
+.page-dev-journey .dj-step-card h3,
+.page-dev-journey .dj-step-card p,
+.page-dev-journey .dj-project-card h3,
+.page-dev-journey .dj-project-card p,
+.page-dev-journey .dj-plan-card .label,
+.page-dev-journey .dj-plan-card__price,
+.page-dev-journey .dj-plan-card__tagline,
+.page-dev-journey .dj-plan-card .detail-list,
+.page-dev-journey .dj-plan-card .button {
+  position: relative;
+  z-index: 2;
+}
+
+.page-dev-journey .platform-assist__art {
+  width: min(205%, 430px);
+  max-width: none;
+  max-height: 370px !important;
+  transform: translate(-54px, -18px) scale(1.34);
+}
+
+.page-dev-journey .platform-assist__card:hover .platform-assist__art {
+  transform: translate(-64px, -28px) scale(1.46);
+}
+
+.page-dev-journey .dj-card-art-shell--roadmap {
+  min-height: clamp(194px, 18vw, 260px);
+}
+
+.page-dev-journey .dj-track-card .dj-card-art {
+  width: min(218%, 450px);
+  max-width: none;
+  max-height: 390px;
+  transform: translate(-48px, -34px) scale(1.44);
+}
+
+.page-dev-journey .dj-track-card .dj-card-art--wide {
+  width: min(236%, 540px);
+  max-height: 370px;
+  transform: translate(-54px, -34px) scale(1.35);
+}
+
+.page-dev-journey .dj-track-card:hover .dj-card-art {
+  transform: translate(-58px, -46px) scale(1.58);
+}
+
+.page-dev-journey .dj-step-card .dj-card-art--feature,
+.page-dev-journey .dj-project-card .dj-card-art--feature {
+  width: min(236%, 520px);
+  max-width: none;
+  max-height: 440px;
+  transform: translate(-86px, -10px) scale(1.42);
+}
+
+.page-dev-journey .dj-step-card:hover .dj-card-art--feature,
+.page-dev-journey .dj-project-card:hover .dj-card-art--feature {
+  transform: translate(-100px, -22px) scale(1.56);
+}
+
+.page-dev-journey .dj-plan-card .dj-card-art {
+  width: min(230%, 540px);
+  max-width: none;
+  max-height: 450px;
+  transform: translate(-92px, -12px) scale(1.44);
+}
+
+.page-dev-journey .dj-plan-card:hover .dj-card-art {
+  transform: translate(-110px, -26px) scale(1.58);
+}
+
+@media (max-width: 1023px) {
+  .page-dev-journey .platform-assist__card {
+    overflow: hidden;
+  }
+
+  .page-dev-journey .platform-assist__art {
+    width: 260px;
+    max-height: 240px !important;
+    transform: translateX(-58px) scale(1.22);
+  }
+
+  .page-dev-journey .dj-track-card,
+  .page-dev-journey .dj-step-card,
+  .page-dev-journey .dj-project-card,
+  .page-dev-journey .dj-plan-card {
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 767px) {
+  .page-dev-journey .platform-assist__art {
+    width: 216px;
+    max-height: 206px !important;
+    transform: translateX(-54px) scale(1.2);
+  }
+
+  .page-dev-journey .dj-track-card .dj-card-art {
+    width: 300px;
+    max-height: 276px;
+    transform: translate(-54px, -12px) scale(1.22);
+  }
+
+  .page-dev-journey .dj-track-card .dj-card-art--wide {
+    width: 330px;
+    max-height: 260px;
+    transform: translate(-62px, -10px) scale(1.16);
+  }
+
+  .page-dev-journey .dj-step-card .dj-card-art--feature,
+  .page-dev-journey .dj-project-card .dj-card-art--feature {
+    width: 250px;
+    max-height: 232px;
+    transform: translateX(-78px) scale(1.22);
+  }
+
+  .page-dev-journey .dj-plan-card .dj-card-art {
+    width: 260px;
+    max-height: 238px;
+    transform: translateX(-86px) scale(1.2);
+  }
+}
+
+/* ── Verified composition overrides -------------------------------
+   This is intentionally the final layer: older asset-scale experiments
+   above remain documented, but cannot re-expand the live composition. */
+.page-dev-journey .platform-assist__grid {
+  grid-template-columns: minmax(0, 1.25fr) repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.page-dev-journey .platform-assist__card,
+.page-dev-journey .platform-assist__card.has-art {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(140px, auto) auto;
+  align-items: stretch;
+  align-content: start;
+  min-height: 0 !important;
+  padding: 16px;
+  gap: 12px;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.page-dev-journey .platform-assist__art-shell {
+  min-height: 148px !important;
+  height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: radial-gradient(circle at 50% 52%, rgba(139, 250, 240, .10), transparent 62%);
+  overflow: visible;
+}
+
+.page-dev-journey .platform-assist__art {
+  width: min(100%, 220px) !important;
+  max-height: 176px !important;
+  transform: none !important;
+  filter: saturate(1.08) brightness(1.04) drop-shadow(0 18px 28px rgba(0, 0, 0, .34));
+}
+
+.page-dev-journey .platform-assist__copy {
+  display: grid;
+  height: auto;
+  align-self: start;
+  gap: 6px;
+}
+
+@media (max-width: 1099px) and (min-width: 768px) {
+  .page-dev-journey .platform-assist__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .page-dev-journey .platform-assist__card,
+  .page-dev-journey .platform-assist__card.has-art {
+    min-height: 290px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .page-dev-journey .platform-assist__grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .page-dev-journey .platform-assist__card,
+  .page-dev-journey .platform-assist__card.has-art {
+    grid-template-columns: 94px minmax(0, 1fr);
+    grid-template-rows: auto;
+    align-items: center;
+    min-height: 0 !important;
+    padding: 11px;
+    gap: 12px;
+    border-radius: 17px;
+  }
+
+  .page-dev-journey .platform-assist__art-shell {
+    grid-row: 1;
+    min-height: 94px !important;
+  }
+
+  .page-dev-journey .platform-assist__art {
+    width: 100% !important;
+    max-height: 94px !important;
+  }
+
+  .page-dev-journey .platform-assist__copy {
+    min-width: 0;
+  }
+}
+
+/* ── Curriculum editorial layout ------------------------------------
+   One open surface per module: the artwork carries the visual weight,
+   while the content stays aligned by rhythm instead of nested boxes. */
+#curriculum.dj-curriculum-section .dj-curriculum-head {
+  position: relative;
+  z-index: 2;
+  margin-bottom: clamp(28px, 4vw, 48px);
+}
+
+#curriculum.dj-curriculum-section .dj-filter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  max-width: none;
+  margin-top: 24px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, .13);
+}
+
+#curriculum.dj-curriculum-section .dj-filter__btn {
+  width: auto;
+  min-height: 0;
+  padding: 7px 0 9px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: rgba(244, 246, 255, .56);
+  font-size: .78rem;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+#curriculum.dj-curriculum-section .dj-filter__btn:hover {
+  transform: none;
+  border-bottom-color: rgba(139, 250, 240, .48);
+  background: transparent;
+  color: rgba(244, 246, 255, .94);
+}
+
+#curriculum.dj-curriculum-section .dj-filter__btn.is-active {
+  border-bottom-color: var(--cyan);
+  background: transparent;
+  box-shadow: none;
+  color: #c8fffb;
+}
+
+#curriculum.dj-curriculum-section .dj-roadmap {
+  position: relative;
+  z-index: 1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  overflow: visible;
+}
+
+#curriculum.dj-curriculum-section .dj-track-card,
+#curriculum.dj-curriculum-section .dj-track-card--pro,
+#curriculum.dj-curriculum-section .dj-track-card--bundle,
+#curriculum.dj-curriculum-section .dj-track-card--arsenal {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  align-content: initial;
+  justify-content: initial;
+  gap: 15px;
+  padding: 0 24px 28px;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#curriculum.dj-curriculum-section .dj-track-card:hover,
+#curriculum.dj-curriculum-section .dj-track-card--pro:hover,
+#curriculum.dj-curriculum-section .dj-track-card--bundle:hover,
+#curriculum.dj-curriculum-section .dj-track-card--arsenal:hover {
+  transform: none;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#curriculum.dj-curriculum-section .dj-track-card__top {
+  display: flex;
+  min-height: 52px;
+  align-items: flex-start;
+  align-content: flex-start;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+#curriculum.dj-curriculum-section .dj-track-card__num {
+  padding-top: 4px;
+  color: rgba(255, 255, 255, .46);
+  font-size: .68rem;
+  letter-spacing: .16em;
+}
+
+#curriculum.dj-curriculum-section .dj-track-card__badge {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: rgba(185, 255, 249, .82);
+  font-size: .68rem;
+  letter-spacing: .10em;
+}
+
+#curriculum.dj-curriculum-section .dj-track-card__badge--gold {
+  border: 0;
+  background: transparent;
+  color: #fff0b6;
+}
+
+#curriculum.dj-curriculum-section .dj-plan-chip {
+  flex-basis: 100%;
+  width: fit-content;
+  min-height: 0;
+  margin: 2px 0 0;
+  padding: 5px 0 7px;
+  border: 0;
+  border-bottom: 1px solid rgba(177, 150, 255, .26);
+  border-radius: 0;
+  background: transparent;
+  color: rgba(220, 207, 255, .78);
+  font-size: .66rem;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+#curriculum.dj-curriculum-section .dj-plan-chip:hover {
+  border-bottom-color: rgba(220, 207, 255, .70);
+  background: transparent;
+}
+
+#curriculum.dj-curriculum-section .dj-card-art-shell--roadmap {
+  position: relative;
+  height: 230px;
+  min-height: 230px;
+  margin: 0 -24px;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#curriculum.dj-curriculum-section .dj-card-art-shell--roadmap::before {
+  inset: auto 10% 8% 10%;
+  height: 46%;
+  background: radial-gradient(ellipse, rgba(139, 250, 240, .16), transparent 70%);
+  filter: blur(24px);
+}
+
+#curriculum.dj-curriculum-section .dj-card-art {
+  position: relative;
+  z-index: 1;
+  width: min(116%, 300px);
+  max-width: none;
+  max-height: 250px;
+  transform: translateY(-13px) scale(1.14);
+  filter: saturate(1.06) brightness(1.04) drop-shadow(0 24px 32px rgba(0, 0, 0, .38));
+  transition: transform .24s cubic-bezier(.16, 1, .3, 1), filter .24s ease;
+}
+
+#curriculum.dj-curriculum-section .dj-card-art--wide {
+  width: min(136%, 350px);
+  max-height: 240px;
+  transform: translateY(-13px) scale(1.08);
+}
+
+#curriculum.dj-curriculum-section .dj-track-card:hover .dj-card-art {
+  transform: translateY(-22px) scale(1.21);
+  filter: saturate(1.10) brightness(1.06) drop-shadow(0 30px 38px rgba(0, 0, 0, .44));
+}
+
+#curriculum.dj-curriculum-section .dj-track-card h3 {
+  max-width: 25ch;
+  font-size: clamp(1.20rem, 1.75vw, 1.52rem);
+  line-height: 1.10;
+  letter-spacing: -.035em;
+}
+
+#curriculum.dj-curriculum-section .dj-track-card p {
+  max-width: 34ch;
+  color: rgba(233, 237, 250, .70);
+  font-size: .92rem;
+  line-height: 1.60;
+}
+
+#curriculum.dj-curriculum-section .dj-track-card .detail-list {
+  width: 100%;
+  margin: auto 0 0;
+  padding: 15px 0 0;
+  gap: 9px;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 0;
+  background: transparent;
+  color: rgba(244, 246, 255, .68);
+  font-size: .79rem;
+  font-weight: 600;
+  letter-spacing: .01em;
+  line-height: 1.46;
+  text-shadow: none;
+}
+
+#curriculum.dj-curriculum-section .dj-track-card .detail-list li {
+  padding-left: 15px;
+}
+
+#curriculum.dj-curriculum-section .dj-track-card .detail-list li::before {
+  color: var(--gold);
+}
+
+@media (min-width: 1024px) {
+  #curriculum.dj-curriculum-section .dj-track-card:nth-child(3n + 2),
+  #curriculum.dj-curriculum-section .dj-track-card:nth-child(3n + 3) {
+    border-left: 1px solid rgba(255, 255, 255, .12);
+    padding-left: 26px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  #curriculum.dj-curriculum-section .dj-roadmap {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #curriculum.dj-curriculum-section .dj-track-card:nth-child(even) {
+    border-left: 1px solid rgba(255, 255, 255, .12);
+    padding-left: 26px;
+  }
+
+  #curriculum.dj-curriculum-section .dj-card-art-shell--roadmap {
+    height: 220px;
+    min-height: 220px;
+  }
+}
+
+@media (max-width: 767px) {
+  #curriculum.dj-curriculum-section .dj-curriculum-head {
+    margin-bottom: 30px;
+  }
+
+  #curriculum.dj-curriculum-section .dj-filter {
+    gap: 12px 18px;
+  }
+
+  #curriculum.dj-curriculum-section .dj-roadmap {
+    grid-template-columns: 1fr;
+  }
+
+  #curriculum.dj-curriculum-section .dj-track-card,
+  #curriculum.dj-curriculum-section .dj-track-card--pro,
+  #curriculum.dj-curriculum-section .dj-track-card--bundle,
+  #curriculum.dj-curriculum-section .dj-track-card--arsenal {
+    padding: 0 0 34px;
+  }
+
+  #curriculum.dj-curriculum-section .dj-track-card + .dj-track-card {
+    padding-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, .12);
+  }
+
+  #curriculum.dj-curriculum-section .dj-card-art-shell--roadmap {
+    height: 205px;
+    min-height: 205px;
+    margin: 0 -8px;
+  }
+
+  #curriculum.dj-curriculum-section .dj-card-art {
+    width: min(112%, 285px);
+    max-height: 226px;
+    transform: translateY(-10px) scale(1.12);
+  }
+
+  #curriculum.dj-curriculum-section .dj-card-art--wide {
+    width: min(128%, 320px);
+    max-height: 216px;
+  }
+}
+
+/* ── Premium education direction ------------------------------------
+   Give the page a clearer learning narrative: one hero surface, open
+   method steps, a quiet platform flow, and portfolio work as editorial
+   showcases rather than a dashboard of nested cards. */
+.page-dev-journey .dj-hero__notice {
+  padding: 8px 0 8px 18px;
+  border: 0;
+  border-left: 2px solid rgba(139, 250, 240, .42);
+  border-radius: 0;
+  background: transparent;
+}
+
+.page-dev-journey .dj-hero__stats {
+  gap: 0;
+}
+
+.page-dev-journey .dj-hero__stats > div {
+  min-width: 0;
+  padding: 14px 16px 0 0;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, .13);
+  border-radius: 0;
+  background: transparent;
+}
+
+.page-dev-journey .dj-system__art-shell {
+  min-height: clamp(270px, 30vw, 380px);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(139, 250, 240, .15), transparent 48%),
+    radial-gradient(circle at 50% 90%, rgba(243, 225, 160, .10), transparent 42%);
+}
+
+.page-dev-journey .dj-system__links {
+  gap: 0;
+  border-top: 1px solid rgba(255, 255, 255, .12);
+}
+
+.page-dev-journey .dj-system__link {
+  padding: 14px 12px 8px 0;
+  border: 0;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, .12);
+  background: transparent;
+}
+
+.page-dev-journey .dj-system__link + .dj-system__link {
+  padding-left: 14px;
+  border-left: 1px solid rgba(255, 255, 255, .12);
+}
+
+.page-dev-journey .dj-system__link:hover {
+  transform: none;
+  border-color: rgba(255, 255, 255, .16);
+  background: rgba(255, 255, 255, .025);
+}
+
+.page-dev-journey .platform-assist__frame {
+  padding: clamp(24px, 3.8vw, 42px);
+  border-radius: clamp(28px, 4vw, 42px);
+  background:
+    radial-gradient(circle at 12% 100%, rgba(177, 150, 255, .10), transparent 32%),
+    linear-gradient(135deg, rgba(19, 23, 41, .76), rgba(7, 10, 19, .70));
+}
+
+.page-dev-journey .platform-assist__grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+}
+
+.page-dev-journey .platform-assist__card,
+.page-dev-journey .platform-assist__card.has-art,
+.page-dev-journey .platform-assist__card.is-emphasized {
+  position: relative;
+  min-height: 0 !important;
+  padding: 12px 20px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.page-dev-journey .platform-assist__card + .platform-assist__card {
+  border-left: 1px solid rgba(255, 255, 255, .12);
+}
+
+.page-dev-journey .platform-assist__card:hover,
+.page-dev-journey .platform-assist__card.is-emphasized:hover {
+  transform: none;
+  border-color: rgba(139, 250, 240, .25);
+  background: rgba(255, 255, 255, .025);
+  box-shadow: none;
+}
+
+.page-dev-journey .platform-assist__art-shell {
+  min-height: 170px !important;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.page-dev-journey .platform-assist__art {
+  width: min(100%, 196px) !important;
+  max-height: 176px !important;
+  transform: translateY(-5px) scale(1.05) !important;
+  filter: saturate(1.08) brightness(1.04) drop-shadow(0 24px 34px rgba(0, 0, 0, .36));
+}
+
+.page-dev-journey .platform-assist__card:hover .platform-assist__art {
+  transform: translateY(-10px) scale(1.11) !important;
+}
+
+.page-dev-journey .platform-assist__copy {
+  gap: 7px;
+}
+
+.page-dev-journey .platform-assist__label {
+  color: rgba(185, 255, 249, .72);
+  font-size: .66rem;
+  letter-spacing: .12em;
+}
+
+.page-dev-journey .platform-assist__card strong {
+  font-family: var(--display);
+  font-size: 1.08rem;
+  line-height: 1.15;
+  letter-spacing: -.02em;
+}
+
+.page-dev-journey .platform-assist__card p {
+  color: rgba(244, 246, 255, .64);
+  font-size: .84rem;
+  line-height: 1.52;
+}
+
+.page-dev-journey #access {
+  padding-top: clamp(96px, 11vw, 168px);
+}
+
+.page-dev-journey #access .dj-access-layout {
+  grid-template-columns: minmax(280px, .72fr) minmax(0, 1.28fr);
+  gap: clamp(38px, 6vw, 92px);
+  align-items: start;
+}
+
+.page-dev-journey #access .dj-access-card {
+  position: relative;
+  min-width: 0;
+  padding: clamp(24px, 3vw, 36px);
+  border-radius: 28px;
+  border-color: rgba(139, 250, 240, .18);
+  background:
+    linear-gradient(145deg, rgba(139, 250, 240, .08), rgba(255, 255, 255, .025) 54%),
+    rgba(7, 10, 19, .52);
+  box-shadow: 0 28px 74px rgba(0, 0, 0, .24), inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+
+.page-dev-journey #access .dj-access-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 28px;
+  width: 84px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cyan), transparent);
+  box-shadow: 0 0 22px rgba(139, 250, 240, .45);
+}
+
+.page-dev-journey #access .dj-access-card .detail-list {
+  margin: 6px 0 0;
+  padding: 0;
+  gap: 14px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: rgba(244, 246, 255, .72);
+  font-size: .88rem;
+  line-height: 1.48;
+}
+
+.page-dev-journey #access .dj-method-shell .section-head {
+  max-width: 650px;
+  margin-bottom: 22px;
+}
+
+.page-dev-journey #access .dj-method-shell .section-head h2 {
+  max-width: 12ch;
+  font-size: clamp(2.2rem, 4vw, 3.8rem);
+  line-height: .98;
+}
+
+.page-dev-journey #access .dj-method-shell .section-head p {
+  max-width: 44ch;
+  color: rgba(244, 246, 255, .72);
+  font-size: .98rem;
+  line-height: 1.62;
+}
+
+.page-dev-journey #access .dj-method-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.page-dev-journey #access .dj-step-card {
+  display: grid;
+  grid-template-columns: minmax(170px, .44fr) minmax(0, .56fr);
+  grid-template-areas:
+    "art title"
+    "art copy";
+  align-items: center;
+  min-width: 0;
+  min-height: 214px;
+  padding: 18px 0;
+  gap: 12px clamp(18px, 3vw, 34px);
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.page-dev-journey #access .dj-step-card:last-child {
+  border-bottom: 1px solid rgba(255, 255, 255, .12);
+}
+
+.page-dev-journey #access .dj-step-card:hover {
+  transform: none;
+  border-color: rgba(255, 255, 255, .18);
+  background: linear-gradient(90deg, rgba(139, 250, 240, .04), transparent 70%);
+}
+
+.page-dev-journey #access .dj-step-card .dj-card-art-shell {
+  grid-area: art;
+  min-height: 198px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.page-dev-journey #access .dj-step-card .dj-card-art--feature {
+  width: min(100%, 250px);
+  max-height: 226px;
+  transform: translate(-8px, -4px) scale(1.04);
+  filter: saturate(1.06) brightness(1.04) drop-shadow(0 24px 34px rgba(0, 0, 0, .40));
+}
+
+.page-dev-journey #access .dj-step-card:hover .dj-card-art--feature {
+  transform: translate(-10px, -9px) scale(1.09);
+}
+
+.page-dev-journey #access .dj-step-card h3 {
+  grid-area: title;
+  align-self: end;
+  max-width: 17ch;
+  font-size: clamp(1.25rem, 2vw, 1.72rem);
+  line-height: 1.05;
+}
+
+.page-dev-journey #access .dj-step-card p {
+  grid-area: copy;
+  align-self: start;
+  max-width: 36ch;
+  color: rgba(244, 246, 255, .68);
+  font-size: .88rem;
+  line-height: 1.55;
+}
+
+.page-dev-journey #projects {
+  padding-top: clamp(100px, 12vw, 180px);
+}
+
+.page-dev-journey #projects .section-head {
+  margin-bottom: clamp(38px, 5vw, 62px);
+}
+
+.page-dev-journey #projects .grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+}
+
+.page-dev-journey #projects .dj-project-card {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  align-content: start;
+  min-width: 0;
+  min-height: 390px;
+  padding: 0 26px 12px;
+  gap: 14px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.page-dev-journey #projects .dj-project-card + .dj-project-card {
+  border-left: 1px solid rgba(255, 255, 255, .12);
+}
+
+.page-dev-journey #projects .dj-project-card:hover {
+  transform: none;
+  border-color: rgba(255, 255, 255, .18);
+  background: linear-gradient(180deg, rgba(139, 250, 240, .035), transparent 70%);
+}
+
+.page-dev-journey #projects .dj-project-card .dj-card-art-shell {
+  min-height: 230px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.page-dev-journey #projects .dj-project-card .dj-card-art--feature {
+  width: min(118%, 300px);
+  max-height: 248px;
+  transform: translate(-10px, -6px) scale(1.04);
+  filter: saturate(1.06) brightness(1.04) drop-shadow(0 24px 34px rgba(0, 0, 0, .38));
+}
+
+.page-dev-journey #projects .dj-project-card:hover .dj-card-art--feature {
+  transform: translate(-12px, -12px) scale(1.09);
+}
+
+.page-dev-journey #projects .dj-project-card h3 {
+  max-width: 18ch;
+  font-size: clamp(1.28rem, 2vw, 1.72rem);
+  line-height: 1.04;
+}
+
+.page-dev-journey #projects .dj-project-card p {
+  max-width: 36ch;
+  color: rgba(244, 246, 255, .68);
+  font-size: .88rem;
+  line-height: 1.58;
+}
+
+@media (max-width: 1099px) and (min-width: 768px) {
+  .page-dev-journey .platform-assist__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+  }
+
+  .page-dev-journey .platform-assist__card:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .page-dev-journey .platform-assist__card:nth-child(n + 3) {
+    margin-top: 22px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(255, 255, 255, .12);
+  }
+
+  .page-dev-journey #access .dj-access-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .page-dev-journey #access .dj-method-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .page-dev-journey #access .dj-step-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "art"
+      "title"
+      "copy";
+    min-height: 0;
+    padding: 18px 20px 0 0;
+  }
+
+  .page-dev-journey #access .dj-step-card + .dj-step-card {
+    padding-left: 20px;
+    border-left: 1px solid rgba(255, 255, 255, .12);
+  }
+
+  .page-dev-journey #access .dj-step-card:last-child {
+    border-bottom: 0;
+  }
+
+  .page-dev-journey #access .dj-step-card .dj-card-art-shell {
+    min-height: 188px;
+  }
+
+  .page-dev-journey #projects .grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+  }
+
+  .page-dev-journey #projects .dj-project-card:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .page-dev-journey #projects .dj-project-card:nth-child(n + 3) {
+    margin-top: 32px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(255, 255, 255, .12);
+  }
+}
+
+@media (max-width: 767px) {
+  .page-dev-journey .dj-hero__stats > div {
+    padding-right: 8px;
+  }
+
+  .page-dev-journey .dj-system__links {
+    grid-template-columns: 1fr;
+  }
+
+  .page-dev-journey .dj-system__link,
+  .page-dev-journey .dj-system__link + .dj-system__link {
+    padding: 12px 0;
+    border-left: 0;
+  }
+
+  .page-dev-journey .platform-assist__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-dev-journey .platform-assist__card,
+  .page-dev-journey .platform-assist__card.has-art,
+  .page-dev-journey .platform-assist__card.is-emphasized {
+    grid-template-columns: 112px minmax(0, 1fr);
+    align-items: center;
+    min-height: 0 !important;
+    padding: 14px 0;
+    gap: 16px;
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, .12);
+  }
+
+  .page-dev-journey .platform-assist__card:first-child {
+    border-top: 0;
+  }
+
+  .page-dev-journey .platform-assist__art-shell {
+    grid-row: 1;
+    min-height: 112px !important;
+  }
+
+  .page-dev-journey .platform-assist__art {
+    width: 124px !important;
+    max-height: 116px !important;
+  }
+
+  .page-dev-journey #access .dj-access-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .page-dev-journey #access .dj-access-card {
+    padding: 22px;
+    border-radius: 24px;
+  }
+
+  .page-dev-journey #access .dj-method-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-dev-journey #access .dj-step-card,
+  .page-dev-journey #access .dj-step-card + .dj-step-card {
+    grid-template-columns: 124px minmax(0, 1fr);
+    grid-template-areas:
+      "art title"
+      "art copy";
+    min-height: 170px;
+    padding: 16px 0;
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, .12);
+  }
+
+  .page-dev-journey #access .dj-step-card .dj-card-art-shell {
+    min-height: 150px;
+  }
+
+  .page-dev-journey #access .dj-step-card .dj-card-art--feature {
+    width: 170px;
+    max-height: 164px;
+    transform: translateX(-22px) scale(1.02);
+  }
+
+  .page-dev-journey #access .dj-step-card h3 {
+    font-size: 1.18rem;
+  }
+
+  .page-dev-journey #access .dj-step-card p,
+  .page-dev-journey #projects .dj-project-card p {
+    font-size: .79rem;
+    line-height: 1.45;
+  }
+
+  .page-dev-journey #projects .grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .page-dev-journey #projects .dj-project-card,
+  .page-dev-journey #projects .dj-project-card + .dj-project-card {
+    min-height: 0;
+    padding: 26px 0 0;
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, .12);
+  }
+
+  .page-dev-journey #projects .dj-project-card:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .page-dev-journey #projects .dj-project-card .dj-card-art-shell {
+    min-height: 190px;
+  }
+
+  .page-dev-journey #projects .dj-project-card .dj-card-art--feature {
+    width: min(120%, 270px);
+    max-height: 210px;
+    transform: translate(-18px, -4px) scale(1.02);
+  }
+}
+
+/* ── Portfolio showcase correction ----------------------------------
+   Reset the older two-column card experiment. Each project is a single
+   readable showcase row, so titles never collapse into narrow columns. */
+.page-dev-journey #projects .grid-3 {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.page-dev-journey #projects .dj-project-card,
+.page-dev-journey #projects .dj-project-card + .dj-project-card {
+  display: grid;
+  grid-template-columns: minmax(270px, .42fr) minmax(0, .58fr);
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "art title"
+    "art copy";
+  align-items: center;
+  min-height: 286px;
+  padding: 30px 0;
+  gap: 10px clamp(28px, 5vw, 76px);
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, .13);
+  border-left: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.page-dev-journey #projects .dj-project-card:last-child {
+  border-bottom: 1px solid rgba(255, 255, 255, .13);
+}
+
+.page-dev-journey #projects .dj-project-card:hover {
+  transform: none;
+  border-color: rgba(255, 255, 255, .20);
+  background: linear-gradient(90deg, rgba(139, 250, 240, .035), transparent 74%);
+}
+
+.page-dev-journey #projects .dj-project-card .dj-card-art-shell {
+  grid-area: art;
+  display: grid;
+  min-height: 230px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.page-dev-journey #projects .dj-project-card .dj-card-art--feature {
+  width: min(100%, 330px);
+  max-height: 255px;
+  transform: translateX(-4px) scale(1.04);
+  filter: saturate(1.06) brightness(1.04) drop-shadow(0 25px 36px rgba(0, 0, 0, .42));
+}
+
+.page-dev-journey #projects .dj-project-card:hover .dj-card-art--feature {
+  transform: translate(-4px, -8px) scale(1.09);
+}
+
+.page-dev-journey #projects .dj-project-card h3 {
+  grid-area: title;
+  align-self: end;
+  max-width: 20ch;
+  font-size: clamp(1.45rem, 2.6vw, 2.35rem);
+  line-height: 1.02;
+  letter-spacing: -.035em;
+}
+
+.page-dev-journey #projects .dj-project-card p {
+  grid-area: copy;
+  align-self: start;
+  max-width: 48ch;
+  color: rgba(244, 246, 255, .70);
+  font-size: clamp(.90rem, 1.2vw, 1rem);
+  line-height: 1.62;
+}
+
+@media (max-width: 767px) {
+  .page-dev-journey #projects .dj-project-card,
+  .page-dev-journey #projects .dj-project-card + .dj-project-card {
+    grid-template-columns: 124px minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "art title"
+      "art copy";
+    min-height: 186px;
+    padding: 24px 0;
+    gap: 8px 16px;
+  }
+
+  .page-dev-journey #projects .dj-project-card:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .page-dev-journey #projects .dj-project-card .dj-card-art-shell {
+    min-height: 156px;
+  }
+
+  .page-dev-journey #projects .dj-project-card .dj-card-art--feature {
+    width: 168px;
+    max-height: 158px;
+    transform: translateX(-20px) scale(1.02);
+  }
+
+  .page-dev-journey #projects .dj-project-card h3 {
+    max-width: 14ch;
+    font-size: 1.22rem;
+  }
+
+  .page-dev-journey #projects .dj-project-card p {
+    font-size: .80rem;
+    line-height: 1.45;
+  }
+}
+
+/* ── Upgrade decision surface --------------------------------------
+   Keep one calm surface per plan. Price, outcome, inclusions and action
+   should scan in one line of sight instead of competing nested panels. */
+.page-dev-journey #upgrade {
+  padding-top: clamp(96px, 12vw, 176px);
+}
+
+.page-dev-journey #upgrade .section-head {
+  margin-bottom: clamp(38px, 5vw, 58px);
+}
+
+.page-dev-journey #upgrade .section-head h2 {
+  max-width: 13ch;
+}
+
+.page-dev-journey #upgrade .dj-upgrade-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.page-dev-journey #upgrade .dj-plan-card,
+.page-dev-journey #upgrade .dj-plan-card.dj-plan-card--featured,
+.page-dev-journey #upgrade .dj-plan-card.dj-plan-card--bundle {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(210px, .27fr) minmax(130px, .17fr) minmax(240px, .38fr) minmax(150px, .18fr);
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+    "art label perks cta"
+    "art price perks cta"
+    "art tagline perks cta";
+  align-items: center;
+  min-width: 0;
+  min-height: 250px;
+  padding: 18px 24px 18px 10px;
+  gap: 5px clamp(18px, 3vw, 44px);
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 26px;
+  background:
+    linear-gradient(110deg, rgba(255, 255, 255, .055), rgba(255, 255, 255, .018) 62%),
+    rgba(7, 10, 19, .60);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .06);
+  overflow: hidden;
+  transform: none;
+}
+
+.page-dev-journey #upgrade .dj-plan-card--featured {
+  border-color: rgba(139, 250, 240, .26);
+  background:
+    linear-gradient(110deg, rgba(139, 250, 240, .09), rgba(255, 255, 255, .018) 62%),
+    rgba(7, 10, 19, .64);
+  box-shadow: 0 28px 72px rgba(0, 0, 0, .26), 0 0 34px rgba(139, 250, 240, .06), inset 0 1px 0 rgba(255, 255, 255, .09);
+}
+
+.page-dev-journey #upgrade .dj-plan-card--bundle {
+  border-color: rgba(243, 225, 160, .24);
+  background:
+    linear-gradient(110deg, rgba(243, 225, 160, .08), rgba(255, 255, 255, .018) 62%),
+    rgba(7, 10, 19, .64);
+}
+
+.page-dev-journey #upgrade .dj-plan-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, .22);
+}
+
+.page-dev-journey #upgrade .dj-plan-card--featured:hover {
+  border-color: rgba(139, 250, 240, .42);
+}
+
+.page-dev-journey #upgrade .dj-plan-card--bundle:hover {
+  border-color: rgba(243, 225, 160, .40);
+}
+
+.page-dev-journey #upgrade .dj-plan-card .dj-card-art-shell--plan {
+  grid-area: art;
+  min-width: 0;
+  min-height: 210px;
+  height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.page-dev-journey #upgrade .dj-plan-card .dj-card-art-shell--plan::before {
+  inset: 14% 8% 8%;
+  background: radial-gradient(circle, rgba(177, 150, 255, .18), transparent 68%);
+  filter: blur(24px);
+}
+
+.page-dev-journey #upgrade .dj-plan-card .dj-card-art {
+  width: min(100%, 270px);
+  max-width: none;
+  max-height: 226px;
+  transform: translateX(-8px) scale(1.04);
+  filter: saturate(1.06) brightness(1.04) drop-shadow(0 24px 34px rgba(0, 0, 0, .42));
+  transition: transform .24s cubic-bezier(.16, 1, .3, 1), filter .24s ease;
+}
+
+.page-dev-journey #upgrade .dj-plan-card:hover .dj-card-art {
+  transform: translate(-10px, -6px) scale(1.09);
+  filter: saturate(1.09) brightness(1.06) drop-shadow(0 30px 40px rgba(0, 0, 0, .48));
+}
+
+.page-dev-journey #upgrade .dj-plan-card > .label {
+  grid-area: label;
+  align-self: end;
+  justify-self: start;
+  width: fit-content;
+  margin: 0;
+}
+
+.page-dev-journey #upgrade .dj-plan-card__price {
+  grid-area: price;
+  align-self: start;
+  margin: 0;
+  font-size: clamp(2.35rem, 4.2vw, 3.85rem);
+  line-height: .92;
+  letter-spacing: -.06em;
+  white-space: nowrap;
+}
+
+.page-dev-journey #upgrade .dj-plan-card__price span {
+  display: block;
+  margin: 9px 0 0;
+  font-family: var(--sans);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(244, 246, 255, .50);
+}
+
+.page-dev-journey #upgrade .dj-plan-card__tagline {
+  grid-area: tagline;
+  align-self: start;
+  max-width: 18ch;
+  margin: 0;
+  color: rgba(244, 246, 255, .70);
+  font-size: .88rem;
+  line-height: 1.45;
+}
+
+.page-dev-journey #upgrade .dj-plan-card .detail-list {
+  grid-area: perks;
+  align-self: stretch;
+  justify-content: center;
+  min-width: 0;
+  margin: 0;
+  padding: 9px 0 9px clamp(16px, 2vw, 28px);
+  gap: 10px;
+  border: 0;
+  border-left: 1px solid rgba(255, 255, 255, .13);
+  border-radius: 0;
+  background: transparent;
+  color: rgba(244, 246, 255, .72);
+  font-size: .80rem;
+  font-weight: 600;
+  line-height: 1.44;
+  text-shadow: none;
+}
+
+.page-dev-journey #upgrade .dj-plan-card .detail-list li {
+  padding-left: 14px;
+}
+
+.page-dev-journey #upgrade .dj-plan-card .detail-list li::before {
+  color: var(--gold);
+}
+
+.page-dev-journey #upgrade .dj-plan-card > .button {
+  grid-area: cta;
+  align-self: end;
+  justify-self: start;
+  width: 100%;
+  min-width: 0;
+  padding-inline: 14px;
+  text-align: center;
+}
+
+@media (max-width: 1023px) and (min-width: 768px) {
+  .page-dev-journey #upgrade .dj-plan-card,
+  .page-dev-journey #upgrade .dj-plan-card.dj-plan-card--featured,
+  .page-dev-journey #upgrade .dj-plan-card.dj-plan-card--bundle {
+    grid-template-columns: minmax(170px, .32fr) minmax(140px, .26fr) minmax(0, .42fr);
+    grid-template-areas:
+      "art label perks"
+      "art price perks"
+      "art tagline cta";
+    min-height: 232px;
+    padding-right: 18px;
+    gap: 5px 22px;
+  }
+
+  .page-dev-journey #upgrade .dj-plan-card .dj-card-art-shell--plan {
+    min-height: 190px;
+  }
+
+  .page-dev-journey #upgrade .dj-plan-card .dj-card-art {
+    width: min(100%, 230px);
+    max-height: 205px;
+  }
+}
+
+@media (max-width: 767px) {
+  .page-dev-journey #upgrade .dj-plan-card,
+  .page-dev-journey #upgrade .dj-plan-card.dj-plan-card--featured,
+  .page-dev-journey #upgrade .dj-plan-card.dj-plan-card--bundle {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto auto auto;
+    grid-template-areas:
+      "art"
+      "label"
+      "price"
+      "tagline"
+      "perks"
+      "cta";
+    min-height: 0;
+    padding: 20px 18px 18px;
+    gap: 10px;
+    border-radius: 23px;
+  }
+
+  .page-dev-journey #upgrade .dj-plan-card .dj-card-art-shell--plan {
+    min-height: 168px;
+  }
+
+  .page-dev-journey #upgrade .dj-plan-card .dj-card-art {
+    width: min(100%, 220px);
+    max-height: 182px;
+    transform: translateY(-4px) scale(1.02);
+  }
+
+  .page-dev-journey #upgrade .dj-plan-card:hover .dj-card-art {
+    transform: translateY(-8px) scale(1.06);
+  }
+
+  .page-dev-journey #upgrade .dj-plan-card__price {
+    font-size: 2.7rem;
+  }
+
+  .page-dev-journey #upgrade .dj-plan-card__price span {
+    display: inline-block;
+    margin: 0 0 0 8px;
+    font-size: .64rem;
+  }
+
+  .page-dev-journey #upgrade .dj-plan-card__tagline {
+    max-width: none;
+  }
+
+  .page-dev-journey #upgrade .dj-plan-card .detail-list {
+    align-self: auto;
+    padding: 14px 0 0;
+    border-top: 1px solid rgba(255, 255, 255, .13);
+    border-left: 0;
+  }
+
+  .page-dev-journey #upgrade .dj-plan-card > .button {
+    width: fit-content;
+    min-width: 150px;
+  }
+}
+
+/* Make the portfolio section prove the outcome at a glance. */
+.page-dev-journey #projects .dj-project-card__proof {
+  display: grid;
+  grid-template-columns: minmax(96px, .62fr) minmax(0, 1.38fr);
+  gap: 18px;
+  margin-top: clamp(20px, 3vw, 30px);
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, .13);
+}
+
+.page-dev-journey #projects .dj-project-card__proof > span {
+  display: grid;
+  align-content: start;
+  gap: 5px;
+  min-width: 0;
+}
+
+.page-dev-journey #projects .dj-project-card__proof > span + span {
+  padding-left: 18px;
+  border-left: 1px solid rgba(255, 255, 255, .10);
+}
+
+.page-dev-journey #projects .dj-project-card__proof strong {
+  color: var(--gold);
+  font-family: var(--mono, monospace);
+  font-size: .61rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.page-dev-journey #projects .dj-project-card__proof > span > span:not(.i18n-en):not(.i18n-pt),
+.page-dev-journey #projects .dj-project-card__proof > span > .i18n-en,
+.page-dev-journey #projects .dj-project-card__proof > span > .i18n-pt {
+  color: rgba(244, 246, 255, .68);
+  font-size: .78rem;
+  line-height: 1.42;
+}
+
+@media (max-width: 767px) {
+  .page-dev-journey #projects .dj-project-card__proof {
+    grid-template-columns: minmax(86px, .58fr) minmax(0, 1.42fr);
+    gap: 12px;
+  }
+
+  .page-dev-journey #projects .dj-project-card__proof > span + span {
+    padding-left: 12px;
+  }
+}
+
+/* Keep the first impression close to the header; the shared page rhythm
+   should not add a full section gap before the hero. */
+.page-dev-journey .dj-hero-section {
+  padding-top: clamp(14px, 1.8vw, 24px);
+}
+
+@media (max-width: 767px) {
+  .page-dev-journey .dj-hero-section {
+    padding-top: 14px;
+  }
+}
+
+/* Use the real interactive outcome previews as the visual anchor for each
+   project instead of decorative artwork. */
+.page-dev-journey #projects .dj-project-card,
+.page-dev-journey #projects .dj-project-card + .dj-project-card {
+  grid-template-columns: minmax(360px, .56fr) minmax(0, .44fr);
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+    "preview title"
+    "preview copy"
+    "preview proof";
+  align-items: start;
+  min-height: 0;
+  gap: 12px clamp(28px, 5vw, 76px);
+}
+
+.page-dev-journey #projects .dj-live-preview {
+  grid-area: preview;
+  min-width: 0;
+  align-self: center;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, .13);
+  border-radius: 24px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .018)),
+    rgba(5, 7, 14, .78);
+  box-shadow: 0 26px 64px rgba(0, 0, 0, .26), inset 0 1px 0 rgba(255, 255, 255, .06);
+}
+
+.page-dev-journey #projects .dj-live-preview__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  padding: 2px 2px 11px;
+}
+
+.page-dev-journey #projects .dj-live-preview__label,
+.page-dev-journey #projects .dj-live-preview__mode {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  gap: 7px;
+  color: rgba(244, 246, 255, .70);
+  font-family: var(--mono, monospace);
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .11em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.page-dev-journey #projects .dj-live-preview__mode {
+  color: rgba(139, 250, 240, .72);
+  text-align: right;
+}
+
+.page-dev-journey #projects .dj-live-preview__dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #8cffd2;
+  box-shadow: 0 0 14px rgba(140, 255, 210, .68);
+}
+
+.page-dev-journey #projects .dj-live-preview__frame {
+  display: block;
+  width: 100%;
+  min-height: 330px;
+  aspect-ratio: 1.45;
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-radius: 17px;
+  background: #0b0d17;
+}
+
+.page-dev-journey #projects .dj-live-preview__note {
+  margin: 10px 2px 0;
+  color: rgba(244, 246, 255, .48);
+  font-size: .70rem;
+  line-height: 1.4;
+}
+
+.page-dev-journey #projects .dj-project-card h3 {
+  grid-area: title;
+  align-self: end;
+}
+
+.page-dev-journey #projects .dj-project-card > p {
+  grid-area: copy;
+  align-self: start;
+}
+
+.page-dev-journey #projects .dj-project-card__proof {
+  grid-area: proof;
+  align-self: start;
+  width: 100%;
+}
+
+@media (max-width: 767px) {
+  .page-dev-journey #projects .dj-project-card,
+  .page-dev-journey #projects .dj-project-card + .dj-project-card {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "preview"
+      "title"
+      "copy"
+      "proof";
+    gap: 10px;
+  }
+
+  .page-dev-journey #projects .dj-live-preview {
+    width: 100%;
+    padding: 11px;
+    border-radius: 20px;
+  }
+
+  .page-dev-journey #projects .dj-live-preview__frame {
+    min-height: 270px;
+    aspect-ratio: 1.25;
+  }
+
+  .page-dev-journey #projects .dj-live-preview__label,
+  .page-dev-journey #projects .dj-live-preview__mode {
+    font-size: .51rem;
+  }
+
+  .page-dev-journey #projects .dj-project-card h3,
+  .page-dev-journey #projects .dj-project-card > p,
+  .page-dev-journey #projects .dj-project-card__proof {
+    width: 100%;
   }
 }

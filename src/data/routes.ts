@@ -89,6 +89,7 @@ export const ROUTES = {
 
   // ── Campaign landings ─────────────────
   tiktokLanding: "/tiktok/",
+  signalDrop: "/signal-drop/",
 
   // ── Other ─────────────────────────────
   launch2026: "/volynx-launch/",

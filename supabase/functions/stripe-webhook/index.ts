@@ -214,6 +214,7 @@ async function syncUserSubscriptionEntitlements(userId: string): Promise<void> {
 
 // Product key detection from prefix
 function detectProductKey(prefix: string): string {
+  if (prefix.startsWith("devjourney_")) return "devjourney";
   if (prefix.startsWith("bundle_")) return "bundle";
   if (prefix.startsWith("daily_")) return "daily";
   if (prefix.startsWith("cvitae_")) return "cvitae";
@@ -235,6 +236,16 @@ const TOKEN_CREDITS: Record<string, number> = {
   tokens_scale: 200,
 };
 
+const DEVJOURNEY_TIERS: Record<string, "pro" | "bundle"> = {
+  devjourney_pro: "pro",
+  devjourney_bundle: "bundle",
+};
+const DEVJOURNEY_TIER_RANK: Record<string, number> = {
+  social: 0,
+  pro: 1,
+  bundle: 2,
+};
+
 // ── Email dispatch helper ──────────────────────────────────
 // Fire-and-forget queueing into email_log. The send-purchase-email function
 // is invoked after the row exists, so even if the HTTP call cold-starts past
@@ -253,7 +264,8 @@ type EmailEventType =
   | "addon_activated"
   | "kit_delivered"
   | "icons_delivered"
-  | "cvitae_template_unlocked";
+  | "cvitae_template_unlocked"
+  | "devjourney_activated";
 
 async function queueEmail(args: {
   event_type: EmailEventType;
@@ -667,6 +679,40 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   // ── One-time payment (Token packs, Add-ons) ──
   if (session.mode === "payment") {
     const tokenAmount = TOKEN_CREDITS[prefix] || 0;
+
+    const devJourneyTier = DEVJOURNEY_TIERS[prefix];
+    if (devJourneyTier) {
+      const { data: currentProfile } = await supabase
+        .from("profiles")
+        .select("devjourney_tier")
+        .eq("id", userId)
+        .maybeSingle();
+
+      const currentTier = String(currentProfile?.devjourney_tier || "social").toLowerCase();
+      const currentRank = DEVJOURNEY_TIER_RANK[currentTier] ?? 0;
+      const targetRank = DEVJOURNEY_TIER_RANK[devJourneyTier];
+
+      if (targetRank > currentRank) {
+        requireDbSuccess(
+          "activate Dev Journey tier",
+          await supabase
+            .from("profiles")
+            .update({ devjourney_tier: devJourneyTier })
+            .eq("id", userId),
+        );
+      }
+
+      await queueEmail({
+        event_type: "devjourney_activated",
+        user_id: userId,
+        recipient_email: userEmail,
+        idempotency_key: session.id,
+        payload: {
+          tier: devJourneyTier,
+          lookup_key: lookupKey,
+        },
+      });
+    }
 
     if (tokenAmount > 0) {
       // Atomic credit via Postgres RPC — SELECT ... FOR UPDATE inside

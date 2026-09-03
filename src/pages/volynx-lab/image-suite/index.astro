@@ -96,7 +96,7 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
               <select id="scale" aria-label="Scale">
                 <option value="2">2x</option>
                 <option value="3">3x</option>
-                <option value="4" selected>4x</option>
+                <option value="4">4x</option>
               </select>
             </label>
 
@@ -155,6 +155,7 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
             </div>
           </div>
 
+          <p id="upscaleHint" class="fmt-hint upscale-hint" hidden aria-live="polite"></p>
           <p id="fmtHint" class="fmt-hint" hidden></p>
           <button id="runBtn" class="btn" type="button" disabled style="margin-top:16px" data-i18n="suite.btn_process">Process</button>
 
@@ -231,6 +232,8 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
     };
     const LAB_ASSET_MANIFEST_URL = "/lab-assets.json";
     const ENCODE_TIMEOUT_MS = 12000;
+    const MAX_RECOMMENDED_UPSCALE_PIXELS = 16_000_000;
+    const MAX_LOCAL_UPSCALE_PIXELS = 36_000_000;
     // License keys removed — plan is checked server-side via check-permission API
 
     function todayKey() {
@@ -298,20 +301,38 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
             if (!perm.useLocalStorage || !allowLocalFallback || (perm.limit === 0 && !shouldUseAnonymousFallback)) {
               return normalized;
             }
+            if (token) {
+              return {
+                allowed: false,
+                plan: 'unknown',
+                remaining: 0,
+                limit: 0,
+                source: 'error',
+                error: 'permission_unavailable',
+              };
+            }
           }
-        } catch (_) {}
+        } catch (_) {
+          if (token || !allowLocalFallback) {
+            return {
+              allowed: false,
+              plan: 'unknown',
+              remaining: 0,
+              limit: 0,
+              source: 'error',
+              error: 'permission_unavailable',
+            };
+          }
+        }
       }
       if (!allowLocalFallback) {
-        const cachedPlan = window.VxPlan?.getCached()?.plan || (isPro ? "pro" : "free");
-        const cachedPaid = window.VxPlan
-          ? window.VxPlan.isPaid(cachedPlan)
-          : (cachedPlan !== "free" && cachedPlan !== "");
         return {
-          allowed: cachedPaid,
-          plan: cachedPlan,
-          remaining: cachedPaid ? -1 : 0,
-          limit: cachedPaid ? -1 : 0,
-          source: cachedPaid ? "cache" : "local",
+          allowed: false,
+          plan: token ? "unknown" : "free",
+          remaining: 0,
+          limit: 0,
+          source: "error",
+          error: token ? "permission_unavailable" : "authentication_required",
         };
       }
       const usage = getLocalUsage();
@@ -382,6 +403,7 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
     const aiEngineStatus = $("aiEngineStatus");
     const zipEngineStatus = $("zipEngineStatus");
     const bgEngineStatus = $("bgEngineStatus");
+    const upscaleHint = $("upscaleHint");
 
     function suiteReturnPath() {
       return window.VxLab
@@ -696,6 +718,10 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
       }
     }
 
+    function yieldToBrowser() {
+      return new Promise((resolve) => window.requestAnimationFrame(() => resolve()));
+    }
+
     function createCanvasSurface(width, height) {
       if (typeof OffscreenCanvas === "function") {
         return new OffscreenCanvas(width, height);
@@ -922,9 +948,82 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
       return !hasPaidPlan();
     }
 
+    function getLargestRequestedOutputPixels() {
+      if (toolEl?.value !== "upscale" || !loadedImages.length) return 0;
+      const scale = Math.max(2, parseInt(scaleEl?.value, 10) || 2);
+      return loadedImages.reduce((largest, item) => {
+        const width = item?.img?.naturalWidth || item?.img?.width || 0;
+        const height = item?.img?.naturalHeight || item?.img?.height || 0;
+        return Math.max(largest, width * height * scale * scale);
+      }, 0);
+    }
+
+    function formatMegapixels(pixels) {
+      return `${(pixels / 1_000_000).toFixed(pixels >= 10_000_000 ? 0 : 1)} MP`;
+    }
+
     function syncRunAvailability() {
       if (!runBtn) return;
-      runBtn.disabled = !loadedImages.length || (toolEl?.value === "bg-remove" && isBgRemoveLocked());
+      const outputTooLarge = toolEl?.value === "upscale"
+        && getLargestRequestedOutputPixels() > MAX_LOCAL_UPSCALE_PIXELS;
+      runBtn.disabled = !loadedImages.length || outputTooLarge || (toolEl?.value === "bg-remove" && isBgRemoveLocked());
+    }
+
+    function updateUpscaleHint() {
+      if (!upscaleHint) return;
+      if (toolEl?.value !== "upscale") {
+        upscaleHint.hidden = true;
+        return;
+      }
+
+      upscaleHint.hidden = false;
+      upscaleHint.dataset.tone = "info";
+
+      if (!loadedImages.length) {
+        upscaleHint.textContent = t(
+          "suite.upscale_hint_default",
+          "For a smoother first run, 2x is recommended. Local AI can take longer on large images; keep this tab open while it works."
+        );
+        return;
+      }
+
+      const scale = Math.max(2, parseInt(scaleEl?.value, 10) || 2);
+      const largestPixels = getLargestRequestedOutputPixels();
+      const largest = loadedImages.reduce((item, current) => {
+        const currentPixels = (current?.img?.naturalWidth || current?.img?.width || 0)
+          * (current?.img?.naturalHeight || current?.img?.height || 0);
+        const largestPixelsInList = (item?.img?.naturalWidth || item?.img?.width || 0)
+          * (item?.img?.naturalHeight || item?.img?.height || 0);
+        return currentPixels > largestPixelsInList ? current : item;
+      }, loadedImages[0]);
+      const width = (largest?.img?.naturalWidth || largest?.img?.width || 0) * scale;
+      const height = (largest?.img?.naturalHeight || largest?.img?.height || 0) * scale;
+
+      if (largestPixels > MAX_LOCAL_UPSCALE_PIXELS) {
+        upscaleHint.dataset.tone = "critical";
+        upscaleHint.textContent = copy(
+          "suite.upscale_hint_too_large",
+          "This image is too large for reliable local {scale}x processing ({pixels}). Choose 2x or a smaller image before processing.",
+          { scale, pixels: formatMegapixels(largestPixels) }
+        );
+        return;
+      }
+
+      if (largestPixels > MAX_RECOMMENDED_UPSCALE_PIXELS || scale > 2) {
+        upscaleHint.dataset.tone = "warning";
+        upscaleHint.textContent = copy(
+          "suite.upscale_hint_large",
+          "Estimated output: {width} × {height} ({pixels}). 2x is the quickest option; {scale}x can take noticeably longer and create a much larger file.",
+          { width, height, pixels: formatMegapixels(largestPixels), scale }
+        );
+        return;
+      }
+
+      upscaleHint.textContent = copy(
+        "suite.upscale_hint_ready",
+        "Estimated output: {width} × {height}. 2x is recommended for the quickest local AI result.",
+        { width, height }
+      );
     }
 
     function syncBgFillColorVisibility() {
@@ -1102,6 +1201,7 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
       setDropMessage(copy("suite.drop_ready", "{files} ready to process", {
         files: fileCountLabel(validFiles.length),
       }));
+      updateUpscaleHint();
       syncRunAvailability();
     }
 
@@ -1114,6 +1214,7 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
 
       setDropMessage(t("suite.ai_model_loading", "Loading the local AI model for the first run..."));
       updateProgressUI(0, "model");
+      await yieldToBrowser();
 
       _aiUpscalerPromise = getLabAssetManifest()
         .then((manifest) => {
@@ -1148,6 +1249,7 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
         const upscaler = await initAIUpscaler();
         setDropMessage(t("suite.ai_upscaling_start", "AI enhancement started..."));
         updateProgressUI(0, 'upscale');
+        await yieldToBrowser();
         const base64 = await upscaler.upscale(img, {
           output: 'base64',
           patchSize: 64,
@@ -1527,7 +1629,12 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
     const fmtHint = $("fmtHint");
     toolEl.addEventListener("change", () => {
       updateFieldVisibility(toolEl.value);
+      updateUpscaleHint();
       syncToolToUrl();
+    });
+    scaleEl.addEventListener("change", () => {
+      updateUpscaleHint();
+      syncRunAvailability();
     });
     fmtEl.addEventListener("change", checkFmtHint);
     bgFormatEl?.addEventListener("change", checkFmtHint);
@@ -1539,6 +1646,7 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
       }
     });
     updateFieldVisibility(toolEl.value);
+    updateUpscaleHint();
 
     if (window.VxLab?.renderToolPresets) {
       VxLab.renderToolPresets("image-suite", {
@@ -1598,13 +1706,19 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
       const quality = parseFloat(qualityEl.value);
 
       const permissionTool = tool === "bg-remove" ? "bg-remove" : "image-suite";
-      const shouldCheckPermission = tool === "bg-remove" ? !hasPaidPlan() : !isPro;
+      // Background removal is paid: always revalidate server-side instead of
+      // trusting a cached plan, which can be stale or locally manipulated.
+      const shouldCheckPermission = tool === "bg-remove" ? true : !isPro;
 
       if (shouldCheckPermission) {
         const perm = await checkToolPermission(permissionTool, loadedImages.length, {
           allowLocalFallback: tool !== "bg-remove",
         });
         if (!perm.allowed) {
+          if (perm.error === "permission_unavailable") {
+            labNotify("Permission check unavailable", "We could not verify your plan. Nothing was processed; please try again in a moment.", "error");
+            return;
+          }
           const isFreeUser = window.VxPlan ? !window.VxPlan.isPaid(perm.plan) : (perm.plan === 'free');
           const returnPath = suiteReturnPath();
           syncToolToUrl();

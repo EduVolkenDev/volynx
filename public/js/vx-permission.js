@@ -5,22 +5,22 @@
  */
 async function vxCheckPermission(toolName) {
   const FREE = { allowed: true, plan: 'free', remaining: null };
+  const token = localStorage.getItem('volynx_access_token') || '';
+  const FAIL_CLOSED = { allowed: false, plan: 'unknown', remaining: 0, limit: 0, source: 'error', error: 'permission_unavailable' };
 
   let cfg;
   try {
     cfg = await fetch('/config.json', { cache: 'no-store' }).then((r) => r.json());
   } catch (_) {
     console.warn('[vx-permission] config.json unavailable, defaulting to free');
-    return FREE;
+    return token ? FAIL_CLOSED : FREE;
   }
 
   const apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
   if (!apiBase) {
     // No billing backend configured — allow as free tier
-    return FREE;
+    return token ? FAIL_CLOSED : FREE;
   }
-
-  const token = localStorage.getItem('volynx_access_token') || '';
 
   try {
     const ctrl = new AbortController();
@@ -37,12 +37,12 @@ async function vxCheckPermission(toolName) {
     clearTimeout(t);
 
     if (!res.ok) {
-      console.warn(`[vx-permission] check-permission HTTP ${res.status}, defaulting to free`);
-      return FREE;
+      console.warn(`[vx-permission] check-permission HTTP ${res.status}, failing closed for authenticated usage`);
+      return token ? FAIL_CLOSED : FREE;
     }
     return await res.json();
   } catch (err) {
-    console.warn('[vx-permission] check-permission failed, defaulting to free:', err.message);
-    return FREE;
+    console.warn('[vx-permission] check-permission failed, failing closed for authenticated usage:', err.message);
+    return token ? FAIL_CLOSED : FREE;
   }
 }

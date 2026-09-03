@@ -1,0 +1,38 @@
+---
+import { DEVJOURNEY_OUTCOME_PREVIEWS } from "../data/devjourney-outcome-previews.js";
+
+const { kind } = Astro.props;
+const preview = DEVJOURNEY_OUTCOME_PREVIEWS[kind];
+
+if (!preview) {
+  throw new Error(`Unknown Dev Journey outcome preview: ${kind}`);
+}
+
+const safeScript = String(preview.js || "").replace(/<\/script/gi, "<\\/script");
+const srcdoc = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';"><style>${preview.css}</style></head><body>${preview.html}<script>${safeScript}</script></body></html>`;
+---
+
+<div class="dj-live-preview" data-preview-kind={kind}>
+  <div class="dj-live-preview__head">
+    <span class="dj-live-preview__label">
+      <span class="dj-live-preview__dot" aria-hidden="true"></span>
+      <span class="i18n-en">{preview.labelEn}</span>
+      <span class="i18n-pt">{preview.labelPt}</span>
+    </span>
+    <span class="dj-live-preview__mode">
+      <span class="i18n-en">Interactive preview</span>
+      <span class="i18n-pt">Preview interativo</span>
+    </span>
+  </div>
+  <iframe
+    class="dj-live-preview__frame"
+    title={preview.titleEn}
+    srcdoc={srcdoc}
+    loading="lazy"
+    sandbox="allow-scripts"
+  ></iframe>
+  <p class="dj-live-preview__note">
+    <span class="i18n-en">{preview.noteEn}</span>
+    <span class="i18n-pt">{preview.notePt}</span>
+  </p>
+</div>

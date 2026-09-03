@@ -54,8 +54,8 @@ const hasJs = Boolean(sandbox?.js?.trim());
   </div>
   <p class="djs-sandbox__note">
     <span aria-hidden="true">◇</span>
-    <span class="i18n-en">This preview runs in an isolated browser frame. Nothing is sent to the server.</span>
-    <span class="i18n-pt">Este preview roda em um frame isolado do navegador. Nada é enviado ao servidor.</span>
+    <span class="i18n-en">This preview runs in an isolated browser frame. Your draft stays in this browser and nothing is sent to the server.</span>
+    <span class="i18n-pt">Este preview roda em um frame isolado do navegador. Seu rascunho fica neste navegador e nada é enviado ao servidor.</span>
   </p>
 </section>
 
@@ -101,7 +101,27 @@ const hasJs = Boolean(sandbox?.js?.trim());
       var tabs = Array.prototype.slice.call(root.querySelectorAll('[data-sandbox-tab]'));
       var editors = Array.prototype.slice.call(root.querySelectorAll('[data-sandbox-editor]'));
       var resetValues = {};
+      var storageKey = 'volynx_devjourney_sandbox_' + id;
+      var saveTimer = null;
       editors.forEach(function (editor) { resetValues[editor.getAttribute('data-sandbox-editor')] = editor.value; });
+
+      function saveDraft() {
+        var draft = {};
+        editors.forEach(function (editor) { draft[editor.getAttribute('data-sandbox-editor')] = editor.value; });
+        try { localStorage.setItem(storageKey, JSON.stringify(draft)); } catch (_) {}
+      }
+
+      function restoreDraft() {
+        try {
+          var draft = JSON.parse(localStorage.getItem(storageKey) || 'null');
+          if (!draft || typeof draft !== 'object') return false;
+          editors.forEach(function (editor) {
+            var kind = editor.getAttribute('data-sandbox-editor');
+            if (typeof draft[kind] === 'string') editor.value = draft[kind];
+          });
+          return true;
+        } catch (_) { return false; }
+      }
 
       tabs.forEach(function (tab) {
         tab.addEventListener('click', function () {
@@ -112,19 +132,30 @@ const hasJs = Boolean(sandbox?.js?.trim());
           if (editor) editor.focus();
         });
       });
-      root.querySelector('[data-sandbox-run="' + id + '"]')?.addEventListener('click', function () { run(root); });
+      root.querySelector('[data-sandbox-run="' + id + '"]')?.addEventListener('click', function () { saveDraft(); run(root); });
       root.querySelector('[data-sandbox-reset="' + id + '"]')?.addEventListener('click', function () {
+        if (saveTimer) clearTimeout(saveTimer);
         editors.forEach(function (editor) { editor.value = resetValues[editor.getAttribute('data-sandbox-editor')] || ''; });
+        try { localStorage.removeItem(storageKey); } catch (_) {}
         run(root);
         setStatus(root, 'Starter restored', 'Starter restaurado');
       });
       editors.forEach(function (editor) {
+        editor.addEventListener('input', function () {
+          if (saveTimer) clearTimeout(saveTimer);
+          saveTimer = setTimeout(function () {
+            saveDraft();
+            setStatus(root, 'Draft saved locally', 'Rascunho salvo localmente');
+          }, 180);
+        });
         editor.addEventListener('keydown', function (event) {
           if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') { event.preventDefault(); run(root); }
           if (event.key === 'Tab') { event.preventDefault(); var start = editor.selectionStart; editor.setRangeText('  ', start, editor.selectionEnd, 'end'); }
         });
       });
+      var restored = restoreDraft();
       run(root);
+      if (restored) setStatus(root, 'Draft restored', 'Rascunho restaurado');
     });
   })();
 </script>

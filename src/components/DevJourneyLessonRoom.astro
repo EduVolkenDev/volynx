@@ -29,6 +29,10 @@ const firstLesson = DEVJOURNEY_LESSONS[0];
       <strong id="djlProgressValue">0%</strong>
       <div class="djl-progress__track"><span id="djlProgressBar"></span></div>
       <span id="djlProgressMeta" class="djl-progress__meta">0 / {DEVJOURNEY_LESSONS.length}</span>
+      <span id="djlSyncStatus" class="djl-progress__sync" role="status" aria-live="polite">
+        <span class="i18n-en">Saved on this device</span>
+        <span class="i18n-pt">Salvo neste dispositivo</span>
+      </span>
     </div>
   </div>
 
@@ -127,6 +131,38 @@ const firstLesson = DEVJOURNEY_LESSONS[0];
             <span class="djl-exercise__mark"><span class="i18n-en">Build → verify → explain</span><span class="i18n-pt">Construa → verifique → explique</span></span>
           </section>
           {lesson.sandbox && <DevJourneyExerciseSandbox lessonId={lesson.id} sandbox={lesson.sandbox} />}
+          <nav class="djl-lesson-nav-actions" aria-label="Lesson navigation">
+            {index > 0 ? (
+              <button
+                class="djl-lesson-step djl-lesson-step--previous"
+                type="button"
+                data-lesson-target={DEVJOURNEY_LESSONS[index - 1].id}
+                data-tier-required={DEVJOURNEY_LESSONS[index - 1].tier !== "social" ? DEVJOURNEY_LESSONS[index - 1].tier : undefined}
+                disabled={DEVJOURNEY_LESSONS[index - 1].tier !== "social"}
+              >
+                <span aria-hidden="true">←</span>
+                <span>
+                  <small><span class="i18n-en">Previous lesson</span><span class="i18n-pt">Aula anterior</span></small>
+                  <strong><span class="i18n-en">{DEVJOURNEY_LESSONS[index - 1].titleEn}</span><span class="i18n-pt">{DEVJOURNEY_LESSONS[index - 1].titlePt}</span></strong>
+                </span>
+              </button>
+            ) : <span class="djl-lesson-step djl-lesson-step--empty" aria-hidden="true"></span>}
+            {index + 1 < DEVJOURNEY_LESSONS.length ? (
+              <button
+                class="djl-lesson-step djl-lesson-step--next"
+                type="button"
+                data-lesson-target={DEVJOURNEY_LESSONS[index + 1].id}
+                data-tier-required={DEVJOURNEY_LESSONS[index + 1].tier !== "social" ? DEVJOURNEY_LESSONS[index + 1].tier : undefined}
+                disabled={DEVJOURNEY_LESSONS[index + 1].tier !== "social"}
+              >
+                <span>
+                  <small><span class="i18n-en">Next lesson</span><span class="i18n-pt">Próxima aula</span></small>
+                  <strong><span class="i18n-en">{DEVJOURNEY_LESSONS[index + 1].titleEn}</span><span class="i18n-pt">{DEVJOURNEY_LESSONS[index + 1].titlePt}</span></strong>
+                </span>
+                <span aria-hidden="true">→</span>
+              </button>
+            ) : <span class="djl-lesson-step djl-lesson-step--empty" aria-hidden="true"></span>}
+          </nav>
         </article>
       ))}
     </div>
@@ -140,18 +176,124 @@ const firstLesson = DEVJOURNEY_LESSONS[0];
     var key = 'volynx_devjourney_lessons';
     var navItems = Array.prototype.slice.call(root.querySelectorAll('[data-lesson-id]'));
     var panels = Array.prototype.slice.call(root.querySelectorAll('[data-lesson-panel]'));
+    var lessonActions = Array.prototype.slice.call(root.querySelectorAll('[data-lesson-target]'));
     var completeButtons = Array.prototype.slice.call(root.querySelectorAll('[data-complete-lesson]'));
     var progressValue = document.getElementById('djlProgressValue');
     var progressBar = document.getElementById('djlProgressBar');
     var progressMeta = document.getElementById('djlProgressMeta');
+    var syncStatus = document.getElementById('djlSyncStatus');
     var mobileLesson = document.getElementById('djlMobileLesson');
+    var progressEndpoint = 'https://zdmpzrderifgqmqivjoy.supabase.co/functions/v1/devjourney-progress';
+    var serverPrefix = 'lesson-';
+    var currentLessonKey = 'volynx_devjourney_current_lesson';
     var total = completeButtons.length;
     var completed = {};
+    var knownLessons = {};
+    var userOpenedLesson = false;
+
+    completeButtons.forEach(function (button) {
+      knownLessons[button.getAttribute('data-complete-lesson')] = true;
+    });
 
     try { completed = JSON.parse(localStorage.getItem(key) || '{}') || {}; } catch (_) { completed = {}; }
 
     function save() {
       try { localStorage.setItem(key, JSON.stringify(completed)); } catch (_) {}
+    }
+
+    function getToken() {
+      try { return localStorage.getItem('volynx_access_token') || ''; } catch (_) { return ''; }
+    }
+
+    function setSyncStatus(state) {
+      if (!syncStatus) return;
+      var labels = {
+        local: ['Saved on this device', 'Salvo neste dispositivo'],
+        syncing: ['Syncing to your account…', 'Sincronizando com sua conta…'],
+        synced: ['Saved to your account', 'Salvo na sua conta'],
+        offline: ['Offline — saved locally', 'Offline — salvo localmente'],
+        error: ['Could not sync — saved locally', 'Não foi possível sincronizar — salvo localmente'],
+      };
+      var pair = labels[state] || labels.local;
+      syncStatus.dataset.state = state;
+      var en = syncStatus.querySelector('.i18n-en');
+      var pt = syncStatus.querySelector('.i18n-pt');
+      if (en) en.textContent = pair[0];
+      if (pt) pt.textContent = pair[1];
+    }
+
+    function syncLesson(id, isComplete, token) {
+      return fetch(progressEndpoint, {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'upsert', item_id: serverPrefix + id, completed: isComplete }),
+      }).then(function (response) {
+        if (response.status === 401) {
+          var expired = new Error('session_expired');
+          expired.code = 'session_expired';
+          throw expired;
+        }
+        if (!response.ok) throw new Error('sync_failed');
+        return response.json().then(function (data) {
+          if (data && data.ok === false) throw new Error('sync_failed');
+          return data;
+        });
+      });
+    }
+
+    function restoreLesson() {
+      var savedLesson = '';
+      try { savedLesson = localStorage.getItem(currentLessonKey) || ''; } catch (_) {}
+      var firstIncomplete = completeButtons.find(function (button) {
+        return !completed[button.getAttribute('data-complete-lesson')];
+      });
+      var firstIncompleteId = firstIncomplete && firstIncomplete.getAttribute('data-complete-lesson');
+      var startLesson = savedLesson && knownLessons[savedLesson] && !completed[savedLesson]
+        ? savedLesson
+        : firstIncompleteId;
+      if (startLesson) openLesson(startLesson);
+    }
+
+    function loadServerProgress() {
+      var token = getToken();
+      if (!token) { setSyncStatus('local'); return; }
+      setSyncStatus('syncing');
+      fetch(progressEndpoint, {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'get' }),
+      }).then(function (response) {
+        if (response.status === 401) {
+          setSyncStatus('local');
+          return null;
+        }
+        if (!response.ok) throw new Error('progress_failed');
+        return response.json();
+      }).then(function (data) {
+        if (!data) return;
+        var merged = {};
+        (Array.isArray(data.items) ? data.items : []).forEach(function (itemId) {
+          var id = String(itemId || '');
+          if (id.indexOf(serverPrefix) === 0 && knownLessons[id.slice(serverPrefix.length)]) {
+            merged[id.slice(serverPrefix.length)] = true;
+          }
+        });
+        var pending = [];
+        Object.keys(completed).forEach(function (id) {
+          if (knownLessons[id] && completed[id] && !merged[id]) {
+            merged[id] = true;
+            pending.push(id);
+          }
+        });
+        completed = merged;
+        save();
+        paintCompletion();
+        if (!userOpenedLesson) restoreLesson();
+        if (!pending.length) { setSyncStatus('synced'); return; }
+        Promise.all(pending.map(function (id) { return syncLesson(id, true, token); }))
+          .then(function () { setSyncStatus('synced'); })
+          .catch(function () { setSyncStatus('error'); });
+      }).catch(function () { setSyncStatus('offline'); });
     }
 
     function updateProgress() {
@@ -184,6 +326,7 @@ const firstLesson = DEVJOURNEY_LESSONS[0];
     function openLesson(id) {
       var target = panels.find(function (panel) { return panel.getAttribute('data-lesson-panel') === id; });
       if (!target || target.hasAttribute('data-tier-required') && target.classList.contains('djl-is-locked')) return;
+      try { localStorage.setItem(currentLessonKey, id); } catch (_) {}
       panels.forEach(function (panel) { panel.classList.toggle('is-hidden', panel !== target); });
       navItems.forEach(function (item) {
         var active = item.getAttribute('data-lesson-id') === id;
@@ -195,7 +338,20 @@ const firstLesson = DEVJOURNEY_LESSONS[0];
 
     navItems.forEach(function (item) {
       item.addEventListener('click', function () {
-        if (!item.disabled) openLesson(item.getAttribute('data-lesson-id'));
+        if (!item.disabled) {
+          userOpenedLesson = true;
+          openLesson(item.getAttribute('data-lesson-id'));
+        }
+      });
+    });
+    lessonActions.forEach(function (button) {
+      button.addEventListener('click', function () {
+        if (button.disabled) return;
+        userOpenedLesson = true;
+        var targetId = button.getAttribute('data-lesson-target');
+        openLesson(targetId);
+        var target = panels.find(function (panel) { return panel.getAttribute('data-lesson-panel') === targetId; });
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
     completeButtons.forEach(function (button) {
@@ -204,9 +360,17 @@ const firstLesson = DEVJOURNEY_LESSONS[0];
         completed[id] = !completed[id];
         save();
         paintCompletion();
+        var token = getToken();
+        if (!token) { setSyncStatus('local'); return; }
+        setSyncStatus('syncing');
+        syncLesson(id, completed[id], token)
+          .then(function () { setSyncStatus('synced'); })
+          .catch(function (error) { setSyncStatus(error.code === 'session_expired' ? 'local' : 'error'); });
       });
     });
     paintCompletion();
+    restoreLesson();
+    loadServerProgress();
 
     window.addEventListener('volynx:devjourney:tier', function (event) {
       var rank = { social: 0, pro: 1, bundle: 2 };
@@ -231,6 +395,9 @@ const firstLesson = DEVJOURNEY_LESSONS[0];
   .djl-room__intro { max-width: 62ch; margin: 0; color: rgba(255,255,255,.68); line-height: 1.65; font-size: 14px; }
   .djl-progress { width: min(230px, 100%); padding: 14px; border: 1px solid rgba(140,255,210,.2); border-radius: 14px; background: rgba(140,255,210,.05); flex: 0 0 auto; }
   .djl-progress__label, .djl-progress__meta { display: block; color: rgba(255,255,255,.58); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; }
+  .djl-progress__sync { display: block; min-height: 16px; margin-top: 9px; color: rgba(140,255,210,.72); font-size: 10px; line-height: 1.4; }
+  .djl-progress__sync[data-state="syncing"] { color: rgba(0,219,255,.82); }
+  .djl-progress__sync[data-state="offline"], .djl-progress__sync[data-state="error"] { color: rgba(255,186,120,.88); }
   .djl-progress strong { display: block; margin: 3px 0 8px; color: #f3e1a0; font-size: 24px; }
   .djl-progress__track { height: 6px; border-radius: 99px; overflow: hidden; background: rgba(255,255,255,.1); }
   .djl-progress__track span { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #8cffd2, #00dbff); transition: width .25s ease; }
@@ -286,7 +453,16 @@ const firstLesson = DEVJOURNEY_LESSONS[0];
   .djl-exercise .djl-card__label { color: rgba(0,219,255,.95); }
   .djl-exercise p { max-width: 62ch; margin: 7px 0 0; color: rgba(255,255,255,.78); font-size: 13px; line-height: 1.6; }
   .djl-exercise__mark { color: rgba(255,255,255,.5); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+  .djl-lesson-nav-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.1); }
+  .djl-lesson-step { display: flex; min-width: 0; width: 100%; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid rgba(255,255,255,.14); border-radius: 12px; color: rgba(255,255,255,.72); background: rgba(255,255,255,.035); text-align: left; cursor: pointer; font: inherit; transition: border-color .2s ease, background .2s ease, transform .2s ease; }
+  .djl-lesson-step > span { min-width: 0; }
+  .djl-lesson-step--next { justify-content: space-between; border-color: rgba(140,255,210,.24); text-align: right; }
+  .djl-lesson-step:hover, .djl-lesson-step:focus-visible { border-color: rgba(0,219,255,.5); background: rgba(0,219,255,.08); transform: translateY(-1px); }
+  .djl-lesson-step:disabled { opacity: .38; cursor: not-allowed; transform: none; }
+  .djl-lesson-step small { display: block; margin-bottom: 3px; color: rgba(140,255,210,.82); font-size: 9px; font-weight: 800; letter-spacing: .12em; line-height: 1.3; text-transform: uppercase; }
+  .djl-lesson-step strong { display: block; overflow: hidden; color: #fff; font-size: 12px; line-height: 1.35; text-overflow: ellipsis; }
+  .djl-lesson-step--empty { border-color: transparent; background: transparent; pointer-events: none; }
   @media (max-width: 850px) { .djl-room__header { align-items: start; flex-direction: column; } .djl-progress { width: 100%; } .djl-layout { grid-template-columns: 1fr; } .djl-curriculum { position: static; max-height: none; } }
-  @media (max-width: 560px) { .djl-content { padding: 16px; } .djl-lesson-head { flex-direction: column; } .djl-complete { width: 100%; justify-content: center; } .djl-lesson-grid { grid-template-columns: 1fr; } .djl-exercise { align-items: start; flex-direction: column; } .djl-exercise__mark { white-space: normal; } }
+  @media (max-width: 560px) { .djl-content { padding: 16px; } .djl-lesson-head { flex-direction: column; } .djl-complete { width: 100%; justify-content: center; } .djl-lesson-grid { grid-template-columns: 1fr; } .djl-exercise { align-items: start; flex-direction: column; } .djl-exercise__mark { white-space: normal; } .djl-lesson-nav-actions { grid-template-columns: 1fr; } .djl-lesson-step--empty { display: none; } .djl-lesson-step--next { text-align: left; } }
   @media (prefers-reduced-motion: reduce) { .djl-progress__track span { transition: none; } }
 </style>

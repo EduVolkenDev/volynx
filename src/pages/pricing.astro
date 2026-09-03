@@ -1591,12 +1591,6 @@ const pricingAssistItems = [
     .qrgen-pricing-grid {
       position: relative;
     }
-    :global(.qrgen-pricing-grid .pricing-card > .card-asset) {
-      top: 12px;
-      right: 12px;
-      width: min(126px, 30%);
-      opacity: .34;
-    }
     :global(.qrgen-pricing-grid .pricing-card__head) {
       display: grid;
       gap: 18px;
@@ -1659,10 +1653,6 @@ const pricingAssistItems = [
       }
       :global(.qrgen-pricing-grid .pricing-card__head) {
         padding-right: 0;
-      }
-      :global(.qrgen-pricing-grid .pricing-card > .card-asset) {
-        width: min(112px, 34%);
-        opacity: .22;
       }
     }
 
@@ -2053,7 +2043,7 @@ const pricingAssistItems = [
         el.classList.toggle('pricing-card__price--hidden', curr !== target);
       });
       document.querySelectorAll('.token-card__pix').forEach(function(el) {
-        el.style.display = target === 'BRL' ? 'flex' : 'none';
+        el.style.display = target === 'BRL' && window.__volynxPixEnabled === true ? 'flex' : 'none';
       });
       if (updateUrl) {
         var url = new URL(window.location.href);
@@ -2076,6 +2066,18 @@ const pricingAssistItems = [
       });
     });
     applyPricingCurrency(new URLSearchParams(window.location.search).get('currency') || localStorage.getItem('volynx_currency') || 'GBP', false);
+    fetch('/config.json', { cache: 'no-store' })
+      .then(function(r) { return r.ok ? r.json() : {}; })
+      .then(function(c) {
+        window.__volynxPixEnabled = c.pixEnabled === true;
+        applyPricingCurrency(
+          new URLSearchParams(window.location.search).get('currency') ||
+          localStorage.getItem('volynx_currency') ||
+          'GBP',
+          false
+        );
+      })
+      .catch(function() {});
   </script>
 
   <FlagshipFooter />
@@ -2593,8 +2595,8 @@ const pricingAssistItems = [
     });
 
     // ── Token pack: Pix checkout (BRL only) ──
-    // Show Pix buttons when currency is BRL
-    if (getCheckoutCurrency() === 'brl') {
+    // Show Pix buttons only when currency is BRL and Stripe has enabled Pix.
+    if (getCheckoutCurrency() === 'brl' && window.__volynxPixEnabled === true) {
       document.querySelectorAll('.token-card__pix').forEach(btn => {
         btn.style.display = 'flex';
       });
@@ -2604,6 +2606,7 @@ const pricingAssistItems = [
       if (btn.dataset.preview === 'true') return;
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
+        if (window.__volynxPixEnabled !== true) return;
         if (!token) { if (window.VxReturn) window.VxReturn.redirectToLogin(); else window.location.href = '/login/?next=/pricing/'; return; }
         const packLookup = btn.getAttribute('data-pix-pack');
         if (!packLookup || !window.VxPix) return;

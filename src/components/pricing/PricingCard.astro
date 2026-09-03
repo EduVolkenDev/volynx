@@ -66,16 +66,16 @@ const ctaHref = plan.href || freePlanHref || (planLookupPrefix ? productPreviewH
     box-sizing: border-box;
   }
 
-  /* Floating plan icon — top-right hero, scaled to read as the card's identity */
+  /* Plan artwork — positioned as a larger lower-right visual anchor */
   .pricing-card > .card-asset {
     position: absolute;
-    top: -6px;
-    right: -10px;
-    width: min(150px, 42%);
+    top: 200px;
+    right: 50px;
+    width: min(250px, 80%);
     height: auto;
     opacity: 0.78;
     pointer-events: none;
-    z-index: 0;
+    z-index: 2;
     transition: opacity .35s ease, transform .35s ease, filter .35s ease;
     filter: drop-shadow(0 14px 32px rgba(0,0,0,.45));
     mix-blend-mode: normal;
@@ -85,10 +85,7 @@ const ctaHref = plan.href || freePlanHref || (planLookupPrefix ? productPreviewH
     transform: scale(1.08) rotate(-3deg);
     filter: drop-shadow(0 22px 44px rgba(0,0,0,.55));
   }
-  .pricing-card > *:not(.card-asset) { position: relative; z-index: 1; }
-  @media (min-width: 768px) {
-    .pricing-card > .card-asset { width: 200px; top: -16px; right: -16px; }
-  }
+  .pricing-card > *:not(.card-asset) { position: relative; z-index: 3; }
   .pricing-card:hover {
     border-color: rgba(255,255,255,.12);
     transform: translateY(-2px);

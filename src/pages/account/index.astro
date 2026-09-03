@@ -374,10 +374,9 @@ import { ROUTES } from "../../data/routes";
     // ── Quick Pix button (show for BR users) ──
     const lang = localStorage.getItem('volynx_lang') || 'en';
     const quickPixBtn = document.getElementById('quickPixBtn');
-    if (quickPixBtn && lang === 'pt') {
-      quickPixBtn.style.display = 'inline-flex';
+    if (quickPixBtn) {
       quickPixBtn.addEventListener('click', () => {
-        if (window.VxPix) {
+        if (window.__volynxPixEnabled === true && window.VxPix) {
           window.VxPix.checkout('tokens_core_brl', {
             successUrl: window.location.origin + '/account/?payment=pix_success',
             cancelUrl: window.location.origin + '/account/?payment=cancelled',
@@ -385,6 +384,15 @@ import { ROUTES } from "../../data/routes";
         }
       });
     }
+    fetch('/config.json', { cache: 'no-store' })
+      .then((r) => r.ok ? r.json() : {})
+      .then((cfg) => {
+        window.__volynxPixEnabled = cfg.pixEnabled === true;
+        if (quickPixBtn && lang === 'pt' && window.__volynxPixEnabled) {
+          quickPixBtn.style.display = 'inline-flex';
+        }
+      })
+      .catch(() => {});
 
     // ── Init ──
     loadPlanInfo();

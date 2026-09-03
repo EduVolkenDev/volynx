@@ -275,6 +275,16 @@ const deliveryAssistItems = [
     function show(id) { const el = document.getElementById(id); if (el) el.style.display = ''; }
     function hide(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
 
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;',
+      }[character] || character));
+    }
+
     function normalizeProductId(raw) {
       const normalized = String(raw || '')
         .trim()

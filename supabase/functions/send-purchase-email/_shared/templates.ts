@@ -18,7 +18,8 @@ export type EventType =
   | "addon_activated"
   | "kit_delivered"
   | "icons_delivered"
-  | "cvitae_template_unlocked";
+  | "cvitae_template_unlocked"
+  | "devjourney_activated";
 
 export interface Profile {
   email: string;
@@ -54,6 +55,7 @@ export function renderTemplate(args: RenderArgs): RenderResult {
     case "kit_delivered":           return kitDelivered(profile, payload);
     case "icons_delivered":         return iconsDelivered(profile, payload);
     case "cvitae_template_unlocked": return cvitaeTemplateUnlocked(profile, payload);
+    case "devjourney_activated":   return devJourneyActivated(profile, payload);
     default: throw new Error(`Unknown event_type: ${event_type}`);
   }
 }
@@ -364,6 +366,33 @@ function cvitaeTemplateUnlocked(p: Profile, x: Record<string, any>): RenderResul
       intro,
       ctaLabel: p.locale === "pt" ? "Abrir CVitae" : "Open CVitae",
       ctaUrl: "https://cvitae.volynx.world/",
+      locale: p.locale,
+    }),
+  };
+}
+
+// ── devjourney_activated ───────────────────────────────────────────────────
+function devJourneyActivated(p: Profile, x: Record<string, any>): RenderResult {
+  const tier = String(x.tier || "pro").toLowerCase() === "bundle" ? "Bundle" : "Pro";
+  const productName = `Dev Journey ${tier}`;
+  const subject = p.locale === "pt"
+    ? `${productName} ativado`
+    : `${productName} is active`;
+  const intro = p.locale === "pt"
+    ? `Olá ${p.first_name}, seu acesso ao ${productName} foi confirmado. Os materiais liberados já estão disponíveis na área do aluno.`
+    : `Hi ${p.first_name}, your ${productName} access is confirmed. The unlocked materials are now available in your student area.`;
+
+  return {
+    subject,
+    html: renderEmail({
+      preheader: intro,
+      heading: subject,
+      intro,
+      bodyHtml: "",
+      ctaLabel: p.locale === "pt" ? "Abrir área do aluno" : "Open student area",
+      ctaUrl: `${URL_BASE}/dev-journey/student/`,
+      secondaryLabel: p.locale === "pt" ? "Ver entregas" : "View deliveries",
+      secondaryUrl: `${URL_BASE}/delivery/`,
       locale: p.locale,
     }),
   };

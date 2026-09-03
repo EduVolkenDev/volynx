@@ -2,17 +2,18 @@
 import FaviconHead from "../../components/FaviconHead.astro";
 import CoreIcon from "../../components/CoreIcon.astro";
 import { ROUTES } from "../../data/routes";
+import "../../styles/galaxy-bgs.css";
 
 const devHubHref = ROUTES.devHub;
 const platformHref = ROUTES.platform;
 
 const ecosystemSurfaces = [
-  { name: "Builder", icon: "builder" as const, href: ROUTES.builder, label: { en: "Build and publish", pt: "Construir e publicar" }, copy: { en: "Turn an idea into a clear public site, campaign or product page.", pt: "Transforme uma ideia em um site, campanha ou página de produto clara." }, tone: "cyan" },
-  { name: "Daily", icon: "daily" as const, href: ROUTES.daily, label: { en: "Plan and focus", pt: "Planejar e focar" }, copy: { en: "Keep the next actions, context and routines visible while the work moves.", pt: "Mantenha ações, contexto e rotinas visíveis enquanto o trabalho avança." }, tone: "violet" },
-  { name: "Lab", icon: "lab" as const, href: ROUTES.lab, label: { en: "Make and refine", pt: "Criar e refinar" }, copy: { en: "Prepare images, QR projects and creative assets in the browser.", pt: "Prepare imagens, projetos QR e ativos criativos no navegador." }, tone: "gold" },
-  { name: "World", icon: "world" as const, href: ROUTES.world, label: { en: "Connect and discover", pt: "Conectar e descobrir" }, copy: { en: "Find people, opportunities and resources around meaningful work.", pt: "Encontre pessoas, oportunidades e recursos para trabalhos relevantes." }, tone: "cyan" },
-  { name: "Services", icon: "services" as const, href: ROUTES.services, label: { en: "Work with an expert", pt: "Trabalhar com especialistas" }, copy: { en: "Add strategy, design and implementation when the project needs a human partner.", pt: "Adicione estratégia, design e implementação quando o projeto precisar de parceria humana." }, tone: "violet" },
-  { name: "Dev Journey", icon: "journey" as const, href: ROUTES.devJourney, label: { en: "Learn by building", pt: "Aprender construindo" }, copy: { en: "Move from understanding to a real project with a guided, practical track.", pt: "Passe do entendimento a um projeto real com uma trilha prática e guiada." }, tone: "gold" },
+  { name: "Builder", icon: "builder" as const, href: ROUTES.builder, asset: "/assets/galaxy/core-surface-builder.webp", label: { en: "Build and publish", pt: "Construir e publicar" }, copy: { en: "Turn an idea into a clear public site, campaign or product page.", pt: "Transforme uma ideia em um site, campanha ou página de produto clara." }, tone: "cyan" },
+  { name: "Daily", icon: "daily" as const, href: ROUTES.daily, asset: "/assets/galaxy/core-surface-daily.webp", label: { en: "Plan and focus", pt: "Planejar e focar" }, copy: { en: "Keep the next actions, context and routines visible while the work moves.", pt: "Mantenha ações, contexto e rotinas visíveis enquanto o trabalho avança." }, tone: "violet" },
+  { name: "Lab", icon: "lab" as const, href: ROUTES.lab, asset: "/assets/galaxy/core-surface-lab.webp", label: { en: "Make and refine", pt: "Criar e refinar" }, copy: { en: "Prepare images, QR projects and creative assets in the browser.", pt: "Prepare imagens, projetos QR e ativos criativos no navegador." }, tone: "gold" },
+  { name: "World", icon: "world" as const, href: ROUTES.world, asset: "/assets/galaxy/core-surface-world.webp", label: { en: "Connect and discover", pt: "Conectar e descobrir" }, copy: { en: "Find people, opportunities and resources around meaningful work.", pt: "Encontre pessoas, oportunidades e recursos para trabalhos relevantes." }, tone: "cyan" },
+  { name: "Services", icon: "services" as const, href: ROUTES.services, asset: "/assets/galaxy/core-surface-services.webp", label: { en: "Work with an expert", pt: "Trabalhar com especialistas" }, copy: { en: "Add strategy, design and implementation when the project needs a human partner.", pt: "Adicione estratégia, design e implementação quando o projeto precisar de parceria humana." }, tone: "violet" },
+  { name: "Dev Journey", icon: "journey" as const, href: ROUTES.devJourney, asset: "/assets/galaxy/core-surface-journey.webp", label: { en: "Learn by building", pt: "Aprender construindo" }, copy: { en: "Move from understanding to a real project with a guided, practical track.", pt: "Passe do entendimento a um projeto real com uma trilha prática e guiada." }, tone: "gold" },
 ];
 ---
 
@@ -25,10 +26,11 @@ const ecosystemSurfaces = [
     <title>VOLYNX Core — Da intenção ao impacto</title>
     <FaviconHead />
   </head>
-  <body>
+  <body class="page-core">
     <div class="ambient ambient--one" aria-hidden="true"></div>
     <div class="ambient ambient--two" aria-hidden="true"></div>
     <div class="starfield" aria-hidden="true"></div>
+    <div class="galaxyfield" aria-hidden="true"></div>
 
     <header class="core-header">
       <a class="brand" href={ROUTES.core} aria-label="VOLYNX Core home">
@@ -120,21 +122,30 @@ const ecosystemSurfaces = [
         <div class="path-grid">
           <article class="path-card path-card--intention reveal">
             <div class="path-card__number">01</div>
-            <p class="path-card__label" data-en="Clarify" data-pt="Esclarecer">Esclarecer</p>
-            <h3 data-en="See the problem clearly." data-pt="Enxergar o problema com clareza.">Enxergar o problema com clareza.</h3>
-            <p data-en="Turn a vague goal into an Impact Map with an audience, assumptions, risks and a first measurable outcome." data-pt="Transforme um objetivo vago em um Mapa de Impacto com público, hipóteses, riscos e um primeiro resultado mensurável.">Transforme um objetivo vago em um Mapa de Impacto com público, hipóteses, riscos e um primeiro resultado mensurável.</p>
+            <img class="path-card__art" src="/assets/galaxy/core-clarify.webp" alt="" loading="lazy" decoding="async" width="1254" height="1254" />
+            <div class="path-card__content">
+              <p class="path-card__label" data-en="Clarify" data-pt="Esclarecer">Esclarecer</p>
+              <h3 data-en="See the problem clearly." data-pt="Enxergar o problema com clareza.">Enxergar o problema com clareza.</h3>
+              <p data-en="Turn a vague goal into an Impact Map with an audience, assumptions, risks and a first measurable outcome." data-pt="Transforme um objetivo vago em um Mapa de Impacto com público, hipóteses, riscos e um primeiro resultado mensurável.">Transforme um objetivo vago em um Mapa de Impacto com público, hipóteses, riscos e um primeiro resultado mensurável.</p>
+            </div>
           </article>
           <article class="path-card path-card--action reveal reveal--late">
             <div class="path-card__number">02</div>
-            <p class="path-card__label" data-en="Build" data-pt="Construir">Construir</p>
-            <h3 data-en="Take the next step." data-pt="Dar o próximo passo.">Dar o próximo passo.</h3>
-            <p data-en="Explore Builder, Daily, Lab, Services and other VOLYNX products whenever one can help you move forward." data-pt="Explore Builder, Daily, Lab, Services e outros produtos VOLYNX sempre que algum deles puder ajudar você a avançar.">Explore Builder, Daily, Lab, Services e outros produtos VOLYNX sempre que algum deles puder ajudar você a avançar.</p>
+            <img class="path-card__art" src="/assets/galaxy/core-build.webp" alt="" loading="lazy" decoding="async" width="1254" height="1254" />
+            <div class="path-card__content">
+              <p class="path-card__label" data-en="Build" data-pt="Construir">Construir</p>
+              <h3 data-en="Take the next step." data-pt="Dar o próximo passo.">Dar o próximo passo.</h3>
+              <p data-en="Explore Builder, Daily, Lab, Services and other VOLYNX products whenever one can help you move forward." data-pt="Explore Builder, Daily, Lab, Services e outros produtos VOLYNX sempre que algum deles puder ajudar você a avançar.">Explore Builder, Daily, Lab, Services e outros produtos VOLYNX sempre que algum deles puder ajudar você a avançar.</p>
+            </div>
           </article>
           <article class="path-card path-card--evidence reveal reveal--later">
             <div class="path-card__number">03</div>
-            <p class="path-card__label" data-en="Learn" data-pt="Comprovar">Comprovar</p>
-            <h3 data-en="Know what changed." data-pt="Saber o que mudou.">Saber o que mudou.</h3>
-            <p data-en="Keep evidence of progress, uncertainty and outcome. Impact is something we learn, not something we claim." data-pt="Registre progresso, incerteza e resultado. Impacto é algo que aprendemos, não algo que apenas declaramos.">Registre progresso, incerteza e resultado. Impacto é algo que aprendemos, não algo que apenas declaramos.</p>
+            <img class="path-card__art" src="/assets/galaxy/core-prove.webp" alt="" loading="lazy" decoding="async" width="1254" height="1254" />
+            <div class="path-card__content">
+              <p class="path-card__label" data-en="Learn" data-pt="Comprovar">Comprovar</p>
+              <h3 data-en="Know what changed." data-pt="Saber o que mudou.">Saber o que mudou.</h3>
+              <p data-en="Keep evidence of progress, uncertainty and outcome. Impact is something we learn, not something we claim." data-pt="Registre progresso, incerteza e resultado. Impacto é algo que aprendemos, não algo que apenas declaramos.">Registre progresso, incerteza e resultado. Impacto é algo que aprendemos, não algo que apenas declaramos.</p>
+            </div>
           </article>
         </div>
       </section>
@@ -165,6 +176,9 @@ const ecosystemSurfaces = [
             <a class:list={["surface-card", `surface-card--${surface.tone}`]} href={surface.href}>
               <span class="surface-card__icon"><CoreIcon name={surface.icon} size={28} /></span>
               <span class="surface-card__meta"><span>{surface.name}</span><span aria-hidden="true">↗</span></span>
+              <span class="surface-card__visual" aria-hidden="true">
+                <img class="surface-card__art" src={surface.asset} alt="" loading="lazy" decoding="async" width="640" height="640" />
+              </span>
               <strong><span class="i18n-en">{surface.label.en}</span><span class="i18n-pt">{surface.label.pt}</span></strong>
               <span class="surface-card__copy"><span class="i18n-en">{surface.copy.en}</span><span class="i18n-pt">{surface.copy.pt}</span></span>
             </a>
@@ -350,6 +364,7 @@ const ecosystemSurfaces = [
   .section-kicker span:first-child { color: var(--cyan); }
   .intro__grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 80px; margin-top: 24px; }
   h2 { max-width: 780px; font-size: clamp(2.5rem, 5vw, 5.5rem); line-height: .98; letter-spacing: -.065em; }
+  .pathways .section-heading h2 { max-width: 780px; font-size: clamp(2.5rem, 5vw, 5.5rem); line-height: .98; letter-spacing: -.025em; }
   .intro__body, .section-heading > p, .handoff__copy > p { color: var(--muted); font-size: 1rem; line-height: 1.7; }
   .text-link { display: inline-block; margin-top: 15px; color: var(--gold); font-size: .78rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
   .text-link:hover, .text-link:focus-visible { color: var(--cyan); }
@@ -357,10 +372,17 @@ const ecosystemSurfaces = [
   .section-heading { margin-bottom: 36px; }
   .section-heading h2 { margin: 20px 0 0; }
   .path-grid, .future-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-  .path-card { min-height: 330px; padding: 27px; display: flex; flex-direction: column; border: 1px solid var(--line); background: linear-gradient(150deg, rgba(255,255,255,.075), rgba(255,255,255,.015)); clip-path: polygon(0 0, 96% 0, 100% 8%, 100% 100%, 4% 100%, 0 92%); transition: transform .3s ease, border-color .3s ease, background .3s ease; }
+  .path-card { position: relative; min-height: 430px; padding: 27px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line); background: linear-gradient(150deg, rgba(255,255,255,.075), rgba(255,255,255,.015)); clip-path: polygon(0 0, 96% 0, 100% 8%, 100% 100%, 4% 100%, 0 92%); transition: transform .3s ease, border-color .3s ease, background .3s ease; }
+  .path-card__number, .path-card__content { position: relative; z-index: 1; }
+  .path-card__art { position: relative; z-index: 0; display: block; width: min(100%, 250px); height: 215px; margin: -8px auto 2px; flex: 0 0 auto; object-fit: contain; opacity: .95; pointer-events: none; filter: drop-shadow(0 14px 24px rgba(30, 130, 255, .18)); transition: transform .3s ease, opacity .3s ease; }
+  .path-card--intention .path-card__art { transform: rotate(-4deg) scale(1.02); }
+  .path-card--action .path-card__art { transform: rotate(3deg) scale(1.05); }
+  .path-card--evidence .path-card__art { transform: rotate(-2deg) scale(1.04); }
+  .path-card__content { margin-top: auto; }
   .path-card:hover { transform: translateY(-5px); border-color: rgba(110,231,249,.5); background: linear-gradient(150deg, rgba(110,231,249,.12), rgba(255,255,255,.02)); }
+  .path-card:hover .path-card__art { opacity: 1; }
   .path-card__number { color: var(--cyan); font-size: .72rem; letter-spacing: .16em; }
-  .path-card__label { margin-top: auto; color: var(--gold); }
+  .path-card__label { margin: 0; color: var(--gold); }
   .path-card h3 { margin: 12px 0 12px; font-size: clamp(1.5rem, 2.3vw, 2.3rem); line-height: 1; letter-spacing: -.05em; }
   .path-card > p:last-child { margin-bottom: 0; color: var(--muted); font-size: .9rem; line-height: 1.6; }
   .handoff { display: grid; grid-template-columns: .95fr 1.05fr; gap: 70px; align-items: center; padding: 72px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
@@ -373,17 +395,24 @@ const ecosystemSurfaces = [
   .hub-list small { color: var(--muted); font-size: .76rem; }
   .ecosystem { padding: 126px 0 136px; border-bottom: 1px solid var(--line); }
   .surface-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  .surface-card { position: relative; min-height: 220px; display: flex; flex-direction: column; gap: 13px; padding: 22px; overflow: hidden; border: 1px solid var(--line); border-radius: 22px 6px 22px 6px; background: linear-gradient(145deg, rgba(255,255,255,.065), rgba(255,255,255,.015)); transition: transform .3s ease, border-color .3s ease, background .3s ease; }
+  .surface-card { position: relative; min-height: 430px; display: flex; flex-direction: column; gap: 13px; padding: 22px; overflow: hidden; border: 1px solid var(--line); border-radius: 22px 6px 22px 6px; background: linear-gradient(145deg, rgba(255,255,255,.065), rgba(255,255,255,.015)); transition: transform .3s ease, border-color .3s ease, background .3s ease; }
   .surface-card::after { content: ""; position: absolute; width: 100px; height: 100px; right: -34px; bottom: -46px; border-radius: 50%; background: currentColor; opacity: .08; filter: blur(4px); transition: transform .3s ease; }
   .surface-card:hover, .surface-card:focus-visible { transform: translateY(-5px); border-color: currentColor; background: linear-gradient(145deg, rgba(255,255,255,.1), rgba(255,255,255,.025)); }
   .surface-card:hover::after, .surface-card:focus-visible::after { transform: scale(1.5); }
   .surface-card--cyan { color: var(--cyan); }
   .surface-card--violet { color: var(--violet); }
   .surface-card--gold { color: var(--gold); }
-  .surface-card__icon { width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 15px 5px 15px 5px; background: rgba(255,255,255,.04); }
-  .surface-card__meta { display: flex; justify-content: space-between; color: currentColor; font-size: .62rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
-  .surface-card strong { color: var(--ink); font-size: 1.35rem; letter-spacing: -.04em; }
-  .surface-card__copy { max-width: 32ch; color: var(--muted); font-size: .82rem; line-height: 1.6; }
+  .surface-card__icon { position: relative; z-index: 1; width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 15px 5px 15px 5px; background: rgba(255,255,255,.04); }
+  .surface-card__meta { position: relative; z-index: 1; display: flex; justify-content: space-between; color: currentColor; font-size: .62rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+  .surface-card__visual { position: relative; z-index: 1; display: grid; place-items: center; height: 145px; margin: -5px -4px 0; }
+  .surface-card__art { display: block; width: min(100%, 195px); height: 145px; object-fit: contain; pointer-events: none; filter: drop-shadow(0 14px 24px rgba(30, 130, 255, .18)); transition: transform .3s ease; }
+  .surface-card:hover .surface-card__art, .surface-card:focus-visible .surface-card__art { transform: scale(1.045); }
+  .surface-card strong { position: relative; z-index: 1; color: var(--ink); font-size: 1.35rem; line-height: 1.1; letter-spacing: -.04em; }
+  .surface-card__copy { position: relative; z-index: 1; max-width: 32ch; color: var(--muted); font-size: .82rem; line-height: 1.6; }
+  .i18n-en { display: none; }
+  .i18n-pt { display: inline; }
+  html[lang="en"] .i18n-en { display: inline; }
+  html[lang="en"] .i18n-pt { display: none; }
   .future { padding: 144px 0; }
   .section-heading > p { max-width: 670px; margin: 20px 0 0; }
   .future-grid article { padding: 22px; border-top: 1px solid var(--line); }
@@ -430,7 +459,10 @@ const ecosystemSurfaces = [
     .signal-label--top { left: 18%; }
     .signal-label--right { right: 0; }
     .path-grid, .future-grid, .hub-list, .surface-grid { grid-template-columns: 1fr; }
-    .path-card { min-height: 270px; }
+    .path-card { min-height: 420px; }
+    .path-card__art { width: min(100%, 250px); height: 190px; }
+    .surface-card { min-height: 390px; }
+    .surface-card__visual, .surface-card__art { height: 135px; }
     .intro, .pathways, .future, .closing { padding-bottom: 92px; }
     .handoff { padding: 56px 0; }
     .core-footer { flex-direction: column; }

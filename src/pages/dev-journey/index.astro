@@ -4,35 +4,46 @@ import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
 import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import FlagshipFooter from "../../components/FlagshipFooter.astro";
 import PlatformAssistStrip from "../../components/PlatformAssistStrip.astro";
-import { ROUTES } from "../../data/routes";
+import DevJourneyOutcomePreview from "../../components/DevJourneyOutcomePreview.astro";
+import { ROUTES, checkoutHref } from "../../data/routes";
+
+const devJourneyProCheckoutHref = checkoutHref("devjourney_pro", {
+  currency: "gbp",
+  next: ROUTES.devJourney,
+});
+const devJourneyBundleCheckoutHref = checkoutHref("devjourney_bundle", {
+  currency: "gbp",
+  next: ROUTES.devJourney,
+});
 
 const devJourneyAssistItems = [
   {
     href: ROUTES.devJourneyStudent,
-    label: { en: "Student area", pt: "Área do aluno" },
-    title: { en: "Open the real course flow", pt: "Abrir o fluxo real do curso" },
-    copy: { en: "Progress, ZIP downloads, gated materials and the practical side of the journey live here.", pt: "Progresso, downloads ZIP, materiais bloqueados e o lado prático da jornada vivem aqui." },
+    label: { en: "Your progress", pt: "Seu progresso" },
+    title: { en: "Pick up where you left off", pt: "Continue de onde parou" },
+    copy: { en: "Save your work, access downloads and continue each project from your account.", pt: "Salve seu trabalho, acesse os downloads e continue cada projeto pela sua conta." },
     emphasized: true,
     iconSrc: "/assets/devjourney/journeyicon.webp",
   },
   {
     href: ROUTES.devJourneyChecklist,
     label: { en: "Checklist", pt: "Checklist" },
-    title: { en: "Track what actually shipped", pt: "Marque o que realmente foi entregue" },
-    copy: { en: "Each block becomes visible work on screen instead of abstract study time.", pt: "Cada bloco vira trabalho visível na tela em vez de tempo abstrato de estudo." },
+    title: { en: "Know what is complete", pt: "Saiba o que está concluído" },
+    copy: { en: "Check each deliverable before moving on, so every step has a clear finish line.", pt: "Confira cada entrega antes de avançar, para que toda etapa tenha um final claro." },
+    iconSrc: "/assets/devjourney/devjourneyicon4.webp",
   },
   {
     href: ROUTES.delivery,
-    label: { en: "Recovery", pt: "Recuperação" },
-    title: { en: "Keep the post-purchase lane in one place", pt: "Mantenha o pós-compra em um só lugar" },
-    copy: { en: "When Pro or Bundle access is involved, delivery stays attached to the same VOLYNX recovery path.", pt: "Quando Pro ou Bundle entram na jogada, a entrega continua presa ao mesmo caminho de recuperação da VOLYNX." },
+    label: { en: "Your access", pt: "Seu acesso" },
+    title: { en: "Find purchases and downloads", pt: "Encontre compras e downloads" },
+    copy: { en: "Keep paid access and delivered files linked to your account.", pt: "Mantenha acessos pagos e arquivos entregues ligados à sua conta." },
     iconSrc: "/assets/mybox.webp",
   },
   {
     href: ROUTES.support,
     label: { en: "Support", pt: "Suporte" },
-    title: { en: "Use the same operational lane", pt: "Use a mesma faixa operacional" },
-    copy: { en: "Access, delivery and launch questions should route through support without leaving the ecosystem.", pt: "Dúvidas de acesso, entrega e lançamento devem passar pelo suporte sem sair do ecossistema." },
+    title: { en: "Get help when you need it", pt: "Peça ajuda quando precisar" },
+    copy: { en: "Questions about access, delivery or launch? Contact VOLYNX support.", pt: "Dúvidas sobre acesso, entrega ou publicação? Fale com o suporte VOLYNX." },
     iconSrc: "/assets/support.webp",
   },
 ];
@@ -44,9 +55,33 @@ const methodCards = [
 ];
 
 const projectCards = [
-  { titleKey: "dj.project_landing", title: "Premium landing", descKey: "dj.project_landing_desc", desc: "Grid, hierarchy, responsiveness, and micro-interactions. The right aesthetic sells.", asset: "/assets/devjourney/devjourneyicon5.webp" },
-  { titleKey: "dj.project_app", title: "Web app", descKey: "dj.project_app_desc", desc: "Data, states, and UX: interfaces that respond fast and can become a product.", asset: "/assets/devjourney/devjourneyicon20.webp" },
-  { titleKey: "dj.project_final", title: "Final project", descKey: "dj.project_final_desc", desc: "Plan, execute, publish, and present. The full cycle, as in the real world.", asset: "/assets/devjourney/devjourneyicon21.webp" },
+  {
+    titleKey: "dj.project_landing",
+    title: "Responsive landing page",
+    descKey: "dj.project_landing_desc",
+    desc: "A polished page with clear hierarchy, responsive layout and interaction.",
+    track: { en: "Social Sprint", pt: "Sprint Social" },
+    output: { en: "A live page you can show", pt: "Uma página publicada para mostrar" },
+    preview: "landing",
+  },
+  {
+    titleKey: "dj.project_app",
+    title: "Working web app",
+    descKey: "dj.project_app_desc",
+    desc: "An interface with state, data and feedback that behaves like a real product.",
+    track: { en: "Pro", pt: "Pro" },
+    output: { en: "A functional app in your portfolio", pt: "Um app funcional no seu portfólio" },
+    preview: "app",
+  },
+  {
+    titleKey: "dj.project_final",
+    title: "Published final project",
+    descKey: "dj.project_final_desc",
+    desc: "A complete build with documentation, live URL, repository and review-ready polish.",
+    track: { en: "Bundle", pt: "Bundle" },
+    output: { en: "A complete project ready to present", pt: "Um projeto completo pronto para apresentar" },
+    preview: "final",
+  },
 ];
 
 const nextSteps = [
@@ -72,7 +107,7 @@ const nextSteps = [
     desc: "Studio Pro unlocks batch processing, advanced export, and commercial usage for your day-to-day workflow.",
     ctaKey: "dj.next_cta_studio",
     cta: "Explore Studio →",
-    asset: "/assets/newimagesuite.webp",
+    asset: "/assets/volynxstudio.webp",
   },
   {
     href: ROUTES.services,
@@ -91,7 +126,7 @@ const nextSteps = [
 
 <FlagshipLayout
   title="Dev Journey • VOLYNX.Lab Education"
-  description="Dev Journey: trilha de aprendizado guiada por projetos, sem encheção de linguiça. Grátis com login — salve progresso, baixe materiais, acompanhe checklists e envie seu projeto para validação automática."
+  description="Dev Journey is a self-guided web development course built around real projects, clear checkpoints and portfolio-ready deliverables. Start free with a VOLYNX account."
   pageClass="page-dev-journey"
 >
   <FlagshipHeader ctaHref={ROUTES.devJourneyStudent} ctaLabel="Enter Student Area" ctaI18n="dj.btn_access" />
@@ -114,14 +149,14 @@ const nextSteps = [
 
             <div class="dj-hero__notice">
               <strong data-i18n="dj.notice_important">Importante:</strong>
-              <span data-i18n="dj.notice_text"> o curso é grátis, mas exige login pra ativar a experiência completa: salvar progresso, baixar materiais, desbloquear blocos, usar checklists e enviar seu projeto para validação automática.</span>
-              <span class="dj-hero__notice-sub" data-i18n="dj.notice_subtext">Sem login você vê a visão geral; com login você roda a jornada.</span>
+              <span data-i18n="dj.notice_text"> The course is free to start. Login saves your progress, unlocks downloads and checklists, and lets you submit your project.</span>
+              <span class="dj-hero__notice-sub" data-i18n="dj.notice_subtext">Without login, you can preview the curriculum; with login, you can work through it.</span>
             </div>
 
             <div class="dj-hero__actions">
-              <a class="button button--gold" href={ROUTES.devJourneyStudent} data-i18n="dj.btn_start">Comece agora (grátis)</a>
-              <a class="button button--ghost" href="#curriculum" data-i18n="dj.btn_curriculum">Ver currículo</a>
-              <a class="button button--ghost" href="#access" data-i18n="dj.btn_login">Como funciona o login</a>
+              <a class="button button--gold" href={ROUTES.devJourneyStudent} data-i18n="dj.btn_start">Start now (free)</a>
+              <a class="button button--ghost" href="#curriculum" data-i18n="dj.btn_curriculum">View curriculum</a>
+              <a class="button button--ghost" href="#access" data-i18n="dj.btn_login">How login works</a>
             </div>
 
             <div class="hero-inline-stats dj-hero__stats">
@@ -140,57 +175,66 @@ const nextSteps = [
             </div>
           </div>
 
-          <aside class="dj-system panel" aria-label="Dev Journey inside VOLYNX">
+          <aside class="dj-system" aria-label="How Dev Journey works">
             <div class="dj-system__art-shell" aria-hidden="true">
-              <img src="/assets/devjourney/journeyicon.webp" alt="" class="dj-system__art" loading="lazy" decoding="async" />
+              <img
+                src="/assets/devjourney/journeyicon.webp"
+                alt=""
+                class="dj-system__art"
+                width="1760"
+                height="1760"
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+              />
             </div>
 
             <span class="eyebrow">
-              <span class="i18n-en">Inside VOLYNX</span>
-              <span class="i18n-pt">Dentro da VOLYNX</span>
+              <span class="i18n-en">How it works</span>
+              <span class="i18n-pt">Como funciona</span>
             </span>
 
             <h2>
-              <span class="i18n-en">The course now sits in the same system as the rest of the platform.</span>
-              <span class="i18n-pt">O curso agora vive no mesmo sistema que o resto da plataforma.</span>
+              <span class="i18n-en">Learn, save your progress and keep every deliverable in one place.</span>
+              <span class="i18n-pt">Aprenda, salve seu progresso e mantenha cada entrega em um só lugar.</span>
             </h2>
 
             <p>
-              <span class="i18n-en">Student area, checklist, ZIP delivery, support and post-purchase recovery no longer need a separate visual language. Dev Journey should feel like a real VOLYNX surface.</span>
-              <span class="i18n-pt">Área do aluno, checklist, entrega ZIP, suporte e recuperação pós-compra não precisam mais de uma linguagem visual separada. O Dev Journey deve parecer uma superfície real da VOLYNX.</span>
+              <span class="i18n-en">Lessons, downloads, checklists and support stay connected, so you always know what to do next.</span>
+              <span class="i18n-pt">Aulas, downloads, checklists e suporte ficam conectados, para você sempre saber qual é o próximo passo.</span>
             </p>
 
             <div class="dj-system__links">
               <a class="dj-system__link" href={ROUTES.devJourneyStudent}>
                 <strong>
-                  <span class="i18n-en">Student area</span>
-                  <span class="i18n-pt">Área do aluno</span>
+                  <span class="i18n-en">Your student area</span>
+                  <span class="i18n-pt">Sua área do aluno</span>
                 </strong>
                 <span>
-                  <span class="i18n-en">Progress, gated materials and ZIP downloads.</span>
-                  <span class="i18n-pt">Progresso, materiais bloqueados e downloads ZIP.</span>
+                  <span class="i18n-en">Continue lessons and see your progress.</span>
+                  <span class="i18n-pt">Continue as aulas e acompanhe seu progresso.</span>
                 </span>
               </a>
 
               <a class="dj-system__link" href={ROUTES.devJourneyChecklist}>
                 <strong>
-                  <span class="i18n-en">Checklist</span>
-                  <span class="i18n-pt">Checklist</span>
+                  <span class="i18n-en">Your checklist</span>
+                  <span class="i18n-pt">Seu checklist</span>
                 </strong>
                 <span>
-                  <span class="i18n-en">Track what actually shipped, not what felt studied.</span>
-                  <span class="i18n-pt">Marque o que realmente foi entregue, não só o que pareceu estudado.</span>
+                  <span class="i18n-en">Confirm each deliverable before moving on.</span>
+                  <span class="i18n-pt">Confirme cada entrega antes de avançar.</span>
                 </span>
               </a>
 
               <a class="dj-system__link" href={ROUTES.delivery}>
                 <strong>
-                  <span class="i18n-en">My products</span>
-                  <span class="i18n-pt">Meus produtos</span>
+                  <span class="i18n-en">Your products</span>
+                  <span class="i18n-pt">Seus produtos</span>
                 </strong>
                 <span>
-                  <span class="i18n-en">Keep the upgrade and recovery lane attached to the platform.</span>
-                  <span class="i18n-pt">Mantenha a trilha de upgrade e recuperação presa à plataforma.</span>
+                  <span class="i18n-en">Find purchases, downloads and access details.</span>
+                  <span class="i18n-pt">Encontre compras, downloads e detalhes de acesso.</span>
                 </span>
               </a>
             </div>
@@ -200,15 +244,15 @@ const nextSteps = [
     </section>
 
     <PlatformAssistStrip
-      eyebrow={{ en: "Platform flow", pt: "Fluxo da plataforma" }}
-      title={{ en: "Dev Journey should move like the rest of VOLYNX.", pt: "O Dev Journey deve se mover como o resto da VOLYNX." }}
-      description={{ en: "Open the course, track progress, recover purchases and route support without jumping into a detached microsite.", pt: "Abra o curso, acompanhe progresso, recupere compras e direcione suporte sem cair num microsite desconectado." }}
+      eyebrow={{ en: "Your course", pt: "Seu curso" }}
+      title={{ en: "Everything you need to keep building.", pt: "Tudo o que você precisa para continuar construindo." }}
+      description={{ en: "Start the course, save progress, download materials and get help without losing your place.", pt: "Comece o curso, salve o progresso, baixe materiais e peça ajuda sem perder seu lugar." }}
       items={devJourneyAssistItems}
     />
 
-    <section class="page-section" id="curriculum">
+    <section class="page-section dj-curriculum-section" id="curriculum">
       <div class="shell">
-        <div class="section-head section-head--split">
+        <div class="section-head section-head--split dj-curriculum-head">
           <div>
             <span class="eyebrow">
               <span class="i18n-en">Curriculum</span>
@@ -369,12 +413,12 @@ const nextSteps = [
               <span class="i18n-pt">A área do aluno mantém a jornada ligada à sua conta.</span>
             </li>
             <li>
-              <span class="i18n-en">Checklist, downloads and review prep stop being loose docs and become part of the platform flow.</span>
-              <span class="i18n-pt">Checklist, downloads e preparação de revisão deixam de ser documentos soltos e passam a fazer parte do fluxo da plataforma.</span>
+              <span class="i18n-en">Your checklist and downloads stay with the lessons, so you always know what comes next.</span>
+              <span class="i18n-pt">Seu checklist e seus downloads ficam junto das aulas, para você sempre saber o próximo passo.</span>
             </li>
             <li>
-              <span class="i18n-en">When Pro or Bundle is involved, delivery and recovery stay in the same VOLYNX lane.</span>
-              <span class="i18n-pt">Quando Pro ou Bundle entram na jogada, entrega e recuperação continuam na mesma faixa da VOLYNX.</span>
+              <span class="i18n-en">If you upgrade, your access and delivered files stay linked to the same account.</span>
+              <span class="i18n-pt">Se fizer upgrade, seu acesso e seus arquivos entregues continuam ligados à mesma conta.</span>
             </li>
           </ul>
           <div class="dj-access-card__actions">
@@ -416,19 +460,35 @@ const nextSteps = [
               <span class="i18n-en">Portfolio output</span>
               <span class="i18n-pt">Saída de portfólio</span>
             </span>
-            <h2 data-i18n="dj.projects_title">Projects that become portfolio</h2>
+            <h2 data-i18n="dj.projects_title">What you'll build</h2>
           </div>
-          <p data-i18n="dj.projects_desc">It's not just about "learning". It's about building assets: pages, apps, and case studies that represent you.</p>
+          <p data-i18n="dj.projects_desc">Each track ends with work you can show: a responsive page, a working app or a published final project.</p>
         </div>
 
         <div class="grid-3">
           {projectCards.map((card) => (
             <article class="panel dj-project-card">
-              <div class="dj-card-art-shell dj-card-art-shell--feature" aria-hidden="true">
-                <img src={card.asset} alt="" class="dj-card-art dj-card-art--feature" loading="lazy" decoding="async" />
-              </div>
+              <DevJourneyOutcomePreview kind={card.preview} />
               <h3 data-i18n={card.titleKey}>{card.title}</h3>
               <p data-i18n={card.descKey}>{card.desc}</p>
+              <div class="dj-project-card__proof">
+                <span>
+                  <strong>
+                    <span class="i18n-en">Track</span>
+                    <span class="i18n-pt">Trilha</span>
+                  </strong>
+                  <span class="i18n-en">{card.track.en}</span>
+                  <span class="i18n-pt">{card.track.pt}</span>
+                </span>
+                <span>
+                  <strong>
+                    <span class="i18n-en">You finish with</span>
+                    <span class="i18n-pt">Você termina com</span>
+                  </strong>
+                  <span class="i18n-en">{card.output.en}</span>
+                  <span class="i18n-pt">{card.output.pt}</span>
+                </span>
+              </div>
             </article>
           ))}
         </div>
@@ -477,7 +537,14 @@ const nextSteps = [
               <li data-i18n="dj.pro_perk3">Pro certificate (14-day track)</li>
               <li data-i18n="dj.pro_perk4">Priority checklist feedback</li>
             </ul>
-            <a class="button button--gold" href={ROUTES.contact} data-i18n="dj.btn_pro">Get Pro access →</a>
+            <a
+              class="button button--gold vx-checkout-btn"
+              href={devJourneyProCheckoutHref}
+              data-lookup="devjourney_pro"
+              data-currency="gbp"
+              data-label="Get Pro access"
+              data-i18n="dj.btn_pro"
+            >Get Pro access →</a>
           </article>
 
           <article class="panel dj-plan-card dj-plan-card--bundle">
@@ -493,7 +560,14 @@ const nextSteps = [
               <li data-i18n="dj.bundle_perk3">Bundle certificate (30-day track)</li>
               <li data-i18n="dj.bundle_perk4">Arsenal Kit (4 reusable projects)</li>
             </ul>
-            <a class="button button--ghost" href={ROUTES.contact} data-i18n="dj.btn_bundle">Get Bundle access →</a>
+            <a
+              class="button button--ghost vx-checkout-btn"
+              href={devJourneyBundleCheckoutHref}
+              data-lookup="devjourney_bundle"
+              data-currency="gbp"
+              data-label="Get Bundle access"
+              data-i18n="dj.btn_bundle"
+            >Get Bundle access →</a>
           </article>
         </div>
       </div>

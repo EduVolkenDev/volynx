@@ -14,6 +14,7 @@
  *   node scripts/stripe-catalog-reconcile.mjs --dry-run
  *   node scripts/stripe-catalog-reconcile.mjs --apply
  *   node scripts/stripe-catalog-reconcile.mjs --apply --live
+ *   node scripts/stripe-catalog-reconcile.mjs --apply --only=devjourney
  */
 
 import Stripe from "stripe";
@@ -28,6 +29,7 @@ dotenv.config({ path: resolve(__dirname, ".env"), quiet: true });
 const args = new Set(process.argv.slice(2));
 const APPLY = args.has("--apply");
 const REQUIRE_LIVE = args.has("--live");
+const ONLY = [...args].find((arg) => arg.startsWith("--only="))?.slice("--only=".length) || "";
 const DRY_RUN = !APPLY;
 
 const STRIPE_KEY = (REQUIRE_LIVE && process.env.STRIPE_LIVE_SECRET_KEY)
@@ -144,6 +146,22 @@ const catalog = [
     tier: "studio",
     recurring: "month",
     amounts: { gbp: 8200, eur: 9600, brl: 54900 },
+  },
+  {
+    name: "Dev Journey Pro",
+    description: "The Pro Dev Journey track with Block 3, React/Vite starter, priority checklist feedback and Pro certification.",
+    lookupPrefix: "devjourney_pro",
+    family: "devjourney",
+    tier: "pro",
+    amounts: { gbp: 4500, eur: 5300, brl: 27900 },
+  },
+  {
+    name: "Dev Journey Bundle",
+    description: "The complete Dev Journey track with architecture, deploy, certification guidance and the Arsenal Kit.",
+    lookupPrefix: "devjourney_bundle",
+    family: "devjourney",
+    tier: "bundle",
+    amounts: { gbp: 9900, eur: 11700, brl: 59900 },
   },
   {
     name: "VX Pack - Starter (12)",
@@ -598,11 +616,18 @@ async function ensurePrice(def, product, cur, actions, rows) {
 async function main() {
   const actions = [];
   const rows = [];
+  const selectedCatalog = ONLY
+    ? catalog.filter((def) => def.family === ONLY || def.lookupPrefix === ONLY || def.lookupPrefix.startsWith(`${ONLY}_`))
+    : catalog;
+
+  if (ONLY && selectedCatalog.length === 0) {
+    throw new Error(`No catalog products matched --only=${ONLY}.`);
+  }
 
   console.log(`VOLYNX Stripe catalog reconcile | mode=${mode} | ${DRY_RUN ? "dry-run" : "apply"}`);
-  console.log(`Expected: ${catalog.length} products, ${catalog.length * currencies.length} prices\n`);
+  console.log(`Expected: ${selectedCatalog.length} products, ${selectedCatalog.length * currencies.length} prices${ONLY ? ` | only=${ONLY}` : ""}\n`);
 
-  for (const def of catalog) {
+  for (const def of selectedCatalog) {
     const product = await ensureProduct(def, actions);
     for (const cur of currencies) {
       await ensurePrice(def, product, cur, actions, rows);

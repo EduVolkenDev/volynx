@@ -271,13 +271,13 @@ export const sitePricing = {
       cta: { pt: 'Abrir QRGen', en: 'Open QRGen' },
       href: '/qrgen/',
       features: {
-        pt: ['prévia ao vivo', 'QR estático', 'cores básicas', '2 exportações grátis/dia'],
-        en: ['live preview', 'static QR', 'basic colors', '2 free exports/day']
+        pt: ['prévia ao vivo', 'QR estático', 'cores básicas', '3 exportações grátis/semana'],
+        en: ['live preview', 'static QR', 'basic colors', '3 free exports/week']
       }
     },
     {
       id: 'launch',
-      image: '/assets/newqrgen.webp',
+      image: '/assets/qrgen-launch.webp',
       name: { pt: 'QRGen Launch', en: 'QRGen Launch' },
       description: {
         pt: 'Para campanhas reais que precisam de PNG em alta resolução e fluxo de rascunhos mais prático.',
@@ -293,7 +293,7 @@ export const sitePricing = {
     },
     {
       id: 'pro',
-      image: '/assets/newqrgen.webp',
+      image: '/assets/qrgen-pro.webp',
       badge: { pt: 'SVG premium', en: 'Premium SVG' },
       featured: true,
       name: { pt: 'QRGen Pro', en: 'QRGen Pro' },
@@ -311,7 +311,7 @@ export const sitePricing = {
     },
     {
       id: 'studio',
-      image: '/assets/newqrgen.webp',
+      image: '/assets/qrgen-studio.webp',
       name: { pt: 'QRGen Studio', en: 'QRGen Studio' },
       description: {
         pt: 'Para trabalho com clientes, QR dinâmico gerenciado, organização de campanhas e caminho de analytics.',

@@ -1,0 +1,78 @@
+/*
+ * Curated galaxy backgrounds
+ *
+ * These are page-level atmospheres, not decorative replacements for the
+ * product artwork. Each page owns its crop and contrast treatment so the
+ * background never competes with copy, controls, or cards.
+ */
+
+/* Core / home ------------------------------------------------------- */
+.page-core {
+  position: relative;
+  isolation: isolate;
+}
+
+.page-core .galaxyfield {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(3, 4, 11, .28), rgba(3, 4, 11, .74) 62%, rgba(3, 4, 11, .94)),
+    url("/assets/galaxy/home-ribbons.webp") center 18% / cover no-repeat;
+  opacity: .78;
+  transform: translateZ(0);
+}
+
+/* Launch ------------------------------------------------------------ */
+.page-launch-2026 .hero-bg {
+  background:
+    linear-gradient(180deg, rgba(6, 6, 8, .56), rgba(6, 6, 8, .76)),
+    url("/assets/galaxy/launch-depth.webp") center 52% / cover no-repeat !important;
+}
+
+/* Flagship pages ---------------------------------------------------- */
+body.page-world {
+  background:
+    linear-gradient(180deg, rgba(4, 5, 10, .72), rgba(4, 5, 10, .84) 46%, rgba(4, 5, 10, .96)),
+    url("/assets/galaxy/world-nebula.webp") center 22% / cover fixed no-repeat;
+}
+
+body.page-pricing {
+  background:
+    linear-gradient(180deg, rgba(4, 5, 10, .80), rgba(4, 5, 10, .91) 46%, rgba(4, 5, 10, .98)),
+    url("/assets/galaxy/pricing-nebula.webp") center 18% / cover fixed no-repeat;
+}
+
+body.page-services {
+  background:
+    linear-gradient(180deg, rgba(4, 5, 10, .76), rgba(4, 5, 10, .88) 46%, rgba(4, 5, 10, .97)),
+    url("/assets/galaxy/services-nebula.webp") center 18% / cover fixed no-repeat;
+}
+
+/* Dev Journey ------------------------------------------------------- */
+body.page-dev-journey {
+  background:
+    radial-gradient(circle at 16% 12%, rgba(177, 150, 255, .12), transparent 28%),
+    linear-gradient(180deg, rgba(4, 5, 12, .76), rgba(4, 5, 12, .90) 44%, rgba(4, 5, 12, .98) 88%),
+    url("/assets/galaxy/world-nebula.webp") center 10% / cover fixed no-repeat;
+}
+
+@media (max-width: 700px), (prefers-reduced-motion: reduce) {
+  .page-core .galaxyfield {
+    background-position: 56% 26%;
+    opacity: .62;
+  }
+
+  .page-launch-2026 .hero-bg {
+    background-position: 50% 44%;
+  }
+
+  body.page-world,
+  body.page-pricing,
+  body.page-services,
+  body.page-dev-journey {
+    background-attachment: scroll, scroll;
+    background-position: center 24%, center;
+  }
+}

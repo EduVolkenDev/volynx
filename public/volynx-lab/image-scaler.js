@@ -1,12 +1,13 @@
 (function () {
   async function checkPermission(toolName) {
     var FREE = { allowed: true, plan: 'free', remaining: null };
+    var token = localStorage.getItem('volynx_access_token') || '';
     var cfg;
     try { cfg = await fetch('/config.json', { cache: 'no-store' }).then(function(r){ return r.json(); }); }
-    catch (_) { return FREE; }
+    catch (_) { return token ? { allowed: false, plan: 'unknown', remaining: 0, source: 'error', error: 'permission_unavailable' } : FREE; }
     var apiBase = (cfg.functionsUrl || cfg.apiBaseUrl || '').replace(/\/$/, '');
-    var token = localStorage.getItem('volynx_access_token') || '';
-    if (!apiBase || !token) return FREE;
+    if (!token) return FREE;
+    if (!apiBase) return { allowed: false, plan: 'unknown', remaining: 0, source: 'error', error: 'permission_unavailable' };
     try {
       var ctrl = new AbortController();
       var t = setTimeout(function(){ ctrl.abort(); }, 3500);
@@ -17,9 +18,9 @@
         signal: ctrl.signal,
       });
       clearTimeout(t);
-      if (!res.ok) return FREE;
+      if (!res.ok) return { allowed: false, plan: 'unknown', remaining: 0, source: 'error', error: 'permission_unavailable' };
       return await res.json();
-    } catch (_) { return FREE; }
+    } catch (_) { return { allowed: false, plan: 'unknown', remaining: 0, source: 'error', error: 'permission_unavailable' }; }
   }
 
   var fileInput   = document.getElementById('file');
@@ -139,6 +140,12 @@
     runBtn.textContent = 'Checking…';
     try {
       var perm = await checkPermission('image-scaler');
+      if (perm.error === 'permission_unavailable') {
+        labNotify('Permission check unavailable', 'We could not verify your plan. Nothing was processed; please try again in a moment.', 'error');
+        runBtn.disabled = false;
+        runBtn.textContent = 'Process';
+        return;
+      }
       if (!perm.allowed) {
         if (window.VxLab?.shouldSendToLogin(perm)) {
           VxLab.confirmLogin(
@@ -180,7 +187,11 @@
         }
       }
     } catch (err) {
-      console.warn('check-permission failed, allowing local usage:', err);
+      console.error('check-permission failed; processing stopped:', err);
+      labNotify('Permission check unavailable', 'We could not verify your plan. Nothing was processed; please try again in a moment.', 'error');
+      runBtn.disabled = false;
+      runBtn.textContent = 'Process';
+      return;
     }
     var mode = modeSelect ? modeSelect.value : 'local';
     if (mode === 'ai') {
