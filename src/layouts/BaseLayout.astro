@@ -21,6 +21,24 @@ const {
 } = Astro.props;
 
 const canonicalUrl = `https://volynx.world${Astro.url.pathname}`;
+const privatePathPrefixes = [
+  "/account/",
+  "/activate/",
+  "/admin/",
+  "/auth/",
+  "/checkout/",
+  "/dashboard/",
+  "/delivery/",
+  "/invite/",
+  "/login/",
+  "/maintenance/",
+  "/profile/",
+  "/recarregar/",
+  "/signup/",
+];
+const robots = privatePathPrefixes.some((prefix) => Astro.url.pathname.startsWith(prefix))
+  ? "noindex, nofollow"
+  : "index, follow";
 ---
 
 <!DOCTYPE html>
@@ -30,6 +48,8 @@ const canonicalUrl = `https://volynx.world${Astro.url.pathname}`;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
+    <link rel="canonical" href={canonicalUrl} />
 
     <!-- Open Graph Tags -->
     <meta property="og:title" content={title} />
@@ -37,6 +57,12 @@ const canonicalUrl = `https://volynx.world${Astro.url.pathname}`;
     <meta property="og:type" content={ogType} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:image" content={`https://volynx.world${ogImage}`} />
+    <meta property="og:image:alt" content={title} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`https://volynx.world${ogImage}`} />
+    <meta name="twitter:image:alt" content={title} />
 
     <FaviconHead />
     <TierAttrInit />

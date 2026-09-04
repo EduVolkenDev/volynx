@@ -6,6 +6,8 @@ import "../../styles/galaxy-bgs.css";
 
 const devHubHref = ROUTES.devHub;
 const platformHref = ROUTES.platform;
+const canonicalUrl = "https://volynx.world/";
+const socialImage = "https://volynx.world/assets/profile-volynx-rare-core.webp";
 
 const ecosystemSurfaces = [
   { name: "Builder", icon: "builder" as const, href: ROUTES.builder, asset: "/assets/galaxy/core-surface-builder.webp", label: { en: "Build and publish", pt: "Construir e publicar" }, copy: { en: "Turn an idea into a clear public site, campaign or product page.", pt: "Transforme uma ideia em um site, campanha ou página de produto clara." }, tone: "cyan" },
@@ -23,6 +25,18 @@ const ecosystemSurfaces = [
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="VOLYNX Core — da intenção ao impacto executável." />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:title" content="VOLYNX Core — Da intenção ao impacto" />
+    <meta property="og:description" content="Transforme intenção em um próximo passo claro, com ferramentas, sistemas e direção para tornar o trabalho real." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:image:alt" content="VOLYNX Core" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="VOLYNX Core — Da intenção ao impacto" />
+    <meta name="twitter:description" content="Transforme intenção em um próximo passo claro, com ferramentas, sistemas e direção para tornar o trabalho real." />
+    <meta name="twitter:image" content={socialImage} />
+    <meta name="twitter:image:alt" content="VOLYNX Core" />
     <title>VOLYNX Core — Da intenção ao impacto</title>
     <FaviconHead />
   </head>
@@ -174,7 +188,7 @@ const ecosystemSurfaces = [
         <div class="surface-grid">
           {ecosystemSurfaces.map((surface) => (
             <a class:list={["surface-card", `surface-card--${surface.tone}`]} href={surface.href}>
-              <span class="surface-card__icon"><CoreIcon name={surface.icon} size={28} /></span>
+              <span class="surface-card__icon"><CoreIcon name={surface.icon} size={40} /></span>
               <span class="surface-card__meta"><span>{surface.name}</span><span aria-hidden="true">↗</span></span>
               <span class="surface-card__visual" aria-hidden="true">
                 <img class="surface-card__art" src={surface.asset} alt="" loading="lazy" decoding="async" width="640" height="640" />
@@ -200,7 +214,7 @@ const ecosystemSurfaces = [
       </section>
 
       <section class="closing core-shell reveal" aria-labelledby="closing-title">
-        <div class="closing__mark" aria-hidden="true"><img src="/assets/V.webp" alt="" width="56" height="56" /></div>
+        <div class="closing__mark" aria-hidden="true"><img src="/assets/V.webp" alt="" width="320" height="320" /></div>
         <p class="eyebrow" data-en="Where VOLYNX is heading" data-pt="Para onde a VOLYNX está indo">Para onde a VOLYNX está indo</p>
         <h2 id="closing-title" data-en="Build what makes a better future more possible." data-pt="Construa o que torna um futuro melhor mais possível.">Construa o que torna um futuro melhor mais possível.</h2>
         <div class="closing__actions">
@@ -402,7 +416,8 @@ const ecosystemSurfaces = [
   .surface-card--cyan { color: var(--cyan); }
   .surface-card--violet { color: var(--violet); }
   .surface-card--gold { color: var(--gold); }
-  .surface-card__icon { position: relative; z-index: 1; width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 15px 5px 15px 5px; background: rgba(255,255,255,.04); }
+  .surface-card__icon { position: relative; z-index: 1; width: 80px; height: 80px; display: grid; place-items: center; border: 2px inset currentColor; border-radius: 25px 2px; background: #0000004a; box-shadow: 0 0 10px 2px inset #00ffff87, 0 0 20px 15px inset rebeccapurple; }
+  .surface-card__icon .core-icon { width: 40px; height: 40px; }
   .surface-card__meta { position: relative; z-index: 1; display: flex; justify-content: space-between; color: currentColor; font-size: .62rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
   .surface-card__visual { position: relative; z-index: 1; display: grid; place-items: center; height: 145px; margin: -5px -4px 0; }
   .surface-card__art { display: block; width: min(100%, 300px); height: auto; object-fit: contain; pointer-events: none; filter: drop-shadow(0 14px 24px rgba(30, 130, 255, .18)); transition: transform .42s cubic-bezier(.2, .75, .2, 1), filter .42s ease; transform: translate(0px, -100px); }
@@ -420,7 +435,8 @@ const ecosystemSurfaces = [
   .future-grid h3 { margin: 18px 0 9px; font-size: 1.55rem; letter-spacing: -.04em; }
   .future-grid p { margin: 0; color: var(--muted); font-size: .88rem; line-height: 1.6; }
   .closing { padding: 110px 0 150px; text-align: center; }
-  .closing__mark { width: 92px; height: 92px; display: grid; place-items: center; margin: 0 auto 26px; border: 1px solid rgba(233,215,165,.5); border-radius: 50%; background: rgba(167,139,250,.08); box-shadow: 0 0 65px rgba(167,139,250,.25); }
+  .closing__mark { position: relative; width: min(550px, calc(100vw - 32px)); height: 152px; display: grid; place-items: center; margin: 0 auto 50px; border: 3px outset rgb(163, 0, 255); border-radius: 50%; background: #17bdc529; box-shadow: 0 0 35px 30px #a78bfa40; }
+  .closing__mark img { position: absolute; z-index: 1; bottom: 48px; width: min(320px, 58vw); height: auto; filter: drop-shadow(0 18px 28px rgba(0, 0, 0, .48)) drop-shadow(0 0 24px rgba(0, 232, 197, .22)); }
   .closing h2 { margin: 18px auto 0; max-width: 880px; }
   .closing__actions { justify-content: center; }
   .core-footer { padding: 20px 0 30px; display: flex; justify-content: space-between; gap: 20px; border-top: 1px solid var(--line); color: var(--soft); font-size: .65rem; letter-spacing: .13em; text-transform: uppercase; }
@@ -463,6 +479,8 @@ const ecosystemSurfaces = [
     .path-card__art { width: min(100%, 250px); height: 190px; }
     .surface-card { min-height: 390px; }
     .surface-card__visual { height: 135px; }
+    .closing__mark { height: 120px; margin-bottom: 42px; }
+    .closing__mark img { bottom: 38px; width: min(250px, 72vw); }
     .intro, .pathways, .future, .closing { padding-bottom: 92px; }
     .handoff { padding: 56px 0; }
     .core-footer { flex-direction: column; }

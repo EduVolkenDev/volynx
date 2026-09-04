@@ -11,6 +11,8 @@ import LabToolShell from "../../../components/LabToolShell.astro";
 
 const pageTitle = "VOLYNX Lab • iMage Suite";
 const pageDescription = "Local-first iMage Suite — upscale, compress, convert and remove backgrounds directly in your browser, no upload required.";
+const canonicalUrl = "https://volynx.world/volynx-lab/image-suite/";
+const socialImage = "https://volynx.world/assets/newimagesuite.webp";
 ---
 
 <!DOCTYPE html>
@@ -20,6 +22,18 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#080610" />
   <meta name="description" content={pageDescription} />
+  <link rel="canonical" href={canonicalUrl} />
+  <meta property="og:title" content={pageTitle} />
+  <meta property="og:description" content={pageDescription} />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonicalUrl} />
+  <meta property="og:image" content={socialImage} />
+  <meta property="og:image:alt" content="VOLYNX iMage Suite" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={pageTitle} />
+  <meta name="twitter:description" content={pageDescription} />
+  <meta name="twitter:image" content={socialImage} />
+  <meta name="twitter:image:alt" content="VOLYNX iMage Suite" />
   <title>{pageTitle}</title>
 
   <FaviconHead />
@@ -219,6 +233,7 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
   <script is:inline>
     const FREE_LIMIT = 3;
     const STORAGE_KEY = "volynx_suite_usage";
+    const STUDIO_PRO_OFFER_URL = "/products/offers/studio-pro/?utm_source=image-suite&utm_medium=upgrade-gate&utm_campaign=studio-pro";
     // Background removal: U²-Net portable (Apache-2.0) running fully local via onnxruntime-web.
     // Replaces the previous @imgly/background-removal (AGPL-3.0) integration so the
     // pipeline stays commercial-safe without paying a copyleft license fee.
@@ -1036,7 +1051,7 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
       if (toolEl?.value === "bg-remove" && isBgRemoveLocked()) {
         proStatus.innerHTML = t(
           "suite.bg_upgrade_html",
-          'Remove BG is a <strong>Pro</strong> feature — <a href="/pricing/">Upgrade</a>'
+          `Remove BG is included with <strong>Studio Pro</strong> — <a href="${STUDIO_PRO_OFFER_URL}">see what is included</a>`
         );
         return;
       }
@@ -1734,7 +1749,7 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
           if (tool === "bg-remove") {
             const confirmMsg = t("suite.bg_upgrade_alert", "Remove BG is available on paid plans. Upgrade to unlock it.");
             if (window.VxLab) {
-              VxLab.confirmUpgrade(confirmMsg + "\n\nClick OK to see upgrade options.");
+              VxLab.confirmUpgrade(confirmMsg + "\n\nClick OK to see what Studio Pro includes.", STUDIO_PRO_OFFER_URL);
             } else {
               labNotify("Upgrade required", confirmMsg, "warn");
             }
@@ -1749,7 +1764,7 @@ const pageDescription = "Local-first iMage Suite — upscale, compress, convert 
             : "\n\nYou've used your daily allowance. Try again tomorrow or manage your plan.\n\nClick OK to see options.";
           
           if (isFreeUser && window.VxLab) {
-            VxLab.confirmUpgrade(limitMsg + upgradeMsg);
+            VxLab.confirmUpgrade(limitMsg + upgradeMsg, STUDIO_PRO_OFFER_URL);
           } else {
             labNotify("Daily limit reached", `${limitMsg}\n\nYou've used your daily allowance. Try again tomorrow.`, "warn");
           }

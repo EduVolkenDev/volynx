@@ -9,7 +9,9 @@ if (!preview) {
 }
 
 const safeScript = String(preview.js || "").replace(/<\/script/gi, "<\\/script");
-const srcdoc = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';"><style>${preview.css}</style></head><body>${preview.html}<script>${safeScript}</script></body></html>`;
+const scriptOpen = "<" + "script>";
+const scriptClose = "</" + "script>";
+const srcdoc = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';"><style>${preview.css}</style></head><body>${preview.html}${scriptOpen}${safeScript}${scriptClose}</body></html>`;
 ---
 
 <div class="dj-live-preview" data-preview-kind={kind}>

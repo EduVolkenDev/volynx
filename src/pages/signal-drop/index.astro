@@ -4,9 +4,11 @@ import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import { ROUTES } from "../../data/routes";
 
 const campaignQuery = "utm_source=signal-drop&utm_medium=owned&utm_campaign=signal-drop-01";
-const campaignHref = (href: string) => `${href}${href.includes("?") ? "&" : "?"}${campaignQuery}`;
-const labHref = campaignHref(ROUTES.lab);
-const platformHref = campaignHref(ROUTES.platform);
+const campaignHref = (href: string, content: string) => `${href}${href.includes("?") ? "&" : "?"}${campaignQuery}&utm_content=${content}`;
+const devJourneyHref = campaignHref(ROUTES.devJourney, "hero-devjourney");
+const qrgenHref = campaignHref(ROUTES.qrgen, "hero-qrgen");
+const platformHref = campaignHref(ROUTES.platform, "ecosystem");
+const labHref = campaignHref(ROUTES.lab, "header-lab");
 ---
 
 <FlagshipLayout
@@ -30,19 +32,19 @@ const platformHref = campaignHref(ROUTES.platform);
           <span class="i18n-pt">A VOLYNX transforma intenção dispersa em próximo passo claro — com ferramentas, sistemas e direção visual que continuam funcionando depois da primeira impressão.</span>
         </p>
         <div class="signal-actions">
-          <a class="button button--gold" href={labHref} data-campaign-event="hero_lab">
-            <span class="i18n-en">Find your signal</span>
-            <span class="i18n-pt">Encontre seu sinal</span>
+          <a class="button button--gold" href={devJourneyHref} data-campaign-event="signal_hero_devjourney">
+            <span class="i18n-en">Start with Dev Journey</span>
+            <span class="i18n-pt">Comece pelo Dev Journey</span>
             <span aria-hidden="true">↗</span>
           </a>
-          <a class="button button--ghost" href={platformHref} data-campaign-event="hero_platform">
-            <span class="i18n-en">See the whole system</span>
-            <span class="i18n-pt">Ver o sistema completo</span>
+          <a class="button button--ghost" href={qrgenHref} data-campaign-event="signal_hero_qrgen">
+            <span class="i18n-en">Try QRGen free</span>
+            <span class="i18n-pt">Teste o QRGen grátis</span>
           </a>
         </div>
         <p class="signal-note">
-          <span class="i18n-en">Free browser tools · no card to start · your work stays in your hands</span>
-          <span class="i18n-pt">Ferramentas gratuitas no navegador · sem cartão para começar · seu trabalho continua nas suas mãos</span>
+          <span class="i18n-en">Free learning + browser tools · no card to start · your work stays in your hands</span>
+          <span class="i18n-pt">Aprendizado e ferramentas gratuitas · sem cartão para começar · seu trabalho continua nas suas mãos</span>
         </p>
       </div>
 
@@ -86,21 +88,53 @@ const platformHref = campaignHref(ROUTES.platform);
       </div>
       <div class="signal-proof__grid">
         <article class="signal-proof__item">
+          <img class="signal-proof__asset" src="/assets/signal-drop/proof-clarity.webp" alt="" width="900" height="900" loading="lazy" decoding="async" aria-hidden="true" />
           <span class="signal-proof__number">01</span>
           <h3><span class="i18n-en">Clear before clever</span><span class="i18n-pt">Clareza antes do truque</span></h3>
           <p><span class="i18n-en">Every action has a visible purpose, a readable state and a next step you can trust.</span><span class="i18n-pt">Toda ação tem propósito visível, estado legível e um próximo passo em que você pode confiar.</span></p>
         </article>
         <article class="signal-proof__item signal-proof__item--accent">
+          <img class="signal-proof__asset" src="/assets/signal-drop/proof-beauty.webp" alt="" width="900" height="900" loading="lazy" decoding="async" aria-hidden="true" />
           <span class="signal-proof__number">02</span>
           <h3><span class="i18n-en">Beauty with a job</span><span class="i18n-pt">Beleza com função</span></h3>
           <p><span class="i18n-en">The visual system creates desire, then gets out of the way so the work can happen.</span><span class="i18n-pt">O sistema visual cria desejo e depois sai do caminho para o trabalho acontecer.</span></p>
         </article>
         <article class="signal-proof__item">
+          <img class="signal-proof__asset" src="/assets/signal-drop/proof-output.webp" alt="" width="900" height="900" loading="lazy" decoding="async" aria-hidden="true" />
           <span class="signal-proof__number">03</span>
           <h3><span class="i18n-en">Output you can keep</span><span class="i18n-pt">Resultado que fica</span></h3>
           <p><span class="i18n-en">A good first moment becomes a useful file, a live project or a system you can return to.</span><span class="i18n-pt">Um bom primeiro momento vira arquivo útil, projeto publicado ou sistema ao qual você pode voltar.</span></p>
         </article>
       </div>
+    </section>
+
+    <section class="signal-section signal-doors shell" aria-labelledby="doors-title">
+      <div class="signal-section__heading signal-doors__heading">
+        <p class="signal-kicker"><span aria-hidden="true">↗</span> TWO WAYS IN</p>
+        <h2 id="doors-title">
+          <span class="i18n-en">Choose the next move that fits your moment.</span>
+          <span class="i18n-pt">Escolha o próximo passo que combina com o seu momento.</span>
+        </h2>
+      </div>
+      <div class="signal-doors__grid">
+        <a class="signal-door signal-door--journey" href={devJourneyHref} data-campaign-event="signal_hero_devjourney">
+          <img class="signal-door__asset" src="/assets/signal-drop/door-devjourney.webp" alt="" width="900" height="900" loading="lazy" decoding="async" aria-hidden="true" />
+          <span class="signal-door__index">01 / LEARN</span>
+          <h3><span class="i18n-en">Build your first real project.</span><span class="i18n-pt">Construa seu primeiro projeto real.</span></h3>
+          <p><span class="i18n-en">Dev Journey takes you from the first click to a published project, with guided practice and a clear finish line.</span><span class="i18n-pt">O Dev Journey leva você do primeiro clique a um projeto publicado, com prática guiada e uma linha de chegada clara.</span></p>
+          <span class="signal-door__cta"><span class="i18n-en">Open the free path</span><span class="i18n-pt">Abrir a trilha gratuita</span><span aria-hidden="true">↗</span></span>
+        </a>
+        <a class="signal-door signal-door--qrgen" href={qrgenHref} data-campaign-event="signal_hero_qrgen">
+          <img class="signal-door__asset" src="/assets/signal-drop/door-qrgen.webp" alt="" width="900" height="900" loading="lazy" decoding="async" aria-hidden="true" />
+          <span class="signal-door__index">02 / MAKE</span>
+          <h3><span class="i18n-en">Turn a link into something people remember.</span><span class="i18n-pt">Transforme um link em algo que as pessoas lembram.</span></h3>
+          <p><span class="i18n-en">QRGen gives you a live preview and a useful free export before you decide whether your workflow needs more.</span><span class="i18n-pt">O QRGen oferece prévia ao vivo e uma exportação gratuita útil antes de você decidir se precisa de mais.</span></p>
+          <span class="signal-door__cta"><span class="i18n-en">Open QRGen free</span><span class="i18n-pt">Abrir o QRGen grátis</span><span aria-hidden="true">↗</span></span>
+        </a>
+      </div>
+      <p class="signal-doors__footer">
+        <a href={platformHref} data-campaign-event="signal_ecosystem_view"><span class="i18n-en">Want the full picture? Explore the VOLYNX ecosystem →</span><span class="i18n-pt">Quer ver o quadro completo? Explore o ecossistema VOLYNX →</span></a>
+      </p>
     </section>
 
     <section class="signal-section signal-loop shell" aria-labelledby="loop-title">
@@ -128,9 +162,9 @@ const platformHref = campaignHref(ROUTES.platform);
         <p class="signal-kicker"><span aria-hidden="true">●</span> YOUR TURN</p>
         <h2 id="close-title"><span class="i18n-en">Start with one thing you want to make clearer.</span><span class="i18n-pt">Comece por uma coisa que você quer tornar mais clara.</span></h2>
       </div>
-      <a class="signal-close__cta" href={labHref} data-campaign-event="close_lab">
-        <span class="i18n-en">Open VOLYNX Lab</span>
-        <span class="i18n-pt">Abrir o VOLYNX Lab</span>
+      <a class="signal-close__cta" href={devJourneyHref} data-campaign-event="signal_close_devjourney">
+        <span class="i18n-en">Start building</span>
+        <span class="i18n-pt">Começar a construir</span>
         <span aria-hidden="true">↗</span>
       </a>
     </section>
@@ -139,16 +173,25 @@ const platformHref = campaignHref(ROUTES.platform);
   <script is:inline>
     (() => {
       const params = new URLSearchParams(window.location.search);
-      const keys = ['utm_source', 'utm_medium', 'utm_campaign'];
+      const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'];
       const attribution = Object.fromEntries(keys.filter((key) => params.has(key)).map((key) => [key, params.get(key)]));
       if (Object.keys(attribution).length) {
         try { sessionStorage.setItem('volynx_campaign_attribution', JSON.stringify(attribution)); } catch (_) {}
       }
+      window.dispatchEvent(new CustomEvent('volynx:campaign-event', {
+        detail: { campaign: 'signal-drop-01', event: 'signal_view', attribution }
+      }));
       document.addEventListener('click', (event) => {
         const target = event.target.closest('[data-campaign-event]');
         if (!target) return;
         window.dispatchEvent(new CustomEvent('volynx:campaign-event', {
-          detail: { campaign: 'signal-drop-01', event: target.dataset.campaignEvent }
+          detail: {
+            campaign: 'signal-drop-01',
+            event: target.dataset.campaignEvent,
+            attribution: (() => {
+              try { return JSON.parse(sessionStorage.getItem('volynx_campaign_attribution') || '{}'); } catch (_) { return {}; }
+            })()
+          }
         }));
       });
     })();
@@ -156,14 +199,16 @@ const platformHref = campaignHref(ROUTES.platform);
 </FlagshipLayout>
 
 <style>
-  .page-signal-drop {
+  :global(body.page-signal-drop) {
     --signal-teal: #8bfaf0;
     --signal-violet: #b196ff;
     --signal-ink: #080a12;
     background:
-      radial-gradient(circle at 18% 12%, rgba(177,150,255,.17), transparent 27%),
-      radial-gradient(circle at 86% 21%, rgba(139,250,240,.12), transparent 24%),
-      linear-gradient(180deg, #090b14 0%, #05060b 48%, #070812 100%);
+      linear-gradient(180deg, rgba(9,11,20,.63), rgba(5,6,11,.86) 48%, rgba(7,8,18,.96) 100%),
+      radial-gradient(circle at 18% 12%, rgba(177,150,255,.19), transparent 27%),
+      radial-gradient(circle at 86% 21%, rgba(139,250,240,.14), transparent 24%),
+      url("/assets/galaxy/world-nebula.webp") center 18% / cover fixed no-repeat;
+    background-color: #05060b;
   }
 
   .signal-drop-page { overflow: hidden; padding-bottom: 50px; }
@@ -201,12 +246,38 @@ const platformHref = campaignHref(ROUTES.platform);
   .signal-section__heading { display: grid; grid-template-columns: minmax(220px, .75fr) minmax(0, 1.35fr); align-items: end; gap: 38px; margin-bottom: 38px; }
   .signal-section h2, .signal-close h2 { margin: 0; color: #f5f6ff; font: 700 clamp(1.8rem, 3.5vw, 3.2rem)/1.07 var(--display); letter-spacing: -.05em; text-wrap: balance; }
   .signal-proof__grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); }
-  .signal-proof__item { min-height: 250px; padding: 26px 28px 30px 0; border-bottom: 1px solid var(--line); }
+  .signal-proof__item { position: relative; min-height: 250px; padding: 26px 28px 30px 0; overflow: hidden; border-bottom: 1px solid var(--line); }
   .signal-proof__item + .signal-proof__item { padding-left: 28px; border-left: 1px solid var(--line); }
   .signal-proof__item--accent { background: radial-gradient(circle at 50% 0%, rgba(139,250,240,.12), transparent 68%); }
+  .signal-proof__asset { position: absolute; right: -24px; bottom: -56px; z-index: 0; width: clamp(150px, 14vw, 220px); height: auto; opacity: .38; mix-blend-mode: screen; pointer-events: none; filter: drop-shadow(0 12px 24px rgba(0,0,0,.28)); }
+  .signal-proof__item > *:not(.signal-proof__asset) { position: relative; z-index: 1; }
   .signal-proof__number { display: block; margin-bottom: 42px; color: var(--signal-teal); font: 700 11px/1 var(--display); letter-spacing: .16em; }
   .signal-proof__item h3 { margin: 0 0 11px; color: #f5f6ff; font: 700 1.12rem/1.2 var(--display); letter-spacing: -.02em; }
   .signal-proof__item p, .signal-loop__copy p { max-width: 34ch; margin: 0; color: var(--muted); line-height: 1.7; }
+
+  .signal-doors__heading { margin-bottom: 28px; }
+  .signal-doors__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .signal-door { position: relative; display: flex; min-height: 330px; flex-direction: column; padding: clamp(24px, 3vw, 38px); overflow: hidden; border: 1px solid rgba(255,255,255,.14); border-radius: 24px; color: #f5f6ff; background: linear-gradient(145deg, rgba(255,255,255,.095), rgba(255,255,255,.025) 62%, rgba(4,7,18,.72)); box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 20px 65px rgba(0,0,0,.18); transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
+  .signal-door::before { position: absolute; width: 220px; aspect-ratio: 1; border-radius: 50%; content: ""; opacity: .8; filter: blur(3px); pointer-events: none; }
+  .signal-door--journey::before { top: -110px; right: -60px; background: radial-gradient(circle, rgba(177,150,255,.25), transparent 68%); }
+  .signal-door--qrgen::before { right: -60px; bottom: -120px; background: radial-gradient(circle, rgba(139,250,240,.2), transparent 68%); }
+  .signal-door:hover, .signal-door:focus-visible { transform: translateY(-4px); border-color: rgba(139,250,240,.48); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 28px 80px rgba(0,0,0,.32), 0 0 35px rgba(139,250,240,.08); }
+  .signal-door--journey:hover, .signal-door--journey:focus-visible { border-color: rgba(177,150,255,.55); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 28px 80px rgba(0,0,0,.32), 0 0 35px rgba(177,150,255,.09); }
+  .signal-door__asset { position: absolute; right: -46px; bottom: -58px; z-index: 0; width: clamp(220px, 25vw, 330px); height: auto; opacity: .7; mix-blend-mode: screen; pointer-events: none; filter: drop-shadow(0 20px 28px rgba(0,0,0,.42)); transform: rotate(-3deg); transition: transform .35s ease, opacity .35s ease; }
+  .signal-door--qrgen .signal-door__asset { right: -38px; bottom: -48px; opacity: .76; transform: rotate(4deg); }
+  .signal-door:hover .signal-door__asset, .signal-door:focus-visible .signal-door__asset { opacity: .88; transform: rotate(-5deg) translateY(-8px) scale(1.04); }
+  .signal-door--qrgen:hover .signal-door__asset, .signal-door--qrgen:focus-visible .signal-door__asset { transform: rotate(6deg) translateY(-8px) scale(1.04); }
+  .signal-door__index, .signal-door__cta { position: relative; z-index: 1; font: 700 10px/1.2 var(--display); letter-spacing: .16em; text-transform: uppercase; }
+  .signal-door__index { color: var(--signal-teal); }
+  .signal-door--journey .signal-door__index { color: var(--signal-violet); }
+  .signal-door h3 { position: relative; z-index: 1; max-width: 12ch; margin: auto 0 15px; color: #f5f6ff; font: 700 clamp(1.7rem, 3vw, 2.7rem)/1.02 var(--display); letter-spacing: -.055em; text-wrap: balance; }
+  .signal-door p { position: relative; z-index: 1; max-width: 44ch; margin: 0; color: var(--muted); line-height: 1.65; }
+  .signal-door__cta { display: inline-flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 28px; color: #f5f6ff; }
+  .signal-door__cta span:last-child { color: var(--signal-teal); font-size: 18px; letter-spacing: 0; }
+  .signal-door--journey .signal-door__cta span:last-child { color: var(--signal-violet); }
+  .signal-doors__footer { margin: 20px 0 0; text-align: center; }
+  .signal-doors__footer a { color: var(--soft); font-size: .9rem; text-decoration: underline; text-decoration-color: rgba(139,250,240,.45); text-underline-offset: 4px; }
+  .signal-doors__footer a:hover, .signal-doors__footer a:focus-visible { color: var(--signal-teal); }
 
   .signal-loop { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.3fr); align-items: center; gap: clamp(40px, 9vw, 150px); }
   .signal-loop__copy > p:last-child { margin-top: 20px; max-width: 52ch; }
@@ -229,9 +300,11 @@ const platformHref = campaignHref(ROUTES.platform);
     .signal-hero__visual { min-height: 500px; max-width: 580px; width: 100%; margin: 0 auto; }
     .signal-section__heading, .signal-loop { grid-template-columns: 1fr; gap: 22px; }
     .signal-proof__item { min-height: 220px; }
+    .signal-door { min-height: 300px; }
   }
 
   @media (max-width: 620px) {
+    :global(body.page-signal-drop) { background-position: center, center, center, center 12%; background-attachment: scroll; }
     .signal-drop-page { padding-bottom: 24px; }
     .signal-hero { width: min(var(--shell), calc(100% - 32px)); padding-top: 46px; padding-bottom: 70px; }
     .signal-hero h1 { font-size: clamp(2.55rem, 12vw, 4.4rem); }
@@ -246,6 +319,11 @@ const platformHref = campaignHref(ROUTES.platform);
     .signal-proof__grid { grid-template-columns: 1fr; }
     .signal-proof__item, .signal-proof__item + .signal-proof__item { min-height: auto; padding: 22px 0 26px; border-left: 0; }
     .signal-proof__number { margin-bottom: 24px; }
+    .signal-proof__asset { right: -20px; bottom: -42px; width: 160px; opacity: .3; }
+    .signal-doors__grid { grid-template-columns: 1fr; }
+    .signal-door { min-height: 280px; }
+    .signal-door__asset { right: -38px; bottom: -48px; width: 235px; }
+    .signal-door--qrgen .signal-door__asset { right: -28px; bottom: -40px; }
     .signal-loop__steps { grid-template-columns: 1fr; }
     .signal-close { width: min(var(--shell), calc(100% - 32px)); align-items: stretch; flex-direction: column; margin-top: 78px; }
     .signal-close__cta { justify-content: center; }
