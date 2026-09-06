@@ -92,6 +92,7 @@ window.VxPix = (function () {
    */
   async function checkout(lookupKey, opts) {
     opts = opts || {};
+    var checkoutAttemptId = opts.checkoutAttemptId || crypto.randomUUID();
 
     var token = getAccessToken();
     if (!token) {
@@ -127,6 +128,7 @@ window.VxPix = (function () {
           payment_method_types: ['pix'],
           success_url: opts.successUrl || window.location.origin + '/account/?payment=pix_success',
           cancel_url: opts.cancelUrl || window.location.href,
+          checkout_attempt_id: checkoutAttemptId,
         }),
       });
 

@@ -16,9 +16,16 @@ const qrgenLookupByPlan = {
   pro: "builder_pro",
   studio: "builder_studio",
 } as Record<string, string>;
+const qrgenPlanImageById = {
+  free: "/assets/qrgen.webp",
+  launch: "/assets/qrgen/qrgen-launch-vari.webp",
+  pro: "/assets/qrgen/qrgen-pro-vari.webp",
+  studio: "/assets/qrgen/qrgen-studio-vari.webp",
+} as Record<string, string>;
 const qrgenPlanPayload = sitePricing.qrgenPlans.map((plan) => ({
   id: plan.id,
   name: plan.name.en,
+  image: qrgenPlanImageById[plan.id] || plan.image || "",
   price: plan.price,
   copy: plan.description.en,
   features: plan.features.en,
@@ -250,35 +257,37 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
       </form>
 
       <section class="qrgen-panel qrgen-preview" aria-label="Live QR preview">
-        <div class="qrgen-preview__head">
-          <div>
-            <span class="qrgen-panel__eyebrow" data-qg-i18n="preview.kicker">Live preview</span>
-            <h2 data-qg-i18n="preview.title">Every change updates instantly.</h2>
+        <div class="qrgen-preview__sticky">
+          <div class="qrgen-preview__head">
+            <div>
+              <span class="qrgen-panel__eyebrow" data-qg-i18n="preview.kicker">Live preview</span>
+              <h2 data-qg-i18n="preview.title">Every change updates instantly.</h2>
+            </div>
+            <span class="qrgen-health" id="qgHealthBadge">Ready</span>
+            <div class="lab-runtime-mini qrgen-runtime-mini" data-lab-runtime-mini data-lab-runtime-tool="qrGen" data-state="checking" aria-live="polite">
+              <span class="lab-runtime-mini__dot" aria-hidden="true"></span>
+              <span class="lab-runtime-mini__label" data-lab-runtime-mini-label>Local QR renderer</span>
+              <strong class="lab-runtime-mini__state" data-lab-runtime-mini-state data-i18n="lab2.runtime_checking">Checking</strong>
+            </div>
           </div>
-          <span class="qrgen-health" id="qgHealthBadge">Ready</span>
-          <div class="lab-runtime-mini qrgen-runtime-mini" data-lab-runtime-mini data-lab-runtime-tool="qrGen" data-state="checking" aria-live="polite">
-            <span class="lab-runtime-mini__dot" aria-hidden="true"></span>
-            <span class="lab-runtime-mini__label" data-lab-runtime-mini-label>Local QR renderer</span>
-            <strong class="lab-runtime-mini__state" data-lab-runtime-mini-state data-i18n="lab2.runtime_checking">Checking</strong>
+
+          <div class="qrgen-stage" aria-live="polite">
+            <div id="qgPreview" class="qrgen-preview-box"></div>
           </div>
+
+          <div class="qrgen-preview-gate" id="qgPreviewGate" hidden role="status" aria-live="polite">
+            <span class="qrgen-preview-gate__eyebrow" id="qgPreviewGateEyebrow">Limited preview</span>
+            <strong id="qgPreviewGateTitle">Premium features are hidden from the Free preview.</strong>
+            <p id="qgPreviewGateCopy">This preview stays basic. Upgrade to apply the selected feature and export it.</p>
+            <a class="qrgen-link-button" id="qgPreviewGateCta" href="/pricing/#qrgen-plans">View plans</a>
+          </div>
+
+          <p class="qrgen-preview__note" id="qgPreviewNote" data-qg-i18n="preview.note">
+            Prévia de exemplo: digite seu conteúdo para personalizar.
+          </p>
+
+          <div class="qrgen-warnings" id="qgWarnings" aria-live="polite"></div>
         </div>
-
-        <div class="qrgen-stage" aria-live="polite">
-          <div id="qgPreview" class="qrgen-preview-box"></div>
-        </div>
-
-        <div class="qrgen-preview-gate" id="qgPreviewGate" hidden role="status" aria-live="polite">
-          <span class="qrgen-preview-gate__eyebrow" id="qgPreviewGateEyebrow">Limited preview</span>
-          <strong id="qgPreviewGateTitle">Premium features are hidden from the Free preview.</strong>
-          <p id="qgPreviewGateCopy">This preview stays basic. Upgrade to apply the selected feature and export it.</p>
-          <a class="qrgen-link-button" id="qgPreviewGateCta" href="/pricing/#qrgen-plans">View plans</a>
-        </div>
-
-        <p class="qrgen-preview__note" id="qgPreviewNote" data-qg-i18n="preview.note">
-          Prévia de exemplo: digite seu conteúdo para personalizar.
-        </p>
-
-        <div class="qrgen-warnings" id="qgWarnings" aria-live="polite"></div>
 
         <div class="qrgen-export">
           <div class="qrgen-export__head">
@@ -372,8 +381,8 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
   <script is:inline src="/scripts/vx-lab-workspace.js?v=20260621-modal-system"></script>
   <script is:inline src="/js/vx-lab-runtime.js"></script>
   <script is:inline set:html={`window.VOLYNX_QRGEN_PLANS = ${JSON.stringify(qrgenPlanPayload)};`}></script>
-  <script is:inline src="/scripts/kit-checkout.js" defer></script>
-  <script is:inline src="/scripts/qrgen-editor.js?v=20260525-qrgen-production"></script>
+  <script is:inline src="/scripts/kit-checkout.js?v=20260906-release" defer></script>
+  <script is:inline src="/scripts/qrgen-editor.js?v=20260906-release"></script>
 </FlagshipLayout>
 
 <style>
@@ -388,7 +397,8 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
     animation: gradientShift 15s ease infinite;
     color: #f8fafc;
     isolation: isolate;
-    overflow-x: hidden;
+    /* Keep the document on the root scroll container so the live preview can use sticky positioning. */
+    overflow-x: clip;
   }
 
   :global(body.page-qrgen .backdrop),
@@ -973,8 +983,21 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
   }
 
   .qrgen-preview {
+    position: relative;
+  }
+
+  .qrgen-preview__sticky {
     position: sticky;
     top: 18px;
+    z-index: 2;
+    padding: 2px 0 8px;
+    border-radius: 22px;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.055), rgba(255,255,255,.025)),
+      rgba(5, 10, 18, .94);
+    box-shadow: 0 18px 46px rgba(0,0,0,.24);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
   }
 
   .qrgen-preview__head {
@@ -1288,7 +1311,9 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
     gap: 14px;
   }
 
-  .qrgen-plan-card {
+  :global(.qrgen-plan-card) {
+    position: relative;
+    overflow: hidden;
     border: 1px solid rgba(255,255,255,.12);
     border-radius: 24px;
     padding: 16px;
@@ -1299,42 +1324,75 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
     gap: 12px;
   }
 
-  .qrgen-plan-card.is-current {
+  :global(.qrgen-plan-card__visual) {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 132px;
+    margin: -16px -16px 0;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    background:
+      radial-gradient(circle at 50% 42%, rgba(125,249,255,.14), transparent 62%),
+      linear-gradient(135deg, rgba(125,249,255,.07), rgba(255,255,255,.02));
+  }
+
+  :global(.qrgen-plan-card__visual::after) {
+    content: "";
+    position: absolute;
+    inset: auto 18% -34px;
+    height: 62px;
+    border-radius: 50%;
+    background: rgba(32,227,178,.16);
+    filter: blur(22px);
+    pointer-events: none;
+  }
+
+  :global(.qrgen-plan-card__visual img) {
+    position: relative;
+    z-index: 1;
+    width: min(152px, 68%);
+    height: auto;
+    max-height: 152px;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    filter: drop-shadow(0 16px 22px rgba(0,0,0,.42));
+    transition: transform .25s ease, filter .25s ease;
+  }
+
+  :global(.qrgen-plan-card:hover .qrgen-plan-card__visual img),
+  :global(.qrgen-plan-card:focus-within .qrgen-plan-card__visual img) {
+    transform: translateY(-4px) scale(1.04);
+    filter: drop-shadow(0 20px 26px rgba(0,0,0,.48));
+  }
+
+  :global(.qrgen-plan-card.is-current) {
     border-color: rgba(32,227,178,.65);
     box-shadow: 0 0 0 1px rgba(32,227,178,.24), 0 20px 60px rgba(32,227,178,.08);
   }
 
-  .qrgen-plan-card h3 {
+  :global(.qrgen-plan-card h3) {
     margin: 0;
     color: #fff;
     font-size: 20px;
   }
 
-  .qrgen-plan-card strong {
+  :global(.qrgen-plan-card strong) {
     color: #7df9ff;
     font-size: 26px;
   }
 
-  .qrgen-plan-card p,
-  .qrgen-plan-card li {
+  :global(.qrgen-plan-card p),
+  :global(.qrgen-plan-card li) {
     color: rgba(226,232,240,.70);
     font-size: 13px;
     line-height: 1.45;
   }
 
-  .qrgen-plan-card ul {
+  :global(.qrgen-plan-card ul) {
     margin: 0;
     padding-left: 18px;
     display: grid;
     gap: 7px;
-  }
-
-  .qrgen-plan-card__cta {
-    display: inline-flex;
-    min-height: 44px;
-    padding: 0 16px;
-    width: 100%;
-    margin-top: auto;
   }
 
   :global(.qrgen-plan-card__cta) {
@@ -1357,6 +1415,10 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
     .qrgen-preview {
       position: static;
       order: -1;
+    }
+
+    .qrgen-preview__sticky {
+      position: static;
     }
 
     .qrgen-plan-grid {

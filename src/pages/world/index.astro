@@ -1158,6 +1158,7 @@ const worldProLocalizedPrice = worldProPlan
     const validCurrencies = ["GBP", "EUR", "BRL"];
     const safeCurrency = validCurrencies.includes(currency) ? currency : "GBP";
     const lookupKey = `${plan}_${safeCurrency.toLowerCase()}`;
+    const checkoutAttemptId = crypto.randomUUID();
     const successUrl = `${window.location.origin}/world/?plan_success=1#join-world`;
     const cancelUrl = `${window.location.origin}/world/#world-pricing`;
     const buttons = document.querySelectorAll<HTMLButtonElement>(`.world-checkout-btn[data-plan="${plan}"]`);
@@ -1166,7 +1167,7 @@ const worldProLocalizedPrice = worldProPlan
       const response = await fetch(`${cfg.functionsUrl}/create-checkout-session`, {
         method: "POST",
         headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ lookup_key: lookupKey, success_url: successUrl, cancel_url: cancelUrl }),
+        body: JSON.stringify({ lookup_key: lookupKey, success_url: successUrl, cancel_url: cancelUrl, checkout_attempt_id: checkoutAttemptId }),
       });
       const result = await response.json().catch(() => ({}));
       if (result.url) { window.location.href = result.url; return; }

@@ -86,6 +86,7 @@ export const ROUTES = {
   adminCodes: "/admin/codes/",
   adminVouchers: "/admin/codes/?tab=vouchers",
   adminQrCodes: "/admin/codes/?tab=qr",
+  adminAnalytics: "/admin/analytics/",
 
   // ── Campaign landings ─────────────────
   tiktokLanding: "/tiktok/",

@@ -129,6 +129,8 @@
 
       var currency = normalizeCurrency(btn.dataset.currency || currentCurrency());
       var lookupKey = lookupBase + '_' + currency;
+      var checkoutAttemptId = btn.dataset.checkoutAttemptId || crypto.randomUUID();
+      btn.dataset.checkoutAttemptId = checkoutAttemptId;
 
       var res = await fetch(apiBase + '/create-checkout-session', {
         method: 'POST',
@@ -137,6 +139,7 @@
           lookup_key: lookupKey,
           success_url: successUrlForLookup(lookupBase),
           cancel_url: window.location.href.split('?')[0] + '?payment=cancelled',
+          checkout_attempt_id: checkoutAttemptId,
         }),
       });
 

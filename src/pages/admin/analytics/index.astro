@@ -1,0 +1,125 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import VxHeader from "../../../components/VxHeader.astro";
+import VxFooter from "../../../components/VxFooter.astro";
+import { ROUTES } from "../../../data/routes";
+
+const title = "Admin · Acquisition Analytics — VOLYNX";
+const description = "Private, consent-based VOLYNX acquisition analytics.";
+---
+
+<BaseLayout title={title} description={description} hideUtilBar>
+  <VxHeader primaryCtaLabel="Sign out" primaryCtaI18n="djs.sign_out" primaryCtaHref="/login/?logout=1" primaryCtaAuth="in" />
+
+  <main class="analytics-shell">
+    <section id="analyticsLoading" class="analytics-state">
+      <p>Carregando métricas de aquisição…</p>
+    </section>
+
+    <section id="analyticsLoggedOut" class="analytics-state" hidden>
+      <span class="analytics-kicker">ACESSO ADMINISTRATIVO</span>
+      <h1>Entre para abrir as métricas.</h1>
+      <p>Este painel é restrito a administradores e não expõe dados pessoais dos visitantes.</p>
+      <a class="analytics-button analytics-button--primary" href={`${ROUTES.login}?next=${ROUTES.adminAnalytics}`}>Fazer login</a>
+    </section>
+
+    <section id="analyticsForbidden" class="analytics-state" hidden>
+      <span class="analytics-kicker">ACESSO RESTRITO</span>
+      <h1>Esta conta não tem acesso ao painel.</h1>
+      <p>As métricas de aquisição ficam disponíveis apenas para administradores da VOLYNX.</p>
+      <a class="analytics-button" href={ROUTES.home}>Voltar ao início</a>
+    </section>
+
+    <section id="analyticsConsole" class="analytics-console" hidden>
+      <header class="analytics-hero">
+        <div>
+          <span class="analytics-kicker">VOLYNX · AQUISIÇÃO</span>
+          <h1>O que está virando intenção real.</h1>
+          <p>Leitura consentida de visitas, CTAs, cadastro e chegada ao Stripe — sem e-mails ou conteúdos pessoais.</p>
+        </div>
+        <div class="analytics-actions" aria-label="Intervalo de análise">
+          <button class="analytics-range is-active" type="button" data-analytics-days="7">7 dias</button>
+          <button class="analytics-range" type="button" data-analytics-days="30">30 dias</button>
+          <a class="analytics-button" href={ROUTES.adminCodes}>Códigos e vouchers</a>
+        </div>
+      </header>
+
+      <p id="analyticsNotice" class="analytics-notice" aria-live="polite"></p>
+
+      <section class="analytics-metrics" aria-label="Resumo do funil">
+        <article><span>Visitantes</span><strong data-analytics-value="visitors">—</strong><small>Sessões únicas com consentimento</small></article>
+        <article><span>Cliques em CTA</span><strong data-analytics-value="cta_clicks">—</strong><small>Próximo sinal de intenção</small></article>
+        <article><span>Cadastro iniciado</span><strong data-analytics-value="signup_started">—</strong><small>Formulário enviado</small></article>
+        <article><span>Confirmação enviada</span><strong data-analytics-value="signup_confirmation_requested">—</strong><small>E-mail de verificação solicitado</small></article>
+        <article><span>Chegaram ao Stripe</span><strong data-analytics-value="checkout_redirected">—</strong><small>Checkout aberto com sucesso</small></article>
+        <article><span>Falhas de checkout</span><strong data-analytics-value="checkout_failed">—</strong><small>Precisam de investigação</small></article>
+      </section>
+
+      <section class="analytics-grid">
+        <article class="analytics-panel">
+          <div class="analytics-panel__head"><span>ORIGEM</span><h2>De onde as pessoas vêm</h2></div>
+          <div id="analyticsSources" class="analytics-list"></div>
+        </article>
+        <article class="analytics-panel">
+          <div class="analytics-panel__head"><span>CAMPANHAS</span><h2>O que está criando sinal</h2></div>
+          <div id="analyticsCampaigns" class="analytics-list"></div>
+        </article>
+        <article class="analytics-panel analytics-panel--wide">
+          <div class="analytics-panel__head"><span>TRAJETÓRIA</span><h2>Movimento por dia</h2></div>
+          <div class="analytics-table-wrap">
+            <table>
+              <thead><tr><th>Data</th><th>Visitantes</th><th>CTAs</th><th>Cadastros concluídos</th><th>Stripe</th></tr></thead>
+              <tbody id="analyticsTimeline"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </section>
+  </main>
+
+  <VxFooter />
+</BaseLayout>
+
+<script is:inline src="/scripts/admin-analytics.js?v=20260905"></script>
+
+<style>
+  .analytics-shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: clamp(32px, 5vw, 72px) 0 96px; }
+  .analytics-state, .analytics-console { border: 1px solid rgba(151, 255, 238, .14); border-radius: 30px; background: linear-gradient(145deg, rgba(21, 31, 48, .86), rgba(7, 10, 20, .94)); box-shadow: 0 30px 90px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.07); }
+  .analytics-state { width: min(620px, 100%); margin: 7vh auto; padding: clamp(26px, 5vw, 52px); text-align: center; }
+  .analytics-state h1, .analytics-hero h1 { margin: 10px 0 14px; color: #f8fbff; letter-spacing: -.045em; line-height: 1.02; }
+  .analytics-state h1 { font-size: clamp(2rem, 5vw, 3.6rem); }
+  .analytics-state p, .analytics-hero p { margin: 0; color: rgba(224, 234, 250, .68); line-height: 1.65; }
+  .analytics-console { padding: clamp(18px, 3vw, 36px); }
+  .analytics-hero { display: flex; align-items: end; justify-content: space-between; gap: 26px; padding: 8px 8px 28px; }
+  .analytics-hero h1 { max-width: 680px; font-size: clamp(2.2rem, 5vw, 4.6rem); }
+  .analytics-hero p { max-width: 650px; }
+  .analytics-kicker { color: #86f7ea; font-size: 11px; font-weight: 800; letter-spacing: .16em; }
+  .analytics-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+  .analytics-button, .analytics-range { min-height: 42px; border-radius: 999px; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.035); color: rgba(245, 248, 255, .88); font: inherit; font-size: 13px; font-weight: 750; padding: 0 15px; text-decoration: none; display: inline-grid; place-items: center; cursor: pointer; transition: transform .18s ease, border-color .18s ease, background .18s ease; }
+  .analytics-button:hover, .analytics-range:hover, .analytics-range.is-active { transform: translateY(-1px); border-color: rgba(126, 247, 234, .52); background: rgba(64, 220, 204, .12); }
+  .analytics-button--primary { margin-top: 22px; background: linear-gradient(135deg, #5eead4, #60a5fa); color: #06131d; border-color: transparent; }
+  .analytics-notice { min-height: 1.5em; margin: 0 8px 16px; color: rgba(190, 250, 240, .82); font-size: 13px; }
+  .analytics-metrics { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+  .analytics-metrics article, .analytics-panel { border: 1px solid rgba(255,255,255,.09); background: linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.018)); border-radius: 20px; }
+  .analytics-metrics article { padding: 18px; min-height: 126px; display: grid; align-content: start; gap: 7px; }
+  .analytics-metrics span, .analytics-panel__head > span { color: rgba(199, 212, 235, .58); font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+  .analytics-metrics strong { color: #fff; font-size: clamp(1.55rem, 3vw, 2.35rem); letter-spacing: -.04em; }
+  .analytics-metrics small { color: rgba(215, 225, 244, .52); font-size: 12px; line-height: 1.4; }
+  .analytics-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+  .analytics-panel { padding: 22px; }
+  .analytics-panel--wide { grid-column: 1 / -1; }
+  .analytics-panel__head h2 { margin: 6px 0 18px; color: #f5f8ff; font-size: 1.2rem; letter-spacing: -.025em; }
+  .analytics-list { display: grid; gap: 9px; }
+  .analytics-list__row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.07); }
+  .analytics-list__row:last-child { border-bottom: 0; }
+  .analytics-list__label { overflow-wrap: anywhere; color: rgba(237,242,251,.78); font-size: 14px; }
+  .analytics-list__count { color: #86f7ea; font-weight: 800; }
+  .analytics-empty { margin: 0; color: rgba(215,225,244,.55); font-size: 14px; line-height: 1.55; }
+  .analytics-table-wrap { overflow-x: auto; }
+  table { width: 100%; min-width: 590px; border-collapse: collapse; text-align: left; }
+  th, td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,.07); font-size: 13px; }
+  th { color: rgba(192,209,233,.55); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+  td { color: rgba(237,242,251,.8); }
+  @media (max-width: 980px) { .analytics-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); } .analytics-hero { align-items: start; flex-direction: column; } .analytics-actions { justify-content: flex-start; } }
+  @media (max-width: 620px) { .analytics-shell { width: min(100% - 20px, 1180px); padding-top: 20px; } .analytics-console { border-radius: 22px; padding: 12px; } .analytics-hero { padding: 14px 10px 22px; } .analytics-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } .analytics-metrics article { padding: 14px; min-height: 112px; } .analytics-grid { grid-template-columns: 1fr; } .analytics-panel--wide { grid-column: auto; } }
+</style>

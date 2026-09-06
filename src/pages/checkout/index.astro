@@ -48,6 +48,7 @@ import { ROUTES } from "../../data/routes";
   const lookupBase = String(params.get("lookup_key") || "").trim();
   const requestedCurrency = String(params.get("currency") || "").trim().toLowerCase();
   const requestedNext = String(params.get("next") || "").trim();
+  const checkoutAttemptId = crypto.randomUUID();
 
   const titleEl = document.getElementById("checkoutTitle");
   const messageEl = document.getElementById("checkoutMessage");
@@ -93,6 +94,21 @@ import { ROUTES } from "../../data/routes";
     propertyflow: "PropertyFlow",
     pricing: "VOLYNX pricing",
   };
+
+  function trackCheckoutEvent(event, detail = {}) {
+    try {
+      if (window.VxAnalytics?.track) {
+        window.VxAnalytics.track(event, detail);
+        return;
+      }
+      const consent = JSON.parse(localStorage.getItem("volynx_consent_v1") || "{}");
+      if (consent?.analytics !== true) return;
+      window.__volynxAnalyticsQueue = window.__volynxAnalyticsQueue || [];
+      window.__volynxAnalyticsQueue.push({ event, detail });
+    } catch (_) {
+      // Checkout must continue even if optional analytics is unavailable.
+    }
+  }
 
   function normalizeCurrency(value) {
     const currency = String(value || "gbp").toLowerCase();
@@ -208,6 +224,7 @@ import { ROUTES } from "../../data/routes";
       if (titleEl) titleEl.textContent = tt.missing_target;
       if (messageEl) messageEl.textContent = tt.missing_target_msg;
       showError(tt.missing_target, tt.missing_target_hint);
+      trackCheckoutEvent("checkout_failed", { label: "missing_lookup" });
       return;
     }
 
@@ -218,6 +235,7 @@ import { ROUTES } from "../../data/routes";
     const currentPath = window.location.pathname + window.location.search + window.location.hash;
 
     if (!token) {
+      trackCheckoutEvent("checkout_started", { label: "authentication_required" });
       if (window.VxReturn) window.VxReturn.redirectToLogin(currentPath);
       else window.location.href = `/login/?next=${encodeURIComponent(currentPath)}`;
       return;
@@ -247,6 +265,7 @@ import { ROUTES } from "../../data/routes";
       const cancelUrl = new URL(cancelPath, window.location.origin);
       cancelUrl.searchParams.set("payment", "cancelled");
       const successUrl = `${window.location.origin}${successPathForLookup(lookupBase)}`;
+      trackCheckoutEvent("checkout_started", { label: lookupKey.replace(/[^a-z0-9_-]/gi, "_").toLowerCase() });
 
       const res = await fetch(`${apiBase}/create-checkout-session`, {
         method: "POST",
@@ -258,18 +277,21 @@ import { ROUTES } from "../../data/routes";
           lookup_key: lookupKey,
           success_url: successUrl,
           cancel_url: cancelUrl.toString(),
+          checkout_attempt_id: checkoutAttemptId,
         }),
       });
 
       const data = await res.json().catch(() => ({}));
 
       if (data?.url) {
+        trackCheckoutEvent("checkout_redirected", { label: lookupKey.replace(/[^a-z0-9_-]/gi, "_").toLowerCase() });
         window.location.href = data.url;
         return;
       }
 
       throw new Error(data?.error || data?.message || tt.no_redirect);
     } catch (error) {
+      trackCheckoutEvent("checkout_failed", { label: "session_creation_failed" });
       console.error("[checkout-page] failed:", error);
       if (titleEl) titleEl.textContent = tt.could_not_start;
       if (messageEl) messageEl.textContent = tt.could_not_start_hint;

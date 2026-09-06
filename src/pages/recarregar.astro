@@ -248,7 +248,7 @@ const L = t[lang];
   <FlagshipFooter />
 
   <!-- Pix checkout helper -->
-  <script is:inline src="/js/vx-pix.js"></script>
+  <script is:inline src="/js/vx-pix.js?v=20260906-release"></script>
 
   <script is:inline>
     (function() {
@@ -359,6 +359,8 @@ const L = t[lang];
           var apiBase = (cfg.functionsUrl || '').replace(/\/$/, '');
           if (!apiBase) return;
           var lookup = btn.getAttribute('data-buy-card');
+          var checkoutAttemptId = btn.dataset.checkoutAttemptId || crypto.randomUUID();
+          btn.dataset.checkoutAttemptId = checkoutAttemptId;
           btn.disabled = true;
           btn.setAttribute('aria-busy', 'true');
           var orig = btn.textContent;
@@ -370,7 +372,8 @@ const L = t[lang];
               body: JSON.stringify({
                 lookup_key: lookup,
                 success_url: window.location.origin + '/account/?recarga=sucesso',
-                cancel_url: window.location.href
+                cancel_url: window.location.href,
+                checkout_attempt_id: checkoutAttemptId,
               })
             });
             var data = await res.json();

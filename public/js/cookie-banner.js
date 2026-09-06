@@ -17,6 +17,15 @@
   function show() { banner.classList.add('vx-cookie--show'); }
   function hide() { banner.classList.remove('vx-cookie--show'); }
 
+  function openPreferences() {
+    const consent = getConsent();
+    const analyticsToggle = document.getElementById('vxConsentAnalytics');
+    const panel = document.getElementById('vxCookiePanel');
+    if (analyticsToggle) analyticsToggle.checked = consent?.analytics === true;
+    if (panel) panel.style.display = 'block';
+    show();
+  }
+
   if (!getConsent()) {
     setTimeout(show, 800);
   }
@@ -28,6 +37,8 @@
     const panel = document.getElementById('vxCookiePanel');
     if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
   });
+
+  window.addEventListener('volynx:open-consent-preferences', openPreferences);
 
   document.getElementById('vxCookieSave')?.addEventListener('click', () => {
     const analytics = document.getElementById('vxConsentAnalytics')?.checked ?? false;

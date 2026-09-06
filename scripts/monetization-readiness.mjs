@@ -131,7 +131,7 @@ const optionChecks = await Promise.all([
   ...fulfillmentFunctions,
 ].map(async (name) => {
   const response = await request(`${functionBaseUrl}/${name}`, { method: "OPTIONS" });
-  expect(response?.status === 200, `Live Edge Function ${name} did not return HTTP 200 to CORS preflight.`);
+  expect([200, 204].includes(response?.status || 0), `Live Edge Function ${name} did not return a successful CORS preflight.`);
   return name;
 }));
 

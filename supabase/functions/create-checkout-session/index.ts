@@ -1,49 +1,47 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import Stripe from "npm:stripe@22.2.2";
+import {
+  corsHeaders,
+  isAllowedReturnUrl,
+  isUuid,
+  jsonResponse,
+  parseJsonObject,
+  rejectUnexpectedOrigin,
+} from "../_shared/edge-security.ts";
 
 const STRIPE_API_VERSION = "2026-02-25.clover";
 const STRIPE_PIX_API_VERSION = "2026-02-25.clover";
 
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
-
-function json(data: Record<string, unknown>, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-  });
-}
-
 const FRONTEND_ORIGIN = Deno.env.get("FRONTEND_ORIGIN") || "https://volynx.world";
 const LOOKUP_KEY_CURRENCY_RE = /_(gbp|eur|brl)$/i;
 
-function isProductionOrigin(origin: string): boolean {
-  return /^https:\/\/(www\.)?volynx\.world\b/i.test(origin);
-}
-
-function shouldBlockTestStripeKey(stripeKey: string): boolean {
-  return isProductionOrigin(FRONTEND_ORIGIN) && stripeKey.startsWith("sk_test_");
-}
-
-function isProductionUrl(value: unknown): boolean {
-  if (typeof value !== "string" || !value) return false;
+function isCanonicalFrontendOrigin(origin: string): boolean {
   try {
-    return isProductionOrigin(new URL(value).origin);
+    return new URL(origin).origin === new URL(FRONTEND_ORIGIN).origin;
   } catch {
     return false;
   }
 }
 
+function isProductionFrontend(): boolean {
+  try {
+    return new URL(FRONTEND_ORIGIN).origin === "https://volynx.world";
+  } catch {
+    return false;
+  }
+}
+
+function shouldBlockTestStripeKey(stripeKey: string): boolean {
+  return isProductionFrontend() && stripeKey.startsWith("sk_test_");
+}
+
 function shouldBlockLiveStripeKey(req: Request, stripeKey: string, successUrl: unknown, cancelUrl: unknown): boolean {
   if (!stripeKey.startsWith("sk_live_")) return false;
   const requestOrigin = req.headers.get("Origin") || "";
-  if (!isProductionOrigin(requestOrigin)) return true;
-  if (typeof successUrl === "string" && successUrl && !isProductionUrl(successUrl)) return true;
-  if (typeof cancelUrl === "string" && cancelUrl && !isProductionUrl(cancelUrl)) return true;
+  if (!isCanonicalFrontendOrigin(requestOrigin)) return true;
+  if (typeof successUrl === "string" && successUrl && !isAllowedReturnUrl(successUrl, FRONTEND_ORIGIN)) return true;
+  if (typeof cancelUrl === "string" && cancelUrl && !isAllowedReturnUrl(cancelUrl, FRONTEND_ORIGIN)) return true;
   return false;
 }
 
@@ -102,9 +100,13 @@ function wantsPixCheckout(body: Record<string, unknown>): boolean {
 }
 
 Deno.serve(async (req: Request) => {
+  const blockedOrigin = rejectUnexpectedOrigin(req);
+  if (blockedOrigin) return blockedOrigin;
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: CORS_HEADERS });
+    return new Response(null, { status: 204, headers: corsHeaders(req) });
   }
+
+  const json = (data: Record<string, unknown>, status = 200) => jsonResponse(req, data, status);
 
   if (req.method !== "POST") {
     return json({ error: "Method not allowed" }, 405);
@@ -131,12 +133,22 @@ Deno.serve(async (req: Request) => {
       return json({ error: "Invalid or expired token. Please log in again." }, 401);
     }
 
-    const body = await req.json() as Record<string, unknown>;
+    const body = await parseJsonObject(req, 12_000);
     const { lookup_key, success_url, cancel_url } = body;
 
     if (!lookup_key || typeof lookup_key !== "string") {
       return json({ error: "Missing lookup_key" }, 400);
     }
+    if (typeof success_url === "string" && success_url && !isAllowedReturnUrl(success_url, FRONTEND_ORIGIN)) {
+      return json({ error: "Invalid success URL" }, 400);
+    }
+    if (typeof cancel_url === "string" && cancel_url && !isAllowedReturnUrl(cancel_url, FRONTEND_ORIGIN)) {
+      return json({ error: "Invalid cancel URL" }, 400);
+    }
+    if (body.checkout_attempt_id !== undefined && !isUuid(body.checkout_attempt_id)) {
+      return json({ error: "Invalid checkout attempt" }, 400);
+    }
+    const checkoutAttemptId = isUuid(body.checkout_attempt_id) ? body.checkout_attempt_id : crypto.randomUUID();
 
     const isCheckoutSmokeTest = extractPrefix(lookup_key) === "checkout_smoke_test";
 
@@ -256,7 +268,7 @@ Deno.serve(async (req: Request) => {
       const customer = await stripe.customers.create({
         email: user.email,
         metadata: { supabase_user_id: user.id },
-      });
+      }, { idempotencyKey: `customer:${user.id}` });
       customerId = customer.id;
       const { error: customerUpdateError } = await supabase
         .from("profiles")
@@ -284,6 +296,7 @@ Deno.serve(async (req: Request) => {
       stripe_lookup_key: stripeLookupKey,
       product_family: canonicalPrefix,
       product_prefix: canonicalPrefix,
+      checkout_attempt_id: checkoutAttemptId,
       ...extraMeta,
     };
 
@@ -347,7 +360,9 @@ Deno.serve(async (req: Request) => {
       : stripe;
 
     checkoutStage = "create_session";
-    const session = await sessionStripe.checkout.sessions.create(params as any);
+    const session = await sessionStripe.checkout.sessions.create(params as any, {
+      idempotencyKey: `checkout:${user.id}:${checkoutAttemptId}`,
+    });
     return json({ url: session.url });
   } catch (err) {
     const checkoutError = err as Error & { code?: string; requestId?: string; type?: string };

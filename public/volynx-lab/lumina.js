@@ -393,7 +393,8 @@ async function callLuminaAi(text, selectedMode, selectedLanguage) {
     },
     body: JSON.stringify({
       tool: "lumina",
-      lite: !hasPaidPlan() && getUses() >= FREE_LIMIT,
+      action_class: "medium",
+      request_id: crypto.randomUUID(),
       input: {
         text,
         mode: selectedMode,
@@ -448,9 +449,12 @@ async function runLumina(nextMode) {
     const sections = localLumina(text, selectedMode, selectedLanguage);
     renderCards(sections);
     saveLuminaHistory("fallback", sections, selectedMode, selectedLanguage, text);
-    setStatus(error?.message
-      ? tr("lumina.runtime.local_fallback_error", "Local fallback: {error}").replace("{error}", error.message)
-      : tr("lumina.runtime.local_fallback", "Local fallback"), "fallback");
+    const noAiBalance = error?.message === "insufficient_balance";
+    setStatus(noAiBalance
+      ? tr("lumina.runtime.ai_limit", "AI quota is used. Showing private local mode; add VX to continue with AI.")
+      : error?.message
+        ? tr("lumina.runtime.local_fallback_error", "Local fallback: {error}").replace("{error}", error.message)
+        : tr("lumina.runtime.local_fallback", "Local fallback"), "fallback");
     if (window.VxLab) {
       VxLab.recordEvent("lumina", "fallback", `${selectedMode} · ${selectedLanguage}`);
       VxLab.track("lumina", "error", { message: error?.message || "Lumina AI unavailable" });

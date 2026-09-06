@@ -34,6 +34,7 @@
     {
       id: "free",
       name: "QRGen Free",
+      image: "/assets/qrgen.webp",
       price: { GBP: "£0", EUR: "€0", BRL: "R$0" },
       copy: "For fast static QR drafts and standard PNGs.",
       features: ["Live preview", "Static QR", "Basic colors", "3 free exports/week"],
@@ -44,6 +45,7 @@
     {
       id: "launch",
       name: "QRGen Launch",
+      image: "/assets/qrgen/qrgen-launch-vari.webp",
       price: { GBP: "£11", EUR: "€13", BRL: "R$69" },
       copy: "For real campaigns that need HD assets.",
       features: ["HD PNG", "More saved projects", "Gradient styles", "No friction for launch work"],
@@ -54,6 +56,7 @@
     {
       id: "pro",
       name: "QRGen Pro",
+      image: "/assets/qrgen/qrgen-pro-vari.webp",
       price: { GBP: "£24", EUR: "€28", BRL: "R$149" },
       copy: "For brand-safe and print-ready exports.",
       features: ["SVG vector", "Transparent background", "Logo export", "4096px PNG"],
@@ -64,6 +67,7 @@
     {
       id: "studio",
       name: "QRGen Studio",
+      image: "/assets/qrgen/qrgen-studio-vari.webp",
       price: { GBP: "£54", EUR: "€63", BRL: "R$349" },
       copy: "For dynamic QR campaigns and client work.",
       features: ["Dynamic QR direction", "Campaign organization", "Analytics path", "Client/project workflow"],
@@ -1687,6 +1691,7 @@
     if (!wrap) return;
     wrap.innerHTML = PLANS.map((plan) => `
       <article class="qrgen-plan-card ${plan.id === currentPlan ? "is-current" : ""}">
+        ${plan.image ? `<div class="qrgen-plan-card__visual" aria-hidden="true"><img src="${escapeHtml(plan.image)}" alt="" width="720" height="720" loading="lazy" decoding="async" /></div>` : ""}
         <h3>${escapeHtml(plan.name)}</h3>
         <strong>${escapeHtml(plan.price?.[currentCurrency] || plan.price?.GBP || "")}</strong>
         <p>${escapeHtml(tq(`plans.${plan.id}.copy`, plan.copy))}</p>

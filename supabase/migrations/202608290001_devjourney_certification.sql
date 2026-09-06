@@ -22,6 +22,32 @@ CREATE TABLE IF NOT EXISTS public.devjourney_progress (
   CONSTRAINT devjourney_progress_item_id_check CHECK (item_id ~ '^[A-Za-z0-9_.-]{1,64}$')
 );
 
+-- Some production environments already have the original two-column
+-- progress table, where the presence of a row represented completion.
+-- Upgrade it in place before adding the new index: retain those completions
+-- as true rather than silently resetting student progress.
+ALTER TABLE public.devjourney_progress
+  ADD COLUMN IF NOT EXISTS completed boolean;
+
+UPDATE public.devjourney_progress
+  SET completed = true
+  WHERE completed IS NULL;
+
+ALTER TABLE public.devjourney_progress
+  ALTER COLUMN completed SET DEFAULT false,
+  ALTER COLUMN completed SET NOT NULL;
+
+ALTER TABLE public.devjourney_progress
+  ADD COLUMN IF NOT EXISTS updated_at timestamptz;
+
+UPDATE public.devjourney_progress
+  SET updated_at = now()
+  WHERE updated_at IS NULL;
+
+ALTER TABLE public.devjourney_progress
+  ALTER COLUMN updated_at SET DEFAULT now(),
+  ALTER COLUMN updated_at SET NOT NULL;
+
 ALTER TABLE public.devjourney_progress ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS devjourney_progress_owner_select ON public.devjourney_progress;
@@ -52,6 +78,36 @@ CREATE TABLE IF NOT EXISTS public.devjourney_submissions (
   CONSTRAINT devjourney_submissions_repo_https CHECK (repo_url ~* '^https://'),
   CONSTRAINT devjourney_submissions_live_https CHECK (live_url ~* '^https://')
 );
+
+-- The original submissions table predates the richer certification record.
+-- Add only the missing fields and seed safe defaults so existing submissions
+-- remain readable and retain their original submission time.
+ALTER TABLE public.devjourney_submissions
+  ADD COLUMN IF NOT EXISTS student_name text,
+  ADD COLUMN IF NOT EXISTS notes text,
+  ADD COLUMN IF NOT EXISTS validation jsonb,
+  ADD COLUMN IF NOT EXISTS fingerprint text,
+  ADD COLUMN IF NOT EXISTS updated_at timestamptz;
+
+UPDATE public.devjourney_submissions
+  SET student_name = 'Dev Journey learner'
+  WHERE student_name IS NULL;
+
+UPDATE public.devjourney_submissions
+  SET validation = '{}'::jsonb
+  WHERE validation IS NULL;
+
+UPDATE public.devjourney_submissions
+  SET updated_at = COALESCE(submitted_at, now())
+  WHERE updated_at IS NULL;
+
+ALTER TABLE public.devjourney_submissions
+  ALTER COLUMN student_name SET DEFAULT 'Dev Journey learner',
+  ALTER COLUMN student_name SET NOT NULL,
+  ALTER COLUMN validation SET DEFAULT '{}'::jsonb,
+  ALTER COLUMN validation SET NOT NULL,
+  ALTER COLUMN updated_at SET DEFAULT now(),
+  ALTER COLUMN updated_at SET NOT NULL;
 
 CREATE INDEX IF NOT EXISTS devjourney_submissions_user_idx
   ON public.devjourney_submissions(user_id, updated_at DESC);

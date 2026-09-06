@@ -13,6 +13,11 @@ const btnLogin    = document.getElementById("confirmBtn");
 const btnRetry    = document.getElementById("confirmBtnRetry");
 
 function showSuccess() {
+  try {
+    window.VxAnalytics?.track("signup_completed", { label: "email_confirmed" });
+  } catch (_) {
+    // Confirmation remains independent from optional analytics.
+  }
   if (spinnerEl) spinnerEl.hidden = true;
   iconEl.classList.add("is-success");
   iconEl.textContent = "";

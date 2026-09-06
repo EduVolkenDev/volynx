@@ -10,7 +10,8 @@ type AuthorizeInput = {
 type CallAiInput = {
   tool: DailyAiTool
   input: Record<string, string>
-  lite: boolean
+  actionClass: DailyAiActionClass
+  accessToken: string
 }
 
 type RunAiInput = AuthorizeInput & {
@@ -56,65 +57,31 @@ export async function authorizeDailyAiCall(input: AuthorizeInput) {
   if (!input.accessToken) {
     return { allowed: false, reason: "login" as const, lite: false }
   }
-
-  const functionsUrl = getDailyFunctionsUrl()
-
-  try {
-    const response = await fetch(`${functionsUrl}/deduct-tokens`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        authorization: `Bearer ${input.accessToken}`
-      },
-      body: JSON.stringify({
-        tool: input.tool,
-        action_class: input.actionClass,
-        description: `AI ${input.tool}`
-      })
-    })
-    const data = (await response.json()) as { ok?: boolean; error?: string }
-
-    if (data.ok) {
-      return { allowed: true, lite: false }
-    }
-
-    if (data.error === "insufficient_balance") {
-      const permissionResponse = await fetch(`${functionsUrl}/check-permission`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          authorization: `Bearer ${input.accessToken}`
-        },
-        body: JSON.stringify({ tool: input.tool })
-      })
-      const permission = (await permissionResponse.json()) as { allowed?: boolean; remaining?: number }
-
-      if (permission.allowed && (permission.remaining ?? 0) > 0) {
-        return { allowed: true, lite: true }
-      }
-
-      return { allowed: false, reason: "tokens" as const, lite: false }
-    }
-
-    return { allowed: true, lite: false }
-  } catch {
-    return { allowed: true, lite: false }
-  }
+  // The Edge Function is the single authority for free quotas, VX charging,
+  // rate limiting and refunds. Never fail open when a billing check is down.
+  return { allowed: true, lite: false }
 }
 
 export async function callDailyAiTool(input: CallAiInput) {
   const functionsUrl = getDailyFunctionsUrl()
   const response = await fetch(`${functionsUrl}/ai-tools`, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      authorization: `Bearer ${input.accessToken}`
+    },
     body: JSON.stringify({
       tool: input.tool,
       input: input.input,
-      lite: input.lite
+      action_class: input.actionClass,
+      request_id: crypto.randomUUID()
     })
   })
   const data = (await response.json()) as AiToolsResponse
 
+  if (data.error === "insufficient_balance") {
+    throw new DailyAiAuthorizationError("tokens")
+  }
   if (!response.ok || data.error || !data.result) {
     throw new Error(data.error ?? "AI tool did not return a result.")
   }
@@ -135,6 +102,7 @@ export async function runDailyAiTool(input: RunAiInput) {
   return callDailyAiTool({
     tool: input.tool,
     input: input.input,
-    lite: authorization.lite
+    actionClass: input.actionClass,
+    accessToken: input.accessToken!
   })
 }

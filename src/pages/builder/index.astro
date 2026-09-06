@@ -2128,17 +2128,24 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
     });
 
     // ── AI Generate / Refine ──────────────────────────────────
-    const functionsBase = ((cfg as any).functionsUrl || "https://zdmpzrderifgqmqivjoy.supabase.co/functions/v1").replace(/\/$/, "");
+    const functionsBase = String((cfg as any).functionsUrl || "").replace(/\/$/, "");
 
     async function callAIBuilder(description: string, refine: boolean, current: any) {
       const token = localStorage.getItem("volynx_access_token") || "";
+      if (!functionsBase) throw new Error("AI Builder is temporarily unavailable. Please try again shortly.");
+      if (!token) throw new Error(tr("builder.ai.signin", "Sign in to use AI Builder."));
       const res = await fetch(`${functionsBase}/ai-builder`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { "Authorization": "Bearer " + token } : {}),
+          "Authorization": "Bearer " + token,
         },
-        body: JSON.stringify({ description, refine, current }),
+        body: JSON.stringify({
+          description,
+          refine,
+          current,
+          request_id: crypto.randomUUID(),
+        }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -2162,27 +2169,11 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
       const generateBtn = $("aiGenerate") as HTMLButtonElement;
       const refineBtn = $("aiRefine") as HTMLButtonElement;
 
-      // Deduct a token first
       const token = localStorage.getItem("volynx_access_token");
       if (!token) {
         setAIStatus(tr("builder.ai.signin", "Sign in to use AI Builder."), "error");
         return;
       }
-      setAIStatus(tr("builder.ai.checking_balance", "Checking balance…"), "info");
-      try {
-        const deductRes = await fetch(`${functionsBase}/deduct-tokens`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-          body: JSON.stringify({ tool: "builder", action_class: "pro", description: "AI Builder site generation" }),
-        });
-        const deductData = await deductRes.json();
-        if (!deductData.ok && deductData.error === "insufficient_balance") {
-          setAIStatus(tr("builder.ai.insufficient", "Not enough tokens. Add more to use AI Builder."), "error");
-          ($("aiStatus") as HTMLElement).innerHTML +=
-            ' <a href="/pricing/" class="btn btn--primary btn--sm" style="margin-left:8px;">' + tr("builder.ai.add_tokens", "Add tokens") + '</a>';
-          return;
-        }
-      } catch { /* allow on network error */ }
 
       generateBtn.disabled = true;
       refineBtn.disabled = true;
@@ -2221,7 +2212,11 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
           switchTab("sections");
         }
       } catch (err: any) {
-        setAIStatus(tr("builder.ai.error", "Error: {error}").replace("{error}", err?.message || tr("builder.ai.failed", "AI generation failed.")), "error");
+        if (err?.message === "insufficient_balance") {
+          setAIStatus(tr("builder.ai.insufficient", "Not enough VX. Add VX to use AI Builder."), "error");
+        } else {
+          setAIStatus(tr("builder.ai.error", "Error: {error}").replace("{error}", err?.message || tr("builder.ai.failed", "AI generation failed.")), "error");
+        }
       } finally {
         generateBtn.disabled = false;
         if (currentProject) refineBtn.disabled = false;

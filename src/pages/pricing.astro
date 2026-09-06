@@ -285,7 +285,7 @@ const pricingAssistItems = [
       </div>
       <div class="shell pricing-grid pricing-grid--plans">
         {sitePricing.builderPlans.map((plan) => (
-          <PricingCard plan={plan} locale={lang} currency={currency} previewSlug="qrgen-pro" />
+          <PricingCard plan={plan} locale={lang} currency={currency} />
         ))}
       </div>
       <div class="shell">
@@ -2087,7 +2087,7 @@ const pricingAssistItems = [
   <FlagshipFooter />
 
   <!-- Pix checkout helper -->
-  <script is:inline src="/js/vx-pix.js"></script>
+  <script is:inline src="/js/vx-pix.js?v=20260906-release"></script>
 
   <!-- Immediate checkout bridge: every money CTA gets a response even if later modules lag. -->
   <script is:inline>
@@ -2238,6 +2238,11 @@ const pricingAssistItems = [
         if ('disabled' in btn) btn.disabled = false;
       }
 
+      function checkoutAttemptId(target) {
+        if (!target.dataset.checkoutAttemptId) target.dataset.checkoutAttemptId = crypto.randomUUID();
+        return target.dataset.checkoutAttemptId;
+      }
+
       function loginNext() {
         return '/login/?next=' + encodeURIComponent('/pricing/' + (window.location.hash || ''));
       }
@@ -2339,7 +2344,8 @@ const pricingAssistItems = [
           var body = {
             lookup_key: checkout.lookupKey,
             success_url: checkout.successUrl || window.location.origin + '/profile/?payment=success',
-            cancel_url: checkout.cancelUrl || pricingUrl({ payment: 'cancelled' })
+            cancel_url: checkout.cancelUrl || pricingUrl({ payment: 'cancelled' }),
+            checkout_attempt_id: checkoutAttemptId(target)
           };
           if (checkout.paymentMethod) body.payment_method = checkout.paymentMethod;
 
@@ -2761,5 +2767,5 @@ const pricingAssistItems = [
       } catch {}
     }
   </script>
-  <script is:inline src="/scripts/kit-checkout.js" defer></script>
+  <script is:inline src="/scripts/kit-checkout.js?v=20260906-release" defer></script>
 </FlagshipLayout>

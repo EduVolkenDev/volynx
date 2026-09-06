@@ -111,6 +111,14 @@ function escapeHtml(value) {
   return element.innerHTML;
 }
 
+function trackSignupEvent(event, detail) {
+  try {
+    window.VxAnalytics?.track(event, detail);
+  } catch (_) {
+    // Measurement must never interrupt account creation.
+  }
+}
+
 function persistSession(session, email) {
   localStorage.setItem("volynx_access_token", session.access_token || "");
   localStorage.setItem("volynx_refresh_token", session.refresh_token || "");
@@ -204,6 +212,7 @@ function showCheckEmail(email, { autoConfirmed = false } = {}) {
 
     btn.disabled = true;
     setMsg(msg, t("signup.msg_creating", "Creating your account..."), "");
+    trackSignupEvent("signup_started", { label: "account" });
 
     try {
       const cfg = await loadConfig();
@@ -223,6 +232,7 @@ function showCheckEmail(email, { autoConfirmed = false } = {}) {
       // Rare: auto-login when email confirmation is disabled
       if (out?.session?.access_token) {
         persistSession(out.session, email);
+        trackSignupEvent("signup_completed", { label: "auto_confirmed" });
         setMsg(msg, t("signup.msg_created", "Account created. Redirecting..."), "ok");
         const redirect = resolveRedirect();
         if (window.VxReturn) window.VxReturn.consume(redirect);
@@ -238,8 +248,13 @@ function showCheckEmail(email, { autoConfirmed = false } = {}) {
       });
       pendingEmail = email;
       showCheckEmail(email, { autoConfirmed: settings?.mailer_autoconfirm === true });
+      trackSignupEvent(
+        settings?.mailer_autoconfirm === true ? "signup_completed" : "signup_confirmation_requested",
+        { label: settings?.mailer_autoconfirm === true ? "auto_confirmed" : "email_confirmation" },
+      );
 
     } catch (err) {
+      trackSignupEvent("signup_failed", { label: "request_failed" });
       setMsg(msg, err?.message || t("signup.err_failed", "Failed to create account."), "err");
     } finally {
       btn.disabled = false;
@@ -253,6 +268,7 @@ function showCheckEmail(email, { autoConfirmed = false } = {}) {
     try {
       const cfg = await loadConfig();
       await supabaseResend({ supabaseUrl: cfg.supabaseUrl, supabaseAnonKey: cfg.supabaseAnonKey, email: pendingEmail });
+      trackSignupEvent("signup_resend_requested", { label: "email_confirmation" });
       checkStatus.textContent = t("signup.resent", "A new confirmation email was requested. Check your inbox and spam folder.");
     } catch (err) {
       checkStatus.textContent = err?.message || t("signup.resend_failed", "We could not send another email yet. Please wait and try again.");

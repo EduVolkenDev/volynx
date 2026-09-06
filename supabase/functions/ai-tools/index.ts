@@ -2,11 +2,11 @@
  * VOLYNX — AI Tools (Supabase Edge Function)
  *
  * Routes AI requests for intent, summary, writing, task, decision, Lumina, and CVitae tools.
- * Called by daily.volynx.world after token deduction is handled client-side.
+ * Billing and free quotas are enforced here, never trusted to the browser.
  *
  * Request:
  *   POST /ai-tools
- *   { tool: "intent"|"summary"|"writing"|"task"|"decision"|"lumina"|"cvitae", input: {...}, lite: boolean }
+ *   { tool: "intent"|"summary"|"writing"|"task"|"decision"|"lumina"|"cvitae", input: {...}, request_id: UUID }
  *
  * Response:
  *   200: { result: string, lite: boolean }
@@ -16,22 +16,28 @@
  */
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+import { createClient } from "jsr:@supabase/supabase-js@2";
+import {
+  corsHeaders,
+  isUuid,
+  jsonResponse,
+  parseJsonObject,
+  rejectUnexpectedOrigin,
+  requireAuthenticatedUser,
+} from "../_shared/edge-security.ts";
 
 // Configurable via Supabase secret AI_MODEL — defaults to Haiku
 const MODEL = Deno.env.get("AI_MODEL") || "claude-haiku-4-5-20251001";
-
-function json(data: unknown, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-  });
-}
+const MAX_INPUT_BYTES = 16_000;
+const TOOL_POLICY: Record<string, { actionClass: "light" | "medium" | "pro"; cost: number; freeLimit: number }> = {
+  intent: { actionClass: "light", cost: 1, freeLimit: 20 },
+  summary: { actionClass: "medium", cost: 2, freeLimit: 5 },
+  writing: { actionClass: "light", cost: 1, freeLimit: 5 },
+  task: { actionClass: "medium", cost: 2, freeLimit: 8 },
+  decision: { actionClass: "pro", cost: 4, freeLimit: 3 },
+  lumina: { actionClass: "medium", cost: 2, freeLimit: 5 },
+  cvitae: { actionClass: "medium", cost: 2, freeLimit: 3 },
+};
 
 async function callClaude(system: string, user: string, maxTokens: number): Promise<string> {
   const apiKey = Deno.env.get("ANTHROPIC_API_KEY") || "";
@@ -68,25 +74,43 @@ function cvitaeLanguageLabel(language?: string): string {
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS_HEADERS });
-  if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
+  const blockedOrigin = rejectUnexpectedOrigin(req);
+  if (blockedOrigin) return blockedOrigin;
+  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders(req) });
+  const respond = (data: Record<string, unknown>, status = 200) => jsonResponse(req, data, status);
+  if (req.method !== "POST") return respond({ error: "Method not allowed" }, 405);
 
+  let billing: ReturnType<typeof createClient> | null = null;
+  let userId = "";
+  let requestId = "";
+  let reservationStarted = false;
   try {
-    const body = await req.json();
-    const { tool, input, lite } = body as { tool: string; input: Record<string, string>; lite?: boolean };
+    const auth = await requireAuthenticatedUser(req);
+    if (!auth) return respond({ error: "Authentication required" }, 401);
 
-    if (!tool || !input) return json({ error: "Missing tool or input" }, 400);
+    const body = await parseJsonObject(req, 20_000);
+    const tool = String(body.tool || "").trim().toLowerCase();
+    const input = body.input;
 
-    const isLite = Boolean(lite);
-    let maxTokens = isLite ? 400 : 1024;
+    if (!TOOL_POLICY[tool] || !input || typeof input !== "object" || Array.isArray(input)) {
+      return respond({ error: "Missing or invalid tool/input" }, 400);
+    }
+    if (!isUuid(body.request_id)) return respond({ error: "A valid request_id is required" }, 400);
+    if (new TextEncoder().encode(JSON.stringify(input)).byteLength > MAX_INPUT_BYTES) {
+      return respond({ error: "Input is too large" }, 413);
+    }
+    const toolInput = input as Record<string, string>;
+
+    let isLite = false;
+    let maxTokens = 1024;
 
     let system = "";
     let user = "";
 
     // ── Intent ─────────────────────────────────────────────────
     if (tool === "intent") {
-      const { text, sourceKind, sourceUrl, filename } = input;
-      if (!text?.trim() && !filename?.trim()) return json({ error: "Missing text" }, 400);
+      const { text, sourceKind, sourceUrl, filename } = toolInput;
+      if (!text?.trim() && !filename?.trim()) return respond({ error: "Missing text" }, 400);
 
       system = `You classify captures for a personal execution system.
 Return valid JSON only. No markdown, no preamble, no code fences.
@@ -127,8 +151,8 @@ Choose the single best intent and include 1-2 suggestedActions. Keep entities sh
 
     // ── Summary ────────────────────────────────────────────────
     } else if (tool === "summary") {
-      const { text } = input;
-      if (!text?.trim()) return json({ error: "Missing text" }, 400);
+      const { text } = toolInput;
+      if (!text?.trim()) return respond({ error: "Missing text" }, 400);
 
       if (isLite) {
         system = "You are a concise summarizer. Respond with exactly 3 bullet points starting with •. No preamble.";
@@ -146,8 +170,8 @@ ACTIONS:
 
     // ── Writing ────────────────────────────────────────────────
     } else if (tool === "writing") {
-      const { text, mode } = input;
-      if (!text?.trim()) return json({ error: "Missing text" }, 400);
+      const { text, mode } = toolInput;
+      if (!text?.trim()) return respond({ error: "Missing text" }, 400);
 
       const instructions: Record<string, string> = {
         professional: "Rewrite the following text to be more professional and polished. Keep the same core meaning.",
@@ -162,8 +186,8 @@ ACTIONS:
 
     // ── Task extraction ────────────────────────────────────────
     } else if (tool === "task") {
-      const { text, referenceDate } = input;
-      if (!text?.trim()) return json({ error: "Missing text" }, 400);
+      const { text, referenceDate } = toolInput;
+      if (!text?.trim()) return respond({ error: "Missing text" }, 400);
 
       system = `You extract actionable tasks from captures for a personal execution system.
 Return valid JSON only. No markdown, no preamble, no code fences.
@@ -189,8 +213,8 @@ Rules:
 
     // ── Decision ───────────────────────────────────────────────
     } else if (tool === "decision") {
-      const { optionA, optionB, criteria } = input;
-      if (!optionA?.trim() || !optionB?.trim()) return json({ error: "Missing options" }, 400);
+      const { optionA, optionB, criteria } = toolInput;
+      if (!optionA?.trim() || !optionB?.trim()) return respond({ error: "Missing options" }, 400);
 
       const criteriaLine = criteria?.trim() ? `\nDecision criteria: ${criteria}` : "";
 
@@ -214,8 +238,8 @@ Rules:
 
     // ── CVitae resume copilot ────────────────────────────────
     } else if (tool === "lumina") {
-      const { text, mode, language } = input;
-      if (!text?.trim()) return json({ error: "Missing text" }, 400);
+      const { text, mode, language } = toolInput;
+      if (!text?.trim()) return respond({ error: "Missing text" }, 400);
 
       const languageLabel: Record<string, string> = {
         pt: "Portuguese",
@@ -263,10 +287,10 @@ Content to illuminate:
 ${text}`;
 
     } else if (tool === "cvitae") {
-      const { mode, role, name, summary, skills, languages, location, experience, experiences, currentText, language } = input;
+      const { mode, role, name, summary, skills, languages, location, experience, experiences, currentText, language } = toolInput;
       const outputLanguage = cvitaeLanguageLabel(language);
 
-      if (!mode?.trim()) return json({ error: "Missing mode" }, 400);
+      if (!mode?.trim()) return respond({ error: "Missing mode" }, 400);
 
       if (mode === "summary_draft") {
         system = `You are CVitae AI, an expert resume copywriter.
@@ -289,7 +313,7 @@ ${experiences || ""}
 
 Use the available information only. If the background is junior, make it sound promising and specific without inventing seniority.`;
       } else if (mode === "summary_polish") {
-        if (!summary?.trim()) return json({ error: "Missing summary" }, 400);
+        if (!summary?.trim()) return respond({ error: "Missing summary" }, 400);
 
         system = `You are CVitae AI, an expert resume copywriter.
 Rewrite the candidate summary in ${outputLanguage}.
@@ -327,7 +351,7 @@ Experience notes:
 ${experiences || ""}`;
       } else if (mode === "experience_improve") {
         const rawText = currentText || experience || "";
-        if (!rawText?.trim()) return json({ error: "Missing experience text" }, 400);
+        if (!rawText?.trim()) return respond({ error: "Missing experience text" }, 400);
 
         system = `You are CVitae AI, an expert resume copywriter.
 Rewrite a work experience description in ${outputLanguage}.
@@ -346,19 +370,72 @@ ${experience || ""}
 Current description:
 ${rawText}`;
       } else {
-        return json({ error: `Unknown CVitae mode: ${mode}` }, 400);
+        return respond({ error: `Unknown CVitae mode: ${mode}` }, 400);
       }
 
     } else {
-      return json({ error: `Unknown tool: ${tool}` }, 400);
+      return respond({ error: `Unknown tool: ${tool}` }, 400);
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+    if (!supabaseUrl || !serviceRoleKey) {
+      console.error("[ai-tools] required server configuration is missing");
+      return respond({ error: "AI is temporarily unavailable" }, 503);
+    }
+
+    userId = auth.user.id;
+    requestId = body.request_id;
+    const policy = TOOL_POLICY[tool];
+    billing = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } });
+    const { data: reservation, error: reservationError } = await billing.rpc("reserve_ai_usage", {
+      p_user_id: userId,
+      p_request_id: requestId,
+      p_tool_name: tool,
+      p_action_class: policy.actionClass,
+      p_token_cost: policy.cost,
+      p_free_limit: policy.freeLimit,
+      p_allow_free_fallback: true,
+      p_description: `AI ${tool}`,
+      p_metadata: { input_bytes: new TextEncoder().encode(JSON.stringify(toolInput)).byteLength },
+    });
+    if (reservationError || !reservation?.ok) {
+      const reason = reservation?.error || "billing_unavailable";
+      const status = reason === "insufficient_balance" ? 402 : reason === "rate_limited" ? 429 : 409;
+      return respond({ error: reason, balance: reservation?.balance, required: reservation?.required }, status);
+    }
+    reservationStarted = true;
+    isLite = reservation.lite === true;
+    maxTokens = isLite ? 400 : 1024;
+    if (isLite) {
+      system += "\n\nThis is a compact free response. Keep the answer focused, useful, and within the available space.";
     }
 
     const result = await callClaude(system, user, maxTokens);
-    return json({ result, lite: isLite });
+    const { error: completeError } = await billing.rpc("complete_ai_usage", {
+      p_user_id: userId,
+      p_request_id: requestId,
+      p_success: true,
+    });
+    if (completeError) {
+      console.error("[ai-tools] could not finalize usage", completeError.message);
+      throw new Error("billing_finalize_failed");
+    }
+    return respond({ result, lite: isLite, balance: reservation.balance, spent: reservation.spent });
 
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Server error";
-    console.error("[ai-tools] Error:", message);
-    return json({ error: message }, 500);
+    const message = err instanceof Error ? err.message : "server_error";
+    console.error("[ai-tools] error", message);
+    if (reservationStarted && billing && userId && requestId) {
+      const { error: refundError } = await billing.rpc("complete_ai_usage", {
+        p_user_id: userId,
+        p_request_id: requestId,
+        p_success: false,
+        p_failure_reason: message,
+      });
+      if (refundError) console.error("[ai-tools] automatic refund failed", refundError.message);
+    }
+    const status = message === "request_too_large" ? 413 : message === "invalid_request" ? 400 : 503;
+    return respond({ error: "AI could not complete this request. No VX was kept for a failed request." }, status);
   }
 });

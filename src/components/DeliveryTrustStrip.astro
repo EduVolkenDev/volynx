@@ -41,15 +41,29 @@ const trustItems = [
   .delivery-trust {
     display: grid;
     gap: 12px;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: 14px;
+    border: 1px solid rgba(148, 163, 184, .16);
+    border-radius: 26px;
+    background:
+      radial-gradient(circle at 8% 0%, rgba(79, 195, 247, .18), transparent 34%),
+      radial-gradient(circle at 92% 100%, rgba(167, 139, 250, .16), transparent 38%),
+      linear-gradient(135deg, rgba(18, 29, 48, .9), rgba(8, 12, 24, .82) 52%, rgba(18, 12, 35, .9));
+    box-shadow: 0 26px 60px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .08);
   }
   .delivery-trust__card {
+    position: relative;
+    z-index: 1;
     display: flex;
     gap: 14px;
     min-height: 132px;
     padding: 20px;
     border-radius: 18px;
-    border: 1px solid rgba(255,255,255,.08);
-    background: rgba(10,12,20,.45);
+    border: 1px solid rgba(255,255,255,.1);
+    background: linear-gradient(145deg, rgba(255,255,255,.09), rgba(7, 10, 20, .56));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.07);
   }
   .delivery-trust__badge {
     display: inline-flex;
@@ -73,6 +87,9 @@ const trustItems = [
     color: rgba(255,255,255,.68);
   }
   @media (min-width: 860px) {
-    .delivery-trust { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .delivery-trust {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 50px;
+    }
   }
 </style>

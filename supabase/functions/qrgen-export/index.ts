@@ -1,21 +1,20 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import QRCode from "npm:qrcode@1.5.3";
+import {
+  corsHeaders,
+  jsonResponse,
+  parseJsonObject,
+  rejectUnexpectedOrigin,
+  requireAuthenticatedUser,
+} from "../_shared/edge-security.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
-const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") || "";
 const SUPABASE_SERVICE_ROLE_KEY =
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const QR_HOST = "qr.volynx.world";
 const MAX_CONTENT_LENGTH = 4096;
 const MAX_LOGO_LENGTH = 700000;
-
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
 
 const PLAN_RANK: Record<string, number> = {
   free: 0,
@@ -47,13 +46,6 @@ type ExportRequest = {
   logoSize?: number | string;
   logoMargin?: number | string;
 };
-
-function json(data: Record<string, unknown>, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-  });
-}
 
 function normalizePlan(value: unknown): string {
   const plan = String(value || "free").toLowerCase();
@@ -211,26 +203,18 @@ function dynamicSlug(value: unknown): string {
 }
 
 Deno.serve(async (req: Request) => {
+  const blockedOrigin = rejectUnexpectedOrigin(req);
+  if (blockedOrigin) return blockedOrigin;
   if (req.method === "OPTIONS")
-    return new Response(null, { status: 204, headers: CORS_HEADERS });
+    return new Response(null, { status: 204, headers: corsHeaders(req) });
+  const json = (data: Record<string, unknown>, status = 200) => jsonResponse(req, data, status);
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
   try {
-    const token = (req.headers.get("Authorization") || "")
-      .replace(/^Bearer\s+/i, "")
-      .trim();
-    if (!token) return json({ error: "Authentication required" }, 401);
+    const auth = await requireAuthenticatedUser(req);
+    if (!auth) return json({ error: "Authentication required" }, 401);
 
-    const authClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      global: { headers: { Authorization: `Bearer ${token}` } },
-      auth: { persistSession: false },
-    });
-    const { data: userData, error: authError } =
-      await authClient.auth.getUser(token);
-    if (authError || !userData.user)
-      return json({ error: "Invalid or expired token" }, 401);
-
-    const body = await req.json().catch(() => ({}));
+    const body = await parseJsonObject(req, MAX_LOGO_LENGTH + 24_000);
     const request = (body.request || {}) as ExportRequest;
     const content = String(request.content || "").trim();
     if (!content || content.length > MAX_CONTENT_LENGTH)
@@ -246,7 +230,7 @@ Deno.serve(async (req: Request) => {
     const { data: profile, error: profileError } = await serviceClient
       .from("profiles")
       .select("builder_plan,is_admin,is_black_diamond")
-      .eq("id", userData.user.id)
+      .eq("id", auth.user.id)
       .maybeSingle();
     if (profileError || !profile)
       return json({ error: "Profile unavailable" }, 503);
@@ -268,7 +252,7 @@ Deno.serve(async (req: Request) => {
       const { data: qr, error: qrError } = await serviceClient
         .from("qr_codes")
         .select("id")
-        .eq("owner_id", userData.user.id)
+        .eq("owner_id", auth.user.id)
         .eq("slug", slug)
         .in("status", ["active", "paused", "grace"])
         .maybeSingle();

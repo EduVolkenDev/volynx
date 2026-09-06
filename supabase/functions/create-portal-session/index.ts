@@ -13,36 +13,38 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import Stripe from "npm:stripe@22.2.2";
-
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+import {
+  corsHeaders,
+  isAllowedReturnUrl,
+  jsonResponse,
+  parseJsonObject,
+  rejectUnexpectedOrigin,
+} from "../_shared/edge-security.ts";
 
 const STRIPE_API_VERSION = "2026-02-25.clover";
 
-function json(data: Record<string, unknown>, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-  });
-}
-
 const FRONTEND_ORIGIN = Deno.env.get("FRONTEND_ORIGIN") || "https://volynx.world";
 
-function isProductionOrigin(origin: string): boolean {
-  return /^https:\/\/(www\.)?volynx\.world\b/i.test(origin);
+function isProductionFrontend(): boolean {
+  try {
+    return new URL(FRONTEND_ORIGIN).origin === "https://volynx.world";
+  } catch {
+    return false;
+  }
 }
 
 function shouldBlockTestStripeKey(stripeKey: string): boolean {
-  return isProductionOrigin(FRONTEND_ORIGIN) && stripeKey.startsWith("sk_test_");
+  return isProductionFrontend() && stripeKey.startsWith("sk_test_");
 }
 
 Deno.serve(async (req: Request) => {
+  const blockedOrigin = rejectUnexpectedOrigin(req);
+  if (blockedOrigin) return blockedOrigin;
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: CORS_HEADERS });
+    return new Response(null, { status: 204, headers: corsHeaders(req) });
   }
+
+  const json = (data: Record<string, unknown>, status = 200) => jsonResponse(req, data, status);
 
   if (req.method !== "POST") {
     return json({ error: "Method not allowed" }, 405);
@@ -66,8 +68,11 @@ Deno.serve(async (req: Request) => {
       return json({ error: "Invalid or expired token. Please log in again." }, 401);
     }
 
-    const body = await req.json().catch(() => ({}));
+    const body = await parseJsonObject(req, 4_000);
     const { return_url } = body;
+    if (typeof return_url === "string" && return_url && !isAllowedReturnUrl(return_url, FRONTEND_ORIGIN)) {
+      return json({ error: "Invalid return URL" }, 400);
+    }
 
     // Get Stripe customer ID from profile
     const { data: profile } = await supabase

@@ -122,20 +122,8 @@ const platformHref = `${ROUTES.platform}${utm}`;
 
   <script is:inline>
     (() => {
-      const params = new URLSearchParams(window.location.search);
-      const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'];
-      const attribution = Object.fromEntries(keys.filter((key) => params.has(key)).map((key) => [key, params.get(key)]));
-      if (Object.keys(attribution).length) {
-        try { sessionStorage.setItem('volynx_campaign_attribution', JSON.stringify(attribution)); } catch (_) {}
-      }
       const emit = (event) => window.dispatchEvent(new CustomEvent('volynx:campaign-event', {
-        detail: {
-          campaign: 'tiktok-bootstrap',
-          event,
-          attribution: (() => {
-            try { return JSON.parse(sessionStorage.getItem('volynx_campaign_attribution') || '{}'); } catch (_) { return {}; }
-          })()
-        }
+        detail: { campaign: 'tiktok-bootstrap', event }
       }));
       emit('tiktok_view');
       document.addEventListener('click', (event) => {

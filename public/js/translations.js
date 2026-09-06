@@ -146,9 +146,9 @@ window.VX_TRANS = {
     "contact.opt_exploring": "Just exploring",
 
     /* === 404 === */
-    "e404.word_system": "System",
-    "e404.word_offline": "Offline",
-    "e404.desc": "We're having some trouble connecting to this Operational Base — or the coordinates you entered don't exist. Check back soon or go to the Main Base.",
+    "e404.word_system": "Page",
+    "e404.word_offline": "not found",
+    "e404.desc": "This address does not point to a VOLYNX page. Return to the Main Base or choose a destination below.",
     "e404.contact": "Contact",
 
     /* === WIDGETS === */
@@ -3177,9 +3177,9 @@ window.VX_TRANS = {
     "priv.collect_title": "What we collect",
     "priv.collect_account": "<strong>Account data</strong> — name and email address when you create an account or sign in via Supabase Auth.",
     "priv.collect_payment": "<strong>Payment data</strong> — billing information processed securely by Stripe. Volynx never stores card numbers directly.",
-    "priv.collect_usage": "<strong>Usage data</strong> — pages visited, tool interactions, and device/browser information for performance and analytics purposes.",
+    "priv.collect_usage": "<strong>Optional analytics data</strong> — a pseudonymous session ID, page path, CTA/product-flow interaction, broad device class and campaign/referrer domain. We do not put email addresses, form values, file names, complete URL parameters or payment data into these events.",
     "priv.collect_contact": "<strong>Contact data</strong> — messages and information you submit through our contact form (processed via Formspree).",
-    "priv.collect_cookies": "<strong>Cookies</strong> — essential session cookies for authentication and optional analytics cookies.",
+    "priv.collect_cookies": "<strong>Cookies and local storage</strong> — essential session storage for authentication and optional first-party analytics storage.",
     "priv.why_title": "Why we collect it",
     "priv.why_account": "To create and manage your account and authenticate sessions",
     "priv.why_purchases": "To process purchases of digital products, icon packs, kits, and subscriptions",
@@ -3187,12 +3187,13 @@ window.VX_TRANS = {
     "priv.why_support": "To respond to support and sales inquiries",
     "priv.why_legal": "To comply with legal and financial obligations",
     "priv.third_title": "Third-party services",
-    "priv.third_supabase": "<strong>Supabase</strong> — authentication and database hosting (EU infrastructure)",
+    "priv.third_supabase": "<strong>Supabase</strong> — authentication, database hosting and first-party consented analytics storage (EU infrastructure)",
     "priv.third_stripe": "<strong>Stripe</strong> — payment processing. Subject to <a href=\"https://stripe.com/privacy\" target=\"_blank\" rel=\"noopener\">Stripe's Privacy Policy</a>.",
     "priv.third_formspree": "<strong>Formspree</strong> — contact form processing",
     "priv.third_cloudflare": "<strong>Cloudflare Pages</strong> — website hosting and CDN",
     "priv.cookies_title": "Cookies",
-    "priv.cookies_desc": "We use essential cookies to keep you logged in and maintain session state. We may also use anonymous analytics cookies to understand usage patterns. You can disable non-essential cookies in your browser settings at any time.",
+    "priv.cookies_desc": "We use essential storage to keep you logged in and maintain session state. With your permission, VOLYNX creates a temporary pseudonymous session and records anonymous product events to understand usage patterns. You can change this preference at any time.",
+    "priv.cookies_manage": "Manage analytics preferences",
     "priv.retention_title": "Data retention",
     "priv.retention_desc": "Account data is retained while your account is active. You may request deletion at any time. Payment records are retained as required by applicable financial regulations.",
     "priv.rights_title": "Your rights",
@@ -3201,7 +3202,7 @@ window.VX_TRANS = {
     "priv.rights_complaint": "Lodge a complaint with your local data protection authority",
     "priv.contact_title": "Contact",
     "priv.contact_desc": "For privacy requests: <a href=\"mailto:hello@volynx.world\">hello@volynx.world</a>",
-    "priv.updated": "Last updated: 2026-04-01",
+    "priv.updated": "Last updated: 2026-09-05",
 
     /* === TERMS === */
     "terms.title": "Terms of Service",
@@ -3660,9 +3661,9 @@ window.VX_TRANS = {
     "contact.opt_exploring": "Apenas explorando",
 
     /* === 404 === */
-    "e404.word_system": "Sistema",
-    "e404.word_offline": "Offline",
-    "e404.desc": "Estamos com dificuldade para conectar a esta Base Operacional — ou as coordenadas inseridas não existem. Volte em breve ou vá para a Base Principal.",
+    "e404.word_system": "Página",
+    "e404.word_offline": "não encontrada",
+    "e404.desc": "Este endereço não aponta para uma página da VOLYNX. Volte para a Base Principal ou escolha um destino abaixo.",
     "e404.contact": "Contato",
 
     /* === WIDGETS === */
@@ -6700,9 +6701,9 @@ window.VX_TRANS = {
     "priv.collect_title": "O que coletamos",
     "priv.collect_account": "<strong>Dados da conta</strong> — nome e endereço de e-mail quando você cria uma conta ou faz login via Supabase Auth.",
     "priv.collect_payment": "<strong>Dados de pagamento</strong> — informações de cobrança processadas com segurança pelo Stripe. A Volynx nunca armazena números de cartão diretamente.",
-    "priv.collect_usage": "<strong>Dados de uso</strong> — páginas visitadas, interações com ferramentas e informações de dispositivo/navegador para fins de desempenho e análise.",
+    "priv.collect_usage": "<strong>Dados opcionais de análise</strong> — um identificador pseudônimo de sessão, caminho da página, interação com CTA/fluxo de produto, classe ampla de dispositivo e domínio de campanha/origem. Não colocamos endereços de e-mail, valores de formulário, nomes de arquivos, parâmetros completos de URL ou dados de pagamento nesses eventos.",
     "priv.collect_contact": "<strong>Dados de contato</strong> — mensagens e informações que você envia através do nosso formulário de contato (processado via Formspree).",
-    "priv.collect_cookies": "<strong>Cookies</strong> — cookies de sessão essenciais para autenticação e cookies de análise opcionais.",
+    "priv.collect_cookies": "<strong>Cookies e armazenamento local</strong> — armazenamento de sessão essencial para autenticação e armazenamento próprio opcional para análise.",
     "priv.why_title": "Por que coletamos",
     "priv.why_account": "Para criar e gerenciar sua conta e autenticar sessões",
     "priv.why_purchases": "Para processar compras de produtos digitais, pacotes de ícones, kits e assinaturas",
@@ -6710,12 +6711,13 @@ window.VX_TRANS = {
     "priv.why_support": "Para responder a consultas de suporte e vendas",
     "priv.why_legal": "Para cumprir obrigações legais e financeiras",
     "priv.third_title": "Serviços de terceiros",
-    "priv.third_supabase": "<strong>Supabase</strong> — autenticação e hospedagem de banco de dados (infraestrutura UE)",
+    "priv.third_supabase": "<strong>Supabase</strong> — autenticação, hospedagem de banco de dados e armazenamento próprio de análise consentida (infraestrutura UE)",
     "priv.third_stripe": "<strong>Stripe</strong> — processamento de pagamentos. Sujeito à <a href=\"https://stripe.com/privacy\" target=\"_blank\" rel=\"noopener\">Política de Privacidade do Stripe</a>.",
     "priv.third_formspree": "<strong>Formspree</strong> — processamento de formulário de contato",
     "priv.third_cloudflare": "<strong>Cloudflare Pages</strong> — hospedagem de site e CDN",
     "priv.cookies_title": "Cookies",
-    "priv.cookies_desc": "Usamos cookies essenciais para manter você conectado e manter o estado da sessão. Também podemos usar cookies de análise anônimos para entender padrões de uso. Você pode desativar cookies não essenciais nas configurações do seu navegador a qualquer momento.",
+    "priv.cookies_desc": "Usamos armazenamento essencial para manter você conectado e preservar o estado da sessão. Com sua permissão, a VOLYNX cria uma sessão pseudônima temporária e registra eventos anônimos de produto para entender padrões de uso. Você pode mudar essa preferência a qualquer momento.",
+    "priv.cookies_manage": "Gerenciar preferências de análise",
     "priv.retention_title": "Retenção de dados",
     "priv.retention_desc": "Os dados da conta são retidos enquanto sua conta estiver ativa. Você pode solicitar a exclusão a qualquer momento. Registros de pagamento são retidos conforme exigido pelas regulamentações financeiras aplicáveis.",
     "priv.rights_title": "Seus direitos",
@@ -6724,7 +6726,7 @@ window.VX_TRANS = {
     "priv.rights_complaint": "Registrar uma reclamação junto à sua autoridade local de proteção de dados",
     "priv.contact_title": "Contato",
     "priv.contact_desc": "Para solicitações de privacidade: <a href=\"mailto:hello@volynx.world\">hello@volynx.world</a>",
-    "priv.updated": "Última atualização: 2026-04-01",
+    "priv.updated": "Última atualização: 2026-09-05",
 
     /* === TERMS === */
     "terms.title": "Termos de Serviço",

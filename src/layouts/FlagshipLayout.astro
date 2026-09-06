@@ -39,6 +39,27 @@ const privatePathPrefixes = [
 const robots = privatePathPrefixes.some((prefix) => Astro.url.pathname.startsWith(prefix))
   ? "noindex, nofollow"
   : "index, follow";
+const structuredData = robots.startsWith("noindex") ? null : {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://volynx.world/#organization",
+      "name": "VOLYNX",
+      "url": "https://volynx.world",
+      "logo": "https://volynx.world/assets/V.webp",
+      "email": "hello@volynx.world",
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://volynx.world/#website",
+      "name": "VOLYNX",
+      "url": "https://volynx.world",
+      "publisher": { "@id": "https://volynx.world/#organization" },
+      "inLanguage": ["en", "pt-BR"],
+    },
+  ],
+};
 ---
 <!doctype html>
 <html lang="en">
@@ -69,14 +90,7 @@ const robots = privatePathPrefixes.some((prefix) => Astro.url.pathname.startsWit
     <FaviconHead />
     <TierAttrInit />
 
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "Volynx",
-        "url": "https://volynx.world"
-      }
-    </script>
+    {structuredData && <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />}
     <!-- Cross-subdomain auth hydration (runs BEFORE the early auth check below) -->
     <script is:inline src="/js/vx-auth-bridge.js"></script>
     <!-- Preserve the exact page/task across login and signup. -->
