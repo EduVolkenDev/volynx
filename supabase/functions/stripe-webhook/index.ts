@@ -67,6 +67,29 @@ function slugify(input: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
+const SERVER_ANALYTICS_EVENTS = new Set([
+  "payment_confirmed",
+  "fulfillment_recorded",
+]);
+
+async function recordServerAnalyticsEvent(eventName: string, eventLabel: string): Promise<void> {
+  if (!SERVER_ANALYTICS_EVENTS.has(eventName)) return;
+
+  const { error } = await supabase.from("analytics_events").insert({
+    event_name: eventName,
+    event_label: slugify(eventLabel).slice(0, 80) || null,
+    page_path: "/api/stripe-webhook",
+    session_id: null,
+    locale: null,
+    device_type: "other",
+    event_source: "server",
+  });
+
+  // Analytics must never make a paid fulfillment fail. The purchase ledger and
+  // entitlement path remain the source of truth if this auxiliary write fails.
+  if (error) console.warn(`[stripe-webhook] analytics event failed: ${eventName}`, error.message);
+}
+
 async function builderSlugExists(slug: string): Promise<boolean> {
   const { data, error } = await supabase
     .from("projects")
@@ -636,6 +659,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       console.log(`Subscription purchase event already recorded for session ${session.id} — skip`);
     } else {
       requireDbSuccess("record subscription purchase event", subscriptionPurchaseEvent);
+      await recordServerAnalyticsEvent("payment_confirmed", productKey);
+      await recordServerAnalyticsEvent("fulfillment_recorded", prefix);
     }
 
     // Notify the buyer — bundle gets its own template, single-product subs
@@ -1231,6 +1256,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       console.log(`One-time purchase event already recorded for session ${session.id} — skip`);
     } else {
       requireDbSuccess("record one-time purchase event", oneTimePurchaseEvent);
+      await recordServerAnalyticsEvent("payment_confirmed", productKey);
+      await recordServerAnalyticsEvent("fulfillment_recorded", prefix);
     }
   }
 }

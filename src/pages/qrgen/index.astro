@@ -18,9 +18,9 @@ const qrgenLookupByPlan = {
 } as Record<string, string>;
 const qrgenPlanImageById = {
   free: "/assets/qrgen.webp",
-  launch: "/assets/qrgen/qrgen-launch-vari.webp",
-  pro: "/assets/qrgen/qrgen-pro-vari.webp",
-  studio: "/assets/qrgen/qrgen-studio-vari.webp",
+  launch: "/assets/qrgen/qrgen-icon3.webp",
+  pro: "/assets/qrgen/qrgen-icon4.webp",
+  studio: "/assets/qrgen/qrgen-icon5.webp",
 } as Record<string, string>;
 const qrgenPlanPayload = sitePricing.qrgenPlans.map((plan) => ({
   id: plan.id,
@@ -56,8 +56,8 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
       </div>
 
       <div class="qrgen-accountbar__actions">
-        <a href={ROUTES.login} class="qrgen-accountbar__button" data-qg-auth="out" data-qg-i18n="account.login">Login</a>
-        <a href={ROUTES.signup} class="qrgen-accountbar__button is-primary" data-qg-auth="out" data-qg-i18n="account.signup">Create account</a>
+        <a href={ROUTES.login} class="qrgen-accountbar__button" data-qg-auth="out" data-analytics-event="qrgen_login" data-qg-i18n="account.login">Login</a>
+        <a href={ROUTES.signup} class="qrgen-accountbar__button is-primary" data-qg-auth="out" data-analytics-event="qrgen_signup" data-qg-i18n="account.signup">Create account</a>
         <a href={ROUTES.profile} class="qrgen-accountbar__button is-primary" data-qg-auth="in" data-qg-role-link="profile" data-qg-i18n="account.profile" hidden>Profile</a>
         <a href={ROUTES.profileQrCodes} class="qrgen-accountbar__button" data-qg-auth="in" data-qg-role-link="codes" data-qg-i18n="account.codes" hidden>My QRs</a>
         <button type="button" id="qgLogoutBtn" class="qrgen-accountbar__button" data-qg-auth="in" data-qg-i18n="account.logout" hidden>Sign out</button>
@@ -79,7 +79,7 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
         <span class="qrgen-plan__eyebrow" data-qg-i18n="plan.status">Current QRGen plan</span>
         <strong id="qgPlanLabel">Free</strong>
         <p id="qgPlanCopy" data-qg-i18n="plan.free_copy">Live preview and standard PNG export.</p>
-        <a href={qrgenProCheckoutHref} class="qrgen-link-button vx-checkout-btn" data-lookup="builder_pro" data-label="Upgrade to Pro" data-qg-i18n="plan.cta">Upgrade to Pro</a>
+        <a href={qrgenProCheckoutHref} class="qrgen-link-button vx-checkout-btn" data-lookup="builder_pro" data-label="Upgrade to Pro" data-analytics-event="qrgen_upgrade_pro" data-qg-i18n="plan.cta">Upgrade to Pro</a>
       </aside>
     </section>
 
@@ -123,7 +123,7 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
 
             <div class="qrgen-dynamic-login" id="qgDynamicLogin" hidden>
               <p data-qg-i18n="dynamic.login_required">Sign in to create dynamic QRs that you can edit later.</p>
-              <a href={`${ROUTES.login}?next=/qrgen/`} class="qrgen-link-button" data-qg-i18n="account.login">Login</a>
+              <a href={`${ROUTES.login}?next=/qrgen/`} class="qrgen-link-button" data-analytics-event="qrgen_dynamic_login" data-qg-i18n="account.login">Login</a>
             </div>
 
             <div id="qgDynamicFields">
@@ -279,7 +279,7 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
             <span class="qrgen-preview-gate__eyebrow" id="qgPreviewGateEyebrow">Limited preview</span>
             <strong id="qgPreviewGateTitle">Premium features are hidden from the Free preview.</strong>
             <p id="qgPreviewGateCopy">This preview stays basic. Upgrade to apply the selected feature and export it.</p>
-            <a class="qrgen-link-button" id="qgPreviewGateCta" href="/pricing/#qrgen-plans">View plans</a>
+            <a class="qrgen-link-button" id="qgPreviewGateCta" href="/pricing/#qrgen-plans" data-analytics-event="qrgen_view_plans">View plans</a>
           </div>
 
           <p class="qrgen-preview__note" id="qgPreviewNote" data-qg-i18n="preview.note">
@@ -585,7 +585,7 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
     inset: 0;
     background:
       linear-gradient(120deg, rgba(125,249,255,.10), transparent 42%),
-      url("/assets/qrgen.webp") right 28px center / min(36vw, 360px) auto no-repeat;
+      url("/assets/qrgen/qrgen-icon3.webp") right 28px center / min(36vw, 360px) auto no-repeat;
     opacity: .72;
     pointer-events: none;
   }

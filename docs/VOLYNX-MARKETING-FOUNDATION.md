@@ -60,7 +60,7 @@ Já existe uma landing em `/signal-drop/` com UTMs e eventos de CTA. Ela deve se
 | `upgrade_view` | medir intenção comercial |
 | `checkout_started` | medir passagem para compra |
 
-Os eventos devem ser ligados a uma ferramenta de analytics autorizada antes de qualquer compra de mídia. Hoje o repositório contém UTMs e eventos locais, mas não há um provedor de analytics configurado confirmado.
+Os eventos agora são registrados pelo analytics first-party da própria VOLYNX, com consentimento para eventos de navegador e confirmação server-side no webhook Stripe. Isso é suficiente para começar o marketing orgânico. Um provedor externo, como Plausible, só deve ser adicionado se houver uma necessidade clara de painel externo e autorização explícita.
 
 ## Conteúdo dos primeiros 14 dias
 
@@ -93,5 +93,5 @@ Os eventos devem ser ligados a uma ferramenta de analytics autorizada antes de q
 1. Transformar `/signal-drop/` em uma landing de campanha com entrada explícita para Dev Journey e QRGen.
 2. Criar uma seção de prova do Dev Journey com projetos reais, etapas e resultado final.
 3. Padronizar UTMs e eventos nos CTAs principais de home, pricing, Dev Journey e QRGen.
-4. Definir o provedor de analytics e o consentimento antes de enviar dados para terceiros.
+4. Executar uma sessão controlada e confirmar a cadeia checkout → pagamento → webhook → acesso/entrega no painel admin.
 5. Preparar os primeiros conteúdos e variações de headline para teste controlado.

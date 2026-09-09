@@ -25,9 +25,9 @@ Antes de decidir, checa as 5 com o app aberto (TikTok não tem busca pública co
 
 Três opções pra A/B mental, escolhe a que casa com o ângulo dos 5 primeiros vídeos:
 
-- **Opção A (produto-first):** `ferramentas criativas com IA. sua imagem nunca sai do navegador.` (76 char)
-- **Opção B (founder-first):** `construindo a VOLYNX sozinho. ferramentas criativas, IA, zero servidor.` (74 char)
-- **Opção C (curiosidade-first):** `por que sua foto NÃO devia ir pra servidor? testa aqui ↓` (58 char)
+- **Opção A (produto-first):** `ferramentas criativas premium. privacidade desde a arquitetura.`
+- **Opção B (founder-first):** `construindo a VOLYNX sozinho. ferramentas criativas premium.`
+- **Opção C (curiosidade-first):** `por que sua foto NÃO deveria ir para um servidor? descubra ↓`
 
 **Recomendação:** começa com a **C**. Bio curta deixa o link respirar, gera clique pelo gancho de privacidade (que é teu diferencial real e raro no nicho de IA criativa). Troca pra A/B depois que pegar 1k.
 
@@ -43,7 +43,7 @@ Três opções pra A/B mental, escolhe a que casa com o ângulo dos 5 primeiros 
 
 TikTok dá **um link**. Não desperdiça em volynx.world raiz — a home tem fricção, várias seções competindo.
 
-**Cria uma landing dedicada:** `volynx.world/tiktok/` — espelha o tom da bio, headline única, um único CTA visível ("testa o removedor de fundo grátis"), prova social mínima, sem menu de navegação completo. Tracking UTM embutido (`?utm_source=tiktok&utm_medium=bio`) pra você medir conversão real e não confundir com tráfego orgânico de Google.
+**Landing dedicada:** `volynx.world/tiktok/` — espelha o tom da bio, explica que a remoção de fundo é um recurso Pro/Studio e oferece um caminho claro para conhecer a ferramenta e a oferta. Não anunciar a remoção de fundo como gratuita.
 
 Essa landing também é onde você aprende o que converte do TikTok — totalmente diferente do que converte de search.
 
@@ -162,7 +162,7 @@ Não publica 6h-9h (audiência tech BR não acorda cedo no TikTok), nem 14h-16h 
 **Duração:** 22 segundos. Curto o suficiente pra completion rate alta, longo o suficiente pra construir o "aha".
 
 **Hook (0-2s):**
-- Tela: gravação de tela mostrando volynx.world/image-suite, foto arrastada caindo no drop zone
+- Tela: gravação de tela mostrando volynx.world/volynx-lab/image-suite/, foto arrastada caindo no drop zone
 - Texto on-screen grande, centralizado: **"removi o fundo dessa foto"**
 - Voiceover: silêncio (só o ASMR do clique)
 
@@ -171,11 +171,11 @@ Não publica 6h-9h (audiência tech BR não acorda cedo no TikTok), nem 14h-16h 
 | Tempo | Tela | Voiceover / Texto |
 |---|---|---|
 | 0-2s | Foto sendo arrastada, drop zone iluminando | Texto: "removi o fundo dessa foto" |
-| 2-5s | Processamento, barra/spinner premium | VO: "em 4 segundos, no navegador" |
+| 2-5s | Processamento, barra/spinner premium | VO: "direto no navegador" |
 | 5-8s | Reveal do fundo removido — composição visualmente satisfatória | Texto: "MAS" (caixa alta, centro) |
-| 8-13s | Cut pra DevTools aberto, aba Network, mostrar zero requests pra servidor | VO: "a foto nunca saiu do meu computador. zero upload." |
+| 8-13s | Mostrar o indicador de processamento local na própria interface | VO: "a foto nunca saiu do meu computador. zero upload para processamento." |
 | 13-17s | Volta pra UI VOLYNX, comparativo lado a lado original/sem fundo | Texto: "U²-Net rodando local. Apache 2.0." |
-| 17-20s | Camera zoom-in lento no badge "processado localmente" da UI | VO: "o que você processa nas outras ferramentas, elas guardam." |
+| 17-20s | Camera zoom-in lento no badge "processado localmente" da UI | VO: "privacidade também pode fazer parte da arquitetura." |
 | 20-22s | Loop: volta pra mesma foto sendo arrastada (replay-trigger) | Texto: "link na bio." |
 
 **Sugestão de áudio:** lo-fi house instrumental, BPM ~95-100. Procura no Creative Center "lofi BR 7 dias" ou usa um som tipo "Aesthetic - Tollan Kim" se ainda disponível. **Não usa trend de fala/diálogo** — quebra autoridade.
@@ -183,7 +183,7 @@ Não publica 6h-9h (audiência tech BR não acorda cedo no TikTok), nem 14h-16h 
 **Texto on-screen:** sempre fonte sans-serif limpa (CapCut "Proxima Nova" ou "Helvetica Now"), branco puro, sem stroke pesado. Posicionamento: sempre no terço superior (não cobre o botão de like).
 
 **Caption:**
-> a maioria das ferramentas de IA que você usa guarda tudo que você faz. essa não. removedor de fundo rodando 100% no seu navegador, modelo open-source U²-Net. testa no link da bio.
+> remover o fundo não deveria exigir enviar sua imagem para um servidor. na VOLYNX, o processamento roda no navegador com U²-Net e ONNX Runtime. conheça no link da bio.
 >
 > #brasildev #ferramentasdeIA #removedordefundo #privacidadedigital #tecnologia
 
@@ -208,9 +208,9 @@ Não publica 6h-9h (audiência tech BR não acorda cedo no TikTok), nem 14h-16h 
 |---|---|---|
 | 0-3s | Terminal com comando Astro rodando | VO: "tô construindo uma plataforma de IA sozinho..." / Texto: "recusei o Next.js. de propósito." |
 | 3-8s | Cut pra GitHub mostrando o repo da VOLYNX, arquivo astro.config.mjs aberto | VO: "...e escolhi Astro em vez do framework que todo mundo usa." |
-| 8-15s | Split screen: à esquerda site VOLYNX rodando suave, à direita aba do Lighthouse com score 95+ | VO: "três razões. um: site estático, zero server, custo zero pra escalar." |
-| 15-22s | DevTools, aba Network, mostrar a página carregando com poucos requests | VO: "dois: HTML primeiro. JavaScript só onde precisa. carrega em ~1 segundo no 4G ruim do Brasil." |
-| 22-30s | Volta pro terminal, comando rodando build, output limpo | VO: "três: não preciso pagar 20 dólares pro Vercel achar bonito. deploy no Cloudflare grátis." |
+| 8-15s | Split screen: à esquerda o site VOLYNX, à direita o resultado real de uma auditoria de desempenho feita no dia da gravação | VO: "um: páginas públicas começam com HTML e carregam JavaScript onde a experiência precisa." |
+| 15-22s | DevTools, aba Network, mostrando uma página real carregando | VO: "dois: eu consigo observar o peso e o comportamento de cada rota sem esconder o custo no servidor." |
+| 22-30s | Volta pro terminal, comando de build e publicação | VO: "três: o deploy estático no Cloudflare simplifica a operação de um founder solo." |
 | 30-35s | Tela cheia volynx.world, navegando pelas seções | VO: "Astro não é hype. mas funciona." |
 | 35-38s | Loop: volta pro terminal do início | Texto: "VOLYNX. link na bio." |
 

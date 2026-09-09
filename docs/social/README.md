@@ -4,6 +4,7 @@ Recovered from the Claude transcript on 2026-05-12 and saved here so the plans a
 
 - [LinkedIn 30 dias](./linkedin-30-dias-volynx.md) — 10 posts prontos em PT-BR, organizados por semana.
 - [TikTok bootstrap](./tiktok-bootstrap-volynx.md) — setup do perfil, cadencia de 30 dias e 5 roteiros iniciais.
+- [Pacote de divulgação imediata](./launch-today-volynx.md) — peças verificadas e sequência de publicação para as primeiras 24 horas.
 
 ## Live Links
 

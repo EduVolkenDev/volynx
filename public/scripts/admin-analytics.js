@@ -61,7 +61,7 @@
     if (!rows?.length) {
       const row = document.createElement("tr");
       const cell = document.createElement("td");
-      cell.colSpan = 5;
+      cell.colSpan = 7;
       cell.textContent = "Ainda não há eventos consentidos neste intervalo.";
       row.appendChild(cell);
       el.timeline.appendChild(row);
@@ -69,7 +69,7 @@
     }
     rows.forEach((item) => {
       const row = document.createElement("tr");
-      [item.date, item.visitors, item.cta_clicks, item.signups, item.checkout_started].forEach((value) => {
+      [item.date, item.visitors, item.cta_clicks, item.signups, item.checkout_started, item.payment_confirmed, item.fulfillment_recorded].forEach((value) => {
         const cell = document.createElement("td");
         cell.textContent = String(value);
         row.appendChild(cell);
@@ -80,7 +80,7 @@
 
   function render(data) {
     const funnel = data.funnel || {};
-    ["visitors", "cta_clicks", "signup_started", "signup_confirmation_requested", "checkout_redirected", "checkout_failed"]
+    ["visitors", "cta_clicks", "signup_started", "signup_confirmation_requested", "checkout_redirected", "checkout_failed", "payment_confirmed", "fulfillment_recorded"]
       .forEach((key) => setMetric(key, funnel[key]));
     list(el.sources, data.top_sources, "Nenhuma origem registrada ainda.");
     list(el.campaigns, data.top_campaigns, "Nenhuma campanha com consentimento registrada ainda.");

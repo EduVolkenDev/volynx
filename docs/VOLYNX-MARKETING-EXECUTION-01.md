@@ -56,8 +56,8 @@ Assim, uma sessão de construção vira quatro peças sem transformar o marketin
 - checkout iniciado;
 - compra, entitlement e entrega confirmados separadamente.
 
-O evento no navegador é apenas uma camada de preparação. Antes de comprar mídia, conectar um provedor de analytics com consentimento e validar a cadeia completa. Não tratar um clique ou uma página HTTP 200 como conversão.
+Os eventos do navegador são consentidos e alimentam o analytics first-party da VOLYNX; pagamentos e fulfillment entram separadamente pelo webhook Stripe. Não tratar um clique ou uma página HTTP 200 como conversão.
 
 ## Próximo bloqueio real
 
-Escolher e autorizar um único provedor de analytics. Depois disso, ligar os eventos `volynx:campaign-event` a esse provedor, revisar consentimento e confirmar a leitura do funil em uma sessão controlada. Sem essa etapa, o marketing orgânico pode começar, mas decisões de escala devem esperar.
+Validar uma sessão controlada no ambiente publicado: campanha → CTA → cadastro → checkout → pagamento → webhook → acesso/entrega. O painel admin já separa origem, intenção, pagamento confirmado e fulfillment registrado. Sem essa prova, o marketing orgânico pode começar, mas decisões de escala devem esperar.

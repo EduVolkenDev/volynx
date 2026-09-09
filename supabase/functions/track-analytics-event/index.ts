@@ -20,6 +20,9 @@ const EVENT_NAMES = new Set([
   "checkout_redirected",
   "checkout_failed",
   "tool_started",
+  "activation_started",
+  "activation_result",
+  "upgrade_view",
 ]);
 
 const DEVICE_TYPES = new Set(["mobile", "tablet", "desktop", "other"]);
@@ -107,6 +110,7 @@ Deno.serve(async (req: Request) => {
       utm_campaign: optionalLabel(body.utm_campaign),
       locale: optionalLabel(body.locale, 16),
       device_type: deviceType,
+      event_source: "browser",
     });
 
     if (error) {

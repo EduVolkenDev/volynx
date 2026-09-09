@@ -25,6 +25,9 @@
     "checkout_redirected",
     "checkout_failed",
     "tool_started",
+    "activation_started",
+    "activation_result",
+    "upgrade_view",
   ]);
   const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content"];
   const PRIVATE_PAGE_PREFIXES = [

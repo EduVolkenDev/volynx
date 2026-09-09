@@ -51,7 +51,7 @@ export const productOfferPreviews: ProductOfferPreview[] = [
     slug: "qrgen-pro", lookup: "builder_pro", name: bi("QRGen Pro", "QRGen Pro"), eyebrow: bi("QR product", "Produto QR"),
     title: bi("Create QR assets that survive print, campaigns and client delivery.", "Crie ativos QR que resistem à impressão, campanhas e entregas a clientes."),
     summary: bi("Brand-ready QR output with HD PNG, SVG vector export, transparent backgrounds and logo export.", "Saída QR pronta para marca com PNG HD, export vetorial SVG, fundos transparentes e export com logo."),
-    image: "/assets/newqrgen.webp", price: bi("£24 / month", "£24 / mês"), format: bi("Subscription", "Assinatura"),
+    image: "/assets/qrgen/qrgen-icon4.webp", price: bi("£24 / month", "£24 / mês"), format: bi("Subscription", "Assinatura"),
     metrics: [metric("SVG", "vector", "vetor"), metric("4096px", "PNG", "PNG"), metric("Logo", "export", "export com logo")],
     whatYouGet: [bi("Print-ready QR output with higher resolution.", "Saída QR pronta para impressão em resolução maior."), bi("SVG vector export and transparent backgrounds.", "Export vetorial SVG e fundos transparentes."), bi("Logo export for branded QR assets.", "Export com logo para ativos QR de marca.")],
     bestFor: [bi("Creators, agencies and businesses shipping QR assets to real campaigns.", "Criadores, agências e negócios entregando QR para campanhas reais.")],

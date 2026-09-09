@@ -77,7 +77,7 @@ Deno.serve(async (req: Request) => {
     const [{ data: events, error: eventsError }, { count: profilesCreated, error: profilesError }] = await Promise.all([
       supabase
         .from("analytics_events")
-        .select("occurred_at,event_name,event_label,page_path,session_id,referrer_host,utm_source,utm_medium,utm_campaign")
+        .select("occurred_at,event_name,event_label,page_path,session_id,event_source,referrer_host,utm_source,utm_medium,utm_campaign")
         .gte("occurred_at", since)
         .order("occurred_at", { ascending: false })
         .limit(20000),
@@ -104,18 +104,21 @@ Deno.serve(async (req: Request) => {
       checkout_started: 0,
       checkout_redirected: 0,
       checkout_failed: 0,
+      payment_confirmed: 0,
+      fulfillment_recorded: 0,
       profiles_created: profilesError ? 0 : (profilesCreated || 0),
     };
     const topPages: Record<string, number> = {};
     const topSources: Record<string, number> = {};
     const topCampaigns: Record<string, number> = {};
-    const daily: Record<string, { visitors: Set<string>; page_views: number; cta_clicks: number; signups: number; checkout_started: number }> = {};
+    const daily: Record<string, { visitors: Set<string>; page_views: number; cta_clicks: number; signups: number; checkout_started: number; payment_confirmed: number; fulfillment_recorded: number }> = {};
 
     for (const event of eventList) {
-      sessions.add(event.session_id);
+      const isBrowserEvent = event.event_source !== "server";
+      if (isBrowserEvent && event.session_id) sessions.add(event.session_id);
       const day = String(event.occurred_at).slice(0, 10);
-      if (!daily[day]) daily[day] = { visitors: new Set(), page_views: 0, cta_clicks: 0, signups: 0, checkout_started: 0 };
-      daily[day].visitors.add(event.session_id);
+      if (!daily[day]) daily[day] = { visitors: new Set(), page_views: 0, cta_clicks: 0, signups: 0, checkout_started: 0, payment_confirmed: 0, fulfillment_recorded: 0 };
+      if (isBrowserEvent && event.session_id) daily[day].visitors.add(event.session_id);
 
       if (event.event_name === "page_view") {
         funnel.page_views += 1;
@@ -138,11 +141,21 @@ Deno.serve(async (req: Request) => {
       }
       if (event.event_name === "checkout_redirected") funnel.checkout_redirected += 1;
       if (event.event_name === "checkout_failed") funnel.checkout_failed += 1;
+      if (event.event_name === "payment_confirmed") {
+        funnel.payment_confirmed += 1;
+        daily[day].payment_confirmed += 1;
+      }
+      if (event.event_name === "fulfillment_recorded") {
+        funnel.fulfillment_recorded += 1;
+        daily[day].fulfillment_recorded += 1;
+      }
 
-      const source = event.utm_source || event.referrer_host || "direct";
-      increment(topSources, source);
-      if (event.utm_campaign) increment(topCampaigns, event.utm_campaign);
-      if (event.event_name === "campaign_view" && event.event_label) increment(topCampaigns, event.event_label);
+      if (isBrowserEvent) {
+        const source = event.utm_source || event.referrer_host || "direct";
+        increment(topSources, source);
+        if (event.utm_campaign) increment(topCampaigns, event.utm_campaign);
+        if (event.event_name === "campaign_view" && event.event_label) increment(topCampaigns, event.event_label);
+      }
     }
 
     const rank = (record: Record<string, number>) => Object.entries(record)
@@ -158,6 +171,8 @@ Deno.serve(async (req: Request) => {
         cta_clicks: item.cta_clicks,
         signups: item.signups,
         checkout_started: item.checkout_started,
+        payment_confirmed: item.payment_confirmed,
+        fulfillment_recorded: item.fulfillment_recorded,
       }));
 
     return json(req, {

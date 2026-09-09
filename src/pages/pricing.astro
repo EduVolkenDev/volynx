@@ -60,8 +60,8 @@ const pricingAssistItems = [
           <p data-i18n="price.hero_desc">Choose what you use, combine products to save, or add VX for selected premium actions. One account. One connected experience.</p>
           <p class="hero-subcopy"><span class="i18n-en">VOLYNX connects Builder, Daily, and CVitae into one unified experience. Plans unlock product access. VX covers enabled add-ons like CVitae exports/templates and selected Studio actions.</span><span class="i18n-pt">A VOLYNX une Builder, Daily e CVitae em uma experiência única. Planos liberam acesso aos produtos. VX cobre complementos habilitados, como exportações e modelos do CVitae, além de ações Studio selecionadas.</span></p>
           <div class="hero-actions">
-            <a href="#plans" class="button button--gold" data-i18n="price.hero_cta1">View plans</a>
-            <a href={ROUTES.lab} class="button button--ghost" data-i18n="price.hero_cta2">Open the Lab</a>
+            <a href="#plans" class="button button--gold" data-analytics-event="pricing_view_plans" data-i18n="price.hero_cta1">View plans</a>
+            <a href={ROUTES.lab} class="button button--ghost" data-analytics-event="pricing_open_lab" data-i18n="price.hero_cta2">Open the Lab</a>
           </div>
         </div>
         <div class="hero-visual hero-visual--float pricing-hero-visual" aria-hidden="true">
@@ -269,8 +269,8 @@ const pricingAssistItems = [
             </div>
           </div>
           <div class="guidance-cta">
-            <a href={ROUTES.lab} class="button button--ghost"><span class="i18n-en">Try Lab for free first</span><span class="i18n-pt">Teste o Lab grátis primeiro</span></a>
-            <a href={ROUTES.signup} class="button button--gold"><span class="i18n-en">Create free account</span><span class="i18n-pt">Criar conta grátis</span></a>
+            <a href={ROUTES.lab} class="button button--ghost" data-analytics-event="pricing_guidance_lab"><span class="i18n-en">Try Lab for free first</span><span class="i18n-pt">Teste o Lab grátis primeiro</span></a>
+            <a href={ROUTES.signup} class="button button--gold" data-analytics-event="pricing_guidance_signup"><span class="i18n-en">Create free account</span><span class="i18n-pt">Criar conta grátis</span></a>
           </div>
         </div>
       </div>
@@ -306,11 +306,11 @@ const pricingAssistItems = [
           <strong>QRGen Pro</strong>
           <p><span class="i18n-en">For buyers who need crisp print quality, editable campaign links and brand-safe files instead of disposable QR screenshots.</span><span class="i18n-pt">Para compradores que precisam de qualidade de impressão, links editáveis de campanha e arquivos seguros para marca em vez de prints descartáveis.</span></p>
           <div class="qrgen-pricing-hero__actions">
-            <a href={ROUTES.qrgen} class="button button--gold"><span class="i18n-en">Open QRGen</span><span class="i18n-pt">Abrir QRGen</span></a>
-            <a href={ROUTES.profileQrCodes} class="button button--ghost"><span class="i18n-en">Manage dynamic QRs</span><span class="i18n-pt">Gerenciar QRs dinâmicos</span></a>
+            <a href={ROUTES.qrgen} class="button button--gold" data-analytics-event="pricing_open_qrgen"><span class="i18n-en">Open QRGen</span><span class="i18n-pt">Abrir QRGen</span></a>
+            <a href={ROUTES.profileQrCodes} class="button button--ghost" data-analytics-event="pricing_manage_dynamic_qrs"><span class="i18n-en">Manage dynamic QRs</span><span class="i18n-pt">Gerenciar QRs dinâmicos</span></a>
           </div>
         </div>
-        <img src="/assets/newqrgen.webp" alt="" class="qrgen-pricing-hero__art" loading="lazy" decoding="async" />
+        <img src="/assets/qrgen/qrgen-icon3.webp" alt="" class="qrgen-pricing-hero__art" loading="lazy" decoding="async" />
       </div>
       <div class="shell pricing-grid pricing-grid--plans qrgen-pricing-grid">
         {sitePricing.qrgenPlans.map((plan) => (
@@ -429,7 +429,7 @@ const pricingAssistItems = [
                 <li><span class="i18n-en">{f}</span><span class="i18n-pt">{plan.features.pt[i] || f}</span></li>
               ))}
             </ul>
-            <a href={plan.href} class={`pricing-card__cta ${plan.featured ? 'pricing-card__cta--primary' : ''}`}>
+            <a href={plan.href} class={`pricing-card__cta ${plan.featured ? 'pricing-card__cta--primary' : ''}`} data-analytics-event={`pricing_plan_${plan.id}`}>
               <span class="i18n-en">{plan.cta.en}</span><span class="i18n-pt">{plan.cta.pt}</span>
             </a>
             {plan.note && <p class="pricing-card__footnote"><span class="i18n-en">{plan.note.en}</span><span class="i18n-pt">{plan.note.pt}</span></p>}

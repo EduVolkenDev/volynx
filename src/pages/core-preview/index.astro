@@ -12,7 +12,7 @@ const socialImage = "https://volynx.world/assets/profile-volynx-rare-core.webp";
 const ecosystemSurfaces = [
   { name: "Builder", icon: "builder" as const, href: ROUTES.builder, asset: "/assets/galaxy/core-surface-builder.webp", label: { en: "Build and publish", pt: "Construir e publicar" }, copy: { en: "Turn an idea into a clear public site, campaign or product page.", pt: "Transforme uma ideia em um site, campanha ou página de produto clara." }, tone: "cyan" },
   { name: "Daily", icon: "daily" as const, href: ROUTES.daily, asset: "/assets/galaxy/core-surface-daily.webp", label: { en: "Plan and focus", pt: "Planejar e focar" }, copy: { en: "Keep the next actions, context and routines visible while the work moves.", pt: "Mantenha ações, contexto e rotinas visíveis enquanto o trabalho avança." }, tone: "violet" },
-  { name: "Lab", icon: "lab" as const, href: ROUTES.lab, asset: "/assets/galaxy/core-surface-lab.webp", label: { en: "Make and refine", pt: "Criar e refinar" }, copy: { en: "Prepare images, QR projects and creative assets in the browser.", pt: "Prepare imagens, projetos QR e ativos criativos no navegador." }, tone: "gold" },
+  { name: "Lab", icon: "lab" as const, href: ROUTES.lab, asset: "/assets/qrgen/qrgen-icon3.webp", label: { en: "Make and refine", pt: "Criar e refinar" }, copy: { en: "Prepare images, QR projects and creative assets in the browser.", pt: "Prepare imagens, projetos QR e ativos criativos no navegador." }, tone: "gold" },
   { name: "World", icon: "world" as const, href: ROUTES.world, asset: "/assets/galaxy/core-surface-world.webp", label: { en: "Connect and discover", pt: "Conectar e descobrir" }, copy: { en: "Find people, opportunities and resources around meaningful work.", pt: "Encontre pessoas, oportunidades e recursos para trabalhos relevantes." }, tone: "cyan" },
   { name: "Services", icon: "services" as const, href: ROUTES.services, asset: "/assets/galaxy/core-surface-services.webp", label: { en: "Work with an expert", pt: "Trabalhar com especialistas" }, copy: { en: "Add strategy, design and implementation when the project needs a human partner.", pt: "Adicione estratégia, design e implementação quando o projeto precisar de parceria humana." }, tone: "violet" },
   { name: "Dev Journey", icon: "journey" as const, href: ROUTES.devJourney, asset: "/assets/galaxy/core-surface-journey.webp", label: { en: "Learn by building", pt: "Aprender construindo" }, copy: { en: "Move from understanding to a real project with a guided, practical track.", pt: "Passe do entendimento a um projeto real com uma trilha prática e guiada." }, tone: "gold" },
@@ -72,10 +72,10 @@ const ecosystemSurfaces = [
             A VOLYNX transforma o que você quer mudar em um problema mais claro, um próximo passo responsável e as ferramentas para torná-lo real.
           </p>
           <div class="hero__actions">
-            <a class="button button--primary" href="#begin" data-en="Start with your intention" data-pt="Começar pela sua intenção">Começar pela sua intenção</a>
-            <a class="button button--quiet" href={ROUTES.manifesto} data-en="Understand the vision" data-pt="Entender a visão">Entender a visão</a>
+            <a class="button button--primary" href="#begin" data-analytics-event="core_begin_intention" data-en="Start with your intention" data-pt="Começar pela sua intenção">Começar pela sua intenção</a>
+            <a class="button button--quiet" href={ROUTES.manifesto} data-analytics-event="core_view_manifesto" data-en="Understand the vision" data-pt="Entender a visão">Entender a visão</a>
           </div>
-          <a class="legacy-entry" href={platformHref}>
+          <a class="legacy-entry" href={platformHref} data-analytics-event="core_open_workspace">
             <span class="legacy-entry__signal" aria-hidden="true"></span>
             <span data-en="Already know VOLYNX? Open your workspace" data-pt="Já conhece a VOLYNX? Abrir seu espaço">Já conhece a VOLYNX? Abrir seu espaço</span>
             <span aria-hidden="true">↗</span>
@@ -169,7 +169,7 @@ const ecosystemSurfaces = [
           <div class="section-kicker"><span>03</span><span data-en="Inside the VOLYNX ecosystem" data-pt="Dentro do ecossistema VOLYNX">Dentro do ecossistema VOLYNX</span></div>
           <h2 id="handoff-title" data-en="From ideas to useful digital work." data-pt="Da ideia a um trabalho digital que faz diferença.">Da ideia a um trabalho digital que faz diferença.</h2>
           <p data-en="Builder, Daily, Lab and World come together when they help you move a project forward." data-pt="Builder, Daily, Lab e World se conectam quando ajudam você a avançar um projeto.">Builder, Daily, Lab e World se conectam quando ajudam você a avançar um projeto.</p>
-          <a class="text-link" href={devHubHref} data-en="Explore VOLYNX tools →" data-pt="Explorar ferramentas VOLYNX →">Explorar ferramentas VOLYNX →</a>
+            <a class="text-link" href={devHubHref} data-analytics-event="core_open_devhub" data-en="Explore VOLYNX tools →" data-pt="Explorar ferramentas VOLYNX →">Explorar ferramentas VOLYNX →</a>
         </div>
         <div class="hub-list">
           <a href={ROUTES.builder}><span data-en="CREATE" data-pt="CRIAR">CRIAR</span><strong>Builder</strong><small data-en="Create and publish" data-pt="Criar e publicar">Criar e publicar</small></a>
@@ -187,7 +187,7 @@ const ecosystemSurfaces = [
         </div>
         <div class="surface-grid">
           {ecosystemSurfaces.map((surface) => (
-            <a class:list={["surface-card", `surface-card--${surface.tone}`]} href={surface.href}>
+            <a class:list={["surface-card", `surface-card--${surface.tone}`]} href={surface.href} data-analytics-event={`core_surface_${surface.name.toLowerCase().replace(/\s+/g, "-")}`}>
               <span class="surface-card__icon"><CoreIcon name={surface.icon} size={40} /></span>
               <span class="surface-card__meta"><span>{surface.name}</span><span aria-hidden="true">↗</span></span>
               <span class="surface-card__visual" aria-hidden="true">
@@ -218,9 +218,9 @@ const ecosystemSurfaces = [
         <p class="eyebrow" data-en="Where VOLYNX is heading" data-pt="Para onde a VOLYNX está indo">Para onde a VOLYNX está indo</p>
         <h2 id="closing-title" data-en="Build what makes a better future more possible." data-pt="Construa o que torna um futuro melhor mais possível.">Construa o que torna um futuro melhor mais possível.</h2>
         <div class="closing__actions">
-          <a class="button button--primary" href="#begin" data-en="Begin the journey" data-pt="Começar a jornada">Começar a jornada</a>
-          <a class="button button--quiet" href={platformHref} data-en="Enter the existing platform" data-pt="Entrar na plataforma atual">Entrar na plataforma atual</a>
-          <a class="button button--quiet" href={ROUTES.launch2026} data-en="See the original story" data-pt="Ver a história original">Ver a história original</a>
+          <a class="button button--primary" href="#begin" data-analytics-event="core_begin_journey" data-en="Begin the journey" data-pt="Começar a jornada">Começar a jornada</a>
+          <a class="button button--quiet" href={platformHref} data-analytics-event="core_open_platform" data-en="Enter the existing platform" data-pt="Entrar na plataforma atual">Entrar na plataforma atual</a>
+          <a class="button button--quiet" href={ROUTES.launch2026} data-analytics-event="core_view_original_story" data-en="See the original story" data-pt="Ver a história original">Ver a história original</a>
         </div>
       </section>
     </main>

@@ -1,719 +1,376 @@
 ---
-import SiteFooter from "../../components/SiteFooter.astro";
 import FaviconHead from "../../components/FaviconHead.astro";
 import PageWidgets from "../../components/PageWidgets.astro";
-import Topbar from "../../components/Topbar.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
 import { ROUTES } from "../../data/routes";
-const pageTitle = "Why VOLYNX? — Manifesto";
-const pageDescription = "VOLYNX exists to democratize intelligent technology with premium design and measurable social impact — ethical, accessible, and built to scale good.";
+
+const pageTitle = "The VOLYNX idea — Manifesto";
+const pageDescription = "The thinking behind VOLYNX: clearer direction, useful systems, human control and evidence over empty promises.";
+
+const ecosystem = [
+  { key: "builder", name: "Builder", href: ROUTES.builder, asset: "/assets/galaxy/core-surface-builder.webp", tone: "cyan" },
+  { key: "daily", name: "Daily", href: ROUTES.daily, asset: "/assets/galaxy/core-surface-daily.webp", tone: "violet" },
+  { key: "lab", name: "Lab", href: ROUTES.lab, asset: "/assets/galaxy/core-surface-lab.webp", tone: "gold" },
+  { key: "world", name: "World", href: ROUTES.world, asset: "/assets/galaxy/core-surface-world.webp", tone: "cyan" },
+  { key: "services", name: "Services", href: ROUTES.services, asset: "/assets/galaxy/core-surface-services.webp", tone: "violet" },
+  { key: "journey", name: "Dev Journey", href: ROUTES.devJourney, asset: "/assets/galaxy/core-surface-journey.webp", tone: "gold" },
+];
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content={pageDescription} />
-  <title>{pageTitle}</title>
-
-  <link rel="preload" as="image" href="/assets/lucid-big.webp" />
-
-  <FaviconHead />
-
-  <style>
-    :root {
-      --sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      --display: "Orbitron", var(--sans);
-      --txt: rgba(231, 233, 255, .92);
-      --muted: rgba(199, 195, 255, .68);
-      --line: rgba(255, 255, 255, .10);
-      --line2: rgba(167, 139, 250, .20);
-      --glass: rgba(8, 6, 22, .52);
-      --a: rgba(130, 220, 255, .9);
-      --b: rgba(210, 140, 255, .9);
-      --r-lg: 22px;
-      --r-md: 16px;
-      --r-pill: 999px;
-      --pad: clamp(14px, 4vw, 28px);
-      --max: 1040px;
-    }
-
-    *, *::before, *::after {
-      box-sizing: border-box;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
-      scroll-behavior: smooth;
-    }
-
-    body {
-      font-family: var(--sans);
-      color: var(--txt);
-      background: #02040d url("/assets/lucid-big.webp") center / cover no-repeat fixed;
-      min-height: 100svh;
-    }
-
-    a { color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; }
-
-    /* ===== OVERLAY ===== */
-    .bg {
-      position: fixed;
-      inset: 0;
-      background: rgba(2, 4, 13, 0.62);
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    /* ===== TOPBAR ===== */
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: rgba(0, 0, 0, .38);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--line);
-    }
-
-    .topbar__inner {
-      max-width: var(--max);
-      margin: 0 auto;
-      padding: 13px var(--pad);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-    }
-
-    .topbar__logo {
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: .10em;
-      color: rgba(200, 200, 255, .55);
-      text-transform: uppercase;
-    }
-
-    .topbar__right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .pill-back {
-      padding: 8px 14px;
-      border: 1px solid var(--line);
-      border-radius: var(--r-pill);
-      background: rgba(255, 255, 255, .04);
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--txt);
-      transition: background .18s ease, border-color .18s ease;
-    }
-
-    .pill-back:hover {
-      background: rgba(255, 255, 255, .08);
-      border-color: rgba(255, 255, 255, .20);
-    }
-
-    /* ===== LANG BUTTONS ===== */
-    .lang {
-      display: flex;
-      gap: 4px;
-      border-left: 1px solid var(--line);
-      padding-left: 10px;
-      margin-left: 2px;
-    }
-
-    .langBtn {
-      appearance: none;
-      border: 1px solid var(--line);
-      background: rgba(10, 8, 24, .40);
-      color: var(--muted);
-      font-weight: 700;
-      letter-spacing: .10em;
-      text-transform: uppercase;
-      font-size: 11px;
-      padding: 7px 10px;
-      border-radius: var(--r-pill);
-      cursor: pointer;
-      font-family: var(--sans);
-      transition: color .18s ease, border-color .18s ease, background .18s ease;
-    }
-
-    .langBtn:hover {
-      color: var(--txt);
-      border-color: var(--line2);
-    }
-
-    .langBtn.is-on {
-      color: var(--txt);
-      border-color: rgba(245, 231, 145, .45);
-      background: rgba(245, 231, 145, .06);
-    }
-
-    /* ===== MAIN WRAP ===== */
-    .shell {
-      position: relative;
-      z-index: 1;
-      max-width: var(--max);
-      margin: 0 auto;
-      padding: 48px var(--pad) 64px;
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-    }
-
-    /* ===== HERO ===== */
-    .hero {
-      display: flex;
-      align-items: center;
-      gap: 28px;
-      flex-wrap: wrap;
-    }
-
-    .hero__eye {
-     width: clamp(64px,70vw,350px);
-  height: clamp(64px,70vw,350px);
-  flex: 0 0 auto;
-  filter: drop-shadow(0 0 20px rgba(126, 44, 225, 0.77)) drop-shadow(0 0 32px rgba(30, 192, 210, 0.78));
-    }
-
-    .hero__eye img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-    }
-
-    .hero__text {
-      flex: 1;
-      min-width: 220px;
-    }
-
-    .hero__label {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--a);
-      margin-bottom: 12px;
-    }
-
-    .hero__dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--a);
-      box-shadow: 0 0 8px var(--a);
-    }
-
-    .hero__title {
-      margin: 0 0 14px;
-      font-size: clamp(30px, 4.5vw, 56px);
-      font-weight: 800;
-      letter-spacing: -.02em;
-      line-height: 1.1;
-      color: var(--txt);
-    }
-
-    .hero__title span {
-      background: linear-gradient(90deg, var(--a), var(--b));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .hero__lead {
-      margin: 0;
-      color: var(--muted);
-      font-size: clamp(14px, 1.4vw, 17px);
-      line-height: 1.75;
-      max-width: 68ch;
-    }
-
-    /* ===== PILLARS ===== */
-    .pillRow {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      padding: 7px 14px;
-      border-radius: var(--r-pill);
-      border: 1px solid var(--line2);
-      background: rgba(10, 8, 24, .50);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      backdrop-filter: blur(8px);
-    }
-
-    /* ===== CARD CONTAINER ===== */
-    .card {
-      border-radius: var(--r-lg);
-      border: 1px solid rgba(255, 255, 255, .10);
-      background: linear-gradient(135deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,.02) 100%);
-      box-shadow:
-        0 20px 60px rgba(0, 0, 0, .55),
-        0 0 0 1px rgba(255, 255, 255, .05) inset;
-      backdrop-filter: blur(18px) saturate(140%);
-      -webkit-backdrop-filter: blur(18px) saturate(140%);
-      overflow: hidden;
-    }
-
-    .card__inner {
-      padding: 32px var(--pad) 28px;
-    }
-
-    .card__section-title {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin: 0 0 20px;
-    }
-
-    /* ===== BOX GRID ===== */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .box {
-      border-radius: var(--r-md);
-      padding: 20px;
-      background: rgba(7, 8, 20, .40);
-      border: 1px solid var(--line2);
-      transition: transform .20s ease, border-color .20s ease, box-shadow .20s ease;
-    }
-
-    .box:hover {
-      transform: translateY(-2px);
-      border-color: rgba(167, 139, 250, .35);
-      box-shadow: 0 12px 32px rgba(0, 0, 0, .40);
-    }
-
-    .box h3 {
-      margin: 0 0 10px;
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: .02em;
-      color: var(--a);
-    }
-
-    .box p, .box .list {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.65;
-      font-size: 13.5px;
-    }
-
-    .list {
-      padding-left: 16px;
-    }
-
-    .list li {
-      margin: 6px 0;
-    }
-
-    /* ===== DIVIDER ===== */
-    .divider {
-      border: none;
-      border-top: 1px solid var(--line);
-      margin: 24px 0;
-    }
-
-    /* ===== CTAs ===== */
-    .ctaRow {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 11px 20px;
-      border-radius: var(--r-pill);
-      border: 1px solid var(--line);
-      background: rgba(10, 8, 24, .60);
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      font-size: 12px;
-      color: var(--txt);
-      backdrop-filter: blur(8px);
-      transition: transform .18s ease, filter .18s ease, border-color .18s ease, box-shadow .18s ease;
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.10);
-      border-color: var(--line2);
-      box-shadow: 0 12px 28px rgba(0, 0, 0, .45);
-    }
-
-    .btn.primary {
-      background: radial-gradient(120% 200% at 50% 0%, rgba(255, 225, 39, .75), rgba(167, 139, 250, .16) 55%, rgba(0, 0, 0, .80) 100%);
-      border-color: rgba(245, 231, 145, .40);
-    }
-
-    /* ===== CLOSING LINE ===== */
-    .closing {
-      margin: 24px 0 0;
-      padding-top: 18px;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      line-height: 1.7;
-      font-size: 14px;
-      font-style: italic;
-      max-width: 90ch;
-    }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 900px) {
-      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-
-    @media (max-width: 600px) {
-      .grid { grid-template-columns: 1fr; }
-      .hero { flex-direction: column; align-items: flex-start; gap: 18px; }
-      .hero__eye { width: 72px; height: 72px; }
-      .ctaRow { flex-direction: column; }
-      .btn { width: 100%; justify-content: center; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      * { animation: none !important; transition: none !important; }
-    }
-
-    /* ===== COOKIE BANNER ===== */
-    .vx-cookie {
-      position: fixed;
-      inset: auto 18px 18px 18px;
-      z-index: 999;
-      display: grid;
-      place-items: end center;
-    }
-
-    .vx-cookie__card {
-      width: min(540px, 100%);
-      border-radius: 18px;
-      border: 1px solid rgba(255, 255, 255, .12);
-      background: rgba(8, 6, 22, .80);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 24px 52px rgba(0, 0, 0, .80), 0 0 28px rgba(167, 139, 250, .12);
-      transform: translateY(12px);
-      opacity: 0;
-      transition: transform .18s ease, opacity .18s ease;
-    }
-
-    .vx-cookie.is-on .vx-cookie__card {
-      transform: translateY(0);
-      opacity: 1;
-    }
-
-    .vx-cookie__head {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 16px 0;
-    }
-
-    .vx-cookie__badge {
-      font-weight: 800;
-      letter-spacing: .14em;
-      font-size: 10px;
-      padding: 6px 10px;
-      border-radius: var(--r-pill);
-      border: 1px solid rgba(160, 252, 252, .18);
-      background: rgba(4, 6, 13, .50);
-      color: var(--a);
-      text-transform: uppercase;
-    }
-
-    .vx-cookie__title {
-      font-weight: 700;
-      font-size: 14px;
-      color: var(--txt);
-      letter-spacing: .04em;
-    }
-
-    .vx-cookie__text {
-      padding: 10px 16px 0;
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.55;
-      font-size: 13px;
-    }
-
-    .vx-cookie__actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      padding: 12px 16px;
-    }
-
-    .vx-btn {
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      font-size: 11px;
-      padding: 9px 14px;
-      border-radius: var(--r-pill);
-      border: 1px solid var(--line);
-      background: rgba(10, 8, 24, .60);
-      color: var(--txt);
-      cursor: pointer;
-      font-family: var(--sans);
-      transition: filter .18s ease, border-color .18s ease;
-    }
-
-    .vx-btn:hover { filter: brightness(1.10); border-color: var(--line2); }
-    .vx-btn--primary { background: rgba(245, 231, 145, .12); border-color: rgba(245, 231, 145, .35); }
-    .vx-btn--soft { border-color: rgba(160, 252, 252, .20); }
-    .vx-btn--ghost { background: transparent; }
-
-    .vx-cookie__link {
-      display: inline-block;
-      padding: 0 16px 12px;
-      font-size: 12px;
-      color: rgba(200, 245, 255, .65);
-      text-decoration: underline;
-    }
-
-    .vx-cookie__prefs { padding: 0 16px 14px; }
-
-    .vx-cookie__prefsTitle {
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      font-size: 11px;
-      color: var(--muted);
-      margin: 4px 0 10px;
-    }
-
-    .vx-toggle {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 0;
-      color: var(--muted);
-      font-size: 13px;
-      cursor: pointer;
-    }
-
-    .vx-toggle input { position: absolute; opacity: 0; pointer-events: none; }
-
-    .vx-toggle__ui {
-      width: 40px;
-      height: 24px;
-      border-radius: var(--r-pill);
-      background: rgba(255, 255, 255, .08);
-      border: 1px solid var(--line);
-      position: relative;
-      flex: 0 0 auto;
-    }
-
-    .vx-toggle__ui::after {
-      content: "";
-      position: absolute;
-      width: 16px;
-      height: 16px;
-      top: 50%;
-      left: 3px;
-      transform: translateY(-50%);
-      border-radius: 50%;
-      background: rgba(255, 255, 255, .70);
-      transition: left .16s ease;
-    }
-
-    .vx-toggle input:checked + .vx-toggle__ui {
-      background: rgba(4, 229, 255, .12);
-      border-color: rgba(160, 252, 252, .25);
-    }
-
-    .vx-toggle input:checked + .vx-toggle__ui::after {
-      left: 20px;
-      background: rgba(245, 231, 145, .85);
-    }
-
-    .vx-cookie__prefsActions {
-      display: flex;
-      justify-content: flex-end;
-      padding-top: 8px;
-    }
-
-    @media (max-width: 480px) {
-      .vx-cookie { inset: auto 12px 12px 12px; }
-    }
-  </style>
-</head>
-
-<body>
-  <div class="bg" aria-hidden="true"></div>
-
-  <Topbar rightLinks={[{ href: ROUTES.home, label: "← Back" }]} />
-
-  <main class="shell">
-    <div class="hero">
-      <div class="hero__eye" aria-hidden="true">
-        <img src="/assets/logo-icon-version.webp" alt="" />
-      </div>
-      <div class="hero__text">
-        <div class="hero__label">
-          <span class="hero__dot" aria-hidden="true"></span>
-          <span data-i18n="heroLabel">Manifesto</span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#050711" />
+    <meta name="description" content={pageDescription} />
+    <link rel="canonical" href="https://volynx.world/manifesto/" />
+    <link rel="preload" as="image" href="/assets/galaxy/core-home-v2.webp" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://volynx.world/manifesto/" />
+    <meta property="og:image" content="https://volynx.world/assets/profile-volynx-rare-core.webp" />
+    <meta property="og:image:alt" content="VOLYNX Core signal" />
+    <title>{pageTitle}</title>
+    <FaviconHead />
+
+    <style>
+      :root {
+        --bg: #050711;
+        --panel: rgba(10, 15, 31, .70);
+        --text: rgba(247, 248, 255, .96);
+        --muted: rgba(206, 216, 239, .72);
+        --soft: rgba(206, 216, 239, .52);
+        --line: rgba(186, 207, 239, .16);
+        --cyan: #8ff7ef;
+        --violet: #c8a5ff;
+        --gold: #f4df9b;
+        --shell: min(1180px, calc(100% - 48px));
+        --display: "Orbitron", "Avenir Next", system-ui, sans-serif;
+        --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      html { scroll-behavior: smooth; background: var(--bg); }
+      body.page-manifesto {
+        min-width: 320px;
+        margin: 0;
+        overflow-x: hidden;
+        color: var(--text);
+        background: var(--bg);
+        font-family: var(--sans);
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+      }
+      body.page-manifesto a { color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+
+      .manifesto-backdrop,
+      .manifesto-grain { position: fixed; inset: 0; pointer-events: none; }
+      .manifesto-backdrop {
+        z-index: -3;
+        background:
+          linear-gradient(90deg, rgba(4, 6, 16, .82), rgba(4, 6, 16, .46) 45%, rgba(4, 6, 16, .58)),
+          linear-gradient(180deg, rgba(4, 6, 16, .20), rgba(4, 6, 16, .86) 84%),
+          url("/assets/galaxy/core-home-v2.webp") center / cover no-repeat;
+        transform: translateZ(0);
+      }
+      .manifesto-backdrop::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 14% 14%, rgba(143, 247, 239, .08), transparent 26%),
+          radial-gradient(circle at 82% 22%, rgba(200, 165, 255, .12), transparent 28%),
+          linear-gradient(180deg, transparent 0 58%, rgba(3, 5, 13, .62));
+      }
+      .manifesto-grain {
+        z-index: -2;
+        opacity: .09;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.32'/%3E%3C/svg%3E");
+        mix-blend-mode: soft-light;
+      }
+
+      .manifesto-header,
+      .manifesto-shell { width: var(--shell); margin-inline: auto; }
+      .manifesto-header {
+        position: relative;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 24px 0 16px;
+      }
+      .manifesto-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 11px;
+        min-height: 44px;
+        font-family: var(--display);
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+      }
+      .manifesto-brand img { width: 34px; height: 34px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(143, 247, 239, .36)); }
+      .manifesto-brand small { display: block; margin-top: 2px; color: var(--soft); font-family: var(--sans); font-size: 9px; font-weight: 800; letter-spacing: .30em; }
+      .manifesto-nav { display: flex; align-items: center; gap: 7px; }
+      .manifesto-nav a,
+      .manifesto-lang {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 9px 13px;
+        border: 1px solid transparent;
+        border-radius: 999px;
+        color: var(--soft);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        transition: color .18s ease, border-color .18s ease, background .18s ease, transform .18s ease;
+      }
+      .manifesto-nav a:hover,
+      .manifesto-lang:hover { color: var(--text); border-color: rgba(143, 247, 239, .24); background: rgba(143, 247, 239, .06); transform: translateY(-1px); }
+      .manifesto-lang { appearance: none; margin-left: 6px; border-color: var(--line); background: rgba(4, 7, 18, .32); cursor: pointer; font-family: inherit; }
+
+      .hero {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(0, 1.02fr) minmax(390px, .98fr);
+        align-items: center;
+        gap: clamp(42px, 8vw, 110px);
+        min-height: min(760px, calc(100svh - 82px));
+        padding: clamp(54px, 9vw, 118px) 0 clamp(72px, 10vw, 132px);
+      }
+      .hero__copy { position: relative; z-index: 2; }
+      .eyebrow,
+      .section-kicker { display: inline-flex; align-items: center; gap: 9px; margin: 0 0 20px; color: var(--cyan); font-size: 10px; font-weight: 900; letter-spacing: .18em; line-height: 1.2; text-transform: uppercase; }
+      .eyebrow::before,
+      .section-kicker::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 14px currentColor; }
+      .hero h1 { max-width: 10ch; margin: 0; font-family: var(--display); font-size: clamp(44px, 6.2vw, 88px); font-weight: 800; letter-spacing: -.055em; line-height: .98; text-wrap: balance; }
+      .hero h1 em { display: block; color: transparent; font-style: normal; background: linear-gradient(100deg, #fff 4%, var(--violet) 58%, var(--cyan)); -webkit-background-clip: text; background-clip: text; }
+      .hero__lead { max-width: 58ch; margin: 28px 0 0; color: var(--muted); font-size: clamp(16px, 1.45vw, 19px); line-height: 1.72; }
+      .hero__actions,
+      .closing__actions { display: flex; flex-wrap: wrap; gap: 11px; margin-top: 32px; }
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        padding: 12px 19px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(4, 7, 18, .42);
+        color: var(--text);
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: .10em;
+        text-transform: uppercase;
+        transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+      }
+      .button:hover { transform: translateY(-2px); border-color: rgba(143, 247, 239, .42); background: rgba(143, 247, 239, .09); box-shadow: 0 14px 32px rgba(0, 0, 0, .24); }
+      .button--primary { color: #080b12; border-color: rgba(244, 223, 155, .70); background: linear-gradient(110deg, #f4df9b, #f2f4e6 48%, #9ff6e7); box-shadow: 0 12px 34px rgba(244, 223, 155, .13); }
+      .button--primary:hover { color: #080b12; border-color: #fff; background: linear-gradient(110deg, #fff2bd, #fff 48%, #b9fff2); }
+      .hero__note { display: flex; align-items: center; gap: 10px; max-width: 50ch; margin: 28px 0 0; color: var(--soft); font-size: 12px; letter-spacing: .02em; }
+      .hero__note::before { content: "↳"; color: var(--gold); font-size: 18px; }
+
+      .hero__visual { position: relative; min-height: 490px; isolation: isolate; }
+      .hero__visual::before,
+      .hero__visual::after { content: ""; position: absolute; border: 1px solid rgba(143, 247, 239, .18); border-radius: 50%; transform: rotate(-18deg); }
+      .hero__visual::before { inset: 7% -5% 8% 4%; box-shadow: 0 0 70px rgba(95, 110, 255, .11), inset 0 0 40px rgba(143, 247, 239, .04); }
+      .hero__visual::after { inset: 19% 8% 20% 16%; border-color: rgba(244, 223, 155, .20); }
+      .hero__art { position: absolute; z-index: 1; inset: 7% 0 5% 0; width: 100%; height: 88%; object-fit: cover; object-position: 76% center; mix-blend-mode: screen; filter: saturate(1.06) contrast(1.04) drop-shadow(0 26px 40px rgba(0, 0, 0, .42)); animation: manifestoFloat 8s ease-in-out infinite; }
+      .hero__visual-core { position: absolute; z-index: 2; right: 22%; bottom: 19%; display: grid; place-items: center; width: 82px; height: 82px; border: 1px solid rgba(244, 223, 155, .34); border-radius: 50%; background: radial-gradient(circle at 35% 28%, rgba(255,255,255,.26), rgba(11,14,28,.82) 64%); box-shadow: 0 0 0 11px rgba(4,7,18,.12), 0 0 42px rgba(143,247,239,.18); }
+      .hero__visual-core img { width: 48px; height: 48px; object-fit: contain; }
+      .hero__tag { position: absolute; z-index: 3; display: grid; gap: 3px; min-width: 118px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 14px; background: rgba(7, 11, 25, .68); box-shadow: 0 12px 28px rgba(0,0,0,.28); backdrop-filter: blur(12px); }
+      .hero__tag small { color: var(--soft); font-size: 8px; font-weight: 900; letter-spacing: .18em; }
+      .hero__tag strong { font-family: var(--display); font-size: 13px; letter-spacing: .03em; }
+      .hero__tag--one { top: 14%; right: 2%; color: var(--cyan); }
+      .hero__tag--two { top: 46%; left: 0; color: var(--violet); }
+      .hero__tag--three { right: 1%; bottom: 5%; color: var(--gold); }
+      .hero__visual-caption { position: absolute; z-index: 3; right: 12%; bottom: -1%; color: var(--soft); font-size: 9px; font-weight: 900; letter-spacing: .22em; text-transform: uppercase; }
+
+      .statement { display: grid; grid-template-columns: .72fr 1.28fr; gap: clamp(32px, 8vw, 112px); padding: clamp(42px, 6vw, 74px) 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+      .statement h2,
+      .section-heading h2,
+      .closing h2 { margin: 0; font-family: var(--display); font-size: clamp(28px, 3.5vw, 52px); letter-spacing: -.045em; line-height: 1.04; text-wrap: balance; }
+      .statement__copy { max-width: 60ch; margin: 0; color: var(--muted); font-size: clamp(17px, 1.6vw, 22px); line-height: 1.65; }
+      .section { padding: clamp(84px, 11vw, 148px) 0 0; }
+      .section-heading { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); align-items: end; gap: 32px; margin-bottom: 42px; }
+      .section-heading__intro { max-width: 44ch; margin: 0; color: var(--muted); font-size: 15px; line-height: 1.7; }
+
+      .principle-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+      .principle { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 19px; padding: 28px 28px 30px 0; border-bottom: 1px solid var(--line); }
+      .principle:nth-child(even) { padding-left: 28px; border-left: 1px solid var(--line); }
+      .principle__number { color: var(--cyan); font-family: var(--display); font-size: 12px; font-weight: 900; letter-spacing: .08em; }
+      .principle:nth-child(2) .principle__number, .principle:nth-child(4) .principle__number { color: var(--violet); }
+      .principle h3 { margin: 0 0 8px; font-family: var(--display); font-size: clamp(18px, 2vw, 25px); letter-spacing: -.03em; line-height: 1.12; }
+      .principle p { max-width: 42ch; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
+
+      .method-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+      .method-card { position: relative; min-height: 390px; overflow: hidden; border: 1px solid var(--line); border-radius: 26px; background: var(--panel); box-shadow: 0 22px 60px rgba(0,0,0,.22); transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease; }
+      .method-card:hover { transform: translateY(-5px); border-color: rgba(143, 247, 239, .28); box-shadow: 0 30px 72px rgba(0,0,0,.34); }
+      .method-card__art { display: block; width: 100%; height: 220px; object-fit: cover; object-position: center; opacity: .90; mix-blend-mode: screen; }
+      .method-card__body { padding: 0 22px 25px; }
+      .method-card__index { display: inline-flex; margin-bottom: 13px; color: var(--gold); font-size: 9px; font-weight: 900; letter-spacing: .16em; }
+      .method-card:nth-child(2) .method-card__index { color: var(--violet); }
+      .method-card:nth-child(3) .method-card__index { color: var(--cyan); }
+      .method-card h3 { margin: 0 0 9px; font-family: var(--display); font-size: 20px; letter-spacing: -.03em; line-height: 1.12; }
+      .method-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
+
+      .ecosystem-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+      .ecosystem-card { position: relative; display: grid; grid-template-columns: 74px minmax(0, 1fr); align-items: center; gap: 14px; min-height: 132px; padding: 12px 14px 12px 10px; overflow: hidden; border: 1px solid var(--line); border-radius: 20px; background: rgba(8, 13, 29, .62); transition: transform .2s ease, border-color .2s ease, background .2s ease; }
+      .ecosystem-card:hover { transform: translateY(-3px); border-color: rgba(200, 165, 255, .35); background: rgba(12, 19, 40, .84); }
+      .ecosystem-card::after { content: "↗"; position: absolute; top: 11px; right: 14px; color: var(--soft); font-size: 13px; }
+      .ecosystem-card__visual { width: 74px; height: 105px; overflow: hidden; border-radius: 15px; background: rgba(3, 7, 17, .82); }
+      .ecosystem-card__visual img { width: 100%; height: 100%; object-fit: cover; opacity: .86; mix-blend-mode: screen; }
+      .ecosystem-card__content { padding-right: 14px; }
+      .ecosystem-card__content small { display: block; margin-bottom: 6px; color: var(--cyan); font-size: 8px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
+      .ecosystem-card--violet .ecosystem-card__content small { color: var(--violet); }
+      .ecosystem-card--gold .ecosystem-card__content small { color: var(--gold); }
+      .ecosystem-card h3 { margin: 0 0 5px; font-family: var(--display); font-size: 16px; letter-spacing: -.025em; line-height: 1.1; }
+      .ecosystem-card p { margin: 0; color: var(--soft); font-size: 11px; line-height: 1.45; }
+
+      .closing { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(270px, .8fr); align-items: end; gap: 38px; margin-top: clamp(92px, 14vw, 180px); padding: clamp(46px, 7vw, 86px) 0 clamp(96px, 11vw, 150px); border-top: 1px solid var(--line); }
+      .closing::before { content: ""; position: absolute; top: -1px; left: 0; width: 27%; height: 1px; background: linear-gradient(90deg, var(--gold), transparent); }
+      .closing p { max-width: 47ch; margin: 18px 0 0; color: var(--muted); font-size: 15px; line-height: 1.7; }
+      .closing__aside { padding: 24px; border: 1px solid var(--line); border-radius: 22px; background: linear-gradient(135deg, rgba(143,247,239,.07), rgba(200,165,255,.06)); }
+      .closing__aside strong { display: block; margin-bottom: 8px; font-family: var(--display); font-size: 18px; letter-spacing: -.03em; }
+      .closing__aside span { color: var(--soft); font-size: 13px; line-height: 1.6; }
+
+      @keyframes manifestoFloat { 0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); } 50% { transform: translate3d(0, -8px, 0) rotate(.45deg); } }
+      @media (max-width: 960px) {
+        :root { --shell: min(100% - 36px, 760px); }
+        .hero { grid-template-columns: 1fr; min-height: auto; padding-top: 66px; }
+        .hero__visual { min-height: 450px; max-width: 620px; width: 100%; margin: 0 auto; }
+        .statement, .section-heading, .closing { grid-template-columns: 1fr; }
+        .section-heading { align-items: start; }
+        .ecosystem-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 640px) {
+        :root { --shell: calc(100% - 28px); }
+        .manifesto-header { align-items: flex-start; padding-top: 16px; }
+        .manifesto-nav a:not(:last-of-type) { display: none; }
+        .manifesto-nav { gap: 2px; }
+        .manifesto-nav a, .manifesto-lang { min-height: 38px; padding: 8px 10px; font-size: 9px; }
+        .manifesto-brand { font-size: 11px; }
+        .manifesto-brand img { width: 30px; height: 30px; }
+        .hero { gap: 18px; padding-top: 52px; }
+        .hero h1 { max-width: 9ch; font-size: clamp(42px, 13vw, 66px); }
+        .hero__lead { margin-top: 22px; font-size: 15px; }
+        .hero__actions, .closing__actions { flex-direction: column; align-items: stretch; }
+        .button { width: 100%; }
+        .hero__visual { min-height: 355px; margin-top: 10px; }
+        .hero__art { inset: 5% 0 5% 0; width: 100%; height: 90%; }
+        .hero__visual-core { right: 18%; bottom: 18%; width: 65px; height: 65px; }
+        .hero__visual-core img { width: 38px; height: 38px; }
+        .hero__tag { min-width: 98px; padding: 8px 9px; }
+        .hero__tag strong { font-size: 10px; }
+        .hero__tag--one { top: 6%; right: 0; }
+        .hero__tag--two { top: 45%; left: 0; }
+        .hero__tag--three { right: 0; bottom: 2%; }
+        .hero__visual-caption { right: 9%; font-size: 7px; }
+        .statement { gap: 20px; }
+        .statement h2, .section-heading h2, .closing h2 { font-size: clamp(29px, 9vw, 44px); }
+        .principle-grid, .method-grid, .ecosystem-grid { grid-template-columns: 1fr; }
+        .principle, .principle:nth-child(even) { padding: 23px 0; border-left: 0; }
+        .method-card { min-height: 0; }
+        .method-card__art { height: 190px; }
+        .ecosystem-card { min-height: 124px; }
+        .closing { gap: 22px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        *, *::before, *::after { animation: none !important; transition: none !important; }
+      }
+    </style>
+  </head>
+
+  <body class="page-manifesto">
+    <div class="manifesto-backdrop" aria-hidden="true"></div>
+    <div class="manifesto-grain" aria-hidden="true"></div>
+
+    <header class="manifesto-header">
+      <a class="manifesto-brand" href={ROUTES.core} aria-label="VOLYNX Core home">
+        <img src="/assets/V.webp" alt="" width="34" height="34" />
+        <span>VOLYNX<small>CORE / MANIFESTO</small></span>
+      </a>
+      <nav class="manifesto-nav" aria-label="VOLYNX navigation">
+        <a href={ROUTES.core} data-i18n="manifesto2.nav_core">Core</a>
+        <a href={ROUTES.platform} data-i18n="manifesto2.nav_platform">Platform</a>
+        <a href={ROUTES.services} data-i18n="manifesto2.nav_services">Services</a>
+        <button class="manifesto-lang" type="button" data-vx-lang-toggle data-vx-lang-title><span data-vx-lang-label>EN</span></button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="manifesto-shell hero" aria-labelledby="manifesto-title">
+        <div class="hero__copy">
+          <p class="eyebrow" data-i18n="manifesto2.hero_kicker">VOLYNX Core / The idea behind the system</p>
+          <h1 id="manifesto-title"><span data-i18n="manifesto2.hero_title_a">Build with intention.</span><em data-i18n="manifesto2.hero_title_b">Move with evidence.</em></h1>
+          <p class="hero__lead" data-i18n="manifesto2.hero_lead">VOLYNX turns meaningful work into a clearer next step — with tools, services and learning paths designed to help ideas become useful, visible and real.</p>
+          <div class="hero__actions">
+            <a class="button button--primary" href={ROUTES.core} data-i18n="manifesto2.hero_primary">Explore the Core</a>
+            <a class="button" href="#method" data-i18n="manifesto2.hero_secondary">See the system</a>
+          </div>
+          <p class="hero__note" data-i18n="manifesto2.hero_note">No noise. No theatre. Just a better path from what matters to what ships.</p>
         </div>
-        <h1 class="hero__title">
-          <span data-i18n="titleLine1">Why</span>
-          <span> <span data-i18n="titleLine2">VOLYNX?</span></span>
-        </h1>
-        <p class="hero__lead" data-i18n="lead">
-          VOLYNX exists to democratize intelligent technology with a premium aesthetic and a real
-          commitment to social impact. We build products and experiences that help people and
-          organizations take action — with clarity, ethics and scale.
-        </p>
-      </div>
-    </div>
-
-    <div class="pillRow" aria-label="Pillars">
-      <span class="pill" data-i18n="pillImpact">Real impact</span>
-      <span class="pill" data-i18n="pillEthics">Ethics &amp; privacy</span>
-      <span class="pill" data-i18n="pillSust">Sustainability</span>
-      <span class="pill" data-i18n="pillAccess">Accessible</span>
-      <span class="pill" data-i18n="pillNetwork">Network effects</span>
-    </div>
-
-    <div class="card">
-      <div class="card__inner">
-        <p class="card__section-title" data-i18n="sectionTitle">Our principles</p>
-
-        <div class="grid">
-          <article class="box">
-            <h3 data-i18n="purposeTitle">Purpose</h3>
-            <p data-i18n="purposeText">
-              Make advanced technology accessible so more people can create, collaborate and solve
-              real problems — with a focus on social causes, support, well-being and sustainability.
-            </p>
-          </article>
-
-          <article class="box">
-            <h3 data-i18n="whatTitle">What we build</h3>
-            <p data-i18n="whatText">
-              Tools, kits and experiences that combine impeccable design and applied intelligence —
-              built for creators, devs and organizations that need speed, quality and trust.
-            </p>
-          </article>
-
-          <article class="box">
-            <h3 data-i18n="forTitle">Who it's for</h3>
-            <ul class="list">
-              <li data-i18n="for1">NGOs and social projects that need clarity and less operational friction.</li>
-              <li data-i18n="for2">Creators and professionals building useful things without becoming hostage to complexity.</li>
-              <li data-i18n="for3">Teams that value privacy, accessibility and solid engineering.</li>
-            </ul>
-          </article>
-
-          <article class="box">
-            <h3 data-i18n="impactTitle">How impact happens</h3>
-            <ul class="list">
-              <li data-i18n="impact1">Simple tools that reduce repetitive work and free energy for the mission.</li>
-              <li data-i18n="impact2">Fast, responsive experiences that reach more people on any device.</li>
-              <li data-i18n="impact3">Products that connect people and resources, strengthening communities.</li>
-            </ul>
-          </article>
-
-          <article class="box">
-            <h3 data-i18n="principlesTitle">Principles</h3>
-            <ul class="list">
-              <li data-i18n="p1">Clarity over noise.</li>
-              <li data-i18n="p2">Consent-first privacy and minimal data by default.</li>
-              <li data-i18n="p3">Accessibility as a standard, not an extra.</li>
-              <li data-i18n="p4">Performance and stability: trust is built in milliseconds.</li>
-              <li data-i18n="p5">Sustainability: efficiency is responsibility.</li>
-            </ul>
-          </article>
-
-          <article class="box">
-            <h3 data-i18n="transparencyTitle">Transparency</h3>
-            <p data-i18n="transparencyText">
-              VOLYNX prioritizes privacy and clear choices. If analytics are used, it will only be
-              with consent — to improve the experience and measure impact responsibly.
-            </p>
-          </article>
+        <div class="hero__visual" aria-label="VOLYNX Core signal">
+          <img class="hero__art" src="/assets/profile-volynx-rare-core.webp" alt="" width="1586" height="992" fetchpriority="high" />
+          <div class="hero__visual-core" aria-hidden="true"><img src="/assets/V.webp" alt="" width="48" height="48" /></div>
+          <div class="hero__tag hero__tag--one"><small>01</small><strong data-i18n="manifesto2.hero_tag_one">Intention</strong></div>
+          <div class="hero__tag hero__tag--two"><small>02</small><strong data-i18n="manifesto2.hero_tag_two">Action</strong></div>
+          <div class="hero__tag hero__tag--three"><small>03</small><strong data-i18n="manifesto2.hero_tag_three">Evidence</strong></div>
+          <span class="hero__visual-caption" data-i18n="manifesto2.hero_visual_caption">Choose the next useful move</span>
         </div>
+      </section>
 
-        <hr class="divider" />
+      <section class="manifesto-shell statement" aria-labelledby="statement-title">
+        <div><p class="section-kicker" data-i18n="manifesto2.statement_kicker">The VOLYNX point of view</p><h2 id="statement-title" data-i18n="manifesto2.statement_title">Premium is not decoration. It is direction.</h2></div>
+        <p class="statement__copy" data-i18n="manifesto2.statement_copy">A premium experience makes the next move easier to see, the work easier to trust and the result easier to use. That is the standard behind every VOLYNX surface.</p>
+      </section>
 
-        <div class="ctaRow" aria-label="Next steps">
-          <a class="btn primary" href={ROUTES.lab} data-i18n="ctaTools">Explore tools</a>
-          <a class="btn" href={ROUTES.services} data-i18n="ctaServices">Services</a>
-          <a class="btn" href={ROUTES.home} data-i18n="ctaMain">Back to main</a>
+      <section class="manifesto-shell section" aria-labelledby="principles-title">
+        <div class="section-heading"><div><p class="section-kicker" data-i18n="manifesto2.principles_kicker">What we hold to</p><h2 id="principles-title" data-i18n="manifesto2.principles_title">A clear standard for useful work.</h2></div><p class="section-heading__intro" data-i18n="manifesto2.principles_intro">The visual layer can be beautiful. It still has to earn its place by making the decision, the action or the outcome clearer.</p></div>
+        <div class="principle-grid">
+          <article class="principle"><span class="principle__number">01</span><div><h3 data-i18n="manifesto2.principle1_title">Clarity before complexity</h3><p data-i18n="manifesto2.principle1_copy">We remove noise before we add features. People should understand the next useful move without decoding the interface.</p></div></article>
+          <article class="principle"><span class="principle__number">02</span><div><h3 data-i18n="manifesto2.principle2_title">Human control by default</h3><p data-i18n="manifesto2.principle2_copy">Privacy, consent and ownership are part of the product — not a footnote added after the experience is finished.</p></div></article>
+          <article class="principle"><span class="principle__number">03</span><div><h3 data-i18n="manifesto2.principle3_title">Make it useful</h3><p data-i18n="manifesto2.principle3_copy">A good idea becomes valuable when it helps someone create, decide, learn, connect or deliver something real.</p></div></article>
+          <article class="principle"><span class="principle__number">04</span><div><h3 data-i18n="manifesto2.principle4_title">Proof over promises</h3><p data-i18n="manifesto2.principle4_copy">We prefer a visible result, a tested path and an honest limitation over language that promises more than the work can carry.</p></div></article>
         </div>
+      </section>
 
-        <p class="closing" data-i18n="closing">
-          We start impeccable and simple. We iterate fast with rigor. We measure impact.
-          Every pixel, every millisecond and every word carries the VOLYNX standard: useful, beautiful and inevitable.
-        </p>
-      </div>
-    </div>
-  </main>
-
-  <!-- Cookie Banner -->
-  <div class="vx-cookie" id="vxCookie" role="dialog" aria-modal="true" aria-label="Cookie preferences" hidden>
-    <div class="vx-cookie__card">
-      <div class="vx-cookie__head">
-        <span class="vx-cookie__badge">VOLYNX</span>
-        <span class="vx-cookie__title" data-i18n="cookieTitle">Cookies &amp; Privacy</span>
-      </div>
-      <p class="vx-cookie__text" data-i18n="cookieText">
-        We use essential cookies for the platform to work. With your permission, we use analytics
-        cookies to improve the experience and track impact responsibly. You are in control.
-      </p>
-      <div class="vx-cookie__actions">
-        <button class="vx-btn vx-btn--ghost" id="vxCookiePrefs" type="button" data-i18n="cookiePrefs">Preferences</button>
-        <button class="vx-btn vx-btn--soft" id="vxCookieReject" type="button" data-i18n="cookieReject">Reject</button>
-        <button class="vx-btn vx-btn--primary" id="vxCookieAccept" type="button" data-i18n="cookieAccept">Accept</button>
-      </div>
-      <a class="vx-cookie__link" href={ROUTES.privacy} rel="noopener" data-i18n="cookieLink">Privacy policy</a>
-      <div class="vx-cookie__prefs" id="vxCookiePanel" hidden>
-        <div class="vx-cookie__prefsTitle" data-i18n="cookiePrefsTitle">Preferences</div>
-        <label class="vx-toggle">
-          <input type="checkbox" checked disabled />
-          <span class="vx-toggle__ui"></span>
-          <span><span data-i18n="cookieEssential">Essential</span> — <small data-i18n="cookieEssentialSub">Always on</small></span>
-        </label>
-        <label class="vx-toggle">
-          <input type="checkbox" id="vxConsentAnalytics" />
-          <span class="vx-toggle__ui"></span>
-          <span><span data-i18n="cookieAnalytics">Analytics</span> — <small data-i18n="cookieAnalyticsSub">Helps improve the experience</small></span>
-        </label>
-        <div class="vx-cookie__prefsActions">
-          <button class="vx-btn vx-btn--soft" id="vxCookieSave" type="button" data-i18n="cookieSave">Save</button>
+      <section class="manifesto-shell section" id="method" aria-labelledby="method-title">
+        <div class="section-heading"><div><p class="section-kicker" data-i18n="manifesto2.method_kicker">From idea to evidence</p><h2 id="method-title" data-i18n="manifesto2.method_title">The method is simple. The standard is high.</h2></div><p class="section-heading__intro" data-i18n="manifesto2.method_intro">Every part of VOLYNX should help move a meaningful idea through three states: clearer, more tangible, and more knowable.</p></div>
+        <div class="method-grid">
+          <article class="method-card"><img class="method-card__art" src="/assets/galaxy/core-clarify.webp" alt="" loading="lazy" decoding="async" width="1254" height="1254" /><div class="method-card__body"><span class="method-card__index">01 / CLARIFY</span><h3 data-i18n="manifesto2.method1_title">See the real problem.</h3><p data-i18n="manifesto2.method1_copy">Turn a vague goal into a shared view of the audience, the constraint and the first outcome worth measuring.</p></div></article>
+          <article class="method-card"><img class="method-card__art" src="/assets/galaxy/core-build.webp" alt="" loading="lazy" decoding="async" width="1254" height="1254" /><div class="method-card__body"><span class="method-card__index">02 / BUILD</span><h3 data-i18n="manifesto2.method2_title">Make the next move tangible.</h3><p data-i18n="manifesto2.method2_copy">Use the right VOLYNX surface — product, service, tool or learning path — to move from intention into action.</p></div></article>
+          <article class="method-card"><img class="method-card__art" src="/assets/galaxy/core-prove.webp" alt="" loading="lazy" decoding="async" width="1254" height="1254" /><div class="method-card__body"><span class="method-card__index">03 / PROVE</span><h3 data-i18n="manifesto2.method3_title">Learn from what changed.</h3><p data-i18n="manifesto2.method3_copy">Keep evidence of progress, uncertainty and outcome. Impact is something we learn, not something we simply claim.</p></div></article>
         </div>
-      </div>
-    </div>
-  </div>
+      </section>
 
-  <SiteFooter />
-  <PageWidgets hideUtilBar includeCookieBanner={false} />
-</body>
+      <section class="manifesto-shell section" aria-labelledby="ecosystem-title">
+        <div class="section-heading"><div><p class="section-kicker" data-i18n="manifesto2.ecosystem_kicker">One system, many ways in</p><h2 id="ecosystem-title" data-i18n="manifesto2.ecosystem_title">Choose the surface that moves the work forward.</h2></div><p class="section-heading__intro" data-i18n="manifesto2.ecosystem_intro">VOLYNX is not one product pretending to solve everything. It is a connected ecosystem with a clear job for each surface.</p></div>
+        <div class="ecosystem-grid">
+          {ecosystem.map((item) => (
+            <a class={`ecosystem-card ecosystem-card--${item.tone}`} href={item.href}>
+              <div class="ecosystem-card__visual"><img src={item.asset} alt="" loading="lazy" decoding="async" width="640" height="640" /></div>
+              <div class="ecosystem-card__content"><small data-i18n={`manifesto2.${item.key}_label`}>Make and move</small><h3>{item.name}</h3><p data-i18n={`manifesto2.${item.key}_copy`}>A focused surface for the next useful step.</p></div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section class="manifesto-shell closing" aria-labelledby="closing-title">
+        <div><p class="section-kicker" data-i18n="manifesto2.closing_kicker">When the idea is ready</p><h2 id="closing-title" data-i18n="manifesto2.closing_title">Start with what matters.</h2><p data-i18n="manifesto2.closing_copy">Choose a tool, a service or a guided path. You do not need the whole answer before the first useful step.</p><div class="closing__actions"><a class="button button--primary" href={ROUTES.core} data-i18n="manifesto2.closing_primary">Open VOLYNX Core</a><a class="button" href={ROUTES.services} data-i18n="manifesto2.closing_secondary">Talk to VOLYNX</a></div></div>
+        <aside class="closing__aside"><strong data-i18n="manifesto2.closing_aside_title">Useful. Beautiful. Built to move.</strong><span data-i18n="manifesto2.closing_aside_copy">Every pixel should reduce friction. Every system should leave the person with more agency than they started with.</span></aside>
+      </section>
+    </main>
+
+    <SiteFooter />
+    <PageWidgets hideUtilBar includeCookieBanner />
+  </body>
 </html>

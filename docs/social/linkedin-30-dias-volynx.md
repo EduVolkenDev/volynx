@@ -17,28 +17,28 @@ Posts caem terça, quarta e quinta entre 8h-10h (BRT) como default — janela B2
 **Dia/horário:** Terça, 08h30 BRT
 
 **Hook:**
-Removi a dependência que custava 400 dólares por mês e ninguém percebeu a diferença.
+Remover o fundo de uma imagem não deveria exigir enviá-la para um servidor.
 
 **Corpo:**
-Removi a dependência que custava 400 dólares por mês e ninguém percebeu a diferença.
+Remover o fundo de uma imagem não deveria exigir enviá-la para um servidor.
 
-Migrei a remoção de fundo do VOLYNX de uma lib proprietária (imgly) pra um modelo open-source rodando direto no navegador do usuário — U²-Net em ONNX runtime.
+Na VOLYNX, a remoção de fundo roda diretamente no navegador do usuário com U²-Net e ONNX Runtime.
 
 O que isso muda na prática:
 
-A imagem nunca sai do computador de quem tá usando. Zero upload, zero servidor processando, zero log de "ah mas onde foi parar aquela foto que eu mandei".
+A imagem não é enviada para uma API de processamento. O resultado é produzido no navegador do usuário.
 
-Custo marginal por uso: zero. Antes eu pagava por chamada de API. Agora o modelo baixa uma vez (~170MB cacheados) e roda no WebAssembly local.
+O modelo e o runtime são carregados no dispositivo e o processamento acontece localmente, sem enviar o arquivo para uma API de imagem.
 
 Licença Apache-2.0 em vez de proprietária. Posso embarcar onde eu quiser sem renegociar nada.
 
-O trade-off honesto: a primeira execução é mais lenta (modelo precisa carregar). Da segunda em diante, é instantâneo e funciona offline.
+O trade-off honesto: a primeira execução pode levar mais tempo porque o navegador precisa carregar o modelo e o runtime local.
 
 Pra quem tá construindo SaaS: toda dependência paga é uma dívida silenciosa. Vale a pena revisitar trimestralmente se o open-source já alcançou o que a versão paga oferecia há dois anos. Quase sempre alcançou.
 
-A versão local tá rodando em produção há semanas. Ninguém abriu ticket reclamando.
+Privacidade não deveria ser apenas uma frase no rodapé. Ela pode fazer parte da arquitetura do produto.
 
-Já fizeram essa troca de proprietário pra open-source em algum produto de vocês? Qual foi o resultado?
+O que você processa nas ferramentas que usa hoje continua sendo realmente seu?
 
 **Hashtags:** #buildinpublic #saas #opensource #webdev
 
@@ -194,16 +194,16 @@ Quem usa QR dinâmico em campanha hoje? O que vocês acompanham além do número
 **Dia/horário:** Quarta, 09h00 BRT
 
 **Hook (também slide 1):**
-Como remover o fundo de 20 fotos sem mandar nenhuma pra servidor nenhum.
+Como remover fundos sem enviar suas imagens para uma API de processamento.
 
 **Corpo (texto que acompanha o carrossel no post):**
-Como remover o fundo de 20 fotos sem mandar nenhuma pra servidor nenhum.
+Como remover fundos sem enviar suas imagens para uma API de processamento.
 
-Fiz um passo a passo do Image Suite do VOLYNX rodando 100% no navegador. Modelo open-source, sem upload, sem fila.
+Fiz um passo a passo da iMage Suite da VOLYNX processando a imagem no navegador. Modelo open-source, sem upload para uma API de imagem.
 
-Funciona pra foto de produto, foto de pessoa, screenshot de tela. O modelo (U²-Net) foi treinado pra segmentação de objeto saliente — ele acerta a borda mesmo em cabelo, contorno irregular, transparência sutil.
+O modelo U²-Net foi criado para segmentação de objetos salientes. A qualidade varia conforme contraste, iluminação e complexidade da imagem, então o resultado deve ser avaliado antes do uso final.
 
-A primeira foto demora alguns segundos porque o modelo precisa baixar uma vez. Da segunda em diante é instantâneo, e funciona offline depois disso.
+A primeira execução pode levar mais tempo porque o navegador precisa carregar o modelo e o runtime local. As seguintes tendem a ser mais rápidas quando esses recursos já estão em cache.
 
 Quem trabalha com produto, e-commerce, portfolio: salva o carrossel. Vai economizar tempo.
 
@@ -211,14 +211,14 @@ Link da ferramenta no primeiro comentário.
 
 **Estrutura dos slides:**
 
-- **Slide 1 (capa/hook):** Texto grande sobre fundo escuro — "Como remover o fundo de 20 fotos sem mandar nenhuma pra servidor nenhum." Subtítulo pequeno: "Image Suite do VOLYNX. 100% no navegador."
+- **Slide 1 (capa/hook):** Texto grande sobre fundo escuro — "Como remover fundos sem enviar suas imagens para uma API." Subtítulo pequeno: "iMage Suite da VOLYNX. Processamento no navegador."
 - **Slide 2:** Screenshot da tela inicial do Image Suite com a área de drop. Anotação: "Arrasta a foto aqui. Nenhum upload acontece."
 - **Slide 3:** Screenshot do DevTools aberto na aba Network durante o processamento. Anotação: "Zero requests. A imagem nunca sai do seu computador."
-- **Slide 4:** Antes/depois de uma foto de produto com fundo branco virando transparente. Anotação: "Borda limpa, sem halo."
-- **Slide 5:** Antes/depois de foto de pessoa com cabelo solto. Anotação: "Funciona em cabelo. É onde quase todo modelo falha."
+- **Slide 4:** Antes/depois de uma foto de produto com fundo branco virando transparente. Anotação: "Compare o original e o recorte."
+- **Slide 5:** Antes/depois de uma imagem mais complexa. Anotação: "O resultado depende do contraste e dos detalhes da imagem."
 - **Slide 6:** Grid de 6 thumbnails processadas em batch. Anotação: "Processa em lote. Resultado fica no navegador."
-- **Slide 7:** Comparação visual: "Servidor: upload + fila + download. Local: processa direto. Mesma qualidade, sem rede no meio."
-- **Slide 8 (CTA):** "Testa grátis em volynx.world/image — link no primeiro comentário. Segue pra mais coisa rodando no browser que servidor não precisa fazer."
+- **Slide 7:** Comparação visual: "Fluxo remoto: upload + processamento + download. VOLYNX: processamento no dispositivo."
+- **Slide 8 (CTA):** "Conheça a iMage Suite Pro em volynx.world/tiktok/ — link no primeiro comentário."
 
 **Hashtags:** #design #produtividade #webdev #ecommerce
 
@@ -243,7 +243,7 @@ Solo técnico em 2026 tem três alavancas que time de 5 pessoas em 2018 não tin
 
 Primeira: a stack ficou absurda. Astro builda em segundos, Supabase resolve auth e banco numa tarde, Stripe processa cobrança em três arquivos. O trabalho que demandava dois backend e um devops agora demanda atenção e bom gosto.
 
-Segunda: modelo open-source de qualidade. Eu rodo segmentação de imagem com U²-Net que era state-of-art em 2020 e hoje é um arquivo de 170MB. Isso era licença de meio milhão de dólares cinco anos atrás.
+Segunda: modelos open-source de qualidade. A segmentação de imagem usa U²-Net com ONNX Runtime e roda no navegador, reduzindo dependência de APIs externas de processamento.
 
 Terceira: distribuição direta. Não preciso de SDR, não preciso de agência. Posts honestos no LinkedIn alcançam quem precisa alcançar, se o produto for honesto também.
 

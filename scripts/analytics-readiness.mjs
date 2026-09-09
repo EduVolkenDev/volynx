@@ -6,6 +6,7 @@ const requiredFiles = [
   "supabase/migrations/202609050001_marketing_analytics.sql",
   "supabase/functions/track-analytics-event/index.ts",
   "supabase/functions/analytics-summary/index.ts",
+  "supabase/functions/stripe-webhook/index.ts",
   "src/pages/admin/analytics/index.astro",
 ];
 
@@ -16,6 +17,8 @@ const requiredSignals = [
   ["supabase/migrations/202609050001_marketing_analytics.sql", "enable row level security"],
   ["supabase/migrations/202609050001_marketing_analytics.sql", "revoke all on table public.analytics_events from anon, authenticated"],
   ["supabase/functions/analytics-summary/index.ts", "is_user_admin"],
+  ["supabase/functions/stripe-webhook/index.ts", "recordServerAnalyticsEvent"],
+  ["supabase/functions/stripe-webhook/index.ts", "payment_confirmed"],
   ["src/pages/admin/analytics/index.astro", "analyticsConsole"],
 ];
 

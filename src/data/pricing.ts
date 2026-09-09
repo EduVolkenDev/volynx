@@ -277,7 +277,7 @@ export const sitePricing = {
     },
     {
       id: 'launch',
-      image: '/assets/qrgen-launch.webp',
+      image: '/assets/qrgen/qrgen-icon3.webp',
       name: { pt: 'QRGen Launch', en: 'QRGen Launch' },
       description: {
         pt: 'Para campanhas reais que precisam de PNG em alta resolução e fluxo de rascunhos mais prático.',
@@ -293,7 +293,7 @@ export const sitePricing = {
     },
     {
       id: 'pro',
-      image: '/assets/qrgen-pro.webp',
+      image: '/assets/qrgen/qrgen-icon4.webp',
       badge: { pt: 'SVG premium', en: 'Premium SVG' },
       featured: true,
       name: { pt: 'QRGen Pro', en: 'QRGen Pro' },
@@ -311,7 +311,7 @@ export const sitePricing = {
     },
     {
       id: 'studio',
-      image: '/assets/qrgen-studio.webp',
+      image: '/assets/qrgen/qrgen-icon5.webp',
       name: { pt: 'QRGen Studio', en: 'QRGen Studio' },
       description: {
         pt: 'Para trabalho com clientes, QR dinâmico gerenciado, organização de campanhas e caminho de analytics.',

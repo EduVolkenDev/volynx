@@ -45,7 +45,7 @@
     {
       id: "launch",
       name: "QRGen Launch",
-      image: "/assets/qrgen/qrgen-launch-vari.webp",
+      image: "/assets/qrgen/qrgen-icon3.webp",
       price: { GBP: "£11", EUR: "€13", BRL: "R$69" },
       copy: "For real campaigns that need HD assets.",
       features: ["HD PNG", "More saved projects", "Gradient styles", "No friction for launch work"],
@@ -56,7 +56,7 @@
     {
       id: "pro",
       name: "QRGen Pro",
-      image: "/assets/qrgen/qrgen-pro-vari.webp",
+      image: "/assets/qrgen/qrgen-icon4.webp",
       price: { GBP: "£24", EUR: "€28", BRL: "R$149" },
       copy: "For brand-safe and print-ready exports.",
       features: ["SVG vector", "Transparent background", "Logo export", "4096px PNG"],
@@ -67,7 +67,7 @@
     {
       id: "studio",
       name: "QRGen Studio",
-      image: "/assets/qrgen/qrgen-studio-vari.webp",
+      image: "/assets/qrgen/qrgen-icon5.webp",
       price: { GBP: "£54", EUR: "€63", BRL: "R$349" },
       copy: "For dynamic QR campaigns and client work.",
       features: ["Dynamic QR direction", "Campaign organization", "Analytics path", "Client/project workflow"],
