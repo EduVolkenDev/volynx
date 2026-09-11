@@ -8,6 +8,84 @@ const conversionBriefHref = `${ROUTES.contact}?product=services&intent=conversio
 const essentialBriefHref = `${ROUTES.contact}?product=services&intent=essential`;
 const growthBriefHref = `${ROUTES.contact}?product=services&intent=growth`;
 const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
+
+const portfolioShowcase = [
+  {
+    id: "jhonatan-peterson",
+    name: "Jhonatan Peterson",
+    cover: "/assets/portfolio-showcase/jhonatan-peterson-cover.webp",
+    logo: "/assets/portfolio-showcase/jhonatan-peterson-logo.webp",
+    href: "https://eduardovolken.volynx.world/work/jhonatan-peterson/",
+    accent: "108, 224, 255",
+    title: "Recent project — Jhonatan Peterson",
+    tagline: "A premium real-estate presence shaped around personal authority, curated properties and a direct path to conversation.",
+    metrics: [
+      ["Real estate", "premium positioning"],
+      ["Curated", "property showcase"],
+      ["Direct", "guided lead flow"],
+    ],
+  },
+  {
+    id: "volynx",
+    name: "VOLYNX",
+    cover: "/assets/portfolio-showcase/volynx-cover.webp",
+    logo: "/assets/portfolio-showcase/volynx-logo.webp",
+    href: "https://eduardovolken.volynx.world/work/volynx/",
+    accent: "139, 250, 240",
+    title: "Featured project — VOLYNX",
+    tagline: "A connected ecosystem of products, tools, account flows, commerce and delivery built to help ideas become working digital systems.",
+    metrics: [
+      ["Product", "connected ecosystem"],
+      ["Intelligent", "tools and workflows"],
+      ["Complete", "access and delivery"],
+    ],
+  },
+  {
+    id: "palavras-do-universo",
+    name: "Palavras do Universo",
+    cover: "/assets/portfolio-showcase/pdu-cover.webp",
+    logo: "/assets/portfolio-showcase/palavras-do-universo-logo.webp",
+    href: "https://eduardovolken.volynx.world/work/palavras-do-universo/",
+    accent: "184, 118, 255",
+    title: "Featured project — Palavras do Universo",
+    tagline: "Tarot, astrology and personal guidance brought together in an atmospheric journey that stays clear, intimate and easy to follow.",
+    metrics: [
+      ["Spiritual", "immersive product"],
+      ["Personal", "guided journeys"],
+      ["Continuous", "account experience"],
+    ],
+  },
+  {
+    id: "pratti-beaute",
+    name: "Pratti Beautê",
+    cover: "/assets/portfolio-showcase/pratti-cover.webp",
+    logo: "/assets/portfolio-showcase/pratti-beaute-logo.webp",
+    href: "https://eduardovolken.volynx.world/work/pratti-beaute/",
+    accent: "255, 192, 203",
+    title: "Featured project — Pratti Beautê",
+    tagline: "A warm editorial presence that gives services, education and professional expertise distinct paths without fragmenting the brand.",
+    metrics: [
+      ["Beauty", "editorial identity"],
+      ["Clear", "booking paths"],
+      ["Expandable", "education offer"],
+    ],
+  },
+  {
+    id: "fairhome",
+    name: "FairHome",
+    cover: "/assets/portfolio-showcase/fairhome-cover.webp",
+    logo: "/assets/portfolio-showcase/fairhome-logo.webp",
+    href: "https://eduardovolken.volynx.world/work/fairhome/",
+    accent: "122, 255, 171",
+    title: "Featured project — FairHome",
+    tagline: "A product concept that makes shared responsibilities visible and household routines feel fairer, lighter and easier to coordinate.",
+    metrics: [
+      ["Shared living", "fair routines"],
+      ["Visible", "responsibilities"],
+      ["Product", "interactive prototype"],
+    ],
+  },
+] as const;
 ---
 <FlagshipLayout title="Full Site + Brand — VOLYNX bespoke" description="Custom website and brand identity projects, by brief, quote and approval. Not a template. Built to carry your business." pageClass="page-services">
   <FlagshipHeader current={ROUTES.services} ctaLabel="Book a call" ctaHref="https://calendly.com/volynx-schedule-your-meeting/new-meeting" />
@@ -411,18 +489,84 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
             <li data-i18n-html="svc2.why_f3"><strong>Full ownership at handoff.</strong> Source code, brand files, domain, analytics — everything yours at delivery.</li>
           </ul>
         </article>
-        <article class="panel panel--pro svc-why-card svc-showcase-card">
-          <div class="svc-card-showcase svc-card-showcase--wide" aria-hidden="true">
-            <img src="/assets/jpimoveis-icon.webp" alt="" loading="lazy" />
+        <article
+          class="panel panel--pro svc-why-card svc-showcase-card svc-portfolio-carousel"
+          data-svc-portfolio-carousel
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="Selected portfolio projects"
+          data-i18n-aria="svc2.portfolio_aria"
+        >
+          <div class="svc-portfolio-viewport">
+            {portfolioShowcase.map((project, projectIndex) => (
+              <div
+                class:list={["svc-portfolio-slide", { "is-active": projectIndex === 0 }]}
+                data-svc-portfolio-slide
+                data-project-id={project.id}
+                role="group"
+                aria-roledescription="slide"
+                aria-hidden={projectIndex === 0 ? "false" : "true"}
+                inert={projectIndex === 0 ? undefined : true}
+                style={`--svc-project-accent: ${project.accent};`}
+              >
+                <div class="svc-card-showcase svc-card-showcase--wide">
+                  <img
+                    class="svc-project-cover"
+                    src={project.cover}
+                    alt={project.name}
+                    loading={projectIndex === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                  />
+                  <span class="svc-project-logo" aria-hidden="true">
+                    <img
+                      src={project.logo}
+                      alt=""
+                      loading={projectIndex === 0 ? "eager" : "lazy"}
+                      decoding="async"
+                    />
+                  </span>
+                  <span class="svc-project-number" aria-hidden="true">
+                    {String(projectIndex + 1).padStart(2, "0")} / {String(portfolioShowcase.length).padStart(2, "0")}
+                  </span>
+                </div>
+                <h3 data-i18n={`svc2.portfolio_${project.id}_title`}>{project.title}</h3>
+                <div class="svc-metrics-row">
+                  {project.metrics.map((metric, metricIndex) => (
+                    <div class="svc-metric">
+                      <strong data-i18n={`svc2.portfolio_${project.id}_metric${metricIndex + 1}_val`}>{metric[0]}</strong>
+                      <span data-i18n={`svc2.portfolio_${project.id}_metric${metricIndex + 1}_label`}>{metric[1]}</span>
+                    </div>
+                  ))}
+                </div>
+                <p data-i18n={`svc2.portfolio_${project.id}_tagline`}>{project.tagline}</p>
+                <a href={project.href} target="_blank" rel="noopener noreferrer" class="button button--ghost" data-i18n="svc2.why_case_btn">Open case study →</a>
+              </div>
+            ))}
           </div>
-          <h3 data-i18n="svc2.why_results_title">Recent project — Parisnez</h3>
-          <div class="svc-metrics-row">
-            <div class="svc-metric"><strong data-i18n="svc2.metric1_val">Real estate</strong><span data-i18n="svc2.metric1_label">premium positioning</span></div>
-            <div class="svc-metric"><strong data-i18n="svc2.metric2_val">Curated</strong><span data-i18n="svc2.metric2_label">property showcase</span></div>
-            <div class="svc-metric"><strong data-i18n="svc2.metric3_val">Brief</strong><span data-i18n="svc2.metric3_label">guided lead flow</span></div>
+          <div class="svc-portfolio-controls" aria-label="Portfolio navigation" data-i18n-aria="svc2.portfolio_controls_aria">
+            <button type="button" class="svc-portfolio-arrow" data-svc-portfolio-prev aria-label="Previous project" data-i18n-aria="svc2.portfolio_prev_aria">←</button>
+            <div class="svc-portfolio-dots">
+              {portfolioShowcase.map((project, projectIndex) => (
+                <button
+                  type="button"
+                  class:list={["svc-portfolio-dot", { "is-active": projectIndex === 0 }]}
+                  data-svc-portfolio-dot
+                  data-project-index={projectIndex}
+                  aria-label={`Show ${project.name}`}
+                  data-i18n-aria={`svc2.portfolio_show_${project.id}`}
+                  aria-current={projectIndex === 0 ? "true" : undefined}
+                >
+                  <span class="sr-only">{project.name}</span>
+                </button>
+              ))}
+            </div>
+            <button type="button" class="svc-portfolio-toggle" data-svc-portfolio-toggle aria-label="Pause project rotation" data-i18n-aria="svc2.portfolio_pause_aria">
+              <span data-svc-portfolio-pause aria-hidden="true">Ⅱ</span>
+              <span data-svc-portfolio-play aria-hidden="true" hidden>▶</span>
+            </button>
+            <button type="button" class="svc-portfolio-arrow" data-svc-portfolio-next aria-label="Next project" data-i18n-aria="svc2.portfolio_next_aria">→</button>
           </div>
-          <p data-i18n="svc2.why_tagline">High-end real estate landing for Jhonatan Peterson, with premium positioning, curated properties, testimonials and a guided conversion path.</p>
-          <a href="https://www.jhonatanpetersonimoveis.com.br/" target="_blank" rel="noopener noreferrer" class="button button--ghost" data-i18n="svc2.why_case_btn">Open project →</a>
+          <p class="sr-only" aria-live="polite" aria-atomic="true" data-svc-portfolio-status></p>
         </article>
       </div>
     </section>
@@ -533,6 +677,121 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
     buttons.forEach((button) => button.addEventListener("click", () => applyMarket(button.dataset.market)));
     window.addEventListener("vx:lang-changed", () => applyMarket(activeMarket));
     applyMarket(activeMarket);
+  })();
+
+  (() => {
+    const carousel = document.querySelector("[data-svc-portfolio-carousel]");
+    if (!carousel) return;
+
+    const slides = Array.from(carousel.querySelectorAll("[data-svc-portfolio-slide]"));
+    const dots = Array.from(carousel.querySelectorAll("[data-svc-portfolio-dot]"));
+    const previousButton = carousel.querySelector("[data-svc-portfolio-prev]");
+    const nextButton = carousel.querySelector("[data-svc-portfolio-next]");
+    const toggleButton = carousel.querySelector("[data-svc-portfolio-toggle]");
+    const pauseIcon = carousel.querySelector("[data-svc-portfolio-pause]");
+    const playIcon = carousel.querySelector("[data-svc-portfolio-play]");
+    const status = carousel.querySelector("[data-svc-portfolio-status]");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const interval = 6800;
+    let activeIndex = 0;
+    let timer = 0;
+    let interactionPaused = false;
+    let userPaused = reduceMotion.matches;
+
+    const language = () => String(document.documentElement.lang || "en").toLowerCase().startsWith("pt") ? "pt" : "en";
+    const translate = (key, fallback) => window.VX_TRANS?.[language()]?.[key] || fallback;
+
+    const stop = () => {
+      if (timer) window.clearInterval(timer);
+      timer = 0;
+    };
+
+    const canRotate = () => slides.length > 1 && !document.hidden && !interactionPaused && !userPaused;
+
+    const start = () => {
+      stop();
+      if (!canRotate()) return;
+      timer = window.setInterval(() => show(activeIndex + 1, false), interval);
+    };
+
+    const syncToggle = () => {
+      if (!toggleButton) return;
+      toggleButton.setAttribute("aria-pressed", String(userPaused));
+      toggleButton.setAttribute(
+        "aria-label",
+        userPaused
+          ? translate("svc2.portfolio_resume_aria", "Resume project rotation")
+          : translate("svc2.portfolio_pause_aria", "Pause project rotation"),
+      );
+      if (pauseIcon) pauseIcon.hidden = userPaused;
+      if (playIcon) playIcon.hidden = !userPaused;
+    };
+
+    function show(nextIndex, announce = true) {
+      const normalizedIndex = (nextIndex + slides.length) % slides.length;
+      if (normalizedIndex === activeIndex && slides[normalizedIndex]?.classList.contains("is-active")) return;
+
+      carousel.dataset.direction = normalizedIndex > activeIndex || (activeIndex === slides.length - 1 && normalizedIndex === 0) ? "next" : "previous";
+      activeIndex = normalizedIndex;
+
+      slides.forEach((slide, index) => {
+        const active = index === activeIndex;
+        slide.classList.toggle("is-active", active);
+        slide.setAttribute("aria-hidden", String(!active));
+        if (active) slide.removeAttribute("inert");
+        else slide.setAttribute("inert", "");
+      });
+      dots.forEach((dot, index) => {
+        const active = index === activeIndex;
+        dot.classList.toggle("is-active", active);
+        if (active) dot.setAttribute("aria-current", "true");
+        else dot.removeAttribute("aria-current");
+      });
+
+      if (announce && status) {
+        const title = slides[activeIndex]?.querySelector("h3")?.textContent?.trim() || "";
+        status.textContent = translate("svc2.portfolio_now_showing", "Now showing") + ": " + title;
+      }
+      start();
+    }
+
+    previousButton?.addEventListener("click", () => show(activeIndex - 1));
+    nextButton?.addEventListener("click", () => show(activeIndex + 1));
+    dots.forEach((dot, index) => dot.addEventListener("click", () => show(index)));
+    toggleButton?.addEventListener("click", () => {
+      userPaused = !userPaused;
+      if (!userPaused) interactionPaused = false;
+      syncToggle();
+      start();
+    });
+
+    carousel.addEventListener("mouseenter", () => {
+      interactionPaused = true;
+      stop();
+    });
+    carousel.addEventListener("mouseleave", () => {
+      interactionPaused = false;
+      start();
+    });
+    carousel.addEventListener("focusin", () => {
+      interactionPaused = true;
+      stop();
+    });
+    carousel.addEventListener("focusout", (event) => {
+      if (carousel.contains(event.relatedTarget)) return;
+      interactionPaused = false;
+      start();
+    });
+    document.addEventListener("visibilitychange", start);
+    reduceMotion.addEventListener?.("change", (event) => {
+      if (event.matches) userPaused = true;
+      syncToggle();
+      start();
+    });
+    window.addEventListener("vx:lang-changed", syncToggle);
+
+    syncToggle();
+    start();
   })();
 </script>
 
@@ -1101,13 +1360,268 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
     padding: 0;
     place-items: stretch;
   }
-  .svc-card-showcase--wide img {
+  .svc-card-showcase--wide > img {
     width: 100%;
     max-width: none;
     max-height: none;
     height: 100%;
     object-fit: cover;
     border-radius: 24px;
+  }
+  .svc-portfolio-carousel {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    border-color: rgba(139,250,240,.18);
+    background:
+      radial-gradient(circle at 86% 12%, rgba(139,250,240,.1), transparent 34%),
+      radial-gradient(circle at 10% 88%, rgba(167,139,250,.1), transparent 38%),
+      linear-gradient(145deg, rgba(255,255,255,.072), rgba(255,255,255,.025));
+  }
+  .svc-portfolio-carousel::before {
+    content: "";
+    position: absolute;
+    inset: -35%;
+    z-index: -1;
+    pointer-events: none;
+    background: conic-gradient(from 180deg, transparent, rgba(139,250,240,.08), transparent 28%, rgba(167,139,250,.08), transparent 58%);
+    animation: svc-portfolio-aurora 18s linear infinite;
+  }
+  .svc-portfolio-viewport {
+    display: grid;
+    min-width: 0;
+  }
+  .svc-portfolio-slide {
+    --svc-project-accent: 139, 250, 240;
+    grid-area: 1 / 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    filter: blur(9px) saturate(.72);
+    transform: translate3d(7%, 0, 0) scale(.975);
+    transition:
+      opacity .72s cubic-bezier(.22, 1, .36, 1),
+      transform .82s cubic-bezier(.22, 1, .36, 1),
+      filter .64s ease,
+      visibility 0s linear .82s;
+  }
+  .svc-portfolio-carousel[data-direction="previous"] .svc-portfolio-slide:not(.is-active) {
+    transform: translate3d(-7%, 0, 0) scale(.975);
+  }
+  .svc-portfolio-slide.is-active {
+    z-index: 2;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    filter: none;
+    transform: translate3d(0, 0, 0) scale(1);
+    transition-delay: .08s, .08s, .08s, 0s;
+  }
+  .svc-portfolio-slide .svc-card-showcase {
+    border-color: rgba(var(--svc-project-accent), .24);
+    background:
+      radial-gradient(circle at 78% 12%, rgba(var(--svc-project-accent), .22), transparent 42%),
+      linear-gradient(155deg, rgba(255,255,255,.1), rgba(255,255,255,.025));
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.1),
+      0 22px 58px rgba(0,0,0,.24),
+      0 0 46px rgba(var(--svc-project-accent), .08);
+  }
+  .svc-portfolio-slide .svc-card-showcase::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(112deg, transparent 28%, rgba(255,255,255,.2) 47%, transparent 64%);
+    transform: translateX(-120%);
+  }
+  .svc-portfolio-slide.is-active .svc-card-showcase::before {
+    animation: svc-portfolio-sheen 1.15s .18s cubic-bezier(.22, 1, .36, 1) both;
+  }
+  .svc-portfolio-carousel .svc-card-showcase img {
+    animation: none;
+    transform: scale(1.055);
+    filter: saturate(.78) brightness(.8);
+    transition: transform 1.05s cubic-bezier(.22, 1, .36, 1), filter .8s ease;
+  }
+  .svc-portfolio-carousel .svc-portfolio-slide.is-active .svc-card-showcase img {
+    transform: scale(1);
+    filter: saturate(1.04) brightness(1);
+  }
+  .svc-portfolio-slide .svc-card-showcase--wide .svc-project-cover {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 24px;
+  }
+  .svc-portfolio-slide .svc-card-showcase--wide::after {
+    inset: 0;
+    z-index: 2;
+    height: auto;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba(3,7,18,.03) 18%, rgba(3,7,18,.58) 100%);
+    filter: none;
+  }
+  .svc-project-logo {
+    position: absolute;
+    left: 22px;
+    bottom: 20px;
+    z-index: 3;
+    width: clamp(112px, 25%, 164px);
+    height: clamp(62px, 27%, 84px);
+    display: grid;
+    place-items: center;
+    padding: 9px 12px;
+    border: 1px solid rgba(255,255,255,.24);
+    border-radius: 16px;
+    background: rgba(3,7,18,.56);
+    box-shadow:
+      0 12px 30px rgba(0,0,0,.34),
+      inset 0 1px 0 rgba(255,255,255,.14);
+    backdrop-filter: blur(10px);
+  }
+  .svc-project-logo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    object-fit: contain;
+    border-radius: 0;
+    filter: drop-shadow(0 6px 12px rgba(0,0,0,.48));
+  }
+  .svc-portfolio-carousel .svc-project-logo img,
+  .svc-portfolio-carousel:hover .svc-portfolio-slide.is-active .svc-project-logo img {
+    transform: none;
+    filter: drop-shadow(0 6px 12px rgba(0,0,0,.48));
+    transition: none;
+  }
+  .svc-project-number {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 3;
+    padding: 7px 10px;
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 999px;
+    color: rgba(255,255,255,.9);
+    background: rgba(3,7,18,.7);
+    box-shadow: 0 10px 30px rgba(0,0,0,.28);
+    backdrop-filter: blur(12px);
+    font-size: .68rem;
+    font-weight: 750;
+    letter-spacing: .13em;
+  }
+  .svc-portfolio-slide h3 {
+    color: rgb(var(--svc-project-accent));
+    text-wrap: balance;
+  }
+  .svc-portfolio-slide > p {
+    flex: 1;
+    margin: 0;
+    line-height: 1.65;
+  }
+  .svc-portfolio-slide > .button {
+    margin-top: auto;
+  }
+  .svc-portfolio-slide .svc-metric {
+    border-color: rgba(var(--svc-project-accent), .16);
+    background: linear-gradient(145deg, rgba(var(--svc-project-accent), .075), rgba(255,255,255,.025));
+  }
+  .svc-portfolio-slide .svc-metric strong {
+    color: rgb(var(--svc-project-accent));
+  }
+  .svc-portfolio-controls {
+    position: relative;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    margin-top: 4px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255,255,255,.07);
+  }
+  .svc-portfolio-carousel .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .svc-portfolio-arrow,
+  .svc-portfolio-toggle,
+  .svc-portfolio-dot {
+    appearance: none;
+    border: 1px solid rgba(255,255,255,.12);
+    color: var(--text, #f4f5f7);
+    background: rgba(255,255,255,.035);
+    cursor: pointer;
+    transition: transform .24s ease, border-color .24s ease, background .24s ease, box-shadow .24s ease;
+  }
+  .svc-portfolio-arrow,
+  .svc-portfolio-toggle {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    font: inherit;
+    font-size: .86rem;
+    line-height: 1;
+  }
+  .svc-portfolio-dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-width: 106px;
+  }
+  .svc-portfolio-dot {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border-radius: 999px;
+  }
+  .svc-portfolio-dot.is-active {
+    width: 30px;
+    border-color: rgba(139,250,240,.72);
+    background: linear-gradient(90deg, #8bfaf0, #a78bfa);
+    box-shadow: 0 0 18px rgba(139,250,240,.3);
+  }
+  .svc-portfolio-arrow:hover,
+  .svc-portfolio-toggle:hover,
+  .svc-portfolio-arrow:focus-visible,
+  .svc-portfolio-toggle:focus-visible,
+  .svc-portfolio-dot:focus-visible {
+    transform: translateY(-2px);
+    border-color: rgba(139,250,240,.52);
+    background: rgba(139,250,240,.1);
+    box-shadow: 0 0 0 3px rgba(139,250,240,.1), 0 10px 24px rgba(0,0,0,.24);
+    outline: none;
+  }
+  @keyframes svc-portfolio-sheen {
+    0% { opacity: 0; transform: translateX(-120%); }
+    24% { opacity: .75; }
+    100% { opacity: 0; transform: translateX(120%); }
+  }
+  @keyframes svc-portfolio-aurora {
+    to { transform: rotate(1turn); }
   }
   @keyframes svc-stat-drift {
     0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg); }
@@ -1140,7 +1654,10 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
   @media (prefers-reduced-motion: reduce) {
     .svc-stat-icon,
     .svc-card-icon img,
-    .svc-card-showcase img { animation: none; }
+    .svc-card-showcase img,
+    .svc-portfolio-carousel::before,
+    .svc-portfolio-slide.is-active .svc-card-showcase::before { animation: none; }
+    .svc-portfolio-slide { transition-duration: .01ms; }
   }
   .svc-why-card h3 { margin: 0 0 12px; }
   .svc-why-card .detail-list {
@@ -1251,8 +1768,11 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
   .svc-mobile-cta { display: none; }
 
   .svc-addon:hover .svc-card-icon img,
-  .svc-showcase-card:hover .svc-card-showcase img {
+  .svc-showcase-card:not(.svc-portfolio-carousel):hover .svc-card-showcase img {
     transform: translateY(-4px) scale(1.035);
+  }
+  .svc-portfolio-carousel:hover .svc-portfolio-slide.is-active .svc-card-showcase img {
+    transform: scale(1.025);
   }
 
   /* Responsive */
@@ -1336,6 +1856,55 @@ const premiumBriefHref = `${ROUTES.contact}?product=services&intent=premium`;
     }
     .svc-card-showcase--wide {
       min-height: 214px;
+    }
+    .svc-portfolio-carousel .svc-card-showcase--wide > .svc-project-cover {
+      width: 100%;
+      max-width: none;
+      max-height: none;
+      height: 100%;
+      object-fit: cover;
+    }
+    .svc-project-logo {
+      left: 16px;
+      bottom: 16px;
+      width: 116px;
+      height: 62px;
+      padding: 7px 9px;
+      border-radius: 13px;
+    }
+    .svc-portfolio-slide {
+      gap: 12px;
+    }
+    .svc-portfolio-slide h3 {
+      font-size: 1.12rem;
+    }
+    .svc-portfolio-carousel .svc-metrics-row {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .svc-portfolio-carousel .svc-metric {
+      min-width: 0;
+      padding: 11px 5px;
+      border-radius: 12px;
+    }
+    .svc-portfolio-carousel .svc-metric strong {
+      font-size: .9rem;
+      line-height: 1.15;
+    }
+    .svc-portfolio-carousel .svc-metric span {
+      margin-top: 5px;
+      font-size: .56rem;
+      line-height: 1.35;
+      letter-spacing: .055em;
+    }
+    .svc-portfolio-controls {
+      gap: 7px;
+    }
+    .svc-portfolio-arrow,
+    .svc-portfolio-toggle {
+      width: 40px;
+      height: 40px;
     }
     .svc-card-showcase--small img {
       max-width: 260px;

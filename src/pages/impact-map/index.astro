@@ -1,0 +1,485 @@
+---
+import FaviconHead from "../../components/FaviconHead.astro";
+import { ROUTES } from "../../data/routes";
+import "../../styles/galaxy-bgs.css";
+
+const mapOptions = [
+  {
+    id: "build",
+    label: { en: "Build something public", pt: "Construir algo público" },
+    copy: { en: "A page, site, campaign or product surface needs to exist.", pt: "Uma página, site, campanha ou superfície de produto precisa existir." },
+    surface: "Builder",
+    surfaceCopy: { en: "Create and publish the first clear version.", pt: "Crie e publique a primeira versão clara." },
+    href: ROUTES.builder,
+    metric: { en: "A useful first version is published.", pt: "Uma primeira versão útil é publicada." },
+    tone: "cyan",
+  },
+  {
+    id: "organize",
+    label: { en: "Organize the work", pt: "Organizar o trabalho" },
+    copy: { en: "The next actions, context or routines are getting lost.", pt: "As próximas ações, o contexto ou as rotinas estão se perdendo." },
+    surface: "Daily",
+    surfaceCopy: { en: "Turn the intention into visible next actions.", pt: "Transforme a intenção em próximas ações visíveis." },
+    href: ROUTES.daily,
+    metric: { en: "The next action is completed with less friction.", pt: "A próxima ação é concluída com menos atrito." },
+    tone: "violet",
+  },
+  {
+    id: "refine",
+    label: { en: "Refine the assets", pt: "Refinar os ativos" },
+    copy: { en: "Images, QR projects or creative materials are blocking progress.", pt: "Imagens, projetos QR ou materiais criativos estão bloqueando o avanço." },
+    surface: "Lab",
+    surfaceCopy: { en: "Prepare the assets needed for the next move.", pt: "Prepare os ativos necessários para o próximo passo." },
+    href: ROUTES.lab,
+    metric: { en: "The required asset is ready to use.", pt: "O ativo necessário está pronto para uso." },
+    tone: "gold",
+  },
+  {
+    id: "connect",
+    label: { en: "Find people or resources", pt: "Encontrar pessoas ou recursos" },
+    copy: { en: "Progress depends on a person, opportunity, expert or resource.", pt: "O avanço depende de uma pessoa, oportunidade, especialista ou recurso." },
+    surface: "World",
+    surfaceCopy: { en: "Discover the people and resources around the work.", pt: "Descubra as pessoas e os recursos ao redor do trabalho." },
+    href: ROUTES.world,
+    metric: { en: "One relevant connection or resource is identified.", pt: "Uma conexão ou recurso relevante é identificado." },
+    tone: "cyan",
+  },
+  {
+    id: "partner",
+    label: { en: "Work with an expert", pt: "Trabalhar com um especialista" },
+    copy: { en: "You need strategy, design or implementation support to move forward.", pt: "Você precisa de apoio de estratégia, design ou implementação para avançar." },
+    surface: "Services",
+    surfaceCopy: { en: "Turn the challenge into a focused project brief.", pt: "Transforme o desafio em um briefing de projeto focado." },
+    href: ROUTES.services,
+    metric: { en: "A clear brief and responsible next step are agreed.", pt: "Um briefing claro e um próximo passo responsável são acordados." },
+    tone: "violet",
+  },
+  {
+    id: "learn",
+    label: { en: "Learn by building", pt: "Aprender construindo" },
+    copy: { en: "You want a guided path to understand and make the work yourself.", pt: "Você quer uma trilha guiada para entender e fazer o trabalho por conta própria." },
+    surface: "Dev Journey",
+    surfaceCopy: { en: "Start with a practical, guided learning path.", pt: "Comece com uma trilha prática e guiada de aprendizado." },
+    href: ROUTES.devJourney,
+    metric: { en: "One practical capability is completed and evidenced.", pt: "Uma capacidade prática é concluída e registrada." },
+    tone: "gold",
+  },
+] as const;
+
+const contexts = [
+  { id: "personal", en: "Personal project", pt: "Projeto pessoal", detailEn: "Something you are making or changing for yourself.", detailPt: "Algo que você está criando ou mudando para você." },
+  { id: "independent", en: "Independent work or business", pt: "Trabalho ou negócio independente", detailEn: "Your practice, offer, portfolio or small business.", detailPt: "Sua prática, oferta, portfólio ou pequeno negócio." },
+  { id: "team", en: "Small team or organization", pt: "Pequena equipe ou organização", detailEn: "Work shared by people with a common goal.", detailPt: "Trabalho compartilhado por pessoas com um objetivo comum." },
+];
+
+const outcomes = [
+  { id: "launch", en: "Launch or publish", pt: "Lançar ou publicar" },
+  { id: "clarity", en: "Gain clarity and momentum", pt: "Ganhar clareza e ritmo" },
+  { id: "reach", en: "Reach or help more people", pt: "Alcançar ou ajudar mais pessoas" },
+  { id: "coordination", en: "Coordinate the next actions", pt: "Coordenar as próximas ações" },
+];
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="VOLYNX Impact Map — transforme uma intenção em um próximo passo responsável." />
+    <link rel="canonical" href="https://volynx.world/impact-map/" />
+    <meta property="og:title" content="VOLYNX Impact Map" />
+    <meta property="og:description" content="Um mapa local e editável para transformar uma intenção em um próximo passo responsável." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://volynx.world/impact-map/" />
+    <title>Impact Map — VOLYNX Core</title>
+    <FaviconHead />
+  </head>
+  <body class="page-impact-map">
+    <div class="ambient ambient--one" aria-hidden="true"></div>
+    <div class="ambient ambient--two" aria-hidden="true"></div>
+    <div class="starfield" aria-hidden="true"></div>
+    <div class="galaxyfield" aria-hidden="true"></div>
+
+    <header class="impact-header">
+      <a class="impact-brand" href={ROUTES.core} aria-label="VOLYNX Core home">
+        <img src="/assets/V.webp" alt="" width="40" height="40" />
+        <span>VOLYNX <small>CORE</small></span>
+      </a>
+      <div class="impact-header__actions">
+        <a href={ROUTES.core} data-en="Back to Core" data-pt="Voltar ao Core">Voltar ao Core</a>
+        <button type="button" data-language-toggle aria-label="Mudar idioma">PT / EN</button>
+      </div>
+    </header>
+
+    <main class="impact-shell">
+      <section class="impact-intro" aria-labelledby="impact-title">
+        <p class="eyebrow"><span class="eyebrow__signal" aria-hidden="true"></span><span data-en="VOLYNX Impact Map" data-pt="VOLYNX Impact Map">VOLYNX Impact Map</span></p>
+        <h1 id="impact-title"><span data-en="Make the next step visible." data-pt="Torne o próximo passo visível.">Torne o próximo passo visível.</span> <em data-en="Then make it real." data-pt="Depois, torne-o real.">Depois, torne-o real.</em></h1>
+        <p class="impact-intro__lead" data-en="A short, local-first planning flow. No account, payment or AI claim is required to begin." data-pt="Um fluxo curto de planejamento local-first. Você não precisa de conta, pagamento ou promessa de IA para começar.">Um fluxo curto de planejamento local-first. Você não precisa de conta, pagamento ou promessa de IA para começar.</p>
+      </section>
+
+      <section class="impact-flow" aria-labelledby="flow-title">
+        <div class="impact-flow__rail" aria-hidden="true">
+          <span class="is-active" data-step-rail="1">01</span>
+          <i></i>
+          <span data-step-rail="2">02</span>
+          <i></i>
+          <span data-step-rail="3">03</span>
+        </div>
+
+        <div class="impact-panel" data-impact-panel>
+          <div class="impact-progress">
+            <span data-en="Step" data-pt="Etapa">Etapa</span> <strong data-current-step>1</strong><span data-en="of 3" data-pt="de 3"> de 3</span>
+          </div>
+          <form id="impactForm" novalidate>
+            <fieldset data-step="1">
+              <legend id="flow-title" data-en="What are you trying to make possible?" data-pt="O que você está tentando tornar possível?">O que você está tentando tornar possível?</legend>
+              <p class="impact-hint" data-en="Use your own words. A sentence is enough to start." data-pt="Use suas próprias palavras. Uma frase é suficiente para começar.">Use suas próprias palavras. Uma frase é suficiente para começar.</p>
+              <label for="intention" data-en="Your intention" data-pt="Sua intenção">Sua intenção</label>
+              <textarea id="intention" name="intention" rows="5" maxlength="500" required placeholder="Ex.: Quero lançar uma página clara para explicar meu novo serviço." data-placeholder-en="Ex.: I want to launch a clear page to explain my new service." data-placeholder-pt="Ex.: Quero lançar uma página clara para explicar meu novo serviço."></textarea>
+              <div class="field-meta"><span data-intention-status>0</span> / 500</div>
+            </fieldset>
+
+            <fieldset data-step="2" hidden>
+              <legend data-en="Where does this work live?" data-pt="Onde esse trabalho acontece?">Onde esse trabalho acontece?</legend>
+              <p class="impact-hint" data-en="This keeps the map grounded in your real context." data-pt="Isso mantém o mapa conectado ao seu contexto real.">Isso mantém o mapa conectado ao seu contexto real.</p>
+              <div class="choice-grid">
+                {contexts.map((context) => (
+                  <label class="choice-card">
+                    <input type="radio" name="context" value={context.id} required />
+                    <span><strong data-en={context.en} data-pt={context.pt}>{context.pt}</strong><small data-en={context.detailEn} data-pt={context.detailPt}>{context.detailPt}</small></span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <fieldset data-step="3" hidden>
+              <legend data-en="What would be different afterwards?" data-pt="O que estaria diferente depois?">O que estaria diferente depois?</legend>
+              <p class="impact-hint" data-en="Choose the first useful outcome, not the biggest possible claim." data-pt="Escolha o primeiro resultado útil, não a maior promessa possível.">Escolha o primeiro resultado útil, não a maior promessa possível.</p>
+              <div class="choice-grid choice-grid--outcomes">
+                {outcomes.map((outcome) => (
+                  <label class="choice-card">
+                    <input type="radio" name="outcome" value={outcome.id} required />
+                    <span><strong data-en={outcome.en} data-pt={outcome.pt}>{outcome.pt}</strong></span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <p class="impact-error" role="alert" data-impact-error hidden></p>
+            <div class="impact-actions">
+              <button type="button" class="button button--quiet" data-impact-back hidden data-en="Back" data-pt="Voltar">Voltar</button>
+              <button type="button" class="button button--primary" data-impact-next data-en="Continue" data-pt="Continuar">Continuar</button>
+            </div>
+          </form>
+          <p class="impact-privacy" data-storage-status data-en="Your draft stays in this browser. Cloud sync is not used in this first version." data-pt="Seu rascunho fica neste navegador. A sincronização cloud não é usada nesta primeira versão.">Seu rascunho fica neste navegador. A sincronização cloud não é usada nesta primeira versão.</p>
+        </div>
+      </section>
+
+      <section class="impact-result" data-impact-result hidden aria-labelledby="result-title" tabindex="-1">
+        <div class="result-head">
+          <div>
+            <p class="eyebrow" data-en="Your working map" data-pt="Seu mapa de trabalho">Seu mapa de trabalho</p>
+            <h2 id="result-title" data-en="A responsible next move, not a grand promise." data-pt="Um próximo movimento responsável, não uma grande promessa.">Um próximo movimento responsável, não uma grande promessa.</h2>
+          </div>
+          <span class="result-state" data-en="Local draft" data-pt="Rascunho local">Rascunho local</span>
+        </div>
+        <div class="map-grid">
+          <article><span data-en="PROBLEM" data-pt="PROBLEMA">PROBLEMA</span><p data-map-intention></p></article>
+          <article><span data-en="CONTEXT" data-pt="CONTEXTO">CONTEXTO</span><p data-map-context></p></article>
+          <article class="map-grid__action"><span data-en="PROPOSED ACTION" data-pt="AÇÃO PROPOSTA">AÇÃO PROPOSTA</span><strong data-map-surface></strong><p data-map-surface-copy></p></article>
+          <article><span data-en="FIRST OUTCOME" data-pt="PRIMEIRO RESULTADO">PRIMEIRO RESULTADO</span><p data-map-outcome></p></article>
+          <article><span data-en="EVIDENCE TO LOOK FOR" data-pt="EVIDÊNCIA A OBSERVAR">EVIDÊNCIA A OBSERVAR</span><p data-map-metric></p></article>
+          <article><span data-en="BOUNDARY" data-pt="LIMITE">LIMITE</span><p data-en="This is a planning hypothesis. Validate it with the people, constraints and evidence in the real work." data-pt="Este é um plano de trabalho. Valide-o com as pessoas, limites e evidências do trabalho real.">Este é um plano de trabalho. Valide-o com as pessoas, limites e evidências do trabalho real.</p></article>
+        </div>
+        <div class="result-actions">
+          <a class="button button--primary" data-map-open href={ROUTES.builder} data-en="Open the next surface" data-pt="Abrir a próxima superfície">Abrir a próxima superfície</a>
+          <button type="button" class="button button--quiet" data-map-edit data-en="Edit map" data-pt="Editar mapa">Editar mapa</button>
+          <button type="button" class="text-button" data-map-reset data-en="Reject and start again" data-pt="Rejeitar e começar de novo">Rejeitar e começar de novo</button>
+        </div>
+        <p class="impact-result__note" data-en="You remain the decision-maker. VOLYNX only helps make the next step clearer." data-pt="Você continua tomando as decisões. A VOLYNX apenas ajuda a tornar o próximo passo mais claro.">Você continua tomando as decisões. A VOLYNX apenas ajuda a tornar o próximo passo mais claro.</p>
+      </section>
+    </main>
+
+    <script define:vars={{ mapOptions, contexts, outcomes }}>
+      (() => {
+        const root = document.documentElement;
+        const languageToggle = document.querySelector("[data-language-toggle]");
+        const form = document.querySelector("#impactForm");
+        const fields = [...document.querySelectorAll("[data-step]")];
+        const nextButton = document.querySelector("[data-impact-next]");
+        const backButton = document.querySelector("[data-impact-back]");
+        const error = document.querySelector("[data-impact-error]");
+        const panel = document.querySelector("[data-impact-panel]");
+        const result = document.querySelector("[data-impact-result]");
+        const stepNumber = document.querySelector("[data-current-step]");
+        const intention = document.querySelector("#intention");
+        const storageNote = document.querySelector("[data-storage-status]");
+        const storageKey = "volynx_impact_map_v1";
+        let storage = null;
+        try {
+          if (typeof window.localStorage !== "undefined") {
+            const candidate = window.localStorage;
+            const probeKey = "volynx_impact_map_storage_probe";
+            candidate.setItem(probeKey, "1");
+            candidate.removeItem(probeKey);
+            storage = candidate;
+          }
+        } catch (_) {}
+        let currentStep = 1;
+        let activeMapData = null;
+
+        const language = () => root.lang.startsWith("pt") ? "pt" : "en";
+        const setLanguage = (nextLanguage) => {
+          const selected = nextLanguage === "pt" ? "pt" : "en";
+          root.lang = selected === "pt" ? "pt-BR" : "en";
+          document.querySelectorAll("[data-en][data-pt]").forEach((node) => {
+            node.textContent = node.dataset[selected] || node.textContent;
+          });
+          document.querySelectorAll("[data-placeholder-en][data-placeholder-pt]").forEach((node) => {
+            node.setAttribute("placeholder", node.dataset[`placeholder${selected === "pt" ? "Pt" : "En"}`] || node.getAttribute("placeholder") || "");
+          });
+          if (languageToggle) languageToggle.textContent = selected === "pt" ? "PT / EN" : "EN / PT";
+          if (activeMapData) renderMap(activeMapData);
+          try { storage?.setItem("volynx_impact_map_language", selected); } catch (_) {}
+        };
+
+        const syncStorageNote = () => {
+          if (!storageNote || storage) return;
+          storageNote.textContent = language() === "pt"
+            ? "Este navegador não permite salvar rascunhos. O mapa continua funcional nesta sessão; a sincronização cloud não é usada."
+            : "This browser does not allow draft storage. The map remains functional in this session; cloud sync is not used.";
+        };
+
+        const announce = (message) => {
+          if (!error) return;
+          error.hidden = !message;
+          error.textContent = message;
+        };
+
+        const copy = (value) => value?.[language()] || value?.en || "";
+        const selectedValue = (name) => form?.querySelector(`input[name="${name}"]:checked`)?.value || "";
+        const selectedOption = (options, value) => options.find((option) => option.id === value);
+        const activeField = () => fields[currentStep - 1];
+
+        const recommendPath = (objective, contextId, outcomeId) => {
+          const words = objective.toLowerCase();
+          if (/\b(qr|imagem|imagens|image|images|ativo|ativos|asset|assets)\b/.test(words)) return "refine";
+          if (/\b(aprender|aprendizado|curso|cursos|learn|learning|study|estudar)\b/.test(words)) return "learn";
+          if (/\b(especialista|especialistas|expert|experts|ajuda|help|design|designer|desenvolver|desenvolvimento)\b/.test(words)) return "partner";
+          if (outcomeId === "launch") return "build";
+          if (outcomeId === "reach") return "connect";
+          if (outcomeId === "coordination") return contextId === "team" ? "partner" : "organize";
+          return contextId === "personal" ? "learn" : "organize";
+        };
+
+        const renderMap = (data) => {
+          const selectedContext = selectedOption(contexts, data.context);
+          const selectedOutcome = selectedOption(outcomes, data.outcome);
+          const selectedMap = selectedOption(mapOptions, data.path) || mapOptions[0];
+          const write = (selector, text) => { const node = document.querySelector(selector); if (node) node.textContent = text; };
+          write("[data-map-intention]", data.intention);
+          write("[data-map-context]", copy(selectedContext));
+          write("[data-map-surface]", selectedMap.surface);
+          write("[data-map-surface-copy]", copy(selectedMap.surfaceCopy));
+          write("[data-map-outcome]", copy(selectedOutcome));
+          write("[data-map-metric]", copy(selectedMap.metric));
+          const open = document.querySelector("[data-map-open]");
+          if (open) { open.href = selectedMap.href; open.textContent = language() === "pt" ? `Abrir ${selectedMap.surface}` : `Open ${selectedMap.surface}`; }
+        };
+
+        const syncStep = () => {
+          fields.forEach((field, index) => { field.hidden = index !== currentStep - 1; });
+          document.querySelectorAll("[data-step-rail]").forEach((rail) => {
+            const value = Number(rail.dataset.stepRail);
+            rail.classList.toggle("is-active", value === currentStep);
+            rail.classList.toggle("is-complete", value < currentStep);
+          });
+          if (stepNumber) stepNumber.textContent = String(currentStep);
+          if (backButton) backButton.hidden = currentStep === 1;
+          if (nextButton) nextButton.textContent = currentStep === fields.length ? (language() === "pt" ? "Criar mapa" : "Create map") : (language() === "pt" ? "Continuar" : "Continue");
+          announce("");
+        };
+
+        const validateStep = () => {
+          const field = activeField();
+          const controls = [...field.querySelectorAll("textarea, input")];
+          const valid = controls.some((control) => control.type === "radio" ? control.checked : control.value.trim().length >= 10);
+          if (valid) return true;
+          announce(language() === "pt" ? (currentStep === 1 ? "Escreva pelo menos uma frase sobre o que você quer tornar possível." : "Escolha uma opção para continuar.") : (currentStep === 1 ? "Write at least one sentence about what you want to make possible." : "Choose an option to continue."));
+          controls.find((control) => control.type === "radio" ? control.name && !field.querySelector(`input[name="${control.name}"]:checked`) : !control.value.trim())?.focus();
+          return false;
+        };
+
+        const save = (data) => {
+          if (!storage) return;
+          try { storage.setItem(storageKey, JSON.stringify({ ...data, savedAt: new Date().toISOString() })); } catch (_) { storage = null; syncStorageNote(); }
+        };
+
+        const showResult = () => {
+          const selectedContext = selectedOption(contexts, selectedValue("context"));
+          const selectedOutcome = selectedOption(outcomes, selectedValue("outcome"));
+          const contextId = selectedContext?.id || contexts[0].id;
+          const outcomeId = selectedOutcome?.id || outcomes[0].id;
+          const selectedMap = selectedOption(mapOptions, recommendPath(intention?.value.trim() || "", contextId, outcomeId)) || mapOptions[0];
+          const data = {
+            intention: intention?.value.trim() || "",
+            context: contextId,
+            outcome: outcomeId,
+            path: selectedMap.id,
+          };
+          save(data);
+          activeMapData = data;
+          renderMap(data);
+          if (panel) panel.hidden = true;
+          if (result) { result.hidden = false; result.focus?.(); }
+        };
+
+        const restore = () => {
+          if (!storage) return;
+          try {
+            const saved = JSON.parse(storage.getItem(storageKey) || "null");
+            if (!saved) return;
+            if (intention) intention.value = typeof saved.intention === "string" ? saved.intention : "";
+            ["context", "outcome"].forEach((name) => {
+              const input = form?.querySelector(`input[name="${name}"][value="${saved[name]}"]`);
+              if (input) input.checked = true;
+            });
+            if (intention) intention.dispatchEvent(new Event("input"));
+          } catch (_) {}
+        };
+
+        intention?.addEventListener("input", () => {
+          const count = document.querySelector("[data-intention-status]");
+          if (count) count.textContent = String(intention.value.length);
+        });
+        nextButton?.addEventListener("click", () => {
+          if (!validateStep()) return;
+          if (currentStep < fields.length) { currentStep += 1; syncStep(); activeField()?.querySelector("input, textarea")?.focus(); return; }
+          showResult();
+        });
+        backButton?.addEventListener("click", () => { if (currentStep > 1) { currentStep -= 1; syncStep(); activeField()?.querySelector("input, textarea")?.focus(); } });
+        document.querySelector("[data-map-edit]")?.addEventListener("click", () => { if (result) result.hidden = true; if (panel) panel.hidden = false; currentStep = 1; syncStep(); intention?.focus(); });
+        document.querySelector("[data-map-reset]")?.addEventListener("click", () => {
+          try { storage?.removeItem(storageKey); } catch (_) {}
+          form?.reset();
+          if (result) result.hidden = true;
+          if (panel) panel.hidden = false;
+          currentStep = 1;
+          if (intention) intention.value = "";
+          intention?.dispatchEvent(new Event("input"));
+          syncStep();
+          intention?.focus();
+        });
+        languageToggle?.addEventListener("click", () => setLanguage(language() === "pt" ? "en" : "pt"));
+        try { setLanguage(storage?.getItem("volynx_impact_map_language") || "pt"); } catch (_) { setLanguage("pt"); }
+        syncStorageNote();
+        restore();
+        syncStep();
+      })();
+    </script>
+
+    <style>
+      :root {
+        --impact-bg: #050711;
+        --impact-panel: rgba(12, 17, 34, .76);
+        --impact-line: rgba(193, 214, 255, .16);
+        --impact-soft: rgba(221, 229, 248, .7);
+        --impact-cyan: #8bfaf0;
+        --impact-violet: #bda4ff;
+        --impact-gold: #eed38c;
+      }
+      *, *::before, *::after { box-sizing: border-box; }
+      html { min-width: 320px; scroll-behavior: smooth; background: var(--impact-bg); }
+      body.page-impact-map { min-width: 320px; min-height: 100vh; margin: 0; overflow-x: hidden; color: #f2f5ff; background: var(--impact-bg); font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+      body.page-impact-map::selection { color: #041016; background: var(--impact-cyan); }
+      .ambient, .starfield, .galaxyfield { position: fixed; inset: 0; pointer-events: none; }
+      .ambient--one { background: radial-gradient(circle at 10% 10%, rgba(82, 173, 255, .15), transparent 30%); }
+      .ambient--two { background: radial-gradient(circle at 90% 90%, rgba(161, 99, 255, .15), transparent 34%); }
+      .starfield { opacity: .4; background-image: radial-gradient(circle, rgba(255,255,255,.7) 0 1px, transparent 1.2px); background-size: 132px 132px; }
+      .galaxyfield { opacity: .16; background: radial-gradient(ellipse at 50% 10%, rgba(81, 139, 255, .34), transparent 48%), radial-gradient(ellipse at 80% 65%, rgba(161, 99, 255, .2), transparent 35%); }
+      .impact-header { position: relative; z-index: 2; max-width: 1180px; margin: 0 auto; padding: 24px 28px; display: flex; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--impact-line); }
+      .impact-brand { display: inline-flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; font-size: .82rem; font-weight: 800; letter-spacing: .12em; }
+      .impact-brand img { width: 38px; height: 38px; object-fit: contain; }
+      .impact-brand small { display: block; margin-top: 3px; color: var(--impact-cyan); font-size: .52rem; letter-spacing: .24em; }
+      .impact-header__actions { display: flex; align-items: center; gap: 18px; }
+      .impact-header__actions a, .impact-header__actions button { color: var(--impact-soft); background: transparent; border: 0; font: inherit; font-size: .72rem; text-decoration: none; cursor: pointer; }
+      .impact-header__actions button { padding: 10px 13px; border: 1px solid var(--impact-line); border-radius: 999px; color: #fff; }
+      .impact-shell { position: relative; z-index: 1; width: min(100% - 40px, 1040px); margin: 0 auto; padding: 82px 0 120px; }
+      .impact-intro { max-width: 720px; margin-bottom: 62px; }
+      .eyebrow { display: flex; align-items: center; gap: 9px; margin: 0 0 18px; color: var(--impact-cyan); font-size: .66rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+      .eyebrow__signal { width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 20px currentColor; }
+      .impact-intro h1 { max-width: 720px; margin: 0; font-size: clamp(2.7rem, 7vw, 6.4rem); line-height: .96; letter-spacing: -.075em; }
+      .impact-intro h1 em { display: block; color: var(--impact-violet); font-style: normal; }
+      .impact-intro__lead { max-width: 580px; margin: 28px 0 0; color: var(--impact-soft); font-size: 1.02rem; line-height: 1.7; }
+      .impact-flow { display: grid; grid-template-columns: 50px minmax(0, 1fr); gap: 26px; align-items: start; }
+      .impact-flow__rail { display: grid; justify-items: center; gap: 9px; padding-top: 19px; color: rgba(220,230,255,.4); font: 700 .66rem/1 ui-monospace, monospace; letter-spacing: .1em; }
+      .impact-flow__rail span { display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid var(--impact-line); border-radius: 50%; transition: color .2s ease, border-color .2s ease, background .2s ease; }
+      .impact-flow__rail span.is-active { color: #061117; border-color: var(--impact-cyan); background: var(--impact-cyan); }
+      .impact-flow__rail span.is-complete { color: var(--impact-cyan); border-color: rgba(139,250,240,.5); }
+      .impact-flow__rail i { width: 1px; height: 62px; background: linear-gradient(var(--impact-line), transparent); }
+      .impact-panel, .impact-result { padding: clamp(24px, 5vw, 54px); border: 1px solid var(--impact-line); border-radius: 26px; background: linear-gradient(145deg, rgba(19, 29, 57, .88), var(--impact-panel)); box-shadow: 0 28px 90px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.06); }
+      .impact-progress { display: flex; align-items: center; gap: 5px; margin-bottom: 34px; color: rgba(220,230,255,.55); font: .68rem/1 ui-monospace, monospace; letter-spacing: .14em; text-transform: uppercase; }
+      .impact-progress strong { color: var(--impact-cyan); }
+      fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+      legend { max-width: 650px; padding: 0; color: #fff; font-size: clamp(1.75rem, 4vw, 3.3rem); font-weight: 750; line-height: 1.03; letter-spacing: -.055em; }
+      .impact-hint { max-width: 540px; margin: 16px 0 30px; color: var(--impact-soft); line-height: 1.6; }
+      label[for="intention"] { display: block; margin-bottom: 9px; color: var(--impact-cyan); font-size: .7rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+      textarea { width: 100%; min-height: 148px; resize: vertical; padding: 17px; border: 1px solid rgba(139,250,240,.25); border-radius: 16px; outline: 0; color: #fff; background: rgba(0,0,0,.2); font: inherit; line-height: 1.55; }
+      textarea::placeholder { color: rgba(220,230,255,.42); }
+      textarea:focus { border-color: var(--impact-cyan); box-shadow: 0 0 0 3px rgba(139,250,240,.12); }
+      .field-meta { margin-top: 7px; color: rgba(220,230,255,.44); font: .68rem ui-monospace, monospace; text-align: right; }
+      .choice-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+      .choice-grid--outcomes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .choice-card { position: relative; min-height: 122px; cursor: pointer; }
+      .choice-card input { position: absolute; opacity: 0; }
+      .choice-card > span { min-height: 100%; display: flex; flex-direction: column; gap: 10px; padding: 18px; border: 1px solid var(--impact-line); border-radius: 16px; color: #fff; background: rgba(255,255,255,.025); transition: border-color .2s ease, background .2s ease, transform .2s ease; }
+      .choice-card strong { font-size: .94rem; line-height: 1.3; }
+      .choice-card small { color: var(--impact-soft); line-height: 1.45; }
+      .choice-card input:checked + span { border-color: var(--impact-cyan); background: rgba(139,250,240,.1); box-shadow: 0 0 0 3px rgba(139,250,240,.09); transform: translateY(-2px); }
+      .choice-card input:focus-visible + span { outline: 2px solid var(--impact-cyan); outline-offset: 3px; }
+      .impact-error { margin: 20px 0 0; color: #ffb0b0; font-size: .84rem; line-height: 1.5; }
+      .impact-actions, .result-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+      .button { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 19px; border: 1px solid transparent; border-radius: 999px; font: 700 .8rem/1 inherit; text-decoration: none; cursor: pointer; }
+      .button--primary { color: #061117; background: linear-gradient(100deg, var(--impact-cyan), #d5fff8); box-shadow: 0 10px 28px rgba(139,250,240,.15); }
+      .button--quiet { color: #fff; border-color: var(--impact-line); background: rgba(255,255,255,.035); }
+      .button:hover, .button:focus-visible { transform: translateY(-2px); outline: none; }
+      .impact-privacy, .impact-result__note { margin: 30px 0 0; color: rgba(220,230,255,.48); font-size: .72rem; line-height: 1.5; }
+      .impact-result[hidden], .impact-panel[hidden] { display: none; }
+      .result-head { display: flex; align-items: start; justify-content: space-between; gap: 24px; margin-bottom: 34px; }
+      .result-head .eyebrow { margin-bottom: 12px; }
+      .result-head h2 { max-width: 660px; margin: 0; font-size: clamp(1.8rem, 4vw, 3.25rem); line-height: 1.05; letter-spacing: -.06em; }
+      .result-state { flex: 0 0 auto; padding: 8px 11px; border: 1px solid rgba(139,250,240,.25); border-radius: 999px; color: var(--impact-cyan); font: .62rem ui-monospace, monospace; letter-spacing: .1em; text-transform: uppercase; }
+      .map-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+      .map-grid article { min-height: 136px; padding: 19px; border: 1px solid rgba(220,230,255,.1); border-radius: 15px; background: rgba(0,0,0,.16); }
+      .map-grid article > span { color: var(--impact-cyan); font: 700 .61rem ui-monospace, monospace; letter-spacing: .13em; }
+      .map-grid article p { margin: 12px 0 0; color: var(--impact-soft); line-height: 1.55; }
+      .map-grid article strong { display: block; margin-top: 13px; color: #fff; font-size: 1.2rem; }
+      .map-grid .map-grid__action { border-color: rgba(139,250,240,.25); background: linear-gradient(145deg, rgba(139,250,240,.11), rgba(255,255,255,.025)); }
+      .text-button { padding: 9px 0; border: 0; color: rgba(220,230,255,.64); background: transparent; font: .76rem/1.4 inherit; text-decoration: underline; cursor: pointer; }
+      .text-button:hover, .text-button:focus-visible { color: #fff; }
+      @media (max-width: 720px) {
+        .impact-header { padding: 18px 20px; }
+        .impact-header__actions { gap: 10px; }
+        .impact-header__actions a { display: none; }
+        .impact-shell { width: min(100% - 28px, 620px); padding-top: 56px; }
+        .impact-intro { margin-bottom: 42px; }
+        .impact-intro h1 { font-size: clamp(2.65rem, 13vw, 4.8rem); }
+        .impact-flow { grid-template-columns: 1fr; gap: 12px; }
+        .impact-flow__rail { display: flex; align-items: center; justify-content: flex-start; gap: 8px; padding: 0 0 8px 3px; }
+        .impact-flow__rail i { width: 36px; height: 1px; align-self: center; background: linear-gradient(90deg, var(--impact-line), transparent); }
+        .impact-panel, .impact-result { padding: 25px 19px; border-radius: 21px; }
+        .choice-grid, .choice-grid--outcomes, .map-grid { grid-template-columns: 1fr; }
+        .choice-card { min-height: 0; }
+        .choice-card > span { min-height: 86px; }
+        .result-head { display: block; }
+        .result-state { display: inline-block; margin-top: 18px; }
+        .impact-actions .button, .result-actions .button { flex: 1 1 auto; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        .button:hover, .button:focus-visible, .choice-card input:checked + span { transform: none; }
+      }
+    </style>
+  </body>
+</html>

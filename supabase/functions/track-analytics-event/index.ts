@@ -5,6 +5,8 @@ const ALLOWED_ORIGINS = new Set([
   "https://volynx.world",
   "http://127.0.0.1:4321",
   "http://localhost:4321",
+  "http://127.0.0.1:4324",
+  "http://localhost:4324",
 ]);
 
 const EVENT_NAMES = new Set([

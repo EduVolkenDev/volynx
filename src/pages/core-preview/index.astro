@@ -72,7 +72,7 @@ const ecosystemSurfaces = [
             A VOLYNX transforma o que você quer mudar em um problema mais claro, um próximo passo responsável e as ferramentas para torná-lo real.
           </p>
           <div class="hero__actions">
-            <a class="button button--primary" href="#begin" data-analytics-event="core_begin_intention" data-en="Start with your intention" data-pt="Começar pela sua intenção">Começar pela sua intenção</a>
+            <a class="button button--primary" href={ROUTES.impactMap} data-analytics-event="core_open_impact_map" data-en="Map my next step" data-pt="Mapear meu próximo passo">Mapear meu próximo passo</a>
             <a class="button button--quiet" href={ROUTES.manifesto} data-analytics-event="core_view_manifesto" data-en="Understand the vision" data-pt="Entender a visão">Entender a visão</a>
           </div>
           <a class="legacy-entry" href={platformHref} data-analytics-event="core_open_workspace">
@@ -172,10 +172,22 @@ const ecosystemSurfaces = [
             <a class="text-link" href={devHubHref} data-analytics-event="core_open_devhub" data-en="Explore VOLYNX tools →" data-pt="Explorar ferramentas VOLYNX →">Explorar ferramentas VOLYNX →</a>
         </div>
         <div class="hub-list">
-          <a href={ROUTES.builder}><span data-en="CREATE" data-pt="CRIAR">CRIAR</span><strong>Builder</strong><small data-en="Create and publish" data-pt="Criar e publicar">Criar e publicar</small></a>
-          <a href={ROUTES.daily}><span data-en="PLAN" data-pt="PLANEJAR">PLANEJAR</span><strong>Daily</strong><small data-en="Plan and focus" data-pt="Planejar e focar">Planejar e focar</small></a>
-          <a href={ROUTES.lab}><span data-en="REFINE" data-pt="REFINAR">REFINAR</span><strong>Lab</strong><small data-en="Create locally" data-pt="Criar localmente">Criar localmente</small></a>
-          <a href={ROUTES.world}><span data-en="DISCOVER" data-pt="DESCOBRIR">DESCOBRIR</span><strong>World</strong><small data-en="Find people and resources" data-pt="Encontrar pessoas e recursos">Encontrar pessoas e recursos</small></a>
+          <a href={ROUTES.builder}>
+            <span class="hub-list__art" aria-hidden="true"><img src="/assets/galaxy/core-surface-builder.webp" alt="" width="640" height="640" loading="lazy" decoding="async" /></span>
+            <span class="hub-list__content"><span data-en="CREATE" data-pt="CRIAR">CRIAR</span><strong>Builder</strong><small data-en="Create and publish" data-pt="Criar e publicar">Criar e publicar</small></span>
+          </a>
+          <a href={ROUTES.daily}>
+            <span class="hub-list__art" aria-hidden="true"><img src="/assets/galaxy/core-surface-daily.webp" alt="" width="640" height="640" loading="lazy" decoding="async" /></span>
+            <span class="hub-list__content"><span data-en="PLAN" data-pt="PLANEJAR">PLANEJAR</span><strong>Daily</strong><small data-en="Plan and focus" data-pt="Planejar e focar">Planejar e focar</small></span>
+          </a>
+          <a href={ROUTES.lab}>
+            <span class="hub-list__art" aria-hidden="true"><img src="/assets/galaxy/core-surface-lab.webp" alt="" width="640" height="640" loading="lazy" decoding="async" /></span>
+            <span class="hub-list__content"><span data-en="REFINE" data-pt="REFINAR">REFINAR</span><strong>Lab</strong><small data-en="Create locally" data-pt="Criar localmente">Criar localmente</small></span>
+          </a>
+          <a href={ROUTES.world}>
+            <span class="hub-list__art" aria-hidden="true"><img src="/assets/galaxy/core-surface-world.webp" alt="" width="640" height="640" loading="lazy" decoding="async" /></span>
+            <span class="hub-list__content"><span data-en="DISCOVER" data-pt="DESCOBRIR">DESCOBRIR</span><strong>World</strong><small data-en="Find people and resources" data-pt="Encontrar pessoas e recursos">Encontrar pessoas e recursos</small></span>
+          </a>
         </div>
       </section>
 
@@ -218,7 +230,7 @@ const ecosystemSurfaces = [
         <p class="eyebrow" data-en="Where VOLYNX is heading" data-pt="Para onde a VOLYNX está indo">Para onde a VOLYNX está indo</p>
         <h2 id="closing-title" data-en="Build what makes a better future more possible." data-pt="Construa o que torna um futuro melhor mais possível.">Construa o que torna um futuro melhor mais possível.</h2>
         <div class="closing__actions">
-          <a class="button button--primary" href="#begin" data-analytics-event="core_begin_journey" data-en="Begin the journey" data-pt="Começar a jornada">Começar a jornada</a>
+          <a class="button button--primary" href={ROUTES.impactMap} data-analytics-event="core_open_impact_map_closing" data-en="Map my next step" data-pt="Mapear meu próximo passo">Mapear meu próximo passo</a>
           <a class="button button--quiet" href={platformHref} data-analytics-event="core_open_platform" data-en="Enter the existing platform" data-pt="Entrar na plataforma atual">Entrar na plataforma atual</a>
           <a class="button button--quiet" href={ROUTES.launch2026} data-analytics-event="core_view_original_story" data-en="See the original story" data-pt="Ver a história original">Ver a história original</a>
         </div>
@@ -367,12 +379,13 @@ const ecosystemSurfaces = [
   .orbit-node--connect:hover, .orbit-node--connect:focus-visible { transform: translateY(calc(-50% - 3px)); }
   .orbit-node__icon { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; color: var(--cyan); background: rgba(110,231,249,.1); }
   .orbit-node--operate .orbit-node__icon, .orbit-node--connect .orbit-node__icon { color: var(--violet); background: rgba(167,139,250,.12); }
-  .signal-label { position: absolute; display: grid; gap: 4px; color: var(--soft); font-size: .58rem; letter-spacing: .2em; }
+  .signal-label { position: absolute; z-index: 1; display: grid; gap: 4px; color: var(--soft); font-size: .58rem; letter-spacing: .2em; pointer-events: none; text-shadow: 0 2px 14px rgba(0,0,0,.55); }
   .signal-label span { color: var(--cyan); }
   .signal-label b { color: var(--ink); font-size: .67rem; font-weight: 800; }
-  .signal-label--top { top: 5%; left: 28%; }
-  .signal-label--right { right: 3%; top: 51%; text-align: left; }
-  .signal-label--bottom { left: 31%; bottom: 4%; }
+  /* Keep the process labels on their own annotation rail so the orbit controls stay readable. */
+  .signal-label--top { top: 12%; left: 7%; }
+  .signal-label--right { right: 5%; top: 64%; text-align: left; }
+  .signal-label--bottom { left: 7%; bottom: 12%; }
   .intro { padding: 64px 0 132px; border-top: 1px solid var(--line); }
   .section-kicker { display: flex; gap: 12px; align-items: center; }
   .section-kicker span:first-child { color: var(--cyan); }
@@ -402,9 +415,20 @@ const ecosystemSurfaces = [
   .handoff { display: grid; grid-template-columns: .95fr 1.05fr; gap: 70px; align-items: center; padding: 72px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
   .handoff h2 { margin: 18px 0; font-size: clamp(2.5rem, 4.8vw, 5rem); }
   .hub-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .hub-list a { min-height: 155px; display: flex; flex-direction: column; justify-content: flex-end; gap: 5px; padding: 20px; border: 1px solid var(--line); background: rgba(255,255,255,.03); transition: border-color .22s ease, transform .22s ease; }
+  .hub-list a { position: relative; min-height: 210px; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; isolation: isolate; padding: 20px; border: 1px solid var(--line); background: linear-gradient(145deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); transition: border-color .22s ease, transform .22s ease; }
+  .hub-list a::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(135deg, rgba(110,231,249,.08), transparent 55%, rgba(167,139,250,.08)); pointer-events: none; }
   .hub-list a:hover, .hub-list a:focus-visible { border-color: rgba(233,215,165,.6); transform: translateY(-3px); }
-  .hub-list span { color: var(--cyan); font-size: .61rem; letter-spacing: .16em; }
+  .hub-list__art { position: absolute; top: -10px; right: -5px; z-index: 0; width: min(57%, 180px); height: 175px; display: grid; place-items: center; opacity: .92; transform: rotate(2deg); transition: transform .42s cubic-bezier(.2,.75,.2,1), opacity .3s ease, filter .3s ease; }
+  .hub-list__art img { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 16px 25px rgba(30,130,255,.2)); }
+  .hub-list a:nth-child(2) .hub-list__art { transform: rotate(-3deg); }
+  .hub-list a:nth-child(3) .hub-list__art { transform: rotate(3deg); }
+  .hub-list a:nth-child(4) .hub-list__art { transform: rotate(-2deg); }
+  .hub-list a:hover .hub-list__art, .hub-list a:focus-visible .hub-list__art { opacity: 1; filter: saturate(1.1) brightness(1.04); transform: translateY(-6px) rotate(4deg) scale(1.06); }
+  .hub-list a:nth-child(2):hover .hub-list__art, .hub-list a:nth-child(2):focus-visible .hub-list__art { transform: translateY(-6px) rotate(-6deg) scale(1.06); }
+  .hub-list a:nth-child(3):hover .hub-list__art, .hub-list a:nth-child(3):focus-visible .hub-list__art { transform: translateY(-6px) rotate(7deg) scale(1.06); }
+  .hub-list a:nth-child(4):hover .hub-list__art, .hub-list a:nth-child(4):focus-visible .hub-list__art { transform: translateY(-6px) rotate(-5deg) scale(1.06); }
+  .hub-list__content { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 5px; max-width: 72%; }
+  .hub-list__content > span { color: var(--cyan); font-size: .61rem; letter-spacing: .16em; }
   .hub-list strong { font-size: 1.7rem; letter-spacing: -.04em; }
   .hub-list small { color: var(--muted); font-size: .76rem; }
   .ecosystem { padding: 126px 0 136px; border-bottom: 1px solid var(--line); }
@@ -472,8 +496,9 @@ const ecosystemSurfaces = [
     .signal-stage__core img { width: 52px; height: 52px; }
     .signal-stage__halo--outer { width: 82%; }
     .signal-stage__caption { bottom: 12%; font-size: .56rem; }
-    .signal-label--top { left: 18%; }
-    .signal-label--right { right: 0; }
+    .signal-label--top { top: 11%; left: 5%; }
+    .signal-label--right { top: 65%; right: 2%; }
+    .signal-label--bottom { left: 5%; bottom: 12%; }
     .path-grid, .future-grid, .hub-list, .surface-grid { grid-template-columns: 1fr; }
     .path-card { min-height: 420px; }
     .path-card__art { width: min(100%, 250px); height: 190px; }

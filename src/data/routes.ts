@@ -9,6 +9,7 @@ export const ROUTES = {
   home: "/",
   core: "/",
   corePreview: "/core-preview/",
+  impactMap: "/impact-map/",
   platform: "/platform/",
   world: "/world/",
   about: "/about/",
