@@ -567,6 +567,35 @@ const portfolioShowcase = [
             <button type="button" class="svc-portfolio-arrow" data-svc-portfolio-next aria-label="Next project" data-i18n-aria="svc2.portfolio_next_aria">→</button>
           </div>
           <p class="sr-only" aria-live="polite" aria-atomic="true" data-svc-portfolio-status></p>
+          <div class="svc-journey-teaser">
+            <a class="svc-journey-teaser__visual" href={ROUTES.devJourney} aria-label="Abrir Dev Journey">
+              <span class="svc-journey-teaser__badge">
+                <span class="i18n-en">FREE COURSE</span>
+                <span class="i18n-pt">CURSO GRÁTIS</span>
+              </span>
+              <img src="/assets/galaxy/core-surface-journey.webp" alt="" width="640" height="640" loading="lazy" decoding="async" />
+            </a>
+            <div class="svc-journey-teaser__copy">
+              <span class="svc-journey-teaser__eyebrow">VOLYNX.Lab Education</span>
+              <h3>
+                <span class="i18n-en">Learn to program by building for real.</span>
+                <span class="i18n-pt">Aprenda a programar construindo de verdade.</span>
+              </h3>
+              <p>
+                <span class="i18n-en">Dev Journey starts free and teaches HTML, CSS and JavaScript through real projects, visible interactions and a publishing checklist. No empty theory: you learn to build.</span>
+                <span class="i18n-pt">O Dev Journey começa grátis e ensina HTML, CSS e JavaScript com projetos reais, interações visíveis e checklist de publicação. Nada de teoria vazia: você aprende a construir.</span>
+              </p>
+              <div class="svc-journey-teaser__proof" aria-label="Dev Journey highlights">
+                <span><strong>£0</strong><small><span class="i18n-en">to start</span><span class="i18n-pt">para começar</span></small></span>
+                <span><strong>HTML · CSS · JS</strong><small><span class="i18n-en">real foundations</span><span class="i18n-pt">fundamentos reais</span></small></span>
+                <span><strong><span class="i18n-en">Real project</span><span class="i18n-pt">Projeto real</span></strong><small><span class="i18n-en">portfolio output</span><span class="i18n-pt">saída de portfólio</span></small></span>
+              </div>
+              <a class="button button--ghost" href={ROUTES.devJourney} data-analytics-event="services_open_devjourney">
+                <span class="i18n-en">Explore Dev Journey →</span>
+                <span class="i18n-pt">Conhecer Dev Journey →</span>
+              </a>
+            </div>
+          </div>
         </article>
       </div>
     </section>
@@ -1556,6 +1585,137 @@ const portfolioShowcase = [
     padding-top: 14px;
     border-top: 1px solid rgba(255,255,255,.07);
   }
+  .svc-journey-teaser {
+    position: relative;
+    z-index: 3;
+    display: grid;
+    grid-template-columns: minmax(148px, .72fr) minmax(0, 1.28fr);
+    gap: 18px;
+    align-items: center;
+    margin-top: 18px;
+    padding: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(139,250,240,.22);
+    border-radius: 20px 7px 20px 7px;
+    background:
+      radial-gradient(circle at 16% 20%, rgba(110,231,249,.18), transparent 42%),
+      linear-gradient(145deg, rgba(20,37,66,.86), rgba(17,11,39,.76));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 18px 42px rgba(0,0,0,.18);
+  }
+  .svc-journey-teaser::after {
+    content: "";
+    position: absolute;
+    inset: auto -8% -55% 30%;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(167,139,250,.18);
+    filter: blur(28px);
+    pointer-events: none;
+  }
+  .svc-journey-teaser__visual {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    min-height: 156px;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 15px 4px 15px 4px;
+    background: rgba(3,7,18,.32);
+    transition: border-color .24s ease, transform .24s ease, background .24s ease;
+  }
+  .svc-journey-teaser__visual:hover,
+  .svc-journey-teaser__visual:focus-visible {
+    border-color: rgba(139,250,240,.62);
+    background: rgba(3,7,18,.48);
+    transform: translateY(-2px);
+  }
+  .svc-journey-teaser__visual img {
+    display: block;
+    width: 122%;
+    height: 122%;
+    object-fit: contain;
+    filter: drop-shadow(0 16px 26px rgba(0,0,0,.38));
+    transition: transform .42s cubic-bezier(.2,.75,.2,1), filter .42s ease;
+  }
+  .svc-journey-teaser__visual:hover img,
+  .svc-journey-teaser__visual:focus-visible img {
+    transform: scale(1.06) rotate(-2deg);
+    filter: drop-shadow(0 20px 32px rgba(0,0,0,.5)) saturate(1.12);
+  }
+  .svc-journey-teaser__badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+    padding: 6px 8px;
+    border: 1px solid rgba(233,215,165,.38);
+    border-radius: 999px;
+    color: var(--gold, #e9d7a5);
+    background: rgba(3,7,18,.76);
+    font-size: .56rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+  }
+  .svc-journey-teaser__copy {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+  }
+  .svc-journey-teaser__eyebrow {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--cyan, #8bfaf0);
+    font-size: .6rem;
+    font-weight: 800;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+  }
+  .svc-journey-teaser h3 {
+    margin: 0 0 9px;
+    color: var(--ink, #f4f5f7);
+    font-size: clamp(1.12rem, 1.8vw, 1.52rem);
+    line-height: 1.08;
+    letter-spacing: -.04em;
+  }
+  .svc-journey-teaser p {
+    margin: 0;
+    color: var(--muted, rgba(209,215,230,.74));
+    font-size: .78rem;
+    line-height: 1.55;
+  }
+  .svc-journey-teaser__proof {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    margin: 13px 0;
+  }
+  .svc-journey-teaser__proof > span {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 3px;
+    padding: 8px 7px;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 10px;
+    background: rgba(255,255,255,.035);
+  }
+  .svc-journey-teaser__proof strong {
+    overflow-wrap: anywhere;
+    color: var(--gold, #e9d7a5);
+    font-size: .68rem;
+    line-height: 1.2;
+  }
+  .svc-journey-teaser__proof small {
+    color: var(--soft, rgba(209,215,230,.48));
+    font-size: .54rem;
+    line-height: 1.25;
+  }
+  .svc-journey-teaser .button {
+    min-height: 40px;
+    padding: 10px 13px;
+    font-size: .64rem;
+  }
   .svc-portfolio-carousel .sr-only {
     position: absolute;
     width: 1px;
@@ -1911,6 +2071,17 @@ const portfolioShowcase = [
     }
     .svc-portfolio-controls {
       gap: 7px;
+    }
+    .svc-journey-teaser {
+      grid-template-columns: 1fr;
+      gap: 14px;
+      padding: 14px;
+    }
+    .svc-journey-teaser__visual {
+      min-height: 148px;
+    }
+    .svc-journey-teaser .button {
+      width: 100%;
     }
     .svc-portfolio-arrow,
     .svc-portfolio-toggle {
