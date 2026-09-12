@@ -106,6 +106,7 @@ Deno.serve(async (req: Request) => {
       checkout_started: 0,
       checkout_redirected: 0,
       checkout_failed: 0,
+      lead_submitted: 0,
       payment_confirmed: 0,
       fulfillment_recorded: 0,
       profiles_created: profilesError ? 0 : (profilesCreated || 0),
@@ -113,13 +114,13 @@ Deno.serve(async (req: Request) => {
     const topPages: Record<string, number> = {};
     const topSources: Record<string, number> = {};
     const topCampaigns: Record<string, number> = {};
-    const daily: Record<string, { visitors: Set<string>; page_views: number; cta_clicks: number; signups: number; checkout_started: number; payment_confirmed: number; fulfillment_recorded: number }> = {};
+    const daily: Record<string, { visitors: Set<string>; page_views: number; cta_clicks: number; signups: number; leads: number; checkout_started: number; payment_confirmed: number; fulfillment_recorded: number }> = {};
 
     for (const event of eventList) {
       const isBrowserEvent = event.event_source !== "server";
       if (isBrowserEvent && event.session_id) sessions.add(event.session_id);
       const day = String(event.occurred_at).slice(0, 10);
-      if (!daily[day]) daily[day] = { visitors: new Set(), page_views: 0, cta_clicks: 0, signups: 0, checkout_started: 0, payment_confirmed: 0, fulfillment_recorded: 0 };
+      if (!daily[day]) daily[day] = { visitors: new Set(), page_views: 0, cta_clicks: 0, signups: 0, leads: 0, checkout_started: 0, payment_confirmed: 0, fulfillment_recorded: 0 };
       if (isBrowserEvent && event.session_id) daily[day].visitors.add(event.session_id);
 
       if (event.event_name === "page_view") {
@@ -143,6 +144,10 @@ Deno.serve(async (req: Request) => {
       }
       if (event.event_name === "checkout_redirected") funnel.checkout_redirected += 1;
       if (event.event_name === "checkout_failed") funnel.checkout_failed += 1;
+      if (event.event_name === "lead_submitted") {
+        funnel.lead_submitted += 1;
+        daily[day].leads += 1;
+      }
       if (event.event_name === "payment_confirmed") {
         funnel.payment_confirmed += 1;
         daily[day].payment_confirmed += 1;
@@ -172,6 +177,7 @@ Deno.serve(async (req: Request) => {
         page_views: item.page_views,
         cta_clicks: item.cta_clicks,
         signups: item.signups,
+        leads: item.leads,
         checkout_started: item.checkout_started,
         payment_confirmed: item.payment_confirmed,
         fulfillment_recorded: item.fulfillment_recorded,

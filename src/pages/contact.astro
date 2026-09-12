@@ -638,6 +638,13 @@ const title = "Contact & Sales — VOLYNX";
         }
 
         // Success — replace form with confirmation
+        var analyticsDetail = { event: 'lead_submitted', detail: { label: data.project_type || 'contact' } };
+        if (window.VxAnalytics && typeof window.VxAnalytics.track === 'function') {
+          window.VxAnalytics.track(analyticsDetail.event, analyticsDetail.detail);
+        } else {
+          window.__volynxAnalyticsQueue = window.__volynxAnalyticsQueue || [];
+          window.__volynxAnalyticsQueue.push(analyticsDetail);
+        }
         form.innerHTML = '<div class="form-success">Thanks, ' + escapeHtml(data.name) + '! Your brief has been received.<br>I will review it and get back to you within 24–48h on business days.</div>';
       } catch (err) {
         // Restore button

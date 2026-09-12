@@ -21,6 +21,7 @@ const EVENT_NAMES = new Set([
   "checkout_started",
   "checkout_redirected",
   "checkout_failed",
+  "lead_submitted",
   "tool_started",
   "activation_started",
   "activation_result",

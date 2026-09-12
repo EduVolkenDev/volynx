@@ -19,6 +19,7 @@ const acquisitionRoutes = [
   "/products/",
   "/pricing/",
   "/services/",
+  "/services/conversion-fix/",
   "/landing/",
   "/about/",
   "/contact/",
