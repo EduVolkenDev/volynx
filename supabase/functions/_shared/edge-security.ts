@@ -35,7 +35,8 @@ export function isAllowedReturnUrl(value: unknown, fallbackOrigin: string): bool
   try {
     const target = new URL(value);
     const fallback = new URL(fallbackOrigin);
-    return target.protocol === fallback.protocol && target.origin === fallback.origin;
+    return (target.protocol === fallback.protocol && target.origin === fallback.origin)
+      || configuredOrigins().includes(target.origin);
   } catch {
     return false;
   }

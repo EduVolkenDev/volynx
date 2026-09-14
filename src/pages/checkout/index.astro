@@ -7,7 +7,7 @@ import { ROUTES } from "../../data/routes";
 
 <FlagshipLayout
   title="Secure Checkout — VOLYNX"
-  description="VOLYNX secure checkout bridge. Validates access, restores auth if needed and redirects into Stripe Checkout."
+  description="VOLYNX secure checkout bridge. Validates access, restores auth if needed and opens the configured payment provider."
   pageClass="page-checkout"
 >
   <FlagshipHeader ctaHref={ROUTES.products} ctaLabel="Browse products" ctaI18n="header.browse_products" />
@@ -17,7 +17,7 @@ import { ROUTES } from "../../data/routes";
       <span class="checkout-kicker"><span class="i18n-en">Secure checkout</span><span class="i18n-pt">Checkout seguro</span></span>
       <h1 id="checkoutTitle"><span class="i18n-en">Preparing your VOLYNX checkout.</span><span class="i18n-pt">Preparando seu checkout VOLYNX.</span></h1>
       <p id="checkoutMessage">
-        <span class="i18n-en">Verifying access, currency and product context before opening Stripe Checkout.</span><span class="i18n-pt">Verificando acesso, moeda e contexto do produto antes de abrir o Stripe Checkout.</span>
+        <span class="i18n-en">Verifying access, currency and product context before opening secure payment.</span><span class="i18n-pt">Verificando acesso, moeda e contexto do produto antes de abrir o pagamento seguro.</span>
       </p>
     </section>
 
@@ -48,7 +48,14 @@ import { ROUTES } from "../../data/routes";
   const lookupBase = String(params.get("lookup_key") || "").trim();
   const requestedCurrency = String(params.get("currency") || "").trim().toLowerCase();
   const requestedNext = String(params.get("next") || "").trim();
-  const checkoutAttemptId = crypto.randomUUID();
+  const requestedPaymentMethod = String(params.get("payment_method") || "").trim().toLowerCase();
+  const paypalReturn = params.get("paypal_return") === "1";
+  const paypalOrderId = String(params.get("paypal_order_id") || params.get("token") || "").trim();
+  const requestedSuccess = String(params.get("success") || "").trim();
+  const isUuid = (value) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ""));
+  const checkoutAttemptId = isUuid(params.get("checkout_attempt_id"))
+    ? params.get("checkout_attempt_id")
+    : crypto.randomUUID();
 
   const titleEl = document.getElementById("checkoutTitle");
   const messageEl = document.getElementById("checkoutMessage");
@@ -65,24 +72,28 @@ import { ROUTES } from "../../data/routes";
       missing_target_msg: "This checkout link does not include a product lookup key.",
       missing_target_hint: "Return to the product page and reopen the secure checkout link.",
       preparing_for: (label) => `Preparing checkout for ${label}.`,
-      checking_session: "Checking your session and opening Stripe Checkout.",
+      checking_session: "Checking your session and opening secure payment.",
       could_not_start: "Checkout could not start.",
       could_not_start_hint: "You can retry, return to the product page or open support with the same purchase context.",
       unexpected: "Unexpected checkout error.",
       missing_config: "Checkout configuration is missing.",
-      no_redirect: "Stripe checkout did not return a redirect URL.",
+      no_redirect: "The payment provider did not return a redirect URL.",
+      paypal_not_ready: "PayPal is not configured for this environment yet.",
+      paypal_confirming: "Confirming your PayPal payment...",
     },
     pt: {
       missing_target: "Checkout sem destino.",
       missing_target_msg: "Este link de checkout não inclui o lookup_key do produto.",
       missing_target_hint: "Volte à página do produto e reabra o link do checkout seguro.",
       preparing_for: (label) => `Preparando checkout de ${label}.`,
-      checking_session: "Verificando sua sessão e abrindo o Stripe Checkout.",
+      checking_session: "Verificando sua sessão e abrindo o pagamento seguro.",
       could_not_start: "Não foi possível iniciar o checkout.",
       could_not_start_hint: "Você pode tentar novamente, voltar ao produto ou abrir o suporte com o mesmo contexto de compra.",
       unexpected: "Erro inesperado no checkout.",
       missing_config: "Configuração do checkout ausente.",
-      no_redirect: "O Stripe Checkout não retornou um URL de redirecionamento.",
+      no_redirect: "O provedor de pagamento não retornou um URL de redirecionamento.",
+      paypal_not_ready: "O PayPal ainda não está configurado neste ambiente.",
+      paypal_confirming: "Confirmando seu pagamento PayPal...",
     },
   };
   const tt = T[LANG];
@@ -264,8 +275,63 @@ import { ROUTES } from "../../data/routes";
       const cancelPath = sanitizeInternalPath(requestedNext) || fallback.href;
       const cancelUrl = new URL(cancelPath, window.location.origin);
       cancelUrl.searchParams.set("payment", "cancelled");
-      const successUrl = `${window.location.origin}${successPathForLookup(lookupBase)}`;
+      const defaultSuccessPath = requestedNext.startsWith("/recarregar")
+        ? "/account/?recarga=sucesso"
+        : successPathForLookup(lookupBase);
+      const successPath = sanitizeInternalPath(requestedSuccess) || defaultSuccessPath;
+      const successUrl = `${window.location.origin}${successPath}`;
       trackCheckoutEvent("checkout_started", { label: lookupKey.replace(/[^a-z0-9_-]/gi, "_").toLowerCase() });
+
+      if (paypalReturn && paypalOrderId) {
+        if (titleEl) titleEl.textContent = LANG === "pt" ? "Confirmando seu pagamento PayPal." : "Confirming your PayPal payment.";
+        if (messageEl) messageEl.textContent = tt.paypal_confirming;
+        const captureRes = await fetch(`${apiBase}/paypal-capture-order`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ order_id: paypalOrderId }),
+        });
+        const captureData = await captureRes.json().catch(() => ({}));
+        if (captureData?.redirect_url) {
+          trackCheckoutEvent("checkout_completed", { label: "paypal" });
+          window.location.href = captureData.redirect_url;
+          return;
+        }
+        throw new Error(captureData?.error || tt.no_redirect);
+      }
+
+      if (requestedPaymentMethod === "paypal") {
+        const returnUrl = new URL("/checkout/", window.location.origin);
+        returnUrl.searchParams.set("payment_method", "paypal");
+        returnUrl.searchParams.set("paypal_return", "1");
+        returnUrl.searchParams.set("lookup_key", lookupKey);
+        returnUrl.searchParams.set("currency", currency);
+        returnUrl.searchParams.set("checkout_attempt_id", checkoutAttemptId);
+
+        const paypalRes = await fetch(`${apiBase}/paypal-create-order`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            lookup_key: lookupKey,
+            checkout_attempt_id: checkoutAttemptId,
+            success_url: successUrl,
+            cancel_url: cancelUrl.toString(),
+            return_url: returnUrl.toString(),
+          }),
+        });
+        const paypalData = await paypalRes.json().catch(() => ({}));
+        if (paypalData?.approval_url) {
+          trackCheckoutEvent("checkout_redirected", { label: "paypal" });
+          window.location.href = paypalData.approval_url;
+          return;
+        }
+        throw new Error(paypalData?.error || tt.paypal_not_ready);
+      }
 
       const res = await fetch(`${apiBase}/create-checkout-session`, {
         method: "POST",

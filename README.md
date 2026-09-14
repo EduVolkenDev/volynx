@@ -69,6 +69,8 @@ Frontend: Astro hybrid (static + API routes). Backend: Express API + Supabase.
 
 ## 🔧 Features
 - Subscriptions: Stripe checkout w/ Supabase auth.
+- PayPal: gated external checkout for one-time VX token packs, with atomic
+  fulfillment and Stripe Custom Payment Method reporting.
 - Schema: Profiles/plans/tokens/projects (RLS).
 - Tools: Image converter/scaler/QR (Lab).
 - Pro: Builder, Studio, premium kits/icons.

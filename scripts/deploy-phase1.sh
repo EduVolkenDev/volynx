@@ -19,6 +19,7 @@ echo "Migrations to apply:"
 echo "  - 20260412_atomic_token_rpcs.sql  (atomic RPCs + security hardening)"
 echo "  - 20260412_plan_check_constraints.sql (if not already applied)"
 echo "  - 20260412_missing_tables_and_indexes.sql (if not already applied)"
+echo "  - 202609130001_paypal_external_payments.sql"
 echo ""
 echo "Run these via Supabase Dashboard > SQL Editor, or:"
 echo "  supabase db push --linked"
@@ -32,6 +33,11 @@ echo "Required payment secrets (verify they exist):"
 echo "  STRIPE_SECRET_KEY"
 echo "  STRIPE_WEBHOOK_SECRET"
 echo "  SUPABASE_SERVICE_ROLE_KEY"
+echo "  PAYPAL_CLIENT_ID"
+echo "  PAYPAL_CLIENT_SECRET"
+echo "  PAYPAL_ENV (sandbox or live)"
+echo "  PAYPAL_WEBHOOK_ID"
+echo "  STRIPE_CUSTOM_PAYPAL_METHOD_ID (optional override for the cpmt_ ID)"
 echo ""
 read -p "Press Enter after secrets are configured..."
 
@@ -55,6 +61,9 @@ FUNCTIONS=(
   "create-pix-checkout"
   "check-pix-status"
   "pix-webhook"
+  "paypal-create-order"
+  "paypal-capture-order"
+  "paypal-webhook"
 )
 
 NO_VERIFY_JWT=(
@@ -70,6 +79,9 @@ NO_VERIFY_JWT=(
   "check-pix-status"
   "stripe-webhook"
   "pix-webhook"
+  "paypal-create-order"
+  "paypal-capture-order"
+  "paypal-webhook"
 )
 
 for fn in "${FUNCTIONS[@]}"; do

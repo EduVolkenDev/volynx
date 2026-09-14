@@ -56,6 +56,7 @@ const t = {
     each: 'cada',
     buyPix: 'Comprar com Pix',
     buyCard: 'Comprar com cartão',
+    buyPaypal: 'Comprar com PayPal',
     trustBilling: '✓ Cobrança segura',
     trustInstant: '✓ Crédito instantâneo',
     trustNoExpiry: '✓ VX nunca expira',
@@ -76,6 +77,7 @@ const t = {
     each: 'each',
     buyPix: 'Buy with Pix',
     buyCard: 'Buy with card',
+    buyPaypal: 'Buy with PayPal',
     trustBilling: '✓ Secure billing',
     trustInstant: '✓ Instant credit',
     trustNoExpiry: '✓ VX never expires',
@@ -213,6 +215,9 @@ const L = t[lang];
             <button class="rec-btn rec-btn--card" data-buy-card-base={`tokens_${pack.id}`} data-buy-card={`tokens_${pack.id}_${currency.toLowerCase()}`} type="button">
               {L.buyCard}
             </button>
+            <button class="rec-btn rec-btn--paypal rec-btn--hidden" data-buy-paypal-base={`tokens_${pack.id}`} data-buy-paypal={`tokens_${pack.id}_${currency.toLowerCase()}`} type="button" hidden>
+              {L.buyPaypal}
+            </button>
           </div>
         </article>
       ))}
@@ -328,6 +333,10 @@ const L = t[lang];
           var base = btn.getAttribute('data-buy-card-base');
           if (base) btn.setAttribute('data-buy-card', base + '_' + target.toLowerCase());
         });
+        document.querySelectorAll('[data-buy-paypal-base]').forEach(function(btn) {
+          var base = btn.getAttribute('data-buy-paypal-base');
+          if (base) btn.setAttribute('data-buy-paypal', base + '_' + target.toLowerCase());
+        });
         document.querySelectorAll('.rec-card-actions').forEach(function(actions) {
           actions.classList.toggle('rec-card-actions--single', target !== 'BRL');
         });
@@ -352,6 +361,11 @@ const L = t[lang];
         .then(function(c) {
           cfg = c;
           window.__volynxPixEnabled = c.pixEnabled === true;
+          window.__volynxPaypalEnabled = c.paypalEnabled === true;
+          document.querySelectorAll('[data-buy-paypal]').forEach(function(el) {
+            el.hidden = !window.__volynxPaypalEnabled;
+            el.classList.toggle('rec-btn--hidden', !window.__volynxPaypalEnabled);
+          });
           applyCurrency(currentCurrency());
         })
         .catch(function(){});
@@ -368,6 +382,24 @@ const L = t[lang];
             successUrl: window.location.origin + '/account/?payment=pix_success',
             cancelUrl: window.location.origin + '/recarregar/?payment=cancelled',
           });
+        });
+      });
+
+      // PayPal is a separate external checkout. The server resolves the
+      // current Stripe price, creates the PayPal order and owns capture.
+      document.querySelectorAll('[data-buy-paypal]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (window.__volynxPaypalEnabled !== true) return;
+          if (!token) { window.location.href = loginHref(); return; }
+          var lookup = btn.getAttribute('data-buy-paypal');
+          if (!lookup) return;
+          var checkoutUrl = new URL('/checkout/', window.location.origin);
+          checkoutUrl.searchParams.set('payment_method', 'paypal');
+          checkoutUrl.searchParams.set('lookup_key', lookup);
+          checkoutUrl.searchParams.set('currency', currentCurrency().toLowerCase());
+          checkoutUrl.searchParams.set('next', window.location.pathname + window.location.search);
+          window.location.href = checkoutUrl.toString();
         });
       });
 
@@ -770,6 +802,15 @@ const L = t[lang];
     .rec-btn--card:hover {
       background: rgba(255, 255, 255, 0.1);
       border-color: rgba(255, 255, 255, 0.28);
+    }
+    .rec-btn--paypal {
+      background: #ffc439;
+      color: #111827;
+      box-shadow: 0 10px 30px rgba(255, 196, 57, 0.18);
+    }
+    .rec-btn--paypal:hover {
+      background: #ffd36a;
+      transform: translateY(-2px);
     }
     .rec-btn:disabled { opacity: .6; cursor: not-allowed; }
 
