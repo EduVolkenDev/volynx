@@ -63,6 +63,7 @@ window.VX_TRANS = {
     "login2.btn_signin": "Sign in",
     "login2.forgot": "Forgot password?",
     "login2.create_account": "Create account",
+    "login2.btn_dashboard": "Open Dashboard",
     "login2.btn_studio": "Go to Studio",
     "login2.btn_lab": "Try Lab",
     "login2.btn_compare": "Compare Free vs Pro",
@@ -6393,6 +6394,7 @@ window.VX_TRANS = {
     // ── login2 ──
     "login2.btn_compare": "Comparar Grátis vs Pro",
     "login2.btn_lab": "Experimentar Lab",
+    "login2.btn_dashboard": "Abrir dashboard",
     "login2.btn_studio": "Ir para Studio",
     "login2.desc": "Entre para acessar suas ferramentas, projetos e espaço de trabalho. Membros Pro desbloqueiam a experiência premium completa com recursos avançados e limites maiores.",
     "login2.expired_title": "Sessão expirada.",

@@ -1,0 +1,390 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+
+const title = "Property Flow Studio";
+const previewMode = false;
+---
+
+<BaseLayout title={title} description="White-label property management studio" hideUtilBar>
+  <main class="pf-studio" id="propertyFlowStudio" data-preview-mode={previewMode ? "true" : "false"}>
+    <section class="pf-state" id="loadingState" aria-live="polite">
+      <span class="pf-spinner" aria-hidden="true"></span>
+      <p>Carregando seu workspace…</p>
+    </section>
+
+    <section class="pf-state" id="loggedOutState" hidden>
+      <span class="pf-state__eyebrow">PROPERTY FLOW STUDIO</span>
+      <h1>Entre para gerenciar sua vitrine.</h1>
+      <p>Seu painel é privado e separado do site público.</p>
+      <a class="pf-button pf-button--primary" href="/login/?next=/dashboard/propertyflow/">Entrar no VOLYNX</a>
+      {import.meta.env.DEV && <a class="pf-button pf-button--ghost" href="/dashboard/propertyflow/?preview=1">Ver prévia local (somente leitura)</a>}
+    </section>
+
+    <section class="pf-state" id="errorState" hidden>
+      <span class="pf-state__eyebrow">PROPERTY FLOW STUDIO</span>
+      <h1>Não conseguimos abrir este workspace.</h1>
+      <p id="errorMessage">Tente atualizar a página.</p>
+      <button class="pf-button pf-button--ghost" id="retryButton" type="button">Tentar novamente</button>
+    </section>
+
+    <div id="appShell" hidden>
+      <aside class="pf-sidebar" id="sidebar">
+        <div class="pf-sidebar__top">
+          <a class="pf-brand" href="/dashboard/propertyflow/" aria-label="Voltar para o início do Property Flow">
+            <span class="pf-brand__mark" id="brandMark">PF</span>
+            <span>
+              <strong id="brandName">Property Flow</strong>
+              <small id="brandTagline">Seu catálogo, sob seu controle.</small>
+            </span>
+          </a>
+          <button class="pf-sidebar__close" id="closeSidebar" type="button" aria-label="Fechar menu">×</button>
+        </div>
+
+        <label class="pf-site-picker">
+          <span>Workspace</span>
+          <select id="siteSelect" aria-label="Selecionar workspace"></select>
+        </label>
+
+        <nav class="pf-nav" id="mainNav" aria-label="Navegação do workspace">
+          <button type="button" class="is-active" data-view="overview" aria-current="page"><span class="pf-nav__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 13h6V4H4v9Zm10 7h6v-9h-6v9ZM4 20h6v-3H4v3Zm10-12h6V4h-6v4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span><b data-nav-label="overview">Visão geral</b></button>
+          <button type="button" data-view="properties"><span class="pf-nav__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 21v-6h6v6" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span><b data-nav-label="properties">Imóveis</b></button>
+          <button type="button" data-view="appearance"><span class="pf-nav__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m14.5 4.5 5 5M5 19l2.2-.5L18.8 6.9a1.8 1.8 0 0 0-2.5-2.5L4.7 16.9 4 20l3-.7Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 4h5M4 8h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span><b data-nav-label="appearance">Identidade</b></button>
+          <button type="button" data-view="modules"><span class="pf-nav__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="7" r="2" fill="var(--pf-surface)" stroke="currentColor" stroke-width="1.8"/><circle cx="15" cy="17" r="2" fill="var(--pf-surface)" stroke="currentColor" stroke-width="1.8"/></svg></span><b data-nav-label="modules">Módulos e campos</b></button>
+        </nav>
+
+        <div class="pf-sidebar__bottom">
+          <div class="pf-account"><span id="accountInitial">V</span><span><strong id="accountEmail">Conta</strong><small id="accountRole">Administrador</small></span></div>
+          <button class="pf-logout" id="logoutButton" type="button">Sair</button>
+        </div>
+      </aside>
+
+      <div class="pf-overlay" id="sidebarOverlay" hidden></div>
+
+      <section class="pf-main">
+        <header class="pf-topbar">
+          <button class="pf-menu-button" id="openSidebar" type="button" aria-label="Abrir menu">☰</button>
+          <div><span class="pf-topbar__kicker">PROPERTY FLOW STUDIO</span><strong id="siteHeading">Seu workspace</strong></div>
+          <div class="pf-topbar__actions"><span class="pf-save-status" id="saveStatus" aria-live="polite"></span><a class="pf-button pf-button--ghost" id="previewLink" href="/propertyflow/" target="_blank" rel="noreferrer">Ver site ↗</a></div>
+        </header>
+
+        <div class="pf-preview-banner" id="previewBanner" role="status" hidden><strong>PRÉVIA LOCAL</strong><span>Dados públicos do catálogo · somente leitura · nenhuma alteração será salva.</span></div>
+
+        <div class="pf-content">
+          <section class="pf-view is-visible" id="view-overview" data-view-panel="overview">
+            <div class="pf-view-head"><div><span class="pf-eyebrow">CENTRO DE CONTROLE</span><h1 id="overviewTitle">Sua vitrine em movimento.</h1><p>Publique, organize e apresente seus imóveis com a identidade da sua marca.</p></div><button class="pf-button pf-button--primary" data-open-property type="button">+ <span data-label="newProperty">Novo imóvel</span></button></div>
+            <div class="pf-metrics" id="metrics"></div>
+            <div class="pf-overview-grid"><article class="pf-card"><div class="pf-card__head"><div><span class="pf-eyebrow">ATIVIDADE</span><h2>Últimos imóveis</h2></div><button class="pf-link" data-show-view="properties" type="button">Ver todos</button></div><div id="recentProperties" class="pf-list"></div></article><article class="pf-card pf-card--accent"><span class="pf-eyebrow">IDENTIDADE</span><h2 id="identityPreviewTitle">Seu painel, sua presença.</h2><p>O comprador do kit pode trocar cores, logo, textos, módulos e campos sem editar código.</p><button class="pf-button pf-button--light" data-show-view="appearance" type="button">Personalizar painel</button></article></div>
+          </section>
+
+          <section class="pf-view" id="view-properties" data-view-panel="properties">
+            <div class="pf-view-head"><div><span class="pf-eyebrow">CATÁLOGO</span><h1>Imóveis</h1><p>O conteúdo é independente da identidade visual do seu workspace.</p></div><button class="pf-button pf-button--primary" data-open-property type="button">+ <span data-label="newProperty">Novo imóvel</span></button></div>
+            <div class="pf-toolbar"><div class="pf-filter" role="group" aria-label="Filtrar imóveis"><button class="is-active" data-filter="all" type="button">Todos</button><button data-filter="published" type="button">Publicados</button><button data-filter="draft" type="button">Rascunhos</button><button data-filter="archived" type="button">Arquivados</button></div><span class="pf-toolbar__count" id="propertyCount"></span></div>
+            <div class="pf-property-grid" id="propertyGrid"></div>
+          </section>
+
+          <section class="pf-view" id="view-appearance" data-view-panel="appearance">
+            <div class="pf-view-head"><div><span class="pf-eyebrow">WHITE-LABEL</span><h1>Identidade do painel</h1><p>Crie uma experiência que pareça sua, mesmo usando o kit Property Flow.</p></div><button class="pf-button pf-button--primary" form="appearanceForm" type="submit">Salvar identidade</button></div>
+            <form class="pf-settings-grid" id="appearanceForm">
+              <article class="pf-card pf-form-card"><div class="pf-card__head"><div><span class="pf-eyebrow">MARCA</span><h2>Nome e presença</h2></div></div><div class="pf-form-grid"><label class="pf-field pf-field--wide"><span>Nome da marca</span><input name="brandName" maxlength="80" required /></label><label class="pf-field pf-field--wide"><span>Frase de apoio</span><input name="tagline" maxlength="120" /></label><label class="pf-field pf-field--wide"><span>Logo (URL pública)</span><input name="logoUrl" type="url" placeholder="https://…" /></label><label class="pf-field"><span>Monograma</span><input name="mark" maxlength="4" /></label><label class="pf-field"><span>Arredondamento</span><select name="radius"><option value="soft">Suave</option><option value="rounded">Arredondado</option><option value="sharp">Editorial</option></select></label></div></article>
+              <article class="pf-card pf-form-card"><div class="pf-card__head"><div><span class="pf-eyebrow">CORES</span><h2>Sistema visual</h2></div></div><div class="pf-color-grid"><label class="pf-color-field"><span>Primária</span><input name="primary" type="color" /></label><label class="pf-color-field"><span>Acento</span><input name="accent" type="color" /></label><label class="pf-color-field"><span>Texto</span><input name="ink" type="color" /></label><label class="pf-color-field"><span>Superfície</span><input name="surface" type="color" /></label></div><div class="pf-mini-preview" id="miniPreview"><span id="miniPreviewMark">PF</span><div><strong id="miniPreviewName">Property Flow</strong><small id="miniPreviewTagline">Seu catálogo</small></div><button type="button">Ação principal</button></div></article>
+            </form>
+          </section>
+
+          <section class="pf-view" id="view-modules" data-view-panel="modules">
+            <div class="pf-view-head"><div><span class="pf-eyebrow">CONFIGURAÇÃO</span><h1>Módulos e campos</h1><p>Escolha o que aparece para sua equipe e quais informações fazem sentido para sua operação.</p></div><button class="pf-button pf-button--primary" form="modulesForm" type="submit">Salvar configuração</button></div>
+            <form class="pf-settings-grid" id="modulesForm"><article class="pf-card pf-form-card"><div class="pf-card__head"><div><span class="pf-eyebrow">NAVEGAÇÃO</span><h2>Módulos do painel</h2></div></div><div class="pf-toggle-list"><label><input type="checkbox" name="moduleOverview" /><span><strong>Visão geral</strong><small>Indicadores e atividade recente.</small></span></label><label><input type="checkbox" name="moduleProperties" /><span><strong>Imóveis</strong><small>Catálogo, publicação e arquivo.</small></span></label><label><input type="checkbox" name="moduleAppearance" /><span><strong>Identidade</strong><small>Cores, logo e linguagem da marca.</small></span></label><label><input type="checkbox" name="moduleModules" /><span><strong>Módulos e campos</strong><small>Controles de personalização do kit.</small></span></label></div></article><article class="pf-card pf-form-card"><div class="pf-card__head"><div><span class="pf-eyebrow">FORMULÁRIO</span><h2>Campos dos imóveis</h2></div></div><div class="pf-toggle-list" id="fieldConfigList"><label data-config-field="category"><input type="checkbox" name="fieldCategory" /><span><strong>Categoria</strong><small>Casa, apartamento, fazenda…</small></span><em><input type="checkbox" name="requiredCategory" /> obrigatório</em></label><label data-config-field="price"><input type="checkbox" name="fieldPrice" /><span><strong>Preço</strong><small>Valor ou texto comercial.</small></span><em><input type="checkbox" name="requiredPrice" /> obrigatório</em></label><label data-config-field="location"><input type="checkbox" name="fieldLocation" /><span><strong>Localização</strong><small>Cidade e região de exibição.</small></span><em><input type="checkbox" name="requiredLocation" /> obrigatório</em></label><label data-config-field="summary"><input type="checkbox" name="fieldSummary" /><span><strong>Resumo</strong><small>Texto curto para cards.</small></span><em><input type="checkbox" name="requiredSummary" /> obrigatório</em></label><label data-config-field="description"><input type="checkbox" name="fieldDescription" /><span><strong>Descrição</strong><small>Detalhes completos do imóvel.</small></span><em><input type="checkbox" name="requiredDescription" /> obrigatório</em></label><label data-config-field="whatsapp"><input type="checkbox" name="fieldWhatsapp" /><span><strong>WhatsApp</strong><small>Mensagem pronta para contato.</small></span><em><input type="checkbox" name="requiredWhatsapp" /> obrigatório</em></label></div></article></form>
+          </section>
+        </div>
+      </section>
+    </div>
+
+    <dialog class="pf-dialog" id="propertyDialog"><form method="dialog" id="propertyForm"><div class="pf-dialog__head"><div><span class="pf-eyebrow">CATÁLOGO</span><h2 id="propertyDialogTitle">Novo imóvel</h2></div><button class="pf-dialog__close" value="cancel" aria-label="Fechar">×</button></div><div class="pf-dialog__body"><div class="pf-form-grid"><label class="pf-field pf-field--wide"><span>Título do imóvel</span><input name="title" required maxlength="120" placeholder="Ex.: Casa com vista para a serra" /></label><label class="pf-field" data-property-field="category"><span>Categoria</span><input name="category" placeholder="Casa" /></label><label class="pf-field" data-property-field="price"><span>Preço ou chamada</span><input name="priceLabel" placeholder="Sob consulta" /></label><label class="pf-field pf-field--wide" data-property-field="location"><span>Localização exibida</span><input name="location" placeholder="Atibaia, SP" /></label><label class="pf-field pf-field--wide" data-property-field="summary"><span>Resumo</span><textarea name="summary" rows="2" maxlength="240" placeholder="Uma frase que abre o desejo."></textarea></label><label class="pf-field pf-field--wide" data-property-field="description"><span>Descrição</span><textarea name="description" rows="5" placeholder="Conte a história e os diferenciais do imóvel."></textarea></label><label class="pf-field pf-field--wide" data-property-field="whatsapp"><span>Mensagem de WhatsApp</span><input name="whatsapp" placeholder="Olá, gostaria de saber mais sobre…" /></label><label class="pf-field pf-field--wide"><span>Fotos</span><input name="images" type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple /><small>Convertidas para WebP automaticamente, até 3 MB por foto.</small></label></div></div><div class="pf-dialog__foot"><span class="pf-save-status" id="propertyStatus" aria-live="polite"></span><button class="pf-button pf-button--ghost" value="cancel">Cancelar</button><button class="pf-button pf-button--primary" type="submit" data-save-property="draft">Salvar rascunho</button><button class="pf-button pf-button--light" type="button" id="saveAndPublish">Salvar e publicar</button></div></form></dialog>
+  </main>
+</BaseLayout>
+
+<script>
+  import { createClient } from "@supabase/supabase-js";
+  import { buildPropertyFlowImagePath, optimizePropertyFlowImage } from "../../../lib/property-flow-images";
+  import { DEFAULT_PROPERTY_FLOW_ADMIN_CONFIG, getPropertyFlowAdminConfig, configForSitePersistence, type PropertyFlowAdminConfig } from "../../../lib/property-flow-config";
+
+  type Site = { id: string; organization_id: string; name: string; slug: string; status: string; domain?: string | null; theme?: Record<string, unknown>; settings?: Record<string, unknown> };
+  type Property = { id: string; site_id: string; organization_id: string; title: string; slug: string; category?: string; status: string; summary?: string; description?: string; price_label?: string; location?: { label?: string }; whatsapp_message?: string; created_at?: string; published_at?: string; archived_at?: string };
+  type ImageRow = { id: string; property_id: string; storage_path: string; is_cover: boolean; sort_order: number; size_bytes?: number; width?: number; height?: number };
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T | null;
+  const studio = $("propertyFlowStudio")!;
+  const previewMode = import.meta.env.DEV && new URLSearchParams(window.location.search).get("preview") === "1";
+  const JOHNNY_PREVIEW_SITE: Site = {
+    id: "645921ff-f33c-484f-b26d-2aa368b81f71",
+    organization_id: "03f8a8f1-151f-4856-8c8f-391efa62a5f5",
+    name: "Jhonatan Peterson Imóveis",
+    slug: "johnny-parisnez",
+    status: "published",
+    domain: "www.jhonatanpetersonimoveis.com.br",
+    theme: {},
+    settings: {
+      image_bucket: "johnny-property-images",
+      property_flow_admin: {
+        brand: {
+          name: "Jhonatan Peterson",
+          tagline: "Imóveis com curadoria, estratégia e atendimento premium.",
+          mark: "JP",
+          colors: { primary: "#d8b36a", accent: "#a9a0ff", ink: "#f7f8fc", surface: "#0c111d" },
+          radius: "rounded",
+        },
+      },
+    },
+  };
+  const state = { supa: null as any, user: null as any, sites: [] as Site[], site: null as Site | null, properties: [] as Property[], images: [] as ImageRow[], config: DEFAULT_PROPERTY_FLOW_ADMIN_CONFIG, filter: "all", editingPropertyId: null as string | null };
+  const tokenKeys = ["volynx_access_token", "volynx_refresh_token"];
+
+  function escapeHtml(value: unknown) { return String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char] || char); }
+  function slugify(value: string) { return value.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 72) || `imovel-${Date.now()}`; }
+  function safeColor(value: unknown, fallback: string) { return typeof value === "string" && /^#[0-9a-f]{6}$/i.test(value) ? value : fallback; }
+  function safeLogo(value: unknown) { if (!value || typeof value !== "string") return ""; try { const parsed = new URL(value, window.location.origin); return ["http:", "https:"].includes(parsed.protocol) ? parsed.href : ""; } catch { return ""; } }
+  function setNotice(message: string, target = $("saveStatus")) { if (!target) return; target.textContent = message; window.setTimeout(() => { if (target.textContent === message) target.textContent = ""; }, 3600); }
+  function setCssVars() { const { brand } = state.config; studio.style.setProperty("--pf-primary", safeColor(brand.colors.primary, "#8de7d5")); studio.style.setProperty("--pf-accent", safeColor(brand.colors.accent, "#a9a0ff")); studio.style.setProperty("--pf-ink", safeColor(brand.colors.ink, "#f7f8fc")); studio.style.setProperty("--pf-surface", safeColor(brand.colors.surface, "#0c111d")); studio.dataset.radius = brand.radius; }
+  function siteBucket() { return String(state.site?.settings?.image_bucket || "property-flow-images"); }
+  function imageUrl(path: string) { return state.supa.storage.from(siteBucket()).getPublicUrl(path).data.publicUrl; }
+  function imagesFor(propertyId: string) { return state.images.filter((image) => image.property_id === propertyId).sort((a, b) => Number(a.sort_order) - Number(b.sort_order)); }
+  function coverFor(propertyId: string) { return imagesFor(propertyId).find((image) => image.is_cover) || imagesFor(propertyId)[0]; }
+  function propertyStatusLabel(status: string) { return status === "published" ? "Publicado" : status === "archived" ? "Arquivado" : "Rascunho"; }
+
+  function applyConfig() {
+    setCssVars();
+    $("brandName")!.textContent = state.config.brand.name;
+    $("brandTagline")!.textContent = state.config.brand.tagline;
+    const brandMark = $("brandMark")!; brandMark.textContent = state.config.brand.mark || state.config.brand.name.slice(0, 2).toUpperCase(); brandMark.style.backgroundImage = state.config.brand.logoUrl ? `url("${state.config.brand.logoUrl.replace(/"/g, "")}")` : ""; brandMark.style.backgroundSize = "cover"; brandMark.style.backgroundPosition = "center"; brandMark.style.color = state.config.brand.logoUrl ? "transparent" : "";
+    $("siteHeading")!.textContent = state.site?.name || state.config.brand.name;
+    $("identityPreviewTitle")!.textContent = `${state.config.brand.name}, do seu jeito.`;
+    document.querySelectorAll<HTMLElement>("[data-nav-label]").forEach((node) => { const key = node.dataset.navLabel as keyof PropertyFlowAdminConfig["labels"]; node.textContent = state.config.labels[key]; });
+    document.querySelectorAll<HTMLElement>("[data-label]").forEach((node) => { const key = node.dataset.label as keyof PropertyFlowAdminConfig["labels"]; node.textContent = state.config.labels[key]; });
+    for (const [module, enabled] of Object.entries(state.config.modules)) { const nav = document.querySelector<HTMLElement>(`[data-view="${module}"]`); if (nav) nav.hidden = !enabled; }
+    renderAppearanceForm();
+    renderModulesForm();
+  }
+
+  function renderAppearanceForm() {
+    const form = $("appearanceForm") as HTMLFormElement | null; if (!form) return;
+    const brand = state.config.brand;
+    (form.elements.namedItem("brandName") as HTMLInputElement).value = brand.name;
+    (form.elements.namedItem("tagline") as HTMLInputElement).value = brand.tagline;
+    (form.elements.namedItem("logoUrl") as HTMLInputElement).value = brand.logoUrl;
+    (form.elements.namedItem("mark") as HTMLInputElement).value = brand.mark;
+    (form.elements.namedItem("radius") as HTMLSelectElement).value = brand.radius;
+    for (const key of ["primary", "accent", "ink", "surface"] as const) (form.elements.namedItem(key) as HTMLInputElement).value = safeColor(brand.colors[key], DEFAULT_PROPERTY_FLOW_ADMIN_CONFIG.brand.colors[key]);
+    $("miniPreviewMark")!.textContent = brand.mark || "PF"; $("miniPreviewName")!.textContent = brand.name; $("miniPreviewTagline")!.textContent = brand.tagline;
+  }
+
+  function renderModulesForm() {
+    const form = $("modulesForm") as HTMLFormElement | null; if (!form) return;
+    for (const key of ["overview", "properties", "appearance", "modules"] as const) (form.elements.namedItem(`module${key[0].toUpperCase()}${key.slice(1)}`) as HTMLInputElement).checked = state.config.modules[key];
+    for (const key of ["category", "price", "location", "summary", "description", "whatsapp"] as const) {
+      const field = state.config.propertyFields[key];
+      (form.elements.namedItem(`field${key[0].toUpperCase()}${key.slice(1)}`) as HTMLInputElement).checked = field.visible;
+      (form.elements.namedItem(`required${key[0].toUpperCase()}${key.slice(1)}`) as HTMLInputElement).checked = field.required;
+    }
+  }
+
+  function renderMetrics() {
+    const counts = { total: state.properties.length, published: state.properties.filter((p) => p.status === "published").length, drafts: state.properties.filter((p) => p.status === "draft").length, media: state.images.length };
+    $("metrics")!.innerHTML = [["Imóveis", counts.total, "no catálogo"], ["Publicados", counts.published, "visíveis no site"], ["Rascunhos", counts.drafts, "aguardando revisão"], ["Fotos", counts.media, "derivados otimizados"]].map(([label, value, hint]) => `<article class="pf-metric"><span>${label}</span><strong>${value}</strong><small>${hint}</small></article>`).join("");
+  }
+
+  function renderRecent() {
+    const list = state.properties.slice(0, 5); const node = $("recentProperties")!;
+    node.innerHTML = list.length ? list.map((property) => `<button class="pf-list-row" type="button" data-edit-property="${property.id}"><span class="pf-list-row__icon">${escapeHtml((property.title || "I").slice(0, 1).toUpperCase())}</span><span><strong>${escapeHtml(property.title)}</strong><small>${escapeHtml(property.location?.label || property.category || "Imóvel")}</small></span><em data-status="${property.status}">${propertyStatusLabel(property.status)}</em></button>`).join("") : `<div class="pf-empty"><strong>Seu catálogo começa aqui.</strong><span>Cadastre o primeiro imóvel para liberar a sua vitrine.</span></div>`;
+  }
+
+  function renderProperties() {
+    const visible = state.properties.filter((property) => state.filter === "all" || property.status === state.filter); const grid = $("propertyGrid")!;
+    $("propertyCount")!.textContent = `${visible.length} ${visible.length === 1 ? "imóvel" : "imóveis"}`;
+    grid.innerHTML = visible.length ? visible.map((property) => { const cover = coverFor(property.id); const url = cover ? imageUrl(cover.storage_path) : ""; return `<article class="pf-property-card"><div class="pf-property-card__image" ${url ? `style="background-image:url('${escapeHtml(url)}')"` : ""}><span data-status="${property.status}">${propertyStatusLabel(property.status)}</span>${!url ? `<strong>${escapeHtml((property.title || "I").slice(0, 1).toUpperCase())}</strong>` : ""}</div><div class="pf-property-card__body"><div><h2>${escapeHtml(property.title)}</h2><p>${escapeHtml(property.location?.label || property.category || "Sem localização")}</p></div><strong>${escapeHtml(property.price_label || "Sob consulta")}</strong><div class="pf-property-card__actions"><button class="pf-link" type="button" data-edit-property="${property.id}">Editar</button>${property.status === "published" ? `<button class="pf-link pf-link--danger" type="button" data-archive-property="${property.id}">${escapeHtml(state.config.labels.archive)}</button>` : `<button class="pf-link pf-link--primary" type="button" data-publish-property="${property.id}">${escapeHtml(state.config.labels.publish)}</button>`}</div></div></article>`; }).join("") : `<div class="pf-empty pf-empty--wide"><strong>Nenhum imóvel neste filtro.</strong><span>Use “Novo imóvel” para criar o primeiro registro.</span></div>`;
+  }
+
+  function renderAll() { applyConfig(); renderMetrics(); renderRecent(); renderProperties(); }
+  function showView(view: string) { document.querySelectorAll<HTMLElement>("[data-view-panel]").forEach((panel) => panel.classList.toggle("is-visible", panel.dataset.viewPanel === view)); document.querySelectorAll<HTMLElement>("[data-view]").forEach((button) => { const active = button.dataset.view === view; button.classList.toggle("is-active", active); if (active) button.setAttribute("aria-current", "page"); else button.removeAttribute("aria-current"); }); if (window.innerWidth < 900) closeSidebar(); }
+  function closeSidebar() { $("sidebar")?.classList.remove("is-open"); $("sidebarOverlay")?.setAttribute("hidden", ""); }
+  function openSidebar() { $("sidebar")?.classList.add("is-open"); $("sidebarOverlay")?.removeAttribute("hidden"); }
+  function preparePreviewMode() {
+    if (!previewMode) return;
+    studio.dataset.previewMode = "true";
+    $("previewBanner")?.removeAttribute("hidden");
+    document.querySelectorAll<HTMLButtonElement>("[data-open-property], #logoutButton, #appearanceForm button[type='submit'], #modulesForm button[type='submit'], [data-edit-property], [data-publish-property], [data-archive-property]").forEach((button) => {
+      button.disabled = true;
+      button.setAttribute("aria-disabled", "true");
+    });
+    document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>("#appearanceForm input, #appearanceForm textarea, #appearanceForm select, #modulesForm input, #modulesForm textarea, #modulesForm select, #propertyForm input, #propertyForm textarea, #propertyForm select").forEach((field) => { field.disabled = true; });
+  }
+
+  async function persistConfig(nextConfig: PropertyFlowAdminConfig) {
+    if (previewMode) { setNotice("A prévia local é somente leitura."); return; }
+    if (!state.site) return;
+    const persisted = configForSitePersistence(nextConfig); const currentTheme = state.site.theme || {}; const currentSettings = state.site.settings || {};
+    const result = await state.supa.from("sites").update({ theme: { ...currentTheme, ...persisted.theme }, settings: { ...currentSettings, ...persisted.settings } }).eq("id", state.site.id);
+    if (result.error) throw result.error;
+    state.site.theme = { ...currentTheme, ...persisted.theme }; state.site.settings = { ...currentSettings, ...persisted.settings }; state.config = nextConfig; renderAll(); setNotice("Configuração salva.");
+  }
+
+  async function ensureWorkspace(user: any): Promise<Site[]> {
+    const existing = await state.supa.from("sites").select("id,organization_id,name,slug,status,domain,theme,settings").eq("template_key", "property-flow").order("created_at", { ascending: true });
+    if (existing.error) throw existing.error;
+    if (existing.data?.length) return existing.data as Site[];
+    const entitlement = await state.supa.rpc("has_property_flow_entitlement");
+    if (entitlement.error) throw entitlement.error;
+    if (!entitlement.data) throw new Error("Seu acesso ao Property Flow ainda não está ativo nesta conta.");
+    const suffix = user.id.replace(/-/g, "").slice(0, 12); const orgSlug = `property-flow-${suffix}`;
+    const org = await state.supa.from("organizations").insert({ name: "Meu Property Flow", slug: orgSlug, owner_id: user.id, plan: "free", status: "active", metadata: { product: "property-flow", white_label: true } }).select("id").single();
+    if (org.error) throw org.error;
+    const member = await state.supa.from("organization_members").insert({ organization_id: org.data.id, user_id: user.id, role: "owner" });
+    if (member.error) throw member.error;
+    const site = await state.supa.from("sites").insert({ organization_id: org.data.id, name: "Meu Property Flow", slug: `property-flow-${suffix}`, template_key: "property-flow", language_default: "pt", status: "draft", theme: {}, settings: { catalog_source: "supabase", image_bucket: "property-flow-images" } }).select("id,organization_id,name,slug,status,domain,theme,settings").single();
+    if (site.error) throw site.error;
+    return [site.data as Site];
+  }
+
+  async function loadSite(site: Site) {
+    state.site = site; state.config = getPropertyFlowAdminConfig(site.settings, site.theme);
+    const propertiesQuery = state.supa.from("property_listings").select("id,site_id,organization_id,title,slug,category,status,summary,description,price_label,location,whatsapp_message,created_at,published_at,archived_at").eq("site_id", site.id);
+    if (previewMode) propertiesQuery.eq("status", "published");
+    const [propertiesResult, imagesResult] = await Promise.all([
+      propertiesQuery.order("created_at", { ascending: false }),
+      state.supa.from("property_listing_images").select("id,property_id,storage_path,is_cover,sort_order,size_bytes,width,height").eq("site_id", site.id).order("sort_order", { ascending: true }),
+    ]);
+    if (propertiesResult.error) throw propertiesResult.error; if (imagesResult.error) throw imagesResult.error;
+    state.properties = (propertiesResult.data || []) as Property[]; state.images = (imagesResult.data || []) as ImageRow[]; renderAll();
+  }
+
+  function openProperty(propertyId?: string) {
+    if (previewMode) { setNotice("A prévia local é somente leitura."); return; }
+    const dialog = $("propertyDialog") as HTMLDialogElement; const form = $("propertyForm") as HTMLFormElement; const property = propertyId ? state.properties.find((item) => item.id === propertyId) : null;
+    state.editingPropertyId = property?.id || null; form.reset(); $("propertyDialogTitle")!.textContent = property ? "Editar imóvel" : "Novo imóvel";
+    if (property) { (form.elements.namedItem("title") as HTMLInputElement).value = property.title || ""; (form.elements.namedItem("category") as HTMLInputElement).value = property.category || ""; (form.elements.namedItem("priceLabel") as HTMLInputElement).value = property.price_label || ""; (form.elements.namedItem("location") as HTMLInputElement).value = property.location?.label || ""; (form.elements.namedItem("summary") as HTMLTextAreaElement).value = property.summary || ""; (form.elements.namedItem("description") as HTMLTextAreaElement).value = property.description || ""; (form.elements.namedItem("whatsapp") as HTMLInputElement).value = property.whatsapp_message || ""; }
+    document.querySelectorAll<HTMLElement>("[data-property-field]").forEach((field) => { const key = field.dataset.propertyField as keyof PropertyFlowAdminConfig["propertyFields"]; const config = state.config.propertyFields[key]; field.hidden = !config.visible; const input = field.querySelector("input, textarea") as HTMLInputElement | HTMLTextAreaElement | null; if (input) input.required = config.required; });
+    $("propertyStatus")!.textContent = ""; dialog.showModal();
+  }
+
+  async function uploadPropertyImages(property: Property, files: FileList | null) {
+    if (!files?.length || !state.site) return;
+    const existing = imagesFor(property.id); const bucket = siteBucket();
+    for (let index = 0; index < files.length; index += 1) {
+      const optimized = await optimizePropertyFlowImage(files.item(index)!); if (!optimized.contentHash) throw new Error("Não foi possível criar o hash da foto neste navegador.");
+      const path = buildPropertyFlowImagePath({ organizationId: property.organization_id, siteId: property.site_id, propertyId: property.id, contentHash: optimized.contentHash });
+      const upload = await state.supa.storage.from(bucket).upload(path, optimized.file, { contentType: optimized.mimeType, cacheControl: "31536000", upsert: true });
+      if (upload.error) throw upload.error;
+      const row = await state.supa.from("property_listing_images").upsert({ property_id: property.id, organization_id: property.organization_id, site_id: property.site_id, storage_path: path, filename: optimized.filename, alt_text: property.title, mime_type: optimized.mimeType, size_bytes: optimized.sizeBytes, width: optimized.width, height: optimized.height, source_bytes: optimized.sourceBytes, optimized_at: new Date().toISOString(), content_hash: optimized.contentHash, sort_order: existing.length + index, is_cover: existing.length === 0 && index === 0 }).select("id,property_id,storage_path,is_cover,sort_order,size_bytes,width,height").single();
+      if (row.error) throw row.error; state.images.push(row.data as ImageRow);
+    }
+  }
+
+  async function saveProperty(mode: "draft" | "published") {
+    if (previewMode) { setNotice("A prévia local é somente leitura."); return; }
+    if (!state.site) return; const form = $("propertyForm") as HTMLFormElement; const data = new FormData(form); const title = String(data.get("title") || "").trim(); if (!title) return;
+    const payload = { organization_id: state.site.organization_id, site_id: state.site.id, slug: state.editingPropertyId ? state.properties.find((property) => property.id === state.editingPropertyId)?.slug : `${slugify(title)}-${Date.now().toString(36)}`, title, category: String(data.get("category") || "Casa"), status: mode, summary: String(data.get("summary") || ""), description: String(data.get("description") || ""), price_label: String(data.get("priceLabel") || ""), location: { label: String(data.get("location") || "") }, features: [], whatsapp_message: String(data.get("whatsapp") || ""), published_at: mode === "published" ? new Date().toISOString() : null, archived_at: null };
+    const statusNode = $("propertyStatus")!; statusNode.textContent = "Salvando…";
+    const result = state.editingPropertyId ? await state.supa.from("property_listings").update(payload).eq("id", state.editingPropertyId).select("*").single() : await state.supa.from("property_listings").insert(payload).select("*").single();
+    if (result.error) throw result.error; const property = result.data as Property; const files = (form.elements.namedItem("images") as HTMLInputElement).files; await uploadPropertyImages(property, files);
+    await loadSite(state.site); statusNode.textContent = "Salvo."; window.setTimeout(() => (statusNode.textContent = ""), 1800); (($("propertyDialog") as HTMLDialogElement)).close();
+  }
+
+  async function changePropertyStatus(id: string, status: "published" | "archived") { if (previewMode) { setNotice("A prévia local é somente leitura."); return; } const result = await state.supa.from("property_listings").update({ status, published_at: status === "published" ? new Date().toISOString() : null, archived_at: status === "archived" ? new Date().toISOString() : null }).eq("id", id); if (result.error) throw result.error; if (state.site) await loadSite(state.site); setNotice(status === "published" ? "Imóvel publicado." : "Imóvel arquivado."); }
+
+  async function boot() {
+    try {
+      const cfg = await fetch("/config.json", { cache: "no-store" }).then((response) => response.json()); state.supa = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+      if (previewMode) {
+        state.user = { email: "Prévia local" };
+        state.sites = [JOHNNY_PREVIEW_SITE];
+        state.site = JOHNNY_PREVIEW_SITE;
+        $("accountEmail")!.textContent = "Prévia local";
+        $("accountInitial")!.textContent = "P";
+        $("accountRole")!.textContent = "Somente leitura";
+        const select = $("siteSelect") as HTMLSelectElement;
+        select.innerHTML = `<option value="${JOHNNY_PREVIEW_SITE.id}">${escapeHtml(JOHNNY_PREVIEW_SITE.name)}</option>`;
+        select.value = JOHNNY_PREVIEW_SITE.id;
+        await loadSite(JOHNNY_PREVIEW_SITE);
+        $("loadingState")!.hidden = true;
+        $("appShell")!.hidden = false;
+        preparePreviewMode();
+        return;
+      }
+      const accessToken = localStorage.getItem(tokenKeys[0]); const refreshToken = localStorage.getItem(tokenKeys[1]); if (accessToken && refreshToken) await state.supa.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+      const userResult = await state.supa.auth.getUser(); if (userResult.error || !userResult.data.user) { $("loadingState")!.hidden = true; $("loggedOutState")!.hidden = false; return; }
+      state.user = userResult.data.user; $("accountEmail")!.textContent = state.user.email || "Conta"; $("accountInitial")!.textContent = (state.user.email || "V").slice(0, 1).toUpperCase(); state.sites = await ensureWorkspace(state.user); const requestedSiteId = new URLSearchParams(window.location.search).get("site"); state.site = state.sites.find((site) => site.id === requestedSiteId) || state.sites[0];
+      const select = $("siteSelect") as HTMLSelectElement; select.innerHTML = state.sites.map((site) => `<option value="${site.id}">${escapeHtml(site.name)}</option>`).join(""); select.value = state.site.id; select.onchange = async () => { const next = state.sites.find((site) => site.id === select.value); if (next) await loadSite(next); };
+      await loadSite(state.site); $("loadingState")!.hidden = true; $("appShell")!.hidden = false;
+    } catch (error) { console.error("[property-flow-studio]", error); $("loadingState")!.hidden = true; $("errorState")!.hidden = false; $("errorMessage")!.textContent = error instanceof Error ? error.message : "Tente novamente."; }
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-view]").forEach((button) => button.addEventListener("click", () => showView(button.dataset.view || "overview")));
+  document.querySelectorAll<HTMLElement>("[data-show-view]").forEach((button) => button.addEventListener("click", () => showView(button.dataset.showView || "overview")));
+  document.querySelectorAll<HTMLElement>("[data-open-property]").forEach((button) => button.addEventListener("click", () => openProperty()));
+  $("openSidebar")?.addEventListener("click", openSidebar); $("closeSidebar")?.addEventListener("click", closeSidebar); $("sidebarOverlay")?.addEventListener("click", closeSidebar); $("retryButton")?.addEventListener("click", () => window.location.reload());
+  $("logoutButton")?.addEventListener("click", async () => { await state.supa?.auth.signOut(); tokenKeys.forEach((key) => localStorage.removeItem(key)); window.location.href = "/login/"; });
+  $("appearanceForm")?.addEventListener("input", () => { const form = $("appearanceForm") as HTMLFormElement; $("miniPreviewMark")!.textContent = (form.elements.namedItem("mark") as HTMLInputElement).value || "PF"; $("miniPreviewName")!.textContent = (form.elements.namedItem("brandName") as HTMLInputElement).value || "Property Flow"; $("miniPreviewTagline")!.textContent = (form.elements.namedItem("tagline") as HTMLInputElement).value || "Seu catálogo"; });
+  $("appearanceForm")?.addEventListener("submit", async (event) => { event.preventDefault(); try { const form = event.currentTarget as HTMLFormElement; const next = structuredClone(state.config); next.brand = { ...next.brand, name: String((form.elements.namedItem("brandName") as HTMLInputElement).value).trim() || "Property Flow", tagline: String((form.elements.namedItem("tagline") as HTMLInputElement).value).trim(), logoUrl: safeLogo((form.elements.namedItem("logoUrl") as HTMLInputElement).value), mark: String((form.elements.namedItem("mark") as HTMLInputElement).value).trim().slice(0, 4) || "PF", radius: (form.elements.namedItem("radius") as HTMLSelectElement).value as PropertyFlowAdminConfig["brand"]["radius"], colors: { primary: (form.elements.namedItem("primary") as HTMLInputElement).value, accent: (form.elements.namedItem("accent") as HTMLInputElement).value, ink: (form.elements.namedItem("ink") as HTMLInputElement).value, surface: (form.elements.namedItem("surface") as HTMLInputElement).value } }; await persistConfig(next); } catch (error) { setNotice(error instanceof Error ? error.message : "Não foi possível salvar."); } });
+  $("modulesForm")?.addEventListener("submit", async (event) => { event.preventDefault(); try { const form = event.currentTarget as HTMLFormElement; const next = structuredClone(state.config); for (const key of ["overview", "properties", "appearance", "modules"] as const) next.modules[key] = (form.elements.namedItem(`module${key[0].toUpperCase()}${key.slice(1)}`) as HTMLInputElement).checked; for (const key of ["category", "price", "location", "summary", "description", "whatsapp"] as const) { next.propertyFields[key] = { visible: (form.elements.namedItem(`field${key[0].toUpperCase()}${key.slice(1)}`) as HTMLInputElement).checked, required: (form.elements.namedItem(`required${key[0].toUpperCase()}${key.slice(1)}`) as HTMLInputElement).checked }; } await persistConfig(next); } catch (error) { setNotice(error instanceof Error ? error.message : "Não foi possível salvar."); } });
+  $("propertyForm")?.addEventListener("submit", async (event) => { event.preventDefault(); try { await saveProperty("draft"); } catch (error) { $("propertyStatus")!.textContent = error instanceof Error ? error.message : "Não foi possível salvar."; } }); $("saveAndPublish")?.addEventListener("click", async () => { try { await saveProperty("published"); } catch (error) { $("propertyStatus")!.textContent = error instanceof Error ? error.message : "Não foi possível publicar."; } });
+  document.addEventListener("click", async (event) => { const target = event.target as HTMLElement; const edit = target.closest<HTMLElement>("[data-edit-property]"); const publish = target.closest<HTMLElement>("[data-publish-property]"); const archive = target.closest<HTMLElement>("[data-archive-property]"); try { if (edit) openProperty(edit.dataset.editProperty); if (publish) await changePropertyStatus(publish.dataset.publishProperty!, "published"); if (archive) await changePropertyStatus(archive.dataset.archiveProperty!, "archived"); } catch (error) { setNotice(error instanceof Error ? error.message : "Não foi possível atualizar o imóvel."); } });
+  document.querySelectorAll<HTMLElement>("[data-filter]").forEach((button) => button.addEventListener("click", () => { state.filter = button.dataset.filter || "all"; document.querySelectorAll<HTMLElement>("[data-filter]").forEach((item) => item.classList.toggle("is-active", item === button)); renderProperties(); }));
+  boot();
+</script>
+
+<style>
+  :global(body) { background: #080b12; }
+  .pf-studio [hidden] { display: none !important; }
+  .pf-studio { --pf-primary: #8de7d5; --pf-accent: #a9a0ff; --pf-ink: #f7f8fc; --pf-surface: #0c111d; min-height: 100vh; color: var(--pf-ink); background: radial-gradient(circle at 74% -10%, color-mix(in srgb, var(--pf-primary) 10%, transparent), transparent 36rem), #080b12; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  .pf-preview-banner { display: flex; align-items: center; gap: 12px; padding: 13px clamp(22px, 4vw, 60px); border-bottom: 1px solid rgba(216,179,106,.24); background: rgba(216,179,106,.08); color: rgba(255,247,223,.8); font-size: 13px; }
+  .pf-preview-banner strong { color: #f1d48c; font-size: 11px; letter-spacing: .14em; }
+  .pf-studio[data-preview-mode="true"] button:disabled { cursor: not-allowed; opacity: .46; }
+  .pf-studio[data-preview-mode="true"] .pf-property-card__actions { min-height: 21px; }
+  .pf-studio[data-preview-mode="true"] .pf-property-card__actions button:disabled { display: none; }
+  .pf-studio[data-radius="soft"] { --pf-radius: 14px; } .pf-studio[data-radius="rounded"] { --pf-radius: 24px; } .pf-studio[data-radius="sharp"] { --pf-radius: 5px; }
+  .pf-state { min-height: 100vh; display: grid; place-content: center; justify-items: center; gap: 12px; padding: 30px; text-align: center; } .pf-state h1 { max-width: 620px; margin: 0; font-size: clamp(2.4rem, 6vw, 5rem); line-height: .98; letter-spacing: -.06em; } .pf-state p { max-width: 520px; margin: 0 0 18px; color: rgba(240,244,255,.6); line-height: 1.6; } .pf-state__eyebrow, .pf-eyebrow, .pf-topbar__kicker { color: var(--pf-primary); font-size: 10px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; } .pf-spinner { width: 26px; height: 26px; border: 2px solid rgba(255,255,255,.16); border-top-color: var(--pf-primary); border-radius: 50%; animation: pf-spin .8s linear infinite; } @keyframes pf-spin { to { transform: rotate(360deg); } }
+  #appShell { min-height: 100vh; } .pf-sidebar { position: fixed; inset: 0 auto 0 0; z-index: 20; display: flex; width: 272px; flex-direction: column; gap: 30px; padding: 26px 18px 18px; border-right: 1px solid rgba(255,255,255,.08); background: color-mix(in srgb, var(--pf-surface) 91%, #05070b); } .pf-sidebar__top { display: flex; align-items: flex-start; justify-content: space-between; } .pf-brand { display: flex; align-items: center; gap: 11px; color: var(--pf-ink); text-decoration: none; } .pf-brand__mark { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 13px; background: linear-gradient(135deg, var(--pf-primary), var(--pf-accent)); color: #071119; font-weight: 900; font-size: 12px; letter-spacing: -.04em; } .pf-brand strong, .pf-account strong { display: block; color: #fff; font-size: 14px; letter-spacing: -.02em; } .pf-brand small, .pf-account small { display: block; max-width: 158px; overflow: hidden; color: rgba(221,228,244,.5); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; } .pf-sidebar__close, .pf-menu-button { display: none; border: 0; background: transparent; color: rgba(255,255,255,.75); font-size: 25px; cursor: pointer; }
+  .pf-site-picker { display: grid; gap: 7px; } .pf-site-picker span { padding-left: 2px; color: rgba(221,228,244,.42); font-size: 10px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; } .pf-site-picker select { width: 100%; min-height: 43px; padding: 0 12px; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; background: rgba(255,255,255,.045); color: #fff; font: inherit; font-size: 13px; }
+  .pf-nav { display: grid; gap: 6px; } .pf-nav button { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 47px; padding: 0 13px; border: 1px solid transparent; border-radius: 13px; background: transparent; color: rgba(222,229,244,.55); font: inherit; font-size: 13px; text-align: left; cursor: pointer; transition: .18s ease; } .pf-nav button span { width: 18px; color: var(--pf-primary); text-align: center; } .pf-nav button:hover, .pf-nav button.is-active { border-color: color-mix(in srgb, var(--pf-primary) 25%, transparent); background: color-mix(in srgb, var(--pf-primary) 9%, transparent); color: #fff; } .pf-sidebar__bottom { display: grid; gap: 16px; margin-top: auto; } .pf-account { display: flex; align-items: center; gap: 10px; padding: 12px 4px; border-top: 1px solid rgba(255,255,255,.08); } .pf-account > span:first-child { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; background: rgba(255,255,255,.1); color: var(--pf-primary); font-size: 12px; font-weight: 800; } .pf-logout { border: 0; background: transparent; color: rgba(221,228,244,.43); font: inherit; font-size: 12px; text-align: left; cursor: pointer; } .pf-logout:hover { color: #fff; }
+  .pf-main { min-width: 0; margin-left: 272px; } .pf-topbar { position: sticky; top: 0; z-index: 10; display: flex; min-height: 78px; align-items: center; justify-content: space-between; gap: 18px; padding: 0 clamp(22px, 4vw, 60px); border-bottom: 1px solid rgba(255,255,255,.07); background: color-mix(in srgb, #080b12 85%, transparent); backdrop-filter: blur(18px); } .pf-topbar > div:nth-child(2) { display: grid; gap: 5px; margin-right: auto; } .pf-topbar strong { color: #fff; font-size: 13px; } .pf-topbar__actions { display: flex; align-items: center; gap: 12px; } .pf-save-status { min-height: 1.3em; color: var(--pf-primary); font-size: 12px; } .pf-content { width: min(1250px, calc(100% - 48px)); margin: 0 auto; padding: clamp(34px, 5vw, 72px) 0 100px; } .pf-view { display: none; } .pf-view.is-visible { display: block; } .pf-view-head { display: flex; align-items: end; justify-content: space-between; gap: 28px; margin-bottom: 32px; } .pf-view-head h1 { margin: 9px 0 12px; color: #fff; font-size: clamp(2.4rem, 5vw, 5rem); line-height: .95; letter-spacing: -.065em; } .pf-view-head p { max-width: 600px; margin: 0; color: rgba(223,230,245,.56); line-height: 1.6; } .pf-button { display: inline-flex; min-height: 43px; align-items: center; justify-content: center; gap: 7px; padding: 0 16px; border: 1px solid rgba(255,255,255,.13); border-radius: 999px; background: rgba(255,255,255,.045); color: #fff; font: inherit; font-size: 12px; font-weight: 800; text-decoration: none; white-space: nowrap; cursor: pointer; transition: transform .18s ease, border-color .18s ease, background .18s ease; } .pf-button:hover { transform: translateY(-1px); border-color: color-mix(in srgb, var(--pf-primary) 60%, transparent); } .pf-button--primary { border-color: transparent; background: linear-gradient(135deg, var(--pf-primary), var(--pf-accent)); color: #071119; } .pf-button--light { border-color: transparent; background: #f4f6fb; color: #0a101b; } .pf-button--ghost { background: rgba(255,255,255,.035); color: rgba(240,244,255,.78); }
+  .pf-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 11px; margin-bottom: 12px; } .pf-metric, .pf-card, .pf-property-card { border: 1px solid rgba(255,255,255,.09); border-radius: var(--pf-radius); background: linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.018)); box-shadow: 0 20px 60px rgba(0,0,0,.14); } .pf-metric { display: grid; min-height: 132px; align-content: space-between; padding: 18px; } .pf-metric span, .pf-metric small { color: rgba(220,228,245,.52); font-size: 11px; } .pf-metric strong { color: #fff; font-size: clamp(2rem, 4vw, 3.2rem); letter-spacing: -.07em; } .pf-overview-grid, .pf-settings-grid { display: grid; grid-template-columns: 1.4fr .8fr; gap: 12px; } .pf-card { padding: clamp(20px, 3vw, 30px); } .pf-card--accent { display: flex; flex-direction: column; justify-content: space-between; min-height: 275px; background: radial-gradient(circle at 100% 0, color-mix(in srgb, var(--pf-accent) 22%, transparent), transparent 18rem), linear-gradient(145deg, color-mix(in srgb, var(--pf-primary) 12%, #111827), rgba(255,255,255,.025)); } .pf-card h2 { margin: 8px 0 12px; color: #fff; font-size: clamp(1.3rem, 2.3vw, 2.1rem); letter-spacing: -.045em; } .pf-card p { max-width: 410px; color: rgba(226,233,247,.62); line-height: 1.62; } .pf-card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 18px; } .pf-card__head h2 { margin-bottom: 0; }
+  .pf-link { padding: 0; border: 0; background: transparent; color: var(--pf-primary); font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; } .pf-link--danger { color: #ff9caa; } .pf-link--primary { color: var(--pf-primary); } .pf-list { display: grid; gap: 3px; } .pf-list-row { display: flex; align-items: center; gap: 11px; min-height: 59px; padding: 7px 4px; border: 0; border-bottom: 1px solid rgba(255,255,255,.07); background: transparent; color: #fff; font: inherit; text-align: left; cursor: pointer; } .pf-list-row:last-child { border-bottom: 0; } .pf-list-row:hover strong { color: var(--pf-primary); } .pf-list-row__icon { display: grid; width: 34px; height: 34px; flex: 0 0 auto; place-items: center; border-radius: 11px; background: rgba(255,255,255,.08); color: var(--pf-primary); font-size: 12px; font-weight: 800; } .pf-list-row > span:nth-child(2) { min-width: 0; margin-right: auto; } .pf-list-row strong, .pf-list-row small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .pf-list-row strong { font-size: 13px; } .pf-list-row small { margin-top: 4px; color: rgba(222,229,244,.5); font-size: 11px; } [data-status] { display: inline-flex; width: fit-content; align-items: center; border-radius: 999px; padding: 5px 8px; background: rgba(255,255,255,.08); color: rgba(235,240,250,.7); font-size: 10px; font-style: normal; font-weight: 800; white-space: nowrap; } [data-status="published"] { background: color-mix(in srgb, var(--pf-primary) 15%, transparent); color: var(--pf-primary); } [data-status="archived"] { color: #ffb2bc; }
+  .pf-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: -5px 0 18px; } .pf-filter { display: flex; flex-wrap: wrap; gap: 6px; } .pf-filter button { padding: 8px 12px; border: 1px solid rgba(255,255,255,.1); border-radius: 999px; background: transparent; color: rgba(223,230,245,.55); font: inherit; font-size: 11px; cursor: pointer; } .pf-filter button.is-active, .pf-filter button:hover { border-color: color-mix(in srgb, var(--pf-primary) 45%, transparent); background: color-mix(in srgb, var(--pf-primary) 9%, transparent); color: #fff; } .pf-toolbar__count { color: rgba(223,230,245,.43); font-size: 12px; } .pf-property-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; } .pf-property-card { overflow: hidden; padding: 0; } .pf-property-card__image { position: relative; display: grid; min-height: 205px; place-items: center; background-position: center; background-size: cover; background-color: rgba(255,255,255,.05); } .pf-property-card__image > strong { color: rgba(255,255,255,.16); font-size: 5rem; letter-spacing: -.1em; } .pf-property-card__image > span { position: absolute; align-self: start; justify-self: start; margin: 14px; } .pf-property-card__body { display: grid; gap: 16px; padding: 18px; } .pf-property-card__body h2 { margin: 0 0 6px; color: #fff; font-size: 17px; letter-spacing: -.035em; } .pf-property-card__body p { margin: 0; color: rgba(223,230,245,.5); font-size: 12px; } .pf-property-card__body > strong { color: var(--pf-primary); font-size: 13px; } .pf-property-card__actions { display: flex; gap: 16px; border-top: 1px solid rgba(255,255,255,.07); padding-top: 15px; }
+  .pf-form-card { min-height: 100%; } .pf-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; } .pf-field { display: grid; align-content: start; gap: 7px; } .pf-field--wide { grid-column: 1 / -1; } .pf-field > span, .pf-color-field > span { color: rgba(226,233,247,.62); font-size: 11px; font-weight: 700; } .pf-field input, .pf-field textarea, .pf-field select { width: 100%; box-sizing: border-box; padding: 12px 13px; border: 1px solid rgba(255,255,255,.12); border-radius: 11px; outline: none; background: rgba(0,0,0,.16); color: #fff; font: inherit; font-size: 13px; resize: vertical; } .pf-field input:focus, .pf-field textarea:focus, .pf-field select:focus { border-color: var(--pf-primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--pf-primary) 13%, transparent); } .pf-field small { color: rgba(223,230,245,.42); font-size: 11px; line-height: 1.45; } .pf-color-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; } .pf-color-field { display: grid; gap: 8px; } .pf-color-field input { width: 100%; height: 50px; padding: 4px; border: 1px solid rgba(255,255,255,.11); border-radius: 11px; background: rgba(0,0,0,.2); cursor: pointer; } .pf-mini-preview { display: flex; align-items: center; gap: 10px; margin-top: 27px; padding: 13px; border: 1px solid rgba(255,255,255,.1); border-radius: 16px; background: rgba(0,0,0,.16); } .pf-mini-preview > span { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 10px; background: linear-gradient(135deg, var(--pf-primary), var(--pf-accent)); color: #08131a; font-size: 9px; font-weight: 900; } .pf-mini-preview div { min-width: 0; margin-right: auto; } .pf-mini-preview strong, .pf-mini-preview small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .pf-mini-preview strong { font-size: 11px; } .pf-mini-preview small { margin-top: 3px; color: rgba(223,230,245,.45); font-size: 9px; } .pf-mini-preview button { padding: 7px 9px; border: 0; border-radius: 999px; background: var(--pf-primary); color: #071119; font: inherit; font-size: 9px; font-weight: 800; }
+  .pf-toggle-list { display: grid; gap: 7px; } .pf-toggle-list > label { display: flex; align-items: center; gap: 11px; min-height: 58px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.07); cursor: pointer; } .pf-toggle-list > label:last-child { border-bottom: 0; } .pf-toggle-list input { accent-color: var(--pf-primary); } .pf-toggle-list span { min-width: 0; margin-right: auto; } .pf-toggle-list strong, .pf-toggle-list small { display: block; } .pf-toggle-list strong { color: #fff; font-size: 13px; } .pf-toggle-list small, .pf-toggle-list em { margin-top: 4px; color: rgba(223,230,245,.45); font-size: 11px; font-style: normal; } .pf-toggle-list em { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+  .pf-empty { display: grid; gap: 5px; padding: 22px 4px; color: rgba(223,230,245,.52); font-size: 12px; } .pf-empty strong { color: #fff; font-size: 13px; } .pf-empty--wide { grid-column: 1 / -1; min-height: 200px; place-content: center; justify-items: center; border: 1px dashed rgba(255,255,255,.14); border-radius: var(--pf-radius); text-align: center; }
+  .pf-dialog { width: min(720px, calc(100% - 26px)); max-height: calc(100vh - 26px); padding: 0; border: 1px solid rgba(255,255,255,.13); border-radius: 24px; background: #0e1421; color: #fff; box-shadow: 0 30px 120px rgba(0,0,0,.62); } .pf-dialog::backdrop { background: rgba(2,5,10,.76); backdrop-filter: blur(8px); } .pf-dialog__head, .pf-dialog__foot { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 22px 26px; border-bottom: 1px solid rgba(255,255,255,.08); } .pf-dialog__head h2 { margin: 7px 0 0; font-size: 1.6rem; letter-spacing: -.045em; } .pf-dialog__close { border: 0; background: transparent; color: rgba(255,255,255,.6); font-size: 27px; cursor: pointer; } .pf-dialog__body { max-height: calc(100vh - 220px); overflow: auto; padding: 26px; } .pf-dialog__foot { justify-content: flex-end; border-top: 1px solid rgba(255,255,255,.08); border-bottom: 0; } .pf-dialog__foot .pf-save-status { margin-right: auto; }
+  @media (max-width: 1050px) { .pf-property-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pf-overview-grid, .pf-settings-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 880px) { .pf-sidebar { transform: translateX(-102%); transition: transform .24s ease; box-shadow: 20px 0 60px rgba(0,0,0,.35); } .pf-sidebar.is-open { transform: translateX(0); } .pf-sidebar__close, .pf-menu-button { display: inline-grid; place-items: center; } .pf-main { margin-left: 0; } .pf-menu-button { display: inline-grid; } .pf-overlay:not([hidden]) { position: fixed; inset: 0; z-index: 15; display: block; background: rgba(0,0,0,.55); } }
+  @media (max-width: 620px) { .pf-content { width: min(100% - 24px, 1250px); padding-top: 26px; } .pf-topbar { min-height: 68px; padding: 0 14px; } .pf-topbar__actions .pf-save-status { display: none; } .pf-topbar__actions .pf-button { padding: 0 11px; } .pf-view-head { align-items: flex-start; flex-direction: column; gap: 18px; margin-bottom: 24px; } .pf-view-head h1 { font-size: clamp(2.55rem, 13vw, 4rem); } .pf-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pf-metric { min-height: 110px; padding: 14px; } .pf-metric strong { font-size: 2.25rem; } .pf-property-grid { grid-template-columns: 1fr; } .pf-form-grid { grid-template-columns: 1fr; } .pf-field--wide { grid-column: auto; } .pf-color-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pf-dialog__head, .pf-dialog__body, .pf-dialog__foot { padding: 18px; } .pf-dialog__foot { flex-wrap: wrap; } .pf-dialog__foot .pf-save-status { width: 100%; } }
+  /* Accessible defaults: larger type, clearer controls, and comfortable touch targets. */
+  .pf-studio { font-size: 16px; }
+  .pf-nav button { min-height: 54px; font-size: 15px; }
+  .pf-nav__icon { display: grid; width: 22px; height: 22px; flex: 0 0 22px; place-items: center; color: var(--pf-primary); }
+  .pf-nav__icon svg { width: 21px; height: 21px; }
+  .pf-brand strong, .pf-account strong { font-size: 16px; }
+  .pf-brand small, .pf-account small { font-size: 12px; }
+  .pf-site-picker span, .pf-eyebrow, .pf-topbar__kicker, .pf-state__eyebrow { font-size: 12px; }
+  .pf-site-picker select, .pf-field input, .pf-field textarea, .pf-field select { min-height: 50px; font-size: 15px; }
+  .pf-field textarea { min-height: 96px; }
+  .pf-field > span, .pf-color-field > span { font-size: 13px; }
+  .pf-field small, .pf-toggle-list small, .pf-toggle-list em { font-size: 13px; }
+  .pf-button { min-height: 50px; font-size: 14px; }
+  .pf-link, .pf-filter button, .pf-toolbar__count, .pf-save-status { font-size: 14px; }
+  .pf-filter button { min-height: 44px; }
+  .pf-topbar strong { font-size: 16px; }
+  .pf-metric span, .pf-metric small { font-size: 13px; }
+  .pf-list-row { min-height: 68px; }
+  .pf-list-row strong { font-size: 15px; }
+  .pf-list-row small { font-size: 13px; }
+  [data-status] { font-size: 12px; }
+  .pf-property-card__body h2 { font-size: 19px; }
+  .pf-property-card__body p, .pf-property-card__body > strong { font-size: 14px; }
+  .pf-toggle-list > label { min-height: 68px; }
+  .pf-toggle-list strong { font-size: 15px; }
+  .pf-empty { font-size: 14px; }
+  .pf-empty strong { font-size: 15px; }
+  .pf-mini-preview strong { font-size: 14px; }
+  .pf-mini-preview small { font-size: 12px; }
+  .pf-mini-preview button { font-size: 12px; min-height: 42px; }
+  .pf-button:focus-visible, .pf-link:focus-visible, .pf-nav button:focus-visible, .pf-filter button:focus-visible, .pf-logout:focus-visible, .pf-sidebar__close:focus-visible, .pf-menu-button:focus-visible, .pf-dialog__close:focus-visible, .pf-field input:focus-visible, .pf-field textarea:focus-visible, .pf-field select:focus-visible { outline: 3px solid var(--pf-primary); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) { .pf-studio *, .pf-studio *::before, .pf-studio *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
+</style>

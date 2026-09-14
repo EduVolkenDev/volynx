@@ -58,6 +58,7 @@ export const ROUTES = {
   builder: "/builder/",
   builderLegacy: "/builder/",  // alias for backwards-compat (unified into /builder/)
   dashboard: "/dashboard/",
+  propertyflowStudio: "/dashboard/propertyflow/",
   purchases: "/dashboard/purchases/",
   propertyflowDelivery: "/dashboard/purchases/propertyflow",
   iconsDelivery: "/dashboard/purchases/icons",

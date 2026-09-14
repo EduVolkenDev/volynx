@@ -76,6 +76,49 @@
     } catch (_) {}
   }
 
+  function isFreshToken(jwt) {
+    try {
+      var payload = decodeJwtPayload(jwt);
+      return !!(payload && payload.exp && (payload.exp * 1000) > (Date.now() + 30000));
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function deactivateAdminMode() {
+    window.VX_IS_ADMIN = false;
+    var html = document.documentElement;
+    if (html) html.classList.remove('vx-admin');
+    if (document.body) document.body.classList.remove('vx-admin');
+
+    var badge = document.getElementById('vxAdminBadge');
+    if (badge && badge.parentNode) badge.parentNode.removeChild(badge);
+
+    if (window.VxTokens) {
+      if (window.VxTokens._vxAdminOriginalSpend) {
+        window.VxTokens.spend = window.VxTokens._vxAdminOriginalSpend;
+        delete window.VxTokens._vxAdminOriginalSpend;
+      }
+      if (window.VxTokens._vxAdminOriginalCanAfford) {
+        window.VxTokens.canAfford = window.VxTokens._vxAdminOriginalCanAfford;
+        delete window.VxTokens._vxAdminOriginalCanAfford;
+      }
+      delete window.VxTokens._adminBypassActive;
+    }
+
+    if (window.VxGate) {
+      if (window.VxGate._vxAdminOriginalRequire) {
+        window.VxGate.require = window.VxGate._vxAdminOriginalRequire;
+        delete window.VxGate._vxAdminOriginalRequire;
+      }
+      if (window.VxGate._vxAdminOriginalRequireAuth) {
+        window.VxGate.requireAuth = window.VxGate._vxAdminOriginalRequireAuth;
+        delete window.VxGate._vxAdminOriginalRequireAuth;
+      }
+      delete window.VxGate._adminBypassActive;
+    }
+  }
+
   async function fetchAdminViaRest(jwt) {
     try {
       var payload = decodeJwtPayload(jwt);
@@ -276,6 +319,12 @@
         setTimeout(patch, 100);
         return;
       }
+      if (!window.VxTokens._vxAdminOriginalSpend) {
+        window.VxTokens._vxAdminOriginalSpend = window.VxTokens.spend;
+      }
+      if (!window.VxTokens._vxAdminOriginalCanAfford) {
+        window.VxTokens._vxAdminOriginalCanAfford = window.VxTokens.canAfford;
+      }
       window.VxTokens.spend = function (tool, actionClass) {
         log('spend bypassed', tool, actionClass);
         return Promise.resolve({ ok: true, balance: Infinity, spent: 0, admin_bypass: true });
@@ -297,6 +346,12 @@
         setTimeout(patch, 100);
         return;
       }
+      if (!window.VxGate._vxAdminOriginalRequire) {
+        window.VxGate._vxAdminOriginalRequire = window.VxGate.require;
+      }
+      if (!window.VxGate._vxAdminOriginalRequireAuth) {
+        window.VxGate._vxAdminOriginalRequireAuth = window.VxGate.requireAuth;
+      }
       window.VxGate.require = function () { return Promise.resolve(true); };
       window.VxGate.requireAuth = function () { return Promise.resolve(true); };
       window.VxGate._adminBypassActive = true;
@@ -311,16 +366,16 @@
     forceOn: function () { activateAdminMode(); writeCachedAdmin(true); },
     forceOff: function () {
       writeCachedAdmin(false);
-      window.VX_IS_ADMIN = false;
-      var b = document.getElementById('vxAdminBadge');
-      if (b && b.parentNode) b.parentNode.removeChild(b);
+      deactivateAdminMode();
     },
   };
 
   async function detectAndActivate() {
     var jwt = getJwt();
-    if (!jwt) {
-      log('no JWT — user not logged in, admin mode requires auth');
+    if (!jwt || !isFreshToken(jwt)) {
+      clearAdminCache();
+      deactivateAdminMode();
+      log('no fresh JWT — admin mode requires an active session');
       return false;
     }
 
@@ -375,10 +430,22 @@
     if (e.key === 'volynx_access_token') {
       log('access token changed — re-detecting');
       clearAdminCache();
-      window.VX_IS_ADMIN = false;
-      var b = document.getElementById('vxAdminBadge');
-      if (b && b.parentNode) b.parentNode.removeChild(b);
+      deactivateAdminMode();
       detectAndActivate().catch(function () {});
     }
   });
+
+  window.addEventListener('vx:token-refreshed', function () {
+    clearAdminCache();
+    deactivateAdminMode();
+    detectAndActivate().catch(function () {});
+  });
+
+  setInterval(function () {
+    var jwt = getJwt();
+    if (!jwt || !isFreshToken(jwt)) {
+      clearAdminCache();
+      deactivateAdminMode();
+    }
+  }, 30000);
 })();
