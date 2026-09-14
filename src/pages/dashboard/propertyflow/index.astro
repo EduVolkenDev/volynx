@@ -203,7 +203,7 @@ const previewMode = false;
   }
 
   function renderAll() { applyConfig(); renderMetrics(); renderRecent(); renderProperties(); }
-  function showView(view: string) { document.querySelectorAll<HTMLElement>("[data-view-panel]").forEach((panel) => panel.classList.toggle("is-visible", panel.dataset.viewPanel === view)); document.querySelectorAll<HTMLElement>("[data-view]").forEach((button) => { const active = button.dataset.view === view; button.classList.toggle("is-active", active); if (active) button.setAttribute("aria-current", "page"); else button.removeAttribute("aria-current"); }); if (window.innerWidth < 900) closeSidebar(); }
+  function showView(view: string) { document.querySelectorAll<HTMLElement>("[data-view-panel]").forEach((panel) => panel.classList.toggle("is-visible", panel.dataset.viewPanel === view)); document.querySelectorAll<HTMLElement>("[data-view]").forEach((button) => { const active = button.dataset.view === view; button.classList.toggle("is-active", active); if (active) button.setAttribute("aria-current", "page"); else button.removeAttribute("aria-current"); }); if (window.innerWidth < 900) closeSidebar(); window.scrollTo({ top: 0, behavior: "auto" }); }
   function closeSidebar() { $("sidebar")?.classList.remove("is-open"); $("sidebarOverlay")?.setAttribute("hidden", ""); }
   function openSidebar() { $("sidebar")?.classList.add("is-open"); $("sidebarOverlay")?.removeAttribute("hidden"); }
   function preparePreviewMode() {
