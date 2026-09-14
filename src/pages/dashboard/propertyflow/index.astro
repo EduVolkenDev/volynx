@@ -334,7 +334,7 @@ const previewMode = false;
   :global(body) { background: #080b12; }
   .pf-studio [hidden] { display: none !important; }
   .pf-studio { --pf-primary: #8de7d5; --pf-accent: #a9a0ff; --pf-ink: #f7f8fc; --pf-surface: #0c111d; min-height: 100vh; color: var(--pf-ink); background: radial-gradient(circle at 74% -10%, color-mix(in srgb, var(--pf-primary) 10%, transparent), transparent 36rem), #080b12; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-  .pf-preview-banner { display: flex; align-items: center; gap: 12px; padding: 13px clamp(22px, 4vw, 60px); border-bottom: 1px solid rgba(216,179,106,.24); background: rgba(216,179,106,.08); color: rgba(255,247,223,.8); font-size: 13px; }
+  .pf-preview-banner { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; padding: 13px clamp(22px, 4vw, 60px); border-bottom: 1px solid rgba(216,179,106,.24); background: rgba(216,179,106,.08); color: rgba(255,247,223,.8); font-size: 13px; line-height: 1.45; }
   .pf-preview-banner strong { color: #f1d48c; font-size: 11px; letter-spacing: .14em; }
   .pf-studio[data-preview-mode="true"] button:disabled { cursor: not-allowed; opacity: .46; }
   .pf-studio[data-preview-mode="true"] .pf-property-card__actions { min-height: 21px; }
@@ -386,5 +386,43 @@ const previewMode = false;
   .pf-mini-preview small { font-size: 12px; }
   .pf-mini-preview button { font-size: 12px; min-height: 42px; }
   .pf-button:focus-visible, .pf-link:focus-visible, .pf-nav button:focus-visible, .pf-filter button:focus-visible, .pf-logout:focus-visible, .pf-sidebar__close:focus-visible, .pf-menu-button:focus-visible, .pf-dialog__close:focus-visible, .pf-field input:focus-visible, .pf-field textarea:focus-visible, .pf-field select:focus-visible { outline: 3px solid var(--pf-primary); outline-offset: 3px; }
+  /* Runtime-rendered catalog nodes do not receive Astro's scoped attribute. */
+  :global(.pf-metric), :global(.pf-property-card) { border: 1px solid rgba(255,255,255,.09); border-radius: var(--pf-radius); background: linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.018)); box-shadow: 0 20px 60px rgba(0,0,0,.14); }
+  :global(.pf-metric) { display: grid; min-height: 132px; align-content: space-between; padding: 18px; }
+  :global(.pf-metric span), :global(.pf-metric small) { color: rgba(220,228,245,.52); font-size: 13px; line-height: 1.35; }
+  :global(.pf-metric strong) { display: block; color: #fff; font-size: clamp(2rem, 4vw, 3.2rem); line-height: 1; letter-spacing: -.07em; }
+  :global(.pf-list-row) { display: flex; box-sizing: border-box; align-items: center; gap: 11px; width: 100%; min-width: 0; min-height: 68px; padding: 7px 4px; border: 0; border-bottom: 1px solid rgba(255,255,255,.07); background: transparent; color: #fff; font: inherit; text-align: left; cursor: pointer; }
+  :global(.pf-list-row:last-child) { border-bottom: 0; }
+  :global(.pf-list-row:hover strong) { color: var(--pf-primary); }
+  :global(.pf-list-row__icon) { display: grid; width: 34px; height: 34px; flex: 0 0 auto; place-items: center; border-radius: 11px; background: rgba(255,255,255,.08); color: var(--pf-primary); font-size: 12px; font-weight: 800; }
+  :global(.pf-list-row > span:nth-child(2)) { min-width: 0; margin-right: auto; }
+  :global(.pf-list-row strong), :global(.pf-list-row small) { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  :global(.pf-list-row strong) { font-size: 15px; }
+  :global(.pf-list-row small) { margin-top: 4px; color: rgba(222,229,244,.5); font-size: 13px; }
+  :global([data-status]) { display: inline-flex; width: fit-content; align-items: center; border-radius: 999px; padding: 5px 8px; background: rgba(255,255,255,.08); color: rgba(235,240,250,.7); font-size: 12px; font-style: normal; font-weight: 800; line-height: 1.1; white-space: nowrap; }
+  :global([data-status="published"]) { background: color-mix(in srgb, var(--pf-primary) 15%, transparent); color: var(--pf-primary); }
+  :global([data-status="archived"]) { color: #ffb2bc; }
+  :global(.pf-property-card) { overflow: hidden; padding: 0; }
+  :global(.pf-property-card__image) { position: relative; display: grid; min-height: 205px; place-items: center; background-position: center; background-size: cover; background-color: rgba(255,255,255,.05); }
+  :global(.pf-property-card__image > strong) { color: rgba(255,255,255,.16); font-size: 5rem; letter-spacing: -.1em; }
+  :global(.pf-property-card__image > span) { position: absolute; align-self: start; justify-self: start; margin: 14px; }
+  :global(.pf-property-card__body) { display: grid; min-width: 0; gap: 16px; padding: 18px; }
+  :global(.pf-property-card__body h2), :global(.pf-property-card__body p), :global(.pf-property-card__body > strong) { overflow-wrap: anywhere; }
+  :global(.pf-property-card__body h2) { margin: 0 0 6px; color: #fff; font-size: 19px; line-height: 1.25; letter-spacing: -.035em; }
+  :global(.pf-property-card__body p) { margin: 0; color: rgba(223,230,245,.5); font-size: 14px; line-height: 1.45; }
+  :global(.pf-property-card__body > strong) { color: var(--pf-primary); font-size: 14px; }
+  :global(.pf-property-card__actions) { display: flex; flex-wrap: wrap; gap: 10px 16px; min-width: 0; border-top: 1px solid rgba(255,255,255,.07); padding-top: 15px; }
+  :global(.pf-property-card .pf-link) { min-height: 32px; line-height: 1.35; }
+  :global(.pf-empty) { display: grid; gap: 5px; padding: 22px 4px; color: rgba(223,230,245,.52); font-size: 14px; line-height: 1.5; }
+  :global(.pf-empty strong) { color: #fff; font-size: 15px; }
+  @media (max-width: 620px) {
+    :global(.pf-metric) { min-height: 110px; padding: 14px; }
+    :global(.pf-metric strong) { font-size: 2.25rem; }
+    :global(.pf-list-row) { min-height: 68px; }
+    :global(.pf-property-card__image) { min-height: 180px; }
+    :global(.pf-property-card__body) { gap: 14px; padding: 16px; }
+    .pf-toolbar { align-items: flex-start; flex-direction: column; gap: 12px; }
+    .pf-filter { width: 100%; }
+  }
   @media (prefers-reduced-motion: reduce) { .pf-studio *, .pf-studio *::before, .pf-studio *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
 </style>

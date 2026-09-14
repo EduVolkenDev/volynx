@@ -50,9 +50,16 @@ const campaignSchema = {
 
         <div class="cf-hero-side">
           <div class="cf-hero-visual" aria-hidden="true">
-            <span class="cf-art-orbit cf-art-orbit--one"></span>
-            <span class="cf-art-orbit cf-art-orbit--two"></span>
-            <img src="/assets/conversion-fix/conversion-fix-hero.webp" alt="" width="1024" height="1536" fetchpriority="high" decoding="async" />
+            <div class="cf-diagnostic">
+              <div class="cf-diagnostic__bar"><span><span class="i18n-en">CONVERSION PATH</span><span class="i18n-pt">CAMINHO DE CONVERSÃO</span></span><span class="cf-diagnostic__live">● <span class="i18n-en">LIVE CHECK</span><span class="i18n-pt">LEITURA AO VIVO</span></span></div>
+              <div class="cf-diagnostic__url">your-site.com <span>↗</span></div>
+              <div class="cf-diagnostic__flow">
+                <div class="cf-diagnostic__step"><span>01</span><strong><span class="i18n-en">Arrive</span><span class="i18n-pt">Chegada</span></strong><small><span class="i18n-en">visitor enters</span><span class="i18n-pt">visitante entra</span></small></div>
+                <div class="cf-diagnostic__step"><span>02</span><strong><span class="i18n-en">Understand</span><span class="i18n-pt">Entende</span></strong><small><span class="i18n-en">offer becomes clear</span><span class="i18n-pt">oferta fica clara</span></small></div>
+                <div class="cf-diagnostic__step"><span>03</span><strong><span class="i18n-en">Act</span><span class="i18n-pt">Age</span></strong><small><span class="i18n-en">next click happens</span><span class="i18n-pt">próximo clique</span></small></div>
+              </div>
+              <div class="cf-diagnostic__signal"><span class="cf-diagnostic__signal-dot">!</span><div><small><span class="i18n-en">FRICTION FOUND</span><span class="i18n-pt">PONTO DE ATRITO</span></small><strong><span class="i18n-en">The next step is unclear.</span><span class="i18n-pt">O próximo passo não está claro.</span></strong></div><span class="cf-diagnostic__signal-arrow">→</span></div>
+            </div>
           </div>
           <aside class="cf-offer-card panel panel--pro">
             <span class="label label--pro"><span class="i18n-en">The fastest useful intervention</span><span class="i18n-pt">A intervenção útil mais rápida</span></span>
@@ -122,8 +129,10 @@ const campaignSchema = {
 </FlagshipLayout>
 
 <style>
-  .page-conversion-fix .cf-hero { padding: clamp(56px, 8vw, 112px) 0 clamp(42px, 6vw, 78px); }
-  .cf-hero-grid { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(280px, .88fr); gap: clamp(28px, 6vw, 84px); align-items: center; }
+  .cf-hero { position: relative; isolation: isolate; overflow: clip; padding: clamp(56px, 8vw, 112px) 0 clamp(42px, 6vw, 78px); background: linear-gradient(90deg, rgba(6,7,16,.98) 0%, rgba(8,9,19,.9) 38%, rgba(7,13,24,.58) 72%, rgba(4,15,20,.68) 100%), url('/assets/galaxy/core-home-v2.webp') center / cover; }
+  .cf-hero::before { position: absolute; inset: 0; z-index: -1; background: radial-gradient(circle at 82% 38%, rgba(110,231,249,.18), transparent 23%), radial-gradient(circle at 58% 12%, rgba(167,139,250,.16), transparent 28%); content: ''; pointer-events: none; }
+  .cf-hero::after { position: absolute; inset: 0; z-index: -1; border-bottom: 1px solid rgba(139,250,240,.14); background: linear-gradient(180deg, rgba(255,255,255,.025), transparent 22%, rgba(3,4,11,.24) 100%); content: ''; pointer-events: none; }
+  .cf-hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(280px, .88fr); gap: clamp(28px, 6vw, 84px); align-items: center; }
   .cf-hero-copy h1 { max-width: 760px; margin: 16px 0 20px; font-size: clamp(2.7rem, 6vw, 6rem); line-height: .98; letter-spacing: -.05em; }
   .cf-lead { max-width: 660px; margin: 0; color: var(--muted, rgba(209,215,230,.74)); font-size: clamp(1rem, 1.45vw, 1.25rem); line-height: 1.65; }
   .cf-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
@@ -132,12 +141,29 @@ const campaignSchema = {
   .cf-proof-row strong, .cf-price, .cf-number { color: var(--cyan, #8bfaf0); }
   .cf-proof-row span { color: var(--muted, rgba(209,215,230,.74)); font-size: .72rem; line-height: 1.35; }
   .cf-hero-side { position: relative; min-width: 0; }
-  .cf-hero-visual { position: relative; z-index: 0; height: clamp(300px, 36vw, 500px); margin: -34px -10% -102px; overflow: visible; pointer-events: none; }
-  .cf-hero-visual img { position: absolute; top: 8%; right: 4%; width: min(80%, 360px); height: auto; filter: drop-shadow(0 24px 38px rgba(0,0,0,.48)); animation: cf-float 9s ease-in-out infinite; }
-  .cf-art-orbit { position: absolute; border: 1px solid rgba(139,250,240,.34); border-radius: 999px; transform: rotate(-28deg); opacity: .7; }
-  .cf-art-orbit--one { width: 70%; height: 22%; top: 35%; right: 8%; box-shadow: 0 0 30px rgba(139,250,240,.1); }
-  .cf-art-orbit--two { width: 45%; height: 14%; top: 48%; right: 20%; border-color: rgba(185,114,255,.3); transform: rotate(38deg); }
-  .cf-offer-card { display: grid; gap: 16px; padding: clamp(24px, 4vw, 38px); background: radial-gradient(circle at 100% 0%, rgba(139,250,240,.16), transparent 52%), rgba(255,255,255,.045); }
+  .cf-hero-side::before { position: absolute; inset: 7% -16% 20%; z-index: -1; border-radius: 50%; background: radial-gradient(circle, rgba(110,231,249,.22), rgba(167,139,250,.1) 36%, transparent 70%); filter: blur(22px); content: ''; pointer-events: none; }
+  .cf-hero-visual { position: relative; z-index: 0; height: clamp(300px, 36vw, 500px); margin: 0 -4% -18px; display: grid; place-items: center; overflow: visible; pointer-events: none; }
+  .cf-hero-visual::before { position: absolute; width: 82%; height: 72%; border: 1px solid rgba(139,250,240,.18); border-radius: 50%; background: radial-gradient(circle, rgba(110,231,249,.13), transparent 66%); box-shadow: 0 0 70px rgba(110,231,249,.1); content: ''; transform: rotate(-12deg); }
+  .cf-diagnostic { position: relative; width: min(100%, 520px); padding: clamp(18px, 3vw, 27px); border: 1px solid rgba(139,250,240,.3); border-radius: 26px 8px 26px 8px; background: linear-gradient(145deg, rgba(8,15,28,.94), rgba(12,28,36,.82)); box-shadow: 0 26px 65px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.12), 0 0 44px rgba(110,231,249,.1); transform: rotate(1deg); }
+  .cf-diagnostic::before { position: absolute; inset: 0; border-radius: inherit; background: repeating-linear-gradient(0deg, transparent 0 23px, rgba(139,250,240,.035) 24px), linear-gradient(90deg, rgba(110,231,249,.08), transparent 36%); content: ''; pointer-events: none; }
+  .cf-diagnostic__bar, .cf-diagnostic__url, .cf-diagnostic__flow, .cf-diagnostic__signal { position: relative; z-index: 1; }
+  .cf-diagnostic__bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: rgba(237,242,251,.7); font-size: .58rem; font-weight: 800; letter-spacing: .16em; }
+  .cf-diagnostic__live { color: var(--cyan, #8bfaf0); white-space: nowrap; }
+  .cf-diagnostic__url { margin-top: clamp(24px, 4vw, 36px); padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,.14); color: var(--ink, #f7f8fb); font-size: clamp(1.15rem, 2.4vw, 1.8rem); font-weight: 700; letter-spacing: -.03em; }
+  .cf-diagnostic__url span { color: var(--gold, #e9d7a5); }
+  .cf-diagnostic__flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin-top: 22px; }
+  .cf-diagnostic__step { position: relative; display: grid; gap: 7px; min-height: 100px; padding: 14px 12px; border: 1px solid rgba(255,255,255,.1); border-radius: 13px 4px 13px 4px; background: rgba(255,255,255,.045); }
+  .cf-diagnostic__step:not(:last-child)::after { position: absolute; top: 50%; right: -14px; width: 18px; border-top: 1px solid rgba(139,250,240,.5); content: ''; }
+  .cf-diagnostic__step > span { color: var(--cyan, #8bfaf0); font-size: .58rem; font-weight: 800; letter-spacing: .13em; }
+  .cf-diagnostic__step strong { color: var(--ink, #f7f8fb); font-size: .9rem; }
+  .cf-diagnostic__step small { color: var(--muted, rgba(209,215,230,.74)); font-size: .66rem; line-height: 1.35; }
+  .cf-diagnostic__signal { display: flex; align-items: center; gap: 12px; margin-top: 18px; padding: 13px 14px; border: 1px solid rgba(233,215,165,.38); border-radius: 14px; background: linear-gradient(90deg, rgba(233,215,165,.12), rgba(110,231,249,.06)); }
+  .cf-diagnostic__signal-dot { display: grid; width: 28px; height: 28px; flex: 0 0 auto; place-items: center; border: 1px solid var(--gold, #e9d7a5); border-radius: 50%; color: var(--gold, #e9d7a5); font-weight: 900; box-shadow: 0 0 18px rgba(233,215,165,.25); }
+  .cf-diagnostic__signal div { display: grid; gap: 4px; min-width: 0; }
+  .cf-diagnostic__signal small { color: var(--gold, #e9d7a5); font-size: .55rem; font-weight: 800; letter-spacing: .14em; }
+  .cf-diagnostic__signal strong { color: var(--ink, #f7f8fb); font-size: .84rem; }
+  .cf-diagnostic__signal-arrow { margin-left: auto; color: var(--cyan, #8bfaf0); font-size: 1.2rem; }
+  .cf-offer-card { display: grid; gap: 16px; padding: clamp(24px, 4vw, 38px); background: radial-gradient(circle at 100% 0%, rgba(139,250,240,.18), transparent 52%), linear-gradient(145deg, rgba(12,16,29,.94), rgba(8,25,31,.84)); box-shadow: 0 22px 54px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.1); backdrop-filter: blur(14px); }
   .cf-hero-side .cf-offer-card { position: relative; z-index: 1; }
   .cf-offer-card h2 { margin: 0; font-size: clamp(1.8rem, 3vw, 2.7rem); letter-spacing: -.04em; }
   .cf-offer-card ul { display: grid; gap: 10px; margin: 0; padding-left: 20px; color: var(--muted, rgba(209,215,230,.74)); line-height: 1.55; }
@@ -156,20 +182,20 @@ const campaignSchema = {
   .cf-fit-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, .9fr); gap: clamp(28px, 8vw, 120px); align-items: center; }
   .cf-fit-grid h2 { max-width: 720px; margin: 14px 0 0; font-size: clamp(2rem, 4vw, 4rem); line-height: 1.02; letter-spacing: -.045em; }
   .cf-fit-side { display: grid; gap: 10px; }
-  .cf-fit-visual { position: relative; height: clamp(180px, 22vw, 285px); margin: -24px -8% -18px 0; overflow: hidden; }
-  .cf-fit-visual::after { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(6,7,14,.05), rgba(6,7,14,.76) 88%); content: ''; pointer-events: none; }
-  .cf-fit-visual img { position: absolute; top: -8%; right: -2%; width: min(66%, 340px); height: 120%; object-fit: contain; object-position: right center; filter: drop-shadow(0 18px 30px rgba(0,0,0,.4)); animation: cf-float 11s ease-in-out -2s infinite; }
-  .cf-fit-list { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+  .cf-fit-visual { position: relative; height: clamp(260px, 32vw, 430px); margin: -36px -10% -34px 0; overflow: hidden; }
+  .cf-fit-visual::after { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(6,7,14,.02), rgba(6,7,14,.58) 86%); content: ''; pointer-events: none; }
+  .cf-fit-visual img { position: absolute; top: 0; right: -4%; width: min(110%, 660px); height: 100%; object-fit: cover; object-position: 66% center; filter: drop-shadow(0 26px 42px rgba(0,0,0,.48)) drop-shadow(0 0 28px rgba(110,231,249,.2)); animation: cf-float 11s ease-in-out -2s infinite; overflow: visible; }
+  .cf-fit-list { position: relative; z-index: 1; display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
   .cf-fit-list li { padding: 18px 18px 18px 22px; border-left: 2px solid var(--cyan, #8bfaf0); border-radius: 0 14px 14px 0; background: rgba(255,255,255,.04); color: rgba(237,242,251,.82); line-height: 1.55; }
   .cf-final { position: relative; display: grid; justify-items: center; gap: 14px; padding: clamp(30px, 5vw, 62px); overflow: hidden; text-align: center; background: radial-gradient(circle at 50% 0%, rgba(139,250,240,.14), transparent 54%), linear-gradient(135deg, rgba(255,255,255,.07), rgba(255,255,255,.025)); border-color: rgba(139,250,240,.22); }
   .cf-final > :not(.cf-final-art) { position: relative; z-index: 1; }
-  .cf-final-art { position: absolute; z-index: 0; inset: auto -7% -17% 10%; height: 76%; opacity: .68; pointer-events: none; }
-  .cf-final-art::after { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(15,17,26,.05), rgba(15,17,26,.72)); content: ''; }
-  .cf-final-art img { width: 100%; height: 100%; object-fit: contain; object-position: center bottom; filter: drop-shadow(0 24px 32px rgba(0,0,0,.35)); }
+  .cf-final-art { position: absolute; z-index: 0; inset: -14% -10% -24% -12%; height: 138%; opacity: .82; pointer-events: none; }
+  .cf-final-art::after { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(15,17,26,.08), rgba(15,17,26,.82)); content: ''; }
+  .cf-final-art img { width: 100%; height: 100%; object-fit: cover; object-position: bottom; filter: drop-shadow(0 24px 32px rgba(0,0,0,.35)); overflow: visible; }
   .cf-final h2 { max-width: 820px; margin: 0; font-size: clamp(2rem, 4vw, 4rem); line-height: 1.02; letter-spacing: -.045em; }
   .cf-final p { margin: 0; color: var(--muted, rgba(209,215,230,.74)); }
   @keyframes cf-float { 0%, 100% { transform: translate3d(0, 0, 0) rotate(-1deg); } 50% { transform: translate3d(0, -10px, 0) rotate(1deg); } }
-  @media (prefers-reduced-motion: reduce) { .cf-hero-visual img, .cf-fit-visual img { animation: none; } }
-  @media (max-width: 900px) { .cf-hero-grid, .cf-fit-grid { grid-template-columns: 1fr; } .cf-hero-copy { text-align: center; } .cf-lead { margin-inline: auto; } .cf-actions, .cf-proof-row { justify-content: center; margin-inline: auto; } .cf-hero-side { max-width: 640px; width: 100%; margin-inline: auto; } .cf-hero-visual { height: clamp(280px, 52vw, 410px); margin-bottom: -74px; } .cf-hero-visual img { right: 8%; width: min(62%, 340px); } .cf-fit-side { max-width: 620px; width: 100%; margin-inline: auto; } .cf-fit-visual { margin-top: -18px; } }
-  @media (max-width: 560px) { .cf-hero-copy h1 { font-size: clamp(2.45rem, 12vw, 4rem); } .cf-proof-row { grid-template-columns: 1fr; max-width: 280px; } .cf-actions .button { width: 100%; text-align: center; } .cf-hero-visual { height: 270px; margin: -10px -3% -54px; } .cf-hero-visual img { top: 4%; right: 8%; width: 65%; } .cf-section-art { height: 150px; border-radius: 18px; } .cf-art-caption { top: 13px; left: 14px; font-size: .62rem; } .cf-fit-visual { height: 220px; margin: -12px -4% -28px 0; } .cf-fit-visual img { top: -8%; width: 72%; height: 120%; } .cf-final-art { inset: auto -18% -7% -10%; height: 55%; opacity: .54; } }
+  @media (prefers-reduced-motion: reduce) { .cf-fit-visual img { animation: none; } }
+  @media (max-width: 900px) { .cf-hero-grid, .cf-fit-grid { grid-template-columns: 1fr; } .cf-hero-copy { text-align: center; } .cf-lead { margin-inline: auto; } .cf-actions, .cf-proof-row { justify-content: center; margin-inline: auto; } .cf-hero-side { max-width: 640px; width: 100%; margin-inline: auto; } .cf-hero-visual { height: clamp(280px, 52vw, 410px); margin: 0 0 -22px; } .cf-fit-side { max-width: 620px; width: 100%; margin-inline: auto; } .cf-fit-visual { margin-top: -24px; } }
+  @media (max-width: 560px) { .cf-hero-copy h1 { font-size: clamp(2.45rem, 12vw, 4rem); } .cf-proof-row { grid-template-columns: 1fr; max-width: 280px; } .cf-actions .button { width: 100%; text-align: center; } .cf-hero-visual { height: 340px; margin: 0; } .cf-diagnostic { transform: none; } .cf-diagnostic__bar { font-size: .5rem; } .cf-diagnostic__flow { gap: 5px; } .cf-diagnostic__step { min-height: 90px; padding: 11px 8px; } .cf-diagnostic__step:not(:last-child)::after { right: -10px; width: 11px; } .cf-diagnostic__step strong { font-size: .78rem; } .cf-diagnostic__step small { font-size: .58rem; } .cf-diagnostic__signal strong { font-size: .72rem; } .cf-section-art { height: 150px; border-radius: 18px; } .cf-art-caption { top: 13px; left: 14px; font-size: .62rem; } .cf-fit-visual { height: 290px; margin: -20px -10% -22px; } .cf-fit-visual img { top: 0; right: -6%; width: 110%; height: 100%; object-fit: cover; object-position: 64% center; } .cf-final-art { inset: -10% -24% -18% -18%; height: 118%; opacity: .7; } }
 </style>

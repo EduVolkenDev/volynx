@@ -265,6 +265,34 @@ const title = "Dashboard — VOLYNX";
   .vx-dashboard__empty strong { color: #fff; font-size: 17px; }
   .vx-dashboard__empty .vx-dashboard__text-link { margin-top: 5px; }
   .vx-button:focus-visible, .vx-dashboard__nav a:focus-visible, .vx-dashboard__logout:focus-visible, .vx-dashboard__close:focus-visible, .vx-dashboard__menu:focus-visible, .vx-dashboard__quick-card:focus-visible, .vx-dashboard__text-link:focus-visible { outline: 3px solid var(--vx-cyan); outline-offset: 3px; }
+  /* Runtime-rendered account nodes do not receive Astro's scoped attribute. */
+  :global(.vx-dashboard__metric), :global(.vx-dashboard__workspace-card), :global(.vx-dashboard__product-card), :global(.vx-dashboard__quick-card) { border: 1px solid rgba(255,255,255,.1); border-radius: 20px; background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.022)); box-shadow: 0 20px 70px rgba(0,0,0,.14); }
+  :global(.vx-dashboard__metric) { display: grid; min-height: 138px; align-content: space-between; padding: 20px; }
+  :global(.vx-dashboard__metric span), :global(.vx-dashboard__metric small) { color: rgba(220,228,245,.62); font-size: 14px; line-height: 1.35; }
+  :global(.vx-dashboard__metric strong) { display: block; color: #fff; font-size: clamp(2rem, 4vw, 3.25rem); line-height: 1; letter-spacing: -.07em; }
+  :global(.vx-dashboard__workspace-card) { display: flex; min-height: 108px; align-items: center; gap: 16px; padding: 18px; }
+  :global(.vx-dashboard__workspace-icon), :global(.vx-dashboard__product-icon) { display: grid; width: 50px; height: 50px; flex: 0 0 50px; place-items: center; border-radius: 16px; background: rgba(141,231,213,.12); color: var(--vx-cyan); }
+  :global(.vx-dashboard__workspace-copy) { min-width: 0; margin-right: auto; }
+  :global(.vx-dashboard__workspace-copy h3), :global(.vx-dashboard__product-card h3) { margin: 6px 0 4px; color: #fff; font-size: 19px; letter-spacing: -.035em; }
+  :global(.vx-dashboard__workspace-copy p), :global(.vx-dashboard__product-card p) { margin: 0; color: rgba(223,230,245,.62); font-size: 15px; line-height: 1.5; }
+  :global(.vx-dashboard__status) { display: inline-flex; width: fit-content; border-radius: 999px; padding: 5px 9px; background: rgba(141,231,213,.13); color: var(--vx-cyan); font-size: 12px; font-weight: 800; line-height: 1.15; }
+  :global(.vx-dashboard__product-card) { display: grid; align-content: start; min-height: 280px; padding: 22px; }
+  :global(.vx-dashboard__product-card .vx-dashboard__status) { margin-top: 20px; }
+  :global(.vx-dashboard__product-card p) { min-height: 72px; margin-bottom: 20px; }
+  :global(.vx-dashboard__workspace-card .vx-button), :global(.vx-dashboard__product-card .vx-button) { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; box-sizing: border-box; }
+  :global(.vx-dashboard__product-card .vx-button) { align-self: end; width: fit-content; }
+  :global(.vx-dashboard__product-icon--violet) { background: rgba(169,160,255,.14); color: var(--vx-violet); }
+  :global(.vx-dashboard__product-icon--gold) { background: rgba(240,197,106,.14); color: var(--vx-gold); }
+  :global(.vx-dashboard__product-icon--neutral) { background: rgba(255,255,255,.1); color: #fff; }
+  :global(.vx-dashboard__empty) { display: grid; gap: 7px; padding: 24px; border: 1px dashed rgba(255,255,255,.16); border-radius: 20px; color: rgba(223,230,245,.62); font-size: 15px; line-height: 1.55; }
+  :global(.vx-dashboard__empty strong) { color: #fff; font-size: 17px; }
+  @media (max-width: 680px) {
+    :global(.vx-dashboard__metric) { min-height: 116px; padding: 15px; }
+    :global(.vx-dashboard__metric strong) { font-size: 2.2rem; }
+    :global(.vx-dashboard__workspace-card) { align-items: flex-start; flex-wrap: wrap; }
+    :global(.vx-dashboard__workspace-card .vx-button) { margin-left: 66px; }
+    :global(.vx-dashboard__product-card .vx-button) { width: 100%; }
+  }
   @media (max-width: 1050px) { .vx-dashboard__product-grid, .vx-dashboard__quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (max-width: 880px) { .vx-dashboard__sidebar { transform: translateX(-102%); transition: transform .24s ease; box-shadow: 20px 0 60px rgba(0,0,0,.35); } .vx-dashboard__sidebar.is-open { transform: translateX(0); } .vx-dashboard__close, .vx-dashboard__menu { display: inline-grid; place-items: center; } .vx-dashboard__main { margin-left: 0; } .vx-dashboard__overlay:not([hidden]) { position: fixed; inset: 0; z-index: 15; display: block; background: rgba(0,0,0,.58); } }
   @media (max-width: 680px) { .vx-dashboard__content { width: min(100% - 24px, 1280px); padding-top: 30px; } .vx-dashboard__topbar { min-height: 70px; padding: 0 14px; } .vx-dashboard__topbar-link { min-height: 44px; padding: 0 12px; font-size: 13px; } .vx-dashboard__hero { align-items: flex-start; flex-direction: column; } .vx-dashboard__hero h1 { font-size: clamp(2.7rem, 15vw, 4.5rem); } .vx-dashboard__hero p { font-size: 16px; } .vx-dashboard__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 44px; } .vx-dashboard__metric { min-height: 116px; padding: 15px; } .vx-dashboard__metric strong { font-size: 2.2rem; } .vx-dashboard__product-grid, .vx-dashboard__quick-grid { grid-template-columns: 1fr; } .vx-dashboard__section { margin-top: 44px; } .vx-dashboard__workspace-card { align-items: flex-start; flex-wrap: wrap; } .vx-dashboard__workspace-card .vx-button { margin-left: 66px; } .vx-dashboard__section-head { align-items: flex-start; flex-direction: column; gap: 8px; } }

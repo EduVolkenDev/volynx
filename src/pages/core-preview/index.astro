@@ -93,19 +93,19 @@ const ecosystemSurfaces = [
             <circle cx="260" cy="260" r="207" />
           </svg>
           <a class="orbit-node orbit-node--build" href={ROUTES.builder} data-signal-en="Build" data-signal-pt="Construir" aria-label="Abrir Builder">
-            <span class="orbit-node__icon"><CoreIcon name="builder" size={25} /></span><span data-en="Build" data-pt="Construir">Construir</span>
+            <span class="orbit-node__icon"><CoreIcon name="builder" size={36} /></span><span data-en="Build" data-pt="Construir">Construir</span>
           </a>
           <a class="orbit-node orbit-node--operate" href={ROUTES.daily} data-signal-en="Plan" data-signal-pt="Planejar" aria-label="Abrir Daily">
-            <span class="orbit-node__icon"><CoreIcon name="daily" size={25} /></span><span data-en="Plan" data-pt="Planejar">Planejar</span>
+            <span class="orbit-node__icon"><CoreIcon name="daily" size={36} /></span><span data-en="Plan" data-pt="Planejar">Planejar</span>
           </a>
           <a class="orbit-node orbit-node--make" href={ROUTES.lab} data-signal-en="Create" data-signal-pt="Criar" aria-label="Abrir Lab">
-            <span class="orbit-node__icon"><CoreIcon name="lab" size={25} /></span><span data-en="Create" data-pt="Criar">Criar</span>
+            <span class="orbit-node__icon"><CoreIcon name="lab" size={36} /></span><span data-en="Create" data-pt="Criar">Criar</span>
           </a>
           <a class="orbit-node orbit-node--connect" href={ROUTES.world} data-signal-en="Discover" data-signal-pt="Descobrir" aria-label="Abrir World">
-            <span class="orbit-node__icon"><CoreIcon name="world" size={25} /></span><span data-en="Discover" data-pt="Descobrir">Descobrir</span>
+            <span class="orbit-node__icon"><CoreIcon name="world" size={36} /></span><span data-en="Discover" data-pt="Descobrir">Descobrir</span>
           </a>
           <div class="signal-stage__core">
-            <img src="/assets/V.webp" alt="" width="70" height="70" />
+            <img src="/assets/volynx-core-icon.webp" alt="" width="240" height="240" />
             <span>CORE</span>
           </div>
           <p class="signal-stage__caption" data-en="Choose where to begin" data-pt="Escolha por onde começar">Escolha por onde começar</p>
@@ -392,11 +392,12 @@ const ecosystemSurfaces = [
   .signal-stage__axis--two { transform: rotate(-62deg); }
   .signal-stage__constellation { position: absolute; width: min(520px, 100%); height: auto; overflow: visible; opacity: .42; transform: rotate(-11deg); animation: constellation-drift 28s linear infinite; }
   .signal-stage__constellation path, .signal-stage__constellation circle { stroke: rgba(110,231,249,.45); stroke-width: 1; vector-effect: non-scaling-stroke; fill: none; stroke-dasharray: 2 10; }
-  .signal-stage__core { width: 150px; height: 150px; display: grid; place-items: center; align-content: center; gap: 6px; border: 1px solid rgba(233,215,165,.65); border-radius: 50%; background: radial-gradient(circle at 35% 25%, rgba(255,255,255,.30), rgba(21,14,40,.92) 58%); box-shadow: 0 0 0 12px rgba(167,139,250,.05), 0 0 70px rgba(167,139,250,.32), inset 0 0 32px rgba(110,231,249,.18); transform: translate(calc(var(--pointer-x, 0) * 8px), calc(var(--pointer-y, 0) * 8px)); transition: transform .45s cubic-bezier(.2,.7,.2,1), box-shadow .3s ease; z-index: 2; }
-  .signal-stage__core img { object-fit: contain; filter: brightness(1.5) drop-shadow(0 0 14px rgba(255,255,255,.7)); }
-  .signal-stage__core span { color: var(--gold); font-size: .55rem; letter-spacing: .26em; }
+  .signal-stage__core { position: relative; width: clamp(240px, 29vw, 300px); height: clamp(240px, 29vw, 300px); display: grid; place-items: center; border: 1px solid rgba(233,215,165,.72); border-radius: 50%; background: radial-gradient(circle at 35% 25%, rgba(255,255,255,.30), rgba(21,14,40,.92) 58%); box-shadow: 0 0 0 12px rgba(167,139,250,.05), 0 0 70px rgba(167,139,250,.32), inset 0 0 32px rgba(110,231,249,.18); transform: translate(calc(var(--pointer-x, 0) * 8px), calc(var(--pointer-y, 0) * 8px)); transition: transform .45s cubic-bezier(.2,.7,.2,1), box-shadow .3s ease; z-index: 2; }
+  .signal-stage__core::before { content: ""; position: absolute; inset: 13px; border: 1px solid rgba(110,231,249,.22); border-radius: 50%; box-shadow: inset 0 0 28px rgba(110,231,249,.12); pointer-events: none; }
+  .signal-stage__core img { display: block; width: min(240px, 82%); height: min(240px, 82%); object-fit: contain; object-position: center; filter: brightness(1.08) drop-shadow(0 0 18px rgba(255,255,255,.78)) drop-shadow(0 0 34px rgba(110,231,249,.3)); transform: translateY(-7px); }
+  .signal-stage__core span { position: absolute; bottom: 24px; color: var(--gold); font-size: .58rem; letter-spacing: .3em; }
   .signal-stage__caption { position: absolute; left: 50%; bottom: 17%; z-index: 2; width: max-content; max-width: 90%; margin: 0; color: var(--soft); font-size: .63rem; letter-spacing: .11em; text-align: center; text-transform: uppercase; transform: translateX(-50%); }
-  .orbit-node { position: absolute; z-index: 3; display: inline-flex; align-items: center; gap: 8px; padding: 7px 10px 7px 7px; border: 1px solid rgba(255,255,255,.16); border-radius: 999px; color: var(--muted); background: rgba(3,4,11,.72); backdrop-filter: blur(12px); font-size: .62rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; transition: color .22s ease, border-color .22s ease, background .22s ease, transform .22s ease; }
+  .orbit-node { position: absolute; z-index: 3; display: inline-flex; align-items: center; gap: 10px; padding: 8px 14px 8px 8px; border: 1px solid rgba(255,255,255,.16); border-radius: 999px; color: var(--muted); background: rgba(3,4,11,.72); backdrop-filter: blur(12px); font-size: .65rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; transition: color .22s ease, border-color .22s ease, background .22s ease, transform .22s ease; }
   .orbit-node:hover, .orbit-node:focus-visible { color: var(--ink); border-color: var(--gold); background: rgba(233,215,165,.1); transform: translateY(-3px); }
   .orbit-node--build { top: 4%; left: 50%; transform: translateX(-50%); }
   .orbit-node--build:hover, .orbit-node--build:focus-visible { transform: translate(-50%, -3px); }
@@ -406,8 +407,9 @@ const ecosystemSurfaces = [
   .orbit-node--make:hover, .orbit-node--make:focus-visible { transform: translate(-50%, -3px); }
   .orbit-node--connect { top: 50%; left: -1%; transform: translateY(-50%); }
   .orbit-node--connect:hover, .orbit-node--connect:focus-visible { transform: translateY(calc(-50% - 3px)); }
-  .orbit-node__icon { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; color: var(--cyan); background: rgba(110,231,249,.1); }
-  .orbit-node--operate .orbit-node__icon, .orbit-node--connect .orbit-node__icon { color: var(--violet); background: rgba(167,139,250,.12); }
+  .orbit-node__icon { position: relative; width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 16px 5px 16px 5px; color: var(--cyan); background: linear-gradient(145deg, rgba(110,231,249,.18), rgba(110,231,249,.035)); box-shadow: inset 0 0 18px rgba(110,231,249,.13), 0 0 18px rgba(110,231,249,.09); }
+  .orbit-node__icon::after { content: ""; position: absolute; width: 7px; height: 7px; margin: -36px 0 0 36px; border: 1px solid currentColor; border-radius: 50%; background: #050711; box-shadow: 0 0 8px currentColor; }
+  .orbit-node--operate .orbit-node__icon, .orbit-node--connect .orbit-node__icon { color: var(--violet); background: linear-gradient(145deg, rgba(167,139,250,.2), rgba(167,139,250,.04)); box-shadow: inset 0 0 18px rgba(167,139,250,.14), 0 0 18px rgba(167,139,250,.1); }
   .signal-label { position: absolute; z-index: 1; display: grid; gap: 4px; color: var(--soft); font-size: .58rem; letter-spacing: .2em; pointer-events: none; text-shadow: 0 2px 14px rgba(0,0,0,.55); }
   .signal-label span { color: var(--cyan); }
   .signal-label b { color: var(--ink); font-size: .67rem; font-weight: 800; }
@@ -496,7 +498,7 @@ const ecosystemSurfaces = [
   .surface-card__art { display: block; width: min(100%, 300px); height: auto; object-fit: contain; pointer-events: none; filter: drop-shadow(0 14px 24px rgba(30, 130, 255, .18)); transition: transform .42s cubic-bezier(.2, .75, .2, 1), filter .42s ease; transform: translate(0px, -100px); }
   .surface-card:hover .surface-card__art, .surface-card:focus-visible .surface-card__art { filter: drop-shadow(0 18px 34px rgba(30, 130, 255, .3)) saturate(1.12) brightness(1.03); transform: translate(0px, -108px) scale(1.035) rotate(-1deg); }
   .surface-card strong { position: relative; z-index: 1; color: var(--ink); font-size: 1.35rem; line-height: 1.1; letter-spacing: -.04em; }
-  .surface-card__copy { position: relative; z-index: 1; max-width: 32ch; color: var(--muted); font-size: .82rem; line-height: 1.6; }
+  .surface-card__copy { position: relative; z-index: 1; max-width: 32ch; color: var(--muted); font-size: .92rem; line-height: 1.6; backdrop-filter: blur(10px); background: #ffffff24; padding: 10px; }
   .i18n-en { display: none; }
   .i18n-pt { display: inline; }
   html[lang="en"] .i18n-en { display: inline; }
@@ -540,9 +542,10 @@ const ecosystemSurfaces = [
     h2 { font-size: clamp(2.5rem, 12vw, 4rem); }
     .hero__actions, .closing__actions { align-items: stretch; flex-direction: column; }
     .button { width: 100%; }
-    .signal-stage { min-height: 330px; }
-    .signal-stage__core { width: 112px; height: 112px; }
-    .signal-stage__core img { width: 52px; height: 52px; }
+    .signal-stage { min-height: 420px; }
+    .signal-stage__core { width: 242px; height: 242px; }
+    .signal-stage__core img { width: 214px; height: 214px; }
+    .signal-stage__core span { bottom: 19px; font-size: .52rem; }
     .signal-stage__halo--outer { width: 82%; }
     .signal-stage__caption { bottom: 12%; font-size: .56rem; }
     .signal-label--top { top: 11%; left: 5%; }
@@ -572,7 +575,9 @@ const ecosystemSurfaces = [
     .handoff { padding: 56px 0; }
     .core-footer { flex-direction: column; }
     .core-nav-platform { color: var(--muted); }
-    .orbit-node { font-size: .56rem; }
+    .orbit-node { gap: 8px; padding: 7px 10px 7px 7px; font-size: .56rem; }
+    .orbit-node__icon { width: 42px; height: 42px; border-radius: 14px 4px 14px 4px; }
+    .orbit-node__icon .core-icon { width: 32px; height: 32px; }
     .orbit-node--operate { right: 0; }
     .orbit-node--connect { left: 0; }
   }

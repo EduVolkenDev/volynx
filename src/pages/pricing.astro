@@ -134,7 +134,7 @@ const pricingAssistItems = [
               <circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>
             </svg>
             <span data-i18n="price.currency">Currency</span>
-            <span class="currency-bar__hint"><span class="i18n-en">Prices update across the page</span><span class="i18n-pt">Preços atualizam na página inteira</span></span>
+            <span class="currency-bar__hint"><span class="i18n-en">Suggested by your region · switch anytime: GBP · EUR · BRL</span><span class="i18n-pt">Sugerida pela sua região · troque quando quiser: BRL · GBP · EUR</span></span>
           </div>
           <div class="currency-bar__pills">
             {['GBP', 'EUR', 'BRL'].map((c) => (
@@ -2034,6 +2034,18 @@ const pricingAssistItems = [
       return /^(GBP|EUR|BRL)$/.test(value) ? value : 'GBP';
     }
 
+    function detectPricingCurrencyFromRegion() {
+      var language = String(navigator.language || '').toLowerCase();
+      var timezone = '';
+      try { timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch {}
+      if (
+        language === 'pt-br' || language.indexOf('pt-br-') === 0 ||
+        ['America/Sao_Paulo', 'America/Fortaleza', 'America/Recife', 'America/Bahia', 'America/Belem', 'America/Manaus'].indexOf(timezone) !== -1
+      ) return 'BRL';
+      if (timezone.indexOf('Europe/') === 0 || language === 'en-gb' || language.indexOf('en-gb-') === 0) return 'GBP';
+      return 'GBP';
+    }
+
     function applyPricingCurrency(target, updateUrl) {
       target = normalizePricingCurrency(target);
       document.querySelectorAll('[data-switch-currency]').forEach(function(p) {
@@ -2069,7 +2081,7 @@ const pricingAssistItems = [
         applyPricingCurrency(target, true);
       });
     });
-    applyPricingCurrency(new URLSearchParams(window.location.search).get('currency') || localStorage.getItem('volynx_currency') || 'GBP', false);
+    applyPricingCurrency(new URLSearchParams(window.location.search).get('currency') || localStorage.getItem('volynx_currency') || detectPricingCurrencyFromRegion(), false);
     fetch('/config.json', { cache: 'no-store' })
       .then(function(r) { return r.ok ? r.json() : {}; })
       .then(function(c) {
@@ -2077,7 +2089,7 @@ const pricingAssistItems = [
         applyPricingCurrency(
           new URLSearchParams(window.location.search).get('currency') ||
           localStorage.getItem('volynx_currency') ||
-          'GBP',
+          detectPricingCurrencyFromRegion(),
           false
         );
       })

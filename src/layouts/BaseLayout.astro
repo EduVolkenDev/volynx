@@ -10,6 +10,7 @@ interface Props {
   ogImage?: string;
   ogType?: string;
   hideUtilBar?: boolean;
+  pageClass?: string;
 }
 
 const {
@@ -17,7 +18,8 @@ const {
   description = "VOLYNX — Premium Tech Platform",
   ogImage = "/assets/volynx-icon.webp",
   ogType = "website",
-  hideUtilBar = false
+  hideUtilBar = false,
+  pageClass = ""
 } = Astro.props;
 
 const canonicalUrl = `https://volynx.world${Astro.url.pathname}`;
@@ -91,8 +93,9 @@ const structuredData = robots.startsWith("noindex") ? null : {
     <script is:inline src="/js/vx-auth-bridge.js"></script>
     <script is:inline src="/js/vx-return.js"></script>
   </head>
-  <body>
+  <body class={pageClass}>
     <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div class="base-atmosphere" aria-hidden="true"></div>
     <div class="vx-page" id="main-content">
       <slot />
     </div>

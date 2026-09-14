@@ -6,7 +6,7 @@ import { ROUTES } from "../data/routes";
 import { sitePricing } from "../data/pricing";
 
 const lang = Astro.url.searchParams.get('lang') === 'en' ? 'en' : 'pt';
-const currencyParam = Astro.url.searchParams.get('currency') || 'BRL';
+const currencyParam = Astro.url.searchParams.get('currency') || '';
 const currency = (['GBP', 'EUR', 'BRL'] as const).includes(currencyParam as any) ? (currencyParam as 'GBP'|'EUR'|'BRL') : 'BRL';
 const tokenPackById = Object.fromEntries(sitePricing.tokenPacks.map((pack) => [pack.id, pack]));
 const getPackAmount = (id: string) => tokenPackById[id]?.amount || 0;
@@ -62,7 +62,7 @@ const t = {
     footerNote: 'Todos os packs incluem Power User badge quando você acumula 100+ VX. Um único saldo aparece na conta e funciona nas áreas com VX habilitado.',
     from: 'Era',
     currencyLabel: 'Moeda',
-    currencyHint: 'Escolha a moeda para o pagamento com cartão.',
+    currencyHint: 'A moeda sugerida depende da sua região. Troque quando quiser: BRL · GBP · EUR.',
   },
   en: {
     pill: 'Add VX with bonus',
@@ -82,7 +82,7 @@ const t = {
     footerNote: 'Every pack includes a Power User badge when you reach 100+ VX. One balance appears in your account and works in VX-enabled areas.',
     from: 'Was',
     currencyLabel: 'Currency',
-    currencyHint: 'Choose the currency for card checkout.',
+    currencyHint: 'The suggested currency follows your region. Change it anytime: BRL · GBP · EUR.',
   }
 };
 const L = t[lang];
@@ -262,11 +262,24 @@ const L = t[lang];
         return validCurrencies.indexOf(code) !== -1 ? code : 'BRL';
       }
 
+      function detectCurrencyFromRegion() {
+        var language = String(navigator.language || '').toLowerCase();
+        var timezone = '';
+        try { timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch {}
+
+        if (
+          language === 'pt-br' || language.indexOf('pt-br-') === 0 ||
+          ['America/Sao_Paulo', 'America/Fortaleza', 'America/Recife', 'America/Bahia', 'America/Belem', 'America/Manaus'].indexOf(timezone) !== -1
+        ) return 'BRL';
+        if (timezone.indexOf('Europe/') === 0 || language === 'en-gb' || language.indexOf('en-gb-') === 0) return 'GBP';
+        return 'GBP';
+      }
+
       function currentCurrency() {
         var fromUrl = new URLSearchParams(window.location.search).get('currency');
         var fromStorage = '';
         try { fromStorage = localStorage.getItem('volynx_currency') || ''; } catch {}
-        return normalizeCurrency(fromUrl || fromStorage || 'BRL');
+        return normalizeCurrency(fromUrl || fromStorage || detectCurrencyFromRegion());
       }
 
       function loginHref() {
@@ -275,6 +288,19 @@ const L = t[lang];
 
       function priceFor(el, code) {
         return el.getAttribute('data-price-' + code.toLowerCase()) || '';
+      }
+
+      function syncPixVisibility(code) {
+        var showPix = normalizeCurrency(code) === 'BRL' && window.__volynxPixEnabled === true;
+        document.querySelectorAll('[data-pix-ui]').forEach(function(el) {
+          el.hidden = !showPix;
+          el.setAttribute('aria-hidden', showPix ? 'false' : 'true');
+        });
+        document.querySelectorAll('[data-buy-pix]').forEach(function(btn) {
+          btn.hidden = !showPix;
+          btn.tabIndex = showPix ? 0 : -1;
+          btn.classList.toggle('rec-btn--hidden', !showPix);
+        });
       }
 
       function applyCurrency(code) {
@@ -305,9 +331,7 @@ const L = t[lang];
         document.querySelectorAll('.rec-card-actions').forEach(function(actions) {
           actions.classList.toggle('rec-card-actions--single', target !== 'BRL');
         });
-        document.querySelectorAll('[data-buy-pix]').forEach(function(btn) {
-          btn.classList.toggle('rec-btn--hidden', target !== 'BRL' || window.__volynxPixEnabled !== true);
-        });
+        syncPixVisibility(target);
 
         var url = new URL(window.location.href);
         url.searchParams.set('currency', target);
@@ -328,9 +352,6 @@ const L = t[lang];
         .then(function(c) {
           cfg = c;
           window.__volynxPixEnabled = c.pixEnabled === true;
-          document.querySelectorAll('[data-pix-ui]').forEach(function(el) {
-            el.hidden = !window.__volynxPixEnabled;
-          });
           applyCurrency(currentCurrency());
         })
         .catch(function(){});
