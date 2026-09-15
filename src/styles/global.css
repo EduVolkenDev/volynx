@@ -27,26 +27,6 @@ body {
   font-family: var(--font-body);
 }
 
-/* Shared atmosphere for BaseLayout surfaces such as Contact, Status and
-   utility pages that do not use the flagship page shell. */
-.base-atmosphere {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(180deg, rgba(4, 5, 12, .72), rgba(4, 5, 12, .88) 52%, rgba(4, 5, 12, .97)),
-    url("/assets/galaxy/world-nebula.webp") center 18% / cover no-repeat;
-  opacity: .78;
-}
-.base-atmosphere::after {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 16% 16%, rgba(177, 150, 255, .16), transparent 28%),
-    radial-gradient(circle at 84% 22%, rgba(139, 250, 240, .12), transparent 24%);
-  content: "";
-}
 .vx-page {
   position: relative;
   z-index: 1;
@@ -88,13 +68,6 @@ button {
 
   .shell {
     max-width: 100%;
-  }
-}
-
-@media (max-width: 700px), (prefers-reduced-motion: reduce) {
-  .base-atmosphere {
-    background-attachment: scroll, scroll;
-    background-position: center 24%, center;
   }
 }
 

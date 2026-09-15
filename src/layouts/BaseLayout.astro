@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import FaviconHead from "../components/FaviconHead.astro";
 import PageWidgets from "../components/PageWidgets.astro";
+import PageAtmosphere from "../components/PageAtmosphere.astro";
 import TierAttrInit from "../components/TierAttrInit.astro";
 
 interface Props {
@@ -95,7 +96,7 @@ const structuredData = robots.startsWith("noindex") ? null : {
   </head>
   <body class={pageClass}>
     <a href="#main-content" class="skip-link">Skip to main content</a>
-    <div class="base-atmosphere" aria-hidden="true"></div>
+    <PageAtmosphere pathname={Astro.url.pathname} />
     <div class="vx-page" id="main-content">
       <slot />
     </div>

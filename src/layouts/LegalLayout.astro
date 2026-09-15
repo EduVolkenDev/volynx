@@ -3,6 +3,7 @@ import "../styles/global.css";
 import "../styles/legal.css";
 import FaviconHead from "../components/FaviconHead.astro";
 import PageWidgets from "../components/PageWidgets.astro";
+import PageAtmosphere from "../components/PageAtmosphere.astro";
 import TierAttrInit from "../components/TierAttrInit.astro";
 import Topbar from "../components/Topbar.astro";
 import { ROUTES } from "../data/routes";
@@ -64,7 +65,7 @@ const structuredData = {
   </head>
   <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
-    <div class="universe-bg" aria-hidden="true"></div>
+    <PageAtmosphere pathname={Astro.url.pathname} />
 
     <div class="shell">
       <Topbar leftLinks={[{ href: ROUTES.about, label: "About", i18n: "footer.about" }, { href: ROUTES.support, label: "Support" }, { href: ROUTES.contact, label: "Contact", i18n: "footer.contact" }]} rightLinks={[{ href: ROUTES.privacy, label: "Privacy", i18n: "footer.privacy" }, { href: ROUTES.terms, label: "Terms", i18n: "footer.terms" }, { href: ROUTES.disclaimer, label: "Disclaimer", i18n: "footer.disclaimer" }]} />

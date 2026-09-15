@@ -1,0 +1,133 @@
+---
+interface AtmospherePreset {
+  image?: string;
+  position?: string;
+  hue?: number;
+  accentHue?: number;
+  imageOpacity?: number;
+  imageScale?: number;
+}
+
+interface Props {
+  pathname: string;
+}
+
+const { pathname } = Astro.props;
+const normalizedPath = pathname.endsWith("/") ? pathname : `${pathname}/`;
+
+const curated: Record<string, AtmospherePreset> = {
+  "/about/": { image: "/assets/future-background.webp", position: "center 38%", hue: 269, accentHue: 193, imageOpacity: .76 },
+  "/terms/": { image: "/assets/profile-volynx-power-constellation-v3.webp", position: "center", hue: 215, accentHue: 188, imageOpacity: .82 },
+  "/privacy/": { image: "/assets/lucid4.jpg", position: "center", hue: 202, accentHue: 316, imageOpacity: .78 },
+  "/disclaimer/": { image: "/assets/lucid6.webp", position: "center", hue: 285, accentHue: 214, imageOpacity: .8 },
+  "/contact/": { image: "/assets/tarantula-nebula.webp", position: "center 34%", hue: 218, accentHue: 18, imageOpacity: .76, imageScale: 1.04 },
+  "/support/": { image: "/assets/stardust-galaxy.jpg", position: "center 30%", hue: 208, accentHue: 318, imageOpacity: .78, imageScale: 1.03 },
+  "/status/": { image: "/assets/space.webp", position: "center 42%", hue: 199, accentHue: 32, imageOpacity: .72 },
+  "/changelog/": { image: "/assets/phoenix-bg.jpg", position: "center 38%", hue: 35, accentHue: 205, imageOpacity: .64 },
+  "/docs/": { image: "/assets/glowbg.jpg", position: "center", hue: 204, accentHue: 39, imageOpacity: .74 },
+  "/tools/": { image: "/assets/lynx-eye.webp", position: "center", hue: 274, accentHue: 201, imageOpacity: .76 },
+  "/products/": { image: "/assets/future-background2.webp", position: "center 42%", hue: 267, accentHue: 195, imageOpacity: .66 },
+  "/login/": { image: "/assets/lucid-big.webp", position: "center", hue: 271, accentHue: 197, imageOpacity: .78 },
+  "/signup/": { image: "/assets/lucid2-big.webp", position: "center", hue: 292, accentHue: 204, imageOpacity: .72 },
+  "/auth/confirm/": { image: "/assets/profile-volynx-power-constellation.webp", position: "center", hue: 220, accentHue: 286, imageOpacity: .7 },
+  "/auth/recover/": { image: "/assets/lucid-realism.webp", position: "center", hue: 201, accentHue: 278, imageOpacity: .76 },
+  "/recarregar/": { image: "/assets/Purple-Universe.jpg", position: "center 24%", hue: 282, accentHue: 198, imageOpacity: .68 },
+  "/dev-hub/": { image: "/assets/galaxy/home-ribbons.webp", position: "center", hue: 251, accentHue: 190, imageOpacity: .64 },
+  "/dev-journey/checklist/": { image: "/assets/galaxy/core-clarify.webp", position: "center", hue: 197, accentHue: 268, imageOpacity: .64 },
+  "/dev-journey/student/": { image: "/assets/galaxy/core-surface-journey.webp", position: "center", hue: 264, accentHue: 188, imageOpacity: .7 },
+  "/dev-journey/submit/": { image: "/assets/galaxy/core-build.webp", position: "center", hue: 190, accentHue: 44, imageOpacity: .66 },
+  "/dev-journey/verify/": { image: "/assets/galaxy/core-prove.webp", position: "center", hue: 43, accentHue: 211, imageOpacity: .58 },
+};
+
+function hashRoute(value: string) {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+const seed = hashRoute(normalizedPath);
+const preset = curated[normalizedPath] || {};
+const hue = preset.hue ?? seed % 360;
+const accentHue = preset.accentHue ?? (hue + 78 + (seed % 64)) % 360;
+const x = 12 + (seed % 77);
+const y = 10 + ((seed >>> 8) % 58);
+const x2 = 12 + ((seed >>> 15) % 77);
+const y2 = 18 + ((seed >>> 22) % 58);
+const imageOpacity = preset.imageOpacity ?? 0;
+const imageScale = preset.imageScale ?? 1;
+const atmosphereKey = normalizedPath === "/"
+  ? "home"
+  : normalizedPath.replace(/^\//, "").replace(/\/$/, "").replace(/[^a-z0-9]+/gi, "-") || "page";
+const atmosphereStyle = [
+  `--vx-atm-image:${preset.image ? `url(\"${preset.image}\")` : "none"}`,
+  `--vx-atm-position:${preset.position || "center"}`,
+  `--vx-atm-image-opacity:${imageOpacity}`,
+  `--vx-atm-image-scale:${imageScale}`,
+  `--vx-atm-hue:${hue}`,
+  `--vx-atm-accent-hue:${accentHue}`,
+  `--vx-atm-x:${x}%`,
+  `--vx-atm-y:${y}%`,
+  `--vx-atm-x2:${x2}%`,
+  `--vx-atm-y2:${y2}%`,
+].join(";");
+---
+
+<div class="route-atmosphere" data-page-atmosphere={atmosphereKey} style={atmosphereStyle} aria-hidden="true"></div>
+
+<style is:global>
+  .route-atmosphere {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at var(--vx-atm-x) var(--vx-atm-y), hsl(var(--vx-atm-hue) 86% 64% / .2), transparent 31%),
+      radial-gradient(circle at var(--vx-atm-x2) var(--vx-atm-y2), hsl(var(--vx-atm-accent-hue) 88% 62% / .14), transparent 27%),
+      linear-gradient(155deg, hsl(var(--vx-atm-hue) 36% 8% / .62), rgba(3, 4, 11, .94) 66%);
+    transform: translateZ(0);
+  }
+
+  .route-atmosphere::before {
+    position: absolute;
+    inset: -3%;
+    background-image:
+      linear-gradient(180deg, rgba(3, 4, 11, .3), rgba(3, 4, 11, .76) 62%, rgba(3, 4, 11, .96)),
+      var(--vx-atm-image);
+    background-position: center, var(--vx-atm-position);
+    background-size: cover, cover;
+    background-repeat: no-repeat;
+    content: "";
+    filter: saturate(1.08) contrast(1.03);
+    opacity: var(--vx-atm-image-opacity);
+    transform: scale(var(--vx-atm-image-scale));
+  }
+
+  .route-atmosphere::after {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(112deg, transparent 0 42%, hsl(var(--vx-atm-accent-hue) 92% 72% / .055) 49%, transparent 56%),
+      radial-gradient(ellipse at 50% 115%, hsl(var(--vx-atm-hue) 90% 58% / .11), transparent 48%);
+    content: "";
+    mix-blend-mode: screen;
+  }
+
+  @media (max-width: 700px) {
+    .route-atmosphere::before {
+      inset: -1%;
+      background-position: center, center top;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .route-atmosphere,
+    .route-atmosphere::before {
+      transform: none;
+    }
+  }
+</style>
