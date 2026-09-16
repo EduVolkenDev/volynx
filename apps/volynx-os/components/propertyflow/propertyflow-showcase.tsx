@@ -518,22 +518,22 @@ export function PropertyFlowTierSamples() {
   const samples = [
     {
       tier: propertyFlowTiers[0],
-      title: "Starter is a sellable static catalogue.",
-      copy: "The buyer gets a premium public site, three display modes and real property cards from day one.",
+      title: "Starter publishes a premium site without code.",
+      copy: "The buyer gets a hosted public site, a VOLYNX subdomain, three display modes and real property cards from day one.",
       icon: Grid2X2,
       properties: demoProperties.slice(0, 3)
     },
     {
       tier: propertyFlowTiers[1],
       title: "Professional feels like an operating product.",
-      copy: "Admin, enquiry capture, galleries and six layouts make it obvious why it is more than a template.",
+      copy: "Live admin, enquiry capture, galleries, guided domains and six layouts make it an operating product rather than a template.",
       icon: BarChart3,
       properties: demoProperties.slice(2, 5)
     },
     {
       tier: propertyFlowTiers[2],
       title: "White-Label becomes an agency platform.",
-      copy: "Multi-tenant logic, CRM hooks and fifteen layouts are presented as a premium resale system.",
+      copy: "Multi-tenant workspaces, CRM hooks, automated onboarding and fifteen layouts make it a premium client-site system.",
       icon: ShieldCheck,
       properties: demoProperties.slice(3, 6)
     }

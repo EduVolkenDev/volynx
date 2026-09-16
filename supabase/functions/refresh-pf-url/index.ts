@@ -143,7 +143,7 @@ serve(async (req) => {
     }
   }
 
-  const version = ((purchase.metadata as Record<string, unknown> | null)?.download_version as string) || "v1.0.0";
+  const version = ((purchase.metadata as Record<string, unknown> | null)?.download_version as string) || "v1.1.0";
   const objectPath = `${purchase.addon_id}/${version}.zip`;
 
   const { data: signed, error: signErr } = await admin

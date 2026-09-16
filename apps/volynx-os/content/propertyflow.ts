@@ -1,7 +1,23 @@
 export type PropertyFlowTierId = "starter" | "professional" | "white-label"
 export type PropertyFlowCurrencyCode = "USD" | "GBP" | "EUR" | "BRL"
+export type PropertyFlowTemplateKey =
+  | "classic-grid"
+  | "magazine"
+  | "compact-list"
+  | "gallery-hero"
+  | "split-view"
+  | "masonry"
+  | "editorial"
+  | "minimalist"
+  | "card-stack"
+  | "timeline"
+  | "map-first"
+  | "grouped"
+  | "story-mode"
+  | "showroom"
+  | "catalog"
 
-export const propertyFlowVersion = "1.0.0"
+export const propertyFlowVersion = "1.1.0"
 
 export const propertyFlowPriceMatrix = {
   USD: {
@@ -73,70 +89,75 @@ export const propertyFlowTiers = [
   {
     id: "starter",
     name: "Starter",
-    badge: "Source code",
-    note: "One-time · Source code",
-    eyebrow: "Launch the catalogue",
-    description: "For solo agents or small teams that need a polished bilingual property showcase with static data.",
-    ctaLabel: "Get Starter",
+    badge: "No-code launch",
+    note: "One-time · Hosted setup",
+    eyebrow: "Publish without developers",
+    description: "For solo agents and small teams that want a polished property site and a guided workspace created automatically after checkout.",
+    ctaLabel: "Start with Starter",
     deliveryHref: "/dashboard/purchases/propertyflow?tier=starter&preview=1",
-    downloadFile: "propertyflow-starter-v1.0.0.zip",
+    downloadFile: "propertyflow-starter-v1.1.0.zip",
     supportWindow: "30 days · 48h SLA",
-    subtitle: "Starter tier · 3 templates · static catalogue",
+    templateCount: 3,
+    subtitle: "Starter tier · 3 templates · hosted catalogue",
     highlight: false,
     features: [
-      "Full React source code",
+      "Hosted VOLYNX site created after checkout",
+      "Guided brand, listings and publication setup",
       "Property catalogue + filters",
       "Bilingual interface (EN/PT)",
-      "Responsive design",
-      "Static data mode",
-      "3 grid templates"
+      "VOLYNX subdomain included",
+      "3 templates: Classic Grid, Magazine and Compact List",
+      "Standalone static export with all 3 Starter templates"
     ]
   },
   {
     id: "professional",
     name: "Professional",
     badge: "Most popular",
-    note: "One-time · Full kit",
+    note: "One-time · Live workspace",
     eyebrow: "Operate the agency",
-    description: "For agencies and brokerages that need Supabase, admin controls, enquiries and a stronger delivery license.",
-    ctaLabel: "Get Professional",
+    description: "For agencies and brokerages that need a fuller operating workspace, image management and a guided custom-domain path without editing code.",
+    ctaLabel: "Start with Professional",
     deliveryHref: "/dashboard/purchases/propertyflow?tier=professional&preview=1",
-    downloadFile: "propertyflow-professional-v1.0.0.zip",
+    downloadFile: "propertyflow-professional-v1.1.0.zip",
     supportWindow: "90 days · 24h SLA",
-    subtitle: "Professional tier · 6 templates · Supabase + admin",
+    templateCount: 6,
+    subtitle: "Professional tier · 6 templates · live workspace",
     highlight: true,
     features: [
       "Everything in Starter",
-      "Supabase backend integration",
-      "Admin dashboard",
+      "Live property data and admin dashboard",
       "Image gallery + modals",
-      "Enquiry capture system",
-      "6 grid templates (vs 3 in Starter)",
-      "Full deployment guide",
+      "WhatsApp-ready contact actions",
+      "Guided custom-domain connection",
+      "6 templates, including Gallery Hero, Split View and Masonry",
+      "Standalone static export with all 6 templates",
       "Agency delivery license (1 client)"
     ]
   },
   {
     id: "white-label",
     name: "White-Label",
-    badge: "Premium",
-    note: "One-time · Agency delivery",
-    eyebrow: "Built for agencies at scale",
-    description: "For agencies reselling PropertyFlow as their own real-estate SaaS across many clients.",
-    ctaLabel: "Get White-Label",
+    badge: "Scale",
+    note: "One-time · White-label system",
+    eyebrow: "Launch many client sites",
+    description: "For agencies and studios that want all 15 templates, isolated client workspaces and white-label delivery rights from one operating system.",
+    ctaLabel: "Start with White-Label",
     deliveryHref: "/dashboard/purchases/propertyflow?tier=white-label&preview=1",
-    downloadFile: "propertyflow-white-label-v1.0.0.zip",
+    downloadFile: "propertyflow-white-label-v1.1.0.zip",
     supportWindow: "12 months · 24h priority SLA",
-    subtitle: "White-Label tier · 15 templates · multi-tenant",
+    templateCount: 15,
+    subtitle: "White-Label tier · 15 templates · multi-tenant publishing",
     highlight: false,
     features: [
       "Everything in Professional",
-      "15 grid templates (vs 6 in Pro)",
-      "Multi-tenant mode (1 install, unlimited clients)",
-      "CRM integrations pack (HubSpot, Pipedrive, Salesforce)",
-      "Advanced analytics (per-tenant, per-agent, trends)",
+      "All 15 templates with safe template switching",
+      "Standalone static export with all 15 templates",
+      "Multi-tenant workspaces for client sites",
+      "Automated client onboarding and publishing",
+      "Integration-ready CRM and analytics toolkit",
       "White-label rights (strip all VOLYNX attribution)",
-      "Automated onboarding + self-serve migration toolkit",
+      "Self-serve migration toolkit for supported platforms",
       "Priority email queue (24h SLA · 12 months)",
       "Community Discord access"
     ]
@@ -144,53 +165,56 @@ export const propertyFlowTiers = [
 ] as const
 
 export const propertyFlowHeroMetrics = [
-  { value: "15", label: "Grid templates" },
+  { value: "15", label: "Templates available" },
+  { value: "0", label: "Code required" },
   { value: "EN/PT", label: "Bilingual UI" },
-  { value: "3", label: "Sellable tiers" },
-  { value: "1h", label: "Setup target" }
+  { value: "1", label: "Hosted workspace" }
 ] as const
 
 export const propertyFlowTemplates = [
-  { name: "Classic Grid", tier: "Starter" },
-  { name: "Magazine", tier: "Starter" },
-  { name: "Compact List", tier: "Starter" },
-  { name: "Gallery Hero", tier: "Pro+" },
-  { name: "Split View", tier: "Pro+" },
-  { name: "Masonry", tier: "Pro+" },
-  { name: "Editorial", tier: "White-Label" },
-  { name: "Minimalist", tier: "White-Label" },
-  { name: "Card Stack", tier: "White-Label" },
-  { name: "Timeline", tier: "White-Label" },
-  { name: "Map-First", tier: "White-Label" },
-  { name: "Grouped", tier: "White-Label" },
-  { name: "Story Mode", tier: "White-Label" },
-  { name: "Showroom", tier: "White-Label" },
-  { name: "Catalog", tier: "White-Label" }
+  { key: "classic-grid", name: "Classic Grid", tier: "Starter", description: "Catálogo direto, limpo e fácil de percorrer.", bestFor: "Agências com muitos imóveis" },
+  { key: "magazine", name: "Magazine", tier: "Starter", description: "Uma imagem principal cria desejo e contexto.", bestFor: "Imóveis premium e boutique" },
+  { key: "compact-list", name: "Compact List", tier: "Starter", description: "Comparação rápida de preço, área e localização.", bestFor: "Busca objetiva e inventário extenso" },
+  { key: "gallery-hero", name: "Gallery Hero", tier: "Professional", description: "Imagem dominante com galeria para contar a história.", bestFor: "Casas e apartamentos de alto padrão" },
+  { key: "split-view", name: "Split View", tier: "Professional", description: "Dados e imagem lado a lado para decidir com segurança.", bestFor: "Empreendimentos e investimento" },
+  { key: "masonry", name: "Masonry", tier: "Professional", description: "Cards flexíveis para imóveis com formatos variados.", bestFor: "Portfólios mistos e terrenos" },
+  { key: "editorial", name: "Editorial", tier: "White-Label", description: "Narrativa sofisticada para lançamentos e imóveis de destaque.", bestFor: "Imobiliárias boutique e alto padrão" },
+  { key: "minimalist", name: "Minimalist", tier: "White-Label", description: "Luxo silencioso com menos bordas e mais respiro visual.", bestFor: "Marcas premium e portfólios selecionados" },
+  { key: "card-stack", name: "Card Stack", tier: "White-Label", description: "Cartões empilhados para apresentações e decisões rápidas.", bestFor: "Apresentações comerciais e demonstrações" },
+  { key: "timeline", name: "Timeline", tier: "White-Label", description: "Organiza lançamentos, visitas e histórico de comercialização.", bestFor: "Projetos e empreendimentos em fases" },
+  { key: "map-first", name: "Map-First", tier: "White-Label", description: "A localização lidera a descoberta dos imóveis.", bestFor: "Operações por bairro e região" },
+  { key: "grouped", name: "Grouped", tier: "White-Label", description: "Separa o inventário por bairros, mercados ou categorias.", bestFor: "Imobiliárias com vários mercados" },
+  { key: "story-mode", name: "Story Mode", tier: "White-Label", description: "Uma experiência narrativa para um imóvel ou campanha.", bestFor: "Lançamentos flagship" },
+  { key: "showroom", name: "Showroom", tier: "White-Label", description: "Carrossel premium para destacar uma curadoria enxuta.", bestFor: "Vitrines de alto padrão" },
+  { key: "catalog", name: "Catalog", tier: "White-Label", description: "Visão operacional para listas e comparações sérias.", bestFor: "Equipes comerciais e shortlists" }
 ] as const
 
 export const propertyFlowComparisonRows = [
-  { feature: "React source code", starter: "Yes", professional: "Yes", whiteLabel: "Yes" },
+  { feature: "Hosted VOLYNX publication", starter: "Yes", professional: "Yes", whiteLabel: "Yes" },
+  { feature: "No-code onboarding", starter: "Yes", professional: "Yes", whiteLabel: "Yes" },
+  { feature: "VOLYNX subdomain", starter: "Yes", professional: "Yes", whiteLabel: "Yes" },
+  { feature: "Custom domain connection", starter: "Guided", professional: "Yes", whiteLabel: "Yes" },
+  { feature: "Standalone static export", starter: "3 templates", professional: "6 templates", whiteLabel: "15 templates" },
   { feature: "Property catalogue", starter: "Yes", professional: "Yes", whiteLabel: "Yes" },
   { feature: "Filters", starter: "Yes", professional: "Yes", whiteLabel: "Yes" },
   { feature: "Bilingual EN/PT", starter: "Yes", professional: "Yes", whiteLabel: "Yes" },
-  { feature: "Static data mode", starter: "Yes", professional: "Yes", whiteLabel: "Yes" },
-  { feature: "Supabase backend", starter: "-", professional: "Yes", whiteLabel: "Yes" },
-  { feature: "Admin dashboard", starter: "-", professional: "Yes", whiteLabel: "Yes" },
+  { feature: "Hosted Supabase backend", starter: "-", professional: "Yes", whiteLabel: "Yes" },
+  { feature: "Hosted admin workspace", starter: "Basic", professional: "Full", whiteLabel: "Multi-tenant" },
   { feature: "Image gallery + modals", starter: "-", professional: "Yes", whiteLabel: "Yes" },
-  { feature: "Enquiry capture", starter: "-", professional: "Yes", whiteLabel: "Yes" },
-  { feature: "Grid templates", starter: "3", professional: "6", whiteLabel: "15" },
+  { feature: "Contact actions", starter: "WhatsApp", professional: "WhatsApp", whiteLabel: "Customizable" },
+  { feature: "Templates included", starter: "3", professional: "6", whiteLabel: "15" },
   { feature: "Agency delivery license", starter: "-", professional: "1 client", whiteLabel: "Unlimited" },
   { feature: "Multi-tenant mode", starter: "-", professional: "-", whiteLabel: "Yes" },
-  { feature: "CRM integrations", starter: "-", professional: "-", whiteLabel: "Yes" },
-  { feature: "Advanced analytics", starter: "-", professional: "-", whiteLabel: "Yes" },
+  { feature: "CRM / analytics toolkit", starter: "-", professional: "-", whiteLabel: "Included" },
   { feature: "White-label rights", starter: "-", professional: "-", whiteLabel: "Yes" },
-  { feature: "Automated onboarding", starter: "-", professional: "-", whiteLabel: "Yes" },
+  { feature: "Automated onboarding", starter: "Yes", professional: "Yes", whiteLabel: "Yes" },
   { feature: "Email support window", starter: "30 days", professional: "90 days", whiteLabel: "12 months" },
   { feature: "Email response SLA", starter: "48h", professional: "24h", whiteLabel: "24h priority" },
   { feature: "Free template updates", starter: "-", professional: "-", whiteLabel: "12 months" }
 ] as const
 
 export const propertyFlowDocs = [
+  { slug: "onboarding", title: "Hosted onboarding", tier: "All tiers", file: "onboarding.md" },
   { slug: "setup", title: "Setup", tier: "Starter+", file: "setup.md" },
   { slug: "customization", title: "Customization", tier: "Starter+", file: "customization.md" },
   { slug: "admin", title: "Admin dashboard", tier: "Professional+", file: "admin.md" },
@@ -205,8 +229,8 @@ export const propertyFlowDocs = [
 
 export const propertyFlowDeliveryFeatures = [
   {
-    title: "React 19 + Vite 7 codebase",
-    description: "Full source, typed, modular. Hot reload and fast builds.",
+    title: "Hosted Property Flow workspace",
+    description: "The public site, dashboard and tenant data are provisioned automatically after checkout.",
     minTier: "starter"
   },
   {
@@ -220,6 +244,11 @@ export const propertyFlowDeliveryFeatures = [
     minTier: "starter"
   },
   {
+    title: "No-code publication",
+    description: "Start with a VOLYNX subdomain. Connect a custom domain through guided DNS verification.",
+    minTier: "starter"
+  },
+  {
     title: "Supabase backend",
     description: "Auth, database and storage. Free tier handles most agencies.",
     minTier: "professional"
@@ -230,23 +259,23 @@ export const propertyFlowDeliveryFeatures = [
     minTier: "professional"
   },
   {
-    title: "Enquiry capture",
-    description: "Contact forms, email notifications and CRM webhook-ready flow.",
+    title: "Contact actions",
+    description: "WhatsApp-ready contact actions that can be customized per property and brand.",
     minTier: "professional"
   },
   {
     title: "Multi-tenant mode",
-    description: "One install, unlimited agency clients. Path or domain tenancy.",
+    description: "Separate client workspaces with isolated data, branding, templates and publication settings.",
     minTier: "white-label"
   },
   {
-    title: "CRM integrations",
-    description: "HubSpot, Pipedrive and Salesforce webhooks pre-wired.",
+    title: "CRM integration toolkit",
+    description: "Documented, tenant-safe connection points for supported CRM integrations.",
     minTier: "white-label"
   },
   {
-    title: "Advanced analytics",
-    description: "Per-tenant and per-agent metrics with trends and exports.",
+    title: "Analytics foundation",
+    description: "Tenant-safe data structures prepared for reporting extensions and exports.",
     minTier: "white-label"
   }
 ] as const

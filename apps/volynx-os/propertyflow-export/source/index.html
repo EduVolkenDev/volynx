@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Catálogo imobiliário Property Flow" />
+    <meta name="theme-color" content="#090d16" />
+    <title>Property Flow</title>
+    <link rel="stylesheet" href="./assets/styles.css" />
+    <script type="module" src="./assets/app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#catalog">Pular para os imóveis</a>
+    <div class="site-shell" id="siteShell" data-template="classic-grid">
+      <header class="site-header">
+        <a class="brand" href="./" aria-label="Página inicial">
+          <img id="brandLogo" class="brand__logo" alt="" hidden />
+          <span id="brandMark" class="brand__mark" aria-hidden="true">PF</span>
+          <span class="brand__copy">
+            <strong id="brandName">Property Flow</strong>
+            <small id="brandTagline">Imóveis selecionados</small>
+          </span>
+        </a>
+        <div class="header-actions">
+          <button class="language-toggle" id="languageToggle" type="button" aria-label="Change language">EN</button>
+          <a class="contact-link" id="headerContact" href="#contact">Contato</a>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="heroTitle">
+          <div class="hero__copy">
+            <span class="eyebrow" id="heroEyebrow">CURADORIA IMOBILIÁRIA</span>
+            <h1 id="heroTitle">Encontre um lugar que faça sentido.</h1>
+            <p id="heroDescription">Explore imóveis selecionados com contexto, clareza e atendimento humano.</p>
+            <div class="hero__actions">
+              <a class="button button--primary" href="#catalog" id="heroCatalogLink">Ver imóveis</a>
+              <a class="button button--secondary" href="#contact" id="heroContactLink">Falar com a equipe</a>
+            </div>
+          </div>
+          <div class="hero__media" id="heroMedia" role="img" aria-label="Imóvel em destaque"></div>
+        </section>
+
+        <section class="template-panel" id="templatePanel" aria-labelledby="templateTitle">
+          <div>
+            <span class="eyebrow" id="templateEyebrow">VISUAL DO SITE</span>
+            <h2 id="templateTitle">Escolha um template para visualizar</h2>
+            <p id="templateHint">A troca altera apenas o layout. Seus imóveis e fotos permanecem iguais.</p>
+          </div>
+          <label class="template-select">
+            <span id="templateLabel">Template</span>
+            <select id="templateSelect"></select>
+          </label>
+        </section>
+
+        <section class="catalog" id="catalog" aria-labelledby="catalogTitle">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow" id="catalogEyebrow">CATÁLOGO</span>
+              <h2 id="catalogTitle">Imóveis disponíveis</h2>
+            </div>
+            <span id="propertyCount" aria-live="polite"></span>
+          </div>
+
+          <div class="filters" aria-label="Filtros do catálogo">
+            <label class="search-field">
+              <span class="visually-hidden" id="searchLabel">Buscar imóveis</span>
+              <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>
+              <input id="searchInput" type="search" autocomplete="off" placeholder="Buscar por imóvel, cidade ou bairro" />
+            </label>
+            <label class="filter-field">
+              <span class="visually-hidden" id="categoryLabel">Categoria</span>
+              <select id="categoryFilter"></select>
+            </label>
+            <label class="filter-field">
+              <span class="visually-hidden" id="listingLabel">Finalidade</span>
+              <select id="listingFilter"></select>
+            </label>
+          </div>
+
+          <div class="map-context" id="mapContext" hidden>
+            <div class="map-context__grid" aria-hidden="true"></div>
+            <div><span class="eyebrow">LOCALIZAÇÃO</span><h3 id="mapTitle">Descubra por região</h3><p id="mapDescription">Use a busca para explorar bairros e cidades do catálogo.</p></div>
+          </div>
+
+          <div class="property-grid" id="propertyGrid"></div>
+          <div class="empty-state" id="emptyState" hidden>
+            <strong id="emptyTitle">Nenhum imóvel encontrado</strong>
+            <p id="emptyDescription">Tente remover um filtro ou usar outro termo de busca.</p>
+          </div>
+        </section>
+
+        <section class="contact-section" id="contact" aria-labelledby="contactTitle">
+          <div>
+            <span class="eyebrow" id="contactEyebrow">ATENDIMENTO</span>
+            <h2 id="contactTitle">Vamos encontrar o imóvel certo?</h2>
+            <p id="contactDescription">Conte o que você procura e nossa equipe retorna com opções selecionadas.</p>
+          </div>
+          <div class="contact-actions">
+            <a class="button button--primary" id="whatsappLink" href="#">WhatsApp</a>
+            <a class="button button--secondary" id="emailLink" href="#">Email</a>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div><strong id="footerBrand">Property Flow</strong><span id="footerAddress"></span></div>
+        <span id="poweredBy">Powered by VOLYNX Property Flow</span>
+      </footer>
+    </div>
+
+    <dialog class="property-dialog" id="propertyDialog" aria-labelledby="dialogTitle">
+      <button class="dialog-close" id="dialogClose" type="button" aria-label="Fechar detalhes">×</button>
+      <div class="dialog-layout">
+        <div class="dialog-gallery">
+          <img id="dialogImage" alt="" />
+          <div class="dialog-thumbnails" id="dialogThumbnails"></div>
+        </div>
+        <div class="dialog-copy">
+          <span class="eyebrow" id="dialogCategory"></span>
+          <h2 id="dialogTitle"></h2>
+          <p class="dialog-location" id="dialogLocation"></p>
+          <strong class="dialog-price" id="dialogPrice"></strong>
+          <p id="dialogDescription"></p>
+          <dl class="dialog-facts" id="dialogFacts"></dl>
+          <a class="button button--primary" id="dialogContact" href="#">Tenho interesse</a>
+        </div>
+      </div>
+    </dialog>
+
+    <div class="fatal-state" id="fatalState" hidden>
+      <strong>Não foi possível carregar o catálogo.</strong>
+      <p>Confira os arquivos <code>content/site.json</code> e <code>content/properties.json</code>, depois rode <code>npm run validate</code>.</p>
+      <pre id="fatalMessage"></pre>
+    </div>
+    <noscript>Ative o JavaScript para visualizar este catálogo.</noscript>
+  </body>
+</html>

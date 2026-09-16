@@ -36,6 +36,7 @@ type Entitlement = {
 const storageKey = "propertyflow-download-history"
 const pendingCheckoutKey = "propertyflow-pending-checkout"
 const propertyFlowPublicHref = getPropertyFlowPublicUrl()
+const propertyFlowWorkspaceHref = "https://volynx.world/dashboard/propertyflow/"
 
 type PendingCheckout = {
   sessionId?: string
@@ -265,11 +266,11 @@ export function PropertyFlowDeliveryClient() {
           {access.label}
         </div>
         <h1 className="mt-6 max-w-4xl text-5xl font-semibold tracking-[-0.06em] text-white md:text-7xl">
-          Your PropertyFlow kit is ready.
+          Your PropertyFlow workspace is ready.
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-8 text-zinc-400">
-          Everything needed for the {tier.name} tier: tier README, commercial license, docs, public assets and
-          protected ZIP delivery. The server checks the Stripe session before opening the pack.
+          Your hosted workspace and VOLYNX address are provisioned automatically. Finish your brand setup, add
+          properties and publish from the dashboard. The source package and operating docs remain available here.
         </p>
       </section>
 
@@ -305,6 +306,22 @@ export function PropertyFlowDeliveryClient() {
           Download ZIP <Download className="ml-2 h-4 w-4" />
         </button>
       </section>
+
+      {access.allowed ? (
+        <section className="mt-5 grid gap-5 rounded-lg border border-emerald-200/15 bg-emerald-200/[0.04] p-6 md:grid-cols-[1fr_auto] md:items-center">
+          <div>
+            <p className="text-xs uppercase tracking-[0.22em] text-emerald-200/70">Hosted workspace</p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-white">Continue with the guided setup.</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">
+              Your workspace is separated from other customers, starts with a VOLYNX subdomain and keeps your existing
+              website untouched. Add your logo, choose a permitted template and publish when you are ready.
+            </p>
+          </div>
+          <a href={propertyFlowWorkspaceHref} className="button-primary w-full md:w-auto">
+            Open workspace <ArrowRight className="ml-2 h-4 w-4" />
+          </a>
+        </section>
+      ) : null}
 
       {!access.allowed ? (
         <div className="mt-5 rounded-lg border border-amber-300/20 bg-amber-300/10 p-5 text-sm leading-7 text-amber-100/90">

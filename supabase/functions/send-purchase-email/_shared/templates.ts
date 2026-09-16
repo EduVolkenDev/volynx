@@ -195,6 +195,9 @@ function propertyflowReady(p: Profile, x: Record<string, any>): RenderResult {
   const url = String(x.signed_url || PROPERTYFLOW_DELIVERY_URL);
   const expiresAt = String(x.expires_at || "");
   const sessionId = String(x.session_id || "");
+  const workspaceUrl = String(x.workspace_url || "https://volynx.world/dashboard/propertyflow/");
+  const publicUrl = String(x.public_url || "");
+  const templateCount = Number(x.template_count || 0);
   const deliveryUrl = sessionId
     ? `${PROPERTYFLOW_DELIVERY_URL}?session_id=${encodeURIComponent(sessionId)}`
     : PROPERTYFLOW_DELIVERY_URL;
@@ -206,11 +209,17 @@ function propertyflowReady(p: Profile, x: Record<string, any>): RenderResult {
     ? `Sua PropertyFlow ${tier} está pronta`
     : `PropertyFlow ${tier} is ready`;
   const intro = p.locale === "pt"
-    ? `Olá ${p.first_name}, seu pacote PropertyFlow ${tier} está disponível para download. O link abaixo é privado e expira em 24 horas — gere um novo a qualquer momento na página de entrega.`
-    : `Hi ${p.first_name}, your PropertyFlow ${tier} bundle is ready. The link below is private and expires in 24 hours — generate a fresh one anytime from your delivery page.`;
+    ? `Olá ${p.first_name}, seu workspace PropertyFlow ${tier} já foi preparado. Abra o painel para concluir sua identidade e começar a publicar — o site já tem um endereço VOLYNX reservado.`
+    : `Hi ${p.first_name}, your PropertyFlow ${tier} workspace is ready. Open the dashboard to finish your brand setup and start publishing — a VOLYNX address is already reserved for you.`;
   const expiryNote = expiresHuman
     ? (p.locale === "pt" ? `<p style="margin:18px 0 0;font-size:13px;color:#a1a1aa;">Link válido até <strong>${escapeText(expiresHuman)}</strong>.</p>` : `<p style="margin:18px 0 0;font-size:13px;color:#a1a1aa;">Link valid until <strong>${escapeText(expiresHuman)}</strong>.</p>`)
     : "";
+  const workspaceNote = `<div style="background:#0a0a0b;border:1px solid #27272a;border-radius:14px;padding:18px 20px;margin:20px 0;">
+    <div style="font-size:12px;color:#71717a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">${p.locale === "pt" ? "Workspace publicado" : "Published workspace"}</div>
+    <a href="${escapeText(workspaceUrl)}" style="font-size:16px;color:#2dd4bf;font-weight:800;text-decoration:none;">${p.locale === "pt" ? "Abrir painel PropertyFlow" : "Open PropertyFlow dashboard"}</a>
+    ${publicUrl ? `<div style="margin-top:12px;font-size:13px;color:#d4d4d8;">${p.locale === "pt" ? "Endereço público:" : "Public address:"} <a href="${escapeText(publicUrl)}" style="color:#f5d58a;">${escapeText(publicUrl)}</a></div>` : ""}
+    ${templateCount ? `<div style="margin-top:8px;font-size:12px;color:#a1a1aa;">${templateCount} ${p.locale === "pt" ? "templates disponíveis no seu tier." : "templates available in your tier."}</div>` : ""}
+  </div>`;
 
   return {
     subject,
@@ -218,11 +227,11 @@ function propertyflowReady(p: Profile, x: Record<string, any>): RenderResult {
       preheader: intro,
       heading: subject,
       intro,
-      bodyHtml: expiryNote,
-      ctaLabel: p.locale === "pt" ? "Baixar ZIP" : "Download ZIP",
-      ctaUrl: url,
-      secondaryLabel: p.locale === "pt" ? "Abrir PropertyFlow" : "Open PropertyFlow delivery",
-      secondaryUrl: deliveryUrl,
+      bodyHtml: workspaceNote + expiryNote,
+      ctaLabel: p.locale === "pt" ? "Abrir meu workspace" : "Open my workspace",
+      ctaUrl: workspaceUrl,
+      secondaryLabel: p.locale === "pt" ? "Baixar pacote fonte" : "Download source package",
+      secondaryUrl: url || deliveryUrl,
       locale: p.locale,
     }),
   };

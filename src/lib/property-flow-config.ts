@@ -60,7 +60,7 @@ export const DEFAULT_PROPERTY_FLOW_ADMIN_CONFIG: PropertyFlowAdminConfig = {
     overview: "Visão geral",
     properties: "Imóveis",
     appearance: "Identidade",
-    modules: "Módulos e campos",
+    modules: "Preferências",
     newProperty: "Novo imóvel",
     publish: "Publicar",
     archive: "Arquivar",

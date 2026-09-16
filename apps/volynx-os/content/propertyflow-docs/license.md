@@ -35,6 +35,8 @@ Your tier defines what you can do. This is the authoritative comparison.
 | Sell under your own sub-brand | — | — | ✓ |
 | Number of grid templates | 3 | 6 | 15 |
 
+The Supabase backend, authenticated admin dashboard and multi-tenant operations above refer to the hosted Property Flow product. The downloadable standalone export is intentionally static in every tier and contains no VOLYNX credentials, tenant data or hosted runtime. Its tier difference is the licensed template set and delivery rights.
+
 ---
 
 ## 3. What every tier permits

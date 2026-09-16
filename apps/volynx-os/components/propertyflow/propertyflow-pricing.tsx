@@ -51,12 +51,27 @@ export function PropertyFlowPricing() {
     setCheckoutError(null)
 
     try {
+      const accessToken = window.localStorage.getItem("volynx_access_token") || ""
+
+      if (!accessToken) {
+        window.location.assign(`/login/?next=${encodeURIComponent(`/products/propertyflow/?checkout=${tier}`)}`)
+        return
+      }
+
       const response = await fetch("/api/checkout/propertyflow", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: {
+          "content-type": "application/json",
+          Authorization: `Bearer ${accessToken}`
+        },
         body: JSON.stringify({ tier, currency })
       })
       const data = await response.json() as { url?: string; sessionId?: string; error?: string }
+
+      if (response.status === 401) {
+        window.location.assign(`/login/?next=${encodeURIComponent(`/products/propertyflow/?checkout=${tier}`)}`)
+        return
+      }
 
       if (!response.ok || !data.url) {
         throw new Error(data.error ?? "Checkout could not be started.")
@@ -86,10 +101,10 @@ export function PropertyFlowPricing() {
         <div className="mb-10 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
             <span className="eyebrow">Pricing</span>
-            <h2 className="section-title">Three tiers, zero manual service dependency.</h2>
+            <h2 className="section-title">Three tiers, one automatic publishing path.</h2>
             <p className="section-copy mt-5">
-              Starter launches the static catalogue, Professional adds the operating layer, and White-Label turns
-              PropertyFlow into a resale-ready system for agencies.
+              Every tier creates a hosted Property Flow workspace and a VOLYNX subdomain. Professional adds live
+              operations, while White-Label adds the scale and controls needed for client delivery.
             </p>
           </div>
           <div className="flex flex-wrap gap-2 rounded-lg border border-white/10 bg-black/30 p-1">
@@ -107,6 +122,12 @@ export function PropertyFlowPricing() {
               </button>
             ))}
           </div>
+        </div>
+
+        <div className="mb-10 grid gap-3 rounded-lg border border-emerald-200/15 bg-emerald-200/[0.04] p-5 text-sm leading-6 text-zinc-300 md:grid-cols-3">
+          <div><strong className="text-white">No code required</strong><br />The setup wizard creates the hosted site after checkout.</div>
+          <div><strong className="text-white">Your current site stays safe</strong><br />The default publication uses a separate subdomain.</div>
+          <div><strong className="text-white">Custom domain available</strong><br />Connect it with guided DNS verification and SSL.</div>
         </div>
 
         <div className="grid gap-5 lg:grid-cols-3">

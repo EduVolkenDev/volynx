@@ -1008,12 +1008,14 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           .eq("metadata->>stripe_session_id", session.id)
           .maybeSingle(),
       );
+      let propertyFlowPurchaseId: string | null = isPropertyFlow ? existingKitOrPf?.id || null : null;
+      let propertyFlowPurchaseMetadata = (existingKitOrPf?.metadata || {}) as Record<string, unknown>;
 
       // Record as addon purchase (single source of truth for /delivery/).
       // For PF and kits, metadata carries delivery context on first insert.
       // Kits still receive a Builder project below as a secondary fallback.
       if (!existingKitOrPf) {
-        requireDbSuccess("record kit or PropertyFlow purchase", await supabase.from("addons_purchased").insert({
+        const purchaseInsert = await supabase.from("addons_purchased").insert({
           user_id: userId,
           addon_id: addonId,
           price_paid: (session.amount_total || 0) / 100,
@@ -1045,7 +1047,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
               delivery_error: kitDownloadError,
             } : {}),
           },
-        }));
+        }).select("id, metadata").single();
+        requireDbSuccess("record kit or PropertyFlow purchase", purchaseInsert);
+        propertyFlowPurchaseId = isPropertyFlow ? purchaseInsert.data?.id || null : null;
+        propertyFlowPurchaseMetadata = (purchaseInsert.data?.metadata || {}) as Record<string, unknown>;
       } else {
         console.log(`Kit/PF purchase ${prefix} already recorded for session ${session.id} — skip insert`);
       }
@@ -1197,6 +1202,39 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       console.log(`${isPropertyFlow ? "PropertyFlow" : "Kit"} purchase ${prefix} activated for ${userId}`);
 
       if (isPropertyFlow) {
+        if (!propertyFlowPurchaseId) {
+          throw new Error(`PropertyFlow purchase ${session.id} has no entitlement row`);
+        }
+
+        const workspaceResult = await supabase.rpc("provision_property_flow_workspace", {
+          p_user_id: userId,
+          p_purchase_id: propertyFlowPurchaseId,
+          p_tier: tier,
+          p_tier_label: tierLabel,
+          p_stripe_session_id: session.id,
+        });
+        if (workspaceResult.error || !workspaceResult.data?.workspace_id) {
+          throw new Error(`PropertyFlow workspace provisioning failed: ${workspaceResult.error?.message || "empty workspace result"}`);
+        }
+
+        const workspace = workspaceResult.data as Record<string, unknown>;
+        const workspaceMetadata = {
+          ...propertyFlowPurchaseMetadata,
+          workspace_id: workspace.workspace_id,
+          organization_id: workspace.organization_id,
+          site_id: workspace.site_id,
+          subdomain: workspace.subdomain,
+          public_url: workspace.public_url,
+          onboarding_status: workspace.onboarding_status,
+          workspace_status: workspace.status,
+          template_count: workspace.template_count,
+          fulfillment_status: "workspace_ready",
+        };
+        requireDbSuccess("attach PropertyFlow workspace to entitlement", await supabase
+          .from("addons_purchased")
+          .update({ metadata: workspaceMetadata })
+          .eq("id", propertyFlowPurchaseId));
+
         await queueEmail({
           event_type: "propertyflow_ready",
           user_id: userId,
@@ -1208,6 +1246,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             session_id: session.id,
             signed_url: pfDownloadUrl,
             expires_at: pfDownloadExpiresAt,
+            workspace_url: "https://volynx.world/dashboard/propertyflow/",
+            public_url: workspace.public_url,
+            onboarding_status: workspace.onboarding_status,
+            template_count: workspace.template_count,
           },
         });
       } else if (presetId) {

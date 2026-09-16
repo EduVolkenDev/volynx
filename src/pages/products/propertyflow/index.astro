@@ -4,8 +4,8 @@ import FaviconHead from "../../../components/FaviconHead.astro";
 import SiteFooter from "../../../components/SiteFooter.astro";
 import Topbar from "../../../components/Topbar.astro";
 import { ROUTES, checkoutHref } from "../../../data/routes";
-const pageTitle = "PropertyFlow — VOLYNX Real Estate Platform";
-const pageDescription = "Premium property management platform for real estate agencies. Smart catalogue, bilingual interface, live filters and lead capture.";
+const pageTitle = "PropertyFlow — site imobiliário publicado sem código | VOLYNX";
+const pageDescription = "PropertyFlow cria e publica automaticamente um site imobiliário personalizado, com subdomínio VOLYNX, domínio próprio guiado e templates premium.";
 ---
 
 <!DOCTYPE html>
@@ -224,6 +224,18 @@ const pageDescription = "Premium property management platform for real estate ag
       flex-direction: column;
       align-items: center;
       gap: 12px;
+    }
+    .step-number {
+      display: inline-grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border: 1px solid rgba(214,179,106,0.34);
+      border-radius: 999px;
+      color: var(--gold-soft);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
     }
     .feature__icon {
       position: relative;
@@ -1045,35 +1057,10 @@ const pageDescription = "Premium property management platform for real estate ag
     .tpl-card:hover .tpl-card__hint { opacity: 1; transform: translateY(0); }
     .tpl-card__hint svg { width: 14px; height: 14px; }
 
-    /* ─── Templates: see-more collapse ─── */
+    /* ─── Templates: all 15 previews stay visible before purchase ─── */
     .tpl-extra {
       display: contents;
     }
-    .tpl-extra[hidden] { display: none; }
-    .templates-toggle-row {
-      display: flex; justify-content: center;
-      margin-top: 24px;
-    }
-    .templates-toggle {
-      display: inline-flex; align-items: center; gap: 10px;
-      padding: 12px 22px; border-radius: 999px;
-      border: 1px solid rgba(214,179,106,.32);
-      background: rgba(214,179,106,.08);
-      color: var(--gold-soft);
-      font-size: .88rem; font-weight: 600;
-      cursor: pointer;
-      transition: background .2s ease, border-color .2s ease, transform .2s ease;
-    }
-    .templates-toggle:hover {
-      background: rgba(214,179,106,.16);
-      border-color: rgba(214,179,106,.5);
-      transform: translateY(-1px);
-    }
-    .templates-toggle svg {
-      width: 14px; height: 14px;
-      transition: transform .3s ease;
-    }
-    .templates-toggle.is-open svg { transform: rotate(180deg); }
 
     /* ─── Layout intro band (before grid) ─── */
     .templates-intro {
@@ -1521,17 +1508,17 @@ const pageDescription = "Premium property management platform for real estate ag
       <div>
         <span class="hero__badge" data-i18n="pf.badge">Real Estate · SaaS</span>
         <h1 data-i18n="pf.title">
-          Property management
-          <span>done with precision.</span>
+          A premium property site
+          <span>that publishes itself.</span>
         </h1>
         <p data-i18n="pf.desc">
-          PropertyFlow is a premium platform for real estate agencies to manage listings,
-          showcase properties, and deliver a polished client experience —
-          with a polished experience from catalogue to enquiry.
+          PropertyFlow is a hosted workspace for your property site. Choose a tier, follow the guided setup and publish
+          without editing your existing website. The dashboard, catalogue, brand settings and VOLYNX address are created
+          automatically; a complete standalone static ZIP is included as an optional delivery mode.
         </p>
         <div class="hero__actions">
-          <a class="btn btn--primary" href="/contact/?product=propertyflow" data-i18n="pf.btn_demo">Request a demo</a>
-          <a class="btn btn--ghost" href={`${ROUTES.docs}#propertyflow`}><span class="i18n-en">Preview buyer flow</span><span class="i18n-pt">Ver fluxo do comprador</span></a>
+          <a class="btn btn--primary" href="#pricing"><span class="i18n-en">Choose a tier</span><span class="i18n-pt">Escolher um tier</span></a>
+          <a class="btn btn--ghost" href="#how-it-works"><span class="i18n-en">How it works</span><span class="i18n-pt">Como funciona</span></a>
           <a class="btn btn--ghost" href="/contact/" data-i18n="pf.btn_talk">Talk to us</a>
         </div>
       </div>
@@ -1547,8 +1534,8 @@ const pageDescription = "Premium property management platform for real estate ag
     <section class="section">
       <div class="section__head">
         <span class="kicker" data-i18n="pf.features_kicker">What's inside</span>
-        <h2 data-i18n="pf.features_title">Everything an agency needs.</h2>
-        <p class="sub" data-i18n="pf.features_subtitle">From listing management to client-facing showcase — built for real workflows.</p>
+        <h2 data-i18n="pf.features_title">From purchase to published site.</h2>
+        <p class="sub" data-i18n="pf.features_subtitle">The hosted workspace, catalogue and publication path are created for you — no access to your existing codebase required.</p>
       </div>
 
       <div class="features">
@@ -1569,19 +1556,48 @@ const pageDescription = "Premium property management platform for real estate ag
         </div>
         <div class="feature">
           <div class="feature__icon"><img src="/assets/supabase.webp" alt="" aria-hidden="true" /></div>
-          <h3 data-i18n="pf.f4_title">Supabase-Ready</h3>
-          <p data-i18n="pf.f4_desc">Clean data layer architected for a real backend. Swap the static data for live queries in minutes.</p>
+          <h3 data-i18n="pf.f4_title">Hosted publication</h3>
+          <p data-i18n="pf.f4_desc">Your workspace and VOLYNX subdomain are created after checkout. Use a custom domain through the guided DNS flow.</p>
         </div>
         <div class="feature">
           <div class="feature__icon"><img src="/assets/premiumvisual.webp" alt="" aria-hidden="true" /></div>
-          <h3 data-i18n="pf.f5_title">Premium Visual System</h3>
-          <p data-i18n="pf.f5_desc">Dark luxury aesthetic with glassmorphism, gold accents and VOLYNX design tokens throughout.</p>
+          <h3 data-i18n="pf.f5_title">Adaptable identity</h3>
+          <p data-i18n="pf.f5_desc">Choose your logo, colors, copy and template without editing code. The Property Flow system stays consistent while your brand becomes visible.</p>
         </div>
         <div class="feature">
           <div class="feature__icon"><img src="/assets/responsive.webp" alt="" aria-hidden="true" /></div>
           <h3 data-i18n="pf.f6_title">Fully Responsive</h3>
           <p data-i18n="pf.f6_desc">Mobile-first layouts. Filter bar, property grid and modal all adapt cleanly to any screen size.</p>
         </div>
+      </div>
+    </section>
+
+    <section class="section" id="how-it-works">
+      <div class="section__head">
+        <span class="kicker"><span class="i18n-en">How it works</span><span class="i18n-pt">Como funciona</span></span>
+        <h2><span class="i18n-en">From payment to published site, with a clear next step.</span><span class="i18n-pt">Do pagamento ao site publicado, sempre com um próximo passo claro.</span></h2>
+        <p class="sub"><span class="i18n-en">You do not need a domain, a developer or access to your current website to begin.</span><span class="i18n-pt">Você não precisa ter domínio, contratar programador ou dar acesso ao seu site atual para começar.</span></p>
+      </div>
+      <div class="features">
+        <div class="feature"><span class="step-number">01</span><h3><span class="i18n-en">Choose your tier</span><span class="i18n-pt">Escolha seu tier</span></h3><p><span class="i18n-en">Starter includes 3 templates, Professional 6, and White-Label all 15.</span><span class="i18n-pt">Starter inclui 3 templates, Professional 6 e White-Label todos os 15.</span></p></div>
+        <div class="feature"><span class="step-number">02</span><h3><span class="i18n-en">Open your workspace</span><span class="i18n-pt">Abra seu workspace</span></h3><p><span class="i18n-en">After payment, your dashboard, site shell and VOLYNX address are created automatically.</span><span class="i18n-pt">Após o pagamento, seu dashboard, site e endereço VOLYNX são criados automaticamente.</span></p></div>
+        <div class="feature"><span class="step-number">03</span><h3><span class="i18n-en">Make it yours</span><span class="i18n-pt">Deixe com a sua marca</span></h3><p><span class="i18n-en">Add your logo, colors, contact details, photos and first properties through guided forms.</span><span class="i18n-pt">Adicione logo, cores, contatos, fotos e os primeiros imóveis por formulários guiados.</span></p></div>
+        <div class="feature"><span class="step-number">04</span><h3><span class="i18n-en">Choose a template</span><span class="i18n-pt">Escolha um template</span></h3><p><span class="i18n-en">Use the templates included in your tier. Switching layout never changes your properties or photos.</span><span class="i18n-pt">Use os templates do seu tier. Trocar o layout nunca altera seus imóveis ou fotos.</span></p></div>
+        <div class="feature"><span class="step-number">05</span><h3><span class="i18n-en">Publish the address</span><span class="i18n-pt">Publique o endereço</span></h3><p><span class="i18n-en">Launch at your-brand.volynx.world, then connect a custom domain later if you want.</span><span class="i18n-pt">Publique em sua-marca.volynx.world e conecte um domínio próprio depois, se quiser.</span></p></div>
+        <div class="feature"><span class="step-number">06</span><h3><span class="i18n-en">Keep your current site safe</span><span class="i18n-pt">Mantenha seu site atual seguro</span></h3><p><span class="i18n-en">Your existing site stays untouched. Add a link first; deeper integrations are optional.</span><span class="i18n-pt">Seu site atual continua intacto. Comece com um link; integrações profundas são opcionais.</span></p></div>
+      </div>
+    </section>
+
+    <section class="section" id="publication">
+      <div class="section__head">
+        <span class="kicker" data-i18n="pf.publication_kicker">Publication paths</span>
+        <h2 data-i18n="pf.publication_title">Your current website does not need to change.</h2>
+        <p class="sub" data-i18n="pf.publication_desc">PropertyFlow is hosted separately by default, so customers can launch without giving VOLYNX access to their existing code.</p>
+      </div>
+      <div class="features">
+        <div class="feature"><h3 data-i18n="pf.publication_subdomain_title">VOLYNX subdomain</h3><p data-i18n="pf.publication_subdomain_desc">The automatic path: publish at yourbrand.volynx.world and add a link from your existing site whenever you want.</p></div>
+        <div class="feature"><h3 data-i18n="pf.publication_domain_title">Custom domain</h3><p data-i18n="pf.publication_domain_desc">Use imoveis.yourdomain.com with a guided DNS check and automatic SSL. No site password is required.</p></div>
+        <div class="feature"><h3 data-i18n="pf.publication_existing_title">Existing site</h3><p data-i18n="pf.publication_existing_desc">Your original site remains untouched. A route inside it or an embedded catalogue is optional and requires access to that site or its hosting.</p></div>
       </div>
     </section>
 
@@ -1856,7 +1872,7 @@ const pageDescription = "Premium property management platform for real estate ag
         <!-- Gallery Hero — Pro+ -->
         <div class="tpl-card tpl-card--pro" data-pf-template
              data-tpl-name="Gallery Hero"
-             data-tpl-tier="Pro"
+             data-tpl-tier="Professional"
              data-tpl-best="Luxury brokers, hero listings, signature properties"
              data-tpl-property-type="High-end residential, penthouses, signature villas"
              data-tpl-when="When one property is the pitch and supporting shots build the dream. Hero image dominates; thumbnails preview the journey."
@@ -1884,7 +1900,7 @@ const pageDescription = "Premium property management platform for real estate ag
             <span class="tpl-card__name" data-i18n="pf.tpl_gallery">Gallery Hero</span>
             <span class="tpl-card__use" data-i18n="pf.tpl_gallery_use">Cinematic hero · high-end residential</span>
           </div>
-          <span class="tpl-pro-tag">Pro+</span>
+          <span class="tpl-pro-tag">Professional</span>
           <span class="tpl-card__hint" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span>
@@ -1893,7 +1909,7 @@ const pageDescription = "Premium property management platform for real estate ag
         <!-- Split View — Pro+ -->
         <div class="tpl-card tpl-card--pro" data-pf-template
              data-tpl-name="Split View"
-             data-tpl-tier="Pro"
+             data-tpl-tier="Professional"
              data-tpl-best="Detailed comparisons, premium specs, investor pitches"
              data-tpl-property-type="Investment properties, off-plan units, commercial"
              data-tpl-when="When the buyer needs to compare hard data — yield, area, ROI — alongside the visual. Image + metrics live side by side."
@@ -1924,7 +1940,7 @@ const pageDescription = "Premium property management platform for real estate ag
             <span class="tpl-card__name" data-i18n="pf.tpl_split">Split View</span>
             <span class="tpl-card__use" data-i18n="pf.tpl_split_use">Image + data side-by-side · investor decks</span>
           </div>
-          <span class="tpl-pro-tag">Pro+</span>
+          <span class="tpl-pro-tag">Professional</span>
           <span class="tpl-card__hint" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span>
@@ -1933,7 +1949,7 @@ const pageDescription = "Premium property management platform for real estate ag
         <!-- Masonry — Pro+ -->
         <div class="tpl-card tpl-card--pro" data-pf-template
              data-tpl-name="Masonry"
-             data-tpl-tier="Pro"
+             data-tpl-tier="Professional"
              data-tpl-best="Mixed inventory, developments, lifestyle browsing"
              data-tpl-property-type="Mixed-use developments, lifestyle properties, varied stock"
              data-tpl-when="When property sizes vary wildly — penthouses next to studios, plots next to villas — and a uniform grid would crop the wrong ones."
@@ -1962,19 +1978,19 @@ const pageDescription = "Premium property management platform for real estate ag
             <span class="tpl-card__name" data-i18n="pf.tpl_masonry">Masonry</span>
             <span class="tpl-card__use" data-i18n="pf.tpl_masonry_use">Mixed sizes · varied inventory</span>
           </div>
-          <span class="tpl-pro-tag">Pro+</span>
+          <span class="tpl-pro-tag">Professional</span>
           <span class="tpl-card__hint" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span>
         </div>
 
-        <!-- ── EXTRA LAYOUTS (hidden by default, expand via "See more") ─── -->
-        <div class="tpl-extra" id="tplExtra" hidden>
+        <!-- ── WHITE-LABEL LAYOUTS ─────────────────────────────────────── -->
+        <div class="tpl-extra" id="tplExtra">
 
-          <!-- Map View — White-Label -->
+          <!-- Map-First — White-Label -->
           <div class="tpl-card tpl-card--pro" data-pf-template
-               data-tpl-name="Map View"
-               data-tpl-tier="Studio"
+               data-tpl-name="Map-First"
+               data-tpl-tier="White-Label"
                data-tpl-best="Location-driven buyers, multi-neighbourhood agencies"
                data-tpl-property-type="Urban portfolios, neighbourhood-segmented inventory, holiday rentals"
                data-tpl-when="When location is the buying decision. Pins on a map carry the whole catalogue; cards expand on hover."
@@ -1995,7 +2011,7 @@ const pageDescription = "Premium property management platform for real estate ag
               </div>
             </div>
             <div class="tpl-card__footer">
-              <span class="tpl-card__name"><span class="i18n-en">Map View</span><span class="i18n-pt">Visão em Mapa</span></span>
+              <span class="tpl-card__name"><span class="i18n-en">Map-First</span><span class="i18n-pt">Map-First</span></span>
               <span class="tpl-card__use"><span class="i18n-en">Geo-pinned inventory · district browsing</span><span class="i18n-pt">Inventário geolocalizado · navegação por bairro</span></span>
             </div>
             <span class="tpl-pro-tag" style="background:rgba(214,179,106,.18);border-color:rgba(214,179,106,.35);color:var(--gold-soft);">White-Label</span>
@@ -2004,10 +2020,10 @@ const pageDescription = "Premium property management platform for real estate ag
             </span>
           </div>
 
-          <!-- Tabbed Categories — White-Label -->
+          <!-- Grouped — White-Label -->
           <div class="tpl-card tpl-card--pro" data-pf-template
-               data-tpl-name="Tabbed Categories"
-               data-tpl-tier="Studio"
+               data-tpl-name="Grouped"
+               data-tpl-tier="White-Label"
                data-tpl-best="Multi-segment portfolios, sale + rent + commercial under one brand"
                data-tpl-property-type="Mixed catalogues: sale, rent, commercial, off-plan"
                data-tpl-when="When a single agency runs multiple inventory tracks and conflating them confuses buyers."
@@ -2037,7 +2053,7 @@ const pageDescription = "Premium property management platform for real estate ag
               </div>
             </div>
             <div class="tpl-card__footer">
-              <span class="tpl-card__name"><span class="i18n-en">Tabbed Categories</span><span class="i18n-pt">Categorias em Abas</span></span>
+              <span class="tpl-card__name"><span class="i18n-en">Grouped</span><span class="i18n-pt">Grouped</span></span>
               <span class="tpl-card__use"><span class="i18n-en">Sale · rent · commercial · all in one</span><span class="i18n-pt">Venda · aluguel · comercial · tudo em um</span></span>
             </div>
             <span class="tpl-pro-tag" style="background:rgba(214,179,106,.18);border-color:rgba(214,179,106,.35);color:var(--gold-soft);">White-Label</span>
@@ -2049,7 +2065,7 @@ const pageDescription = "Premium property management platform for real estate ag
           <!-- Story Mode — White-Label -->
           <div class="tpl-card tpl-card--pro" data-pf-template
                data-tpl-name="Story Mode"
-               data-tpl-tier="Studio"
+               data-tpl-tier="White-Label"
                data-tpl-best="Single-property launches, off-plan developments, flagship listings"
                data-tpl-property-type="Off-plan projects, signature villas, flagship launches"
                data-tpl-when="When you're selling ONE thing — a single development, a flagship property — and need a full narrative arc, not a grid."
@@ -2085,10 +2101,10 @@ const pageDescription = "Premium property management platform for real estate ag
             </span>
           </div>
 
-          <!-- Carousel Hero — White-Label -->
+          <!-- Showroom — White-Label -->
           <div class="tpl-card tpl-card--pro" data-pf-template
-               data-tpl-name="Carousel Hero"
-               data-tpl-tier="Studio"
+               data-tpl-name="Showroom"
+               data-tpl-tier="White-Label"
                data-tpl-best="Spotlight rotation, weekly featured properties, top-of-funnel traffic"
                data-tpl-property-type="Featured campaigns, paid spotlights, hero properties"
                data-tpl-when="When you want a small set of properties to dominate the entry experience without forcing a single choice."
@@ -2114,7 +2130,7 @@ const pageDescription = "Premium property management platform for real estate ag
               </div>
             </div>
             <div class="tpl-card__footer">
-              <span class="tpl-card__name">Carousel Hero</span>
+              <span class="tpl-card__name">Showroom</span>
               <span class="tpl-card__use"><span class="i18n-en">Rotating spotlight · weekly featured</span><span class="i18n-pt">Destaque rotativo · em alta na semana</span></span>
             </div>
             <span class="tpl-pro-tag" style="background:rgba(214,179,106,.18);border-color:rgba(214,179,106,.35);color:var(--gold-soft);">White-Label</span>
@@ -2123,14 +2139,176 @@ const pageDescription = "Premium property management platform for real estate ag
             </span>
           </div>
 
-        </div>
-      </div>
+          <!-- Editorial — White-Label -->
+          <div class="tpl-card tpl-card--pro" data-pf-template
+               data-tpl-name="Editorial"
+               data-tpl-tier="White-Label"
+               data-tpl-best="Boutique agencies, luxury launches, signature portfolios"
+               data-tpl-property-type="Luxury homes, design-led apartments, curated collections"
+               data-tpl-when="When the brand story matters as much as the property list. Lead with a point of view, then let the catalogue follow."
+               data-tpl-strength="A considered editorial rhythm gives premium inventory context without hiding the path to enquire."
+               data-tpl-package="White-Label">
+            <div class="tpl-preview tpl-preview--gallery" aria-hidden="true" style="background:linear-gradient(145deg,rgba(83,47,115,.26),rgba(11,13,21,.96));">
+              <div class="tpl-preview__topbar">
+                <span class="tpl-dot tpl-dot--active"></span>
+                <span class="tpl-dot"></span>
+                <span class="tpl-pill"></span>
+              </div>
+              <div class="tpl-preview__gallery-layout" style="grid-template-columns:1.2fr .8fr;">
+                <div class="tpl-preview__hero-spot">
+                  <span class="tpl-preview__gallery-image" style="background:linear-gradient(145deg,rgba(214,179,106,.42),rgba(102,65,142,.2));"></span>
+                  <span class="tpl-preview__gallery-chip"></span>
+                </div>
+                <div class="tpl-preview__gallery-grid">
+                  <span class="tpl-gallery-card"></span>
+                  <span class="tpl-gallery-card"></span>
+                  <span class="tpl-gallery-card"></span>
+                </div>
+              </div>
+            </div>
+            <div class="tpl-card__footer">
+              <span class="tpl-card__name"><span class="i18n-en">Editorial</span><span class="i18n-pt">Editorial</span></span>
+              <span class="tpl-card__use"><span class="i18n-en">Premium storytelling · curated launches</span><span class="i18n-pt">Narrativa premium · lançamentos selecionados</span></span>
+            </div>
+            <span class="tpl-pro-tag" style="background:rgba(214,179,106,.18);border-color:rgba(214,179,106,.35);color:var(--gold-soft);">White-Label</span>
+            <span class="tpl-card__hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
 
-      <div class="templates-toggle-row">
-        <button type="button" class="templates-toggle" id="tplToggle" aria-expanded="false" aria-controls="tplExtra">
-          <span data-tpl-toggle-label="more"><span class="i18n-en">See 4 more layouts</span><span class="i18n-pt">Ver mais 4 layouts</span></span>
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
+          <!-- Minimalist — White-Label -->
+          <div class="tpl-card tpl-card--pro" data-pf-template
+               data-tpl-name="Minimalist"
+               data-tpl-tier="White-Label"
+               data-tpl-best="Premium brands, small curated portfolios, independent brokers"
+               data-tpl-property-type="Design properties, high-value homes, curated listings"
+               data-tpl-when="When calm presentation and generous space should make a small, exceptional catalogue feel unmistakably premium."
+               data-tpl-strength="Less chrome, clearer decisions. Every listing gets room to breathe while the enquiry path stays obvious."
+               data-tpl-package="White-Label">
+            <div class="tpl-preview tpl-preview--classic" aria-hidden="true" style="background:linear-gradient(180deg,rgba(235,232,224,.16),rgba(18,19,25,.96));">
+              <div class="tpl-preview__topbar">
+                <span class="tpl-dot tpl-dot--active"></span>
+                <span class="tpl-pill"></span>
+              </div>
+              <div class="tpl-preview__classic-grid" style="grid-template-columns:1.25fr .75fr;gap:12px;">
+                <div class="tpl-mini" style="background:rgba(245,241,232,.12);">
+                  <span class="tpl-mini__media tpl-mini__media--tall" style="background:linear-gradient(145deg,rgba(245,241,232,.45),rgba(214,179,106,.18));"></span>
+                  <span class="tpl-mini__meta tpl-mini__meta--lg"></span>
+                  <span class="tpl-mini__meta tpl-mini__meta--sm"></span>
+                </div>
+                <div class="tpl-mini" style="background:rgba(245,241,232,.08);">
+                  <span class="tpl-mini__media"></span>
+                  <span class="tpl-mini__meta tpl-mini__meta--md"></span>
+                  <span class="tpl-mini__meta tpl-mini__meta--sm"></span>
+                </div>
+              </div>
+            </div>
+            <div class="tpl-card__footer">
+              <span class="tpl-card__name"><span class="i18n-en">Minimalist</span><span class="i18n-pt">Minimalist</span></span>
+              <span class="tpl-card__use"><span class="i18n-en">Quiet luxury · curated catalogue</span><span class="i18n-pt">Luxo silencioso · catálogo selecionado</span></span>
+            </div>
+            <span class="tpl-pro-tag" style="background:rgba(214,179,106,.18);border-color:rgba(214,179,106,.35);color:var(--gold-soft);">White-Label</span>
+            <span class="tpl-card__hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+
+          <!-- Card Stack — White-Label -->
+          <div class="tpl-card tpl-card--pro" data-pf-template
+               data-tpl-name="Card Stack"
+               data-tpl-tier="White-Label"
+               data-tpl-best="Sales presentations, shortlists, commercial demonstrations"
+               data-tpl-property-type="Featured homes, shortlists, campaign inventory"
+               data-tpl-when="When visitors should make quick decisions from a focused sequence of standout properties."
+               data-tpl-strength="A tactile stack makes comparison feel simple and keeps the next action close to the property being considered."
+               data-tpl-package="White-Label">
+            <div class="tpl-preview tpl-preview--magazine" aria-hidden="true" style="background:linear-gradient(150deg,rgba(36,74,92,.24),rgba(11,13,21,.96));">
+              <div class="tpl-preview__topbar">
+                <span class="tpl-dot tpl-dot--active"></span>
+                <span class="tpl-dot"></span>
+                <span class="tpl-pill"></span>
+              </div>
+              <div class="tpl-preview__mag-layout" style="grid-template-columns:1fr;position:relative;">
+                <div class="tpl-mini tpl-mini--feature" style="width:76%;margin:0 auto;transform:rotate(-4deg);">
+                  <span class="tpl-mini__media tpl-mini__media--tall"></span>
+                  <span class="tpl-mini__meta tpl-mini__meta--lg"></span>
+                  <span class="tpl-mini__meta tpl-mini__meta--md"></span>
+                </div>
+                <div class="tpl-mini" style="position:absolute;right:4%;bottom:0;width:66%;transform:rotate(5deg);opacity:.55;">
+                  <span class="tpl-mini__media"></span>
+                  <span class="tpl-mini__meta tpl-mini__meta--md"></span>
+                </div>
+              </div>
+            </div>
+            <div class="tpl-card__footer">
+              <span class="tpl-card__name"><span class="i18n-en">Card Stack</span><span class="i18n-pt">Card Stack</span></span>
+              <span class="tpl-card__use"><span class="i18n-en">Focused shortlist · fast decisions</span><span class="i18n-pt">Seleção focada · decisões rápidas</span></span>
+            </div>
+            <span class="tpl-pro-tag" style="background:rgba(214,179,106,.18);border-color:rgba(214,179,106,.35);color:var(--gold-soft);">White-Label</span>
+            <span class="tpl-card__hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+
+          <!-- Timeline — White-Label -->
+          <div class="tpl-card tpl-card--pro" data-pf-template
+               data-tpl-name="Timeline"
+               data-tpl-tier="White-Label"
+               data-tpl-best="Developments, launches, release schedules and sold histories"
+               data-tpl-property-type="New developments, phased projects, investment portfolios"
+               data-tpl-when="When timing matters: show what is launching now, what is coming next, and what has already moved."
+               data-tpl-strength="A chronological browsing pattern gives complex projects an easy-to-follow sense of progress."
+               data-tpl-package="White-Label">
+            <div class="tpl-preview tpl-preview--compact" aria-hidden="true" style="background:linear-gradient(145deg,rgba(54,94,83,.24),rgba(11,13,21,.96));">
+              <div class="tpl-preview__topbar">
+                <span class="tpl-dot tpl-dot--active"></span>
+                <span class="tpl-dot"></span>
+                <span class="tpl-pill"></span>
+              </div>
+              <div class="tpl-preview__list" style="position:relative;padding-left:16px;">
+                <span style="position:absolute;left:5px;top:4px;bottom:4px;width:2px;background:linear-gradient(var(--gold),rgba(89,195,255,.3));border-radius:4px;"></span>
+                <div class="tpl-row"><span class="tpl-row__thumb" style="border-radius:999px;width:12px;height:12px;background:var(--gold);"></span><span class="tpl-row__copy"><span class="tpl-row__line tpl-row__line--lg"></span><span class="tpl-row__line tpl-row__line--sm"></span></span><span class="tpl-row__price"></span></div>
+                <div class="tpl-row"><span class="tpl-row__thumb" style="border-radius:999px;width:12px;height:12px;background:var(--blue);"></span><span class="tpl-row__copy"><span class="tpl-row__line tpl-row__line--md"></span><span class="tpl-row__line tpl-row__line--sm"></span></span><span class="tpl-row__price"></span></div>
+                <div class="tpl-row"><span class="tpl-row__thumb" style="border-radius:999px;width:12px;height:12px;background:var(--violet);"></span><span class="tpl-row__copy"><span class="tpl-row__line tpl-row__line--lg"></span><span class="tpl-row__line tpl-row__line--sm"></span></span><span class="tpl-row__price"></span></div>
+              </div>
+            </div>
+            <div class="tpl-card__footer">
+              <span class="tpl-card__name"><span class="i18n-en">Timeline</span><span class="i18n-pt">Timeline</span></span>
+              <span class="tpl-card__use"><span class="i18n-en">Launch cadence · project progress</span><span class="i18n-pt">Cronograma · progresso do projeto</span></span>
+            </div>
+            <span class="tpl-pro-tag" style="background:rgba(214,179,106,.18);border-color:rgba(214,179,106,.35);color:var(--gold-soft);">White-Label</span>
+            <span class="tpl-card__hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+
+          <!-- Catalog — White-Label -->
+          <div class="tpl-card tpl-card--pro" data-pf-template
+               data-tpl-name="Catalog"
+               data-tpl-tier="White-Label"
+               data-tpl-best="Operational teams, serious shortlists, high-volume buyer research"
+               data-tpl-property-type="Large portfolios, investment searches, commercial inventory"
+               data-tpl-when="When buyers need a complete, structured view of the inventory before narrowing to a shortlist."
+               data-tpl-strength="A catalogue-first layout turns many properties into a clear working surface for comparison and enquiry."
+               data-tpl-package="White-Label">
+            <div class="tpl-preview tpl-preview--compact" aria-hidden="true" style="background:linear-gradient(145deg,rgba(78,64,104,.3),rgba(11,13,21,.96));">
+              <div class="tpl-preview__topbar">
+                <span class="tpl-dot tpl-dot--active"></span>
+                <span class="tpl-dot"></span>
+                <span class="tpl-pill"></span>
+              </div>
+              <div class="tpl-preview__filterrow">
+                <span class="tpl-chip tpl-chip--active"></span>
+                <span class="tpl-chip"></span>
+                <span class="tpl-chip"></span>
+              </div>
+              <div class="tpl-preview__list">
+                <div class="tpl-row"><span class="tpl-row__thumb"></span><span class="tpl-row__copy"><span class="tpl-row__line tpl-row__line--lg"></span><span class="tpl-row__line tpl-row__line--md"></span></span><span class="tpl-row__price"></span></div>
+                <div class="tpl-row"><span class="tpl-row__thumb"></span><span class="tpl-row__copy"><span class="tpl-row__line tpl-row__line--lg"></span><span class="tpl-row__line tpl-row__line--sm"></span></span><span class="tpl-row__price"></span></div>
+                <div class="tpl-row"><span class="tpl-row__thumb"></span><span class="tpl-row__copy"><span class="tpl-row__line tpl-row__line--md"></span><span class="tpl-row__line tpl-row__line--sm"></span></span><span class="tpl-row__price"></span></div>
+              </div>
+            </div>
+            <div class="tpl-card__footer">
+              <span class="tpl-card__name"><span class="i18n-en">Catalog</span><span class="i18n-pt">Catalog</span></span>
+              <span class="tpl-card__use"><span class="i18n-en">Structured inventory · buyer shortlists</span><span class="i18n-pt">Inventário estruturado · listas de interesse</span></span>
+            </div>
+            <span class="tpl-pro-tag" style="background:rgba(214,179,106,.18);border-color:rgba(214,179,106,.35);color:var(--gold-soft);">White-Label</span>
+            <span class="tpl-card__hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+
+        </div>
       </div>
 
       <p class="sub" style="margin-top:16px;font-size:.85rem;text-align:center;opacity:.5;" data-i18n="pf.templates_note">White-Label includes 15 templates with all variations. Click any layout above for the full breakdown — what it's for, when to choose it, and which package ships it.</p>
@@ -2184,7 +2362,7 @@ const pageDescription = "Premium property management platform for real estate ag
       <div class="section__head">
         <span class="kicker" data-i18n="pf.pricing_kicker">Pricing</span>
         <h2 data-i18n="pf.pricing_title">Choose the property package that matches your workflow.</h2>
-        <p class="sub" data-i18n="pf.pricing_desc">PropertyFlow ships as a real-estate catalogue site/app package. Starter is static and simple; Professional and White-Label add live property data, lead capture and team tools.</p>
+        <p class="sub" data-i18n="pf.pricing_desc">Every tier creates a hosted Property Flow workspace and a VOLYNX subdomain automatically. Professional adds live operations; White-Label adds multi-client scale.</p>
         <div class="vx-currency-bar" style="margin-top:20px;justify-content:flex-start;"></div>
       </div>
       <div class="pricing-grid">
@@ -2199,12 +2377,12 @@ const pageDescription = "Premium property management platform for real estate ag
           </div>
           <div class="price-card__billing" data-i18n="pf.plan1_billing">One-time · 3 templates</div>
           <ul class="price-card__features">
-            <li data-i18n="pf.plan1_f1">3 grid layout templates</li>
-            <li data-i18n="pf.plan1_f2"><span class="i18n-en">Static source package (edit properties via JSON)</span><span class="i18n-pt">Pacote estático fonte (editar imóveis via JSON)</span></li>
+            <li data-i18n="pf.plan1_f1">3 templates: Classic Grid, Magazine and Compact List</li>
+            <li data-i18n="pf.plan1_f2"><span class="i18n-en">Hosted site created after checkout</span><span class="i18n-pt">Site hospedado criado após o checkout</span></li>
             <li data-i18n="pf.plan1_f3">Property catalogue + filters</li>
             <li data-i18n="pf.plan1_f4">Bilingual interface (EN/PT)</li>
             <li data-i18n="pf.plan1_f5">Responsive design</li>
-            <li data-i18n="pf.plan1_f6"><span class="i18n-en">Static catalogue with no live data connection</span><span class="i18n-pt">Catálogo estático sem conexão com dados ao vivo</span></li>
+            <li data-i18n="pf.plan1_f6"><span class="i18n-en">Complete standalone static export</span><span class="i18n-pt">Export estático independente completo</span></li>
           </ul>
           <a href={checkoutHref("pf_starter", { next: ROUTES.propertyflow })} class="btn btn--ghost price-card__cta vx-checkout-btn" data-lookup="pf_starter" data-i18n="pf.plan1_cta">Get Starter</a>
         </div>
@@ -2221,13 +2399,13 @@ const pageDescription = "Premium property management platform for real estate ag
           </div>
           <div class="price-card__billing" data-i18n="pf.plan2_billing">One-time · 6 templates</div>
           <ul class="price-card__features">
-            <li data-i18n="pf.plan2_f1">6 grid layout templates</li>
+            <li data-i18n="pf.plan2_f1">6 templates: the Starter set plus Gallery Hero, Split View and Masonry</li>
             <li data-i18n="pf.plan2_f2">Everything in Starter</li>
-            <li data-i18n="pf.plan2_f3"><span class="i18n-en">Live property data connection (setup required)</span><span class="i18n-pt">Conexão com dados ao vivo (requer configuração)</span></li>
+            <li data-i18n="pf.plan2_f3"><span class="i18n-en">Live property data, already connected</span><span class="i18n-pt">Dados de imóveis ao vivo, já conectados</span></li>
             <li data-i18n="pf.plan2_f4"><span class="i18n-en">Property management dashboard</span><span class="i18n-pt">Painel para gerenciar imóveis</span></li>
             <li data-i18n="pf.plan2_f5">Image gallery + modals</li>
-            <li data-i18n="pf.plan2_f6">Enquiry capture system</li>
-            <li data-i18n="pf.plan2_f7">Full deployment guide</li>
+            <li data-i18n="pf.plan2_f6">WhatsApp-ready contact actions</li>
+            <li data-i18n="pf.plan2_f7"><span class="i18n-en">Guided custom-domain connection</span><span class="i18n-pt">Conexão guiada de domínio próprio</span></li>
             <li data-i18n="pf.plan2_f8">Agency delivery license (1 client)</li>
           </ul>
           <a href={checkoutHref("pf_professional", { next: ROUTES.propertyflow })} class="btn btn--primary price-card__cta vx-checkout-btn" data-lookup="pf_professional" data-i18n="pf.plan2_cta">Get Professional</a>
@@ -2243,13 +2421,13 @@ const pageDescription = "Premium property management platform for real estate ag
           </div>
           <div class="price-card__billing" data-i18n="pf.plan3_billing">One-time · 15 templates</div>
           <ul class="price-card__features">
-            <li data-i18n="pf.plan3_f1">15 grid layout templates</li>
+            <li data-i18n="pf.plan3_f1">All 15 Property Flow templates</li>
             <li data-i18n="pf.plan3_f2">Everything in Professional</li>
-            <li data-i18n="pf.plan3_f3"><span class="i18n-en">Multi-tenant (1 install → serve N agencies)</span><span class="i18n-pt">Multi-tenant (1 instalação → serve N agências)</span></li>
-            <li data-i18n="pf.plan3_f4">CRM integrations pack</li>
-            <li data-i18n="pf.plan3_f5">Advanced analytics (per-tenant, per-agent, trends)</li>
+            <li data-i18n="pf.plan3_f3"><span class="i18n-en">Multi-tenant workspaces for client sites</span><span class="i18n-pt">Workspaces multi-tenant para sites de clientes</span></li>
+            <li data-i18n="pf.plan3_f4">Integration-ready CRM and analytics toolkit</li>
+            <li data-i18n="pf.plan3_f5">Multi-tenant reporting foundation</li>
             <li data-i18n="pf.plan3_f6">White-label rights (strip all VOLYNX attribution)</li>
-            <li data-i18n="pf.plan3_f7">Automated onboarding + self-serve migration toolkit</li>
+            <li data-i18n="pf.plan3_f7">Automated onboarding + supported migration toolkit</li>
             <li data-i18n="pf.plan3_f8"><span class="i18n-en">For agencies/devs serving multiple clients</span><span class="i18n-pt">Para agências/devs servindo múltiplos clientes</span></li>
           </ul>
           <a href={checkoutHref("pf_white_label", { next: ROUTES.propertyflow })} class="btn btn--primary price-card__cta vx-checkout-btn" data-lookup="pf_white_label" data-i18n="pf.plan3_cta">Get White-Label</a>
@@ -2267,15 +2445,15 @@ const pageDescription = "Premium property management platform for real estate ag
         </span>
         <span class="pricing-trust__item">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 3h9l3 3v15H6V3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M14 3v4h4M9 12h6M9 16h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          <span data-i18n="pf.trust_vx">Protected delivery after Stripe checkout</span>
+          <span data-i18n="pf.trust_vx">Hosted workspace created after checkout</span>
         </span>
         <span class="pricing-trust__item">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M5 19l3-3M16 8l3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          <strong><span class="i18n-en">Setup guide included</span><span class="i18n-pt">Guia de setup incluso</span></strong>
+          <strong><span class="i18n-en">No-code setup included</span><span class="i18n-pt">Configuração sem código incluída</span></strong>
         </span>
       </div>
 
-      <p class="sub" style="margin-top:20px;font-size:.85rem;text-align:center;opacity:.5;" data-i18n="pf.pricing_note">All packages are one-time purchases. Starter uses paid update releases. Professional and White-Label include the support and update windows defined in the license.</p>
+      <p class="sub" style="margin-top:20px;font-size:.85rem;text-align:center;opacity:.5;" data-i18n="pf.pricing_note">Every tier includes the hosted setup and a complete standalone static export. Domain registration and third-party hosting remain separate provider services. Existing-site embeds or internal routes require access to that site.</p>
     </section>
 
     <!-- ───────────── Closing CTA — premium ───────────── -->
@@ -2285,15 +2463,15 @@ const pageDescription = "Premium property management platform for real estate ag
           <div class="pf-close__copy">
             <span class="pf-close__signal">
               <span class="pf-close__signal__dot"></span>
-              <span><span class="i18n-en">Protected delivery · setup docs included</span><span class="i18n-pt">Entrega protegida · docs de setup inclusas</span></span>
+              <span><span class="i18n-en">Automatic publication · no-code setup included</span><span class="i18n-pt">Publicação automática · configuração sem código incluída</span></span>
             </span>
             <h2 data-i18n="pf.cta_title">
               <span class="i18n-en">Ready to <span>modernise</span> your property showcase?</span>
               <span class="i18n-pt">Pronto pra <span>modernizar</span> seu showcase imobiliário?</span>
             </h2>
             <p data-i18n="pf.cta_desc">
-              <span class="i18n-en">One-time payment. Use it as a standalone catalogue site, a subdomain, a linked property catalogue or a custom integration handled by your developer.</span>
-              <span class="i18n-pt">Pagamento único. Use como site catálogo próprio, subdomínio, catálogo linkado ou integração técnica feita pelo seu desenvolvedor.</span>
+              <span class="i18n-en">Choose a tier and publish a standalone property site without changing your existing website. Use a VOLYNX subdomain by default, connect a custom domain with guidance, or request a supported integration when you control the site.</span>
+              <span class="i18n-pt">Escolha um tier e publique um site imobiliário próprio sem alterar seu site atual. Use um subdomínio VOLYNX, conecte um domínio próprio com orientação ou solicite uma integração compatível quando você controlar o site.</span>
             </p>
             <div class="pf-close__actions">
               <a class="btn btn--primary" href="#pricing" data-i18n="pf.cta_btn1">
@@ -2314,8 +2492,8 @@ const pageDescription = "Premium property management platform for real estate ag
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </span>
               <div>
-                <strong><span class="i18n-en">Source code is yours</span><span class="i18n-pt">O código-fonte é seu</span></strong>
-                <span><span class="i18n-en">Full React project. Deploy on your domain, your hosting, your terms.</span><span class="i18n-pt">Projeto React completo. Deploy no seu domínio, sua hospedagem, suas regras.</span></span>
+                <strong><span class="i18n-en">Your hosted workspace is yours</span><span class="i18n-pt">Seu workspace hospedado é seu</span></strong>
+                <span><span class="i18n-en">Your properties, brand, domain settings and dashboard stay separated in your own tenant.</span><span class="i18n-pt">Seus imóveis, sua marca, configurações de domínio e dashboard ficam separados no seu próprio tenant.</span></span>
               </div>
             </div>
             <div class="pf-close__guarantee">
@@ -2323,8 +2501,8 @@ const pageDescription = "Premium property management platform for real estate ag
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
               </span>
               <div>
-                <strong><span class="i18n-en">Live in under an hour</span><span class="i18n-pt">No ar em menos de 1h</span></strong>
-                <span><span class="i18n-en">Pre-wired catalogue, filters, gallery, modals. Drop in your data and ship.</span><span class="i18n-pt">Catálogo, filtros, galeria, modais — tudo pré-montado. Coloque seus dados e publique.</span></span>
+                <strong><span class="i18n-en">Published without a developer</span><span class="i18n-pt">Publicado sem desenvolvedor</span></strong>
+                <span><span class="i18n-en">The catalogue, filters, gallery and dashboard are pre-wired. Configure your brand and publish from the guided flow.</span><span class="i18n-pt">Catálogo, filtros, galeria e dashboard já vêm conectados. Configure sua marca e publique pelo fluxo guiado.</span></span>
               </div>
             </div>
             <div class="pf-close__guarantee">
@@ -2396,33 +2574,6 @@ const pageDescription = "Premium property management platform for real estate ag
             head.addEventListener('click', function () {
               card.classList.toggle('is-open');
             });
-          }
-        });
-      }
-
-      // ── Templates: see-more toggle ────────────────────────────────────
-      var tplToggle = document.getElementById('tplToggle');
-      var tplExtra = document.getElementById('tplExtra');
-      if (tplToggle && tplExtra) {
-        tplToggle.addEventListener('click', function () {
-          var isHidden = tplExtra.hasAttribute('hidden');
-          if (isHidden) {
-            tplExtra.removeAttribute('hidden');
-            tplToggle.classList.add('is-open');
-            tplToggle.setAttribute('aria-expanded', 'true');
-            // Swap label
-            var label = tplToggle.querySelector('[data-tpl-toggle-label]');
-            if (label) {
-              label.innerHTML = '<span class="i18n-en">Hide extra layouts</span><span class="i18n-pt">Esconder layouts extras</span>';
-            }
-          } else {
-            tplExtra.setAttribute('hidden', '');
-            tplToggle.classList.remove('is-open');
-            tplToggle.setAttribute('aria-expanded', 'false');
-            var label2 = tplToggle.querySelector('[data-tpl-toggle-label]');
-            if (label2) {
-              label2.innerHTML = '<span class="i18n-en">See 4 more layouts</span><span class="i18n-pt">Ver mais 4 layouts</span>';
-            }
           }
         });
       }
