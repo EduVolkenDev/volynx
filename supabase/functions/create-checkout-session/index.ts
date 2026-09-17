@@ -313,7 +313,7 @@ Deno.serve(async (req: Request) => {
       allow_promotion_codes: true,
     };
 
-    if (isCheckoutSmokeTest) {
+    if (requiresRealCheckout) {
       params.adaptive_pricing = { enabled: false };
       if (price.currency.toLowerCase() === "brl") {
         params.locale = "pt-BR";

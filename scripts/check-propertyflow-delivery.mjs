@@ -78,6 +78,7 @@ expect(catalog.includes('lookupPrefix: "pf_starter_e2e"'), "PropertyFlow E2E off
 expect(catalog.includes('tier: "starter_e2e"'), "PropertyFlow E2E offer must remain isolated from the commercial tier label.");
 expect(catalog.includes("amounts: { gbp: 30, eur: 50, brl: 50 }"), "PropertyFlow E2E offer must remain R$0.50.");
 expect(checkout.includes('checkoutPrefix === "pf_starter_e2e"'), "PropertyFlow E2E must bypass the admin simulation and reach Stripe.");
+expect(!checkout.includes("isCheckoutSmokeTest"), "Checkout still references the retired smoke-test-only flag.");
 expect(checkout.includes('prefix === "pf_starter_e2e"') && checkout.includes('return "pf_starter"'), "Checkout must canonicalize the E2E offer to Starter.");
 expect(webhook.includes('prefix === "pf_starter_e2e"') && webhook.includes('return "pf_starter"'), "Webhook must canonicalize the E2E offer to Starter.");
 expect(checkoutPage.includes('key === "pf_starter_e2e"'), "Checkout page must force BRL for the PropertyFlow E2E offer.");
