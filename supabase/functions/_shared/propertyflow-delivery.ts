@@ -49,7 +49,11 @@ export function normalizePropertyFlowAddonId(value: unknown): PropertyFlowAddonI
     .toLowerCase()
     .replace(/-/g, "_")
     .replace(/_(gbp|eur|brl)$/i, "");
-  const canonical = normalized === "pf_enterprise" ? "pf_white_label" : normalized;
+  const canonical = normalized === "pf_enterprise"
+    ? "pf_white_label"
+    : normalized === "pf_starter_e2e"
+      ? "pf_starter"
+      : normalized;
   return canonical in ARTIFACTS ? canonical as PropertyFlowAddonId : null;
 }
 

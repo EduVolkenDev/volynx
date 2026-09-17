@@ -128,12 +128,12 @@ import { ROUTES } from "../../data/routes";
 
   function defaultCurrencyForLookup(lookup) {
     const key = String(lookup || "").toLowerCase().replace(/_(gbp|eur|brl)$/i, "");
-    return key === "checkout_smoke_test" ? "brl" : "gbp";
+    return key === "checkout_smoke_test" || key === "pf_starter_e2e" ? "brl" : "gbp";
   }
 
   function storedCurrencyForLookup(lookup) {
     const key = String(lookup || "").toLowerCase().replace(/_(gbp|eur|brl)$/i, "");
-    return key === "checkout_smoke_test" ? "" : localStorage.getItem("volynx_currency");
+    return key === "checkout_smoke_test" || key === "pf_starter_e2e" ? "" : localStorage.getItem("volynx_currency");
   }
 
   function hasCurrencySuffix(value) {

@@ -12,6 +12,10 @@ const consumers = [
   "supabase/functions/refresh-pf-url/index.ts",
   "supabase/functions/regenerate-delivery-url/index.ts",
 ];
+const checkoutPath = resolve(root, "supabase/functions/create-checkout-session/index.ts");
+const webhookPath = resolve(root, "supabase/functions/stripe-webhook/index.ts");
+const catalogPath = resolve(root, "scripts/stripe-catalog-reconcile.mjs");
+const checkoutPagePath = resolve(root, "src/pages/checkout/index.astro");
 
 const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
 const contract = await readFile(contractPath, "utf8");
@@ -62,6 +66,21 @@ for (const relative of consumers) {
   expect(!source.includes("propertyflow-professional-v1.0.0.zip"), `${relative} still references the retired Professional v1.0.0 ZIP.`);
   expect(!source.includes("propertyflow-white-label-v1.0.0.zip"), `${relative} still references the retired White-Label v1.0.0 ZIP.`);
 }
+
+const [checkout, webhook, catalog, checkoutPage] = await Promise.all([
+  readFile(checkoutPath, "utf8"),
+  readFile(webhookPath, "utf8"),
+  readFile(catalogPath, "utf8"),
+  readFile(checkoutPagePath, "utf8"),
+]);
+
+expect(catalog.includes('lookupPrefix: "pf_starter_e2e"'), "PropertyFlow E2E offer is missing from the Stripe catalog.");
+expect(catalog.includes('tier: "starter_e2e"'), "PropertyFlow E2E offer must remain isolated from the commercial tier label.");
+expect(catalog.includes("amounts: { gbp: 30, eur: 50, brl: 50 }"), "PropertyFlow E2E offer must remain R$0.50.");
+expect(checkout.includes('checkoutPrefix === "pf_starter_e2e"'), "PropertyFlow E2E must bypass the admin simulation and reach Stripe.");
+expect(checkout.includes('prefix === "pf_starter_e2e"') && checkout.includes('return "pf_starter"'), "Checkout must canonicalize the E2E offer to Starter.");
+expect(webhook.includes('prefix === "pf_starter_e2e"') && webhook.includes('return "pf_starter"'), "Webhook must canonicalize the E2E offer to Starter.");
+expect(checkoutPage.includes('key === "pf_starter_e2e"'), "Checkout page must force BRL for the PropertyFlow E2E offer.");
 
 if (failures.length) {
   console.error(`PropertyFlow delivery check failed with ${failures.length} issue(s):`);
