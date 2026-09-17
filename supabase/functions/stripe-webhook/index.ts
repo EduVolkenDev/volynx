@@ -22,6 +22,11 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.14.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import {
+  getPropertyFlowArtifact,
+  PROPERTYFLOW_BUCKET,
+  PROPERTYFLOW_SIGNED_URL_TTL_SECONDS,
+} from "../_shared/propertyflow-delivery.ts";
 
 // ── Config ──────────────────────────────────────────────────
 
@@ -926,20 +931,19 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       let pfDownloadUrl: string | null = null;
       let pfDownloadExpiresAt: string | null = null;
       let pfSignError: string | null = null;
-      const PF_VERSION = "v1.1.0";
-      const PF_SIGNED_URL_TTL = 60 * 60 * 24; // 24h
+      const pfArtifact = isPropertyFlow ? getPropertyFlowArtifact(addonId) : null;
       if (isPropertyFlow) {
-        const objectPath = `${addonId}/${PF_VERSION}.zip`;
+        if (!pfArtifact) throw new Error(`Unsupported PropertyFlow tier: ${addonId}`);
         try {
           const { data: signed, error: signErr } = await supabase
             .storage
-            .from("propertyflow")
-            .createSignedUrl(objectPath, PF_SIGNED_URL_TTL);
+            .from(PROPERTYFLOW_BUCKET)
+            .createSignedUrl(pfArtifact.objectPath, PROPERTYFLOW_SIGNED_URL_TTL_SECONDS);
           if (signErr) {
             pfSignError = signErr.message;
           } else if (signed?.signedUrl) {
             pfDownloadUrl = signed.signedUrl;
-            pfDownloadExpiresAt = new Date(Date.now() + PF_SIGNED_URL_TTL * 1000).toISOString();
+            pfDownloadExpiresAt = new Date(Date.now() + PROPERTYFLOW_SIGNED_URL_TTL_SECONDS * 1000).toISOString();
           }
         } catch (e) {
           pfSignError = (e as Error).message;
@@ -1031,7 +1035,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             ...(isPropertyFlow ? {
               download_url: pfDownloadUrl,
               download_expires_at: pfDownloadExpiresAt,
-              download_version: PF_VERSION,
+              download_bucket: PROPERTYFLOW_BUCKET,
+              download_path: pfArtifact?.objectPath,
+              download_filename: pfArtifact?.filename,
+              download_version: pfArtifact?.objectPath.split("/").at(-1)?.replace(/\.zip$/, ""),
+              download_bytes: pfArtifact?.bytes,
+              download_sha256: pfArtifact?.sha256,
+              templates: pfArtifact?.templates,
               delivery_status: pfDownloadUrl ? "ready" : "pending_signed_url",
               delivery_error: pfSignError,
             } : isKit ? {

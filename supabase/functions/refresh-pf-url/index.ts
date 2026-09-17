@@ -20,11 +20,16 @@
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import {
+  getPropertyFlowArtifact,
+  normalizePropertyFlowAddonId,
+  PROPERTYFLOW_BUCKET,
+  PROPERTYFLOW_SIGNED_URL_TTL_SECONDS,
+} from "../_shared/propertyflow-delivery.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
-const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24; // 24h
 const REFRESH_COOLDOWN_MS = 60 * 1000; // 60s
 
 const corsHeaders = {
@@ -72,7 +77,7 @@ serve(async (req) => {
     return jsonResponse({ error: "bad_json" }, 400);
   }
   const purchaseId = body.purchase_id ? String(body.purchase_id).trim() : "";
-  const fallbackAddonId = body.addon_id ? String(body.addon_id).trim().replace(/-/g, "_").replace(/_(gbp|eur|brl)$/i, "") : "";
+  const fallbackAddonId = normalizePropertyFlowAddonId(body.addon_id) || "";
   if (!purchaseId && !fallbackAddonId) {
     return jsonResponse({ error: "missing_purchase_id_or_addon_id" }, 400);
   }
@@ -129,7 +134,8 @@ serve(async (req) => {
   if (purchase.status !== "active") {
     return jsonResponse({ error: "not_active" }, 403);
   }
-  if (!purchase.addon_id?.startsWith("pf_")) {
+  const artifact = getPropertyFlowArtifact(purchase.addon_id);
+  if (!artifact) {
     return jsonResponse({ error: "not_propertyflow" }, 403);
   }
 
@@ -143,27 +149,30 @@ serve(async (req) => {
     }
   }
 
-  const version = ((purchase.metadata as Record<string, unknown> | null)?.download_version as string) || "v1.1.0";
-  const objectPath = `${purchase.addon_id}/${version}.zip`;
-
   const { data: signed, error: signErr } = await admin
     .storage
-    .from("propertyflow")
-    .createSignedUrl(objectPath, SIGNED_URL_TTL_SECONDS);
+    .from(PROPERTYFLOW_BUCKET)
+    .createSignedUrl(artifact.objectPath, PROPERTYFLOW_SIGNED_URL_TTL_SECONDS);
 
   if (signErr || !signed?.signedUrl) {
     console.error("refresh-pf-url signing error:", signErr?.message || "no url");
     return jsonResponse({ error: "sign_failed", detail: signErr?.message }, 500);
   }
 
-  const expiresAt = new Date(Date.now() + SIGNED_URL_TTL_SECONDS * 1000).toISOString();
+  const expiresAt = new Date(Date.now() + PROPERTYFLOW_SIGNED_URL_TTL_SECONDS * 1000).toISOString();
 
   // Merge into existing metadata so we don't drop fields written by the webhook.
   const nextMetadata = {
     ...(typeof purchase.metadata === "object" && purchase.metadata ? purchase.metadata : {}),
     download_url: signed.signedUrl,
     download_expires_at: expiresAt,
-    download_version: version,
+    download_bucket: PROPERTYFLOW_BUCKET,
+    download_path: artifact.objectPath,
+    download_filename: artifact.filename,
+    download_version: artifact.objectPath.split("/").at(-1)?.replace(/\.zip$/, ""),
+    download_bytes: artifact.bytes,
+    download_sha256: artifact.sha256,
+    templates: artifact.templates,
     download_refreshed_at: new Date().toISOString(),
   };
 
@@ -183,6 +192,9 @@ serve(async (req) => {
     expires_at: expiresAt,
     download_expires_at: expiresAt,
     delivery_status: "ready",
-    version,
+    version: artifact.objectPath.split("/").at(-1)?.replace(/\.zip$/, ""),
+    filename: artifact.filename,
+    bytes: artifact.bytes,
+    sha256: artifact.sha256,
   });
 });
