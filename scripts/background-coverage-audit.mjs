@@ -47,8 +47,7 @@ if (!fs.existsSync(distDir)) {
   errors.push("dist is missing; run npm run build before backgrounds:check");
 }
 
-const backgroundProofs = [
-  "data-page-atmosphere=",
+const ownBackgroundProofs = [
   "class=\"lab-bg",
   "class=\"galaxyfield",
   "class=\"cyber-grid",
@@ -63,8 +62,11 @@ const backgroundProofs = [
 ];
 
 const htmlFiles = walk(distDir, (file) => file.endsWith(".html"));
+const renderedImageOwners = new Map();
 let redirects = 0;
 let visualPages = 0;
+let atmospherePages = 0;
+let ownBackgroundPages = 0;
 for (const file of htmlFiles) {
   const html = fs.readFileSync(file, "utf8");
   const route = routeForHtml(file);
@@ -76,8 +78,20 @@ for (const file of htmlFiles) {
     continue;
   }
   visualPages += 1;
-  if (!backgroundProofs.some((proof) => html.includes(proof))) {
-    errors.push(`${route} has no auditable page-background marker`);
+  const atmosphereTag = html.match(/<div[^>]+class=\"route-atmosphere\"[^>]*>/)?.[0] || "";
+  const renderedImage = atmosphereTag.match(/--vx-atm-image:url\(&#34;([^&]+)&#34;\)/)?.[1] || "";
+  const renderedOpacity = Number(atmosphereTag.match(/--vx-atm-image-opacity:([^;\"]+)/)?.[1] || 0);
+  const hasAtmosphereImage = Boolean(renderedImage) && renderedOpacity > 0;
+  const hasOwnBackground = ownBackgroundProofs.some((proof) => html.includes(proof));
+  if (hasAtmosphereImage) {
+    atmospherePages += 1;
+    const owner = renderedImageOwners.get(renderedImage);
+    if (owner) errors.push(`${route} renders ${renderedImage}, already rendered by ${owner}`);
+    renderedImageOwners.set(renderedImage, route);
+  }
+  if (hasOwnBackground) ownBackgroundPages += 1;
+  if (!hasAtmosphereImage && !hasOwnBackground) {
+    errors.push(`${route} has only a generic atmosphere; assign a route image or an auditable page-owned background`);
   }
 }
 
@@ -86,5 +100,5 @@ if (errors.length) {
   for (const error of errors) console.error(`- ${error}`);
   process.exitCode = 1;
 } else {
-  console.log(`Background audit passed: ${visualPages} visual pages, ${redirects} redirects, ${curatedEntries.length} unique curated assets.`);
+  console.log(`Background audit passed: ${visualPages} visual pages, ${redirects} redirects, ${atmospherePages} route images, ${ownBackgroundPages} page-owned backgrounds, ${curatedEntries.length} unique curated assets.`);
 }
