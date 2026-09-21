@@ -47,19 +47,22 @@ if (!fs.existsSync(distDir)) {
   errors.push("dist is missing; run npm run build before backgrounds:check");
 }
 
-const ownBackgroundProofs = [
-  "class=\"lab-bg",
-  "class=\"galaxyfield",
-  "class=\"cyber-grid",
-  "class=\"ambient",
-  "class=\"holo-bg",
-  "class=\"page-bg",
-  "class=\"wmp-bg",
-  "class=\"manifesto-backdrop",
-  "class=\"world-webgl",
-  "class=\"hero-bg",
-  "data-page-background=",
-];
+// Pages with bespoke backgrounds are explicit exceptions to the route-atmosphere
+// image contract. Check their rendered element, source image reference, and file.
+const pageOwnedBackgrounds = new Map([
+  ["/", { marker: 'class="galaxyfield"', image: "/assets/galaxy/core-home-v2.webp", source: "src/styles/galaxy-bgs.css" }],
+  ["/core-preview/", { marker: 'class="galaxyfield"', image: "/assets/galaxy/core-home-v2.webp", source: "src/styles/galaxy-bgs.css" }],
+  ["/launch-2026/", { marker: 'class="hero-bg"', image: "/assets/galaxy/launch-depth.webp", source: "src/styles/galaxy-bgs.css" }],
+  ["/maintenance/", { marker: 'class="wmp-bg"', image: "/assets/seedream22.webp", source: "src/styles/maintenance.css" }],
+  ["/manifesto/", { marker: 'class="manifesto-backdrop"', image: "/assets/nebula-abstract.webp", source: "src/pages/manifesto/index.astro" }],
+  ["/products/portfolio-pro-kit/", { marker: 'class="page-bg"', image: "/assets/lucid3.jpg", source: "src/pages/products/portfolio-pro-kit/index.astro" }],
+  ["/404/", { marker: 'class="lab-bg"', image: "/assets/PIA20357~orig.webp", source: "src/pages/404.astro" }],
+  ["/builder/", { marker: 'class="lab-bg"', image: "/assets/lucid3.jpg", source: "src/pages/builder/index.astro" }],
+  ["/volynx-lab/converter/", { marker: 'class="lab-bg"', image: "/assets/vynx-ai.jpg", source: "src/pages/volynx-lab/converter/index.astro" }],
+  ["/volynx-lab/image-scaler/", { marker: 'class="lab-bg"', image: "/assets/vynx-ai2.jpg", source: "src/pages/volynx-lab/image-scaler/index.astro" }],
+  ["/volynx-lab/image-suite/", { marker: 'class="lab-bg"', image: "/assets/vynx-ai5.jpg", source: "src/pages/volynx-lab/image-suite/index.astro" }],
+  ["/volynx-lab/lumina/", { marker: 'class="lab-bg"', image: "/assets/lucid2.webp", source: "src/pages/volynx-lab/lumina/index.astro" }],
+]);
 
 const htmlFiles = walk(distDir, (file) => file.endsWith(".html"));
 const renderedImageOwners = new Map();
@@ -71,8 +74,7 @@ for (const file of htmlFiles) {
   const html = fs.readFileSync(file, "utf8");
   const route = routeForHtml(file);
   if (route.startsWith("/assets/")) continue;
-  const redirect = /<meta[^>]+http-equiv=["']refresh["']/i.test(html)
-    || /window\.location\.(?:replace|href)/.test(html);
+  const redirect = /<meta[^>]+http-equiv=["']refresh["']/i.test(html);
   if (redirect) {
     redirects += 1;
     continue;
@@ -82,7 +84,15 @@ for (const file of htmlFiles) {
   const renderedImage = atmosphereTag.match(/--vx-atm-image:url\(&#34;([^&]+)&#34;\)/)?.[1] || "";
   const renderedOpacity = Number(atmosphereTag.match(/--vx-atm-image-opacity:([^;\"]+)/)?.[1] || 0);
   const hasAtmosphereImage = Boolean(renderedImage) && renderedOpacity > 0;
-  const hasOwnBackground = ownBackgroundProofs.some((proof) => html.includes(proof));
+  const pageOwned = pageOwnedBackgrounds.get(route);
+  const hasOwnBackground = Boolean(pageOwned && html.includes(pageOwned.marker));
+  if (pageOwned && !hasOwnBackground) errors.push(`${route} is missing its page-owned background element`);
+  if (pageOwned) {
+    const source = fs.readFileSync(path.join(root, pageOwned.source), "utf8");
+    if (!source.includes(pageOwned.image)) errors.push(`${route} no longer references ${pageOwned.image} in ${pageOwned.source}`);
+    if (!fs.existsSync(path.join(root, "public", pageOwned.image.slice(1)))) errors.push(`${route} references missing asset ${pageOwned.image}`);
+    if (pageOwned.marker === 'class="lab-bg"' && !html.includes(pageOwned.image)) errors.push(`${route} does not render its background image`);
+  }
   if (hasAtmosphereImage) {
     atmospherePages += 1;
     const owner = renderedImageOwners.get(renderedImage);
