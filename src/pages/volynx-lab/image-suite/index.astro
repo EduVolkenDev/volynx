@@ -863,6 +863,98 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       return removeBackgroundLocalToCanvas;
     }
 
+    function estimateBorderColor(pixels, width, height) {
+      const samples = [];
+      const cornerSize = Math.min(12, Math.max(2, Math.floor(Math.min(width, height) * 0.08)));
+      const corners = [
+        [0, 0], [width - cornerSize, 0],
+        [0, height - cornerSize], [width - cornerSize, height - cornerSize],
+      ];
+      for (const [x0, y0] of corners) {
+        for (let y = y0; y < y0 + cornerSize; y += 1) {
+          for (let x = x0; x < x0 + cornerSize; x += 1) {
+            const index = (y * width + x) * 4;
+            if (pixels[index + 3] >= 245) {
+              samples.push([pixels[index], pixels[index + 1], pixels[index + 2]]);
+            }
+          }
+        }
+      }
+      if (!samples.length) return [255, 255, 255];
+      return [0, 1, 2].map((channel) => {
+        const values = samples.map((sample) => sample[channel]).sort((a, b) => a - b);
+        return values[Math.floor(values.length / 2)];
+      });
+    }
+
+    function smoothstep(edge0, edge1, value) {
+      const t = Math.max(0, Math.min(1, (value - edge0) / (edge1 - edge0)));
+      return t * t * (3 - 2 * t);
+    }
+
+    function applyMaskWithMatteCorrection(srcImage, maskCanvas, backgroundColor) {
+      const width = srcImage.naturalWidth || srcImage.width;
+      const height = srcImage.naturalHeight || srcImage.height;
+      const output = document.createElement("canvas");
+      output.width = width;
+      output.height = height;
+      const outputCtx = output.getContext("2d");
+      if (!outputCtx) throw new Error("Failed to create output canvas context.");
+
+      // Process tiles so large source images do not require one enormous ImageData allocation.
+      const tileSize = 1024;
+      const sourceTile = document.createElement("canvas");
+      const sourceTileCtx = sourceTile.getContext("2d", { willReadFrequently: true });
+      const maskTile = document.createElement("canvas");
+      const maskTileCtx = maskTile.getContext("2d", { willReadFrequently: true });
+      if (!sourceTileCtx || !maskTileCtx) throw new Error("Failed to create matte correction canvas.");
+
+      outputCtx.imageSmoothingEnabled = true;
+      outputCtx.imageSmoothingQuality = "high";
+      for (let top = 0; top < height; top += tileSize) {
+        for (let left = 0; left < width; left += tileSize) {
+          const tileWidth = Math.min(tileSize, width - left);
+          const tileHeight = Math.min(tileSize, height - top);
+          sourceTile.width = tileWidth;
+          sourceTile.height = tileHeight;
+          maskTile.width = tileWidth;
+          maskTile.height = tileHeight;
+          sourceTileCtx.clearRect(0, 0, tileWidth, tileHeight);
+          sourceTileCtx.drawImage(srcImage, left, top, tileWidth, tileHeight, 0, 0, tileWidth, tileHeight);
+          maskTileCtx.clearRect(0, 0, tileWidth, tileHeight);
+          maskTileCtx.drawImage(
+            maskCanvas,
+            (left / width) * maskCanvas.width,
+            (top / height) * maskCanvas.height,
+            (tileWidth / width) * maskCanvas.width,
+            (tileHeight / height) * maskCanvas.height,
+            0, 0, tileWidth, tileHeight
+          );
+
+          const sourceData = sourceTileCtx.getImageData(0, 0, tileWidth, tileHeight);
+          const maskData = maskTileCtx.getImageData(0, 0, tileWidth, tileHeight).data;
+          for (let index = 0; index < sourceData.data.length; index += 4) {
+            const alpha = maskData[index + 3] / 255;
+            if (alpha < 0.08) {
+              sourceData.data[index + 3] = 0;
+              continue;
+            }
+            // Recover edge RGB from the original matte before applying alpha.
+            // This prevents white/black fringes around otherwise clean cutouts.
+            const safeAlpha = Math.max(alpha, 0.08);
+            for (let channel = 0; channel < 3; channel += 1) {
+              const recovered = (sourceData.data[index + channel] - backgroundColor[channel] * (1 - safeAlpha)) / safeAlpha;
+              sourceData.data[index + channel] = Math.max(0, Math.min(255, Math.round(recovered)));
+            }
+            sourceData.data[index + 3] = Math.round(alpha * 255);
+          }
+          sourceTileCtx.putImageData(sourceData, 0, 0);
+          outputCtx.drawImage(sourceTile, left, top);
+        }
+      }
+      return output;
+    }
+
     async function removeBackgroundLocalToCanvas(srcImage, onProgress) {
       const session = await loadBgSession();
       const ort = await loadOrtOnce();
@@ -883,6 +975,7 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       inCtx.imageSmoothingQuality = "high";
       inCtx.drawImage(srcImage, 0, 0, N, N);
       const pixels = inCtx.getImageData(0, 0, N, N).data;
+      const backgroundColor = estimateBorderColor(pixels, N, N);
 
       const tensorData = new Float32Array(3 * N * N);
       const HW = N * N;
@@ -918,7 +1011,8 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       }
       const range = ma - mi || 1;
 
-      // Build mask canvas at N×N as RGBA where alpha == mask probability
+      // Build a gently thresholded mask at N×N. Raw min/max values contain
+      // low-confidence edge noise that otherwise becomes a visible matte halo.
       const maskCanvas = document.createElement("canvas");
       maskCanvas.width = N;
       maskCanvas.height = N;
@@ -926,7 +1020,8 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       if (!maskCtx) throw new Error("Failed to create mask canvas context.");
       const maskImage = maskCtx.createImageData(N, N);
       for (let i = 0; i < maskData.length; i++) {
-        const a = Math.round(((maskData[i] - mi) / range) * 255);
+        const normalized = Math.max(0, Math.min(1, (maskData[i] - mi) / range));
+        const a = Math.round(smoothstep(0.08, 0.42, normalized) * 255);
         const idx = i * 4;
         maskImage.data[idx]     = 255;
         maskImage.data[idx + 1] = 255;
@@ -935,19 +1030,8 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       }
       maskCtx.putImageData(maskImage, 0, 0);
 
-      // Output canvas at the original resolution — quality preserved
-      const outCanvas = document.createElement("canvas");
-      outCanvas.width = W;
-      outCanvas.height = H;
-      const outCtx = outCanvas.getContext("2d");
-      if (!outCtx) throw new Error("Failed to create output canvas context.");
-      outCtx.imageSmoothingEnabled = true;
-      outCtx.imageSmoothingQuality = "high";
-      outCtx.drawImage(srcImage, 0, 0, W, H);
-      // Apply the up-scaled mask as the alpha channel
-      outCtx.globalCompositeOperation = "destination-in";
-      outCtx.drawImage(maskCanvas, 0, 0, W, H);
-      outCtx.globalCompositeOperation = "source-over";
+      // Apply the mask while recovering RGB from the original background matte.
+      const outCanvas = applyMaskWithMatteCorrection(srcImage, maskCanvas, backgroundColor);
 
       onProgress?.(100, "done");
       return outCanvas;
