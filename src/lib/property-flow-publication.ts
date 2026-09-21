@@ -1,5 +1,6 @@
 export type PropertyFlowPublicationMode = "volynx-subdomain" | "custom-domain" | "existing-site";
 export type PropertyFlowDomainStatus = "not-configured" | "pending-dns" | "verified" | "published";
+export type PropertyFlowIntegrationPath = "smart-link" | "embed" | "separate-site";
 
 export const PROPERTY_FLOW_HOST = "volynx.world";
 
@@ -48,6 +49,29 @@ export function propertyFlowDomainUrl(domain: unknown): string {
   return normalized ? `https://${normalized}/` : "";
 }
 
+export function normalizePropertyFlowWebsiteUrl(value: unknown): string {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  try {
+    const parsed = new URL(/^https?:\/\//i.test(raw) ? raw : `https://${raw}`);
+    if (!isPropertyFlowCustomDomainFormat(parsed.hostname)) return "";
+    return `${parsed.protocol}//${parsed.hostname}${parsed.pathname === "/" ? "" : parsed.pathname.replace(/\/$/, "")}`;
+  } catch {
+    return "";
+  }
+}
+
+export function propertyFlowIntegrationButtonHtml(publicUrl: unknown, label = "Ver imóveis"): string {
+  const url = String(publicUrl || "").trim();
+  if (!/^https:\/\/[a-z0-9.-]+\/?$/i.test(url)) return "";
+  const safeLabel = String(label || "Ver imóveis").trim().slice(0, 80)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+  return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 24px;border-radius:999px;background:#111827;color:#ffffff;font:700 16px/1.2 system-ui,sans-serif;text-decoration:none">${safeLabel}</a>`;
+}
+
 export function propertyFlowPublicationFromSettings(settings: Record<string, unknown> | undefined) {
   const root = settings?.property_flow;
   const publication = root && typeof root === "object" ? (root as Record<string, unknown>).publication : null;
@@ -57,6 +81,7 @@ export function propertyFlowPublicationFromSettings(settings: Record<string, unk
     domainStatus: (value.domain_status === "pending-dns" || value.domain_status === "verified" || value.domain_status === "published" ? value.domain_status : "not-configured") as PropertyFlowDomainStatus,
     subdomain: normalizePropertyFlowSubdomain(value.subdomain),
     customDomain: normalizePropertyFlowDomain(value.custom_domain),
-    integrationPath: value.integration_path === "embed" ? "embed" : "separate-site",
+    existingSiteUrl: normalizePropertyFlowWebsiteUrl(value.existing_site_url),
+    integrationPath: (value.integration_path === "embed" || value.integration_path === "smart-link" ? value.integration_path : "separate-site") as PropertyFlowIntegrationPath,
   };
 }

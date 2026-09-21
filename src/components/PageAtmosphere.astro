@@ -2,6 +2,7 @@
 interface AtmospherePreset {
   image?: string;
   position?: string;
+  imageSize?: string;
   hue?: number;
   accentHue?: number;
   imageOpacity?: number;
@@ -15,6 +16,9 @@ interface Props {
 const { pathname } = Astro.props;
 const normalizedPath = pathname.endsWith("/") ? pathname : `${pathname}/`;
 
+const largeIcon = "clamp(420px, 54vw, 860px) auto";
+const mediumIcon = "clamp(360px, 46vw, 720px) auto";
+
 const curated: Record<string, AtmospherePreset> = {
   "/about/": { image: "/assets/future-background.webp", position: "center 38%", hue: 269, accentHue: 193, imageOpacity: .76 },
   "/terms/": { image: "/assets/profile-volynx-power-constellation-v3.webp", position: "center", hue: 215, accentHue: 188, imageOpacity: .82 },
@@ -26,17 +30,73 @@ const curated: Record<string, AtmospherePreset> = {
   "/changelog/": { image: "/assets/phoenix-bg.jpg", position: "center 38%", hue: 35, accentHue: 205, imageOpacity: .64 },
   "/docs/": { image: "/assets/glowbg.jpg", position: "center", hue: 204, accentHue: 39, imageOpacity: .74 },
   "/tools/": { image: "/assets/lynx-eye.webp", position: "center", hue: 274, accentHue: 201, imageOpacity: .76 },
-  "/products/": { image: "/assets/future-background2.webp", position: "center 42%", hue: 267, accentHue: 195, imageOpacity: .66 },
+  "/products/": { image: "/assets/future-background2.webp", position: "center 42%", hue: 267, accentHue: 195, imageOpacity: .82, imageScale: 1.04 },
   "/login/": { image: "/assets/lucid-big.webp", position: "center", hue: 271, accentHue: 197, imageOpacity: .78 },
   "/signup/": { image: "/assets/lucid2-big.webp", position: "center", hue: 292, accentHue: 204, imageOpacity: .72 },
   "/auth/confirm/": { image: "/assets/profile-volynx-power-constellation.webp", position: "center", hue: 220, accentHue: 286, imageOpacity: .7 },
   "/auth/recover/": { image: "/assets/lucid-realism.webp", position: "center", hue: 201, accentHue: 278, imageOpacity: .76 },
   "/recarregar/": { image: "/assets/Purple-Universe.jpg", position: "center 24%", hue: 282, accentHue: 198, imageOpacity: .68 },
-  "/dev-hub/": { image: "/assets/galaxy/home-ribbons.webp", position: "center", hue: 251, accentHue: 190, imageOpacity: .64 },
+  "/dev-hub/": { image: "/assets/galaxy/devhub-signal-field.svg", position: "center", hue: 251, accentHue: 190, imageOpacity: 1 },
   "/dev-journey/checklist/": { image: "/assets/galaxy/core-clarify.webp", position: "center", hue: 197, accentHue: 268, imageOpacity: .64 },
   "/dev-journey/student/": { image: "/assets/galaxy/core-surface-journey.webp", position: "center", hue: 264, accentHue: 188, imageOpacity: .7 },
   "/dev-journey/submit/": { image: "/assets/galaxy/core-build.webp", position: "center", hue: 190, accentHue: 44, imageOpacity: .66 },
   "/dev-journey/verify/": { image: "/assets/galaxy/core-prove.webp", position: "center", hue: 43, accentHue: 211, imageOpacity: .58 },
+  "/account/": { image: "/assets/profile-volynx-power-constellation-v2.webp", position: "center 34%", hue: 215, accentHue: 42, imageOpacity: .72 },
+  "/activate/": { image: "/assets/lucid5.webp", position: "center 32%", hue: 200, accentHue: 274, imageOpacity: .72 },
+  "/checkout/": { image: "/assets/modal-upgrade.webp", position: "82% 20%", imageSize: mediumIcon, hue: 265, accentHue: 42, imageOpacity: .48 },
+  "/dashboard/purchases/icons/": { image: "/assets/devhub-icons-store.webp", position: "84% 18%", imageSize: mediumIcon, hue: 270, accentHue: 190, imageOpacity: .48 },
+  "/dashboard/purchases/kits/": { image: "/assets/devhub-starter-systems.webp", position: "84% 18%", imageSize: mediumIcon, hue: 205, accentHue: 280, imageOpacity: .48 },
+  "/dashboard/purchases/propertyflow/": { image: "/assets/newproperty.webp", position: "84% 18%", imageSize: mediumIcon, hue: 195, accentHue: 35, imageOpacity: .48 },
+  "/delivery/": { image: "/assets/devhub-premium-assets.webp", position: "84% 18%", imageSize: mediumIcon, hue: 265, accentHue: 190, imageOpacity: .48 },
+  "/dev-hub/saas-landing-system/": { image: "/assets/devhub-saas-system.webp", position: "84% 20%", imageSize: largeIcon, hue: 190, accentHue: 270, imageOpacity: .52 },
+  "/impact-map/": { image: "/assets/galaxy/core-surface-world.webp", position: "84% 20%", imageSize: largeIcon, hue: 207, accentHue: 275, imageOpacity: .54 },
+  "/invite/black-diamond/": { image: "/assets/btndiamondbg.webp", position: "center", hue: 42, accentHue: 230, imageOpacity: .7 },
+  "/pricing/": { image: "/assets/galaxy/pricing-nebula.webp", position: "center 32%", hue: 260, accentHue: 190, imageOpacity: .74 },
+  "/products/agency-launch-kit/": { image: "/assets/Volynx-OS-Cards/agencykit.webp", position: "84% 20%", imageSize: largeIcon, hue: 190, accentHue: 320, imageOpacity: .52 },
+  "/products/saas-landing-system/": { image: "/assets/galaxy/core-surface-builder.webp", position: "84% 20%", imageSize: largeIcon, hue: 195, accentHue: 270, imageOpacity: .54 },
+  "/profile/": { image: "/assets/profile-volynx-power-emblem-v5.webp", position: "84% 18%", imageSize: mediumIcon, hue: 215, accentHue: 275, imageOpacity: .5 },
+  "/volynx-launch/": { image: "/assets/galaxy/core-surface-daily.webp", position: "84% 20%", imageSize: largeIcon, hue: 275, accentHue: 42, imageOpacity: .54 },
+  "/world/": { image: "/assets/galaxy/world-nebula.webp", position: "center 24%", hue: 205, accentHue: 275, imageOpacity: .74 },
+  "/admin/analytics/": { image: "/assets/Volynx-OS-Cards/WEALTH.png", position: "84% 20%", imageSize: largeIcon, hue: 222, accentHue: 42, imageOpacity: .38 },
+  "/admin/codes/": { image: "/assets/modal-confirm.webp", position: "84% 18%", imageSize: mediumIcon, hue: 265, accentHue: 188, imageOpacity: .42 },
+  "/admin/qr-codes/": { image: "/assets/newqrgen.webp", position: "85% 18%", imageSize: mediumIcon, hue: 198, accentHue: 288, imageOpacity: .42 },
+  "/admin/vouchers/": { image: "/assets/vx-new.webp", position: "84% 18%", imageSize: mediumIcon, hue: 276, accentHue: 43, imageOpacity: .4 },
+  "/core-demo/": { image: "/assets/volynx-core-icon.webp", position: "84% 20%", imageSize: largeIcon, hue: 260, accentHue: 192, imageOpacity: .42 },
+  "/dashboard/": { image: "/assets/ecosystem.webp", position: "85% 18%", imageSize: mediumIcon, hue: 210, accentHue: 282, imageOpacity: .42 },
+  "/dashboard/propertyflow/": { image: "/assets/Volynx-OS-Cards/newpropertyflow.webp", position: "84% 18%", imageSize: mediumIcon, hue: 198, accentHue: 18, imageOpacity: .4 },
+  "/design-studio/": { image: "/assets/design-studio/creation.webp", position: "84% 18%", imageSize: mediumIcon, hue: 197, accentHue: 278, imageOpacity: .42 },
+  "/dev-journey/": { image: "/assets/devjourney-banner.webp", position: "84% 18%", imageSize: largeIcon, hue: 260, accentHue: 188, imageOpacity: .42 },
+  "/landing/": { image: "/assets/landing-express/premium-visual-system.webp", position: "84% 20%", imageSize: mediumIcon, hue: 226, accentHue: 28, imageOpacity: .4 },
+  "/platform/": { image: "/assets/systems.webp", position: "85% 18%", imageSize: mediumIcon, hue: 205, accentHue: 278, imageOpacity: .4 },
+  "/products/agency-launch-kit/preview/": { image: "/assets/Volynx-OS-Cards/agencykit2.webp", position: "85% 20%", imageSize: largeIcon, hue: 205, accentHue: 24, imageOpacity: .4 },
+  "/products/offers/builder-launch/": { image: "/assets/builderlaunch.webp", position: "84% 18%", imageSize: mediumIcon, hue: 219, accentHue: 192, imageOpacity: .42 },
+  "/products/offers/builder-pro/": { image: "/assets/builderpro.webp", position: "84% 18%", imageSize: mediumIcon, hue: 202, accentHue: 286, imageOpacity: .42 },
+  "/products/offers/builder-studio/": { image: "/assets/builderstudio.webp", position: "84% 18%", imageSize: mediumIcon, hue: 274, accentHue: 198, imageOpacity: .42 },
+  "/products/offers/builder-teams/": { image: "/assets/builderteams.webp", position: "84% 18%", imageSize: mediumIcon, hue: 205, accentHue: 252, imageOpacity: .42 },
+  "/products/offers/cvitae-business/": { image: "/assets/cvitae.webp", position: "84% 18%", imageSize: mediumIcon, hue: 197, accentHue: 38, imageOpacity: .42 },
+  "/products/offers/daily-diamond/": { image: "/assets/daily-diamond.webp", position: "84% 18%", imageSize: mediumIcon, hue: 38, accentHue: 266, imageOpacity: .42 },
+  "/products/offers/daily-pro/": { image: "/assets/dailypro.webp", position: "84% 18%", imageSize: mediumIcon, hue: 266, accentHue: 196, imageOpacity: .42 },
+  "/products/offers/qrgen-pro/": { image: "/assets/qrgen/qrgen-icon4.webp", position: "84% 18%", imageSize: mediumIcon, hue: 210, accentHue: 282, imageOpacity: .42 },
+  "/products/offers/studio-pro/": { image: "/assets/volynxstudio.webp", position: "84% 18%", imageSize: mediumIcon, hue: 265, accentHue: 190, imageOpacity: .42 },
+  "/products/offers/volynx-complete/": { image: "/assets/getbundle.webp", position: "84% 18%", imageSize: mediumIcon, hue: 228, accentHue: 42, imageOpacity: .42 },
+  "/products/offers/volynx-essential/": { image: "/assets/volynx-essential.webp", position: "84% 18%", imageSize: mediumIcon, hue: 278, accentHue: 38, imageOpacity: .42 },
+  "/products/offers/vx-core/": { image: "/assets/vx3.webp", position: "84% 18%", imageSize: mediumIcon, hue: 198, accentHue: 282, imageOpacity: .42 },
+  "/products/offers/vx-pro/": { image: "/assets/VX4.webp", position: "84% 18%", imageSize: mediumIcon, hue: 282, accentHue: 188, imageOpacity: .42 },
+  "/products/offers/vx-scale/": { image: "/assets/VX5.webp", position: "84% 18%", imageSize: mediumIcon, hue: 42, accentHue: 196, imageOpacity: .42 },
+  "/products/offers/vx-starter/": { image: "/assets/vx-2.webp", position: "84% 18%", imageSize: mediumIcon, hue: 204, accentHue: 28, imageOpacity: .42 },
+  "/products/portfolio-pro-kit/preview/": { image: "/assets/Volynx-OS-Cards/portfoliokit2.webp", position: "84% 18%", imageSize: largeIcon, hue: 260, accentHue: 194, imageOpacity: .4 },
+  "/products/propertyflow/": { image: "/assets/propertyflow2.webp", position: "84% 18%", imageSize: largeIcon, hue: 195, accentHue: 24, imageOpacity: .42 },
+  "/products/saas-landing-system/preview/": { image: "/assets/Volynx-OS-Cards/saas-dash.webp", position: "84% 18%", imageSize: largeIcon, hue: 208, accentHue: 282, imageOpacity: .4 },
+  "/products/volynx-icons-store/": { image: "/assets/icons-store-logo.webp", position: "84% 18%", imageSize: largeIcon, hue: 268, accentHue: 190, imageOpacity: .44 },
+  "/profile/qr-codes/": { image: "/assets/qrgen-studio.webp", position: "84% 18%", imageSize: mediumIcon, hue: 210, accentHue: 286, imageOpacity: .42 },
+  "/propertyflow/site/": { image: "/assets/smartcatalogue.webp", position: "84% 18%", imageSize: mediumIcon, hue: 194, accentHue: 26, imageOpacity: .42 },
+  "/qrgen/": { image: "/assets/qrgen.webp", position: "84% 18%", imageSize: largeIcon, hue: 204, accentHue: 284, imageOpacity: .42 },
+  "/services/conversion-fix/": { image: "/assets/conversion-fix/conversion-fix-hero.webp", position: "84% 18%", imageSize: largeIcon, hue: 193, accentHue: 272, imageOpacity: .42 },
+  "/services/": { image: "/assets/galaxy/core-surface-services.webp", position: "center", hue: 258, accentHue: 188, imageOpacity: .7 },
+  "/signal-drop/": { image: "/assets/signal-drop/proof-output.webp", position: "84% 18%", imageSize: largeIcon, hue: 274, accentHue: 186, imageOpacity: .4 },
+  "/tiktok/": { image: "/assets/Volynx-OS-Cards/organic.webp", position: "84% 18%", imageSize: mediumIcon, hue: 328, accentHue: 188, imageOpacity: .42 },
+  "/volynx-lab/": { image: "/assets/volynx-blue-aurora.webp", position: "center 40%", hue: 250, accentHue: 168, imageOpacity: .88 },
+  "/world/profile/": { image: "/assets/world/world-profile-icon.webp", position: "84% 18%", imageSize: mediumIcon, hue: 210, accentHue: 42, imageOpacity: .42 },
 };
 
 function hashRoute(value: string) {
@@ -58,12 +118,14 @@ const x2 = 12 + ((seed >>> 15) % 77);
 const y2 = 18 + ((seed >>> 22) % 58);
 const imageOpacity = preset.imageOpacity ?? 0;
 const imageScale = preset.imageScale ?? 1;
+const imageSize = preset.imageSize ?? "cover";
 const atmosphereKey = normalizedPath === "/"
   ? "home"
   : normalizedPath.replace(/^\//, "").replace(/\/$/, "").replace(/[^a-z0-9]+/gi, "-") || "page";
 const atmosphereStyle = [
   `--vx-atm-image:${preset.image ? `url(\"${preset.image}\")` : "none"}`,
   `--vx-atm-position:${preset.position || "center"}`,
+  `--vx-atm-size:${imageSize}`,
   `--vx-atm-image-opacity:${imageOpacity}`,
   `--vx-atm-image-scale:${imageScale}`,
   `--vx-atm-hue:${hue}`,
@@ -95,10 +157,10 @@ const atmosphereStyle = [
     position: absolute;
     inset: -3%;
     background-image:
-      linear-gradient(180deg, rgba(3, 4, 11, .3), rgba(3, 4, 11, .76) 62%, rgba(3, 4, 11, .96)),
+      linear-gradient(180deg, rgba(3, 4, 11, .18), rgba(3, 4, 11, .48) 62%, rgba(3, 4, 11, .78)),
       var(--vx-atm-image);
     background-position: center, var(--vx-atm-position);
-    background-size: cover, cover;
+    background-size: cover, var(--vx-atm-size);
     background-repeat: no-repeat;
     content: "";
     filter: saturate(1.08) contrast(1.03);

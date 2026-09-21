@@ -55,8 +55,8 @@ import { ROUTES } from "../../data/routes";
     (function () {
       try {
         const params = new URLSearchParams(window.location.search);
-        // Only show if explicitly redirected with ?next= or ?session_expired=1
-        if (params.has("next") || params.get("session_expired") === "1") {
+        // A product destination is not evidence that an existing session expired.
+        if (params.get("session_expired") === "1") {
           const el = document.getElementById("sessionExpiredKicker");
           if (el) el.hidden = false;
         }
@@ -85,6 +85,7 @@ import { ROUTES } from "../../data/routes";
     font-size: 13.5px;
     line-height: 1.5;
   }
+  .session-expired[hidden] { display: none; }
   .session-expired strong { color: #fff; font-weight: 700; }
   .session-expired__dot {
     flex: 0 0 auto;

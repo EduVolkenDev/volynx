@@ -18,6 +18,7 @@
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { callAiProvider } from "../_shared/ai-provider.ts";
 import {
   corsHeaders,
   isUuid,
@@ -27,8 +28,6 @@ import {
   requireAuthenticatedUser,
 } from "../_shared/edge-security.ts";
 
-// Configurable via Supabase secret AI_MODEL — defaults to Haiku
-const MODEL = Deno.env.get("AI_MODEL") || "claude-haiku-4-5-20251001";
 const AI_BUILDER_COST = 4;
 const MAX_DESCRIPTION_LENGTH = 2_000;
 const MAX_CURRENT_BYTES = 100_000;
@@ -255,10 +254,9 @@ Deno.serve(async (req: Request) => {
       return jsonResponse(req, { error: "Current project data is too large" }, 413);
     }
 
-    const apiKey = Deno.env.get("ANTHROPIC_API_KEY") || "";
     const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-    if (!apiKey || !supabaseUrl || !serviceRoleKey) {
+    if (!supabaseUrl || !serviceRoleKey) {
       console.error("[ai-builder] required server configuration is missing");
       return jsonResponse(req, { error: "AI Builder is temporarily unavailable" }, 503);
     }
@@ -309,29 +307,14 @@ ${description}
 Output the builder_data JSON only.`;
     }
 
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 4096,
-        system: systemPrompt,
-        messages: [{ role: "user", content: userMessage }],
-      }),
+    const rawText = await callAiProvider({
+      product: "volynx",
+      capability: "builder",
+      system: systemPrompt,
+      user: userMessage,
+      maxTokens: 4096,
+      requestId,
     });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      const message = (err as { error?: { message?: string } })?.error?.message || `Claude API error ${res.status}`;
-      throw new Error(message);
-    }
-
-    const data = await res.json();
-    const rawText: string = (data as { content?: Array<{ text?: string }> }).content?.[0]?.text || "";
 
     // Strip any accidental markdown code fences
     const cleaned = rawText

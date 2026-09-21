@@ -17,16 +17,12 @@
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-
-// Whitelist of addon_ids that are deliverable from the `kits` bucket.
-// Adding a new product? Map its ID → Storage path here and you're done.
-const DELIVERABLE_PATHS: Record<string, string> = {
-  pf_starter:      "propertyflow/propertyflow-starter-v1.0.0.zip",
-  pf_professional: "propertyflow/propertyflow-professional-v1.0.0.zip",
-  pf_white_label:  "propertyflow/propertyflow-white-label-v1.0.0.zip",
-};
-
-const TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
+import {
+  getPropertyFlowArtifact,
+  normalizePropertyFlowAddonId,
+  PROPERTYFLOW_BUCKET,
+  PROPERTYFLOW_SIGNED_URL_TTL_SECONDS,
+} from "../_shared/propertyflow-delivery.ts";
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -74,14 +70,11 @@ serve(async (req: Request) => {
     return jsonResponse({ error: "Invalid JSON body" }, 400);
   }
 
-  const addonId = String(body?.addon_id || "").trim();
+  const addonId = normalizePropertyFlowAddonId(body?.addon_id);
   if (!addonId) {
-    return jsonResponse({ error: "Missing addon_id" }, 400);
+    return jsonResponse({ error: "Invalid PropertyFlow addon_id" }, 400);
   }
-  const path = DELIVERABLE_PATHS[addonId];
-  if (!path) {
-    return jsonResponse({ error: `No delivery path registered for ${addonId}` }, 404);
-  }
+  const artifact = getPropertyFlowArtifact(addonId)!;
 
   // Verify ownership: latest active addons_purchased row for this user + addon.
   const { data: row, error: dbErr } = await supabase
@@ -104,20 +97,29 @@ serve(async (req: Request) => {
 
   // Issue a fresh signed URL.
   const { data: signed, error: storageErr } = await supabase.storage
-    .from("kits")
-    .createSignedUrl(path, TTL_SECONDS);
+    .from(PROPERTYFLOW_BUCKET)
+    .createSignedUrl(artifact.objectPath, PROPERTYFLOW_SIGNED_URL_TTL_SECONDS);
 
   if (storageErr || !signed?.signedUrl) {
     console.error("createSignedUrl failed:", storageErr?.message);
     return jsonResponse({ error: storageErr?.message || "Storage error" }, 500);
   }
 
-  const expiresAt = new Date(Date.now() + TTL_SECONDS * 1000).toISOString();
+  const expiresAt = new Date(Date.now() + PROPERTYFLOW_SIGNED_URL_TTL_SECONDS * 1000).toISOString();
   const newMeta = {
     ...(row.metadata as Record<string, unknown> || {}),
+    download_url: signed.signedUrl,
+    download_expires_at: expiresAt,
+    download_bucket: PROPERTYFLOW_BUCKET,
+    download_path: artifact.objectPath,
+    download_filename: artifact.filename,
+    download_version: artifact.objectPath.split("/").at(-1)?.replace(/\.zip$/, ""),
+    download_bytes: artifact.bytes,
+    download_sha256: artifact.sha256,
+    templates: artifact.templates,
     delivery_url: signed.signedUrl,
     delivery_expires_at: expiresAt,
-    delivery_path: path,
+    delivery_path: artifact.objectPath,
     delivery_regenerated_at: new Date().toISOString(),
   };
 
@@ -135,5 +137,8 @@ serve(async (req: Request) => {
     url: signed.signedUrl,
     expires_at: expiresAt,
     addon_id: addonId,
+    filename: artifact.filename,
+    bytes: artifact.bytes,
+    sha256: artifact.sha256,
   });
 });

@@ -17,6 +17,7 @@
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { callAiProvider } from "../_shared/ai-provider.ts";
 import {
   corsHeaders,
   isUuid,
@@ -26,8 +27,6 @@ import {
   requireAuthenticatedUser,
 } from "../_shared/edge-security.ts";
 
-// Configurable via Supabase secret AI_MODEL — defaults to Haiku
-const MODEL = Deno.env.get("AI_MODEL") || "claude-haiku-4-5-20251001";
 const MAX_INPUT_BYTES = 16_000;
 const TOOL_POLICY: Record<string, { actionClass: "light" | "medium" | "pro"; cost: number; freeLimit: number }> = {
   intent: { actionClass: "light", cost: 1, freeLimit: 20 },
@@ -38,34 +37,6 @@ const TOOL_POLICY: Record<string, { actionClass: "light" | "medium" | "pro"; cos
   lumina: { actionClass: "medium", cost: 2, freeLimit: 5 },
   cvitae: { actionClass: "medium", cost: 2, freeLimit: 3 },
 };
-
-async function callClaude(system: string, user: string, maxTokens: number): Promise<string> {
-  const apiKey = Deno.env.get("ANTHROPIC_API_KEY") || "";
-  if (!apiKey) throw new Error("ANTHROPIC_API_KEY not configured");
-
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      max_tokens: maxTokens,
-      system,
-      messages: [{ role: "user", content: user }],
-    }),
-  });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error((err as { error?: { message?: string } })?.error?.message || `Claude API error ${res.status}`);
-  }
-
-  const data = await res.json();
-  return (data as { content?: Array<{ text?: string }> }).content?.[0]?.text || "";
-}
 
 function cvitaeLanguageLabel(language?: string): string {
   const raw = String(language || "").trim().toLowerCase();
@@ -411,7 +382,14 @@ ${rawText}`;
       system += "\n\nThis is a compact free response. Keep the answer focused, useful, and within the available space.";
     }
 
-    const result = await callClaude(system, user, maxTokens);
+    const result = await callAiProvider({
+      product: "volynx",
+      capability: tool as Parameters<typeof callAiProvider>[0]["capability"],
+      system,
+      user,
+      maxTokens,
+      requestId,
+    });
     const { error: completeError } = await billing.rpc("complete_ai_usage", {
       p_user_id: userId,
       p_request_id: requestId,
