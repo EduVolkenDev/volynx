@@ -364,6 +364,7 @@ function extractPrefix(lookupKey: string): string {
 }
 
 function canonicalizeLookupPrefix(prefix: string): string {
+  if (prefix === "pf_starter_e2e") return "pf_starter";
   return prefix === "pf_enterprise" ? "pf_white_label" : prefix;
 }
 

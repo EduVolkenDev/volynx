@@ -257,6 +257,14 @@ const catalog = [
     amounts: { gbp: 30, eur: 50, brl: 50 },
   },
   {
+    name: "PropertyFlow Starter — E2E Verification",
+    description: "Private low-value offer used only to verify the complete PropertyFlow payment, entitlement, email and protected ZIP delivery flow.",
+    lookupPrefix: "pf_starter_e2e",
+    family: "propertyflow",
+    tier: "starter_e2e",
+    amounts: { gbp: 30, eur: 50, brl: 50 },
+  },
+  {
     name: "Icons Store Single - Budget",
     description: "Accessible single-icon license for lighter SVG/PNG assets.",
     lookupPrefix: "icons_single_budget",

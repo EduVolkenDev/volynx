@@ -79,6 +79,7 @@ function resolveStripeLookupCandidates(lookupKey: string): string[] {
 }
 
 function canonicalizeLookupPrefix(prefix: string): string {
+  if (prefix === "pf_starter_e2e") return "pf_starter";
   return prefix === "pf_enterprise" ? "pf_white_label" : prefix;
 }
 
@@ -150,7 +151,8 @@ Deno.serve(async (req: Request) => {
     }
     const checkoutAttemptId = isUuid(body.checkout_attempt_id) ? body.checkout_attempt_id : crypto.randomUUID();
 
-    const isCheckoutSmokeTest = extractPrefix(lookup_key) === "checkout_smoke_test";
+    const checkoutPrefix = extractPrefix(lookup_key);
+    const requiresRealCheckout = checkoutPrefix === "checkout_smoke_test" || checkoutPrefix === "pf_starter_e2e";
 
     // ── Admin bypass — simulate purchase, skip Stripe entirely ──
     // Admin already has all plans + huge balance, so we just return a
@@ -164,7 +166,7 @@ Deno.serve(async (req: Request) => {
         .eq("id", user.id)
         .maybeSingle();
 
-      if (adminProfile?.is_admin && !isCheckoutSmokeTest) {
+      if (adminProfile?.is_admin && !requiresRealCheckout) {
         const baseSuccess = (typeof success_url === "string" && success_url)
           ? success_url
           : `${FRONTEND_ORIGIN}/billing/success/`;
@@ -311,7 +313,7 @@ Deno.serve(async (req: Request) => {
       allow_promotion_codes: true,
     };
 
-    if (isCheckoutSmokeTest) {
+    if (requiresRealCheckout) {
       params.adaptive_pricing = { enabled: false };
       if (price.currency.toLowerCase() === "brl") {
         params.locale = "pt-BR";

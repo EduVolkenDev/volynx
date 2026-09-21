@@ -616,6 +616,8 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       }
       if (result.upscaleMode === "ai") {
         parts.push(t("suite.meta_ai_enhanced", "AI enhanced"));
+      } else if (result.upscaleMode === "alpha-safe") {
+        parts.push(t("suite.meta_alpha_safe", "transparency preserved"));
       } else if (result.upscaleMode === "standard") {
         parts.push(t("suite.meta_standard_resize", "standard resize"));
       }
@@ -1108,6 +1110,15 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
         return;
       }
 
+      if (loadedImages.some((item) => item.hasTransparency)) {
+        upscaleHint.dataset.tone = "info";
+        upscaleHint.textContent = t(
+          "suite.upscale_hint_transparent",
+          "Transparent images use high-quality alpha-safe resizing instead of the AI model, which can turn transparency black and create colored edges."
+        );
+        return;
+      }
+
       if (largestPixels > MAX_RECOMMENDED_UPSCALE_PIXELS || scale > 2) {
         upscaleHint.dataset.tone = "warning";
         upscaleHint.textContent = copy(
@@ -1147,7 +1158,13 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       const isCompress = toolEl.value === "compress";
       const isPng = fmtEl.value === "image/png";
       const isSvg = fmtEl.value === "image/svg+xml" || bgFormatEl?.value === "image/svg+xml";
-      if (isCompress && isPng) {
+      if (toolEl.value === "upscale" && fmtEl.value === "image/jpeg" && loadedImages.some((item) => item.hasTransparency)) {
+        fmtHint.textContent = t(
+          "suite.fmt_hint_alpha_jpeg",
+          "JPG cannot preserve transparency. Transparent images will be exported as PNG."
+        );
+        fmtHint.hidden = false;
+      } else if (isCompress && isPng) {
         fmtHint.textContent = t(
           "suite.fmt_hint_compress_png",
           "Tip: PNG is lossless — switch to WebP or JPG for smaller files."
@@ -1267,6 +1284,25 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       return img;
     }
 
+    function imageHasTransparency(img, mimeType) {
+      if (mimeType === "image/jpeg") return false;
+      const canvas = document.createElement("canvas");
+      canvas.width = img.naturalWidth || img.width;
+      canvas.height = img.naturalHeight || img.height;
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      if (!ctx) return true; // A safe resize is preferable when alpha cannot be inspected.
+      try {
+        ctx.drawImage(img, 0, 0);
+        const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        for (let i = 3; i < data.length; i += 4) {
+          if (data[i] < 255) return true;
+        }
+        return false;
+      } catch {
+        return true;
+      }
+    }
+
     async function loadFiles(files) {
       const validFiles = files.filter((file) => file && file.type && file.type.startsWith("image/"));
 
@@ -1288,6 +1324,7 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
         loadedImages.push({
           file,
           img,
+          hasTransparency: imageHasTransparency(img, file.type),
           baseName: file.name.replace(/\.[^/.]+$/, "")
         });
       }
@@ -1301,6 +1338,7 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
         files: fileCountLabel(validFiles.length),
       }));
       updateUpscaleHint();
+      checkFmtHint();
       syncRunAvailability();
     }
 
@@ -1541,6 +1579,8 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       const img = item.img;
       const file = item.file;
       const baseName = item.baseName;
+      const formatAdjustedForAlpha = tool === "upscale" && item.hasTransparency && mime === "image/jpeg";
+      const outputMime = formatAdjustedForAlpha ? "image/png" : mime;
 
       const w = img.width;
       const h = img.height;
@@ -1557,7 +1597,11 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       else if (tool !== "upscale") updateProgressUI(0, "scale");
 
       if (tool === "upscale") {
-        const upscaleResult = await aiUpscaleToCanvas(img, scale);
+        // ESRGAN's RGB output does not preserve alpha. Never send a cutout
+        // through it: it makes transparent pixels opaque and amplifies edge RGB.
+        const upscaleResult = item.hasTransparency
+          ? { canvas: null, mode: "alpha-safe", error: null }
+          : await aiUpscaleToCanvas(img, scale);
         if (upscaleResult.canvas) {
           canvas.width = upscaleResult.canvas.width;
           canvas.height = upscaleResult.canvas.height;
@@ -1579,14 +1623,14 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       }
 
       updateProgressUI(70, "encode");
-      const requestedSvg = mime === "image/svg+xml";
+      const requestedSvg = outputMime === "image/svg+xml";
       const encoded = tool === "compress"
         ? requestedSvg
           ? await encodeCanvasWithFallback(canvas, "image/png", 1)
-          : await encodeCompression(canvas, mime, quality, file.size)
+          : await encodeCompression(canvas, outputMime, quality, file.size)
         : await encodeCanvasWithFallback(
             canvas,
-            requestedSvg ? "image/png" : mime,
+            requestedSvg ? "image/png" : outputMime,
             0.95
           );
       const blob = requestedSvg
@@ -1603,7 +1647,7 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
         kept = true;
       }
 
-      const finalMime = requestedSvg ? "image/svg+xml" : (kept ? (file.type || mime) : encoded.mime);
+      const finalMime = requestedSvg ? "image/svg+xml" : (kept ? (file.type || outputMime) : encoded.mime);
 
       return {
         baseName,
@@ -1616,6 +1660,7 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
         encodeFallback: !requestedSvg && !kept && encoded.fallback,
         compressionQuality: tool === "compress" ? encoded.quality : null,
         compressionQualityAdjusted: tool === "compress" && Boolean(encoded.qualityAdjusted),
+        formatAdjustedForAlpha,
         requestedMime: requestedSvg ? "image/svg+xml" : (encoded.requestedMime || mime),
         mimeType: finalMime,
         extension: kept
@@ -1883,6 +1928,8 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
         const adjustedCompressionResults = processedResults.filter((result) => result.compressionQualityAdjusted);
         const fallbackResults = processedResults.filter((result) => result.encodeFallback);
         const standardUpscaleResults = processedResults.filter((result) => result.upscaleMode === "standard");
+        const alphaSafeResults = processedResults.filter((result) => result.upscaleMode === "alpha-safe");
+        const alphaPngResults = processedResults.filter((result) => result.formatAdjustedForAlpha);
         if (processedResults.length === 1) {
           outMeta.textContent = formatSingleResultMeta(processedResults[0]);
         } else {
@@ -1900,7 +1947,7 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
               { count: keptCount }
             )}`;
           }
-          if (tool === "upscale" && standardUpscaleResults.length === 0) {
+          if (tool === "upscale" && standardUpscaleResults.length === 0 && alphaSafeResults.length === 0) {
             metaText += ` • ${t("suite.meta_ai_enhanced", "AI enhanced")}`;
           }
           outMeta.textContent = metaText;
@@ -1973,19 +2020,30 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
           setDropMessage(copy("suite.drop_done", "{files} processed successfully", {
             files: fileCountLabel(processedResults.length),
           }));
-        } else if (standardUpscaleResults.length > 0) {
-          setResultHint(
-            copy(
-              standardUpscaleResults.length === 1
-                ? "suite.ai_fallback_one"
-                : "suite.ai_fallback_many",
+        } else if (standardUpscaleResults.length > 0 || alphaSafeResults.length > 0) {
+          const notices = [];
+          if (alphaSafeResults.length > 0) {
+            notices.push(copy(
+              alphaSafeResults.length === 1 ? "suite.alpha_safe_one" : "suite.alpha_safe_many",
+              alphaSafeResults.length === 1
+                ? "Transparency was preserved with high-quality resizing; the AI model was skipped to avoid black backgrounds and colored edges."
+                : "Transparency was preserved for {count} files with high-quality resizing; the AI model was skipped to avoid black backgrounds and colored edges.",
+              { count: alphaSafeResults.length }
+            ));
+          }
+          if (alphaPngResults.length > 0) {
+            notices.push(t("suite.alpha_jpeg_exported", "JPG cannot preserve transparency. Transparent images were exported as PNG."));
+          }
+          if (standardUpscaleResults.length > 0) {
+            notices.push(copy(
+              standardUpscaleResults.length === 1 ? "suite.ai_fallback_one" : "suite.ai_fallback_many",
               standardUpscaleResults.length === 1
                 ? "The AI engine was unavailable, so this file used standard high-quality resizing."
                 : "The AI engine was unavailable, so {count} files used standard high-quality resizing.",
               { count: standardUpscaleResults.length }
-            ),
-            "warning"
-          );
+            ));
+          }
+          setResultHint(notices.join(" "), "info");
           setDropMessage(copy("suite.ai_fallback_done", "Completed with standard resize: {files}", {
             files: fileCountLabel(processedResults.length),
           }));

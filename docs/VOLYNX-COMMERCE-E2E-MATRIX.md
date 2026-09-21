@@ -39,6 +39,17 @@ The existing R$0.50 `checkout_smoke_test` proves the live Checkout and
 `checkout.session.completed` path, but it is not an entitlement or delivery
 test. It must remain separate from the product-family matrix.
 
+The private R$0.50 `pf_starter_e2e_brl` offer is the representative
+PropertyFlow delivery test. It is intentionally absent from public pricing.
+Checkout canonicalizes it to `pf_starter`, so a successful live payment must
+create the same active Starter entitlement, signed `v1.1.0` ZIP URL, delivery
+email and dashboard card as a full-price purchase. Start it only from the
+internal URL below while authenticated:
+
+```text
+https://volynx.world/checkout/?lookup_key=pf_starter_e2e&currency=brl&next=/products/propertyflow/
+```
+
 ## Safety boundary
 
 Do not create a public “all products” combo. The current Checkout path is
