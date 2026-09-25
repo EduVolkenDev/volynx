@@ -3600,6 +3600,14 @@ window.VX_TRANS = {
     "portfolio.aria_support": "Support",
 
     /* === POST-PURCHASE DELIVERY === */
+    "delivery.payment_success": "Payment confirmed — your purchase is ready.",
+    "delivery.payment_cancelled": "Checkout paused — no charge was made.",
+    "delivery.payment_error": "Checkout interrupted — let's pick up where you left off.",
+    "delivery.loading_deliveries": "Preparing your deliverables…",
+    "delivery.empty_title": "No purchases yet — start exploring",
+    "delivery.empty_cta": "Browse products",
+    "delivery.error_title": "We couldn't load your purchases",
+    "delivery.error_cta": "Try again",
     "delivery.pf.tier_starter":      "Starter",
     "delivery.pf.tier_professional": "Professional",
     "delivery.pf.tier_white_label":  "White-Label",
@@ -7253,6 +7261,14 @@ window.VX_TRANS = {
     "portfolio.aria_support": "Suporte",
 
     /* === ENTREGA PÓS-COMPRA === */
+    "delivery.payment_success": "Pagamento confirmado — sua compra está pronta.",
+    "delivery.payment_cancelled": "Checkout pausado — nenhuma cobrança foi feita.",
+    "delivery.payment_error": "Checkout interrompido — vamos retomar de onde você parou.",
+    "delivery.loading_deliveries": "Preparando seus entregáveis…",
+    "delivery.empty_title": "Nenhuma compra ainda — comece a explorar",
+    "delivery.empty_cta": "Ver produtos",
+    "delivery.error_title": "Não foi possível carregar suas compras",
+    "delivery.error_cta": "Tentar novamente",
     "delivery.pf.tier_starter":      "Starter",
     "delivery.pf.tier_professional": "Professional",
     "delivery.pf.tier_white_label":  "White-Label",

@@ -899,7 +899,7 @@ function formatPrice(amount, currency, minorUnits = false) {
 
       if (!supabaseUrl || !anonKey) {
         hide('deliveryLoading');
-        document.getElementById('deliveryErrorMsg').textContent = 'Configuration error. Please contact support.';
+        document.getElementById('deliveryErrorMsg').textContent = tx('delivery.error_title', 'We couldn\'t load your purchases.');
         show('deliveryError');
         return;
       }
@@ -1080,7 +1080,7 @@ function formatPrice(amount, currency, minorUnits = false) {
       } catch (err) {
         console.error('delivery page load failed', err);
         hide('deliveryLoading');
-        document.getElementById('deliveryErrorMsg').textContent = 'Failed to load purchases. Please refresh and try again.';
+        document.getElementById('deliveryErrorMsg').textContent = tx('delivery.error_title', 'We couldn\'t load your purchases.');
         show('deliveryError');
       }
     })();
