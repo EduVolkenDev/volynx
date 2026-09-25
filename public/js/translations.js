@@ -3633,6 +3633,16 @@ window.VX_TRANS = {
     "delivery.open_builder_draft": "Open Builder draft",
     "delivery.purchased": "Purchased",
     "delivery.paid": "Paid",
+    "delivery.type_kit": "Kit",
+    "delivery.type_icons": "Icon pack",
+    "delivery.type_propertyflow": "PropertyFlow",
+    "delivery.type_tokens": "VX top-up",
+    "delivery.type_addon": "Add-on",
+    "delivery.type_product": "Product",
+    "delivery.method_builder": "Builder project",
+    "delivery.method_download": "Download",
+    "delivery.method_balance": "VX balance",
+    "delivery.method_support": "Support",
 
     /* === TIKTOK LANDING === */
     "tt.eyebrow":      "From TikTok",
@@ -7286,6 +7296,16 @@ window.VX_TRANS = {
     "delivery.open_builder_draft": "Abrir rascunho no Builder",
     "delivery.purchased": "Comprado em",
     "delivery.paid": "Valor pago",
+    "delivery.type_kit": "Kit",
+    "delivery.type_icons": "Pack de ícones",
+    "delivery.type_propertyflow": "PropertyFlow",
+    "delivery.type_tokens": "Recarga VX",
+    "delivery.type_addon": "Add-on",
+    "delivery.type_product": "Produto",
+    "delivery.method_builder": "Projeto no Builder",
+    "delivery.method_download": "Download",
+    "delivery.method_balance": "Saldo VX",
+    "delivery.method_support": "Suporte",
 
     /* === TIKTOK LANDING === */
     "tt.eyebrow":      "Do TikTok",

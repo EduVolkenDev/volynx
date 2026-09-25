@@ -815,9 +815,9 @@ const deliveryAssistItems = [
       const sessionId = purchaseSessionId(item);
       if (isTokenProductId(id)) return 'View VX balance';
       if (isSubscriptionProductId(id)) return 'Open account';
-      if (id.startsWith('kit-')) return sessionId ? 'Open kit delivery' : 'Recover kit delivery';
-      if (id.startsWith('pf-')) return sessionId ? 'Open PropertyFlow delivery' : 'Recover PropertyFlow access';
-      if (id.startsWith('icons-')) return sessionId ? 'Open icon delivery' : 'Open icon purchases';
+      if (id.startsWith('kit-')) return sessionId ? 'Open kit' : 'Recover kit';
+      if (id.startsWith('pf-')) return sessionId ? 'Open PropertyFlow' : 'Recover PropertyFlow access';
+      if (id.startsWith('icons-')) return 'Open Icon Vault';
       if (id.startsWith('addon-')) return 'Open support';
       if (isCheckoutSmokeProductId(id)) return 'Browse products';
       return 'Open account';
@@ -840,6 +840,15 @@ function formatPrice(amount, currency, minorUnits = false) {
       } catch { return String(amount); }
     }
 
+    // 3.2 — CTA loading state: prevent double-clicks, show progress on the CTA
+    document.addEventListener('click', function(e) {
+      const cta = e.target && e.target.closest ? e.target.closest('.delivery-card__cta') : null;
+      if (!cta || cta.dataset.ctaLoading === '1') return;
+      cta.dataset.ctaLoading = '1';
+      cta.classList.add('is-loading');
+      cta.setAttribute('aria-disabled', 'true');
+    });
+
     // Retry button handler
     document.addEventListener('DOMContentLoaded', function() {
       var retryBtn = document.getElementById('deliveryRetryBtn');
@@ -850,6 +859,41 @@ function formatPrice(amount, currency, minorUnits = false) {
       }
     });
 
+    /** 3.1 — product family for card hierarchy treatment. */
+    function productTypeKey(id) {
+      if (isKitProductId(id)) return 'kit';
+      if (isIconsProductId(id)) return 'icons';
+      if (isPropertyFlowProductId(id)) return 'propertyflow';
+      if (isTokenProductId(id)) return 'tokens';
+      if (isAddonProductId(id)) return 'addon';
+      return 'product';
+    }
+
+    /** 3.1 — small visual identifier per product family. */
+    function productTypeIcon(type) {
+      const svgOpen = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">';
+      const icons = {
+        kit: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
+        icons: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+        propertyflow: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 21v-4h6v4"/><path d="M8 7h2M8 11h2M14 7h2M14 11h2"/>',
+        tokens: '<path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/>',
+        addon: '<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
+      };
+      return icons[type] ? svgOpen + icons[type] + '</svg>' : '';
+    }
+
+    /** 3.1 — delivery method label per product family. */
+    function productMethodKey(type) {
+      const map = {
+        kit: 'delivery.method_builder',
+        icons: 'delivery.method_download',
+        propertyflow: 'delivery.method_download',
+        tokens: 'delivery.method_balance',
+        addon: 'delivery.method_support',
+      };
+      return map[type] || '';
+    }
+
     function buildCard(item) {
       const productId = String(purchaseLookupBase(item) || '');
       const label   = addonLabel(productId);
@@ -858,15 +902,24 @@ function formatPrice(amount, currency, minorUnits = false) {
       const price   = formatPrice(amount, item.currency, item.price_paid == null);
       const builderHref = productHref(item);
       const cta = productCta(item);
+      const type = productTypeKey(productId);
+      const typeClass = type !== 'product' ? ` delivery-card--${type}` : '';
+      const icon = productTypeIcon(type);
+      const eyebrow = isCheckoutSmokeProductId(productId)
+        ? 'Checkout verification'
+        : escapeHtml(tx('delivery.type_' + type, 'Product'));
+      const methodKey = productMethodKey(type);
 
       return `
-        <article class="panel delivery-card">
+        <article class="panel delivery-card${typeClass}">
           <div class="delivery-card__body">
-            <span class="eyebrow delivery-card__eyebrow">${isCheckoutSmokeProductId(productId) ? 'Checkout verification' : 'Product'}</span>
+            ${icon ? `<span class="delivery-card__icon" aria-hidden="true">${icon}</span>` : ''}
+            <span class="eyebrow delivery-card__eyebrow">${eyebrow}</span>
             <h3 class="delivery-card__name">${label}</h3>
             <dl class="delivery-card__meta">
               ${date  ? `<div><dt>${escapeHtml(tx('delivery.purchased', 'Purchased'))}</dt><dd>${date}</dd></div>` : ''}
               ${price ? `<div><dt>${escapeHtml(tx('delivery.paid', 'Paid'))}</dt><dd>${price}</dd></div>` : ''}
+              ${methodKey ? `<div><dt>${escapeHtml(tx('delivery.delivery_label', 'Delivery'))}</dt><dd>${escapeHtml(tx(methodKey, ''))}</dd></div>` : ''}
             </dl>
           </div>
           <div class="delivery-card__actions">
@@ -1393,7 +1446,36 @@ function formatPrice(amount, currency, minorUnits = false) {
   }
 
   .delivery-card__actions { margin-top: auto; }
-  .delivery-card__cta { width: 100%; justify-content: center; text-align: center; }
+  .delivery-card__cta { width: 100%; justify-content: center; text-align: center; display: inline-flex; align-items: center; }
+  /* 3.1 — branded treatment per product family */
+  .delivery-card--kit { border-top: 2px solid rgba(214, 179, 106, .55); }
+  .delivery-card--icons { border-top: 2px solid rgba(139, 250, 240, .45); }
+  .delivery-card--propertyflow { border-top: 2px solid rgba(180, 160, 255, .45); }
+  .delivery-card--tokens { border-top: 2px solid rgba(255, 210, 120, .5); }
+  .delivery-card--addon { border-top: 2px solid rgba(255, 255, 255, .2); }
+  .delivery-card__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    background: rgba(255, 255, 255, .05);
+    border: 1px solid rgba(255, 255, 255, .1);
+    color: rgba(214, 179, 106, .9);
+  }
+  /* 3.2 — loading indicator on CTA click */
+  .delivery-card__cta.is-loading { opacity: .7; pointer-events: none; }
+  .delivery-card__cta.is-loading::after {
+    content: '';
+    width: 15px;
+    height: 15px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    margin-left: 10px;
+  }
   .page-section--tight { padding-top: 0; }
   .delivery-help {
     display: flex;
