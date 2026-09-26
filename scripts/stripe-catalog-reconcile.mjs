@@ -52,6 +52,8 @@ if (mode === "live" && !APPLY) {
 
 const stripe = new Stripe(STRIPE_KEY, {
   apiVersion: "2026-02-25.clover",
+  maxNetworkRetries: 2,
+  timeout: 15_000,
 });
 
 const currencies = ["gbp", "eur", "brl"];
@@ -621,6 +623,20 @@ async function ensurePrice(def, product, cur, actions, rows) {
   }
 }
 
+async function mapWithConcurrency(items, limit, worker) {
+  const results = new Array(items.length);
+  let nextIndex = 0;
+  async function run() {
+    while (true) {
+      const index = nextIndex++;
+      if (index >= items.length) return;
+      results[index] = await worker(items[index], index);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, run));
+  return results;
+}
+
 async function main() {
   const actions = [];
   const rows = [];
@@ -635,15 +651,21 @@ async function main() {
   console.log(`VOLYNX Stripe catalog reconcile | mode=${mode} | ${DRY_RUN ? "dry-run" : "apply"}`);
   console.log(`Expected: ${selectedCatalog.length} products, ${selectedCatalog.length * currencies.length} prices${ONLY ? ` | only=${ONLY}` : ""}\n`);
 
-  for (const def of selectedCatalog) {
+  await mapWithConcurrency(selectedCatalog, 6, async (def) => {
     const product = await ensureProduct(def, actions);
     for (const cur of currencies) {
       await ensurePrice(def, product, cur, actions, rows);
     }
-  }
+  });
 
   const outputPath = resolve(__dirname, `stripe-catalog-${mode}-reconcile-output.json`);
-  writeFileSync(outputPath, JSON.stringify({ mode, applied: APPLY, actions, prices: rows }, null, 2));
+  writeFileSync(outputPath, JSON.stringify({
+    mode,
+    applied: APPLY,
+    generatedAt: new Date().toISOString(),
+    actions,
+    prices: rows,
+  }, null, 2));
 
   const summary = rows.reduce((acc, row) => {
     acc[row.status] = (acc[row.status] || 0) + 1;

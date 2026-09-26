@@ -40,19 +40,21 @@ async function request(url, options) {
 // The companion `monetization:check:live` command refreshes this ignored
 // report with a read-only Stripe dry-run. Keep the report recent so this
 // command cannot accidentally validate a stale production catalog snapshot.
-try {
-  const info = await stat(reportPath);
-  const ageMs = Date.now() - info.mtimeMs;
-  expect(ageMs <= 15 * 60 * 1000, "Live catalog report is older than 15 minutes. Run npm run monetization:check:live first.");
-} catch (error) {
-  failures.push(`Could not inspect live catalog report: ${error.message}`);
-}
-
 let report;
 try {
   report = JSON.parse(await readFile(reportPath, "utf8"));
 } catch (error) {
   failures.push(`Could not read live catalog report: ${error.message}`);
+}
+
+try {
+  const info = await stat(reportPath);
+  const ageMs = Date.now() - info.mtimeMs;
+  const generatedAt = report?.generatedAt ? Date.parse(report.generatedAt) : info.mtimeMs;
+  const reportAgeMs = Number.isFinite(generatedAt) ? Date.now() - generatedAt : ageMs;
+  expect(reportAgeMs <= 15 * 60 * 1000, "Live catalog report is older than 15 minutes. Run npm run monetization:check:live first.");
+} catch (error) {
+  failures.push(`Could not inspect live catalog report: ${error.message}`);
 }
 
 const [webhookSource, checkoutSource, tiktokSource, imageSuiteSource, labToolShellSource, labUpgradeBannerSource] = await Promise.all([

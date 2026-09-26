@@ -90,6 +90,10 @@ function canonicalizeLookupKey(lookupKey: string): string {
   return lookupKey.replace(prefix, canonicalPrefix);
 }
 
+function isCheckoutSmokeTest(prefix: string): boolean {
+  return prefix === "checkout_smoke_test";
+}
+
 function wantsPixCheckout(body: Record<string, unknown>): boolean {
   const paymentMethod = typeof body.payment_method === "string" ? body.payment_method : "";
   const paymentMethodType = typeof body.payment_method_type === "string" ? body.payment_method_type : "";
@@ -152,7 +156,7 @@ Deno.serve(async (req: Request) => {
     const checkoutAttemptId = isUuid(body.checkout_attempt_id) ? body.checkout_attempt_id : crypto.randomUUID();
 
     const checkoutPrefix = extractPrefix(lookup_key);
-    const requiresRealCheckout = checkoutPrefix === "checkout_smoke_test" || checkoutPrefix === "pf_starter_e2e";
+    const requiresRealCheckout = isCheckoutSmokeTest(checkoutPrefix) || checkoutPrefix === "pf_starter_e2e";
 
     // ── Admin bypass — simulate purchase, skip Stripe entirely ──
     // Admin already has all plans + huge balance, so we just return a

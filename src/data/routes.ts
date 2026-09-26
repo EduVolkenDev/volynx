@@ -59,7 +59,8 @@ export const ROUTES = {
   builderLegacy: "/builder/",  // alias for backwards-compat (unified into /builder/)
   dashboard: "/dashboard/",
   propertyflowStudio: "/dashboard/propertyflow/",
-  purchases: "/dashboard/purchases/",
+  // Canonical public all-purchases hub. Legacy dashboard links redirect here.
+  purchases: "/delivery/",
   propertyflowDelivery: "/dashboard/purchases/propertyflow",
   iconsDelivery: "/dashboard/purchases/icons",
   kitsDelivery: "/dashboard/purchases/kits",

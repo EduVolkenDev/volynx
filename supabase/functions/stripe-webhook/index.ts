@@ -375,6 +375,10 @@ function canonicalizeLookupKey(lookupKey: string): string {
   return lookupKey.replace(prefix, canonicalPrefix);
 }
 
+function isCheckoutSmokeTest(prefix: string): boolean {
+  return prefix === "checkout_smoke_test";
+}
+
 function getKitStorageSlug(prefix: string): string | null {
   if (prefix.startsWith("kit_portfolio")) return "portfolio";
   if (prefix.startsWith("kit_agency")) return "agency";
@@ -529,7 +533,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const prefix = canonicalizeLookupPrefix(stripePrefix);
   const lookupKey = canonicalizeLookupKey(stripeLookupKey);
   const currency = lookupKey.split("_").pop()?.toUpperCase() || "GBP";
-  const productKey = detectProductKey(prefix);
+  const productKey = isCheckoutSmokeTest(prefix) ? "checkout_test" : detectProductKey(prefix);
 
   // Resolve user email for identification in all records
   const userProfile = requireDbSuccess(
@@ -799,11 +803,14 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       } else {
         // Pull entitlement so the row carries the feature list inline. UI can
         // read either v_user_entitlements (joined) or this row directly.
-        const { data: entitlement } = await supabase
+        const { data: entitlement, error: entitlementError } = await supabase
           .from("addon_entitlements")
           .select("features, slot_delta, download_zip, billing")
           .eq("addon_id", addonId)
           .maybeSingle();
+        if (entitlementError) {
+          throw new Error(`addon_entitlements lookup failed for ${addonId}: ${entitlementError.message}`);
+        }
 
         requireDbSuccess("activate one-time addon", await supabase.from("addons_purchased").insert({
           user_id: userId,

@@ -75,7 +75,8 @@ const [report, webhookSource, checkoutSource, deliverySource, refreshIconsSource
 ]);
 
 const reportInfo = await stat(reportPath);
-const reportAgeMinutes = (Date.now() - reportInfo.mtimeMs) / 60_000;
+const reportGeneratedAt = report.generatedAt ? Date.parse(report.generatedAt) : reportInfo.mtimeMs;
+const reportAgeMinutes = (Date.now() - reportGeneratedAt) / 60_000;
 expect(report.mode === "live", "O relatório do catálogo não é live.");
 expect(report.applied === false, "A checagem exige um relatório read-only; nenhum apply é permitido.");
 expect(report.actions?.length === 0, `O catálogo live tem ${report.actions?.length || 0} ação(ões) pendente(s).`);
