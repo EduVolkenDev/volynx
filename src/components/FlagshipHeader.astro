@@ -111,7 +111,7 @@ const { current = "", brandHref = ROUTES.core, ctaHref = ROUTES.pricing, ctaLabe
             <div class="vx-mega__grid">
               {group.items.map((item) => (
                 <a href={item.href} class="vx-mega-item">
-                  <span class="vx-mega-item__icon"><img data-vx-lazy-nav-icon={navIconThumb(item.icon)} alt="" width="32" height="32" decoding="async" /></span>
+                  <span class="vx-mega-item__icon"><img data-vx-lazy-nav-icon={navIconThumb(item.icon)} data-vx-nav-icon-full={item.icon} alt="" width="32" height="32" decoding="async" /></span>
                   <span class="vx-mega-item__copy"><strong><span class="i18n-en">{item.label}</span><span class="i18n-pt">{item.labelPt || item.label}</span></strong><span><span class="i18n-en">{item.detail}</span><span class="i18n-pt">{item.detailPt}</span></span></span>
                   <span class="vx-mega-item__arrow" aria-hidden="true">↗</span>
                 </a>
@@ -202,7 +202,7 @@ const { current = "", brandHref = ROUTES.core, ctaHref = ROUTES.pricing, ctaLabe
           </a>
           {group.items.map((item) => (
             <a href={item.href} class="vx-mobile-group__item">
-              <span class="vx-mobile-group__icon"><img data-vx-lazy-nav-icon={navIconThumb(item.icon)} alt="" width="32" height="32" decoding="async" /></span>
+              <span class="vx-mobile-group__icon"><img data-vx-lazy-nav-icon={navIconThumb(item.icon)} data-vx-nav-icon-full={item.icon} alt="" width="32" height="32" decoding="async" /></span>
               <span><strong><span class="i18n-en">{item.label}</span><span class="i18n-pt">{item.labelPt || item.label}</span></strong><small><span class="i18n-en">{item.detail}</span><span class="i18n-pt">{item.detailPt}</span></small></span>
             </a>
           ))}
@@ -1006,6 +1006,14 @@ const { current = "", brandHref = ROUTES.core, ctaHref = ROUTES.pricing, ctaLabe
       if (img.getAttribute("src")) return;
       const src = img.dataset.vxLazyNavIcon;
       if (!src) return;
+      const full = img.dataset.vxNavIconFull;
+      if (full) {
+        const onThumbError = () => {
+          img.removeEventListener("error", onThumbError);
+          img.src = full;
+        };
+        img.addEventListener("error", onThumbError);
+      }
       img.src = src;
       img.removeAttribute("data-vx-lazy-nav-icon");
     });
