@@ -181,12 +181,19 @@ const PLAN_DOWNGRADE_MAP: Record<string, Record<string, string>> = {
   studio_pro:     { builder_plan: "free" },
 };
 
+// Rank per plan VALUE for mergeHighestPlan (syncUserSubscriptionEntitlements).
+// Each profile field only ever compares values from its own product family,
+// so one table is enough: builder_plan (launch<pro<studio<teams),
+// daily_plan (pro<diamond), cvitae_plan (business), world_plan (member<pro).
+// NOTE: diamond must outrank pro (daily upgrade path) and member must be
+// present — otherwise a resync silently keeps/downgrades entitlements.
 const PLAN_RANK: Record<string, number> = {
   free: 0,
   launch: 1,
-  business: 2,
+  member: 1,
+  business: 1,
   pro: 2,
-  diamond: 2,
+  diamond: 3,
   studio: 3,
   teams: 4,
 };
@@ -402,6 +409,88 @@ function normalizeInternalKitPrefix(prefix: string): string {
 
 function isLikelyMissingStorageAsset(message: string | null): boolean {
   return /not found|does not exist|404|no such object|object not found|failed to find/i.test(String(message || ""));
+}
+
+// ── Icons-store fulfillment validation ─────────────────────
+// Session metadata (icon_id/icon_path/icon_collection) originates from the
+// client-controlled checkout body. Before signing any delivery, verify the
+// purchased prefix matches the requested asset in the public catalog.
+// Without this, a buyer of the cheapest tier could request a premium asset
+// (e.g. icon_collection="__all_premium__") and receive it.
+const ICON_CATALOG_URL = "https://volynx.world/assets/icons-store/catalog.json";
+const ICON_CATALOG_TTL_MS = 10 * 60 * 1000;
+let iconCatalogCache: { fetchedAt: number; items: Array<Record<string, unknown>> } | null = null;
+
+async function fetchIconCatalog(): Promise<Array<Record<string, unknown>> | null> {
+  if (iconCatalogCache && Date.now() - iconCatalogCache.fetchedAt < ICON_CATALOG_TTL_MS) {
+    return iconCatalogCache.items;
+  }
+  try {
+    const res = await fetch(ICON_CATALOG_URL, { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!Array.isArray(data)) return null;
+    iconCatalogCache = { fetchedAt: Date.now(), items: data as Array<Record<string, unknown>> };
+    return iconCatalogCache.items;
+  } catch {
+    return null;
+  }
+}
+
+type IconFulfillmentCheck = { ok: boolean; reason?: string; item?: Record<string, unknown> };
+
+function checkIconSelection(
+  prefix: string,
+  fields: { icon_id: string; icon_path: string; icon_collection: string },
+  catalog: Array<Record<string, unknown>>,
+): IconFulfillmentCheck {
+  if (prefix.startsWith("icons_pack_")) {
+    const collection = fields.icon_collection.trim();
+    if (!collection) return { ok: false, reason: "missing_collection" };
+    if (collection === "__all_premium__") {
+      return prefix === "icons_pack_hyper"
+        ? { ok: true, item: { collection } }
+        : { ok: false, reason: "collection_tier_mismatch" };
+    }
+    const match = catalog.find(
+      (item) => item.collection === collection && typeof item.packLookup === "string" && item.packLookup,
+    );
+    if (!match) return { ok: false, reason: "unknown_collection" };
+    return match.packLookup === prefix
+      ? { ok: true, item: match }
+      : { ok: false, reason: "collection_tier_mismatch" };
+  }
+  const iconId = fields.icon_id.trim();
+  const iconPath = fields.icon_path.trim();
+  const byId = iconId !== "" ? catalog.find((entry) => entry.id === iconId) : undefined;
+  const byPath = iconPath !== "" ? catalog.find((entry) => entry.path === iconPath) : undefined;
+  // Both identifiers provided must agree — never mix the id of one asset with
+  // the path of another.
+  if (byId && byPath && byId !== byPath) return { ok: false, reason: "icon_identifier_mismatch" };
+  const item = byId || byPath;
+  if (!item) return { ok: false, reason: "unknown_icon" };
+  if (!item.singleLookup) return { ok: false, reason: "icon_not_single_eligible" };
+  return item.singleLookup === prefix
+    ? { ok: true, item }
+    : { ok: false, reason: "icon_tier_mismatch" };
+}
+
+/** Fail-closed gate: returns null when the delivery must NOT be signed. */
+async function validateIconFulfillment(
+  prefix: string,
+  meta: Record<string, string>,
+): Promise<IconFulfillmentCheck> {
+  const catalog = await fetchIconCatalog();
+  if (!catalog) return { ok: false, reason: "catalog_unavailable" };
+  return checkIconSelection(
+    prefix,
+    {
+      icon_id: String(meta.icon_id || ""),
+      icon_path: String(meta.icon_path || ""),
+      icon_collection: String(meta.icon_collection || ""),
+    },
+    catalog,
+  );
 }
 
 const ICONS_BUCKET = "icons";
@@ -866,7 +955,50 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       if (existingIcon) {
         console.log(`Icon purchase ${prefix} already recorded for session ${session.id} — skip`);
       } else {
-        const iconDelivery = await signIconDelivery(prefix, meta);
+        // Tier gate (fail closed): the requested icon/collection must match
+        // the purchased prefix in the catalog. On mismatch — or when the
+        // catalog cannot be verified — record the purchase but sign nothing;
+        // delivery stays manual_review instead of leaking a premium asset.
+        const fulfillmentCheck = await validateIconFulfillment(prefix, meta);
+        let iconDelivery: {
+          path: string | null;
+          filename: string | null;
+          url: string | null;
+          expiresAt: string | null;
+          status: string;
+          error: string | null;
+        };
+        if (!fulfillmentCheck.ok) {
+          console.error(
+            `Icon fulfillment ${prefix} blocked (${fulfillmentCheck.reason}) for session ${session.id}`,
+          );
+          iconDelivery = {
+            path: null,
+            filename: null,
+            url: null,
+            expiresAt: null,
+            status: "manual_review",
+            error: `tier_validation:${fulfillmentCheck.reason}`,
+          };
+        } else {
+          // Canonical delivery: sign using the catalog item's identifiers,
+          // never the raw client-supplied metadata (prevents id/path mix-ups
+          // and any post-validation reinterpretation).
+          const canonicalMeta: Record<string, string> = { ...meta };
+          const validatedItem = fulfillmentCheck.item;
+          if (validatedItem) {
+            if (typeof validatedItem.id === "string" && validatedItem.id) {
+              canonicalMeta.icon_id = validatedItem.id;
+            }
+            if (typeof validatedItem.path === "string" && validatedItem.path) {
+              canonicalMeta.icon_path = validatedItem.path;
+            }
+            if (typeof validatedItem.collection === "string" && validatedItem.collection) {
+              canonicalMeta.icon_collection = validatedItem.collection;
+            }
+          }
+          iconDelivery = await signIconDelivery(prefix, canonicalMeta);
+        }
         if (iconDelivery.error) {
           console.error(`Icon delivery ${prefix} signing status=${iconDelivery.status}:`, iconDelivery.error);
         }
