@@ -65,20 +65,20 @@ Blackbox applies premium visual polish to the checkout success/delivery page sta
 
 ## Phase 4: Translation Updates (public/js/translations.js)
 
-### 4.1 Add delivery-specific translations
-- [ ] Add `delivery.payment_success` — Premium success message
-- [ ] Add `delivery.payment_cancelled` — Cancelled state message
-- [ ] Add `delivery.payment_error` — Error state message
-- [ ] Add `delivery.loading_deliveries` — Loading state
-- [ ] Add `delivery.empty_title` — Empty state title
-- [ ] Add `delivery.empty_cta` — Empty state CTA
-- [ ] Add `delivery.error_title` — Error state title
-- [ ] Add `delivery.error_cta` — Error state CTA
+### 4.1 Add delivery-specific translations ✅ COMPLETE
+- [x] Add `delivery.payment_success` — Premium success message
+- [x] Add `delivery.payment_cancelled` — Cancelled state message
+- [x] Add `delivery.payment_error` — Error state message
+- [x] Add `delivery.loading_deliveries` — Loading state
+- [x] Add `delivery.empty_title` — Empty state title
+- [x] Add `delivery.empty_cta` — Empty state CTA
+- [x] Add `delivery.error_title` — Error state title
+- [x] Add `delivery.error_cta` — Error state CTA
 
-### 4.2 PT/EN Copy Sync
-- [ ] Ensure same intent across both languages
-- [ ] Premium tone consistency
-- [ ] No generic placeholder text
+### 4.2 PT/EN Copy Sync ✅ COMPLETE
+- [x] Ensure same intent across both languages
+- [x] Premium tone consistency
+- [x] No generic placeholder text
 
 ---
 
