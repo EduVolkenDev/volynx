@@ -107,7 +107,7 @@ const deliveryAssistItems = [
       <div class="shell">
 
 <!-- Loading state -->
-        <div id="deliveryLoading" class="delivery-state">
+        <div id="deliveryLoading" class="delivery-state" role="status" tabindex="-1">
           <div class="delivery-spinner delivery-spinner--premium" aria-hidden="true">
             <div class="delivery-spinner__ring"></div>
             <div class="delivery-spinner__ring"></div>
@@ -117,11 +117,11 @@ const deliveryAssistItems = [
             <span class="i18n-en">Preparing your deliverables...</span>
             <span class="i18n-pt">Preparando seus arquivos...</span>
           </p>
-          <p class="delivery-state__sublabel"><span class="i18n-en">Loading your collection</span><span class="i18n-pt">Carregando sua coleção</span></p>
+          <p class="delivery-state__sublabel"><span class="i18n-en">Fetching your kits, downloads and subscriptions</span><span class="i18n-pt">Buscando seus kits, downloads e assinaturas</span></p>
         </div>
 
         <!-- Error state -->
-        <div id="deliveryError" class="delivery-state delivery-state--error" style="display:none;">
+        <div id="deliveryError" class="delivery-state delivery-state--error" style="display:none;" role="alert" tabindex="-1">
           <div class="delivery-state__icon" aria-hidden="true">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"/>
@@ -140,7 +140,7 @@ const deliveryAssistItems = [
         </div>
 
         <!-- Empty state -->
-        <div id="deliveryEmpty" class="delivery-state delivery-state--empty" style="display:none;">
+        <div id="deliveryEmpty" class="delivery-state delivery-state--empty" style="display:none;" tabindex="-1">
           <div class="delivery-state__visual" aria-hidden="true">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
@@ -149,10 +149,10 @@ const deliveryAssistItems = [
             </svg>
           </div>
           <p class="delivery-state__label">
-            <span class="i18n-en">Your collection is empty.</span>
-            <span class="i18n-pt">Sua coleção está vazia.</span>
+            <span class="i18n-en">No purchases yet — start exploring.</span>
+            <span class="i18n-pt">Nenhuma compra ainda — comece a explorar.</span>
           </p>
-          <p class="delivery-state__hint"><span class="i18n-en">Ready to start exploring? Browse our kit catalog.</span><span class="i18n-pt">Pronto para explorar? Navegue pelo catálogo de kits.</span></p>
+          <p class="delivery-state__hint"><span class="i18n-en">Your kits, downloads and subscriptions will appear here after checkout.</span><span class="i18n-pt">Seus kits, downloads e assinaturas aparecem aqui após a compra.</span></p>
           <div class="delivery-state__actions">
             <a href={ROUTES.products} class="button button--gold"><span class="i18n-en">Explore kits</span><span class="i18n-pt">Explorar kits</span></a>
             <a href={ROUTES.pricing} class="button button--ghost"><span class="i18n-en">View pricing</span><span class="i18n-pt">Ver preços</span></a>
@@ -272,7 +272,16 @@ const deliveryAssistItems = [
     })();
 
     // ── Helpers ─────────────────────────────────────────────────────────────
-    function show(id) { const el = document.getElementById(id); if (el) el.style.display = ''; }
+    function show(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.display = '';
+      // 5.3 — focus management: move keyboard/screen-reader focus to the
+      // state container when it appears so the status is announced.
+      if (el.classList.contains('delivery-state')) {
+        try { el.focus({ preventScroll: true }); } catch {}
+      }
+    }
     function hide(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
 
     function escapeHtml(value) {
@@ -1203,6 +1212,27 @@ function formatPrice(amount, currency, minorUnits = false) {
     .payment-banner__message {
       font-size: 13px;
     }
+    /* 1.3 — small-viewport state polish: no overflow, stacked CTAs, 44px targets */
+    .delivery-state {
+      padding: 48px 16px;
+      gap: 16px;
+    }
+    .delivery-state__actions {
+      flex-direction: column;
+      width: 100%;
+      max-width: 320px;
+    }
+    .delivery-state__actions .button {
+      width: 100%;
+      min-height: 44px;
+    }
+    .delivery-card__cta {
+      min-height: 44px;
+    }
+    .payment-banner__close {
+      width: 44px;
+      height: 44px;
+    }
   }
 
   /* ── Hero ───────────────────────────────────────────────────────────────── */
@@ -1341,6 +1371,10 @@ function formatPrice(amount, currency, minorUnits = false) {
   @keyframes spinner-orbit {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .delivery-spinner__ring { animation-duration: 3s; }
+    .payment-banner { animation: none; }
   }
 
   /* ── Product grid ────────────────────────────────────────────────────────── */
