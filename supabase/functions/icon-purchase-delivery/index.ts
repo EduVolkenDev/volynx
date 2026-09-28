@@ -4,12 +4,21 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 const BUCKET = "icons-originals";
 const ROOT = "volynx-icons-private";
 const TTL_SECONDS = 60 * 60;
+// Tier ordering mirrors the storefront price ladders (see ICON_PRICE_TIERS /
+// ICON_PACK_PRICES in src/pages/products/volynx-icons-store/index.astro):
+// singles: budget < standard < curated < premium < signature < hyper
+// packs:   entry < mixed < curated < premium < signature < hyper
+// Every purchasable tier must be present — a missing tier resolves to -1 and
+// would 403 legitimate buyers of that tier on download refresh.
 const TIER_RANK: Record<string, number> = {
   budget: 0,
-  standard: 1,
-  mixed: 1,
-  premium: 2,
-  hyper: 3,
+  entry: 1,
+  standard: 2,
+  mixed: 2,
+  curated: 3,
+  premium: 4,
+  signature: 5,
+  hyper: 6,
 };
 
 const supabase = createClient(
