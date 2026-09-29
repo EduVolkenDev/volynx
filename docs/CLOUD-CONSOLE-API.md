@@ -32,7 +32,7 @@ Campos ainda sem fonte conservam `null`: nome do recurso no cartão de backup, b
 
 ### Projeção de dados
 
-O papel é resolvido no servidor após a leitura sob RLS: plataforma (`volynx_admin`, `volynx_operator`) ou cliente (`client_admin`, `client_viewer`). O commit SHA aparece só na projeção de plataforma. Referência de secret, URL de repositório, JSON bruto de provider, metadata e mensagens técnicas de falha não são selecionados nem retornados. O cliente recebe erro de deploy com referência estável e texto seguro. O papel no response serve para apresentação; decisões futuras de escrita precisam verificar o papel novamente no servidor.
+O papel é resolvido no servidor após a leitura sob RLS: plataforma (`volynx_admin`, `volynx_operator`) ou cliente (`client_admin`, `client_viewer`). O commit SHA permanece `null` para todos os papéis: o grant de coluna ao papel compartilhado `authenticated` permitiria leitura direta por qualquer cliente autorizado à linha. Uma futura projeção exclusiva de operador exigirá uma fronteira de autorização separada no banco. Referência de secret, URL de repositório, JSON bruto de provider, metadata e mensagens técnicas de falha não são selecionados nem retornados. O cliente recebe erro de deploy com referência estável e texto seguro. O papel no response serve para apresentação; decisões futuras de escrita precisam verificar o papel novamente no servidor.
 
 ### Falhas
 

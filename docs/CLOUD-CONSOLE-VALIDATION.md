@@ -2,6 +2,28 @@
 
 Data: 2026-09-28. Branch: `codex/cloud-console-core`. Base inicial: `5777a8a6`; atualizada por fast-forward para `de9d2b63` antes do PR.
 
+## Fechamento da validação local — 2026-09-29
+
+O banco descartável foi executado novamente sem usar os projetos locais VOLYNX/PDU: **66/66** testes PostgreSQL/RLS e observações passaram. A suíte da aplicação passou com **29/29** testes normais; os quatro testes opt-in de Auth foram executados separadamente contra uma instância Supabase temporária com portas próprias e passaram **4/4**. O fluxo cobriu login por senha, JWT real, catálogo por tenant, Overview fora do escopo, leitura direta pela Data API com `commit_sha` negado e revogação efetiva na leitura seguinte. `tsc --noEmit`, lint da aplicação, build Next 14 completo (incluindo as rotas do Console) e `git diff --check` também passaram. A migration criou as 16 tabelas `cloud_*` nessa instância; ao final, seus contêineres e volumes foram removidos. Nenhum recurso hospedado novo ou dado de produção foi criado por estes testes.
+
+Este fechamento comprova o caminho Auth/PostgREST **local**, não o login no VolynxCore hospedado, a UI autenticada em navegador, as integrações de providers, backup/restore real ou o deploy de `apps/volynx-os`. As seções históricas abaixo descrevem o estado de cada execução no momento em que ocorreu; afirmações antigas de que a migration ainda não tinha sido aplicada remotamente não representam o estado atual.
+
+Uma consulta somente de leitura ao histórico remoto confirmou `20260928235714` tanto local quanto remotamente. O banco remoto também registra `202609280001` (outra migration) e três versões posteriores ausentes deste checkout (`20260929010421`, `20260929010846`, `20260929140119`). Não executar `db push` a partir desta branch antes de reconciliar esse histórico; nenhuma dessas migrations foi alterada neste fechamento.
+
+## Atualização remota — 2026-09-29
+
+Com autorização de Eduardo, o SQL do working tree foi aplicado ao projeto Supabase VolynxCore (`zdmpzrderifgqmqivjoy`) como migration `20260928235714_cloud_console_core`. A versão original `202609280001` colidia com a migration já registrada `jhonatan_property_flow_white_label_baseline`; o nome local foi alinhado à versão gerada pelo Supabase sem alterar o SQL (SHA-256 `0c08e379c007bb2f63b65668f51cf07ce6336d1a0b3a357ced02fc40cc18a2ba`). A verificação remota listou as 16 tabelas `cloud_*`, todas com RLS habilitado. `anon` não possui SELECT/INSERT nessas tabelas nem EXECUTE nas oito funções `cloud_*`; clientes, produtos, membros do Console e eventos de auditoria permanecem com zero linhas. Nenhum dado de teste, tenant ou produto foi criado. Quatro helpers de autorização `cloud_*` são executáveis por `authenticated` intencionalmente para as políticas RLS e apareceram no advisor como funções SECURITY DEFINER; a checagem de chamadas reais com JWT continua pendente. Os relatos abaixo de "nenhuma migration remota" descrevem as validações locais anteriores a esta atualização; não comprovam ainda login/RLS autenticado no ambiente hospedado, integrações de providers, backup ou deploy da aplicação.
+
+## Retomada: grant de deploy e projeção do commit
+
+A revisão detectou que `commit_sha`, embora oculto na resposta para cliente, ainda estava concedido por coluna ao papel compartilhado `authenticated`; uma leitura direta pela Data API poderia contornar a projeção da rota. O grant foi removido da migration ainda inédita e a Overview deixou de selecionar esse campo para todos os papéis. Um futuro acesso exclusivo de operador precisará de uma fronteira própria no banco, não apenas da checagem de papel no Next. O teste SQL agora exige negação de leitura direta para cliente e operador. Validação local: 66/66 testes de banco descartável/observações, 28/28 testes da aplicação, TypeScript sem emissão e `git diff --check`. Nenhuma migration foi aplicada remotamente; esta execução não prova JWT/PostgREST real nem deploy.
+
+## Validação com Auth e PostgREST locais
+
+Uma instância Supabase separada foi inicializada em diretório temporário, com projeto/portas próprios; Core sem seed demonstrativo e migration Cloud Console foram aplicados somente ali. Quatro contas temporárias fizeram login real por e-mail/senha local, gerando JWTs usados pelo mesmo adapter de catálogo/Overview da aplicação. O primeiro teste revelou um defeito real: `cloud_clients` faltava à allowlist do adapter, então o catálogo retornava 503 apesar de Auth e RLS estarem corretos. A allowlist foi corrigida e ganhou regressão unitária.
+
+Na repetição, **4/4 testes de integração passaram**: catálogo limitado a cada cliente e organização, Overview 404 para produto de outro cliente/organização, RLS na Data API direta com negação de `commit_sha`, e revogação de membro efetiva na próxima leitura com o mesmo JWT. O teste opt-in está em `apps/volynx-os/server/cloud-console/local-e2e.test.ts`; só aceita projeto temporário local identificado como Cloud Console. A stack foi desligada com descarte dos volumes após a execução. Nenhuma conta remota, migration hospedada ou dado de produção foi tocado. Isso comprova Auth/PostgREST local, **não** staging hospedado ou a interface autenticada em navegador.
+
 ## Atualização: integração da UI do Muse no monorepo
 
 Com autorização posterior de Eduardo, a UI baseada no commit `1afffd8` foi portada para `apps/volynx-os/app/console/**`, `components/console/**` e `lib/console/**`. A galeria `/console/preview` permanece fictícia e rotulada. O Console operacional usa autenticação Supabase no navegador, catálogo por JWT/RLS (`GET /api/cloud/v1/catalog`) e Overview (`GET /api/cloud/v1/overview`). URLs carregam UUIDs de navegação; o servidor verifica autorização a cada leitura. A troca de contexto não exibe dados do contexto anterior durante a próxima consulta. Nenhum endpoint de escrita operacional foi habilitado.
@@ -21,7 +43,7 @@ Na preparação do PR, Eduardo autorizou commit e abertura do PR (não merge/dep
 ## OWNED AREA / FILES TOUCHED / DEPENDENCIES / EXPECTED OUTPUT
 
 - **OWNED AREA:** dados, autorização, contratos e validação server-side. Nenhum componente visual alterado.
-- **FILES TOUCHED:** migration inédita `202609280001_cloud_console_core.sql`, `contracts/cloud-console-v1.ts`, `apps/volynx-os/server/cloud-console/observations.ts`, dois testes `scripts/check-cloud-console-*.test.mjs`, audit/decision log e documentos de validação/handoff.
+- **FILES TOUCHED:** migration inédita `20260928235714_cloud_console_core.sql`, `contracts/cloud-console-v1.ts`, `apps/volynx-os/server/cloud-console/observations.ts`, dois testes `scripts/check-cloud-console-*.test.mjs`, audit/decision log e documentos de validação/handoff.
 - **DEPENDENCIES:** Docker local, PostgreSQL 17, Node, TypeScript/ESLint/Next existentes. Nenhuma dependência ou lockfile adicionado/alterado. Para a execução local foram usados links temporários aos node_modules existentes do checkout principal.
 - **EXPECTED OUTPUT:** migration executável e regressões testadas em banco efêmero, contratos reconciliados com Muse e limites de integração documentados.
 

@@ -83,10 +83,11 @@ describe('Cloud overview read boundary',()=>{
     expect(result.body.context.role).toBe('client_viewer')
     expect(JSON.stringify(result.body)).not.toMatch(/PRIVATE_REPO|PRIVATE_COMMIT|SECRET_PROVIDER_ERROR|DO_NOT_ECHO/)
   })
-  it('returns a richer operator projection without raw provider errors',async()=>{
+  it('keeps commit hashes private even for operator reads without a dedicated grant',async()=>{
     const result=await read(request(),{rows:{cloud_console_members:[{platform_organization_id:organization,user_id:user,role:'volynx_operator'}]}})
     expect(result.body.context.role).toBe('volynx_operator')
-    expect(result.body.data.deployments.data[0].source.commitSha).toBe('PRIVATE_COMMIT')
+    expect(result.body.data.deployments.data[0].source.commitSha).toBeNull()
+    expect(JSON.stringify(result.body)).not.toContain('PRIVATE_COMMIT')
     expect(result.body.data.deployments.data[0].error.referenceId).toBe(id(600))
     expect(JSON.stringify(result.body)).not.toContain('SECRET_PROVIDER_ERROR')
   })

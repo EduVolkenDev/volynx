@@ -5,7 +5,7 @@ const timeoutMs=8000
 const columns=/^[a-z_]+(?:,[a-z_]+)*$/
 const identifier=/^[a-z_]+$/
 const tables=new Set([
-  'cloud_products','cloud_environments','cloud_console_members','cloud_client_members',
+  'cloud_clients','cloud_products','cloud_environments','cloud_console_members','cloud_client_members',
   'cloud_resources','cloud_deployments','cloud_backup_capabilities','cloud_incidents','cloud_care_plans'
 ])
 

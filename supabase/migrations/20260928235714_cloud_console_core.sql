@@ -468,7 +468,9 @@ GRANT SELECT (id,client_id,user_id,role,created_at) ON public.cloud_client_membe
 GRANT SELECT (id,platform_organization_id,client_id,volynx_id,name,slug,status,production_url,created_at,updated_at) ON public.cloud_products TO authenticated;
 GRANT SELECT (id,platform_organization_id,product_id,environment_key,name,kind,status,source,checked_at,created_at,updated_at) ON public.cloud_environments TO authenticated;
 GRANT SELECT (id,platform_organization_id,product_id,environment_id,provider,resource_kind,name,status,source,checked_at,last_seen_at,created_at,updated_at) ON public.cloud_resources TO authenticated;
-GRANT SELECT (id,platform_organization_id,product_id,environment_id,provider,commit_sha,status,started_at,finished_at,failure_code,source,checked_at,created_at) ON public.cloud_deployments TO authenticated;
+-- Column grants apply to every authenticated user, including client viewers.
+-- Keep commit_sha private until an operator-only read path exists.
+GRANT SELECT (id,platform_organization_id,product_id,environment_id,provider,status,started_at,finished_at,failure_code,source,checked_at,created_at) ON public.cloud_deployments TO authenticated;
 GRANT SELECT ON public.cloud_monitoring_checks TO authenticated;
 GRANT SELECT (id,platform_organization_id,product_id,environment_id,check_id,status,checked_at,latency_ms,failure_code,source) ON public.cloud_monitoring_results TO authenticated;
 GRANT SELECT (id,platform_organization_id,product_id,environment_id,resource_id,provider,capability_status,retention_days,last_success_at,restore_supported,verification_status,source,checked_at,created_at,updated_at) ON public.cloud_backup_capabilities TO authenticated;

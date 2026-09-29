@@ -90,9 +90,9 @@ function resource(row: unknown, productId: string, environmentId: string, now: D
   if (!result.ok) throw new ReadFailure('malformed_response')
   return { ...result.value, resource:{id:v.id,name:v.name}, type:v.resource_kind, provider:v.provider }
 }
-function deployment(row: unknown, productId: string, environmentId: string, operator: boolean): Deployment {
+function deployment(row: unknown, productId: string, environmentId: string): Deployment {
   const v=asObject(row)
-  if (!v || v.product_id !== productId || v.environment_id !== environmentId || !string(v.id) || !string(v.provider) || !string(v.status) || !string(v.created_at) || !nullableString(v.commit_sha) || !nullableString(v.started_at) || !nullableString(v.finished_at) || !nullableString(v.source) || !nullableString(v.checked_at) || !nullableString(v.failure_code)) throw new ReadFailure('malformed_response')
+  if (!v || v.product_id !== productId || v.environment_id !== environmentId || !string(v.id) || !string(v.provider) || !string(v.status) || !string(v.created_at) || !nullableString(v.started_at) || !nullableString(v.finished_at) || !nullableString(v.source) || !nullableString(v.checked_at) || !nullableString(v.failure_code)) throw new ReadFailure('malformed_response')
   const statuses: Deployment['status'][]=['queued','running','succeeded','failed','cancelled','unknown']
   if (!statuses.includes(v.status as Deployment['status'])) throw new ReadFailure('malformed_response')
   if (v.source !== null && !safeSource(v.source)) throw new ReadFailure('malformed_response')
@@ -101,7 +101,7 @@ function deployment(row: unknown, productId: string, environmentId: string, oper
   if (duration !== null && (!finiteNumber(duration) || duration < 0)) throw new ReadFailure('malformed_response')
   return {
     id:v.id,status:v.status as Deployment['status'],
-    source:{repo:null,commitSha:operator?v.commit_sha:null,branch:null,author:null},
+    source:{repo:null,commitSha:null,branch:null,author:null},
     createdAt:v.created_at,durationMs:duration,triggeredBy:null,lastCheckedAt:v.checked_at,providerSource:v.source,
     error:v.status === 'failed' ? error('operation_failed',v.finished_at ?? v.created_at,v.id) : null
   }
@@ -162,11 +162,10 @@ export async function readOverview(request: Request, deps: OverviewDependencies)
     const environment=environmentRow(rawEnvironment)
     if (environment.id !== environmentId || environment.productId !== productId || environment.orgId !== product.orgId) throw new ReadFailure('malformed_response')
     const activeRole=await role(source,product.orgId,product.clientId,verified.userId)
-    const operator=activeRole==='volynx_operator' || activeRole==='volynx_admin'
     const scope={platform_organization_id:product.orgId,product_id:productId,environment_id:environmentId}
     const [resources,deployments,backups,incidents,carePlan]=await Promise.all([
       readModule(async()=> (await source.many('cloud_resources','id,product_id,environment_id,provider,resource_kind,name,status,source,checked_at',scope,50)).map(v=>resource(v,productId,environmentId,now)),at,ref),
-      readModule(async()=> (await source.many('cloud_deployments','id,product_id,environment_id,provider,commit_sha,status,started_at,finished_at,failure_code,source,checked_at,created_at',scope,20,'created_at')).map(v=>deployment(v,productId,environmentId,operator)),at,ref),
+      readModule(async()=> (await source.many('cloud_deployments','id,product_id,environment_id,provider,status,started_at,finished_at,failure_code,source,checked_at,created_at',scope,20,'created_at')).map(v=>deployment(v,productId,environmentId)),at,ref),
       readModule(async()=> (await source.many('cloud_backup_capabilities','id,product_id,environment_id,resource_id,provider,capability_status,retention_days,last_success_at,restore_supported,verification_status,source,checked_at',scope,50)).map(v=>backup(v,productId,environmentId,now)),at,ref),
       readModule(async()=> {
         const columns='id,product_id,environment_id,title,severity,status,detected_at'

@@ -44,4 +44,17 @@ describe('Supabase Console source',()=>{
     vi.spyOn(globalThis,'fetch').mockRejectedValue(new Error('provider offline'))
     expect(await createSupabaseSource('fixture-jwt').verify('fixture-jwt')).toEqual({userId:null,unavailable:true})
   })
+  it('allows the catalog client table but rejects unlisted tables',async()=>{
+    process.env.NEXT_PUBLIC_SUPABASE_URL='http://127.0.0.1:9999'
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY='public-test-key'
+    const requests:string[]=[]
+    vi.spyOn(globalThis,'fetch').mockImplementation(async input=>{
+      requests.push(String(input))
+      return new Response('[]',{status:200,headers:{'Content-Type':'application/json'}})
+    })
+    const source=createSupabaseSource('fixture-jwt')
+    expect(await source.many('cloud_clients','id,platform_organization_id,name',{status:'active'},100)).toEqual([])
+    expect(requests[0]).toContain('/rest/v1/cloud_clients')
+    await expect(source.many('auth_users','id',{},1)).rejects.toThrow('Invalid Console query')
+  })
 })

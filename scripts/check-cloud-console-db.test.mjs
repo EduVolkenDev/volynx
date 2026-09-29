@@ -51,7 +51,7 @@ before(async () => {
   const core = readFileSync(`${root}supabase/migrations/202605240001_volynx_os_core.sql`, 'utf8')
   assert.ok(core.includes('-- ── 9. Demo seed'))
   sql(core.split('-- ── 9. Demo seed')[0])
-  sql(readFileSync(`${root}supabase/migrations/202609280001_cloud_console_core.sql`, 'utf8'))
+  sql(readFileSync(`${root}supabase/migrations/20260928235714_cloud_console_core.sql`, 'utf8'))
   sql(`INSERT INTO auth.users(id) VALUES ${[1,2,3,4,5,6,7,8].map(n => `('${id(n)}')`).join(',')};
     INSERT INTO public.organizations(id,name,slug,owner_id) VALUES ('${orgA}','Fixture A','fixture-a','${legacyOwner}'),('${orgB}','Fixture B','fixture-b',null);
     INSERT INTO public.cloud_console_members(platform_organization_id,user_id,role) VALUES ('${orgA}','${adminA}','volynx_admin'),('${orgA}','${operatorA}','volynx_operator'),('${orgB}','${adminB}','volynx_admin');
@@ -162,8 +162,9 @@ test('support requires matching product and environment', () => {
   assert.throws(() => asUser(viewerA, `INSERT INTO public.cloud_support_requests(platform_organization_id,client_id,product_id,environment_id,requester_id,subject,description) VALUES ('${orgA}','${clientA}','${productA}','${envB}','${viewerA}','Wrong environment','Fixture')`), /foreign key/)
 })
 test('raw metadata, results, repositories and secret references are denied', () => {
-  for (const [table,column] of [['cloud_products','repository_url'],['cloud_resources','metadata'],['cloud_monitoring_results','result'],['cloud_integrations','secret_ref'],['cloud_deployments','failure_message']]) {
+  for (const [table,column] of [['cloud_products','repository_url'],['cloud_resources','metadata'],['cloud_monitoring_results','result'],['cloud_integrations','secret_ref'],['cloud_deployments','failure_message'],['cloud_deployments','commit_sha']]) {
     assert.throws(() => asUser(viewerA,`SELECT ${column} FROM public.${table}`), /permission denied/)
+    assert.throws(() => asUser(operatorA,`SELECT ${column} FROM public.${table}`), /permission denied/)
   }
 })
 test('VLX ID and tenant identity are immutable for trusted ingestion too', () => {
