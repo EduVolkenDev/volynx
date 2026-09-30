@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import Link from "next/link"
 import { Download, Image as ImageIcon, Mail, ShieldCheck } from "lucide-react"
 import { DeliveryTrustStrip } from "@/components/common/delivery-trust-strip"
 import { supportEmail } from "@/content/legal-pages"
@@ -178,11 +179,11 @@ export function IconsDeliveryClient() {
   return (
     <div className="container-shell py-12 md:py-16">
       <nav className="mb-10 flex flex-wrap items-center gap-3 text-sm text-zinc-500">
-        <a href="/" className="transition hover:text-white">Home</a>
+        <Link href="/" className="transition hover:text-white">Home</Link>
         <span>/</span>
-        <a href="/dashboard/purchases" className="transition hover:text-white">Purchases</a>
+        <Link href="/dashboard/purchases" className="transition hover:text-white">Purchases</Link>
         <span>/</span>
-        <a href="/icons-store" className="transition hover:text-white">Icons Store</a>
+        <Link href="/icons-store" className="transition hover:text-white">Icons Store</Link>
         <span>/</span>
         <span className="text-zinc-300">Delivery</span>
       </nav>

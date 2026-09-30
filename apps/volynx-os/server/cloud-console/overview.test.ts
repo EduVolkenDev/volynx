@@ -83,6 +83,15 @@ describe('Cloud overview read boundary',()=>{
     expect(result.body.context.role).toBe('client_viewer')
     expect(JSON.stringify(result.body)).not.toMatch(/PRIVATE_REPO|PRIVATE_COMMIT|SECRET_PROVIDER_ERROR|DO_NOT_ECHO/)
   })
+  it('accepts evidenced PostgREST UTC timestamps without weakening validation',async()=>{
+    const result=await read(request(),{rows:{cloud_resources:[{
+      ...fixture.cloud_resources[0],status:'operational',source:'synthetic-local-test',
+      checked_at:'2026-09-28T11:59:00.123456+00:00'
+    }]}})
+    expect(result.body.data.resources.state).toBe('ready')
+    expect(result.body.data.resources.data[0].lastCheckedAt).toBe('2026-09-28T11:59:00.123Z')
+    expect(result.body.data.resources.data[0].stale).toBe(false)
+  })
   it('keeps commit hashes private even for operator reads without a dedicated grant',async()=>{
     const result=await read(request(),{rows:{cloud_console_members:[{platform_organization_id:organization,user_id:user,role:'volynx_operator'}]}})
     expect(result.body.context.role).toBe('volynx_operator')

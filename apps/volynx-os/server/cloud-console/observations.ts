@@ -6,7 +6,8 @@ export type ObservationValidation =
   | { ok: false; code: 'malformed_response'; value: Observation }
 
 const unknown: Observation = { status: 'unknown', source: null, lastCheckedAt: null, stale: false }
-const isoUtc = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/
+// PostgREST serializes UTC timestamptz values with +00:00 and up to six fractional digits.
+const isoUtc = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|\+00:00)$/
 
 /** Validate normalized adapter output, not a raw provider payload. No secret echo. */
 export function validateObservation(input: unknown, now: Date, maxAgeMs: number): ObservationValidation {
@@ -28,5 +29,5 @@ export function validateObservation(input: unknown, now: Date, maxAgeMs: number)
   if (status === 'not_configured' && (source !== null || timestamp !== null)) return invalid()
   if (typeof timestamp === 'string' && Date.parse(timestamp) > now.getTime()) return invalid()
   const stale = typeof timestamp === 'string' && now.getTime() - Date.parse(timestamp) >= maxAgeMs
-  return { ok: true, value: { status, source: source as string | null, lastCheckedAt: timestamp as string | null, stale } }
+  return { ok: true, value: { status, source: source as string | null, lastCheckedAt: typeof timestamp === 'string' ? new Date(timestamp).toISOString() : null, stale } }
 }

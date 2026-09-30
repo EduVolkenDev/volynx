@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useState } from "react"
+import Link from "next/link"
 import { ArrowRight, Download, FileText, LockKeyhole, Mail, ShieldCheck } from "lucide-react"
 import { DeliveryTrustStrip } from "@/components/common/delivery-trust-strip"
 import {
@@ -251,9 +252,9 @@ export function PropertyFlowDeliveryClient() {
   return (
     <div className="container-shell py-12 md:py-16">
       <nav className="mb-10 flex flex-wrap items-center gap-3 text-sm text-zinc-500">
-        <a href="/" className="transition hover:text-white">Home</a>
+        <Link href="/" className="transition hover:text-white">Home</Link>
         <span>/</span>
-        <a href="/dashboard/purchases" className="transition hover:text-white">Purchases</a>
+        <Link href="/dashboard/purchases" className="transition hover:text-white">Purchases</Link>
         <span>/</span>
         <a href={propertyFlowPublicHref} className="transition hover:text-white">PropertyFlow</a>
         <span>/</span>
