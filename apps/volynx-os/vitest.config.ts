@@ -9,6 +9,6 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    include: ["lib/daily/**/*.test.ts"]
+    include: ["lib/daily/**/*.test.ts", "server/cloud-console/**/*.test.ts"]
   }
 })

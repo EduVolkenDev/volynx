@@ -1,14 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "standalone",
   images: {
     unoptimized: true
   },
-  experimental: {
-    typedRoutes: false,
-    outputFileTracingIncludes: {
-      "/api/downloads/propertyflow": ["./storage/propertyflow/*.zip"],
-      "/api/downloads/propertyflow/entitlement": ["./storage/propertyflow/*.zip"]
-    }
+  typedRoutes: false,
+  outputFileTracingIncludes: {
+    "/api/downloads/propertyflow": ["./storage/propertyflow/*.zip"],
+    "/api/downloads/propertyflow/entitlement": ["./storage/propertyflow/*.zip"]
   }
 }
 

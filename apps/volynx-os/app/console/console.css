@@ -1,0 +1,130 @@
+/* VOLYNX Cloud Console — design tokens (Muse domain).
+   Premium black/gold system. Status scale is independent from the brand accent:
+   status is information, never decoration. All status communication pairs
+   color with icon + label. */
+
+.console-root {
+  --st-operational: #34d399;
+  --st-degraded: #fbbf24;
+  --st-incident: #f87171;
+  --st-maintenance: #7dd3fc;
+  --st-unknown: #a1a1aa;
+  --st-not-configured: #71717a;
+
+  /* Volynx gold — the premium accent. Used sparingly: eyebrows, key statements,
+     active states, primary actions. Never for status. */
+  --gold: #e3b85c;
+  --gold-bright: #f2d68a;
+  --gold-deep: #9a742f;
+  --gold-glow: rgba(227, 184, 92, 0.13);
+  --gold-line: rgba(227, 184, 92, 0.28);
+
+  --console-line: rgba(255, 255, 255, 0.08);
+  --console-surface: rgba(255, 255, 255, 0.025);
+  --console-surface-strong: rgba(255, 255, 255, 0.05);
+}
+
+/* Display serif for hero statements — the Volynx voice. System stack, no fetch. */
+.console-root .font-display {
+  font-family: Didot, "Bodoni MT", Cochin, Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+/* Gold gradient text for key statements. */
+.console-root .text-gold-gradient {
+  background: linear-gradient(120deg, var(--gold-bright) 10%, var(--gold) 55%, var(--gold-deep) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Premium panel — carved inset edge, teal glass depth. */
+.console-root .console-panel {
+    position: relative;
+    border: 1px inset black;
+    border-radius: 25px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, -0), rgb(1 76 75 / 36%));
+    box-shadow: inset 0 7px 30px 15px rgba(255, 255, 255, 0.07), 0 24px 48px 35px rgba(0, 0, 0, 0.45);
+}
+
+/* Chip — asymmetric radius, generous padding; the status color glows from inside. */
+.console-root .console-chip {
+    border-radius: 21px 10px 10px 3px;
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+}
+
+/* Gold-accented panel for the hero / primary attention. */
+.console-root .console-panel-gold {
+  border-color: var(--gold-line);
+  background:
+    radial-gradient(120% 90% at 50% 0%, var(--gold-glow), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+  box-shadow:
+    inset 0 1px 0 rgba(242, 214, 138, 0.18),
+    0 24px 48px -24px rgba(0, 0, 0, 0.65);
+}
+
+/* Eyebrow label — small caps, wide tracking, zinc or gold. */
+.console-root .eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+}
+
+.console-root ::selection {
+  background: rgba(227, 184, 92, 0.28);
+  color: #fff;
+}
+
+/* Tabular numerals for metrics and timestamps — precision language. */
+.console-root .tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Skeleton shimmer for loading states (per-module, never full-page). */
+@keyframes console-shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
+}
+
+.console-root .console-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.09) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
+  background-size: 400px 100%;
+  animation: console-shimmer 1.4s ease infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .console-root .console-skeleton {
+    animation: none;
+  }
+}
+
+/* Focus visibility — keyboard navigation is a first-class path. */
+.console-root :focus-visible {
+  outline: 2px solid rgba(227, 184, 92, 0.75);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Refined sidebar scrollbar. */
+.console-root .console-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.console-root .console-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+.console-root .console-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
