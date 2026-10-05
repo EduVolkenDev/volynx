@@ -249,6 +249,9 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
     const ENCODE_TIMEOUT_MS = 12000;
     const MAX_RECOMMENDED_UPSCALE_PIXELS = 16_000_000;
     const MAX_LOCAL_UPSCALE_PIXELS = 36_000_000;
+    const MAX_SOURCE_PIXELS = 50_000_000;
+    const MAX_SOURCE_BYTES = 80 * 1024 * 1024;
+    const MAX_BATCH_FILES = 12;
     // License keys removed — plan is checked server-side via check-permission API
 
     function todayKey() {
@@ -686,7 +689,7 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
     function updateProgressUI(pct, key) {
       if (!bgProgress || !bgProgressLabel || !bgProgressFill) return;
 
-      const safePct = Math.max(0, Math.min(100, Number.isFinite(pct) ? pct : 0));
+      const safePct = normalizeProgressPercent(pct);
       bgProgress.hidden = false;
       bgProgress.dataset.active = "true";
       bgProgressFill.style.width = `${safePct}%`;
@@ -733,6 +736,16 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       } else {
         bgProgressLabel.textContent = t("suite.bg_progress", "Loading AI model...");
       }
+    }
+
+    // UpscalerJS normally reports a fraction (0–1), but some runtime/model
+    // combinations report a percentage instead. Keep both forms in the same
+    // 0–100 range so the scale factor (2x/3x/4x) can never become progress.
+    function normalizeProgressPercent(value) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric)) return 0;
+      const percent = numeric >= 0 && numeric <= 1 ? numeric * 100 : numeric;
+      return Math.max(0, Math.min(100, Math.round(percent)));
     }
 
     function yieldToBrowser() {
@@ -1286,9 +1299,15 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
 
     function imageHasTransparency(img, mimeType) {
       if (mimeType === "image/jpeg") return false;
+      // A bounded sample is enough for the alpha-safe resize decision. Reading
+      // full-resolution ImageData here can allocate hundreds of MB and freeze
+      // the browser on phone/camera images.
+      const sourceWidth = img.naturalWidth || img.width;
+      const sourceHeight = img.naturalHeight || img.height;
+      const sampleScale = Math.min(1, 512 / Math.max(sourceWidth, sourceHeight));
       const canvas = document.createElement("canvas");
-      canvas.width = img.naturalWidth || img.width;
-      canvas.height = img.naturalHeight || img.height;
+      canvas.width = Math.max(1, Math.round(sourceWidth * sampleScale));
+      canvas.height = Math.max(1, Math.round(sourceHeight * sampleScale));
       const ctx = canvas.getContext("2d", { willReadFrequently: true });
       if (!ctx) return true; // A safe resize is preferable when alpha cannot be inspected.
       try {
@@ -1304,23 +1323,45 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
     }
 
     async function loadFiles(files) {
-      const validFiles = files.filter((file) => file && file.type && file.type.startsWith("image/"));
+      const validFiles = files
+        .filter((file) => file && file.type && file.type.startsWith("image/"))
+        .slice(0, MAX_BATCH_FILES);
 
       loadedImages = [];
       resetPreview();
+      runBtn.disabled = true;
 
       if (!validFiles.length) {
         labNotify("No valid images", t("suite.alert_no_valid", "Select a PNG, JPG, WebP or another browser-readable image."));
         return;
       }
 
-      runBtn.disabled = true;
+      const oversizedFiles = files.filter((file) => file && file.size > MAX_SOURCE_BYTES);
+      if (oversizedFiles.length) {
+        labNotify(
+          "Image too large for local processing",
+          `Choose files below ${formatBytesLabel(MAX_SOURCE_BYTES)}. This protects the browser from exhausting memory.`,
+          "warn"
+        );
+      }
+      const boundedFiles = validFiles.filter((file) => file.size <= MAX_SOURCE_BYTES);
+      if (!boundedFiles.length) return;
+
       setDropMessage(copy("suite.drop_loading", "Loading {files}...", {
-        files: fileCountLabel(validFiles.length),
+        files: fileCountLabel(boundedFiles.length),
       }));
 
-      for (const file of validFiles) {
+      for (const file of boundedFiles) {
         const img = await fileToImage(file);
+        const pixels = (img.naturalWidth || img.width) * (img.naturalHeight || img.height);
+        if (pixels > MAX_SOURCE_PIXELS) {
+          labNotify(
+            "Image dimensions too large",
+            `${file.name} exceeds the safe local limit of ${formatMegapixels(MAX_SOURCE_PIXELS)}. Choose a smaller image or resize it first.`,
+            "warn"
+          );
+          continue;
+        }
         loadedImages.push({
           file,
           img,
@@ -1329,13 +1370,13 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
         });
       }
       if (window.VxLab) {
-        VxLab.recordEvent("image-suite", "upload", `${validFiles.length} file(s) selected`);
+        VxLab.recordEvent("image-suite", "upload", `${loadedImages.length} file(s) selected`);
       }
 
-      const totalBytes = validFiles.reduce((sum, file) => sum + file.size, 0);
-      origMeta.textContent = `${fileCountLabel(validFiles.length)} • ${formatBytesLabel(totalBytes)}`;
+      const totalBytes = loadedImages.reduce((sum, item) => sum + item.file.size, 0);
+      origMeta.textContent = `${fileCountLabel(loadedImages.length)} • ${formatBytesLabel(totalBytes)}`;
       setDropMessage(copy("suite.drop_ready", "{files} ready to process", {
-        files: fileCountLabel(validFiles.length),
+        files: fileCountLabel(loadedImages.length),
       }));
       updateUpscaleHint();
       checkFmtHint();
@@ -1387,13 +1428,17 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
         setDropMessage(t("suite.ai_upscaling_start", "AI enhancement started..."));
         updateProgressUI(0, 'upscale');
         await yieldToBrowser();
+        let lastProgress = 0;
         const base64 = await upscaler.upscale(img, {
           output: 'base64',
           patchSize: 64,
           padding: 4,
           progress: (pct) => {
-            const p = Math.round(pct * 100);
-            setDropMessage(`AI upscaling… ${p}%`);
+            // Progress is independent from the requested output scale. Never
+            // derive it from targetScale: 2x is not the same thing as 200%.
+            const p = Math.max(lastProgress, normalizeProgressPercent(pct));
+            lastProgress = p;
+            setDropMessage(copy("suite.ai_upscaling_progress", "AI upscaling… {pct}%", { pct: p }));
             updateProgressUI(p, 'upscale');
           }
         });
@@ -2063,11 +2108,16 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
         // Log ALL users (free + pro) — pro just doesn't get a quota check.
         // We still need per-tool call counts for analytics + total API calls.
         logToolUsage("image-suite", processedResults.length);
-        await window.VxLab?.recordUsage?.("image-suite", tool, "completed", {
+        // Usage telemetry is non-critical. Do not hold the completed image
+        // hostage to a remote analytics request that may be slow or never
+        // resolve (for example when the provider is unavailable).
+        Promise.resolve().then(() => window.VxLab?.recordUsage?.("image-suite", tool, "completed", {
           quantity: processedResults.length,
           input_bytes: processedResults.reduce((sum, result) => sum + (Number(result.inputBytes) || 0), 0),
           output_bytes: processedResults.reduce((sum, result) => sum + (Number(result.outputBytes) || 0), 0),
           metadata: { mode: tool },
+        })).catch((error) => {
+          console.warn("[iMage Suite] Usage telemetry did not complete.", error);
         });
         if (window.VxLab) {
           VxLab.recordEvent("image-suite", tool, `${processedResults.length} file(s) processed`);

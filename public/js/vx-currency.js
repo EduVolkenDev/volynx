@@ -7,7 +7,7 @@
  *   1. Include this script on the page.
  *   2. Add a container with class "vx-currency-bar" — buttons auto-generated.
  *      OR add buttons manually: <button class="vx-cur-btn" data-cur="GBP">£ GBP</button>
- *   3. Mark price elements: <span data-price-gbp="£187" data-price-eur="€219" data-price-brl="R$1.290">£187</span>
+ *   3. Mark price elements: <span data-price-gbp="£187" data-price-gbp-pt="£187 por mês" data-price-eur="€219" data-price-brl="R$1.290">£187</span>
  *
  * The active currency is stored in localStorage as volynx_currency.
  * If there is no saved choice, the first suggestion follows browser language
@@ -27,6 +27,12 @@
   function normalize(code) {
     code = String(code || "").toUpperCase();
     return /^(GBP|EUR|BRL)$/.test(code) ? code : "";
+  }
+
+  function getLanguage() {
+    var language = "";
+    try { language = String(document.documentElement.lang || localStorage.getItem("volynx_lang") || ""); } catch (_) { /* noop */ }
+    return language.toLowerCase().indexOf("pt") === 0 ? "pt" : "en";
   }
 
   function getUrlCurrency() {
@@ -76,7 +82,9 @@
     var els = document.querySelectorAll("[data-price-gbp], [data-price-eur], [data-price-brl]");
     for (var i = 0; i < els.length; i++) {
       var el = els[i];
-      var val = el.getAttribute("data-price-" + code.toLowerCase());
+      var baseKey = "data-price-" + code.toLowerCase();
+      var localizedVal = el.getAttribute(baseKey + "-" + getLanguage());
+      var val = localizedVal || el.getAttribute(baseKey);
       if (val) el.textContent = val;
     }
 
@@ -149,6 +157,12 @@
       apply(next);
     }
   };
+
+  // Language changes must refresh localized price labels too. Currency and
+  // language are independent preferences, but the displayed copy is not.
+  window.addEventListener("vx:lang-changed", function () {
+    apply(getStored());
+  });
 
   // Inject styles once
   var style = document.createElement("style");
