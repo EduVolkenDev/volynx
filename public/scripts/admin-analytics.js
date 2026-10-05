@@ -9,6 +9,8 @@
     sources: $("analyticsSources"),
     campaigns: $("analyticsCampaigns"),
     timeline: $("analyticsTimeline"),
+    labTools: $("labAuditTools"),
+    labRecent: $("labAuditRecent")?.querySelector("tbody"),
   };
   let currentDays = 7;
 
@@ -78,6 +80,31 @@
     });
   }
 
+  function labMetric(name, value) {
+    const node = document.querySelector(`[data-lab-audit-value="${name}"]`);
+    if (node) node.textContent = new Intl.NumberFormat("pt-BR").format(Number(value || 0));
+  }
+
+  function renderLab(data) {
+    const totals = data.totals || {};
+    labMetric("confirmed", totals.confirmed);
+    labMetric("test", totals.test);
+    labMetric("legacy", Number(totals.legacy_needs_review || 0) + Number(totals.unattributed || 0));
+    labMetric("unclassified", totals.unclassified);
+    list(el.labTools, (data.by_tool || []).map((item) => ({
+      label: `${item.tool_key} · confirmado ${item.confirmed} · teste ${item.test}`,
+      count: item.confirmed + item.test + item.legacy + item.unclassified,
+    })), "Nenhum evento de Lab no intervalo.");
+    if (!el.labRecent) return;
+    el.labRecent.textContent = "";
+    (data.recent || []).slice(0, 20).forEach((item) => {
+      const row = document.createElement("tr");
+      [new Date(item.occurred_at).toLocaleString("pt-BR"), item.tool_key, item.action, item.actor_class, item.confidence]
+        .forEach((value) => { const cell = document.createElement("td"); cell.textContent = String(value || "—"); row.appendChild(cell); });
+      el.labRecent.appendChild(row);
+    });
+  }
+
   function render(data) {
     const funnel = data.funnel || {};
     ["visitors", "cta_clicks", "signup_started", "signup_confirmation_requested", "lead_submitted", "checkout_redirected", "checkout_failed", "payment_confirmed", "fulfillment_recorded"]
@@ -118,6 +145,13 @@
       if (!response.ok || !data?.ok) throw new Error(data?.error || "analytics_unavailable");
       setVisible(el.console);
       render(data);
+      const labResponse = await fetch(`${baseUrl}/lab-usage-summary`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ days }),
+      });
+      const labData = await labResponse.json().catch(() => ({}));
+      if (labResponse.ok && labData?.ok) renderLab(labData);
     } catch (_) {
       setVisible(el.console);
       text(el.notice, "Não foi possível carregar as métricas agora. Tente novamente em alguns instantes.");

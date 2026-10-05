@@ -339,6 +339,7 @@ convertBtn.addEventListener('click', async () => {
   // Log usage after successful conversion
   if (converted.length > 0) {
     await logUsage('converter', converted.length);
+    await window.VxLab?.recordUsage?.('converter', 'convert', 'completed', { quantity: converted.length });
     if (window.VxLab) {
       VxLab.recordEvent('converter', 'convert', `${converted.length} file(s) converted to ${format.toUpperCase()}`);
       VxLab.savePreset('converter', {

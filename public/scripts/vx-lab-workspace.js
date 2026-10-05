@@ -167,6 +167,55 @@
     return configPromise;
   }
 
+  function usageSessionId() {
+    var key = "volynx_lab_usage_session_v1";
+    try {
+      var existing = sessionStorage.getItem(key);
+      if (existing) return existing;
+      var created = window.crypto && typeof window.crypto.randomUUID === "function"
+        ? window.crypto.randomUUID()
+        : Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+      sessionStorage.setItem(key, created);
+      return created;
+    } catch (_) {
+      return "";
+    }
+  }
+
+  function recordUsage(tool, action, eventStatus, details) {
+    var data = details && typeof details === "object" ? details : {};
+    var sessionId = usageSessionId();
+    var payload = {
+      tool_key: String(tool || "lab").slice(0, 80),
+      action: String(action || "use").slice(0, 80),
+      event_status: String(eventStatus || "completed").slice(0, 32),
+      request_id: String(data.request_id || (tool + ":" + action + ":" + eventStatus + ":" + Date.now() + ":" + Math.random().toString(36).slice(2, 8))),
+      session_id: /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(sessionId) ? sessionId : null,
+      quantity: Number.isInteger(data.quantity) && data.quantity >= 0 ? data.quantity : 1,
+      input_bytes: Number.isFinite(Number(data.input_bytes)) ? Number(data.input_bytes) : undefined,
+      output_bytes: Number.isFinite(Number(data.output_bytes)) ? Number(data.output_bytes) : undefined,
+      metadata: data.metadata && typeof data.metadata === "object" ? data.metadata : {},
+    };
+    try {
+      var testRunId = sessionStorage.getItem("volynx_lab_test_run_id");
+      if (testRunId) payload.test_run_id = testRunId;
+    } catch (_) {}
+
+    return ensureFreshToken().then(function (token) {
+      return getConfig().then(function (cfg) {
+        if (!cfg || !cfg.supabaseUrl || !cfg.supabaseAnonKey) return false;
+        var headers = { apikey: cfg.supabaseAnonKey, "Content-Type": "application/json" };
+        if (token) headers.Authorization = "Bearer " + token;
+        return fetch(cfg.supabaseUrl + "/functions/v1/track-lab-usage", {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify(payload),
+          keepalive: true,
+        }).then(function (res) { return res.ok; }).catch(function () { return false; });
+      });
+    }).catch(function () { return false; });
+  }
+
   function apiFetch(path, options) {
     return ensureFreshToken().then(function (token) {
       if (!token) throw new Error("missing_token");
@@ -1539,6 +1588,7 @@
     modalText: modalText,
     openModal: openModal,
     recordEvent: recordEvent,
+    recordUsage: recordUsage,
     track: track,
     setStatus: setStatus,
     savePreset: savePreset,

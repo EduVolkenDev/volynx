@@ -7,10 +7,11 @@
  *   1. Include this script on the page.
  *   2. Add a container with class "vx-currency-bar" — buttons auto-generated.
  *      OR add buttons manually: <button class="vx-cur-btn" data-cur="GBP">£ GBP</button>
- *   3. Mark price elements: <span data-price-gbp="£187" data-price-eur="€219" data-price-brl="R$1.290">£187</span>
+ *   3. Mark price elements: <span data-price-gbp="£187" data-price-gbp-pt="£187 por mês" data-price-eur="€219" data-price-brl="R$1.290">£187</span>
  *
  * The active currency is stored in localStorage as volynx_currency.
- * Default: GBP.
+ * If there is no saved choice, the first suggestion follows browser language
+ * and timezone. The user can always override it manually.
  */
 (function () {
   "use strict";
@@ -28,6 +29,12 @@
     return /^(GBP|EUR|BRL)$/.test(code) ? code : "";
   }
 
+  function getLanguage() {
+    var language = "";
+    try { language = String(document.documentElement.lang || localStorage.getItem("volynx_lang") || ""); } catch (_) { /* noop */ }
+    return language.toLowerCase().indexOf("pt") === 0 ? "pt" : "en";
+  }
+
   function getUrlCurrency() {
     try {
       return normalize(new URLSearchParams(window.location.search).get("currency"));
@@ -42,7 +49,21 @@
       try { localStorage.setItem(STORAGE_KEY, urlCurrency); } catch (_) { /* noop */ }
       return urlCurrency;
     }
-    try { return normalize(localStorage.getItem(STORAGE_KEY)) || "GBP"; } catch (_) { return "GBP"; }
+    try { return normalize(localStorage.getItem(STORAGE_KEY)) || detectFromRegion(); } catch (_) { return detectFromRegion(); }
+  }
+
+  function detectFromRegion() {
+    var language = String(navigator.language || navigator.userLanguage || "").toLowerCase();
+    var timezone = "";
+    try { timezone = String(Intl.DateTimeFormat().resolvedOptions().timeZone || ""); } catch (_) { /* noop */ }
+
+    var brazilTimezones = ["America/Sao_Paulo", "America/Fortaleza", "America/Recife", "America/Bahia", "America/Belem", "America/Manaus", "America/Cuiaba", "America/Porto_Velho", "America/Boa_Vista", "America/Rio_Branco", "America/Noronha"];
+    if (/^pt-br/.test(language) || brazilTimezones.indexOf(timezone) !== -1) return "BRL";
+    if (/^(de|fr|es|it|nl|el|fi|sv|da|no|pl|cs|sk|sl|et|lv|lt|ga|mt|cy|hr|hu|ro|bg|pt)(-|$)/.test(language) && timezone.indexOf("Europe/") === 0) return "EUR";
+    if (timezone.indexOf("Europe/London") === 0 || /^(en-gb|cy-gb|gd-gb)(-|$)/.test(language)) return "GBP";
+    if (timezone.indexOf("Europe/") === 0) return "EUR";
+    if (/^pt(-|$)/.test(language)) return "BRL";
+    return "GBP";
   }
 
   function setStored(code) {
@@ -61,18 +82,25 @@
     var els = document.querySelectorAll("[data-price-gbp], [data-price-eur], [data-price-brl]");
     for (var i = 0; i < els.length; i++) {
       var el = els[i];
-      var val = el.getAttribute("data-price-" + code.toLowerCase());
+      var baseKey = "data-price-" + code.toLowerCase();
+      var localizedVal = el.getAttribute(baseKey + "-" + getLanguage());
+      var val = localizedVal || el.getAttribute(baseKey);
       if (val) el.textContent = val;
     }
 
     // Update active button state
-    var btns = document.querySelectorAll(".vx-cur-btn");
+    var btns = document.querySelectorAll(".vx-cur-btn, [data-switch-currency]");
     for (var j = 0; j < btns.length; j++) {
       var btn = btns[j];
-      if (btn.getAttribute("data-cur") === code) {
+      var buttonCode = btn.getAttribute("data-cur") || btn.getAttribute("data-switch-currency");
+      if (buttonCode === code) {
         btn.classList.add("vx-cur-btn--active");
+        btn.classList.add("is-active");
+        btn.setAttribute("aria-pressed", "true");
       } else {
         btn.classList.remove("vx-cur-btn--active");
+        btn.classList.remove("is-active");
+        btn.setAttribute("aria-pressed", "false");
       }
     }
 
@@ -107,10 +135,10 @@
     }
 
     // Bind click handlers
-    var allBtns = document.querySelectorAll(".vx-cur-btn");
+    var allBtns = document.querySelectorAll(".vx-cur-btn, [data-switch-currency]");
     for (var k = 0; k < allBtns.length; k++) {
       allBtns[k].addEventListener("click", function () {
-        var code = this.getAttribute("data-cur");
+        var code = this.getAttribute("data-cur") || this.getAttribute("data-switch-currency");
         setStored(code);
         apply(code);
       });
@@ -119,6 +147,22 @@
     // Apply stored currency
     apply(getStored());
   }
+
+  window.VxCurrency = {
+    get: getStored,
+    detect: detectFromRegion,
+    set: function (code) {
+      var next = normalize(code) || detectFromRegion();
+      setStored(next);
+      apply(next);
+    }
+  };
+
+  // Language changes must refresh localized price labels too. Currency and
+  // language are independent preferences, but the displayed copy is not.
+  window.addEventListener("vx:lang-changed", function () {
+    apply(getStored());
+  });
 
   // Inject styles once
   var style = document.createElement("style");

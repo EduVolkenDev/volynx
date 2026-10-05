@@ -543,12 +543,36 @@ async function signIconDelivery(prefix: string, meta: Record<string, string>) {
   }
 
   try {
-    const { data: signed, error } = await supabase.storage
+    let objectPath = resolved.path;
+    let { data: signed, error } = await supabase.storage
       .from(ICONS_BUCKET)
-      .createSignedUrl(resolved.path, ICONS_SIGNED_URL_TTL);
+      .createSignedUrl(objectPath, ICONS_SIGNED_URL_TTL);
+
+    // The catalog id can change while the public asset path remains stable.
+    // Use the private manifest as the compatibility index before marking a
+    // paid delivery as missing.
+    if (error || !signed?.signedUrl) {
+      const { data: manifestFile } = await supabase.storage
+        .from(ICONS_BUCKET)
+        .download(`${ICONS_VERSION}/manifest.json`);
+      if (manifestFile) {
+        const manifest = await manifestFile.text().then((raw) => JSON.parse(raw)).catch(() => null) as {
+          singles?: Array<{ public_path?: string; object_path?: string }>;
+        } | null;
+        const manifestEntry = manifest?.singles?.find((entry) => entry.public_path === meta.icon_path && entry.object_path);
+        if (manifestEntry?.object_path && manifestEntry.object_path !== objectPath) {
+          objectPath = manifestEntry.object_path;
+          ({ data: signed, error } = await supabase.storage
+            .from(ICONS_BUCKET)
+            .createSignedUrl(objectPath, ICONS_SIGNED_URL_TTL));
+        }
+      }
+    }
+
     if (error || !signed?.signedUrl) {
       return {
         ...resolved,
+        path: objectPath,
         url: null,
         expiresAt: null,
         status: isLikelyMissingStorageAsset(error?.message || null) ? "missing_storage_asset" : "pending_signed_url",
@@ -557,6 +581,7 @@ async function signIconDelivery(prefix: string, meta: Record<string, string>) {
     }
     return {
       ...resolved,
+      path: objectPath,
       url: signed.signedUrl,
       expiresAt: new Date(Date.now() + ICONS_SIGNED_URL_TTL * 1000).toISOString(),
       status: "ready",

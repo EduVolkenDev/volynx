@@ -17,6 +17,7 @@ export const ROUTES = {
   support: "/support/",
   pricing: "/pricing/",
   docs: "/docs/",
+  propertyflowGuide: "/docs/propertyflow/",
   manifesto: "/manifesto/",
   changelog: "/changelog/",
   status: "/status/",

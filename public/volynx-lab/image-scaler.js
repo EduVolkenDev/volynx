@@ -231,6 +231,10 @@
       outMeta.textContent = processedResults.length + ' file(s) · ' + fmtSize(totalOut) + ' (' + ext.toUpperCase() + ')';
 
       if (processedResults.length === 1) singleBlob = processedResults[0].blob;
+      await window.VxLab?.recordUsage?.('image-scaler', 'upscale', 'completed', {
+        quantity: processedResults.length,
+        output_bytes: totalOut,
+      });
       if (window.VxLab) {
         VxLab.recordEvent('image-scaler', 'upscale', processedResults.length + ' file(s) upscaled');
         VxLab.savePreset('image-scaler', {

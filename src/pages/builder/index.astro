@@ -504,13 +504,16 @@ import PageWidgets from "../../components/PageWidgets.astro";
     return firstUnlocked?.id || "blank";
   }
 
-  async function countActiveProjects(userId: string): Promise<{ drafts: number; published: number }> {
+  async function countActiveProjects(userId: string, requireSuccess = false): Promise<{ drafts: number; published: number }> {
     const { data, error } = await supa
       .from("projects")
       .select("id,status")
       .eq("user_id", userId)
       .is("deleted_at", null);
-    if (error || !data) return { drafts: 0, published: 0 };
+    if (error || !data) {
+      if (requireSuccess) throw new Error("Could not confirm your project limit. Please try again before spending VX.");
+      return { drafts: 0, published: 0 };
+    }
     const published = data.filter((p: any) => p.status === "published").length;
     return { drafts: data.length, published };
   }
@@ -2180,6 +2183,15 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
       setAIStatus(tr("builder.ai.generating", "Generating site with AI… this may take a few seconds."), "info");
 
       try {
+        if (!refine) {
+          // Avoid spending VX on generation when this account cannot create a draft.
+          const counts = await countActiveProjects(user.id, true);
+          const check = canCreate(counts);
+          if (!check.ok) {
+            setAIStatus(check.msg, "error");
+            return;
+          }
+        }
         const current = refine && currentProject ? currentProject.builder_data : undefined;
         const builderData = await callAIBuilder(prompt, refine, current);
 
@@ -2196,12 +2208,6 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
         } else {
           // Create a new draft project with AI-generated data
           const name = prompt.slice(0, 40).replace(/[^\w\s-]/g, "").trim() || "AI Generated Site";
-          const counts = await countActiveProjects(user.id);
-          const check = canCreate(counts);
-          if (!check.ok) {
-            setAIStatus(check.msg, "error");
-            return;
-          }
           const { data, error } = await createDraftProject(user.id, name, name, builderData);
 
           if (error) { setAIStatus(error.message, "error"); return; }

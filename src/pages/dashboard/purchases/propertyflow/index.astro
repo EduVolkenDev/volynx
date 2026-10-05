@@ -10,10 +10,10 @@ const assistItems = [
   { href: ROUTES.delivery, label: "All purchases", title: "Back to my products", copy: "Switch to the full delivery dashboard to access kits, VX and other purchases.", emphasized: true },
   { href: ROUTES.propertyflow, label: "Product", title: "PropertyFlow page", copy: "Compare tiers and feature lists if you're considering an upgrade." },
   { href: ROUTES.support, label: "Help", title: "Open support", copy: "Use the support lane if your download fails or licensing needs clarification." },
-  { href: ROUTES.docs, label: "Docs", title: "Setup guide", copy: "Find install, deploy and customisation docs while the ZIP is downloading." },
+  { href: ROUTES.propertyflowGuide, label: "Docs", title: "Publishing guide", copy: "Understand subdomains, custom domains and connecting an existing website." },
 ];
 ---
-<FlagshipLayout title="PropertyFlow downloads — VOLYNX" description="Download your PropertyFlow ZIP, refresh expired links, and recover your purchase." pageClass="page-pf-delivery">
+<FlagshipLayout title="PropertyFlow Studio — VOLYNX" description="Configure and publish your PropertyFlow site without code." pageClass="page-pf-delivery">
   <FlagshipHeader ctaLabel="Back to delivery" ctaI18n="header.back_to_delivery" ctaHref={ROUTES.delivery} />
   <main>
 
@@ -30,15 +30,15 @@ const assistItems = [
 
         <div class="hero-grid pf-hero-grid">
           <div class="hero-copy">
-            <span class="eyebrow"><span class="i18n-en">Your PropertyFlow downloads</span><span class="i18n-pt">Seus downloads PropertyFlow</span></span>
-            <h1><span class="i18n-en">Download, refresh, deploy.</span><span class="i18n-pt">Baixar, renovar, deploy.</span></h1>
+            <span class="eyebrow"><span class="i18n-en">Your PropertyFlow site</span><span class="i18n-pt">Seu site PropertyFlow</span></span>
+            <h1><span class="i18n-en">Configure, publish, done.</span><span class="i18n-pt">Configure, publique, pronto.</span></h1>
             <p>
-              <span class="i18n-en">Each PropertyFlow tier ships as a versioned ZIP with full React source. Links expire after 24 hours for security — refresh anytime from this page.</span>
-              <span class="i18n-pt">Cada tier do PropertyFlow é entregue como ZIP versionado com código-fonte React completo. Links expiram em 24 horas por segurança — atualize aqui sempre que precisar.</span>
+              <span class="i18n-en">Start in your hosted Studio. Choose your brand, add properties, select a template and publish — no terminal, code or hosting setup required.</span>
+              <span class="i18n-pt">Comece pelo Studio hospedado. Escolha sua identidade, cadastre imóveis, selecione um template e publique — sem terminal, código ou configuração de hospedagem.</span>
             </p>
             <div class="hero-actions">
-              <a href="/dashboard/propertyflow/" class="button button--gold"><span class="i18n-en">Open your Studio</span><span class="i18n-pt">Abrir seu Studio</span></a>
-              <a href={ROUTES.docs + "#propertyflow"} class="button button--ghost"><span class="i18n-en">Setup docs</span><span class="i18n-pt">Documentação</span></a>
+              <a href="/dashboard/propertyflow/" class="button button--gold"><span class="i18n-en">Start configuring my site</span><span class="i18n-pt">Começar configuração do meu site</span></a>
+              <a href={ROUTES.propertyflowGuide} class="button button--ghost"><span class="i18n-en">How publishing works</span><span class="i18n-pt">Como funciona a publicação</span></a>
               <a href={ROUTES.support + "?product=propertyflow"} class="button button--ghost"><span class="i18n-en">Support</span><span class="i18n-pt">Suporte</span></a>
             </div>
           </div>
@@ -53,10 +53,48 @@ const assistItems = [
 
     <PlatformAssistStrip
       eyebrow="PropertyFlow lane"
-      title="Stay close to delivery, docs, and support."
-      description="Refreshing a link is one click. Everything else you might need is one click further."
+      title="Your site lives here."
+      description="Manage the hosted site in the Studio. The ZIP is optional for advanced self-hosting."
       items={assistItems}
     />
+
+    <section class="page-section page-section--tight pf-flow-guide" aria-labelledby="pf-flow-title">
+      <div class="shell">
+        <div class="pf-section-heading">
+          <span class="eyebrow"><span class="i18n-en">The simple path</span><span class="i18n-pt">O caminho simples</span></span>
+          <h2 id="pf-flow-title"><span class="i18n-en">Your site online in three steps</span><span class="i18n-pt">Seu site online em três passos</span></h2>
+          <p><span class="i18n-en">Everything happens in the Studio. You only need your brand, your property information and the address you want to use.</span><span class="i18n-pt">Tudo acontece no Studio. Você só precisa da sua marca, das informações dos imóveis e do endereço que deseja usar.</span></p>
+        </div>
+        <div class="pf-flow-steps">
+          <article class="pf-flow-step"><span>01</span><strong><span class="i18n-en">Open the Studio</span><span class="i18n-pt">Abra o Studio</span></strong><p><span class="i18n-en">Your workspace is created automatically after payment.</span><span class="i18n-pt">Seu workspace é criado automaticamente depois do pagamento.</span></p></article>
+          <article class="pf-flow-step"><span>02</span><strong><span class="i18n-en">Make it yours</span><span class="i18n-pt">Deixe com a sua cara</span></strong><p><span class="i18n-en">Add your logo, colors, template, properties and photos.</span><span class="i18n-pt">Adicione logo, cores, template, imóveis e fotos.</span></p></article>
+          <article class="pf-flow-step"><span>03</span><strong><span class="i18n-en">Publish the address</span><span class="i18n-pt">Publique o endereço</span></strong><p><span class="i18n-en">Use a free VOLYNX address or connect your own domain.</span><span class="i18n-pt">Use um endereço VOLYNX gratuito ou conecte seu próprio domínio.</span></p></article>
+        </div>
+        <div class="pf-publication-explainer">
+          <article><strong><span class="i18n-en">VOLYNX address</span><span class="i18n-pt">Endereço VOLYNX</span></strong><p><span class="i18n-en">Example: your-agency.volynx.world. No DNS setup.</span><span class="i18n-pt">Exemplo: sua-imobiliaria.volynx.world. Sem configurar DNS.</span></p></article>
+          <article><strong><span class="i18n-en">Your own domain</span><span class="i18n-pt">Seu domínio próprio</span></strong><p><span class="i18n-en">The Studio shows the exact DNS step. Your domain goes live after verification.</span><span class="i18n-pt">O Studio mostra o passo exato de DNS. Seu domínio entra no ar depois da verificação.</span></p></article>
+          <article><strong><span class="i18n-en">Existing website</span><span class="i18n-pt">Site existente</span></strong><p><span class="i18n-en">Get a hosted catalog link and a ready button to paste into your site builder.</span><span class="i18n-pt">Receba um link de catálogo hospedado e um botão pronto para colar no seu construtor de sites.</span></p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section page-section--tight">
+      <div class="shell">
+        <div class="pf-help panel" aria-labelledby="pf-cloud-title">
+          <div>
+            <span class="eyebrow"><span class="i18n-en">Hosting after setup</span><span class="i18n-pt">Hospedagem depois da configuração</span></span>
+            <strong id="pf-cloud-title"><span class="i18n-en">30 days included. Keep it online with VOLYNX Cloud or export it.</span><span class="i18n-pt">30 dias incluídos. Mantenha no ar com VOLYNX Cloud ou use o export.</span></strong>
+            <p>
+              <span class="i18n-en">The included period gives you time to configure, test and publish. From day 31, hosted operation, storage, backups, monitoring and platform updates are a separate monthly service, starting at €219.90/month for essential care. You can also download the standalone export and host it elsewhere.</span>
+              <span class="i18n-pt">O período incluído dá tempo para configurar, testar e publicar. A partir do 31º dia, operação hospedada, armazenamento, backups, monitoramento e atualizações passam a ser um serviço mensal separado, a partir de €219,90/mês no cuidado essencial. Você também pode baixar o export independente e hospedá-lo em outro lugar.</span>
+            </p>
+          </div>
+          <div class="hero-actions">
+            <a href="/maintenance/" class="button button--ghost"><span class="i18n-en">See Cloud plans</span><span class="i18n-pt">Ver planos Cloud</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- ═══ PURCHASES ═══ -->
     <section class="page-section">
@@ -100,11 +138,11 @@ const assistItems = [
       <div class="shell pf-help panel">
         <div>
           <span class="eyebrow"><span class="i18n-en">Need a hand?</span><span class="i18n-pt">Precisa de ajuda?</span></span>
-          <strong><span class="i18n-en">Link expired or download failed?</span><span class="i18n-pt">Link expirou ou download falhou?</span></strong>
-          <p>
-            <span class="i18n-en">Click <em>Generate fresh link</em> on any card to mint a new 24-hour signed URL. The download starts automatically.</span>
-            <span class="i18n-pt">Clique em <em>Gerar novo link</em> em qualquer card para criar um novo URL assinado de 24h. O download começa automaticamente.</span>
-          </p>
+        <strong><span class="i18n-en">Need the optional ZIP?</span><span class="i18n-pt">Precisa do ZIP opcional?</span></strong>
+        <p>
+            <span class="i18n-en">The hosted Studio is the recommended path. Download the ZIP only if you or your technical team plan to self-host it.</span>
+            <span class="i18n-pt">O Studio hospedado é o caminho recomendado. Baixe o ZIP apenas se você ou sua equipe técnica quiserem hospedar por conta própria.</span>
+        </p>
         </div>
         <div class="hero-actions">
           <a href={ROUTES.support + "?product=propertyflow&intent=delivery"} class="button button--ghost"><span class="i18n-en">Contact support</span><span class="i18n-pt">Falar com suporte</span></a>
@@ -285,12 +323,12 @@ const assistItems = [
 
       const purchaseId = item.purchase_id || item.id || '';
 
-      const primary = valid
+      const zipAction = valid
         ? `<a href="${escapeHtml(meta.download_url)}" class="button button--gold pf-card__cta" download>
-             <span class="i18n-en">Download ZIP</span><span class="i18n-pt">Baixar ZIP</span>
+             <span class="i18n-en">Download optional ZIP</span><span class="i18n-pt">Baixar ZIP opcional</span>
            </a>`
         : `<button type="button" class="button button--gold pf-card__cta pf-card__refresh" data-purchase-id="${escapeHtml(item.id)}" data-addon-id="${escapeHtml(addonId)}">
-             <span class="i18n-en">Generate fresh link</span><span class="i18n-pt">Gerar novo link</span>
+             <span class="i18n-en">Generate optional ZIP link</span><span class="i18n-pt">Gerar link do ZIP opcional</span>
            </button>`;
 
       return `
@@ -311,16 +349,17 @@ const assistItems = [
           </dl>
 
           <p class="pf-card__hint" data-pf-status>${valid
-            ? `<span class="i18n-en">Direct download — link expires after ${expiry}.</span><span class="i18n-pt">Download direto — o link expira após ${expiry}.</span>`
-            : `<span class="i18n-en">Click below to mint a new 24h download link.</span><span class="i18n-pt">Clique abaixo para gerar um novo link de download de 24h.</span>`}</p>
+            ? `<span class="i18n-en">Optional ZIP — link expires after ${expiry}.</span><span class="i18n-pt">ZIP opcional — o link expira após ${expiry}.</span>`
+            : `<span class="i18n-en">Optional ZIP — generate a new 24h link only if you plan to self-host.</span><span class="i18n-pt">ZIP opcional — gere um novo link de 24h apenas se quiser hospedar por conta própria.</span>`}</p>
 
           ${errorNote}
           ${featureList(meta.features)}
 
           <div class="pf-card__actions">
-            ${primary}
+            <a href="/dashboard/propertyflow/" class="button button--gold pf-card__cta"><span class="i18n-en">Start configuring my site</span><span class="i18n-pt">Começar configuração do meu site</span></a>
+            ${zipAction}
             <a href="/products/propertyflow/" class="button button--ghost pf-card__cta-secondary">
-              <span class="i18n-en">Product page</span><span class="i18n-pt">Página do produto</span>
+              <span class="i18n-en">See product details</span><span class="i18n-pt">Ver detalhes do produto</span>
             </a>
           </div>
         </article>`;
@@ -360,12 +399,12 @@ const assistItems = [
               a.href = url;
               a.className = 'button button--gold pf-card__cta';
               a.setAttribute('download', '');
-              a.innerHTML = '<span class="i18n-en">Download ZIP</span><span class="i18n-pt">Baixar ZIP</span>';
+              a.innerHTML = '<span class="i18n-en">Download optional ZIP</span><span class="i18n-pt">Baixar ZIP opcional</span>';
               btn.replaceWith(a);
               if (status) {
                 const exp = data.download_expires_at || data.expires_at;
                 const when = exp ? new Date(exp).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '';
-                status.innerHTML = `<span class="i18n-en">Direct download — link expires after ${when}.</span><span class="i18n-pt">Download direto — o link expira após ${when}.</span>`;
+                status.innerHTML = `<span class="i18n-en">Optional ZIP — link expires after ${when}.</span><span class="i18n-pt">ZIP opcional — o link expira após ${when}.</span>`;
               }
               // Auto-trigger so the buyer doesn't have to click twice.
               a.click();
@@ -503,6 +542,7 @@ const assistItems = [
     .pf-hero-grid { grid-template-columns: 1fr; gap: 24px; }
     .pf-hero-visual { min-height: auto; }
     .pf-hero-visual .vx-glow-container { width: 200px; height: 200px; }
+    .pf-flow-steps, .pf-publication-explainer { grid-template-columns: 1fr; }
   }
   .pf-breadcrumbs {
     display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
@@ -651,6 +691,19 @@ const assistItems = [
   }
   .pf-card__cta { width: 100%; justify-content: center; text-align: center; }
   .pf-card__cta-secondary { width: 100%; justify-content: center; text-align: center; font-size: .85rem; }
+
+  /* ── No-code path ───────────────────────────────────────── */
+  .pf-flow-guide { padding-top: 0; }
+  .pf-section-heading { max-width: 720px; margin-bottom: 24px; }
+  .pf-section-heading h2 { margin: 8px 0 10px; font-size: clamp(1.7rem, 4vw, 2.4rem); line-height: 1.12; }
+  .pf-section-heading p { margin: 0; color: rgba(255,255,255,.62); line-height: 1.65; }
+  .pf-flow-steps, .pf-publication-explainer { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .pf-flow-step, .pf-publication-explainer article { min-height: 150px; padding: 20px; border: 1px solid rgba(255,255,255,.08); border-radius: 14px; background: rgba(255,255,255,.035); }
+  .pf-flow-step > span { display: block; margin-bottom: 24px; color: #d8b36a; font: 700 .75rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .12em; }
+  .pf-flow-step strong, .pf-publication-explainer strong { display: block; color: rgba(255,255,255,.94); font-size: 1rem; line-height: 1.35; }
+  .pf-flow-step p, .pf-publication-explainer p { margin: 8px 0 0; color: rgba(255,255,255,.55); font-size: .88rem; line-height: 1.55; }
+  .pf-publication-explainer { margin-top: 12px; }
+  .pf-publication-explainer article { min-height: 0; border-color: rgba(216,179,106,.18); background: rgba(216,179,106,.045); }
 
   /* ── Recovery panel ─────────────────────────────────────── */
   .pf-help { display: flex; align-items: center; justify-content: space-between; gap: 20px; }

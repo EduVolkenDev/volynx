@@ -13,12 +13,14 @@
  *   200: { builderData: { brand: {...}, sections: [...] } }
  *   400/500: { error: string }
  *
- * Required secrets: ANTHROPIC_API_KEY
+ * Required secrets: ANTHROPIC_API_KEY by default, or OPENAI_API_KEY when
+ * AI_PROVIDER_BUILDER=openai. Other AI capabilities remain on Anthropic.
  */
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { callAiProvider } from "../_shared/ai-provider.ts";
+import { assertAiProviderConfigured, callAiProvider } from "../_shared/ai-provider.ts";
+import { isBuilderData } from "../_shared/builder-data.ts";
 import {
   corsHeaders,
   isUuid,
@@ -149,7 +151,7 @@ workflow — Step-by-step process
   "content": {
     "title": "How it works",
     "steps": [
-      { "title": "Step 1 title", "description": "What happens in this step" }
+      { "step": "01", "title": "Step 1 title", "description": "What happens in this step" }
     ]
   }
 }
@@ -176,7 +178,7 @@ contactForm — Inline contact form
       { "name": "email", "label": "Email address", "type": "email" },
       { "name": "message", "label": "Message", "type": "textarea" }
     ],
-    "cta": { "label": "Send message" }
+    "submitLabel": "Send message"
   }
 }
 
@@ -186,9 +188,8 @@ problemStatement — Pain points section
   "content": {
     "title": "The problem",
     "subtitle": "Optional subheading",
-    "items": [
-      { "title": "Pain point title", "description": "Description" }
-    ]
+    "description": "A short explanation of the problem",
+    "points": ["Pain point one", "Pain point two"]
   }
 }
 
@@ -260,6 +261,8 @@ Deno.serve(async (req: Request) => {
       console.error("[ai-builder] required server configuration is missing");
       return jsonResponse(req, { error: "AI Builder is temporarily unavailable" }, 503);
     }
+    // Fail before reserving VX when the selected provider has no server-side key.
+    assertAiProviderConfigured({ product: "volynx", capability: "builder" });
 
     userId = auth.user.id;
     requestId = body.request_id;
@@ -329,14 +332,18 @@ Output the builder_data JSON only.`;
       console.error("[ai-builder] provider returned invalid JSON");
       throw new Error("invalid_provider_response");
     }
+    if (!isBuilderData(builderData)) {
+      console.error("[ai-builder] provider returned an unrenderable site");
+      throw new Error("invalid_provider_response");
+    }
 
-    const { error: completeError } = await billing.rpc("complete_ai_usage", {
+    const { data: completion, error: completeError } = await billing.rpc("complete_ai_usage", {
       p_user_id: userId,
       p_request_id: requestId,
       p_success: true,
     });
-    if (completeError) {
-      console.error("[ai-builder] could not finalize usage", completeError.message);
+    if (completeError || !completion?.ok || completion.status !== "completed") {
+      console.error("[ai-builder] could not finalize usage", completeError?.message || completion?.error || completion?.status);
       throw new Error("billing_finalize_failed");
     }
 
@@ -345,16 +352,26 @@ Output the builder_data JSON only.`;
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "server_error";
     console.error("[ai-builder] error", message);
+    let refundConfirmed = !reservationStarted;
     if (reservationStarted && billing && userId && requestId) {
-      const { error: refundError } = await billing.rpc("complete_ai_usage", {
-        p_user_id: userId,
-        p_request_id: requestId,
-        p_success: false,
-        p_failure_reason: message,
-      });
-      if (refundError) console.error("[ai-builder] automatic refund failed", refundError.message);
+      try {
+        const { data: refund, error: refundError } = await billing.rpc("complete_ai_usage", {
+          p_user_id: userId,
+          p_request_id: requestId,
+          p_success: false,
+          p_failure_reason: message,
+        });
+        refundConfirmed = !refundError && refund?.ok && refund.status === "refunded";
+        if (!refundConfirmed) console.error("[ai-builder] automatic refund could not be confirmed", refundError?.message || refund?.error || refund?.status);
+      } catch (refundError) {
+        console.error("[ai-builder] automatic refund request failed", refundError);
+      }
     }
     const status = message === "request_too_large" ? 413 : message === "invalid_request" ? 400 : 503;
-    return jsonResponse(req, { error: "AI Builder could not complete this request. No VX was kept for a failed request." }, status);
+    return jsonResponse(req, {
+      error: refundConfirmed
+        ? "AI Builder could not complete this request. No VX was kept for a failed request."
+        : "AI Builder could not complete this request. We could not confirm your VX refund. Please contact support if your balance does not recover.",
+    }, status);
   }
 });

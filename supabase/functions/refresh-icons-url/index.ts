@@ -67,6 +67,22 @@ function resolveIconDeliveryPath(addonId: string, metadata: Record<string, unkno
   return `${ICONS_VERSION}/singles/${slugify(iconId)}/${safeFileName(iconPath)}`;
 }
 
+async function resolveManifestIconPath(metadata: Record<string, unknown>): Promise<string | null> {
+  const iconPath = String(metadata.icon_path || "").trim();
+  const bucket = String(metadata.download_bucket || ICONS_BUCKET);
+  if (!iconPath.startsWith("/assets/icons-store/") || iconPath.includes("..")) return null;
+
+  const { data, error } = await adminClient.storage.from(bucket).download(`${ICONS_VERSION}/manifest.json`);
+  if (error || !data) return null;
+  const manifest = await data.json().catch(() => null) as { singles?: Array<{ public_path?: string; object_path?: string }> } | null;
+  const match = manifest?.singles?.find((entry) => entry.public_path === iconPath && entry.object_path);
+  return match?.object_path || null;
+}
+
+const adminClient = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
+  auth: { persistSession: false },
+});
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return jsonResponse({ error: "method_not_allowed" }, 405);
@@ -154,32 +170,47 @@ serve(async (req) => {
     }
   }
 
-  const objectPath = resolveIconDeliveryPath(purchase.addon_id, metadata);
-  if (!objectPath) {
+  let resolvedObjectPath = resolveIconDeliveryPath(purchase.addon_id, metadata);
+  if (!resolvedObjectPath) {
     return jsonResponse({ error: "missing_delivery_path", delivery_status: "manual_review" }, 422);
   }
 
-  const { data: signed, error: signErr } = await admin
+  let { data: signed, error: signErr } = await adminClient
     .storage
     .from(String(metadata.download_bucket || ICONS_BUCKET))
-    .createSignedUrl(objectPath, SIGNED_URL_TTL_SECONDS);
+    .createSignedUrl(resolvedObjectPath, SIGNED_URL_TTL_SECONDS);
+
+  // Older purchases can contain a path generated from an E2E-only icon id.
+  // Resolve those records by the immutable public asset path in the private
+  // manifest, so a historical purchase remains deliverable after a catalog
+  // identifier changes.
+  if (signErr || !signed?.signedUrl) {
+    const manifestPath = await resolveManifestIconPath(metadata);
+    if (manifestPath && manifestPath !== resolvedObjectPath) {
+      resolvedObjectPath = manifestPath;
+      ({ data: signed, error: signErr } = await adminClient
+        .storage
+        .from(String(metadata.download_bucket || ICONS_BUCKET))
+        .createSignedUrl(resolvedObjectPath, SIGNED_URL_TTL_SECONDS));
+    }
+  }
 
   if (signErr || !signed?.signedUrl) {
-    console.error("refresh-icons-url signing error:", signErr?.message || "no url", "path:", objectPath);
+    console.error("refresh-icons-url signing error:", signErr?.message || "no url", "path:", resolvedObjectPath);
     return jsonResponse({
       error: "sign_failed",
       detail: signErr?.message,
       delivery_status: "pending_signed_url",
-      object_path: objectPath,
+      object_path: resolvedObjectPath,
     }, 500);
   }
 
   const expiresAt = new Date(Date.now() + SIGNED_URL_TTL_SECONDS * 1000).toISOString();
-  const filename = String(metadata.download_filename || safeFileName(objectPath, "volynx-icons.zip"));
+  const filename = String(metadata.download_filename || safeFileName(resolvedObjectPath, "volynx-icons.zip"));
   const nextMetadata = {
     ...metadata,
     download_bucket: String(metadata.download_bucket || ICONS_BUCKET),
-    download_path: objectPath,
+    download_path: resolvedObjectPath,
     download_filename: filename,
     download_url: signed.signedUrl,
     download_expires_at: expiresAt,

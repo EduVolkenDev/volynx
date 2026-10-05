@@ -690,7 +690,7 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
     function updateProgressUI(pct, key) {
       if (!bgProgress || !bgProgressLabel || !bgProgressFill) return;
 
-      const safePct = Math.max(0, Math.min(100, Number.isFinite(pct) ? pct : 0));
+      const safePct = normalizeProgressPercent(pct);
       bgProgress.hidden = false;
       bgProgress.dataset.active = "true";
       bgProgressFill.style.width = `${safePct}%`;
@@ -737,6 +737,16 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       } else {
         bgProgressLabel.textContent = t("suite.bg_progress", "Loading AI model...");
       }
+    }
+
+    // UpscalerJS normally reports a fraction (0–1), but some runtime/model
+    // combinations report a percentage instead. Keep both forms in the same
+    // 0–100 range so the scale factor (2x/3x/4x) can never become progress.
+    function normalizeProgressPercent(value) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric)) return 0;
+      const percent = numeric >= 0 && numeric <= 1 ? numeric * 100 : numeric;
+      return Math.max(0, Math.min(100, Math.round(percent)));
     }
 
     function yieldToBrowser() {
@@ -1428,13 +1438,17 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
         setDropMessage(t("suite.ai_upscaling_start", "AI enhancement started..."));
         updateProgressUI(0, 'upscale');
         await yieldToBrowser();
+        let lastProgress = 0;
         const base64 = await upscaler.upscale(img, {
           output: 'base64',
           patchSize: 64,
           padding: 4,
           progress: (pct) => {
-            const p = Math.round(pct * 100);
-            setDropMessage(`AI upscaling… ${p}%`);
+            // Progress is independent from the requested output scale. Never
+            // derive it from targetScale: 2x is not the same thing as 200%.
+            const p = Math.max(lastProgress, normalizeProgressPercent(pct));
+            lastProgress = p;
+            setDropMessage(copy("suite.ai_upscaling_progress", "AI upscaling… {pct}%", { pct: p }));
             updateProgressUI(p, 'upscale');
           }
         });
@@ -2104,6 +2118,17 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
         // Log ALL users (free + pro) — pro just doesn't get a quota check.
         // We still need per-tool call counts for analytics + total API calls.
         logToolUsage("image-suite", processedResults.length);
+        // Usage telemetry is non-critical. Do not hold the completed image
+        // hostage to a remote analytics request that may be slow or never
+        // resolve (for example when the provider is unavailable).
+        Promise.resolve().then(() => window.VxLab?.recordUsage?.("image-suite", tool, "completed", {
+          quantity: processedResults.length,
+          input_bytes: processedResults.reduce((sum, result) => sum + (Number(result.inputBytes) || 0), 0),
+          output_bytes: processedResults.reduce((sum, result) => sum + (Number(result.outputBytes) || 0), 0),
+          metadata: { mode: tool },
+        })).catch((error) => {
+          console.warn("[iMage Suite] Usage telemetry did not complete.", error);
+        });
         if (window.VxLab) {
           VxLab.recordEvent("image-suite", tool, `${processedResults.length} file(s) processed`);
           VxLab.savePreset("image-suite", {

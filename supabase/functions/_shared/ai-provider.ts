@@ -2,8 +2,8 @@
  * Provider-neutral AI contract for VOLYNX Edge Functions.
  *
  * Product endpoints own authentication, authorization, and billing. This
- * module owns only provider selection, bounded inputs, and the Anthropic
- * transport so those concerns do not drift between functions.
+ * module owns provider selection, bounded inputs, and provider transports so
+ * those concerns do not drift between functions.
  */
 
 export type AiProduct = "pdu" | "volynx";
@@ -30,6 +30,7 @@ export type AiProviderRequest = {
 };
 
 const DEFAULT_MODEL = "claude-haiku-4-5-20251001";
+const DEFAULT_OPENAI_BUILDER_MODEL = "gpt-4o-mini";
 const MAX_SYSTEM_CHARS = 40_000;
 const MAX_USER_CHARS = 120_000;
 
@@ -42,6 +43,22 @@ function providerTimeoutMs(): number {
 function modelFor(capability: AiCapability): string {
   const envKey = `AI_MODEL_${capability.toUpperCase()}`;
   return Deno.env.get(envKey)?.trim() || Deno.env.get("AI_MODEL")?.trim() || DEFAULT_MODEL;
+}
+
+function providerFor(request: Pick<AiProviderRequest, "product" | "capability">): "anthropic" | "openai" {
+  // The pilot cannot change PDU/Lume or any other VOLYNX capability.
+  if (request.product !== "volynx" || request.capability !== "builder") return "anthropic";
+  const configured = Deno.env.get("AI_PROVIDER_BUILDER")?.trim().toLowerCase() || "anthropic";
+  if (configured !== "anthropic" && configured !== "openai") {
+    throw new Error("AI Builder provider configuration is invalid");
+  }
+  return configured;
+}
+
+export function assertAiProviderConfigured(request: Pick<AiProviderRequest, "product" | "capability">): void {
+  const provider = providerFor(request);
+  const key = provider === "openai" ? "OPENAI_API_KEY" : "ANTHROPIC_API_KEY";
+  if (!Deno.env.get(key)?.trim()) throw new Error("AI provider is not configured");
 }
 
 function boundedTokenCount(value: number): number {
@@ -65,6 +82,21 @@ function textFromResponse(value: unknown): string {
     .trim();
 }
 
+function textFromOpenAiResponse(value: unknown): string {
+  if (!value || typeof value !== "object") return "";
+  const response = value as { status?: unknown; output?: unknown };
+  if (response.status !== "completed" || !Array.isArray(response.output)) return "";
+  return response.output
+    .filter((item): item is { type?: unknown; content?: unknown } => Boolean(item) && typeof item === "object")
+    .filter((item) => item.type === "message" && Array.isArray(item.content))
+    .flatMap((item) => item.content as unknown[])
+    .filter((part): part is { type?: unknown; text?: unknown } => Boolean(part) && typeof part === "object")
+    .filter((part) => part.type === "output_text" && typeof part.text === "string")
+    .map((part) => part.text as string)
+    .join("")
+    .trim();
+}
+
 async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -81,10 +113,41 @@ export async function callAiProvider(request: AiProviderRequest): Promise<string
     throw new Error("AI prompt is too large");
   }
 
-  const apiKey = Deno.env.get("ANTHROPIC_API_KEY")?.trim() || "";
-  if (!apiKey) throw new Error("AI provider is not configured");
+  assertAiProviderConfigured(request);
+  const provider = providerFor(request);
+  const apiKey = Deno.env.get(provider === "openai" ? "OPENAI_API_KEY" : "ANTHROPIC_API_KEY")!.trim();
 
   const temperature = boundedTemperature(request.temperature);
+  if (provider === "openai") {
+    const response = await fetchWithTimeout(
+      "https://api.openai.com/v1/responses",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          ...(request.requestId ? { "X-Client-Request-Id": request.requestId } : {}),
+        },
+        body: JSON.stringify({
+          model: Deno.env.get("OPENAI_MODEL_BUILDER")?.trim() || DEFAULT_OPENAI_BUILDER_MODEL,
+          input: [
+            { role: "developer", content: `${request.system}\n\nRespond with a JSON object.` },
+            { role: "user", content: request.user },
+          ],
+          max_output_tokens: boundedTokenCount(request.maxTokens),
+          text: { format: { type: "json_object" } },
+          store: false,
+          ...(temperature === undefined ? {} : { temperature }),
+        }),
+      },
+      providerTimeoutMs(),
+    );
+    if (!response.ok) throw new Error(`AI provider error ${response.status}`);
+    const text = textFromOpenAiResponse(await response.json());
+    if (!text) throw new Error("AI provider returned an empty or incomplete response");
+    return text;
+  }
+
   const body = {
     model: modelFor(request.capability),
     max_tokens: boundedTokenCount(request.maxTokens),
