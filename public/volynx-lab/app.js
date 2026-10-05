@@ -2,6 +2,7 @@
 
 const FREE_LIMIT = 5;
 const STORAGE_KEY = "volynx_converter_usage";
+const MAX_CONVERTER_PIXELS = 50_000_000;
 
 function todayKey() {
   const d = new Date();
@@ -372,6 +373,11 @@ function convertImage(file, mime, quality, maxw) {
       if (maxw > 0 && w > maxw) {
         h = Math.round((h * maxw) / w);
         w = maxw;
+      }
+
+      if (w * h > MAX_CONVERTER_PIXELS) {
+        reject(new Error(`Image exceeds the safe local conversion limit of ${MAX_CONVERTER_PIXELS / 1_000_000} MP. Choose a smaller maximum width.`));
+        return;
       }
 
       const canvas = document.createElement('canvas');

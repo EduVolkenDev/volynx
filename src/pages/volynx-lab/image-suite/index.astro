@@ -249,6 +249,9 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
     const ENCODE_TIMEOUT_MS = 12000;
     const MAX_RECOMMENDED_UPSCALE_PIXELS = 16_000_000;
     const MAX_LOCAL_UPSCALE_PIXELS = 36_000_000;
+    const MAX_SOURCE_PIXELS = 50_000_000;
+    const MAX_SOURCE_BYTES = 80 * 1024 * 1024;
+    const MAX_BATCH_FILES = 12;
     // License keys removed — plan is checked server-side via check-permission API
 
     function todayKey() {
@@ -1286,9 +1289,15 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
 
     function imageHasTransparency(img, mimeType) {
       if (mimeType === "image/jpeg") return false;
+      // A bounded sample is enough for the alpha-safe resize decision. Reading
+      // full-resolution ImageData here can allocate hundreds of MB and freeze
+      // the browser on phone/camera images.
+      const sourceWidth = img.naturalWidth || img.width;
+      const sourceHeight = img.naturalHeight || img.height;
+      const sampleScale = Math.min(1, 512 / Math.max(sourceWidth, sourceHeight));
       const canvas = document.createElement("canvas");
-      canvas.width = img.naturalWidth || img.width;
-      canvas.height = img.naturalHeight || img.height;
+      canvas.width = Math.max(1, Math.round(sourceWidth * sampleScale));
+      canvas.height = Math.max(1, Math.round(sourceHeight * sampleScale));
       const ctx = canvas.getContext("2d", { willReadFrequently: true });
       if (!ctx) return true; // A safe resize is preferable when alpha cannot be inspected.
       try {
@@ -1304,23 +1313,45 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
     }
 
     async function loadFiles(files) {
-      const validFiles = files.filter((file) => file && file.type && file.type.startsWith("image/"));
+      const validFiles = files
+        .filter((file) => file && file.type && file.type.startsWith("image/"))
+        .slice(0, MAX_BATCH_FILES);
 
       loadedImages = [];
       resetPreview();
+      runBtn.disabled = true;
 
       if (!validFiles.length) {
         labNotify("No valid images", t("suite.alert_no_valid", "Select a PNG, JPG, WebP or another browser-readable image."));
         return;
       }
 
-      runBtn.disabled = true;
+      const oversizedFiles = files.filter((file) => file && file.size > MAX_SOURCE_BYTES);
+      if (oversizedFiles.length) {
+        labNotify(
+          "Image too large for local processing",
+          `Choose files below ${formatBytesLabel(MAX_SOURCE_BYTES)}. This protects the browser from exhausting memory.`,
+          "warn"
+        );
+      }
+      const boundedFiles = validFiles.filter((file) => file.size <= MAX_SOURCE_BYTES);
+      if (!boundedFiles.length) return;
+
       setDropMessage(copy("suite.drop_loading", "Loading {files}...", {
-        files: fileCountLabel(validFiles.length),
+        files: fileCountLabel(boundedFiles.length),
       }));
 
-      for (const file of validFiles) {
+      for (const file of boundedFiles) {
         const img = await fileToImage(file);
+        const pixels = (img.naturalWidth || img.width) * (img.naturalHeight || img.height);
+        if (pixels > MAX_SOURCE_PIXELS) {
+          labNotify(
+            "Image dimensions too large",
+            `${file.name} exceeds the safe local limit of ${formatMegapixels(MAX_SOURCE_PIXELS)}. Choose a smaller image or resize it first.`,
+            "warn"
+          );
+          continue;
+        }
         loadedImages.push({
           file,
           img,
@@ -1329,13 +1360,13 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
         });
       }
       if (window.VxLab) {
-        VxLab.recordEvent("image-suite", "upload", `${validFiles.length} file(s) selected`);
+        VxLab.recordEvent("image-suite", "upload", `${loadedImages.length} file(s) selected`);
       }
 
-      const totalBytes = validFiles.reduce((sum, file) => sum + file.size, 0);
-      origMeta.textContent = `${fileCountLabel(validFiles.length)} • ${formatBytesLabel(totalBytes)}`;
+      const totalBytes = loadedImages.reduce((sum, item) => sum + item.file.size, 0);
+      origMeta.textContent = `${fileCountLabel(loadedImages.length)} • ${formatBytesLabel(totalBytes)}`;
       setDropMessage(copy("suite.drop_ready", "{files} ready to process", {
-        files: fileCountLabel(validFiles.length),
+        files: fileCountLabel(loadedImages.length),
       }));
       updateUpscaleHint();
       checkFmtHint();
