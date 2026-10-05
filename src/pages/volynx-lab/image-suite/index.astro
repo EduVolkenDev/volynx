@@ -38,6 +38,7 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
 
   <FaviconHead />
   <script is:inline src="/js/vx-file-metrics.js"></script>
+  <script is:inline src="/js/vx-image-safety.js"></script>
 </head>
 
 <body>
@@ -1352,6 +1353,15 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       }));
 
       for (const file of boundedFiles) {
+        const dimensions = await window.VxImageSafety?.inspectDimensions(file);
+        if (dimensions && dimensions.width * dimensions.height > MAX_SOURCE_PIXELS) {
+          labNotify(
+            "Image dimensions too large",
+            `${file.name} exceeds the safe local limit of ${formatMegapixels(MAX_SOURCE_PIXELS)}. Choose a smaller image or resize it first.`,
+            "warn"
+          );
+          continue;
+        }
         const img = await fileToImage(file);
         const pixels = (img.naturalWidth || img.width) * (img.naturalHeight || img.height);
         if (pixels > MAX_SOURCE_PIXELS) {

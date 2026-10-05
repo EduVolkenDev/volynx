@@ -3,6 +3,7 @@
 const FREE_LIMIT = 5;
 const STORAGE_KEY = "volynx_converter_usage";
 const MAX_CONVERTER_PIXELS = 50_000_000;
+const MAX_CONVERTER_BYTES = 80 * 1024 * 1024;
 
 function todayKey() {
   const d = new Date();
@@ -360,7 +361,15 @@ async function resolveFile(file) {
   return Array.isArray(result) ? result[0] : result;
 }
 
-function convertImage(file, mime, quality, maxw) {
+async function convertImage(file, mime, quality, maxw) {
+  if (file.size > MAX_CONVERTER_BYTES) {
+    throw new Error(`Image exceeds the safe local file limit of ${MAX_CONVERTER_BYTES / 1024 / 1024} MB.`);
+  }
+  const dimensions = await window.VxImageSafety?.inspectDimensions(file);
+  if (dimensions && dimensions.width * dimensions.height > MAX_CONVERTER_PIXELS) {
+    throw new Error(`Image exceeds the safe local conversion limit of ${MAX_CONVERTER_PIXELS / 1_000_000} MP. Choose a smaller image.`);
+  }
+
   return new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
