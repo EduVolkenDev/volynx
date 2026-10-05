@@ -252,7 +252,6 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
     const MAX_LOCAL_UPSCALE_PIXELS = 36_000_000;
     const MAX_SOURCE_PIXELS = 50_000_000;
     const MAX_SOURCE_BYTES = 80 * 1024 * 1024;
-    const MAX_BATCH_FILES = 12;
     // License keys removed — plan is checked server-side via check-permission API
 
     function todayKey() {
@@ -1324,9 +1323,7 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
     }
 
     async function loadFiles(files) {
-      const validFiles = files
-        .filter((file) => file && file.type && file.type.startsWith("image/"))
-        .slice(0, MAX_BATCH_FILES);
+      const validFiles = files.filter((file) => file && file.type && file.type.startsWith("image/"));
 
       loadedImages = [];
       resetPreview();
