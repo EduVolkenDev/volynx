@@ -53,9 +53,9 @@ This repo now uses Next.js server routes for Stripe Checkout, protected ZIP deli
 
 - Generate all archives with `npm run propertyflow:exports`.
 - Verify structure, tier boundaries, checksums and secret exclusions with `npm run propertyflow:exports:check`.
-- `propertyflow-starter-v1.1.0.zip`: autonomous static export with 3 templates.
-- `propertyflow-professional-v1.1.0.zip`: autonomous static export with 6 templates and one-client agency rights.
-- `propertyflow-white-label-v1.1.0.zip`: autonomous static export with all 15 templates and removable attribution.
+- `propertyflow-starter-v1.1.1.zip`: autonomous static export with 3 templates.
+- `propertyflow-professional-v1.1.1.zip`: autonomous static export with 6 templates and one-client agency rights.
+- `propertyflow-white-label-v1.1.1.zip`: autonomous static export with all 15 templates and removable attribution.
 - Every export uses local JSON and images; no buyer ZIP may include Supabase, Stripe, environment files, tenant data or private routes.
 
 The `propertyflow-complete-FINAL.zip` audit bundle is stored in `storage/propertyflow` and contains the three generated tier archives plus a manifest. Buyers receive only their licensed tier.

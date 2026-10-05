@@ -12,7 +12,7 @@ const manifestPath = path.join(root, "apps/volynx-os/public/downloads/propertyfl
 const licensePath = path.join(root, "apps/volynx-os/content/propertyflow-docs/license.md");
 const canonicalCatalogPath = path.join(root, "apps/volynx-os/content/propertyflow.ts");
 const checkOnly = process.argv.includes("--check");
-const version = "1.1.0";
+const version = "1.1.1";
 
 const templates = [
   ["classic-grid", "Classic Grid"], ["magazine", "Magazine"], ["compact-list", "Compact List"],
