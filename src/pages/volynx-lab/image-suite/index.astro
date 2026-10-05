@@ -2063,6 +2063,12 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
         // Log ALL users (free + pro) — pro just doesn't get a quota check.
         // We still need per-tool call counts for analytics + total API calls.
         logToolUsage("image-suite", processedResults.length);
+        await window.VxLab?.recordUsage?.("image-suite", tool, "completed", {
+          quantity: processedResults.length,
+          input_bytes: processedResults.reduce((sum, result) => sum + (Number(result.inputBytes) || 0), 0),
+          output_bytes: processedResults.reduce((sum, result) => sum + (Number(result.outputBytes) || 0), 0),
+          metadata: { mode: tool },
+        });
         if (window.VxLab) {
           VxLab.recordEvent("image-suite", tool, `${processedResults.length} file(s) processed`);
           VxLab.savePreset("image-suite", {

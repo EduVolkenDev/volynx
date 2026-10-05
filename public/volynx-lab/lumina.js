@@ -440,6 +440,10 @@ async function runLumina(nextMode) {
     if (!hasPaidPlan()) setUses(getUses() + 1);
     renderCards(sections);
     saveLuminaHistory("ai", sections, selectedMode, selectedLanguage, text);
+    await window.VxLab?.recordUsage?.("lumina", "generate", "completed", {
+      quantity: 1,
+      metadata: { source: "ai", mode: selectedMode, language: selectedLanguage },
+    });
     setStatus(tr("lumina.runtime.ai_active", "AI active"), "ok");
     if (window.VxLab) {
       VxLab.recordEvent("lumina", "ai", `${selectedMode} · ${selectedLanguage}`);
@@ -449,6 +453,10 @@ async function runLumina(nextMode) {
     const sections = localLumina(text, selectedMode, selectedLanguage);
     renderCards(sections);
     saveLuminaHistory("fallback", sections, selectedMode, selectedLanguage, text);
+    await window.VxLab?.recordUsage?.("lumina", "generate", "completed", {
+      quantity: 1,
+      metadata: { source: "local_fallback", mode: selectedMode, language: selectedLanguage },
+    });
     const noAiBalance = error?.message === "insufficient_balance";
     setStatus(noAiBalance
       ? tr("lumina.runtime.ai_limit", "AI quota is used. Showing private local mode; add VX to continue with AI.")

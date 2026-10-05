@@ -303,6 +303,7 @@ const { current = "", brandHref = ROUTES.core, ctaHref = ROUTES.pricing, ctaLabe
     display: inline-flex;
     align-items: center;
     line-height: 1;
+    min-width: 0;
   }
   .vx-brand__wordmark {
     width: 160px;
@@ -933,6 +934,14 @@ const { current = "", brandHref = ROUTES.core, ctaHref = ROUTES.pricing, ctaLabe
     .vx-login, .vx-cta { display: none !important; }
     :global(.vx-authed) .vx-cta { display: none !important; }
     .vx-burger { display: inline-flex; }
+    /* Tablet keeps the authenticated actions visible without letting the
+       desktop-sized brand push language/profile off the viewport. */
+    .vx-topbar__inner { gap: 10px; }
+    .vx-brand { min-width: 0; }
+    .vx-brand__wordmark { width: clamp(124px, 21vw, 160px); }
+    .vx-actions { gap: 8px; min-width: 0; }
+    :global(.vx-authed) .vx-token-pill { padding: 8px 12px; font-size: 12px; }
+    :global(.vx-authed) .vx-recharge { padding: 8px 15px; font-size: 12px; }
     /* Lang toggle stays visible on mobile — every page must expose it */
     .vx-lang { display: inline-flex; min-width: 40px; height: 34px; padding: 0 10px; font-size: 11px; }
   }

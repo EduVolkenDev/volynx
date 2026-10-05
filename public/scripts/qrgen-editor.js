@@ -628,6 +628,10 @@
       setDynamicShortUrl(shortUrl);
       dynamicMessage(`${tq("dynamic.created", "Dynamic QR created:")} ${shortUrl}`, "ok");
       if (window.VxLab) {
+        await window.VxLab.recordUsage?.("qr-gen", "dynamic", "completed", {
+          quantity: 1,
+          metadata: { mode: "dynamic", label: label || null },
+        });
         VxLab.recordEvent("qr-gen", "dynamic", "Dynamic QR created");
         VxLab.savePreset("qr-gen", {
           mode: "dynamic",
@@ -1418,6 +1422,11 @@
           saveBlob(blob, `${fileNameForState(state)}.${extension}`);
           incrementUsage();
           if (window.VxLab) {
+            await window.VxLab.recordUsage?.("qr-gen", "export", "completed", {
+              quantity: 1,
+              output_bytes: blob.size,
+              metadata: { format: extension, size, paid_with_vx: Boolean(exportOptions.vxCost) },
+            });
             VxLab.recordEvent("qr-gen", "export", exportOptions.vxCost ? `${extension.toUpperCase()} exported via VX` : `${extension.toUpperCase()} exported`);
             VxLab.savePreset("qr-gen", {
               mode: state.mode,
@@ -1440,6 +1449,10 @@
       await exportQr.download({ name: fileNameForState(state), extension });
       incrementUsage();
       if (window.VxLab) {
+        await window.VxLab.recordUsage?.("qr-gen", "export", "completed", {
+          quantity: 1,
+          metadata: { format: extension, size, paid_with_vx: Boolean(exportOptions.vxCost) },
+        });
         VxLab.recordEvent("qr-gen", "export", exportOptions.vxCost ? `${extension.toUpperCase()} exported via VX` : `${extension.toUpperCase()} exported`);
         VxLab.savePreset("qr-gen", {
           mode: state.mode,
@@ -1560,6 +1573,10 @@
     if (savedProject && window.VxLab?.syncArtifact) VxLab.syncArtifact("qr-project", savedProject);
     renderProjects();
     if (window.VxLab) {
+      window.VxLab.recordUsage?.("qr-gen", "save", "completed", {
+        quantity: 1,
+        metadata: { mode: state.mode, format: state.exportFormat },
+      });
       VxLab.recordEvent("qr-gen", "save", "QR draft saved");
       VxLab.savePreset("qr-gen", {
         mode: state.mode,

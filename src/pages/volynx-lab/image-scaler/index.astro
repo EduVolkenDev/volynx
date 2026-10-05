@@ -404,6 +404,7 @@ const socialImage = "https://volynx.world/assets/newimagescaler.webp";
         outMeta.textContent = `${processedResults.length} file(s) · ${(totalOut / 1024 / 1024).toFixed(2)} MB`;
         if (processedResults.length === 1) singleBlob = processedResults[0].blob;
         logToolUsage("image-scaler", processedResults.length);
+        await window.VxLab?.recordUsage?.("image-scaler", "upscale", "completed", { quantity: processedResults.length });
         if (window.VxLab) {
           VxLab.recordEvent("image-scaler", "upscale", `${processedResults.length} file(s) upscaled at ${scale}x`);
           VxLab.savePreset("image-scaler", {
