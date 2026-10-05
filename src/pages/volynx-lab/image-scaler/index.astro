@@ -134,6 +134,7 @@ const socialImage = "https://volynx.world/assets/newimagescaler.webp";
   </main>
 
   <script is:inline src="/js/vx-file-metrics.js"></script>
+  <script is:inline src="/js/vx-image-safety.js"></script>
   <script is:inline src="/js/vx-auth-bridge.js"></script>
   <script is:inline src="/scripts/vx-lab-workspace.js?v=20260621-modal-system"></script>
   <script is:inline src="/js/vx-lab-runtime.js"></script>
@@ -338,6 +339,12 @@ const socialImage = "https://volynx.world/assets/newimagescaler.webp";
 
       try {
         for (const f of valid) {
+          const dimensions = await window.VxImageSafety?.inspectDimensions(f);
+          const scale = Math.max(2, parseInt(scaleEl?.value, 10) || 2);
+          if (dimensions && dimensions.width * dimensions.height * scale * scale > MAX_OUTPUT_PIXELS) {
+            labNotify("Image output too large", `${f.name} would exceed the safe local output limit. Choose a smaller image or scale.`, "warn");
+            continue;
+          }
           const img = await fileToImage(f);
           loadedImages.push({ file: f, img, baseName: f.name.replace(/\.[^/.]+$/, "") });
         }
