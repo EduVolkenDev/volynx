@@ -1066,8 +1066,8 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       if (toolEl?.value !== "upscale" || !loadedImages.length) return 0;
       const scale = Math.max(2, parseInt(scaleEl?.value, 10) || 2);
       return loadedImages.reduce((largest, item) => {
-        const width = item?.img?.naturalWidth || item?.img?.width || 0;
-        const height = item?.img?.naturalHeight || item?.img?.height || 0;
+        const width = item?.width || 0;
+        const height = item?.height || 0;
         return Math.max(largest, width * height * scale * scale);
       }, 0);
     }
@@ -1104,14 +1104,12 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       const scale = Math.max(2, parseInt(scaleEl?.value, 10) || 2);
       const largestPixels = getLargestRequestedOutputPixels();
       const largest = loadedImages.reduce((item, current) => {
-        const currentPixels = (current?.img?.naturalWidth || current?.img?.width || 0)
-          * (current?.img?.naturalHeight || current?.img?.height || 0);
-        const largestPixelsInList = (item?.img?.naturalWidth || item?.img?.width || 0)
-          * (item?.img?.naturalHeight || item?.img?.height || 0);
+        const currentPixels = (current?.width || 0) * (current?.height || 0);
+        const largestPixelsInList = (item?.width || 0) * (item?.height || 0);
         return currentPixels > largestPixelsInList ? current : item;
       }, loadedImages[0]);
-      const width = (largest?.img?.naturalWidth || largest?.img?.width || 0) * scale;
-      const height = (largest?.img?.naturalHeight || largest?.img?.height || 0) * scale;
+      const width = (largest?.width || 0) * scale;
+      const height = (largest?.height || 0) * scale;
 
       if (largestPixels > MAX_LOCAL_UPSCALE_PIXELS) {
         upscaleHint.dataset.tone = "critical";
@@ -1359,20 +1357,14 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
           );
           continue;
         }
-        const img = await fileToImage(file);
-        const pixels = (img.naturalWidth || img.width) * (img.naturalHeight || img.height);
-        if (pixels > MAX_SOURCE_PIXELS) {
-          labNotify(
-            "Image dimensions too large",
-            `${file.name} exceeds the safe local limit of ${formatMegapixels(MAX_SOURCE_PIXELS)}. Choose a smaller image or resize it first.`,
-            "warn"
-          );
-          continue;
-        }
         loadedImages.push({
           file,
-          img,
-          hasTransparency: imageHasTransparency(img, file.type),
+          width: dimensions?.width || 0,
+          height: dimensions?.height || 0,
+          // Transparency is inspected only when a file enters the processing
+          // queue. Keeping decoded Image objects here made 100+ file batches
+          // retain every full-resolution bitmap in memory before work began.
+          hasTransparency: null,
           baseName: file.name.replace(/\.[^/.]+$/, "")
         });
       }
@@ -1587,12 +1579,18 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
     }
 
     async function processOne(item, tool, scale, mime, quality) {
+      const img = await fileToImage(item.file);
+      item.width = img.naturalWidth || img.width;
+      item.height = img.naturalHeight || img.height;
+      item.hasTransparency = imageHasTransparency(img, item.file.type);
+
+      try {
       if (tool === "bg-remove") {
         const bgMime = bgFormatEl?.value || "image/png";
         const fillValue = bgFillEl?.value || "transparent";
         const fillColor = bgFillColorEl?.value || "#ffffff";
 
-        const cutoutCanvas = await removeBackgroundLocalToCanvas(item.img, (pct, key) => {
+        const cutoutCanvas = await removeBackgroundLocalToCanvas(img, (pct, key) => {
           updateProgressUI(pct, key);
         });
 
@@ -1619,8 +1617,8 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
           baseName: `${item.baseName}-no-bg`,
           originalFile: item.file,
           blob: finalBlob,
-          width: item.img.width,
-          height: item.img.height,
+          width: img.width,
+          height: img.height,
           inputBytes: item.file.size,
           keptOriginal: false,
           mimeType: bgMime,
@@ -1628,7 +1626,6 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
         };
       }
 
-      const img = item.img;
       const file = item.file;
       const baseName = item.baseName;
       const formatAdjustedForAlpha = tool === "upscale" && item.hasTransparency && mime === "image/jpeg";
@@ -1721,6 +1718,14 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
         upscaleMode: tool === "upscale" ? (canvas.dataset.upscaleMode || "standard") : null,
         upscaleError: tool === "upscale" ? (canvas.dataset.upscaleError || null) : null,
       };
+      } finally {
+        // Release the decoded bitmap as soon as this queue item is complete.
+        // The output blob is retained for the explicit download action, but
+        // source Image objects and their backing surfaces are not.
+        img.onload = null;
+        img.onerror = null;
+        img.src = "";
+      }
     }
 
     // Detect pro status from server-side check (await to avoid race condition)
