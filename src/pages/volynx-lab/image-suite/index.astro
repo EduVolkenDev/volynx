@@ -900,11 +900,6 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       });
     }
 
-    function smoothstep(edge0, edge1, value) {
-      const t = Math.max(0, Math.min(1, (value - edge0) / (edge1 - edge0)));
-      return t * t * (3 - 2 * t);
-    }
-
     function applyMaskWithMatteCorrection(srcImage, maskCanvas, backgroundColor) {
       const width = srcImage.naturalWidth || srcImage.width;
       const height = srcImage.naturalHeight || srcImage.height;
@@ -932,6 +927,10 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
           sourceTile.height = tileHeight;
           maskTile.width = tileWidth;
           maskTile.height = tileHeight;
+          // Resizing a canvas resets its context state. Set interpolation for
+          // every tile after resizing so the 320px mask scales smoothly.
+          maskTileCtx.imageSmoothingEnabled = true;
+          maskTileCtx.imageSmoothingQuality = "high";
           sourceTileCtx.clearRect(0, 0, tileWidth, tileHeight);
           sourceTileCtx.drawImage(srcImage, left, top, tileWidth, tileHeight, 0, 0, tileWidth, tileHeight);
           maskTileCtx.clearRect(0, 0, tileWidth, tileHeight);
@@ -948,13 +947,13 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
           const maskData = maskTileCtx.getImageData(0, 0, tileWidth, tileHeight).data;
           for (let index = 0; index < sourceData.data.length; index += 4) {
             const alpha = maskData[index + 3] / 255;
-            if (alpha < 0.08) {
+            if (alpha < 0.015) {
               sourceData.data[index + 3] = 0;
               continue;
             }
             // Recover edge RGB from the original matte before applying alpha.
             // This prevents white/black fringes around otherwise clean cutouts.
-            const safeAlpha = Math.max(alpha, 0.08);
+            const safeAlpha = Math.max(alpha, 0.02);
             for (let channel = 0; channel < 3; channel += 1) {
               const recovered = (sourceData.data[index + channel] - backgroundColor[channel] * (1 - safeAlpha)) / safeAlpha;
               sourceData.data[index + channel] = Math.max(0, Math.min(255, Math.round(recovered)));
@@ -1024,8 +1023,9 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       }
       const range = ma - mi || 1;
 
-      // Build a gently thresholded mask at N×N. Raw min/max values contain
-      // low-confidence edge noise that otherwise becomes a visible matte halo.
+      // Keep the model's continuous alpha instead of applying a hard threshold.
+      // The soft transition is the antialiasing information needed to retain
+      // hair, curved edges and small details after the 320px mask is enlarged.
       const maskCanvas = document.createElement("canvas");
       maskCanvas.width = N;
       maskCanvas.height = N;
@@ -1034,7 +1034,7 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       const maskImage = maskCtx.createImageData(N, N);
       for (let i = 0; i < maskData.length; i++) {
         const normalized = Math.max(0, Math.min(1, (maskData[i] - mi) / range));
-        const a = Math.round(smoothstep(0.08, 0.42, normalized) * 255);
+        const a = Math.round(normalized * 255);
         const idx = i * 4;
         maskImage.data[idx]     = 255;
         maskImage.data[idx + 1] = 255;
