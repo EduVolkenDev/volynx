@@ -19,13 +19,14 @@ import { getHomeContent } from "@/content/home"
 import { resolveSiteLocale, documentLanguage } from "@/lib/site-locale"
 
 type HomePageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     lang?: string | string[]
-  }
+  }>
 }
 
-export default function HomePage({ searchParams }: HomePageProps) {
-  const locale = resolveSiteLocale(searchParams?.lang, headers().get("accept-language"))
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const [query, requestHeaders] = await Promise.all([searchParams, headers()])
+  const locale = resolveSiteLocale(query?.lang, requestHeaders.get("accept-language"))
   const content = getHomeContent(locale)
 
   return (
