@@ -41,10 +41,14 @@ test. It must remain separate from the product-family matrix.
 
 The private R$0.50 `pf_starter_e2e_brl` offer is the representative
 PropertyFlow delivery test. It is intentionally absent from public pricing.
-Checkout canonicalizes it to `pf_starter`, so a successful live payment must
-create the same active Starter entitlement, signed `v1.1.0` ZIP URL, delivery
-email and dashboard card as a full-price purchase. Start it only from the
-internal URL below while authenticated:
+Checkout canonicalizes it to `pf_starter`. Two real purchases on 2026-09-17
+and 2026-09-28 each produced a completed `purchase_events` row, an active
+Starter entitlement, a published three-template workspace, and a signed
+`v1.1.0` ZIP URL. This is payment → entitlement → workspace → link issuance
+proof. It is not evidence of an opened ZIP, delivered email, or the later
+`v1.1.3` recovery/download path. Do not repeat the charge just to recreate
+already verified checkout evidence. If a new controlled test is explicitly
+needed, start it only from the internal URL below while authenticated:
 
 ```text
 https://volynx.world/checkout/?lookup_key=pf_starter_e2e&currency=brl&next=/products/propertyflow/

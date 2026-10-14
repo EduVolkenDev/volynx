@@ -32,6 +32,14 @@ for (const [index, property] of properties.entries()) {
   if (!isLocalized(property.title)) fail(`Property ${property.id} needs a title`);
   if (!property.category || !["sale", "rent"].includes(property.listingType)) fail(`Property ${property.id} needs category and listingType`);
   if (!property.location?.label) fail(`Property ${property.id} needs location.label`);
+  if (property.highlights !== undefined) {
+    if (!property.highlights || typeof property.highlights !== "object") fail(`Property ${property.id} highlights must be localized lists`);
+    for (const [language, points] of Object.entries(property.highlights)) {
+      if (!["pt-BR", "en"].includes(language) || !Array.isArray(points) || points.length > 6 || points.some((point) => typeof point !== "string" || !point.trim() || point.length > 140)) {
+        fail(`Property ${property.id} highlights.${language} must contain up to six short non-empty strings`);
+      }
+    }
+  }
   if (!Array.isArray(property.images) || property.images.length === 0) fail(`Property ${property.id} needs at least one image`);
   for (const image of property.images) {
     if (!image.src || image.src.startsWith("http://") || image.src.startsWith("https://")) fail(`Property ${property.id} must use local image paths`);

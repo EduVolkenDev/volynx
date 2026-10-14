@@ -158,9 +158,7 @@ const pageDescription = "PropertyFlow cria e publica automaticamente um site imo
     .btn--ghost { background: rgba(255,255,255,0.04); color: var(--text); }
 
     /* ─── Hero visual ─── */
-    .hero__visual {
-      position: relative; min-height: 480px;
-    }
+    .hero__visual { position: relative; min-height: 480px; }
     .hero__glow {
       position: absolute; border-radius: 999px;
       filter: blur(60px); opacity: 0.3; pointer-events: none;
@@ -286,6 +284,15 @@ const pageDescription = "PropertyFlow cria e publica automaticamente um site imo
     .feature h3 { margin: 0; font-size: 1rem; }
 
     .feature p { margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.7; }
+
+    .pf-buyer-card { position: relative; isolation: isolate; overflow: hidden; align-items: stretch; gap: 0; padding: 0; border-color: rgba(214,179,106,.2); border-radius: 26px; background: #10131c; text-align: left; }
+    .pf-buyer-card__media { display: grid; height: 210px; place-items: center; overflow: hidden; background: radial-gradient(circle at 50% 65%, rgba(214,179,106,.14), transparent 62%), linear-gradient(180deg, #111722, #0d1119); }
+    .pf-buyer-card__media img { width: min(86%, 240px); height: 100%; object-fit: contain; filter: drop-shadow(0 22px 38px rgba(0,0,0,.5)); }
+    .pf-buyer-card__content { display: grid; align-content: start; gap: 12px; min-height: 200px; padding: 27px; border-top: 1px solid rgba(214,179,106,.12); background: linear-gradient(180deg, rgba(255,255,255,.04), transparent); }
+    .pf-buyer-card__content .step-number { width: auto; height: auto; place-items: initial; border: 0; border-radius: 0; color: var(--gold-soft); }
+    .pf-buyer-card__content h3 { font-size: 1.16rem; letter-spacing: -.025em; }
+    .pf-buyer-card__content p { max-width: 34ch; font-size: .92rem; }
+    @media (max-width: 560px) { .pf-buyer-card__media { height: 180px; } .pf-buyer-card__content { min-height: 0; padding: 24px; } }
 
     /* ─── Stack row ─── */
     .stack { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 26px; }
@@ -1561,17 +1568,17 @@ const pageDescription = "PropertyFlow cria e publica automaticamente um site imo
         <div class="feature">
           <div class="feature__icon"><img src="/assets/smartcatalogue.webp" alt="" aria-hidden="true" /></div>
           <h3 data-i18n="pf.f1_title">Smart Catalogue</h3>
-          <p data-i18n="pf.f1_desc">Property grid with cover images, meta tags, featured badges and detail modals with full gallery.</p>
+          <p data-i18n="pf.f1_desc">A buyer sees the live catalogue; “View details” opens that property's real photo gallery, description, location and facts in a branded editorial presentation.</p>
         </div>
         <div class="feature">
           <div class="feature__icon"><img src="/assets/livefilters.webp" alt="" aria-hidden="true" /></div>
           <h3 data-i18n="pf.f2_title">Live Filters</h3>
-          <p data-i18n="pf.f2_desc">Search by name, neighbourhood or city. Filter by purpose (sale / rent), type and price range.</p>
+          <p data-i18n="pf.f2_desc">Search by property, neighbourhood or city and filter by property type. The standalone export also includes sale/rent filtering.</p>
         </div>
         <div class="feature">
           <div class="feature__icon"><img src="/assets/bilingual.webp" alt="" aria-hidden="true" /></div>
           <h3 data-i18n="pf.f3_title">Bilingual by Default</h3>
-          <p data-i18n="pf.f3_desc">Full EN / PT-BR interface with one-click language toggle. Every string translated — zero hardcoded text.</p>
+          <p data-i18n="pf.f3_desc">The standalone export includes an EN / PT-BR language switch for its interface and property content.</p>
         </div>
         <div class="feature">
           <div class="feature__icon"><img src="/assets/supabase.webp" alt="" aria-hidden="true" /></div>
@@ -1588,6 +1595,19 @@ const pageDescription = "PropertyFlow cria e publica automaticamente um site imo
           <h3 data-i18n="pf.f6_title">Fully Responsive</h3>
           <p data-i18n="pf.f6_desc">Mobile-first layouts. Filter bar, property grid and modal all adapt cleanly to any screen size.</p>
         </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="pf-buyer-experience">
+      <div class="section__head">
+        <span class="kicker"><span class="i18n-en">THE REAL EXPERIENCE</span><span class="i18n-pt">A EXPERIÊNCIA REAL</span></span>
+        <h2 id="pf-buyer-experience"><span class="i18n-en">What opens after you buy?</span><span class="i18n-pt">O que abre depois da compra?</span></h2>
+        <p class="sub"><span class="i18n-en">The hosted site is the guided default. The independent static ZIP is an additional delivery option, not the dashboard itself.</span><span class="i18n-pt">O site hospedado é o caminho guiado padrão. O ZIP estático independente é uma opção adicional de entrega — não é o painel administrativo.</span></p>
+      </div>
+      <div class="features">
+        <div class="feature pf-buyer-card"><div class="pf-buyer-card__media"><img src="/assets/propertyflow/visuals/feature/04-property-key.webp" alt="" loading="lazy" decoding="async" /></div><div class="pf-buyer-card__content"><span class="step-number">01 / STUDIO</span><h3><span class="i18n-en">Your private workspace</span><span class="i18n-pt">Seu espaço de gestão</span></h3><p><span class="i18n-en">Configure your brand, add property descriptions and real photos, choose one of the layouts in your tier and publish.</span><span class="i18n-pt">Configure a marca, cadastre descrições e fotos reais, escolha um layout do seu tier e publique.</span></p></div></div>
+        <div class="feature pf-buyer-card"><div class="pf-buyer-card__media"><img src="/assets/propertyflow/visuals/feature/07-property-search.webp" alt="" loading="lazy" decoding="async" /></div><div class="pf-buyer-card__content"><span class="step-number">02 / SITE</span><h3><span class="i18n-en">Your public catalogue</span><span class="i18n-pt">Seu catálogo público</span></h3><p><span class="i18n-en">Visitors browse published properties and filters. Opening a property shows its own gallery, narrative, location and facts — not template filler.</span><span class="i18n-pt">Visitantes exploram imóveis publicados e filtros. Ao abrir um imóvel, veem a galeria, a descrição, a localização e os dados daquele imóvel — não texto genérico.</span></p></div></div>
+        <div class="feature pf-buyer-card"><div class="pf-buyer-card__media"><img src="/assets/propertyflow/visuals/feature/10-publish.webp" alt="" loading="lazy" decoding="async" /></div><div class="pf-buyer-card__content"><span class="step-number">03 / EXPORT</span><h3><span class="i18n-en">Your optional source export</span><span class="i18n-pt">Seu export de código opcional</span></h3><p><span class="i18n-en">The standalone ZIP starts with clearly marked sample listings. Replace them locally before launch; it does not sync automatically with your hosted workspace.</span><span class="i18n-pt">O ZIP autônomo começa com imóveis demonstrativos identificados. Substitua-os antes de publicar; ele não sincroniza automaticamente com o painel hospedado.</span></p></div></div>
       </div>
     </section>
 
@@ -2399,9 +2419,10 @@ const pageDescription = "PropertyFlow cria e publica automaticamente um site imo
             <li data-i18n="pf.plan1_f1">3 templates: Classic Grid, Magazine and Compact List</li>
             <li data-i18n="pf.plan1_f2"><span class="i18n-en">Hosted site created after checkout</span><span class="i18n-pt">Site hospedado criado após o checkout</span></li>
             <li data-i18n="pf.plan1_f3">Property catalogue + filters</li>
-            <li data-i18n="pf.plan1_f4">Bilingual interface (EN/PT)</li>
+            <li data-i18n="pf.plan1_f4">Bilingual EN/PT interface in the standalone export</li>
             <li data-i18n="pf.plan1_f5">Responsive design</li>
             <li data-i18n="pf.plan1_f6"><span class="i18n-en">Complete standalone static export</span><span class="i18n-pt">Export estático independente completo</span></li>
+            <li><span class="i18n-en">30 branded visual assets in the export; two already used in property details</span><span class="i18n-pt">30 assets visuais da marca no export; dois já aplicados aos detalhes dos imóveis</span></li>
           </ul>
           <a href={checkoutHref("pf_starter", { next: ROUTES.propertyflow })} class="btn btn--ghost price-card__cta vx-checkout-btn" data-lookup="pf_starter" data-i18n="pf.plan1_cta">Get Starter</a>
         </div>
@@ -2423,7 +2444,7 @@ const pageDescription = "PropertyFlow cria e publica automaticamente um site imo
             <li data-i18n="pf.plan2_f3"><span class="i18n-en">Live property data, already connected</span><span class="i18n-pt">Dados de imóveis ao vivo, já conectados</span></li>
             <li data-i18n="pf.plan2_f4"><span class="i18n-en">Property management dashboard</span><span class="i18n-pt">Painel para gerenciar imóveis</span></li>
             <li data-i18n="pf.plan2_f5">Image gallery + modals</li>
-            <li data-i18n="pf.plan2_f6">WhatsApp-ready contact actions</li>
+            <li data-i18n="pf.plan2_f6">WhatsApp/email contact actions in the standalone export</li>
             <li data-i18n="pf.plan2_f7"><span class="i18n-en">Guided custom-domain connection</span><span class="i18n-pt">Conexão guiada de domínio próprio</span></li>
             <li data-i18n="pf.plan2_f8">Agency delivery license (1 client)</li>
           </ul>

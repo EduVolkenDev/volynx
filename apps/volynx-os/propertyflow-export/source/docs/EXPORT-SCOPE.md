@@ -7,7 +7,7 @@ Included:
 - Local brand, contact and bilingual copy configuration.
 - Local property data and optimized sample images.
 - Search, category and sale/rent filters.
-- Responsive property cards, accessible details dialog and WhatsApp/email actions.
+- Responsive property cards, an accessible details dialog with a real-photo gallery, property-specific narrative/highlights, branded editorial panels and WhatsApp/email actions.
 - The templates licensed for the purchased tier.
 - Repeatable validation, local preview and production build commands.
 
@@ -21,3 +21,5 @@ Not included:
 - Customer or Jhonatan Peterson data.
 
 The hosted product and this static export are separate delivery modes. They can share a brand and catalogue concept, but they do not share runtime data automatically.
+
+After purchase, the hosted workspace is the guided editing and publication path. This ZIP is an optional autonomous source delivery: opening it locally first shows fictional demo properties, not the buyer's own inventory. Replace the sample content and photos before publishing. The public **Ver detalhes** action in this export opens the exact property information entered in `content/properties.json`; templates do not generate or rewrite a listing's claims.

@@ -83,6 +83,13 @@
             <div><span class="eyebrow">LOCALIZAÇÃO</span><h3 id="mapTitle">Descubra por região</h3><p id="mapDescription">Use a busca para explorar bairros e cidades do catálogo.</p></div>
           </div>
 
+          <div class="carousel-controls" id="carouselControls" hidden>
+            <span class="carousel-controls__position" id="carouselPosition" aria-live="polite"></span>
+            <div class="carousel-controls__actions">
+              <button type="button" id="carouselPrevious" aria-label="Imóvel anterior" aria-controls="propertyGrid"><span aria-hidden="true">←</span></button>
+              <button type="button" id="carouselNext" aria-label="Próximo imóvel" aria-controls="propertyGrid"><span aria-hidden="true">→</span></button>
+            </div>
+          </div>
           <div class="property-grid" id="propertyGrid"></div>
           <div class="empty-state" id="emptyState" hidden>
             <strong id="emptyTitle">Nenhum imóvel encontrado</strong>
@@ -121,8 +128,22 @@
           <h2 id="dialogTitle"></h2>
           <p class="dialog-location" id="dialogLocation"></p>
           <strong class="dialog-price" id="dialogPrice"></strong>
-          <p id="dialogDescription"></p>
-          <dl class="dialog-facts" id="dialogFacts"></dl>
+          <section class="detail-story" aria-labelledby="dialogStoryLabel">
+            <img class="detail-story__art" src="./assets/propertyflow/visuals/feature/04-property-key.webp" alt="" aria-hidden="true" loading="lazy" />
+            <div class="detail-story__content">
+              <span class="eyebrow" id="dialogStoryLabel">A EXPERIÊNCIA</span>
+              <p id="dialogDescription"></p>
+              <ul id="dialogHighlights" class="detail-highlights" hidden></ul>
+            </div>
+          </section>
+          <section class="detail-place" aria-labelledby="dialogPlaceLabel">
+            <img class="detail-place__art" src="./assets/propertyflow/visuals/feature/05-location.webp" alt="" aria-hidden="true" loading="lazy" />
+            <div class="detail-place__content">
+              <span class="eyebrow" id="dialogPlaceLabel">O ENDEREÇO</span>
+              <strong id="dialogPlace"></strong>
+              <dl class="dialog-facts" id="dialogFacts"></dl>
+            </div>
+          </section>
           <a class="button button--primary" id="dialogContact" href="#">Tenho interesse</a>
         </div>
       </div>

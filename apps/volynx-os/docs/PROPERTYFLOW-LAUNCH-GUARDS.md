@@ -51,14 +51,18 @@ This repo now uses Next.js server routes for Stripe Checkout, protected ZIP deli
 
 ## Tier ZIPs
 
-- Generate all archives with `npm run propertyflow:exports`.
+- Generate the versioned v1.1.3 archives with `npm run propertyflow:exports`.
 - Verify structure, tier boundaries, checksums and secret exclusions with `npm run propertyflow:exports:check`.
-- `propertyflow-starter-v1.1.1.zip`: autonomous static export with 3 templates.
-- `propertyflow-professional-v1.1.1.zip`: autonomous static export with 6 templates and one-client agency rights.
-- `propertyflow-white-label-v1.1.1.zip`: autonomous static export with all 15 templates and removable attribution.
+- `propertyflow-starter-v1.1.3.zip`: autonomous static export with 3 templates.
+- `propertyflow-professional-v1.1.3.zip`: autonomous static export with 6 templates and one-client agency rights.
+- `propertyflow-white-label-v1.1.3.zip`: autonomous static export with all 15 templates and removable attribution.
 - Every export uses local JSON and images; no buyer ZIP may include Supabase, Stripe, environment files, tenant data or private routes.
 
-The `propertyflow-complete-FINAL.zip` audit bundle is stored in `storage/propertyflow` and contains the three generated tier archives plus a manifest. Buyers receive only their licensed tier.
+The `propertyflow-complete-v1.1.3.zip` audit bundle is stored in `storage/propertyflow` and contains the three generated tier archives plus a manifest. Buyers receive only their licensed tier.
+
+The three v1.1.3 tier ZIPs were published to the private `propertyflow` bucket at `pf_starter/v1.1.3.zip`, `pf_professional/v1.1.3.zip`, and `pf_white_label/v1.1.3.zip` on 2026-10-13. Each remote object was downloaded and verified against its manifest byte count and SHA-256. The shared delivery contract was confirmed in the deployed source of `stripe-webhook`, `refresh-pf-url`, and `regenerate-delivery-url`. Earlier objects remain intact; unexpired signed URLs may still point to earlier versions.
+
+Historical live checkout proof (2026-09-17 and 2026-09-28): two private R$0.50 Property Flow Starter purchases each produced a completed `purchase_events` row, an active `pf_starter` row in `addons_purchased`, a published Starter workspace with three templates, and a signed download URL. Both links were for v1.1.0 and have expired. This proves payment → entitlement → workspace → signed-link issuance for those purchases; it does not prove that the buyer opened a ZIP, nor does it exercise the later v1.1.3 recovery/download path. Do not charge the buyer again merely to repeat this already verified checkout test.
 
 ## Required env vars
 

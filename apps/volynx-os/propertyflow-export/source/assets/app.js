@@ -29,7 +29,8 @@ const UI = {
     contactDescription: "Conte o que você procura e nossa equipe retorna com opções selecionadas.",
     interest: "Tenho interesse", bedrooms: "quartos", bathrooms: "banheiros", parking: "vagas", area: "área",
     mapTitle: "Descubra por região", mapDescription: "Use a busca para explorar bairros e cidades do catálogo.",
-    close: "Fechar detalhes", language: "Change language"
+    close: "Fechar detalhes", language: "Change language", previousProperty: "Imóvel anterior", nextProperty: "Próximo imóvel", positionOf: "de",
+    storyLabel: "A EXPERIÊNCIA", placeLabel: "O ENDEREÇO"
   },
   en: {
     contact: "Contact", catalogButton: "View properties", talk: "Talk to the team",
@@ -43,7 +44,8 @@ const UI = {
     contactDescription: "Tell us what you need and our team will return with selected options.",
     interest: "I'm interested", bedrooms: "bedrooms", bathrooms: "bathrooms", parking: "parking", area: "area",
     mapTitle: "Explore by area", mapDescription: "Use search to explore neighbourhoods and cities in the catalogue.",
-    close: "Close details", language: "Mudar idioma"
+    close: "Close details", language: "Mudar idioma", previousProperty: "Previous property", nextProperty: "Next property", positionOf: "of",
+    storyLabel: "THE EXPERIENCE", placeLabel: "THE ADDRESS"
   }
 };
 
@@ -119,7 +121,7 @@ function applyLanguage() {
     templateEyebrow: "templateEyebrow", templateTitle: "templateTitle", templateHint: "templateHint", templateLabel: "templateLabel",
     catalogEyebrow: "catalogEyebrow", catalogTitle: "catalogTitle", emptyTitle: "emptyTitle", emptyDescription: "emptyDescription",
     contactEyebrow: "contactEyebrow", contactTitle: "contactTitle", contactDescription: "contactDescription",
-    mapTitle: "mapTitle", mapDescription: "mapDescription"
+    mapTitle: "mapTitle", mapDescription: "mapDescription", dialogStoryLabel: "storyLabel", dialogPlaceLabel: "placeLabel"
   };
   Object.entries(pairs).forEach(([id, key]) => { byId(id).textContent = ui(key); });
   byId("searchInput").placeholder = ui("search");
@@ -127,6 +129,8 @@ function applyLanguage() {
   byId("categoryLabel").textContent = ui("allCategories");
   byId("listingLabel").textContent = ui("allListings");
   byId("dialogClose").setAttribute("aria-label", ui("close"));
+  byId("carouselPrevious").setAttribute("aria-label", ui("previousProperty"));
+  byId("carouselNext").setAttribute("aria-label", ui("nextProperty"));
   byId("languageToggle").textContent = state.language === "pt-BR" ? "EN" : "PT";
   byId("languageToggle").setAttribute("aria-label", ui("language"));
   applyBrand();
@@ -268,6 +272,8 @@ function renderProperties() {
   } else {
     properties.forEach((property, index) => grid.append(propertyCard(property, index)));
   }
+  grid.scrollLeft = 0;
+  updateCarousel();
   byId("emptyState").hidden = properties.length > 0;
   byId("propertyCount").textContent = `${properties.length} ${properties.length === 1 ? ui("property") : ui("properties")}`;
   const featured = properties.find((property) => property.featured) || properties[0] || state.properties[0];
@@ -277,12 +283,50 @@ function renderProperties() {
   hero.setAttribute("aria-label", featured ? `${localized(featured.title)} — ${featured.location?.label || ""}` : "");
 }
 
+function carouselCards() { return [...byId("propertyGrid").querySelectorAll(".property-card")]; }
+
+function activeCarouselIndex() {
+  const grid = byId("propertyGrid");
+  const cards = carouselCards();
+  const center = grid.getBoundingClientRect().left + grid.clientWidth / 2;
+  return cards.reduce((closest, card, index) => Math.abs(card.getBoundingClientRect().left + card.clientWidth / 2 - center) < Math.abs(cards[closest].getBoundingClientRect().left + cards[closest].clientWidth / 2 - center) ? index : closest, 0);
+}
+
+function updateCarousel() {
+  const cards = carouselCards();
+  const controls = byId("carouselControls");
+  controls.hidden = state.template !== "showroom" || cards.length < 2;
+  if (controls.hidden) return;
+  const index = activeCarouselIndex();
+  byId("carouselPosition").textContent = `${index + 1} ${ui("positionOf")} ${cards.length}`;
+  byId("carouselPrevious").disabled = index === 0;
+  byId("carouselNext").disabled = index === cards.length - 1;
+}
+
+function moveCarousel(direction) {
+  const grid = byId("propertyGrid");
+  const cards = carouselCards();
+  const target = cards[Math.max(0, Math.min(cards.length - 1, activeCarouselIndex() + direction))];
+  if (!target) return;
+  grid.scrollTo({ left: grid.scrollLeft + target.getBoundingClientRect().left - grid.getBoundingClientRect().left, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+}
+
 function openProperty(property) {
   byId("dialogCategory").textContent = property.category || ui("property");
   byId("dialogTitle").textContent = localized(property.title);
   byId("dialogLocation").textContent = property.location?.label || "";
   byId("dialogPrice").textContent = property.priceLabel || "";
   byId("dialogDescription").textContent = localized(property.description) || localized(property.summary);
+  byId("dialogPlace").textContent = property.location?.label || "";
+  const highlights = byId("dialogHighlights");
+  clear(highlights);
+  const points = property.highlights?.[state.language] || property.highlights?.["pt-BR"] || property.highlights?.en || [];
+  if (Array.isArray(points)) points.filter((point) => typeof point === "string" && point.trim()).forEach((point) => {
+    const item = document.createElement("li");
+    item.textContent = point;
+    highlights.append(item);
+  });
+  highlights.hidden = !highlights.childElementCount;
   const facts = byId("dialogFacts");
   clear(facts);
   const entries = [
@@ -328,6 +372,10 @@ function openProperty(property) {
 }
 
 function wireEvents() {
+  byId("carouselPrevious").addEventListener("click", () => moveCarousel(-1));
+  byId("carouselNext").addEventListener("click", () => moveCarousel(1));
+  byId("propertyGrid").addEventListener("scroll", () => requestAnimationFrame(updateCarousel), { passive: true });
+  window.addEventListener("resize", updateCarousel);
   byId("languageToggle").addEventListener("click", () => {
     const allowed = state.site.languages || ["pt-BR"];
     const next = state.language === "pt-BR" && allowed.includes("en") ? "en" : "pt-BR";

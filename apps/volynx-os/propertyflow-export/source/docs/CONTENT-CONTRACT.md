@@ -34,6 +34,7 @@ Each property supports:
   "title": { "pt-BR": "Título", "en": "Title" },
   "summary": { "pt-BR": "Resumo", "en": "Summary" },
   "description": { "pt-BR": "Descrição", "en": "Description" },
+  "highlights": { "pt-BR": ["Diferencial real do imóvel"], "en": ["A real property highlight"] },
   "priceLabel": "R$ 1.000.000",
   "priceAmount": 1000000,
   "location": { "label": "Cidade, UF", "city": "Cidade", "region": "UF", "neighborhood": "Bairro" },
@@ -43,6 +44,8 @@ Each property supports:
 ```
 
 Allowed `listingType` values are `sale` and `rent`.
+
+`highlights` is optional (up to six short statements per language). Add only verified details about that specific listing. On the published site, **Ver detalhes** opens the property's own photo gallery, title, description, highlights, location, facts and contact action. The visual assets behind the two editorial panels are decorative Property Flow artwork, never photographs or floor plans of that listing. Switching templates changes the catalogue layout, not the property information in this dialog.
 
 ## Photos
 

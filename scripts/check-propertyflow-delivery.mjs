@@ -21,8 +21,8 @@ function expect(condition, message) {
   if (!condition) failures.push(message);
 }
 
-expect(manifest.version === "1.1.1", `Expected PropertyFlow manifest v1.1.1, found ${manifest.version || "missing"}.`);
-expect(contract.includes('PROPERTYFLOW_VERSION = "v1.1.1"'), "Shared contract version does not match the manifest.");
+expect(manifest.version === "1.1.3", `Expected PropertyFlow manifest v1.1.3, found ${manifest.version || "missing"}.`);
+expect(contract.includes(`PROPERTYFLOW_VERSION = "v${manifest.version}"`), "Shared contract version does not match the manifest.");
 expect(contract.includes('PROPERTYFLOW_BUCKET = "propertyflow"'), "Shared contract must use the private propertyflow bucket.");
 
 const tierContracts = [

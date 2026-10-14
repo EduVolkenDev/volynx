@@ -12,9 +12,19 @@ const description = "Catálogo de imóveis publicado com Property Flow.";
     <div id="publicSite" hidden>
       <header class="pf-public__header"><a class="pf-public__brand" href="/"><span class="pf-public__mark" id="publicMark">PF</span><span><strong id="publicBrandName">Property Flow</strong><small id="publicBrandTagline">Catálogo de imóveis</small></span></a><span class="pf-public__template" id="publicTemplateLabel"></span></header>
       <section class="pf-public__hero"><div class="pf-public__hero-copy"><span class="pf-public__eyebrow">PROPERTY FLOW</span><h1 id="publicTitle">Encontre o imóvel certo.</h1><p id="publicDescription">Explore imóveis selecionados com clareza, contexto e uma experiência feita para decidir.</p><a class="pf-public__contact" id="publicContact" href="#catalog">Ver imóveis</a></div><div class="pf-public__hero-media" id="publicHeroMedia" role="img" aria-label="Imagem de destaque do catálogo"></div></section>
-      <section class="pf-public__catalog" id="catalog"><div class="pf-public__catalog-head"><div><span class="pf-public__eyebrow">CATÁLOGO</span><h2>Imóveis disponíveis</h2></div><span id="publicCount"></span></div><div class="pf-public__filter-bar"><label class="pf-public__search"><span class="sr-only">Buscar imóveis</span><span aria-hidden="true">⌕</span><input id="publicSearch" type="search" placeholder="Buscar imóvel, cidade ou bairro" autocomplete="off" /></label><div class="pf-public__filters" id="publicFilters" role="group" aria-label="Filtrar imóveis"></div></div><div class="pf-public__map-context" id="publicMapContext" hidden><div class="pf-public__map-grid" aria-hidden="true"></div><div><span class="pf-public__eyebrow">MAP-FIRST</span><h3>Comece pela região.</h3><p>Explore o catálogo por cidade e localização antes de escolher o imóvel.</p></div></div><div class="pf-public__grid" id="publicGrid"></div></section>
+      <section class="pf-public__catalog" id="catalog"><div class="pf-public__catalog-head"><div><span class="pf-public__eyebrow">CATÁLOGO</span><h2>Imóveis disponíveis</h2></div><span id="publicCount"></span></div><div class="pf-public__filter-bar"><label class="pf-public__search"><span class="sr-only">Buscar imóveis</span><span aria-hidden="true">⌕</span><input id="publicSearch" type="search" placeholder="Buscar imóvel, cidade ou bairro" autocomplete="off" /></label><div class="pf-public__filters" id="publicFilters" role="group" aria-label="Filtrar imóveis"></div></div><div class="pf-public__map-context" id="publicMapContext" hidden><div class="pf-public__map-grid" aria-hidden="true"></div><div><span class="pf-public__eyebrow">MAP-FIRST</span><h3>Comece pela região.</h3><p>Explore o catálogo por cidade e localização antes de escolher o imóvel.</p></div></div><div class="pf-public__carousel" id="publicCarousel" hidden><span class="pf-public__carousel-position" id="publicCarouselPosition" aria-live="polite"></span><div class="pf-public__carousel-actions"><button type="button" id="publicCarouselPrevious" aria-label="Imóvel anterior" aria-controls="publicGrid"><span aria-hidden="true">←</span></button><button type="button" id="publicCarouselNext" aria-label="Próximo imóvel" aria-controls="publicGrid"><span aria-hidden="true">→</span></button></div></div><div class="pf-public__grid" id="publicGrid"></div></section>
       <footer class="pf-public__footer" id="contact"><span id="publicFooterBrand">Property Flow</span><span>Powered by VOLYNX</span></footer>
     </div>
+    <dialog class="pf-details" id="publicDetails" aria-labelledby="publicDetailsTitle">
+      <button class="pf-details__close" id="publicDetailsClose" type="button" aria-label="Fechar detalhes">×</button>
+      <div class="pf-details__layout">
+        <div class="pf-details__gallery"><img id="publicDetailsImage" alt="" /><div class="pf-details__thumbs" id="publicDetailsThumbs"></div></div>
+        <div class="pf-details__copy"><span class="pf-public__eyebrow" id="publicDetailsCategory"></span><h2 id="publicDetailsTitle"></h2><strong class="pf-details__price" id="publicDetailsPrice"></strong>
+          <section class="pf-details__panel pf-details__panel--story" id="publicDetailsStory" aria-labelledby="publicDetailsStoryLabel"><img src="/assets/propertyflow/visuals/feature/04-property-key.webp" alt="" aria-hidden="true" loading="lazy" /><div><span class="pf-public__eyebrow" id="publicDetailsStoryLabel">A EXPERIÊNCIA</span><p id="publicDetailsDescription"></p><ul id="publicDetailsHighlights" hidden></ul></div></section>
+          <section class="pf-details__panel pf-details__panel--place" aria-labelledby="publicDetailsPlaceLabel"><img src="/assets/propertyflow/visuals/feature/05-location.webp" alt="" aria-hidden="true" loading="lazy" /><div><span class="pf-public__eyebrow" id="publicDetailsPlaceLabel">O ENDEREÇO</span><strong id="publicDetailsLocation"></strong><dl id="publicDetailsFacts"></dl></div></section>
+        </div>
+      </div>
+    </dialog>
   </main>
 </BaseLayout>
 
@@ -54,6 +64,84 @@ const description = "Catálogo de imóveis publicado com Property Flow.";
     const featureNumber = (property: Property, label: string) => { const features = Array.isArray(property.features) ? property.features : []; const match = features.find((feature) => typeof feature === "string" && feature.toLowerCase().includes(label)); const number = typeof match === "string" ? match.match(/\d+/)?.[0] : undefined; return number ? Number(number) : undefined; };
     const propertyMeta = (property: Property) => ({ beds: property.bedrooms ?? featureNumber(property, "quarto") ?? featureNumber(property, "bed"), baths: property.bathrooms ?? featureNumber(property, "banheiro") ?? featureNumber(property, "bath"), location: property.location?.label || [property.location?.city, property.location?.region].filter(Boolean).join(", ") || "Localização sob consulta" });
     const heroProperty = data.properties.find((property) => property.is_featured) || data.properties[0]; const heroImage = heroProperty?.demo_image || imageUrl(supa, bucket, heroProperty ? coverFor(heroProperty.id, data.images) : undefined); const heroMedia = $("publicHeroMedia"); if (heroMedia) { heroMedia.style.backgroundImage = heroImage ? `linear-gradient(180deg,rgba(5,8,14,.04),rgba(5,8,14,.64)),url('${escapeHtml(heroImage)}')` : ""; heroMedia.setAttribute("aria-label", heroProperty ? `Imagem de destaque: ${heroProperty.title}` : "Imagem de destaque do catálogo"); heroMedia.toggleAttribute("hidden", !heroImage); }
+    const grid = $("publicGrid")!;
+    const carousel = $("publicCarousel")!;
+    const carouselPosition = $("publicCarouselPosition")!;
+    const previous = $("publicCarouselPrevious") as HTMLButtonElement;
+    const next = $("publicCarouselNext") as HTMLButtonElement;
+    const carouselCards = () => [...grid.querySelectorAll<HTMLElement>(".pf-public__card")];
+    const activeCarouselIndex = () => {
+      const cards = carouselCards();
+      const center = grid.getBoundingClientRect().left + grid.clientWidth / 2;
+      return cards.reduce((closest, card, index) => Math.abs(card.getBoundingClientRect().left + card.clientWidth / 2 - center) < Math.abs(cards[closest].getBoundingClientRect().left + cards[closest].clientWidth / 2 - center) ? index : closest, 0);
+    };
+    const updateCarousel = () => {
+      const cards = carouselCards();
+      carousel.hidden = template !== "showroom" || cards.length < 2;
+      if (carousel.hidden) return;
+      const index = activeCarouselIndex();
+      carouselPosition.textContent = `${index + 1} de ${cards.length}`;
+      previous.disabled = index === 0;
+      next.disabled = index === cards.length - 1;
+    };
+    const moveCarousel = (direction: number) => {
+      const cards = carouselCards();
+      const target = cards[Math.max(0, Math.min(cards.length - 1, activeCarouselIndex() + direction))];
+      if (!target) return;
+      grid.scrollTo({ left: grid.scrollLeft + target.getBoundingClientRect().left - grid.getBoundingClientRect().left, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    };
+    previous.addEventListener("click", () => moveCarousel(-1));
+    next.addEventListener("click", () => moveCarousel(1));
+    grid.addEventListener("scroll", () => requestAnimationFrame(updateCarousel), { passive: true });
+    window.addEventListener("resize", updateCarousel);
+    const details = $("publicDetails") as HTMLDialogElement;
+    const closeDetails = $("publicDetailsClose") as HTMLButtonElement;
+    closeDetails.addEventListener("click", () => details.close());
+    details.addEventListener("click", (event) => { if (event.target === details) details.close(); });
+    const openDetails = (property: Property) => {
+      const meta = propertyMeta(property);
+      $("publicDetailsCategory")!.textContent = property.category || "Imóvel";
+      $("publicDetailsTitle")!.textContent = property.title;
+      $("publicDetailsPrice")!.textContent = property.price_label || "Sob consulta";
+      const narrative = property.description || property.summary || "";
+      $("publicDetailsDescription")!.textContent = narrative;
+      $("publicDetailsStory")!.hidden = !narrative;
+      $("publicDetailsLocation")!.textContent = meta.location;
+      const highlights = $("publicDetailsHighlights")!;
+      highlights.replaceChildren();
+      const features = Array.isArray(property.features) ? property.features.filter((feature): feature is string => typeof feature === "string" && !!feature.trim()).slice(0, 6) : [];
+      for (const feature of features) { const item = document.createElement("li"); item.textContent = feature; highlights.append(item); }
+      highlights.hidden = !features.length;
+      const facts = $("publicDetailsFacts")!;
+      facts.replaceChildren();
+      for (const [label, value] of [["Quartos", meta.beds], ["Banheiros", meta.baths]] as const) {
+        if (value === undefined || value === null) continue;
+        const wrapper = document.createElement("div"); const term = document.createElement("dt"); const detail = document.createElement("dd");
+        term.textContent = label; detail.textContent = String(value); wrapper.append(term, detail); facts.append(wrapper);
+      }
+      const gallery = $("publicDetailsThumbs")!;
+      gallery.replaceChildren();
+      const images = data.images.filter((image) => image.property_id === property.id).sort((a, b) => a.sort_order - b.sort_order).map((image) => imageUrl(supa, bucket, image));
+      if (property.demo_image && !images.length) images.push(property.demo_image);
+      const main = $("publicDetailsImage") as HTMLImageElement;
+      const galleryPanel = main.parentElement as HTMLElement;
+      galleryPanel.hidden = !images.length;
+      galleryPanel.parentElement?.classList.toggle("pf-details__layout--no-gallery", !images.length);
+      if (images.length) { main.src = images[0]; main.alt = `${property.title} — foto 1`; }
+      images.forEach((src, index) => {
+        const button = document.createElement("button"); button.type = "button"; button.setAttribute("aria-label", `Ver foto ${index + 1} de ${images.length}`);
+        const image = document.createElement("img"); image.src = src; image.alt = ""; image.loading = "lazy"; button.append(image);
+        button.addEventListener("click", () => { main.src = src; main.alt = `${property.title} — foto ${index + 1}`; });
+        gallery.append(button);
+      });
+      details.showModal();
+    };
+    grid.addEventListener("click", (event) => {
+      const button = (event.target as HTMLElement).closest<HTMLButtonElement>("[data-open-property]");
+      if (!button) return;
+      const property = data.properties.find((item) => item.id === button.dataset.openProperty);
+      if (property) openDetails(property);
+    });
     const renderGrid = (category = "all", query = "") => {
       const normalizedQuery = query.trim().toLocaleLowerCase();
       const properties = data.properties.filter((property) => {
@@ -66,20 +154,21 @@ const description = "Catálogo de imóveis publicado com Property Flow.";
         const meta = propertyMeta(property);
         const stats = [meta.beds ? `${meta.beds} quartos` : "", meta.baths ? `${meta.baths} banheiros` : "", property.yield ? `yield ${property.yield}` : ""].filter(Boolean).join("  ·  ");
         const style = image ? ` style="background-image:linear-gradient(180deg,rgba(6,10,18,.08),rgba(6,10,18,.86)),url('${escapeHtml(image)}')"` : "";
-        return `<article class="pf-public__card" data-property-card data-category="${escapeHtml(property.category || "Imóvel")}" data-timeline-index="${index + 1}" style="--card-index:${index}"><div class="pf-public__image" role="img" aria-label="Imagem de ${escapeHtml(property.title)}"${style}><div class="pf-public__image-top"><span>${escapeHtml(property.category || "Imóvel")}</span>${property.is_featured ? `<strong>Em destaque</strong>` : ""}</div><div class="pf-public__image-meta"><small>${escapeHtml(meta.location)}</small><h3>${escapeHtml(property.title)}</h3><div><b>${escapeHtml(property.price_label || "Sob consulta")}</b><span>${escapeHtml(stats || listingLabel(property.listing_type))}</span></div></div>${!image ? `<strong class="pf-public__image-placeholder">${escapeHtml((property.title || "P").slice(0, 1).toUpperCase())}</strong>` : ""}</div><div class="pf-public__card-body"><p>${escapeHtml(property.summary || property.description || "Conheça os detalhes deste imóvel.")}</p><div class="pf-public__card-foot"><span>${escapeHtml(listingLabel(property.listing_type))}</span><a href="#contact">Tenho interesse</a></div></div></article>`;
+        return `<article class="pf-public__card" data-property-card data-category="${escapeHtml(property.category || "Imóvel")}" data-timeline-index="${index + 1}" style="--card-index:${index}"><div class="pf-public__image" role="img" aria-label="Imagem de ${escapeHtml(property.title)}"${style}><div class="pf-public__image-top"><span>${escapeHtml(property.category || "Imóvel")}</span>${property.is_featured ? `<strong>Em destaque</strong>` : ""}</div><div class="pf-public__image-meta"><small>${escapeHtml(meta.location)}</small><h3>${escapeHtml(property.title)}</h3><div><b>${escapeHtml(property.price_label || "Sob consulta")}</b><span>${escapeHtml(stats || listingLabel(property.listing_type))}</span></div></div>${!image ? `<strong class="pf-public__image-placeholder">${escapeHtml((property.title || "P").slice(0, 1).toUpperCase())}</strong>` : ""}</div><div class="pf-public__card-body"><p>${escapeHtml(property.summary || property.description || "")}</p><div class="pf-public__card-foot"><span>${escapeHtml(listingLabel(property.listing_type))}</span><button type="button" data-open-property="${escapeHtml(property.id)}">Ver detalhes</button></div></div></article>`;
       };
-      const grid = $("publicGrid")!;
-      if (!properties.length) { grid.innerHTML = `<div class="pf-public__empty">Nenhum imóvel encontrado nesta busca.</div>`; return; }
+      if (!properties.length) { grid.innerHTML = `<div class="pf-public__empty">Nenhum imóvel encontrado nesta busca.</div>`; updateCarousel(); return; }
       if (template === "grouped") {
         const groups = properties.reduce((map, property) => { const key = property.category || "Imóveis"; const group = map.get(key) || []; group.push(property); map.set(key, group); return map; }, new Map<string, Property[]>());
         grid.innerHTML = [...groups.entries()].map(([name, group]) => `<section class="pf-public__group"><h3>${escapeHtml(name)}</h3><div class="pf-public__group-grid">${group.map((property, index) => cardMarkup(property, index)).join("")}</div></section>`).join("");
       } else {
         grid.innerHTML = properties.map(cardMarkup).join("");
       }
+      grid.scrollLeft = 0;
+      updateCarousel();
     };
     const rerender = () => renderGrid(filters.querySelector<HTMLButtonElement>("button.is-active")?.dataset.category || "all", search?.value || "");
     renderGrid(); filters.querySelectorAll<HTMLButtonElement>("button").forEach((button) => button.addEventListener("click", () => { filters.querySelectorAll("button").forEach((item) => item.classList.toggle("is-active", item === button)); rerender(); })); search?.addEventListener("input", rerender);
-    $("publicLoading")!.hidden = true; $("publicSite")!.hidden = false;
+    $("publicLoading")!.hidden = true; $("publicSite")!.hidden = false; requestAnimationFrame(updateCarousel);
   }
   async function boot() {
     try {
@@ -157,6 +246,14 @@ const description = "Catálogo de imóveis publicado com Property Flow.";
   .pf-public[data-template="story-mode"] :global(.pf-public__card):nth-child(even) .pf-public__image { order: 2; }
   .pf-public[data-template="story-mode"] :global(.pf-public__card-body) { align-content: center; padding: clamp(26px, 5vw, 58px); }
   .pf-public[data-template="showroom"] .pf-public__grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 18px; }
+  .pf-public__carousel { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 16px; }
+  .pf-public__carousel[hidden] { display: none; }
+  .pf-public__carousel-position { color: var(--pf-public-primary); font-size: 13px; font-weight: 800; letter-spacing: .08em; }
+  .pf-public__carousel-actions { display: flex; gap: 10px; }
+  .pf-public__carousel-actions button { display: grid; width: 48px; height: 48px; place-items: center; border: 1px solid color-mix(in srgb, var(--pf-public-primary) 55%, transparent); border-radius: 50%; background: color-mix(in srgb, var(--pf-public-primary) 12%, var(--pf-public-surface)); color: var(--pf-public-ink); cursor: pointer; font-size: 23px; transition: background .2s ease, transform .2s ease; }
+  .pf-public__carousel-actions button:hover:not(:disabled) { background: var(--pf-public-primary); color: #071119; transform: translateY(-2px); }
+  .pf-public__carousel-actions button:focus-visible { outline: 3px solid var(--pf-public-primary); outline-offset: 3px; }
+  .pf-public__carousel-actions button:disabled { opacity: .35; cursor: not-allowed; }
   .pf-public[data-template="showroom"] :global(.pf-public__card) { min-width: min(720px, 82vw); scroll-snap-align: start; }
   .pf-public[data-template="showroom"] :global(.pf-public__image) { min-height: 470px; }
   .pf-public[data-template="card-stack"] .pf-public__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px 16px; padding: 10px 10px 30px; align-items: start; }
@@ -259,6 +356,44 @@ const description = "Catálogo de imóveis publicado com Property Flow.";
   .pf-public[data-template="catalog"] .pf-public__hero-media { display: none; }
   .pf-public[data-template="catalog"] .pf-public__hero h1 { max-width: 880px; font-size: clamp(2.8rem, 6vw, 6.2rem); }
   .pf-public[data-template="catalog"] .pf-public__catalog-head { padding: 14px 18px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04); }
+
+  :global(.pf-public__card-foot button) { min-height: 40px; padding: 0 12px; border: 1px solid color-mix(in srgb, var(--pf-public-primary) 46%, transparent); border-radius: 999px; background: color-mix(in srgb, var(--pf-public-primary) 10%, transparent); color: var(--pf-public-ink); font: inherit; font-size: 12px; font-weight: 850; cursor: pointer; }
+  :global(.pf-public__card-foot button:hover) { background: var(--pf-public-primary); color: #071119; }
+  :global(.pf-public__card-foot button:focus-visible) { outline: 3px solid var(--pf-public-primary); outline-offset: 3px; }
+  .pf-details { width: min(1140px, calc(100% - 28px)); max-height: calc(100dvh - 28px); overflow: auto; padding: 0; border: 1px solid rgba(255,255,255,.18); border-radius: 28px; background: #0d121c; color: var(--pf-public-ink); box-shadow: 0 34px 120px rgba(0,0,0,.65); }
+  .pf-details::backdrop { background: rgba(3,5,9,.8); backdrop-filter: blur(12px); }
+  .pf-details__close { position: sticky; z-index: 3; top: 14px; left: calc(100% - 58px); display: grid; width: 44px; height: 44px; place-items: center; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; background: rgba(8,11,18,.9); color: #fff; font: inherit; font-size: 26px; cursor: pointer; }
+  .pf-details__layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, .92fr); gap: 28px; padding: 0 26px 30px; }
+  .pf-details__layout--no-gallery { grid-template-columns: minmax(0, 1fr); }
+  .pf-details__gallery, .pf-details__copy { min-width: 0; }
+  .pf-details__gallery > img { display: block; width: 100%; aspect-ratio: 4 / 3; border-radius: 20px; object-fit: cover; background: var(--pf-public-surface); }
+  .pf-details__thumbs { display: flex; gap: 9px; overflow-x: auto; margin-top: 10px; padding-bottom: 5px; }
+  :global(.pf-details__thumbs button) { width: 82px; height: 62px; flex: 0 0 auto; overflow: hidden; padding: 0; border: 1px solid rgba(255,255,255,.18); border-radius: 10px; background: transparent; cursor: pointer; }
+  :global(.pf-details__thumbs button:focus-visible), .pf-details__close:focus-visible { outline: 3px solid var(--pf-public-primary); outline-offset: 3px; }
+  :global(.pf-details__thumbs img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .pf-details__copy { padding: 12px 4px; }
+  .pf-details__copy h2 { margin: 10px 0 18px; font-size: clamp(2rem, 4vw, 3.5rem); line-height: 1; letter-spacing: -.06em; overflow-wrap: anywhere; }
+  .pf-details__price { display: block; margin-bottom: 24px; color: var(--pf-public-primary); font-size: 1.5rem; }
+  .pf-details__panel { position: relative; isolation: isolate; overflow: hidden; border: 1px solid color-mix(in srgb, var(--pf-public-primary) 24%, rgba(255,255,255,.1)); border-radius: 24px; background: radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--pf-public-primary) 15%, transparent), transparent 65%), var(--pf-public-surface); }
+  .pf-details__panel::before { position: absolute; z-index: -1; inset: 0; content: ""; background: linear-gradient(90deg, rgba(10,14,22,.96), rgba(10,14,22,.86) 54%, rgba(10,14,22,.24)); pointer-events: none; }
+  .pf-details__panel > img { position: absolute; z-index: -2; width: 58%; height: 110%; object-fit: contain; opacity: .75; pointer-events: none; }
+  .pf-details__panel > div { position: relative; z-index: 1; max-width: 74%; }
+  .pf-details__panel--story { min-height: 245px; padding: 30px; }
+  .pf-details__panel--story > img { top: 50%; right: -35px; transform: translateY(-50%); }
+  .pf-details__panel p { margin: 17px 0 0; line-height: 1.65; white-space: pre-line; text-wrap: pretty; }
+  .pf-details__panel ul { display: grid; gap: 10px; margin: 20px 0 0; padding: 18px 0 0; border-top: 1px solid rgba(255,255,255,.14); list-style: none; }
+  :global(.pf-details__panel li) { display: flex; gap: 10px; color: rgba(247,248,252,.85); font-size: 13px; line-height: 1.45; }
+  :global(.pf-details__panel li::before) { content: ""; width: 6px; height: 6px; flex: 0 0 auto; margin-top: .55em; border-radius: 50%; background: var(--pf-public-primary); }
+  .pf-details__panel--place { min-height: 190px; margin-top: 12px; padding: 26px 30px; }
+  .pf-details__panel--place > img { right: -18px; bottom: -66px; height: 150%; }
+  .pf-details__panel--place strong { display: block; margin-top: 10px; font-size: 1.13rem; }
+  .pf-details__panel dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 22px 0 0; }
+  :global(.pf-details__panel dl > div) { padding-top: 10px; border-top: 1px solid rgba(255,255,255,.16); }
+  :global(.pf-details__panel dt) { color: rgba(247,248,252,.6); font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  :global(.pf-details__panel dd) { margin: 5px 0 0; font-weight: 850; }
+  @media (max-width: 900px) { .pf-details__layout { grid-template-columns: 1fr; } }
+  @media (max-width: 620px) { .pf-details { border-radius: 20px; } .pf-details__layout { padding: 0 16px 22px; } .pf-details__gallery > img { border-radius: 14px; } .pf-details__panel { border-radius: 18px; } .pf-details__panel--story, .pf-details__panel--place { padding: 23px; } .pf-details__panel > div { max-width: 82%; } .pf-details__panel > img { right: -70px; width: 76%; opacity: .54; } }
+  @media (max-width: 760px) { .pf-public[data-template="compact-list"] .pf-public__filter-bar { grid-template-columns: minmax(0, 1fr); } }
 
   @media (max-width: 760px) { .pf-public__header, .pf-public__hero, .pf-public__catalog, .pf-public__footer { width: min(100% - 24px, 1180px); } .pf-public__hero { grid-template-columns: 1fr; align-items: start; gap: 30px; padding: 58px 0 54px; } .pf-public__hero h1 { font-size: clamp(3rem, 16vw, 5rem); } .pf-public__hero-media { min-height: 68vw; border-radius: 26px; } .pf-public__grid { grid-template-columns: 1fr; } .pf-public[data-template="editorial"] :global(.pf-public__card):first-child, .pf-public[data-template="story-mode"] :global(.pf-public__card):first-child, .pf-public[data-template="showroom"] :global(.pf-public__card):first-child, .pf-public[data-template="magazine"] :global(.pf-public__card):first-child, .pf-public[data-template="gallery-hero"] :global(.pf-public__card):first-child, .pf-public[data-template="map-first"] :global(.pf-public__card):first-child, .pf-public[data-template="grouped"] :global(.pf-public__card):first-child { grid-column: auto; } .pf-public[data-template="compact-list"] :global(.pf-public__card), .pf-public[data-template="catalog"] :global(.pf-public__card), .pf-public[data-template="timeline"] :global(.pf-public__card) { display: block; } .pf-public[data-template="masonry"] .pf-public__grid { column-count: 1; } .pf-public[data-template="split-view"] .pf-public__grid { grid-template-columns: 1fr; } .pf-public__footer { flex-direction: column; } }
   @media (max-width: 760px) { .pf-public__map-context { grid-template-columns: 1fr; } .pf-public__map-grid { min-height: 150px; } .pf-public[data-template="magazine"] .pf-public__grid, .pf-public[data-template="card-stack"] .pf-public__grid, .pf-public__group-grid { grid-template-columns: 1fr; } .pf-public[data-template="magazine"] :global(.pf-public__card):first-child, .pf-public[data-template="magazine"] :global(.pf-public__card):not(:first-child) { grid-column: auto; grid-row: auto; } .pf-public[data-template="magazine"] :global(.pf-public__card):first-child .pf-public__image { min-height: 70vw; } .pf-public[data-template="gallery-hero"] :global(.pf-public__card):first-child, .pf-public[data-template="story-mode"] :global(.pf-public__card), .pf-public[data-template="split-view"] :global(.pf-public__card) { display: block; min-height: 0; } .pf-public[data-template="compact-list"] :global(.pf-public__card) { display: grid; grid-template-columns: 96px minmax(0, 1fr); min-height: 0; } .pf-public[data-template="compact-list"] :global(.pf-public__image) { min-height: 128px; } .pf-public[data-template="compact-list"] :global(.pf-public__card-body) { gap: 8px; padding: 12px; } .pf-public[data-template="catalog"] :global(.pf-public__card) { display: grid; grid-template-columns: 112px minmax(0, 1fr); min-height: 0; } .pf-public[data-template="catalog"] :global(.pf-public__image) { min-height: 150px; } .pf-public[data-template="catalog"] :global(.pf-public__card-body) { padding: 14px; } .pf-public[data-template="timeline"] :global(.pf-public__card) { display: block; min-height: 0; } .pf-public[data-template="timeline"] :global(.pf-public__image) { min-height: 220px; } .pf-public[data-template="card-stack"] :global(.pf-public__image) { min-height: 230px; } .pf-public[data-template="card-stack"] :global(.pf-public__card) { transform: none; } .pf-public[data-template="gallery-hero"] :global(.pf-public__card):first-child .pf-public__image { min-height: 70vw; } .pf-public[data-template="story-mode"] :global(.pf-public__card):nth-child(even) .pf-public__image, .pf-public[data-template="split-view"] :global(.pf-public__card):nth-child(even) .pf-public__image { order: initial; } .pf-public[data-template="timeline"] .pf-public__grid { padding-left: 0; } .pf-public[data-template="timeline"] .pf-public__grid::before, .pf-public[data-template="timeline"] :global(.pf-public__card)::before { display: none; } .pf-public[data-template="showroom"] :global(.pf-public__card) { min-width: 88vw; } .pf-public[data-template="showroom"] :global(.pf-public__image) { min-height: 70vw; } }

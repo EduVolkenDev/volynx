@@ -8,11 +8,14 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(scriptDir, "..");
 const sourceDir = path.join(root, "apps/volynx-os/propertyflow-export/source");
 const storageDir = path.join(root, "apps/volynx-os/storage/propertyflow");
-const manifestPath = path.join(root, "apps/volynx-os/public/downloads/propertyflow/manifest.json");
+// Stage the next release independently; never overwrite published buyer archives.
+const manifestPath = path.join(storageDir, "propertyflow-v1.1.3-release-manifest.json");
 const licensePath = path.join(root, "apps/volynx-os/content/propertyflow-docs/license.md");
 const canonicalCatalogPath = path.join(root, "apps/volynx-os/content/propertyflow.ts");
+const visualAssetsDir = path.join(root, "public/assets/propertyflow/visuals");
 const checkOnly = process.argv.includes("--check");
-const version = "1.1.1";
+const version = "1.1.3";
+const auditBundleName = `propertyflow-complete-v${version}.zip`;
 
 const templates = [
   ["classic-grid", "Classic Grid"], ["magazine", "Magazine"], ["compact-list", "Compact List"],
@@ -71,12 +74,17 @@ This is a complete standalone static property website. It does not need a VOLYNX
 - Responsive bilingual property catalogue.
 - Local brand, contact, property and photo configuration.
 - Search, category and sale/rent filters.
-- Property gallery and accessible details dialog.
+- Accessible details dialog with actual listing photos, tailored highlights, location, facts and two Property Flow editorial art panels.
 - WhatsApp and email contact actions.
 - ${available.length} licensed templates for the ${tier.label} tier.
 - Local validation, preview and production build scripts with no external runtime dependency.
+- 30 web-ready Property Flow visuals in \`assets/propertyflow/visuals/\`; two are already integrated into the details dialog and the rest are available for customization.
 
 ${tier.rights}
+
+## What opens after purchase
+
+The hosted Property Flow workspace is the guided editing and publication path. This ZIP is the optional self-hosted source: \`npm run dev\` opens a working sample site with clearly fictional demo listings. Replace their content and photos before going live. On the public site, **View details** opens the selected property's actual gallery, description, optional verified highlights, location and facts in Property Flow's editorial panels. The decorative artwork in those panels does not depict the listed home. This ZIP does not synchronize with your hosted workspace.
 
 ## Start locally
 
@@ -94,8 +102,9 @@ Open http://127.0.0.1:4173. No \`npm install\` is required because this export u
 1. Edit \`content/site.json\` with the company name, colors, contacts and default template.
 2. Edit \`content/properties.json\` with the real catalogue.
 3. Put optimized WebP or AVIF photos in \`images/\` and reference them with local paths.
-4. Run \`npm run validate\` after every content change.
-5. Set \`template.showSelector\` to \`false\` before launch if visitors should not see the preview selector.
+4. Add verified, property-specific \`highlights\` where useful. The details dialog already uses two decorative assets; the remaining visual library can support custom editorial sections. None are a substitute for real property photos. See \`docs/VISUAL-ASSETS.md\`.
+5. Run \`npm run validate\` after every content change.
+6. Set \`template.showSelector\` to \`false\` before launch if visitors should not see the preview selector.
 
 The full data shape is documented in [docs/CONTENT-CONTRACT.md](docs/CONTENT-CONTRACT.md).
 
@@ -133,6 +142,7 @@ async function sourceEntriesForTier(tierId) {
   for (const [relative, buffer] of await walk(sourceDir)) {
     if (relative === "content/site.json") {
       const site = buffer.toString("utf8")
+        .replace("__EXPORT_VERSION__", version)
         .replace("__TIER__", tierId)
         .replace("__SHOW_POWERED_BY__", String(tier.attribution))
         .replace("__AVAILABLE_TEMPLATES__", JSON.stringify(available));
@@ -141,6 +151,9 @@ async function sourceEntriesForTier(tierId) {
       entries.push([relative, buffer]);
     }
   }
+  const visualAssets = await walk(visualAssetsDir);
+  if (visualAssets.length !== 30) throw new Error(`Expected 30 Property Flow visuals, found ${visualAssets.length}`);
+  for (const [relative, buffer] of visualAssets) entries.push([`assets/propertyflow/visuals/${relative}`, buffer]);
   for (const [filename, relative] of imageSources) entries.push([`images/${filename}`, await readFile(path.join(root, relative))]);
   entries.push(["LICENSE.md", await readFile(licensePath)]);
   entries.push(["README.md", Buffer.from(readmeFor(tierId, tier, available))]);
@@ -187,14 +200,15 @@ async function inspectArchive(tierId, buffer) {
   const tier = tiers[tierId];
   const expectedTemplates = templates.slice(0, tier.count).map(([key]) => key);
   const zip = await JSZip.loadAsync(buffer);
-  const required = ["index.html", "assets/app.js", "assets/styles.css", "content/site.json", "content/properties.json", "scripts/validate.mjs", "scripts/build.mjs", "scripts/serve.mjs", "README.md", "LICENSE.md", "EXPORT-MANIFEST.json", ...imageSources.map(([name]) => `images/${name}`)];
+  const required = ["index.html", "assets/app.js", "assets/styles.css", "content/site.json", "content/properties.json", "scripts/validate.mjs", "scripts/build.mjs", "scripts/serve.mjs", "docs/VISUAL-ASSETS.md", "README.md", "LICENSE.md", "EXPORT-MANIFEST.json", ...imageSources.map(([name]) => `images/${name}`)];
   const missing = required.filter((entry) => !zip.file(entry));
   if (missing.length) throw new Error(`${tierId} archive missing: ${missing.join(", ")}`);
   const names = Object.keys(zip.files);
   const forbidden = names.filter((name) => /(^|\/)(\.env|supabase|stripe|node_modules)(\/|$)/i.test(name));
   if (forbidden.length) throw new Error(`${tierId} archive contains private/runtime paths: ${forbidden.join(", ")}`);
   const site = JSON.parse(await zip.file("content/site.json").async("string"));
-  if (site.tier !== tierId || JSON.stringify(site.template.available) !== JSON.stringify(expectedTemplates)) throw new Error(`${tierId} tier/template contract mismatch`);
+  if (site.tier !== tierId || site.exportVersion !== version || JSON.stringify(site.template.available) !== JSON.stringify(expectedTemplates)) throw new Error(`${tierId} tier/template/version contract mismatch`);
+  if (names.filter((name) => name.startsWith("assets/propertyflow/visuals/") && name.endsWith(".webp")).length !== 30) throw new Error(`${tierId} archive must contain exactly 30 visual assets`);
   const textNames = names.filter((name) => /\.(html|js|css|json|md)$/i.test(name));
   for (const name of textNames) {
     const value = await zip.file(name)?.async("string");
@@ -214,13 +228,13 @@ async function verifyExisting() {
     if (!expectedHash || expectedHash !== sha256(buffer)) throw new Error(`${filename} checksum does not match manifest`);
     console.log(`${filename}: ${buffer.length} bytes, ${inspected.entries} files, ${inspected.templates} templates, checksum verified.`);
   }
-  const complete = await readFile(path.join(storageDir, "propertyflow-complete-FINAL.zip"));
+  const complete = await readFile(path.join(storageDir, auditBundleName));
   if (manifest.sourceBytes !== complete.length || manifest.sourceSha256 !== sha256(complete)) throw new Error("Complete audit bundle does not match manifest");
   const completeZip = await JSZip.loadAsync(complete);
   for (const tierId of Object.keys(tiers)) {
     if (!completeZip.file(`archives/${archiveName(tierId)}`)) throw new Error(`Complete audit bundle missing ${tierId}`);
   }
-  console.log(`propertyflow-complete-FINAL.zip: ${complete.length} bytes, audit bundle verified.`);
+  console.log(`${auditBundleName}: ${complete.length} bytes, audit bundle verified.`);
 }
 
 async function generate() {
@@ -247,7 +261,7 @@ async function generate() {
     console.log(`Generated ${filename} (${buffer.length} bytes).`);
   }
 
-  const publicManifest = { product: "propertyflow", version, generatedAt, source: "propertyflow-complete-FINAL.zip", sourceBytes: 0, sourceSha256: "", tiers: tierOutput };
+  const publicManifest = { product: "propertyflow", version, generatedAt, status: "staged-not-published", source: auditBundleName, sourceBytes: 0, sourceSha256: "", tiers: tierOutput };
   const complete = new JSZip();
   complete.file("README.md", `# Property Flow export audit bundle\n\nGenerated ${generatedAt}. Contains the three autonomous static tier archives and their public delivery manifest. This bundle is for release auditing; buyers receive only the archive licensed for their tier.\n`);
   for (const [tierId, buffer] of Object.entries(archiveBuffers)) complete.file(`archives/${archiveName(tierId)}`, buffer, { date: new Date("2026-09-16T00:00:00.000Z") });
@@ -260,9 +274,9 @@ async function generate() {
   const completeBuffer = await complete.generateAsync({ type: "nodebuffer", compression: "DEFLATE", compressionOptions: { level: 9 }, platform: "UNIX" });
   publicManifest.sourceBytes = completeBuffer.length;
   publicManifest.sourceSha256 = sha256(completeBuffer);
-  await writeFile(path.join(storageDir, "propertyflow-complete-FINAL.zip"), completeBuffer);
+  await writeFile(path.join(storageDir, auditBundleName), completeBuffer);
   await writeFile(manifestPath, `${JSON.stringify(publicManifest, null, 2)}\n`);
-  console.log(`Generated propertyflow-complete-FINAL.zip (${completeBuffer.length} bytes).`);
+  console.log(`Generated ${auditBundleName} (${completeBuffer.length} bytes).`);
 }
 
 if (checkOnly) await verifyExisting();
