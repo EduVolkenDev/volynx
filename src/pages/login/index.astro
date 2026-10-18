@@ -32,6 +32,16 @@ import { ROUTES } from "../../data/routes";
             </div>
             <button type="submit" id="submitBtn" class="button button--gold" style="width:100%;justify-content:center;" data-i18n="login2.btn_signin">Sign in</button>
             <p id="msg" class="msg" aria-live="polite"></p>
+            <div class="login-alternatives" id="loginAlternatives" aria-labelledby="loginAlternativesTitle" hidden>
+              <p class="login-alternatives__title" id="loginAlternativesTitle"><span class="i18n-en">Other ways to enter</span><span class="i18n-pt">Outras formas de entrar</span></p>
+              <div class="login-alternatives__grid">
+                <button type="button" id="googleSignInBtn" class="button button--ghost login-alternatives__button" disabled><span class="login-alternatives__symbol" aria-hidden="true">G</span><span><span class="i18n-en">Continue with Google</span><span class="i18n-pt">Continuar com Google</span></span></button>
+                <button type="button" id="appleSignInBtn" class="button button--ghost login-alternatives__button" disabled><span><span class="i18n-en">Continue with Apple</span><span class="i18n-pt">Continuar com Apple</span></span></button>
+                <button type="button" id="passkeySignInBtn" class="button button--ghost login-alternatives__button login-alternatives__button--wide" disabled><span class="login-alternatives__symbol" aria-hidden="true">✦</span><span><span class="i18n-en">Sign in with a passkey</span><span class="i18n-pt">Entrar com chave de acesso</span></span></button>
+              </div>
+              <p class="login-alternatives__hint"><span class="i18n-en">A passkey can use your device's face scan, fingerprint, PIN, or password manager. Save one in your profile after signing in.</span><span class="i18n-pt">A chave de acesso pode usar reconhecimento facial, digital, PIN ou gerenciador de senhas. Salve uma no perfil depois de entrar.</span></p>
+              <p id="loginAlternativesStatus" class="login-alternatives__status" role="status" aria-live="polite"></p>
+            </div>
             <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;">
               <a href={ROUTES.authRecover} style="color:var(--muted);transition:color .15s;" data-i18n="login2.forgot">Forgot password?</a>
               <a href={ROUTES.signup} style="color:var(--cyan);transition:color .15s;" data-i18n="login2.create_account">Create account</a>
@@ -63,13 +73,26 @@ import { ROUTES } from "../../data/routes";
       } catch (_) {}
     })();
   </script>
-  <script is:inline type="module" src="/scripts/auth-login.js"></script>
+  <script is:inline src="/vendor/supabase-js-2.118.0/supabase.js"></script>
+  <script is:inline type="module" src="/scripts/auth-login.js?v=20261018"></script>
 </FlagshipLayout>
 
 <style>
   .msg{ min-height: 18px; margin: 0; font-size: 13px; }
   .msg.err{ color: rgba(255, 140, 140, .95); }
   .msg.ok{ color: rgba(140, 255, 210, .92); }
+  .login-alternatives { display: grid; gap: 12px; margin: 8px 0; padding-top: 18px; border-top: 1px solid var(--line); }
+  .login-alternatives[hidden], .login-alternatives__button[hidden] { display: none; }
+  .login-alternatives__title { margin: 0; color: #f3f3f7; font-size: .86rem; font-weight: 700; }
+  .login-alternatives__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .login-alternatives__button { min-height: 52px; width: 100%; justify-content: center; gap: 10px; text-align: center; line-height: 1.25; }
+  .login-alternatives__button--wide { grid-column: 1 / -1; }
+  .login-alternatives__button:disabled { cursor: not-allowed; opacity: .55; }
+  .login-alternatives__button:not(:disabled):focus-visible { outline: 2px solid #b8e9ff; outline-offset: 3px; }
+  .login-alternatives__symbol { display: inline-grid; place-items: center; width: 25px; height: 25px; flex: 0 0 auto; border-radius: 50%; background: rgba(255,255,255,.1); color: #f6dba1; font-weight: 800; }
+  .login-alternatives__hint, .login-alternatives__status { margin: 0; color: var(--muted); font-size: .78rem; line-height: 1.5; }
+  .login-alternatives__status { min-height: 1.5em; }
+  @media (max-width: 520px) { .login-alternatives__grid { grid-template-columns: 1fr; } .login-alternatives__button--wide { grid-column: auto; } }
   .account-hero{ padding-top: clamp(40px, 6vw, 80px); padding-bottom: clamp(40px, 6vw, 80px); }
 
   .session-expired {

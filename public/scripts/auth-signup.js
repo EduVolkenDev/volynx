@@ -120,18 +120,8 @@ function trackSignupEvent(event, detail) {
 }
 
 function persistSession(session, email) {
-  localStorage.setItem("volynx_access_token", session.access_token || "");
-  localStorage.setItem("volynx_refresh_token", session.refresh_token || "");
-  localStorage.setItem("volynx_user_email", email || session?.user?.email || "");
-  localStorage.setItem("volynx_session", JSON.stringify({
-    access_token: session.access_token || "",
-    refresh_token: session.refresh_token || "",
-    expires_at: session.expires_at || null,
-    expires_in: session.expires_in || null,
-    user: session.user || null
-  }));
-  // Mirror tokens to cross-subdomain cookies so daily.volynx.world / cvitae.volynx.world see the session
-  if (window.VxAuthBridge) window.VxAuthBridge.sync();
+  if (!window.VxAuthBridge?.persistSession) throw new Error("Authentication is unavailable. Please refresh.");
+  window.VxAuthBridge.persistSession(session, email);
 }
 
 function showCheckEmail(email, { autoConfirmed = false } = {}) {
@@ -230,8 +220,9 @@ function showCheckEmail(email, { autoConfirmed = false } = {}) {
       });
 
       // Rare: auto-login when email confirmation is disabled
-      if (out?.session?.access_token) {
-        persistSession(out.session, email);
+      const session = out?.session?.access_token ? out.session : out?.access_token ? out : null;
+      if (session?.access_token && session.refresh_token) {
+        persistSession(session, email);
         trackSignupEvent("signup_completed", { label: "auto_confirmed" });
         setMsg(msg, t("signup.msg_created", "Account created. Redirecting..."), "ok");
         const redirect = resolveRedirect();

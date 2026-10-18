@@ -18,7 +18,7 @@ const jszipTarget = join(root, "public", "vendor", "jszip-3.10.1");
 const heic2anyTarget = join(root, "public", "vendor", "heic2any-0.0.4");
 const ortTarget = join(root, "public", "vendor", "onnxruntime-web-1.21.0");
 const qrCodeStylingTarget = join(root, "public", "vendor", "qr-code-styling-1.9.2");
-const supabaseTarget = join(root, "public", "vendor", "supabase-js-2.101.1");
+const supabaseTarget = join(root, "public", "vendor", "supabase-js-2.118.0");
 const manifestTarget = join(root, "public", "lab-assets.json");
 
 await Promise.all([
@@ -110,10 +110,10 @@ const manifest = {
   auth: {
     realtimeFallback: {
       library: "@supabase/supabase-js",
-      version: "2.101.1",
+      version: "2.118.0",
       license: "MIT",
       local: true,
-      script: await fileMeta("/vendor/supabase-js-2.101.1/supabase.js"),
+      script: await fileMeta("/vendor/supabase-js-2.118.0/supabase.js"),
     },
   },
   imageSuite: {

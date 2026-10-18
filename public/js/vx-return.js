@@ -3,7 +3,7 @@
   'use strict';
 
   var STORAGE_KEY = 'volynx_post_login_next';
-  var AUTH_PATHS = ['/login/', '/signup/', '/auth/confirm/', '/auth/recover/'];
+  var AUTH_PATHS = ['/login/', '/signup/', '/auth/confirm/', '/auth/recover/', '/auth/oauth/'];
 
   function safePath(value) {
     if (typeof value !== 'string') return '';

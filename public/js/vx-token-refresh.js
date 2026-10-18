@@ -54,8 +54,11 @@
     try {
       localStorage.removeItem(ACCESS_KEY);
       localStorage.removeItem(REFRESH_KEY);
+      localStorage.removeItem("volynx_user_email");
       localStorage.removeItem("volynx_session");
     } catch (_) {}
+    // A revoked session must not be restored from a sibling subdomain's cookie.
+    try { window.VxAuthBridge?.clear(); } catch (_) {}
     try {
       document.documentElement.classList.remove("vx-authed");
     } catch (_) {}
@@ -87,7 +90,8 @@
         if (!res.ok) {
           // Refresh token itself is dead — wipe the slate so no further
           // 401s fire, the user just goes through /login/ next time.
-          if (res.status === 400 || res.status === 401) {
+          if ((res.status === 400 || res.status === 401)
+            && localStorage.getItem(REFRESH_KEY) === refreshToken) {
             clearAuth();
           }
           throw new Error("refresh " + res.status);
@@ -97,6 +101,11 @@
       .then(function (data) {
         if (!data || !data.access_token) {
           throw new Error("refresh: empty response");
+        }
+        // Another tab or auth flow may have rotated the session while this
+        // request was in flight. Never replace that newer token pair.
+        if (localStorage.getItem(REFRESH_KEY) !== refreshToken) {
+          return localStorage.getItem(ACCESS_KEY) || null;
         }
         try {
           localStorage.setItem(ACCESS_KEY, data.access_token);
@@ -142,7 +151,7 @@
     try {
       token = localStorage.getItem(ACCESS_KEY) || "";
     } catch (_) {}
-    if (!token) return Promise.resolve(null);
+    if (!token) return performRefresh();
 
     var exp = decodeExp(token);
     var remaining = exp - Date.now();

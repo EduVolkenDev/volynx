@@ -1,3 +1,6 @@
+import { persistVolynxSession } from "./auth-session.js";
+import { passkeyErrorMessage } from "./auth-passkey-errors.js";
+
 const DEFAULT_REDIRECT = "/volynx-lab/";
 
 function t(key, fallback) {
@@ -7,28 +10,7 @@ function t(key, fallback) {
 }
 
 function resolveRedirect() {
-  if (window.VxReturn) {
-    return window.VxReturn.paramPath() || window.VxReturn.storedPath() || DEFAULT_REDIRECT;
-  }
-  // Accept both ?next= and ?return= — most of the platform uses `next`
-  // but a few callers (icons-store) used `return`. Treat them identically
-  // so a stale-token redirect never drops the user at the default Lab.
-  try {
-    const url = new URL(window.location.href);
-    const candidates = [
-      url.searchParams.get("next"),
-      url.searchParams.get("return"),
-      url.searchParams.get("redirect"),
-    ];
-    for (const raw of candidates) {
-      if (!raw) continue;
-      const next = decodeURIComponent(raw);
-      if (next.startsWith("/") && !next.startsWith("//")) return next;
-    }
-    const stored = localStorage.getItem("volynx_post_login_next") || "";
-    if (stored.startsWith("/") && !stored.startsWith("//")) return stored;
-  } catch {}
-  return DEFAULT_REDIRECT;
+  return window.VxReturn?.paramPath() || window.VxReturn?.storedPath() || DEFAULT_REDIRECT;
 }
 
 async function loadConfig() {
@@ -62,19 +44,15 @@ function setMsg(el, text, kind) {
   if (kind) el.classList.add(kind);
 }
 
-function persistSession(session, email) {
-  localStorage.setItem("volynx_access_token", session.access_token || "");
-  localStorage.setItem("volynx_refresh_token", session.refresh_token || "");
-  localStorage.setItem("volynx_user_email", email || session?.user?.email || "");
-  localStorage.setItem("volynx_session", JSON.stringify({
-    access_token: session.access_token || "",
-    refresh_token: session.refresh_token || "",
-    expires_at: session.expires_at || null,
-    expires_in: session.expires_in || null,
-    user: session.user || null
-  }));
-  // Mirror tokens to cross-subdomain cookies so daily.volynx.world / cvitae.volynx.world see the session
-  if (window.VxAuthBridge) window.VxAuthBridge.sync();
+function localized(en, pt) {
+  return (localStorage.getItem("volynx_lang") || "en").startsWith("pt") ? pt : en;
+}
+
+function createAuthClient(cfg) {
+  if (!window.supabase?.createClient) throw new Error(localized("Authentication is loading. Please refresh.", "A autenticação está carregando. Atualize a página."));
+  return window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+    auth: { flowType: "pkce" },
+  });
 }
 
 (function init() {
@@ -85,6 +63,96 @@ function persistSession(session, email) {
   const msg = document.getElementById("msg");
 
   if (!form || !emailEl || !passEl || !btn || !msg) return;
+
+  const googleBtn = document.getElementById("googleSignInBtn");
+  const appleBtn = document.getElementById("appleSignInBtn");
+  const passkeyBtn = document.getElementById("passkeySignInBtn");
+  const alternativesStatus = document.getElementById("loginAlternativesStatus");
+  const alternatives = document.getElementById("loginAlternatives");
+  let authClient = null;
+
+  function finishSignIn(session, email) {
+    persistVolynxSession(session, email);
+    const redirect = resolveRedirect();
+    const isProductReturn = redirect !== DEFAULT_REDIRECT
+      && redirect !== "/profile/"
+      && redirect !== "/profile"
+      && !redirect.startsWith("/profile/?")
+      && redirect.startsWith("/");
+    if (window.VxReturn) window.VxReturn.consume(redirect);
+    else localStorage.removeItem("volynx_post_login_next");
+    window.location.href = isProductReturn ? redirect : "/profile/?welcome=1";
+  }
+
+  async function prepareAlternatives() {
+    try {
+      const cfg = await loadConfig();
+      if (!cfg?.supabaseUrl || !cfg?.supabaseAnonKey) throw new Error("Missing authentication configuration.");
+      authClient = createAuthClient(cfg);
+      const response = await fetch(`${cfg.supabaseUrl}/auth/v1/settings`, {
+        headers: { apikey: cfg.supabaseAnonKey }, cache: "no-store",
+      });
+      if (!response.ok) throw new Error("Authentication options unavailable.");
+      const settings = await response.json();
+      const available = {
+        google: settings.external?.google === true,
+        apple: settings.external?.apple === true,
+        passkey: settings.passkeys_enabled === true
+          && Boolean(window.PublicKeyCredential && window.isSecureContext)
+          && typeof authClient.auth.signInWithPasskey === "function",
+      };
+      for (const [button, enabled] of [[googleBtn, available.google], [appleBtn, available.apple], [passkeyBtn, available.passkey]]) {
+        if (!button) continue;
+        button.hidden = !enabled;
+        button.disabled = !enabled;
+      }
+      if (alternatives) alternatives.hidden = !Object.values(available).some(Boolean);
+      if (alternativesStatus) alternativesStatus.textContent = "";
+    } catch (_) {
+      if (alternatives) alternatives.hidden = true;
+    }
+  }
+
+  async function startSocialSignIn(provider, button) {
+    if (!authClient || button.disabled) return;
+    button.disabled = true;
+    if (alternativesStatus) alternativesStatus.textContent = localized("Opening secure sign-in...", "Abrindo o acesso seguro...");
+    try {
+      if (window.VxReturn) window.VxReturn.remember(resolveRedirect());
+      const { error } = await authClient.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: `${window.location.origin}/auth/oauth/` },
+      });
+      if (error) throw error;
+    } catch (error) {
+      if (alternativesStatus) alternativesStatus.textContent = error?.message || localized("Could not start sign-in. Please try again.", "Não foi possível iniciar o acesso. Tente novamente.");
+      button.disabled = false;
+    }
+  }
+
+  googleBtn?.addEventListener("click", () => startSocialSignIn("google", googleBtn));
+  appleBtn?.addEventListener("click", () => startSocialSignIn("apple", appleBtn));
+  passkeyBtn?.addEventListener("click", async () => {
+    if (!authClient || passkeyBtn.disabled) return;
+    passkeyBtn.disabled = true;
+    if (alternativesStatus) alternativesStatus.textContent = localized("Choose your saved passkey on this device.", "Escolha sua chave de acesso salva neste dispositivo.");
+    try {
+      const { data, error } = await authClient.auth.signInWithPasskey();
+      if (error) throw error;
+      if (!data?.session) throw new Error(localized("No session was returned.", "Nenhuma sessão foi retornada."));
+      finishSignIn(data.session, data.user?.email);
+    } catch (error) {
+      if (alternativesStatus) alternativesStatus.textContent = passkeyErrorMessage(error, localStorage.getItem("volynx_lang") || "en");
+      if (error?.code === "passkey_disabled") {
+        passkeyBtn.hidden = true;
+        if (alternatives && googleBtn?.hidden && appleBtn?.hidden) alternatives.hidden = true;
+      } else {
+        passkeyBtn.disabled = false;
+      }
+    }
+  });
+
+  prepareAlternatives();
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -113,24 +181,8 @@ function persistSession(session, email) {
         password
       });
 
-      persistSession(session, email);
-      const redirect = resolveRedirect();
       setMsg(msg, t("login.msg_welcome", "Welcome back. Redirecting..."), "ok");
-
-      // If the user came from a specific product / checkout / service
-      // (i.e. the login URL carried ?next=/?return=/?redirect= pointing
-      // somewhere other than the generic Lab default), send them DIRECTLY
-      // back. Passing through /profile/?welcome=1 + Continue is the right
-      // UX for organic login, but for "I was mid-purchase, token expired,
-      // sign me in again" it's pure friction and a common abandonment cause.
-      const isProductReturn = redirect !== DEFAULT_REDIRECT
-        && redirect !== "/profile/"
-        && redirect !== "/profile"
-        && !redirect.startsWith("/profile/?")
-        && redirect.startsWith("/");
-      if (window.VxReturn) window.VxReturn.consume(redirect);
-      else localStorage.removeItem("volynx_post_login_next");
-      window.location.href = isProductReturn ? redirect : "/profile/?welcome=1";
+      finishSignIn(session, email);
     } catch (err) {
       setMsg(msg, err?.message || t("login.err_failed", "Sign in failed. Please try again."), "err");
     } finally {

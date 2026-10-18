@@ -1,0 +1,29 @@
+---
+import FlagshipLayout from "../../../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "../../../components/FlagshipHeader.astro";
+import FlagshipFooter from "../../../components/FlagshipFooter.astro";
+import { ROUTES } from "../../../data/routes";
+---
+
+<FlagshipLayout title="Finishing sign in — VOLYNX" description="Completing your secure VOLYNX sign in." pageClass="page-login">
+  <FlagshipHeader current={ROUTES.login} ctaLabel="Sign in" ctaHref={ROUTES.login} />
+  <main class="shell oauth-callback">
+    <section class="oauth-callback__card" aria-live="polite">
+      <span class="kicker">VOLYNX ACCESS</span>
+      <h1><span class="i18n-en">Finishing your sign in</span><span class="i18n-pt">Concluindo seu acesso</span></h1>
+      <p id="oauthCallbackStatus"><span class="i18n-en">Checking your account securely…</span><span class="i18n-pt">Verificando sua conta com segurança…</span></p>
+      <a id="oauthCallbackRetry" class="button button--ghost" href={ROUTES.login} hidden><span class="i18n-en">Back to sign in</span><span class="i18n-pt">Voltar para entrar</span></a>
+    </section>
+  </main>
+  <FlagshipFooter />
+  <script is:inline src="/vendor/supabase-js-2.118.0/supabase.js"></script>
+  <script is:inline type="module" src="/scripts/auth-oauth.js?v=20261018"></script>
+</FlagshipLayout>
+
+<style>
+  .oauth-callback { min-height: 60svh; display: grid; place-items: center; padding-block: 64px; }
+  .oauth-callback__card { width: min(100%, 520px); padding: clamp(28px, 5vw, 48px); border: 1px solid rgba(220,190,130,.25); border-radius: 26px; background: rgba(11,13,25,.82); box-shadow: 0 20px 70px rgba(0,0,0,.22); }
+  .oauth-callback__card h1 { margin: 16px 0; }
+  .oauth-callback__card p { line-height: 1.6; }
+  .oauth-callback__card a:not([hidden]) { margin-top: 20px; }
+</style>

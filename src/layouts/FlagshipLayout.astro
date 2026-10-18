@@ -12,6 +12,7 @@ interface Props {
   ogImage?: string;
   ogType?: string;
   pageClass?: string;
+  disableTokenRefresh?: boolean;
 }
 const {
   title = "VOLYNX — Building a Smarter Future",
@@ -19,6 +20,7 @@ const {
   ogImage = "/assets/volynx-icon.webp",
   ogType = "website",
   pageClass = "",
+  disableTokenRefresh = false,
 } = Astro.props;
 
 const canonicalUrl = `https://volynx.world${Astro.url.pathname}`;
@@ -96,8 +98,6 @@ const structuredData = robots.startsWith("noindex") ? null : {
     <script is:inline src="/js/vx-auth-bridge.js"></script>
     <!-- Preserve the exact page/task across login and signup. -->
     <script is:inline src="/js/vx-return.js"></script>
-    <!-- Keep the access_token fresh; otherwise authed calls 401 after 1h -->
-    <script src="/js/vx-token-refresh.js" defer></script>
     <script is:inline>
       function vxAuthTokenIsFresh() {
         try {
@@ -183,7 +183,7 @@ const structuredData = robots.startsWith("noindex") ? null : {
 
     <slot />
 
-    <PageWidgets hideUtilBar />
+    <PageWidgets hideUtilBar disableTokenRefresh={disableTokenRefresh} />
     <script is:inline src="/js/vx-clickable-cards.js"></script>
   </body>
 </html>

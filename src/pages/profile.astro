@@ -20,6 +20,7 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 ---
 
 <FlagshipLayout
+  disableTokenRefresh
 	title="Profile — VOLYNX"
 	description="Manage your VOLYNX account, profile settings, and subscription."
 	ogImage="/assets/volynx-icon.webp"
@@ -489,9 +490,9 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 				</div>
 				<div class="glass-section glass-section--compact security-section">
 					<div class="section-label" data-i18n="profile.section_security">Security</div>
-					<div class="info-row"><span data-i18n="profile.security_password">Password</span><strong data-i18n="profile.security_set">Set</strong></div>
+					<div class="info-row"><span data-i18n="profile.security_password">Password</span><strong><span class="i18n-en">Optional</span><span class="i18n-pt">Opcional</span></strong></div>
 					<div class="info-row security-action-row">
-						<button type="button" class="btn btn--sm" id="changePasswordBtn" data-i18n="profile.change_password">Change password</button>
+						<button type="button" class="btn btn--sm" id="changePasswordBtn"><span class="i18n-en">Set or change password</span><span class="i18n-pt">Criar ou alterar senha</span></button>
 					</div>
 					<div id="passwordForm" class="password-form" hidden>
 						<div class="password-form__grid">
@@ -505,6 +506,13 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 						</div>
 					</div>
 					<div class="info-row security-2fa-row"><span data-i18n="profile.security_2fa">2FA</span><strong data-i18n="profile.security_not_enabled">Not enabled</strong></div>
+						<div class="profile-passkey" id="passkeySettings" hidden>
+							<strong><span class="i18n-en">Passkey</span><span class="i18n-pt">Chave de acesso</span></strong>
+							<p><span class="i18n-en">Save a passkey on this device or in a password manager. Your device may use face recognition, fingerprint, or PIN to unlock it.</span><span class="i18n-pt">Salve uma chave neste dispositivo ou gerenciador de senhas. Ele pode usar reconhecimento facial, digital ou PIN para desbloqueá-la.</span></p>
+							<button type="button" class="btn btn--sm" id="registerPasskeyBtn" disabled><span class="i18n-en">Save a passkey</span><span class="i18n-pt">Salvar chave de acesso</span></button>
+							<p id="registerPasskeyStatus" class="profile-passkey__status" role="status" aria-live="polite"></p>
+							<ul id="passkeyList" class="profile-passkey__list" aria-label="Saved passkeys" hidden></ul>
+						</div>
 				</div>
 			</section>
 
@@ -553,7 +561,8 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 		})();
 		</script>
 
-		<script is:inline src="/vendor/supabase.js"></script>
+		<script is:inline src="/vendor/supabase-js-2.118.0/supabase.js"></script>
+		<script is:inline type="module" src="/scripts/vx-passkey-profile.js?v=20261018"></script>
 		<script is:inline src="/vendor/jszip.min.js"></script>
 		<script is:inline>
 			if (typeof supabase === "undefined") {
@@ -649,7 +658,7 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 					accessToken = localStorage.getItem("volynx_access_token") || "";
 					const refreshToken = localStorage.getItem("volynx_refresh_token") || "";
 					log("tokens: access=" + (accessToken ? "yes" : "NO") + " refresh=" + (refreshToken ? "yes" : "NO"));
-					if (!accessToken) { goLogin(); return; }
+					if (!accessToken && !refreshToken) { goLogin(); return; }
 
 					log("fetching config.json");
 					const cfgRes = await fetch("/config.json", { cache: "no-store" });
@@ -659,17 +668,31 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 
 					log("creating supabase client");
 					supabase = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+					supabase.auth.onAuthStateChange((event, session) => {
+						if (event === "TOKEN_REFRESHED" && session?.access_token && session.refresh_token) {
+							window.VxAuthBridge?.persistSession(session);
+						}
+					});
 					log("client created");
 
 					log("setSession start");
-					const { error: sessErr } = await supabase.auth.setSession({
-						access_token: accessToken,
-						refresh_token: refreshToken,
-					});
+					let { data: sessionData, error: sessErr } = accessToken
+						? await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
+						: await supabase.auth.refreshSession({ refresh_token: refreshToken });
+					if (sessErr && localStorage.getItem("volynx_refresh_token") !== refreshToken) {
+						({ data: sessionData, error: sessErr } = await supabase.auth.setSession({
+							access_token: localStorage.getItem("volynx_access_token") || "",
+							refresh_token: localStorage.getItem("volynx_refresh_token") || "",
+						}));
+					}
 					if (sessErr) {
 						log("setSession FAILED: " + sessErr.message);
 						goLogin();
 						return;
+					}
+					if (sessionData?.session && window.VxAuthBridge?.persistSession) {
+						window.VxAuthBridge.persistSession(sessionData.session);
+						accessToken = sessionData.session.access_token;
 					}
 					log("setSession ok");
 
@@ -815,6 +838,8 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 				}
 
 				showView("profile");
+				window.VxProfileAuthClient = supabase;
+				window.dispatchEvent(new Event("vx:profile-ready"));
 				log("render complete");
 
 				// ══════════════════════════════════════════════════════
@@ -3077,6 +3102,18 @@ const BD_AVATARS = AVATAR_CATALOG.filter((a) => a.bdOnly);
 		margin-top: 10px;
 	}
 	.password-form { margin-top: 14px; }
+	.profile-passkey { display: grid; justify-items: start; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.12); }
+	.profile-passkey[hidden] { display: none; }
+	.profile-passkey p { margin: 0; color: var(--muted); font-size: .86rem; line-height: 1.5; }
+	.profile-passkey .btn:disabled { cursor: not-allowed; opacity: .55; }
+	.profile-passkey__status { min-height: 1.5em; }
+	.profile-passkey__list { display: grid; gap: 10px; width: 100%; margin: 4px 0 0; padding: 0; list-style: none; }
+	.profile-passkey__list[hidden] { display: none; }
+	.profile-passkey__item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid rgba(255,255,255,.12); border-radius: 14px; background: rgba(255,255,255,.04); }
+	.profile-passkey__name { min-width: 0; overflow-wrap: anywhere; color: #f4f4f8; font-size: .86rem; }
+	.profile-passkey__remove { flex: 0 0 auto; border: 1px solid rgba(255,255,255,.2); border-radius: 10px; padding: 7px 10px; color: #f4f4f8; background: transparent; cursor: pointer; }
+	.profile-passkey__remove:hover, .profile-passkey__remove:focus-visible { border-color: rgba(255,190,190,.7); background: rgba(255,100,100,.08); }
+	.profile-passkey__remove:disabled { cursor: not-allowed; opacity: .5; }
 	.password-form__grid { display: grid; gap: 10px; }
 	.field-input {
 		width: 100%;
