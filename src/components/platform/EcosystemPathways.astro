@@ -1,0 +1,76 @@
+---
+import CoreIcon from "../CoreIcon.astro";
+import { ROUTES } from "../../data/routes";
+
+const pathways = [
+  {
+    name: "Lab",
+    icon: "lab" as const,
+    href: ROUTES.lab,
+    art: "/assets/galaxy/core-surface-lab.webp",
+    tone: "cyan",
+    label: { en: "Make and refine", pt: "Criar e refinar" },
+    copy: { en: "Prepare images, QR projects and creative assets in your browser.", pt: "Prepare imagens, projetos QR e ativos criativos no navegador." },
+  },
+  {
+    name: "Services",
+    icon: "services" as const,
+    href: ROUTES.services,
+    art: "/assets/galaxy/core-surface-services.webp",
+    tone: "gold",
+    label: { en: "Build with an expert", pt: "Construir com especialistas" },
+    copy: { en: "Bring strategy, design and implementation together when your project needs a partner.", pt: "Una estratégia, design e execução quando o projeto precisa de uma parceria." },
+  },
+  {
+    name: "World",
+    icon: "world" as const,
+    href: ROUTES.world,
+    art: "/assets/galaxy/core-surface-world.webp",
+    tone: "violet",
+    label: { en: "Connect and discover", pt: "Conectar e descobrir" },
+    copy: { en: "Find people, opportunities and resources around meaningful work.", pt: "Encontre pessoas, oportunidades e recursos para trabalhos relevantes." },
+  },
+  {
+    name: "Dev Journey",
+    icon: "journey" as const,
+    href: ROUTES.devJourney,
+    art: "/assets/galaxy/core-surface-journey.webp",
+    tone: "cyan",
+    label: { en: "Learn by building", pt: "Aprender construindo" },
+    copy: { en: "Turn understanding into a real project with a guided, practical track.", pt: "Transforme aprendizado em um projeto real com uma trilha prática e guiada." },
+  },
+];
+---
+
+<div class="ecosystem-pathways">
+  {pathways.map((path) => (
+    <a class:list={["surface-card", `surface-card--${path.tone}`]} href={path.href} data-analytics-event={`home_ecosystem_${path.icon}`}>
+      <span class="surface-card__meta"><span class="surface-card__icon"><CoreIcon name={path.icon} size={24} /></span>{path.name}<span aria-hidden="true">↗</span></span>
+      <img class="surface-card__art" src={path.art} alt="" width="640" height="640" loading="lazy" decoding="async" />
+      <span class="surface-card__content">
+        <strong><span class="i18n-en">{path.label.en}</span><span class="i18n-pt">{path.label.pt}</span></strong>
+        <span class="surface-card__copy"><span class="i18n-en">{path.copy.en}</span><span class="i18n-pt">{path.copy.pt}</span></span>
+      </span>
+    </a>
+  ))}
+</div>
+
+<style>
+  .ecosystem-pathways { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
+  .surface-card { --accent: #8bfaf0; position: relative; isolation: isolate; display: flex; flex-direction: column; min-width: 0; min-height: 334px; overflow: hidden; padding: 20px; border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent); border-radius: 22px; background: radial-gradient(circle at 76% 26%, color-mix(in srgb, var(--accent) 15%, transparent), transparent 54%), linear-gradient(150deg, #111a2b, #080d19 70%); color: #fff; text-decoration: none; transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
+  .surface-card--gold { --accent: #f3e1a0; }
+  .surface-card--violet { --accent: #b196ff; }
+  .surface-card:hover, .surface-card:focus-visible { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 18px 46px rgba(0,0,0,.24); }
+  .surface-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .surface-card__meta { position: relative; z-index: 2; display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: .73rem; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; }
+  .surface-card__meta > span:last-child { margin-left: auto; font-size: 1rem; }
+  .surface-card__icon { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 12px; background: rgba(3,8,20,.55); }
+  .surface-card__art { position: absolute; z-index: 0; top: 24px; right: -10px; width: min(78%, 215px); height: auto; object-fit: contain; opacity: .82; pointer-events: none; filter: drop-shadow(0 16px 24px rgba(0,0,0,.36)); transition: transform .3s ease; }
+  .surface-card:hover .surface-card__art, .surface-card:focus-visible .surface-card__art { transform: translateY(-5px) scale(1.03); }
+  .surface-card__content { position: relative; z-index: 1; display: grid; justify-items: start; gap: 12px; margin-top: auto; }
+  .surface-card__content > strong { max-width: 19ch; color: #fff; font-size: clamp(1.18rem, 1.6vw, 1.5rem); line-height: 1.15; letter-spacing: -.03em; }
+  .surface-card__copy { position: relative; z-index: 1; max-width: 32ch; color: rgb(231 233 246); font-size: .92rem; line-height: 1.6; backdrop-filter: blur(1px); background: #ffffff24; padding: 15px; border-radius: 15px; }
+  @media (max-width: 1020px) { .ecosystem-pathways { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 600px) { .ecosystem-pathways { grid-template-columns: 1fr; } .surface-card { min-height: 290px; } .surface-card__art { width: min(60%, 220px); } }
+  @media (prefers-reduced-motion: reduce) { .surface-card, .surface-card__art { transition: none; } }
+</style>

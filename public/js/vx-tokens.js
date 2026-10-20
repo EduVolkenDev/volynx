@@ -165,7 +165,7 @@ window.VxTokens = (function () {
     if (typeof window.supabase === 'undefined' || !window.supabase.createClient) {
       await new Promise(function(resolve, reject) {
         var script = document.createElement('script');
-        script.src = '/vendor/supabase-js-2.101.1/supabase.js';
+        script.src = '/vendor/supabase-js-2.118.0/supabase.js';
         script.onload = resolve;
         script.onerror = reject;
         document.head.appendChild(script);

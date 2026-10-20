@@ -329,7 +329,7 @@ export const sitePricing = {
   dailyPlans: [
     {
       id: 'daily_free',
-      image: '/assets/daily-icon.webp',
+      image: '/assets/daily-icon-general-512.webp',
       name: { pt: 'Daily Free', en: 'Daily Free' },
       description: { pt: 'As ferramentas essenciais para começar com limites diários e simplicidade local.', en: 'Essential tools to start with daily limits and local simplicity.' },
       price: { GBP: '£0', EUR: '€0', BRL: 'R$0' },

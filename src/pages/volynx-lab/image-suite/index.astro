@@ -130,6 +130,11 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
               <input id="quality" type="range" min="0.3" max="1" step="0.05" value="0.85" aria-label="Quality" />
               <em id="qualityVal" style="font-style:normal;font-size:12px;color:rgba(255,255,255,.68)">0.85</em>
             </label>
+            <label class="field" id="targetSizeGroup" hidden>
+              <span data-i18n="suite.target_size_label">Tamanho máximo (KB)</span>
+              <input id="targetSize" type="number" min="1" max="20000" step="25" value="450" inputmode="numeric" aria-label="Maximum output size in kilobytes" />
+              <small data-i18n="suite.target_size_hint">A qualidade será reduzida progressivamente até caber, se possível.</small>
+            </label>
           </div>
 
           <div class="field-group" id="bgRemoveGroup" hidden>
@@ -403,9 +408,11 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
     const fmtEl = $("format");
     const qualityEl = $("quality");
     const qualityValEl = $("qualityVal");
+    const targetSizeEl = $("targetSize");
     const scaleGroup = $("scaleGroup");
     const formatGroup = $("formatGroup");
     const qualityGroup = $("qualityGroup");
+    const targetSizeGroup = $("targetSizeGroup");
     const bgRemoveGroup = $("bgRemoveGroup");
     const bgFormatEl = $("bgFormat");
     const bgFillEl = $("bgFill");
@@ -1193,7 +1200,7 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
     }
 
     function updateFieldVisibility(tool) {
-      [scaleGroup, qualityGroup, formatGroup, bgRemoveGroup].forEach((group) => {
+      [scaleGroup, qualityGroup, targetSizeGroup, formatGroup, bgRemoveGroup].forEach((group) => {
         if (group) group.hidden = true;
       });
 
@@ -1203,6 +1210,7 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
         setBgProgressHidden(true);
       } else if (tool === "compress") {
         qualityGroup.hidden = false;
+        targetSizeGroup.hidden = false;
         formatGroup.hidden = false;
         if (fmtEl.value === "image/png" || fmtEl.value === "image/svg+xml") {
           fmtEl.value = "image/webp";
@@ -1548,7 +1556,14 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
       return [...new Set(candidates)];
     }
 
-    async function encodeCompression(canvas, mime, quality, inputBytes) {
+    function compressionTargetBytes() {
+      const enteredKb = Number.parseInt(targetSizeEl?.value || "450", 10);
+      const targetKb = Number.isFinite(enteredKb) ? Math.max(1, Math.min(20000, enteredKb)) : 450;
+      if (targetSizeEl) targetSizeEl.value = String(targetKb);
+      return targetKb * 1024;
+    }
+
+    async function encodeCompression(canvas, mime, quality, targetBytes) {
       const lossyMime = mime === "image/webp" || mime === "image/jpeg";
       const candidates = lossyMime ? compressionQualityCandidates(quality) : [quality];
       let smallest = null;
@@ -1565,13 +1580,13 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
           smallest = result;
         }
 
-        // Stop at the first effective result so we preserve as much quality
-        // as possible instead of blindly selecting the smallest encode.
-        if (encoded.blob.size < inputBytes) return result;
+        // Candidates are tried from highest to lowest quality. Stop at the
+        // first one that satisfies the target, not merely any saving.
+        if (encoded.blob.size <= targetBytes) return { ...result, targetReached: true };
         if (!lossyMime || encoded.mime !== mime) break;
       }
 
-      return smallest;
+      return smallest ? { ...smallest, targetReached: smallest.blob.size <= targetBytes } : null;
     }
 
     function encodeFallbackMessage(requestedMime, actualMime) {
@@ -1673,10 +1688,11 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
 
       updateProgressUI(70, "encode");
       const requestedSvg = outputMime === "image/svg+xml";
+      const requestedTargetBytes = tool === "compress" ? compressionTargetBytes() : null;
       const encoded = tool === "compress"
         ? requestedSvg
           ? await encodeCanvasWithFallback(canvas, "image/png", 1)
-          : await encodeCompression(canvas, outputMime, quality, file.size)
+          : await encodeCompression(canvas, outputMime, quality, requestedTargetBytes)
         : await encodeCanvasWithFallback(
             canvas,
             requestedSvg ? "image/png" : outputMime,
@@ -1709,6 +1725,8 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
         encodeFallback: !requestedSvg && !kept && encoded.fallback,
         compressionQuality: tool === "compress" ? encoded.quality : null,
         compressionQualityAdjusted: tool === "compress" && Boolean(encoded.qualityAdjusted),
+        compressionTargetBytes: requestedTargetBytes,
+        compressionTargetReached: tool === "compress" && finalBlob.size <= requestedTargetBytes,
         formatAdjustedForAlpha,
         requestedMime: requestedSvg ? "image/svg+xml" : (encoded.requestedMime || mime),
         mimeType: finalMime,
@@ -1983,6 +2001,9 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
         const M = window.VxFileMetrics;
         const keptCount = processedResults.filter((result) => result.keptOriginal).length;
         const adjustedCompressionResults = processedResults.filter((result) => result.compressionQualityAdjusted);
+        const missedCompressionTargets = tool === "compress"
+          ? processedResults.filter((result) => !result.compressionTargetReached)
+          : [];
         const fallbackResults = processedResults.filter((result) => result.encodeFallback);
         const standardUpscaleResults = processedResults.filter((result) => result.upscaleMode === "standard");
         const alphaSafeResults = processedResults.filter((result) => result.upscaleMode === "alpha-safe");
@@ -2014,7 +2035,26 @@ const socialImage = "https://volynx.world/assets/newimagesuite.webp";
           singleOutBlob = processedResults[0].blob;
         }
 
-        if (tool === "compress" && keptCount > 0) {
+        if (tool === "compress" && missedCompressionTargets.length > 0) {
+          const targetKb = Math.round(missedCompressionTargets[0].compressionTargetBytes / 1024);
+          setResultHint(
+            copy(
+              missedCompressionTargets.length === 1
+                ? "suite.compress_target_missed_one"
+                : "suite.compress_target_missed_many",
+              missedCompressionTargets.length === 1
+                ? "The output is {size}, above your {target} KB target. Try WebP or resize the image."
+                : "{count} outputs exceed your {target} KB target. Try WebP or resize them.",
+              {
+                size: formatBytesLabel(missedCompressionTargets[0].blob.size),
+                target: targetKb,
+                count: missedCompressionTargets.length,
+              }
+            ),
+            "warning"
+          );
+          setDropMessage(copy("suite.drop_done", "Done: {files}", { files: fileCountLabel(processedResults.length) }));
+        } else if (tool === "compress" && keptCount > 0) {
           if (keptCount === processedResults.length) {
             setResultHint(
               keptCount === 1

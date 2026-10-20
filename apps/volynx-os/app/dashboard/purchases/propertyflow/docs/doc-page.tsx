@@ -17,7 +17,7 @@ import { getPropertyFlowPublicUrl } from "@/lib/volynx-public"
 
 type PropertyFlowDocViewProps = {
   slug: string
-  searchParams?: Record<string, string | string[] | undefined>
+  searchParams?: Promise<Record<string, string | string[] | undefined>>
 }
 
 type PropertyFlowDocAccess = {
@@ -122,7 +122,7 @@ async function resolveDocAccess(slug: string, searchParams: Record<string, strin
 export async function PropertyFlowDocView({ slug, searchParams }: PropertyFlowDocViewProps) {
   const doc = getDoc(slug)
   const source = readDoc(doc.file)
-  const access = await resolveDocAccess(slug, searchParams)
+  const access = await resolveDocAccess(slug, await searchParams)
   const tier = getPropertyFlowTier(access.tierId)
   const visibleDocs = propertyFlowDocs.filter((item) => isPropertyFlowDocTierAllowed(tier.id, item.tier))
 

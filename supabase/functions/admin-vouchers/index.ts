@@ -55,6 +55,30 @@ function normalizeType(type: string): string {
   return LEGACY_TYPE_ALIASES[type] ?? type;
 }
 
+function validateGrantContract(type: string, grants: Record<string, unknown>): string | null {
+  const dailyPlan = grants.daily_plan;
+  const hasDuration = Object.prototype.hasOwnProperty.call(grants, "daily_plan_expires_in_days");
+  if (type === "daily_access" && !dailyPlan) return "daily_plan_required";
+  if (dailyPlan !== undefined && !["free", "pro", "diamond"].includes(String(dailyPlan).toLowerCase())) {
+    return "invalid_daily_plan";
+  }
+  if (hasDuration) {
+    const days = grants.daily_plan_expires_in_days;
+    if (!dailyPlan) return "daily_plan_required_for_duration";
+    if (!Number.isInteger(days) || Number(days) < 1 || Number(days) > 3650 || String(dailyPlan).toLowerCase() === "free") {
+      return "invalid_daily_plan_duration";
+    }
+  }
+  return null;
+}
+
+function normalizeExpiry(value: unknown): string | null {
+  if (value === null || value === undefined || value === "") return null;
+  const date = new Date(String(value));
+  if (Number.isNaN(date.getTime())) throw new Error("invalid_expires_at");
+  return date.toISOString();
+}
+
 function generateCode(type: string): string {
   const prefix = TYPE_PREFIX[type] ?? "VLX";
   const buf = new Uint8Array(4);
@@ -96,6 +120,19 @@ serve(async (req: Request) => {
       return json({ ok: true, items: data ?? [] });
     }
 
+    if (action === "redemptions") {
+      const limit = Math.min(Math.max(Number.parseInt(body?.limit ?? 100, 10) || 100, 1), 500);
+      let query = supabase
+        .from("voucher_redemptions")
+        .select("id, voucher_id, user_email, grants_applied, redeemed_at")
+        .order("redeemed_at", { ascending: false })
+        .limit(limit);
+      if (body?.voucher_id) query = query.eq("voucher_id", String(body.voucher_id));
+      const { data, error } = await query;
+      if (error) return json({ error: "redemptions_failed", detail: error.message }, 500);
+      return json({ ok: true, items: data ?? [] });
+    }
+
     if (action === "create") {
       const requestedType = String(body?.type ?? "generic").toLowerCase();
       if (!ALLOWED_TYPES.includes(requestedType)) return json({ error: "invalid_type", allowed: ALLOWED_TYPES }, 400);
@@ -107,8 +144,17 @@ serve(async (req: Request) => {
       const targetEmail = body?.target_email ? String(body.target_email).toLowerCase().slice(0, 320) : null;
       const maxUses = Math.min(Math.max(parseInt(body?.max_uses ?? 1), 1), 100000);
       const transferable = body?.transferable !== false;
-      const expiresAt = body?.expires_at ? new Date(body.expires_at).toISOString() : null;
-      const grants = body?.grants && typeof body.grants === "object" ? body.grants : {};
+      let expiresAt: string | null;
+      try {
+        expiresAt = normalizeExpiry(body?.expires_at);
+      } catch {
+        return json({ error: "invalid_expires_at" }, 400);
+      }
+      const grants = body?.grants && typeof body.grants === "object" && !Array.isArray(body.grants)
+        ? body.grants as Record<string, unknown>
+        : {};
+      const grantError = validateGrantContract(type, grants);
+      if (grantError) return json({ error: grantError }, 400);
 
       // Try a few times in case of code collision (very rare)
       let code = "";
@@ -138,8 +184,18 @@ serve(async (req: Request) => {
       }
       if (!inserted) return json({ error: "create_failed", detail: lastErr ?? "code_collision" }, 500);
 
-      const baseUrl = Deno.env.get("VOLYNX_PUBLIC_URL") || "https://volynx.world";
+      const baseUrl = (Deno.env.get("VOLYNX_PUBLIC_URL") || "https://volynx.world").replace(/\/$/, "");
       const inviteUrl = (() => {
+        if (inserted.grants?.daily_plan) {
+          const dailyUrl = new URL("/redeem/", "https://daily.volynx.world");
+          dailyUrl.searchParams.set("code", inserted.code);
+          return dailyUrl.toString();
+        }
+        if (inserted.grants?.badge !== "black_diamond") {
+          const accountUrl = new URL("/account/", baseUrl);
+          accountUrl.searchParams.set("voucher", inserted.code);
+          return accountUrl.toString();
+        }
         const u = new URL("/invite/black-diamond/", baseUrl);
         if (recipientName) u.searchParams.set("to", recipientName);
         u.searchParams.set("code", inserted.code);
@@ -169,9 +225,27 @@ serve(async (req: Request) => {
       const patch: Record<string, unknown> = {};
       if ("label" in body) patch.label = body.label ? String(body.label).slice(0, 200) : null;
       if ("target_email" in body) patch.target_email = body.target_email ? String(body.target_email).toLowerCase().slice(0, 320) : null;
-      if ("max_uses" in body) patch.max_uses = Math.min(Math.max(parseInt(body.max_uses ?? 1), 1), 100000);
+      if ("max_uses" in body) {
+        const maxUses = Number(body.max_uses);
+        if (!Number.isInteger(maxUses) || maxUses < 1 || maxUses > 100000) return json({ error: "invalid_max_uses" }, 400);
+        const { data: current, error: currentError } = await supabase
+          .from("vouchers")
+          .select("times_used")
+          .eq("id", id)
+          .maybeSingle();
+        if (currentError) return json({ error: "voucher_lookup_failed" }, 500);
+        if (!current) return json({ error: "voucher_not_found" }, 404);
+        if (maxUses < Number(current.times_used || 0)) return json({ error: "max_uses_below_redemptions" }, 400);
+        patch.max_uses = maxUses;
+      }
       if ("transferable" in body) patch.transferable = body.transferable === true;
-      if ("expires_at" in body) patch.expires_at = body.expires_at ? new Date(body.expires_at).toISOString() : null;
+      if ("expires_at" in body) {
+        try {
+          patch.expires_at = normalizeExpiry(body.expires_at);
+        } catch {
+          return json({ error: "invalid_expires_at" }, 400);
+        }
+      }
       if ("active" in body) patch.active = body.active === true;
 
       if (!Object.keys(patch).length) return json({ error: "empty_update" }, 400);

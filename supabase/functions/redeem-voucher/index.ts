@@ -17,6 +17,7 @@
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { resolveDailyPlanGrant } from "../_shared/voucher-entitlements.mjs";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -117,22 +118,51 @@ Deno.serve(async (req: Request) => {
     // ── Prepare grants ─────────────────────────────────────────
     const grants = voucher.grants || {};
     const isBlackDiamondGrant = grants.badge === "black_diamond";
-
-    // ── Check if already redeemed by this user ────────────────
-    const { data: existing } = await supabase
-      .from("voucher_redemptions")
-      .select("id")
-      .eq("voucher_id", voucher.id)
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (existing) {
-      return json({ ok: false, error: isBlackDiamondGrant ? "already_black_diamond" : "already_redeemed" }, 400);
+    if (grants.tokens !== undefined && (!Number.isSafeInteger(grants.tokens) || grants.tokens < 0 || grants.tokens > 2_147_483_647)) {
+      return json({ ok: false, error: "invalid_grant" }, 400);
     }
 
-    // ── Apply grants ──────────────────────────────────────────
+    // Validate the Daily entitlement before applying any other grant. Voucher
+    // lifetime (vouchers.expires_at) and subscription lifetime are separate:
+    // only the latter updates profiles.daily_plan_expires_at.
+    if (grants.daily_plan_expires_in_days !== undefined && !grants.daily_plan) {
+      return json({ ok: false, error: "daily_plan_required_for_duration" }, 400);
+    }
+    let dailyPlanGrant: { daily_plan: string; daily_plan_expires_at: string | null } | null = null;
+    if (grants.daily_plan) {
+      const { data: profile, error: profileErr } = await supabase
+        .from("profiles")
+        .select("daily_plan, daily_plan_expires_at")
+        .eq("id", userId)
+        .single();
+
+      if (profileErr || !profile) {
+        console.error("[redeem-voucher] Daily profile lookup error:", profileErr?.message);
+        return json({ ok: false, error: "grant_failed" }, 500);
+      }
+
+      try {
+        dailyPlanGrant = resolveDailyPlanGrant({
+          currentPlan: profile.daily_plan,
+          currentExpiresAt: profile.daily_plan_expires_at,
+          requestedPlan: grants.daily_plan,
+          durationDays: grants.daily_plan_expires_in_days,
+        });
+      } catch (error) {
+        const reason = error instanceof Error ? error.message : "invalid_daily_plan";
+        const publicErrors: Record<string, string> = {
+          invalid_daily_plan: "invalid_daily_plan",
+          invalid_daily_plan_duration: "invalid_daily_plan_duration",
+          daily_plan_permanent_entitlement: "daily_plan_already_permanent",
+          invalid_current_daily_expiration: "grant_failed",
+        };
+        const responseError = publicErrors[reason] || "invalid_daily_plan";
+        return json({ ok: false, error: responseError }, responseError === "grant_failed" ? 500 : 400);
+      }
+    }
+
+    // Prepare profile changes, but do not mutate data outside the atomic RPC.
     const profileUpdates: Record<string, unknown> = {};
-    let tokensGranted = 0;
 
     if (isBlackDiamondGrant) {
       const { data: profile, error: profileErr } = await supabase
@@ -153,7 +183,7 @@ Deno.serve(async (req: Request) => {
 
     // Plan upgrades
     if (grants.builder_plan) profileUpdates.builder_plan = grants.builder_plan;
-    if (grants.daily_plan) profileUpdates.daily_plan = grants.daily_plan;
+    if (dailyPlanGrant) Object.assign(profileUpdates, dailyPlanGrant);
     if (grants.plan) profileUpdates.plan = grants.plan;
     if (grants.devjourney_tier && ["social", "pro", "bundle"].includes(String(grants.devjourney_tier).toLowerCase())) {
       profileUpdates.devjourney_tier = String(grants.devjourney_tier).toLowerCase();
@@ -165,81 +195,36 @@ Deno.serve(async (req: Request) => {
       profileUpdates.black_diamond_claimed_at = new Date().toISOString();
     }
 
-    // Token grants — atomic credit via Postgres RPC
-    if (grants.tokens && grants.tokens > 0) {
-      const { data: creditResult, error: creditErr } = await supabase.rpc(
-        "credit_tokens_atomic",
-        {
-          p_user_id: userId,
-          p_amount: grants.tokens,
-          p_type: "grant",
-          p_description: `Voucher redeemed: ${voucher.label || voucher.type} (${code})`,
-          p_metadata: JSON.stringify({
-            source: "voucher",
-            voucher_id: voucher.id,
-            voucher_type: voucher.type,
-          }),
-        }
-      );
+    const tokensGranted = grants.tokens || 0;
+    const grantsApplied = {
+      ...grants,
+      ...(dailyPlanGrant ? { daily_plan_expires_at: dailyPlanGrant.daily_plan_expires_at } : {}),
+      tokens_granted: tokensGranted,
+    };
 
-      if (creditErr) {
-        console.error("[redeem-voucher] credit_tokens_atomic error:", creditErr.message);
-        return json({ ok: false, error: "grant_failed" }, 500);
-      }
-
-      tokensGranted = grants.tokens;
-      // Don't add token_balance to profileUpdates — RPC already handled it
-    }
-
-    // Apply profile updates if any
-    if (Object.keys(profileUpdates).length > 0) {
-      const { error: updateErr } = await supabase
-        .from("profiles")
-        .update(profileUpdates)
-        .eq("id", userId);
-
-      if (updateErr) {
-        console.error("[redeem-voucher] profile update error:", updateErr.message);
-        return json({ ok: false, error: "grant_failed" }, 500);
-      }
-
-      // Sync plan to JWT app_metadata
-      if (grants.builder_plan || grants.daily_plan || grants.plan) {
-        await supabase.rpc("sync_plan_to_app_metadata", { p_user_id: userId });
-      }
-    }
-
-    // ── Record redemption (unique constraint prevents double-redeem) ──
-    const { error: redeemErr } = await supabase.from("voucher_redemptions").insert({
-      voucher_id: voucher.id,
-      user_id: userId,
-      user_email: userEmail,
-      grants_applied: {
-        ...grants,
-        tokens_granted: tokensGranted,
+    const { data: redemption, error: redemptionErr } = await supabase.rpc("redeem_voucher_atomic", {
+      p_voucher_id: voucher.id,
+      p_user_id: userId,
+      p_user_email: userEmail,
+      p_profile_updates: profileUpdates,
+      p_token_amount: tokensGranted,
+      p_grants_applied: grantsApplied,
+      p_token_description: `Voucher redeemed: ${voucher.label || voucher.type} (${code})`,
+      p_token_metadata: {
+        source: "voucher",
+        voucher_id: voucher.id,
+        voucher_type: voucher.type,
       },
     });
 
-    if (redeemErr) {
-      if (redeemErr.code === "23505") {
-        return json({ ok: false, error: "already_redeemed" }, 400);
-      }
-      console.error("[redeem-voucher] redemption insert error:", redeemErr.message);
+    if (redemptionErr) {
+      console.error(`[redeem-voucher] atomic redemption failed for ${code}:`, redemptionErr.message);
       return json({ ok: false, error: "grant_failed" }, 500);
     }
-
-    // Atomic increment — prevents race condition exceeding max_uses.
-    // The previous fallback (read-then-write using cached times_used) was
-    // racy: under concurrent redemptions reading the same value, the
-    // counter could be left at the old number indefinitely, allowing
-    // more redemptions than max_uses. If the RPC fails, surface the error
-    // and rollback the redemption row instead of pretending it worked.
-    const { error: incErr } = await supabase.rpc("increment_voucher_usage", { p_voucher_id: voucher.id });
-    if (incErr) {
-      console.error(`[redeem-voucher] increment_voucher_usage failed for ${code}:`, incErr.message);
-      // Rollback the redemption insert so a retry can proceed cleanly.
-      await supabase.from("voucher_redemptions").delete().eq("voucher_id", voucher.id).eq("user_id", userId);
-      return json({ ok: false, error: "increment_failed", detail: incErr.message }, 500);
+    if (!redemption?.ok) {
+      const error = redemption?.error || "grant_failed";
+      const status = ["invalid_code", "expired", "max_uses_reached", "wrong_recipient", "already_redeemed", "already_black_diamond"].includes(error) ? 400 : 500;
+      return json({ ok: false, error }, status);
     }
 
     console.log(`Voucher ${code} (${voucher.type}) redeemed by ${userEmail}. Grants: ${JSON.stringify(grants)}`);
@@ -251,7 +236,8 @@ Deno.serve(async (req: Request) => {
       grants_applied: {
         tokens: tokensGranted,
         builder_plan: grants.builder_plan || null,
-        daily_plan: grants.daily_plan || null,
+        daily_plan: dailyPlanGrant?.daily_plan || null,
+        daily_plan_expires_at: dailyPlanGrant?.daily_plan_expires_at || null,
         badge: grants.badge || null,
       },
     });

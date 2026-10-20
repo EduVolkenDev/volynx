@@ -7,7 +7,7 @@ const navIconThumb = (src: string) =>
 const navGroups = [
   {
     key: "volynx",
-    href: ROUTES.core,
+    href: ROUTES.home,
     label: "VOLYNX",
     eyebrow: "Ecosystem",
     eyebrowPt: "Ecossistema",
@@ -15,8 +15,8 @@ const navGroups = [
     descriptionPt: "Navegue por todas as camadas VOLYNX em um único painel.",
     items: [
       { href: ROUTES.world, label: "World", detail: "People, opportunities and the ecosystem.", detailPt: "Pessoas, oportunidades e ecossistema.", icon: "/assets/V.webp" },
-      { href: ROUTES.daily, label: "Daily OS", detail: "Daily command, Vault and intelligent routines.", detailPt: "Comando diário, Vault e rotinas inteligentes.", icon: "/assets/volynx-daily.webp" },
-      { href: ROUTES.cvitae, label: "CVitae", detail: "Career assets, resumes and applications.", detailPt: "Carreira, currículos e candidaturas.", icon: "/assets/cvitae.webp" },
+      { href: ROUTES.daily, label: "Daily OS", detail: "Daily command, Vault and intelligent routines.", detailPt: "Comando diário, Vault e rotinas inteligentes.", icon: "/assets/daily-icon-general-512.webp" },
+      { href: ROUTES.cvitae, label: "CVitae", detail: "Career assets, resumes and applications.", detailPt: "Carreira, currículos e candidaturas.", icon: "/assets/cvitae-pathfinder-mark.png" },
       { href: ROUTES.propertyflow, label: "PropertyFlow", detail: "Premium real-estate workflows.", detailPt: "Fluxos imobiliários premium.", icon: "/assets/Volynx-OS-Cards/newpropertyflow.webp" },
     ],
   },
@@ -48,7 +48,7 @@ const navGroups = [
       { href: ROUTES.labConverter, label: "Converter", detail: "Convert image formats locally.", detailPt: "Converta formatos de imagem localmente.", icon: "/assets/converterbig.webp" },
       { href: ROUTES.labImageScaler, label: "Image Scaler", detail: "Resize and upscale with precision.", detailPt: "Redimensione e amplie com precisão.", icon: "/assets/newimagescaler.webp" },
       { href: ROUTES.labImageSuite, label: "iMage Suite", detail: "Compress, clean and process images.", detailPt: "Comprima, limpe e processe imagens.", icon: "/assets/newimagesuite.webp" },
-      { href: ROUTES.labLumina, label: "Lumina", detail: "AI-assisted knowledge and writing.", detailPt: "Conhecimento e escrita assistidos por IA.", icon: "/assets/lumina/lumina-icon-transparent.webp" },
+      { href: ROUTES.labLumina, label: "Lumina", detail: "AI-assisted knowledge and writing.", detailPt: "Conhecimento e escrita assistidos por IA.", icon: "/assets/lumina/lumina-hero-monogram.webp" },
       { href: ROUTES.qrgen, label: "QRGen", detail: "Design production-ready QR projects.", detailPt: "Crie projetos QR prontos para produção.", icon: "/assets/qrgen/qrgen-icon3.webp" },
     ],
   },
@@ -77,12 +77,12 @@ interface Props {
   ctaLabel?: string;
   ctaI18n?: string;
 }
-const { current = "", brandHref = ROUTES.core, ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "nav.go_pro" } = Astro.props;
+const { current = "", brandHref = ROUTES.home, ctaHref = ROUTES.pricing, ctaLabel = "Go Pro", ctaI18n = "nav.go_pro" } = Astro.props;
 ---
 <header class="vx-topbar" id="vxTopbar">
   <div class="vx-topbar__inner">
     <!-- LOGO -->
-    <a href={brandHref} class="vx-brand" aria-label="VOLYNX Core home" data-i18n-aria="aria.platform_home">
+    <a href={brandHref} class="vx-brand" aria-label="VOLYNX home" data-i18n-aria="aria.platform_home">
       <img src="/assets/V.webp" alt="" class="vx-brand__mark" width="44" height="44" aria-hidden="true" loading="eager" decoding="async" />
       <span class="vx-brand__text">
         <img src="/assets/wordmark-dark-trimmed.webp" alt="VOLYNX" class="vx-brand__wordmark" width="160" height="69" loading="eager" decoding="async" />
@@ -167,7 +167,7 @@ const { current = "", brandHref = ROUTES.core, ctaHref = ROUTES.pricing, ctaLabe
           </a>
           <a href={ROUTES.daily} class="vx-account-menu__item" role="menuitem">
             <span class="vx-account-menu__icon vx-account-menu__icon--daily" aria-hidden="true">
-              <img src="/assets/volynx-daily.webp" alt="" loading="lazy" decoding="async" />
+              <img src="/assets/daily-icon-general-512.webp" alt="" loading="lazy" decoding="async" />
             </span>
             <span>Daily</span>
           </a>
@@ -227,7 +227,7 @@ const { current = "", brandHref = ROUTES.core, ctaHref = ROUTES.pricing, ctaLabe
       <span data-i18n="nav.profile">Profile</span>
     </a>
     <a href={ROUTES.daily} class="vx-mobile__profile" data-auth="in">
-      <span class="vx-mobile__avatar vx-mobile__avatar--daily" aria-hidden="true"><img src="/assets/volynx-daily.webp" alt="" loading="lazy" decoding="async" /></span>
+      <span class="vx-mobile__avatar vx-mobile__avatar--daily" aria-hidden="true"><img src="/assets/daily-icon-general-512.webp" alt="" loading="lazy" decoding="async" /></span>
       <span>Daily</span>
     </a>
   </nav>

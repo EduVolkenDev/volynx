@@ -31,7 +31,7 @@ const toolCards = [
     label: "AI + Local",
     href: ROUTES.labLumina,
     cta: "Open Lumina",
-    image: "/assets/lumina/lumina-icon-transparent.webp",
+    image: "/assets/lumina/lumina-hero-monogram.webp",
     description: "Turn complex scientific, technical and educational content into clear explanations.",
     promise: "Clear explanations with AI when available, a useful local fallback and export.",
     states: ["Free quota", "AI", "Local fallback", "Export"],
@@ -106,16 +106,27 @@ const workflowSteps = [
 ];
 
 const memorySteps = [
-  ["1", "Select", "Choose a tool", "Your current route and task stay attached to the session.", "/assets/chooseatool.webp"],
-  ["2", "Create", "Upload or write", "Files, prompts and useful presets remain close to the work.", "/assets/lumina/uploadorwrite.webp"],
-  ["3", "Deliver", "Export cleanly", "Finish the action with a clear output and recovery path.", "/assets/exportcleanly.webp"],
-  ["4", "Continue", "Resume in profile", "Return to the same task without starting again.", "/assets/lumina/resumeinprofile.webp"],
+  ["1", "Select", "Choose a tool", "Your current route and task stay attached to the session.", "/assets/chooseatool.webp", "#tools"],
+  ["2", "Create", "Upload or write", "Files, prompts and useful presets remain close to the work.", "/assets/lumina/uploadorwrite.webp", ROUTES.labLumina],
+  ["3", "Deliver", "Export cleanly", "Finish the action with a clear output and recovery path.", "/assets/exportcleanly.webp", ROUTES.labImageSuite],
+  ["4", "Continue", "Resume in profile", "Return to the same task without starting again.", "/assets/lumina/resumeinprofile.webp", ROUTES.profile],
 ];
 ---
 <FlagshipLayout title="VOLYNX Lab — Free Image Tools" description="Free browser-based image tools by VOLYNX — convert, upscale and process images locally." pageClass="page-lab">
   <FlagshipHeader current={ROUTES.lab} ctaLabel="Unlock Studio Pro" ctaI18n="lab2.header_cta" />
   <main>
     <LabToolShell active="home" />
+
+    <section class="page-section lab-education-callout" aria-label="VOLYNX Education Lab">
+      <div class="shell lab-education-callout__inner">
+        <div>
+          <span class="kicker"><span class="i18n-en">VOLYNX Education Lab</span><span class="i18n-pt">VOLYNX Education Lab</span></span>
+          <h2><span class="i18n-en">Free paths for people who want to build.</span><span class="i18n-pt">Trilhas gratuitas para quem quer construir.</span></h2>
+          <p><span class="i18n-en">Start with Dev Journey or open the new Cheatcodes reference for developers and learners.</span><span class="i18n-pt">Comece pelo Dev Journey ou abra a nova referência Cheatcodes para desenvolvedores e aprendizes.</span></p>
+        </div>
+        <a class="button button--gold" href={ROUTES.labEducation}><span class="i18n-en">Open Education</span><span class="i18n-pt">Abrir Education</span><span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
 
     <!-- ═══ HERO ═══ -->
     <section class="hero">
@@ -173,8 +184,8 @@ const memorySteps = [
           <p data-i18n="lab2.memory_desc">Your recent activity and presets stay available in your profile, so returning to a task is quick.</p>
         </div>
         <div class="lab-flow__steps">
-          {memorySteps.map(([number, state, title, copy, iconSrc]) => (
-            <article>
+          {memorySteps.map(([number, state, title, copy, iconSrc, href]) => (
+            <a class="lab-flow__step" href={href}>
               <div class="lab-flow__step-top">
                 <strong>{number}</strong>
                 <em data-i18n={`lab2.memory_step${number}_state`}>{state}</em>
@@ -186,7 +197,8 @@ const memorySteps = [
                 <span data-i18n={`lab2.memory_step${number}_title`}>{title}</span>
                 <p data-i18n={`lab2.memory_step${number}_desc`}>{copy}</p>
               </div>
-            </article>
+              <span class="lab-flow__step-cta" aria-hidden="true">↗</span>
+            </a>
           ))}
         </div>
       </div>
@@ -300,6 +312,11 @@ const memorySteps = [
 </FlagshipLayout>
 
 <style is:global>
+  .page-lab .lab-education-callout { padding-top: 0; }
+  .page-lab .lab-education-callout__inner { display: flex; align-items: center; justify-content: space-between; gap: 28px; padding: 26px 30px; border: 1px solid rgba(184,247,123,.22); border-radius: 20px; background: linear-gradient(105deg, rgba(184,247,123,.08), rgba(110,231,249,.05)); }
+  .page-lab .lab-education-callout h2 { margin: 8px 0 6px; font-size: clamp(1.45rem, 3vw, 2.4rem); letter-spacing: -.045em; }
+  .page-lab .lab-education-callout p { max-width: 660px; margin: 0; color: rgba(226,232,240,.68); line-height: 1.5; }
+  .page-lab .lab-education-callout .button { display: inline-flex; flex-shrink: 0; gap: 10px; align-items: center; }
   .page-lab .lab-runtime-section {
     padding-top: 10px;
   }
@@ -427,7 +444,8 @@ const memorySteps = [
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 10px;
   }
-  .page-lab .lab-flow__steps article {
+  .page-lab .lab-flow__step {
+    position: relative;
     min-height: 222px;
     display: flex;
     flex-direction: column;
@@ -440,6 +458,26 @@ const memorySteps = [
       linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025)),
       rgba(255,255,255,.025);
     box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    color: inherit;
+    text-decoration: none;
+    transition: transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
+  }
+  .page-lab .lab-flow__step:hover,
+  .page-lab .lab-flow__step:focus-visible {
+    transform: translateY(-4px);
+    border-color: rgba(125,249,255,.46);
+    background:
+      linear-gradient(180deg, rgba(125,249,255,.1), rgba(255,255,255,.035)),
+      rgba(255,255,255,.04);
+    box-shadow: 0 16px 30px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.1);
+    outline: none;
+  }
+  .page-lab .lab-flow__step-cta {
+    position: absolute;
+    right: 15px;
+    bottom: 14px;
+    color: rgba(125,249,255,.82);
+    font-size: 17px;
   }
   .page-lab .lab-flow__step-top {
     display: flex;
@@ -522,7 +560,6 @@ const memorySteps = [
       linear-gradient(135deg, rgba(125,249,255,.08), rgba(214,168,79,.05)),
       rgba(255,255,255,.035);
   }
-  .page-lab .tool-card:hover,
   .page-lab .tool-card:focus-within {
     filter: drop-shadow(0 18px 42px rgba(125,249,255,.12));
     transform: translateY(-6px);
@@ -781,34 +818,6 @@ const memorySteps = [
       drop-shadow(0 0 18px rgba(255, 255, 255, .08));
     transition: filter 0.22s ease;
   }
-  .page-lab .stat-block:hover {
-    transform: translateY(-4px);
-    box-shadow:
-      0 18px 40px rgba(0, 0, 0, .22),
-      0 0 24px rgba(130, 220, 255, .06);
-    background:
-      linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04)),
-      radial-gradient(circle at top, var(--stat-glow), transparent 72%);
-  }
-  .page-lab .stat-block:hover .stat-icon-wrap {
-    transform: translateY(-2px);
-    border-color: rgba(130,220,255,.18);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.07),
-      0 16px 30px rgba(0, 0, 0, .18);
-    background:
-      radial-gradient(circle at 50% 22%, rgba(255,255,255,.15), transparent 36%),
-      linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-  }
-  .page-lab .stat-block:hover .stat-icon-wrap::before {
-    filter: blur(20px);
-    transform: scale(1.05);
-  }
-  .page-lab .stat-block:hover .stat-icon {
-    filter:
-      drop-shadow(0 22px 30px rgba(0, 0, 0, .3))
-      drop-shadow(0 0 22px rgba(255, 255, 255, .11));
-  }
   .page-lab .stat-icon--queue {
     width: min(100%, 246px);
     transform: translateY(10px) scale(1.03);
@@ -840,6 +849,7 @@ const memorySteps = [
     }
   }
   @media (max-width: 900px) {
+    .page-lab .lab-education-callout__inner { align-items: flex-start; flex-direction: column; }
     .page-lab .lab-runtime__head {
       flex-direction: column;
     }
@@ -890,6 +900,8 @@ const memorySteps = [
     }
   }
   @media (max-width: 560px) {
+    .page-lab .lab-education-callout__inner { padding: 22px 18px; }
+    .page-lab .lab-education-callout .button { width: 100%; justify-content: center; }
     .page-lab .tool-grid {
       grid-template-columns: 1fr;
     }
@@ -897,7 +909,7 @@ const memorySteps = [
     .page-lab .lab-workflow__grid {
       grid-template-columns: 1fr;
     }
-    .page-lab .lab-flow__steps article,
+    .page-lab .lab-flow__steps .lab-flow__step,
     .page-lab .lab-workflow__grid div {
       min-height: 158px;
     }

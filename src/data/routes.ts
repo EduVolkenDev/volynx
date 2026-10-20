@@ -10,7 +10,7 @@ export const ROUTES = {
   core: "/",
   corePreview: "/core-preview/",
   impactMap: "/impact-map/",
-  platform: "/platform/",
+  platform: "/platform/", // legacy alias; the unified entry is ROUTES.home
   world: "/world/",
   about: "/about/",
   contact: "/contact/",
@@ -68,6 +68,8 @@ export const ROUTES = {
 
   // ── Lab (Free) ────────────────────────
   lab: "/volynx-lab/",
+  labEducation: "/volynx-lab/education/",
+  cheatcodes: "/volynx-lab/education/cheatcodes/",
   labConverter: "/volynx-lab/converter/",
   labImageScaler: "/volynx-lab/image-scaler/",
   labImageSuite: "/volynx-lab/image-suite/",

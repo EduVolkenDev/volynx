@@ -17,6 +17,8 @@ const ecosystemSurfaces = [
   { name: "Services", icon: "services" as const, href: ROUTES.services, asset: "/assets/galaxy/core-surface-services.webp", label: { en: "Work with an expert", pt: "Trabalhar com especialistas" }, copy: { en: "Add strategy, design and implementation when the project needs a human partner.", pt: "Adicione estratégia, design e implementação quando o projeto precisar de parceria humana." }, tone: "violet" },
   { name: "Dev Journey", icon: "journey" as const, href: ROUTES.devJourney, asset: "/assets/galaxy/core-surface-journey.webp", label: { en: "Learn by building", pt: "Aprender construindo" }, copy: { en: "Move from understanding to a real project with a guided, practical track.", pt: "Passe do entendimento a um projeto real com uma trilha prática e guiada." }, tone: "gold" },
 ];
+
+return Astro.redirect("/");
 ---
 
 <!doctype html>
@@ -57,10 +59,19 @@ const ecosystemSurfaces = [
         <a href={devHubHref} data-en="Dev Hub" data-pt="Dev Hub">Dev Hub</a>
         <a class="core-nav-platform" href={platformHref} data-en="Platform" data-pt="Plataforma">Plataforma</a>
       </nav>
+      <span class="core-seasonal-tag" aria-hidden="true">OCTOBER / NIGHT SIGNAL</span>
       <button class="language" type="button" data-language-toggle aria-label="Mudar idioma">PT / EN</button>
     </header>
 
     <main id="top">
+      <section class="core-halloween-feature core-shell" aria-label="October edition">
+        <div class="core-halloween-feature__copy">
+          <span class="section-kicker"><span>OCT 31</span><span data-en="Night signal" data-pt="Sinal noturno">Sinal noturno</span></span>
+          <h2 data-en="A darker signal for the work ahead." data-pt="Um sinal mais noturno para o trabalho à frente.">Um sinal mais noturno para o trabalho à frente.</h2>
+          <p data-en="VOLYNX Core, in its October edition: clarity, action and evidence under a different light." data-pt="VOLYNX Core, em sua edição de outubro: clareza, ação e evidência sob outra luz.">VOLYNX Core, em sua edição de outubro: clareza, ação e evidência sob outra luz.</p>
+        </div>
+        <img class="core-halloween-feature__art" src="/assets/halloween-volynx-orb.png" alt="" width="1025" height="1535" />
+      </section>
       <section class="hero core-shell" aria-labelledby="hero-title">
         <div class="hero__copy reveal">
           <p class="eyebrow"><span class="eyebrow__signal" aria-hidden="true"></span><span data-en="VOLYNX Core" data-pt="VOLYNX Core">VOLYNX Core</span></p>
@@ -84,6 +95,7 @@ const ecosystemSurfaces = [
         </div>
 
         <div class="signal-stage reveal reveal--late" aria-label="VOLYNX Core signal" data-signal-stage>
+          <span class="signal-stage__seasonal-pulse" aria-hidden="true"></span>
           <div class="signal-stage__halo signal-stage__halo--outer"></div>
           <div class="signal-stage__halo signal-stage__halo--inner"></div>
           <div class="signal-stage__axis signal-stage__axis--one"></div>
@@ -114,6 +126,14 @@ const ecosystemSurfaces = [
           <div class="signal-label signal-label--bottom"><span>03</span><b data-en="EVIDENCE" data-pt="EVIDÊNCIA">EVIDÊNCIA</b></div>
         </div>
       </section>
+
+      <div class="core-seasonal-rail core-shell" aria-hidden="true">
+        <span class="core-seasonal-rail__line"></span>
+        <span class="core-seasonal-rail__node core-seasonal-rail__node--orange"></span>
+        <span class="core-seasonal-rail__node core-seasonal-rail__node--violet"></span>
+        <span class="core-seasonal-rail__label">NIGHT SIGNAL / OCT 31 / ACTIVE</span>
+        <span class="core-seasonal-rail__line"></span>
+      </div>
 
       <section class="intro core-shell reveal" id="begin" aria-labelledby="begin-title">
         <div class="section-kicker"><span>01</span><span data-en="Begin with what matters" data-pt="Comece pelo que importa">Comece pelo que importa</span></div>
@@ -267,6 +287,7 @@ const ecosystemSurfaces = [
     </main>
 
     <footer class="core-footer core-shell">
+      <span class="core-footer__seasonal" aria-hidden="true">◉ NIGHT SIGNAL / 31 OCT</span>
       <span>VOLYNX / CORE</span>
       <span data-en="One connected experience. Built to keep evolving." data-pt="Uma experiência conectada. Feita para evoluir.">Uma experiência conectada. Feita para evoluir.</span>
     </footer>
@@ -362,6 +383,7 @@ const ecosystemSurfaces = [
   nav a, .language { transition: color .2s ease, border-color .2s ease; }
   nav a:hover, nav a:focus-visible { color: var(--ink); }
   .core-nav-platform { color: var(--gold); }
+  .core-seasonal-tag { color: rgba(255, 130, 56, .78); font-size: .56rem; font-weight: 800; letter-spacing: .16em; white-space: nowrap; }
   .language { border: 1px solid var(--line); border-radius: 999px; padding: 9px 13px; color: var(--muted); background: rgba(255,255,255,.035); cursor: pointer; font-size: .7rem; letter-spacing: .12em; }
   .language:hover, .language:focus-visible { color: var(--ink); border-color: rgba(233,215,165,.55); }
   .hero { min-height: 760px; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(380px, .95fr); align-items: center; gap: clamp(42px, 8vw, 120px); padding-top: 64px; padding-bottom: 86px; }
@@ -384,6 +406,8 @@ const ecosystemSurfaces = [
   .legacy-entry__signal { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; background: var(--gold); box-shadow: 0 0 16px rgba(233,215,165,.65); }
   .signal-stage { position: relative; min-height: 540px; display: grid; place-items: center; isolation: isolate; overflow: hidden; }
   .signal-stage::before { content: ""; position: absolute; width: 46%; aspect-ratio: 1; border-radius: 50%; background: rgba(110,231,249,.10); filter: blur(55px); z-index: -1; transform: translate(calc(var(--pointer-x, 0) * 18px), calc(var(--pointer-y, 0) * 18px)); transition: transform .6s cubic-bezier(.2,.7,.2,1); }
+  .signal-stage::after { content: ""; position: absolute; width: 78%; aspect-ratio: 1; border: 1px solid rgba(255, 130, 56, .2); border-radius: 50%; transform: rotate(26deg) scaleY(.42); box-shadow: 0 0 42px rgba(255, 130, 56, .08); pointer-events: none; }
+  .signal-stage__seasonal-pulse { position: absolute; top: 13%; right: 16%; width: 8px; height: 8px; border-radius: 50%; background: #ff8238; box-shadow: 0 0 0 7px rgba(255,130,56,.08), 0 0 24px 8px rgba(255,130,56,.4); animation: seasonal-pulse 2.8s ease-in-out infinite; }
   .signal-stage__halo { position: absolute; border: 1px solid rgba(167,139,250,.35); border-radius: 50%; transform: rotate(-24deg); }
   .signal-stage__halo--outer { width: min(500px, 90%); aspect-ratio: 1; box-shadow: inset 0 0 80px rgba(124,58,237,.07), 0 0 60px rgba(124,58,237,.10); }
   .signal-stage__halo--inner { width: 63%; aspect-ratio: 1; border-color: rgba(110,231,249,.42); transform: rotate(32deg); }
@@ -437,7 +461,9 @@ const ecosystemSurfaces = [
   .path-card--action .path-card__art { transform: rotate(3deg) scale(1.05); }
   .path-card--evidence .path-card__art { transform: rotate(-2deg) scale(1.04); }
   .path-card__content { margin-top: auto; }
-  .path-card:hover { transform: translateY(-5px); border-color: rgba(110,231,249,.5); background: linear-gradient(150deg, rgba(110,231,249,.12), rgba(255,255,255,.02)); }
+  .path-card:hover { transform: translateY(-5px); border-color: rgba(255,130,56,.65); background: linear-gradient(150deg, rgba(255,130,56,.12), rgba(255,255,255,.02)); }
+  .path-card:nth-child(2) { border-color: rgba(167,139,250,.28); }
+  .path-card:nth-child(3) { border-color: rgba(255,130,56,.22); }
   .path-card:hover .path-card__art { opacity: 1; }
   .path-card__number { color: var(--cyan); font-size: .72rem; letter-spacing: .16em; }
   .path-card__label { margin: 0; color: var(--gold); }
@@ -498,7 +524,7 @@ const ecosystemSurfaces = [
   .surface-card__art { display: block; width: min(100%, 300px); height: auto; object-fit: contain; pointer-events: none; filter: drop-shadow(0 14px 24px rgba(30, 130, 255, .18)); transition: transform .42s cubic-bezier(.2, .75, .2, 1), filter .42s ease; transform: translate(0px, -100px); }
   .surface-card:hover .surface-card__art, .surface-card:focus-visible .surface-card__art { filter: drop-shadow(0 18px 34px rgba(30, 130, 255, .3)) saturate(1.12) brightness(1.03); transform: translate(0px, -108px) scale(1.035) rotate(-1deg); }
   .surface-card strong { position: relative; z-index: 1; color: var(--ink); font-size: 1.35rem; line-height: 1.1; letter-spacing: -.04em; }
-  .surface-card__copy { position: relative; z-index: 1; max-width: 32ch; color: var(--muted); font-size: .92rem; line-height: 1.6; backdrop-filter: blur(10px); background: #ffffff24; padding: 10px; }
+  .surface-card__copy { position: relative; z-index: 1; max-width: 32ch; color: rgb(231 233 246); font-size: .92rem; line-height: 1.6; backdrop-filter: blur(1px); background: #ffffff24; padding: 15px; border-radius: 15px; }
   .i18n-en { display: none; }
   .i18n-pt { display: inline; }
   html[lang="en"] .i18n-en { display: inline; }
@@ -520,6 +546,7 @@ const ecosystemSurfaces = [
   .reveal--later { transition-delay: .22s; }
   .reveal.is-visible { opacity: 1; transform: none; }
   @keyframes constellation-drift { from { transform: rotate(-11deg); } to { transform: rotate(349deg); } }
+  @keyframes seasonal-pulse { 0%, 100% { opacity: .55; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.18); } }
   :focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -528,12 +555,41 @@ const ecosystemSurfaces = [
     .signal-stage__constellation { animation: none; }
   }
   @media (max-width: 860px) {
+    .core-seasonal-tag { display: none; }
     .hero, .intro__grid, .handoff { grid-template-columns: 1fr; }
     .hero { min-height: auto; padding-top: 82px; }
     .signal-stage { min-height: 440px; max-width: 600px; margin-inline: auto; width: 100%; }
     .intro__grid, .handoff { gap: 28px; }
   }
+  .core-halloween-feature {
+    position: relative;
+    display: flex;
+    min-height: 188px;
+    align-items: center;
+    overflow: hidden;
+    margin-top: 32px;
+    margin-bottom: 18px;
+    padding: 28px clamp(24px, 5vw, 68px);
+    border: 1px solid rgba(255, 130, 56, .3);
+    border-radius: 24px;
+    background: radial-gradient(circle at 78% 46%, rgba(125, 69, 208, .22), transparent 34%), linear-gradient(105deg, rgba(16, 10, 30, .94), rgba(8, 9, 20, .72));
+    box-shadow: inset 0 1px rgba(255,255,255,.09), 0 24px 70px rgba(0,0,0,.22);
+  }
+
+  .core-halloween-feature__copy { position: relative; z-index: 1; max-width: 590px; }
+  .core-halloween-feature__copy h2 { max-width: 550px; margin: 10px 0 8px; color: #f4efff; font-size: clamp(1.55rem, 3vw, 2.5rem); line-height: 1.02; }
+  .core-halloween-feature__copy p { max-width: 470px; margin: 0; color: #aaa9c0; font-size: .9rem; line-height: 1.55; }
+  .core-halloween-feature__art { position: absolute; right: clamp(28px, 8vw, 110px); bottom: -30px; width: auto; height: 270px; filter: drop-shadow(0 0 28px rgba(255,130,56,.23)); pointer-events: none; }
+
+  @media (max-width: 700px) {
+    .core-halloween-feature { min-height: 174px; margin-top: 18px; padding: 22px 20px; padding-right: 120px; }
+    .core-halloween-feature__copy h2 { font-size: 1.45rem; }
+    .core-halloween-feature__copy p { font-size: .76rem; }
+    .core-halloween-feature__art { right: -8px; bottom: -34px; width: auto; height: 190px; }
+  }
+
   @media (max-width: 640px) {
+    .core-seasonal-tag { display: none; }
     .core-shell, .core-header { width: min(100% - 32px, 1180px); }
     .core-header { flex-wrap: wrap; }
     nav { order: 3; width: 100%; justify-content: space-between; gap: 12px; font-size: .65rem; }
@@ -581,4 +637,45 @@ const ecosystemSurfaces = [
     .orbit-node--operate { right: 0; }
     .orbit-node--connect { left: 0; }
   }
+  /* October edition: distributed spectral interface across the full home. */
+  .page-core .galaxyfield { opacity: .6; }
+  .ambient--one { background: radial-gradient(circle at 70% 15%, rgba(124,58,237,.2), transparent 27%), radial-gradient(circle at 12% 70%, rgba(255,130,56,.08), transparent 24%); }
+  .page-core .hero .reveal { opacity: 1; transform: none; }
+  .page-core .hero__copy { position: relative; z-index: 1; }
+  .page-core .hero__copy::before { content: ""; position: absolute; inset: -34px -48px -38px -28px; z-index: -1; border-radius: 32px; background: radial-gradient(ellipse at 35% 42%, rgba(3,4,11,.72), rgba(3,4,11,.28) 58%, transparent 78%); pointer-events: none; }
+  .page-core .hero__lead { color: rgba(232,234,248,.82); }
+  .page-core .hero__trust { color: rgba(220,223,242,.7); }
+  .core-header { box-shadow: 0 12px 36px rgba(255,130,56,.06); }
+  .core-header::after { content: ""; position: absolute; right: 0; bottom: -1px; left: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,130,56,.6), rgba(167,139,250,.6), transparent); opacity: .7; }
+  .core-seasonal-tag { text-shadow: 0 0 16px rgba(255,130,56,.48); }
+  .core-halloween-feature { box-shadow: inset 0 1px rgba(255,255,255,.12), 0 20px 70px rgba(255,130,56,.1), 0 0 0 1px rgba(167,139,250,.08); }
+  .core-halloween-feature::before { content: ""; position: absolute; inset: 0; opacity: .22; background: repeating-linear-gradient(115deg, transparent 0 36px, rgba(167,139,250,.18) 37px, transparent 38px); pointer-events: none; }
+  .core-seasonal-rail { display: flex; align-items: center; gap: 12px; padding-top: 8px; padding-bottom: 8px; color: rgba(255,130,56,.7); }
+  .core-seasonal-rail__line { height: 1px; flex: 1; background: linear-gradient(90deg, transparent, rgba(255,130,56,.45), rgba(167,139,250,.42), transparent); }
+  .core-seasonal-rail__node { width: 7px; height: 7px; border-radius: 50%; box-shadow: 0 0 0 5px rgba(255,130,56,.08), 0 0 18px currentColor; }
+  .core-seasonal-rail__node--orange { color: #ff8238; background: #ff8238; }
+  .core-seasonal-rail__node--violet { color: #a78bfa; background: #a78bfa; }
+  .core-seasonal-rail__label { font-size: .52rem; font-weight: 800; letter-spacing: .2em; white-space: nowrap; }
+  .button--primary { background: linear-gradient(120deg, #fff, #ffb36f 52%, #a78bfa); box-shadow: 0 14px 40px rgba(255,130,56,.2), 0 0 22px rgba(167,139,250,.14); transition: transform .2s ease, box-shadow .2s ease, filter .2s ease; }
+  .button--primary:hover, .button--primary:focus-visible { filter: saturate(1.15); transform: translateY(-3px); box-shadow: 0 18px 42px rgba(255,130,56,.3), 0 0 30px rgba(167,139,250,.24); }
+  .button--quiet:hover, .button--quiet:focus-visible { border-color: rgba(255,130,56,.76); background: linear-gradient(120deg, rgba(255,130,56,.12), rgba(167,139,250,.1)); box-shadow: 0 0 22px rgba(255,130,56,.1); }
+  .orbit-node:hover, .orbit-node:focus-visible { border-color: #ff8238; box-shadow: 0 0 20px rgba(255,130,56,.18); }
+  .orbit-node__icon { color: #ff8238; background: linear-gradient(145deg, rgba(255,130,56,.2), rgba(167,139,250,.04)); box-shadow: inset 0 0 18px rgba(255,130,56,.14), 0 0 18px rgba(255,130,56,.12); }
+  .orbit-node--operate .orbit-node__icon, .orbit-node--connect .orbit-node__icon { color: var(--violet); }
+  .learning-feature, .handoff, .ecosystem, .future { position: relative; }
+  .learning-feature::before, .handoff::before, .ecosystem::before, .future::before { content: ""; position: absolute; top: 0; left: 0; width: 74px; height: 2px; background: linear-gradient(90deg, #ff8238, #a78bfa, transparent); box-shadow: 0 0 18px rgba(255,130,56,.24); }
+  .path-card { background: linear-gradient(150deg, rgba(255,130,56,.065), rgba(167,139,250,.035) 44%, rgba(255,255,255,.015)); }
+  .path-card__art { filter: drop-shadow(0 14px 24px rgba(255,130,56,.18)) saturate(1.04); }
+  .path-card:hover .path-card__art { filter: drop-shadow(0 18px 28px rgba(255,130,56,.32)) saturate(1.18); transform: translateY(-6px) rotate(2deg) scale(1.06); }
+  .hub-list a:hover, .hub-list a:focus-visible { border-color: rgba(255,130,56,.68); box-shadow: inset 0 0 28px rgba(255,130,56,.07); }
+  .surface-card { background: linear-gradient(145deg, rgba(255,130,56,.07), rgba(167,139,250,.045), rgba(255,255,255,.015)); }
+  .surface-card__icon { box-shadow: 0 0 10px 2px inset rgba(255,130,56,.52), 0 0 20px 15px inset rgba(124,58,237,.28); }
+  .future-grid article { background: linear-gradient(120deg, rgba(255,130,56,.04), transparent 60%); transition: border-color .2s ease, background .2s ease; }
+  .future-grid article:hover { border-color: rgba(255,130,56,.52); background: linear-gradient(120deg, rgba(255,130,56,.1), rgba(167,139,250,.05)); }
+  .closing__mark { border-color: rgba(255,130,56,.8); box-shadow: 0 0 35px 20px rgba(255,130,56,.12), 0 0 70px rgba(167,139,250,.22); }
+  .closing__mark img { filter: drop-shadow(0 18px 28px rgba(0,0,0,.48)) drop-shadow(0 0 24px rgba(255,130,56,.32)); }
+  .core-footer { position: relative; }
+  .core-footer__seasonal { color: rgba(255,130,56,.76); text-shadow: 0 0 14px rgba(255,130,56,.35); }
+  @media (max-width: 860px) { .core-seasonal-rail { width: calc(100% - 32px); } .core-seasonal-rail__label { font-size: .45rem; letter-spacing: .12em; } .core-footer__seasonal { order: -1; } }
+  @media (max-width: 640px) { .core-seasonal-rail { gap: 7px; padding-top: 2px; padding-bottom: 2px; } .core-seasonal-rail__label { max-width: 10rem; overflow: hidden; text-overflow: ellipsis; } .core-footer__seasonal { font-size: .55rem; } }
 </style>

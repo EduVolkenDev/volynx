@@ -145,7 +145,7 @@ export const productOfferPreviews: ProductOfferPreview[] = [
     slug: "cvitae-business", lookup: "cvitae_business", name: bi("CVitae Business", "CVitae Business"), eyebrow: bi("Career product", "Produto de carreira"),
     title: bi("Build, refine and export professional CVs without a ceiling.", "Crie, refine e exporte CVs profissionais sem ficar limitado."),
     summary: bi("Unlimited CV workflow, premium templates and professional exports for people whose career asset must stay ready.", "Fluxo ilimitado de CVs, templates premium e exports profissionais para quem precisa manter seu ativo de carreira pronto."),
-    image: "/assets/cvitae.webp", price: bi("£15 / month", "£15 / mês"), format: bi("Subscription", "Assinatura"),
+    image: "/assets/cvitae-pathfinder-mark.png", price: bi("£15 / month", "£15 / mês"), format: bi("Subscription", "Assinatura"),
     metrics: [metric("Unlimited", "CVs", "CVs"), metric("Premium", "templates", "templates"), metric("Pro", "exports", "exports")],
     whatYouGet: [bi("Guided CV editor with live preview.", "Editor guiado de CV com preview ao vivo."), bi("Unlimited CV management and premium templates.", "Gestão ilimitada de CVs e templates premium."), bi("Professional export workflow for repeated career use.", "Fluxo de export profissional para uso recorrente na carreira.")],
     bestFor: [bi("Professionals, freelancers and candidates who keep multiple versions ready.", "Profissionais, freelancers e candidatos que mantêm várias versões prontas.")],

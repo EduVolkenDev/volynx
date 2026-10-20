@@ -316,10 +316,15 @@ import { ROUTES } from "../../data/routes";
     });
 
     // ── Voucher redemption ──
+    const voucherFromLink = new URLSearchParams(window.location.search).get('voucher');
+    if (voucherFromLink) {
+      const voucherField = document.getElementById('voucherInput');
+      if (voucherField) voucherField.value = voucherFromLink.trim().toUpperCase();
+    }
     document.getElementById('redeemBtn')?.addEventListener('click', async () => {
       const input = document.getElementById('voucherInput');
       const msg = document.getElementById('voucherMsg');
-      const code = (input?.value || '').trim();
+      const code = (input?.value || '').trim().toUpperCase();
       if (!code) return;
 
       msg.style.display = 'block';
@@ -340,6 +345,9 @@ import { ROUTES } from "../../data/routes";
           if (data.grants_applied?.tokens) parts.push(data.grants_applied.tokens + ' tokens');
           if (data.grants_applied?.builder_plan) parts.push('Builder ' + data.grants_applied.builder_plan);
           if (data.grants_applied?.daily_plan) parts.push('Daily ' + data.grants_applied.daily_plan);
+          if (data.grants_applied?.daily_plan_expires_at) {
+            parts.push('until ' + new Date(data.grants_applied.daily_plan_expires_at).toLocaleDateString());
+          }
           if (data.grants_applied?.badge) parts.push(data.grants_applied.badge + ' badge');
           msg.textContent = 'Redeemed! ' + (parts.join(' + ') || data.label || 'Success');
           input.value = '';
@@ -354,6 +362,8 @@ import { ROUTES } from "../../data/routes";
             max_uses_reached: 'This code has been fully used.',
             wrong_recipient: 'This code is for a different account.',
             already_redeemed: 'You already redeemed this code.',
+            daily_plan_already_permanent: 'Your Daily plan is already permanent; this temporary voucher did not change it.',
+            rate_limited: 'Too many attempts. Wait a minute and try again.',
           };
           msg.textContent = errors[data.error] || data.error || 'Something went wrong.';
         }

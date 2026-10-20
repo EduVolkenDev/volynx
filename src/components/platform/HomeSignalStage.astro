@@ -1,0 +1,49 @@
+---
+import CoreIcon from "../CoreIcon.astro";
+import { ROUTES } from "../../data/routes";
+
+const routes = [
+  { name: "Builder", icon: "builder" as const, href: ROUTES.builder, en: "Build", pt: "Construir" },
+  { name: "Daily", icon: "daily" as const, href: ROUTES.daily, en: "Operate", pt: "Operar" },
+  { name: "Lab", icon: "lab" as const, href: ROUTES.lab, en: "Create", pt: "Criar" },
+  { name: "Services", icon: "services" as const, href: ROUTES.services, en: "Collaborate", pt: "Colaborar" },
+];
+---
+
+<div class="home-signal">
+  <div class="home-signal__glow" aria-hidden="true"></div>
+  <div class="home-signal__identity">
+    <span class="home-signal__eyebrow"><span class="i18n-en">VOLYNX · ONE ECOSYSTEM</span><span class="i18n-pt">VOLYNX · UM ECOSSISTEMA</span></span>
+    <img src="/assets/volynx-core-icon.webp" alt="" width="320" height="320" loading="eager" decoding="async" />
+    <p><span class="i18n-en">Your next move starts here.</span><span class="i18n-pt">Seu próximo passo começa aqui.</span></p>
+  </div>
+  <div class="home-signal__routes">
+    {routes.map((route) => (
+      <a href={route.href} class="home-signal__route" data-analytics-event={`home_signal_${route.icon}`}>
+        <span class="home-signal__route-icon" aria-hidden="true"><CoreIcon name={route.icon} size={24} /></span>
+        <span><strong>{route.name}</strong><small><span class="i18n-en">{route.en}</span><span class="i18n-pt">{route.pt}</span></small></span>
+        <span class="home-signal__arrow" aria-hidden="true">↗</span>
+      </a>
+    ))}
+  </div>
+</div>
+
+<style>
+  .home-signal { position: relative; z-index: 1; isolation: isolate; width: min(100%, 520px); padding: clamp(20px, 2.5vw, 32px); overflow: hidden; border: 1px solid rgba(159, 191, 244, .26); border-radius: 30px; background: linear-gradient(145deg, rgba(10, 19, 39, .94), rgba(5, 10, 25, .97)); box-shadow: 0 32px 90px rgba(0, 0, 0, .4), inset 0 1px 0 rgba(255,255,255,.12); backdrop-filter: blur(18px); }
+  .home-signal__glow { position: absolute; z-index: -1; inset: -20% -15% 35%; background: radial-gradient(circle, rgba(101, 209, 239, .18), rgba(132, 101, 220, .1) 42%, transparent 68%); pointer-events: none; }
+  .home-signal__identity { display: grid; justify-items: center; text-align: center; }
+  .home-signal__eyebrow { color: #99f2ee; font-size: .7rem; font-weight: 800; letter-spacing: .2em; }
+  .home-signal__identity img { display: block; width: min(68%, 270px); height: auto; margin: -3px 0 -5px; filter: drop-shadow(0 12px 30px rgba(64, 167, 247, .23)); }
+  .home-signal__identity p { margin: 0 0 26px; color: #edf4ff; font-size: clamp(1.15rem, 1.65vw, 1.55rem); font-weight: 750; line-height: 1.25; letter-spacing: -.035em; }
+  .home-signal__routes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .home-signal__route { display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 72px; padding: 10px; border: 1px solid rgba(179, 204, 241, .16); border-radius: 15px; background: rgba(255,255,255,.045); color: #fff; text-decoration: none; transition: border-color .2s, background .2s, transform .2s; }
+  .home-signal__route:hover, .home-signal__route:focus-visible { border-color: #8bfaf0; background: rgba(139, 250, 240, .1); transform: translateY(-2px); }
+  .home-signal__route:focus-visible { outline: 2px solid #8bfaf0; outline-offset: 2px; }
+  .home-signal__route-icon { flex: 0 0 38px; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; color: #8bfaf0; background: rgba(139, 250, 240, .1); }
+  .home-signal__route strong, .home-signal__route small { display: block; }
+  .home-signal__route strong { font-size: .88rem; line-height: 1.2; }
+  .home-signal__route small { margin-top: 3px; color: #b9c7da; font-size: .72rem; }
+  .home-signal__arrow { margin-left: auto; align-self: flex-start; color: #a7bbd2; font-size: .8rem; }
+  @media (max-width: 420px) { .home-signal__routes { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) { .home-signal__route { transition: none; } }
+</style>

@@ -79,7 +79,7 @@ export function SiteFooter({ locale = "en", brand = "platform" }: SiteFooterProp
       ? "Área diária para capturar ideias, planejar, escrever, decidir e acompanhar a execução."
       : "Daily workspace for capture, planning, writing, decisions and follow-through.")
     : copy.description
-  const brandIcon = isDaily ? "/assets/brand/daily-icon.webp" : "/assets/brand/vx-new.webp"
+  const brandIcon = isDaily ? "/assets/brand/daily-icon-general-192.webp" : "/assets/brand/vx-new.webp"
   const brandIconAlt = isDaily ? "VOLYNX Daily icon" : "VOLYNX OS icon"
 
   return (

@@ -1,0 +1,87 @@
+---
+import FlagshipLayout from "../../../../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "../../../../components/FlagshipHeader.astro";
+import FlagshipFooter from "../../../../components/FlagshipFooter.astro";
+import { ROUTES } from "../../../../data/routes";
+
+const codes = [
+  { number: "01", title: { en: "Read the error", pt: "Leia o erro" }, copy: { en: "Turn a scary message into a location, a cause and a next test.", pt: "Transforme uma mensagem assustadora em localização, causa e próximo teste." } },
+  { number: "02", title: { en: "Make the smallest test", pt: "Faça o menor teste" }, copy: { en: "Change one thing, observe one result and keep your reasoning visible.", pt: "Mude uma coisa, observe um resultado e mantenha seu raciocínio visível." } },
+  { number: "03", title: { en: "Name the boundary", pt: "Nomeie o limite" }, copy: { en: "Know when a local demo, a prototype or an API is not production-ready.", pt: "Saiba quando uma demo local, um protótipo ou uma API ainda não estão prontos para produção." } },
+  { number: "04", title: { en: "Ship the proof", pt: "Publique a prova" }, copy: { en: "A working URL, a README and an honest explanation beat a perfect claim.", pt: "Uma URL funcionando, um README e uma explicação honesta valem mais que uma promessa perfeita." } },
+];
+
+const libraryTracks = [
+  { number: "01", title: { en: "Web foundations", pt: "Fundamentos web" }, copy: { en: "HTML, CSS, browser behavior and the first useful mental models.", pt: "HTML, CSS, comportamento do navegador e os primeiros modelos mentais úteis." }, bridge: { en: "Start in Dev Journey Blocks 0–1", pt: "Comece nos Blocos 0–1 do Dev Journey" } },
+  { number: "02", title: { en: "Debugging", pt: "Debugging" }, copy: { en: "Read errors, reduce the reproduction and choose the next test.", pt: "Leia erros, reduza a reprodução e escolha o próximo teste." }, bridge: { en: "Use before asking for help", pt: "Use antes de pedir ajuda" } },
+  { number: "03", title: { en: "Git & delivery", pt: "Git e entrega" }, copy: { en: "Commits, README files, deploy checks and evidence that another person can inspect.", pt: "Commits, README, checks de deploy e evidências que outra pessoa consegue inspecionar." }, bridge: { en: "Prepare for a published project", pt: "Prepare-se para um projeto publicado" } },
+  { number: "04", title: { en: "Frontend patterns", pt: "Padrões de frontend" }, copy: { en: "Components, state, responsive behavior, accessibility and useful empty states.", pt: "Componentes, estado, responsividade, acessibilidade e estados vazios úteis." }, bridge: { en: "Go deeper with the React track", pt: "Aprofunde na trilha de React" } },
+  { number: "05", title: { en: "APIs & architecture", pt: "APIs e arquitetura" }, copy: { en: "Separate browser, server, validation, data and the limits of a prototype.", pt: "Separe navegador, servidor, validação, dados e os limites de um protótipo." }, bridge: { en: "Bundle path in Dev Journey", pt: "Caminho Bundle no Dev Journey" } },
+  { number: "06", title: { en: "AI, privacy & boundaries", pt: "IA, privacidade e limites" }, copy: { en: "Use AI critically, protect data and say what a tool does not prove.", pt: "Use IA com senso crítico, proteja dados e diga o que uma ferramenta não prova." }, bridge: { en: "A VOLYNX point of view", pt: "A visão da VOLYNX" } },
+];
+---
+
+<FlagshipLayout title="Cheatcodes for Devs & Learners — VOLYNX" description="Free practical cheatcodes, mental models and debugging patterns for developers and learners." pageClass="page-cheatcodes">
+  <FlagshipHeader current={ROUTES.cheatcodes} ctaLabel="Open Education" ctaHref={ROUTES.labEducation} />
+  <main>
+    <section class="cheatcodes-hero">
+      <div class="shell">
+        <span class="kicker"><span class="i18n-en">VOLYNX Education Lab · 02</span><span class="i18n-pt">VOLYNX Education Lab · 02</span></span>
+        <h1><span class="i18n-en">Cheatcodes for<br /><em>Devs &amp; Learners.</em></span><span class="i18n-pt">Cheatcodes para<br /><em>Devs &amp; Learners.</em></span></h1>
+        <p><span class="i18n-en">Shortcuts for understanding, not shortcuts around learning.</span><span class="i18n-pt">Atalhos para entender, não atalhos para pular o aprendizado.</span></p>
+        <div class="cheatcodes-hero__actions"><a class="button button--gold" href="#cheatcodes"><span class="i18n-en">Explore the first codes</span><span class="i18n-pt">Explorar os primeiros códigos</span><span aria-hidden="true">↓</span></a><a class="button button--ghost" href={ROUTES.devJourney}><span class="i18n-en">Need a guided path?</span><span class="i18n-pt">Precisa de um caminho guiado?</span><span aria-hidden="true">↗</span></a></div>
+      </div>
+    </section>
+    <section class="page-section cheatcodes-grid-section" id="cheatcodes" aria-labelledby="cheatcodes-title">
+      <div class="shell"><div class="section-heading"><span class="kicker"><span class="i18n-en">The first set</span><span class="i18n-pt">O primeiro conjunto</span></span><h2 id="cheatcodes-title"><span class="i18n-en">Keep these close when the screen gets noisy.</span><span class="i18n-pt">Tenha isso por perto quando a tela ficar barulhenta.</span></h2></div><div class="cheatcodes-grid">{codes.map((code) => <article class="cheatcode-card"><span class="cheatcode-card__number">{code.number}</span><h3><span class="i18n-en">{code.title.en}</span><span class="i18n-pt">{code.title.pt}</span></h3><p><span class="i18n-en">{code.copy.en}</span><span class="i18n-pt">{code.copy.pt}</span></p></article>)}</div></div>
+    </section>
+    <section class="page-section cheatcodes-library" aria-labelledby="library-title">
+      <div class="shell">
+        <div class="section-heading"><span class="kicker"><span class="i18n-en">Public library map</span><span class="i18n-pt">Mapa da biblioteca pública</span></span><h2 id="library-title"><span class="i18n-en">Small, useful pieces. Released with intention.</span><span class="i18n-pt">Peças pequenas e úteis. Publicadas com intenção.</span></h2><p><span class="i18n-en">Cheatcodes will grow by topic. Each entry should solve one real learning moment, show its limits and point to the right next step.</span><span class="i18n-pt">O Cheatcodes vai crescer por assunto. Cada entrada deve resolver um momento real de aprendizado, mostrar seus limites e apontar o próximo passo.</span></p></div>
+        <div class="cheatcodes-library__grid">{libraryTracks.map((track) => <article class="library-card"><span class="library-card__number">{track.number}</span><h3><span class="i18n-en">{track.title.en}</span><span class="i18n-pt">{track.title.pt}</span></h3><p><span class="i18n-en">{track.copy.en}</span><span class="i18n-pt">{track.copy.pt}</span></p><small><span class="i18n-en">{track.bridge.en}</span><span class="i18n-pt">{track.bridge.pt}</span></small></article>)}</div>
+      </div>
+    </section>
+    <section class="cheatcodes-access" aria-labelledby="access-title">
+      <div class="shell cheatcodes-access__grid"><div><span class="kicker"><span class="i18n-en">Access model</span><span class="i18n-pt">Modelo de acesso</span></span><h2 id="access-title"><span class="i18n-en">Free knowledge. Protected work.</span><span class="i18n-pt">Conhecimento gratuito. Trabalho protegido.</span></h2></div><div class="cheatcodes-access__columns"><article><strong><span class="i18n-en">Free in Cheatcodes</span><span class="i18n-pt">Grátis no Cheatcodes</span></strong><p><span class="i18n-en">Concepts, checklists, generic examples, debugging moves, terminology and honest boundaries.</span><span class="i18n-pt">Conceitos, checklists, exemplos genéricos, debugging, terminologia e limites honestos.</span></p></article><article><strong><span class="i18n-en">Protected in VOLYNX</span><span class="i18n-pt">Protegido na VOLYNX</span></strong><p><span class="i18n-en">Complete product code, proprietary assets, full project packs, private feedback and certification evidence.</span><span class="i18n-pt">Código completo de produtos, assets proprietários, pacotes de projetos, feedback privado e evidências de certificação.</span></p></article></div></div>
+    </section>
+    <section class="cheatcodes-note"><div class="shell"><p><strong><span class="i18n-en">Free to learn.</span><span class="i18n-pt">Gratuito para aprender.</span></strong> <span class="i18n-en">These materials are protected VOLYNX educational content. Do not copy, resell, redistribute or turn them into a competing product.</span><span class="i18n-pt">Este material é conteúdo educacional protegido da VOLYNX. Não copie, revenda, redistribua nem transforme em produto concorrente.</span></p></div></section>
+  </main>
+  <FlagshipFooter />
+</FlagshipLayout>
+
+<style>
+  .page-cheatcodes { --cheat-green: #b8f77b; --cheat-cyan: #6ee7f9; }
+  .cheatcodes-hero { padding: clamp(90px, 14vw, 180px) 0 clamp(80px, 10vw, 130px); background: radial-gradient(circle at 72% 38%, rgba(184,247,123,.13), transparent 24%), radial-gradient(circle at 18% 70%, rgba(110,231,249,.1), transparent 27%), #090b18; }
+  .cheatcodes-hero h1 { max-width: 980px; margin: 20px 0 20px; font-size: clamp(3.7rem, 10vw, 9.5rem); line-height: .84; letter-spacing: -.085em; }
+  .cheatcodes-hero h1 em { color: var(--cheat-green); font-style: normal; }
+  .cheatcodes-hero p { color: rgba(238,241,255,.7); font-size: clamp(1.05rem, 2vw, 1.5rem); }
+  .cheatcodes-hero__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+  .cheatcodes-hero__actions .button { display: inline-flex; gap: 12px; align-items: center; }
+  .section-heading { max-width: 780px; margin-bottom: 38px; }
+  .section-heading h2 { margin: 12px 0 0; font-size: clamp(2rem, 4vw, 4rem); line-height: 1; letter-spacing: -.06em; }
+  .cheatcodes-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+  .cheatcode-card { min-height: 270px; padding: 25px; border: 1px solid rgba(255,255,255,.12); border-radius: 20px; background: linear-gradient(150deg, rgba(110,231,249,.08), rgba(255,255,255,.025)); }
+  .cheatcode-card:nth-child(even) { background: linear-gradient(150deg, rgba(184,247,123,.08), rgba(255,255,255,.025)); }
+  .cheatcode-card__number { color: var(--cheat-green); font: 700 .72rem ui-monospace, monospace; letter-spacing: .18em; }
+  .cheatcode-card h3 { margin: 72px 0 12px; font-size: clamp(1.35rem, 2vw, 1.9rem); letter-spacing: -.04em; }
+  .cheatcode-card p { color: rgba(226,232,240,.67); line-height: 1.55; }
+  .cheatcodes-note { padding: 0 0 70px; }
+  .cheatcodes-note p { margin: 0; padding: 20px 24px; border-left: 3px solid var(--cheat-green); color: rgba(238,241,255,.58); line-height: 1.6; }
+  .cheatcodes-note strong { color: var(--cheat-green); }
+  .cheatcodes-library { background: linear-gradient(180deg, rgba(110,231,249,.04), transparent); }
+  .cheatcodes-library__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .library-card { min-height: 220px; padding: 22px; border: 1px solid rgba(255,255,255,.11); border-radius: 18px; background: rgba(255,255,255,.025); }
+  .library-card__number { color: var(--cheat-cyan); font: 700 .72rem ui-monospace, monospace; letter-spacing: .16em; }
+  .library-card h3 { margin: 42px 0 10px; font-size: 1.25rem; letter-spacing: -.035em; }
+  .library-card p { min-height: 72px; color: rgba(226,232,240,.64); line-height: 1.5; }
+  .library-card small { display: block; margin-top: 17px; color: var(--cheat-green); font-size: .7rem; line-height: 1.4; }
+  .cheatcodes-access { padding: 70px 0; background: rgba(184,247,123,.045); }
+  .cheatcodes-access__grid { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(30px, 8vw, 110px); align-items: start; }
+  .cheatcodes-access h2 { margin: 12px 0 0; font-size: clamp(2rem, 4vw, 3.8rem); line-height: .97; letter-spacing: -.06em; }
+  .cheatcodes-access__columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .cheatcodes-access__columns article { padding: 22px; border: 1px solid rgba(255,255,255,.12); border-radius: 16px; background: rgba(0,0,0,.14); }
+  .cheatcodes-access__columns strong { color: var(--cheat-green); }
+  .cheatcodes-access__columns p { color: rgba(226,232,240,.65); line-height: 1.55; }
+  @media (max-width: 900px) { .cheatcodes-grid, .cheatcodes-library__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .cheatcodes-access__grid { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .cheatcodes-hero h1 { font-size: clamp(3.4rem, 17vw, 6rem); } .cheatcodes-hero__actions { display: grid; grid-template-columns: 1fr; } .cheatcodes-hero__actions .button { justify-content: center; } .cheatcodes-grid, .cheatcodes-library__grid, .cheatcodes-access__columns { grid-template-columns: 1fr; } .cheatcode-card, .library-card { min-height: 0; } .cheatcode-card h3, .library-card h3 { margin-top: 46px; } .library-card p { min-height: 0; } }
+</style>

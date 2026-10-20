@@ -72,9 +72,15 @@ export function SiteHeader({
   return (
     <header className="sticky top-0 z-50 border-b border-white/5 bg-black/70 backdrop-blur-xl">
       <div className="container-shell flex h-18 items-center justify-between py-4">
-        <BrandLockup href={showLanguageToggle ? localeHref(languageHrefBase, locale) : "/"} size="sm" caption={copy.brandCaption} priority />
+        <BrandLockup
+          href={showLanguageToggle ? localeHref(languageHrefBase, locale) : "/"}
+          size="sm"
+          caption={copy.brandCaption}
+          priority
+          className="site-header-brand"
+        />
 
-        <nav className="hidden items-center gap-7 md:flex">
+        <nav className="hidden items-center gap-7 xl:flex">
           {copy.nav.map((item) => (
             <Link
               key={item.label}
@@ -117,7 +123,7 @@ export function SiteHeader({
           </div>
         </div>
       </div>
-      <nav className="container-shell flex gap-2 overflow-x-auto border-t border-white/5 pb-3 md:hidden">
+      <nav className="container-shell flex gap-2 overflow-x-auto border-t border-white/5 pb-3 xl:hidden">
         {copy.mobileNav.map((item) => (
           <Link
             key={item.label}

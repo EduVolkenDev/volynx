@@ -1,0 +1,91 @@
+---
+import { ROUTES } from "../data/routes";
+---
+
+<aside class="privacy-position" aria-label="VOLYNX privacy position">
+  <div class="privacy-position__mark" aria-hidden="true">♡</div>
+  <div class="privacy-position__copy">
+    <strong>
+      <span class="i18n-en">Your data is not VOLYNX's product.</span>
+      <span class="i18n-pt">Seus dados não são o produto da VOLYNX.</span>
+    </strong>
+    <span>
+      <span class="i18n-en">Local-first tools where possible, consent before analytics, and clear boundaries when a service needs data.</span>
+      <span class="i18n-pt">Ferramentas locais quando possível, consentimento antes de analytics e limites claros quando um serviço precisa de dados.</span>
+    </span>
+    <small>
+      <span class="i18n-en">Public source. Clear boundaries. Built to stay understandable.</span>
+      <span class="i18n-pt">Código público. Limites claros. Feita para continuar compreensível.</span>
+    </small>
+  </div>
+  <div class="privacy-position__actions">
+    <a href={ROUTES.privacy}>
+      <span class="i18n-en">See our privacy principles</span>
+      <span class="i18n-pt">Ver nossos princípios de privacidade</span>
+    </a>
+    <a class="privacy-position__secondary" href={ROUTES.lab}>
+      <span class="i18n-en">Explore local tools</span>
+      <span class="i18n-pt">Explorar ferramentas locais</span>
+    </a>
+    <a class="privacy-position__source" href="https://github.com/EduVolkenDev/volynx" target="_blank" rel="noreferrer">
+      <span class="i18n-en">View the source</span>
+      <span class="i18n-pt">Ver o código</span>
+    </a>
+  </div>
+</aside>
+
+<style>
+  .privacy-position {
+    position: relative;
+    z-index: 3;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: clamp(14px, 2vw, 28px);
+    width: min(1180px, calc(100% - 40px));
+    margin: 12px auto 0;
+    padding: 18px clamp(18px, 3vw, 30px);
+    border: 1px solid rgba(167, 139, 250, .28);
+    border-radius: 18px;
+    color: #eef1ff;
+    background:
+      radial-gradient(circle at 12% 50%, rgba(110, 231, 249, .12), transparent 28%),
+      linear-gradient(100deg, rgba(13, 19, 39, .96), rgba(28, 18, 48, .92));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1), 0 14px 34px rgba(0, 0, 0, .18);
+  }
+  .privacy-position__mark {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border: 2px solid #b8f77b;
+    border-radius: 50%;
+    color: #b8f77b;
+    font-size: 29px;
+    line-height: 1;
+    transform: rotate(-10deg);
+  }
+  .privacy-position__copy { display: grid; gap: 4px; min-width: 0; }
+  .privacy-position__copy strong { font-size: clamp(1rem, 1.8vw, 1.28rem); letter-spacing: -.025em; }
+  .privacy-position__copy > span { color: rgba(226, 232, 240, .68); font-size: .78rem; line-height: 1.45; }
+  .privacy-position__copy small { color: rgba(184, 247, 123, .78); font-size: .66rem; font-weight: 700; letter-spacing: .04em; line-height: 1.35; }
+  .privacy-position__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 9px; }
+  .privacy-position__actions a { display: inline-flex; min-height: 38px; align-items: center; justify-content: center; padding: 9px 13px; border: 1px solid rgba(184, 247, 123, .72); border-radius: 999px; color: #d9ffb8; background: rgba(184, 247, 123, .08); font-size: .68rem; font-weight: 800; letter-spacing: .06em; text-align: center; text-transform: uppercase; transition: transform .2s ease, background .2s ease, border-color .2s ease; }
+  .privacy-position__actions a:hover, .privacy-position__actions a:focus-visible { transform: translateY(-2px); background: rgba(184, 247, 123, .17); border-color: #b8f77b; }
+  .privacy-position__actions .privacy-position__secondary { border-color: rgba(255, 255, 255, .18); color: rgba(238, 241, 255, .84); background: rgba(255, 255, 255, .04); }
+  .privacy-position__actions .privacy-position__secondary:hover, .privacy-position__actions .privacy-position__secondary:focus-visible { border-color: rgba(110, 231, 249, .6); background: rgba(110, 231, 249, .09); }
+  .privacy-position__actions .privacy-position__source { border-color: rgba(167, 139, 250, .45); color: rgba(226, 218, 255, .9); background: rgba(167, 139, 250, .08); }
+  .privacy-position__actions .privacy-position__source:hover, .privacy-position__actions .privacy-position__source:focus-visible { border-color: rgba(167, 139, 250, .82); background: rgba(167, 139, 250, .16); }
+  @media (max-width: 860px) {
+    .privacy-position { grid-template-columns: auto minmax(0, 1fr); }
+    .privacy-position__actions { grid-column: 1 / -1; justify-content: flex-start; }
+  }
+  @media (max-width: 520px) {
+    .privacy-position { width: min(100% - 24px, 1180px); gap: 12px; padding: 16px; border-radius: 16px; }
+    .privacy-position__mark { width: 36px; height: 36px; font-size: 24px; }
+    .privacy-position__copy strong { font-size: .98rem; }
+    .privacy-position__copy > span { font-size: .73rem; }
+    .privacy-position__actions { display: grid; grid-template-columns: 1fr; width: 100%; }
+    .privacy-position__actions a { width: 100%; }
+  }
+</style>

@@ -46,7 +46,7 @@ export default function DailyPage() {
                 <div className="mb-7 inline-flex items-center gap-4">
                   <span className="daily-brand-mark">
                     <Image
-                      src="/assets/brand/daily-icon.webp"
+                      src="/assets/brand/daily-icon-general-192.webp"
                       alt="Volynx Daily icon"
                       width={192}
                       height={192}

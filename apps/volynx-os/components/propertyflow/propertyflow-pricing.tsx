@@ -185,13 +185,13 @@ export function PropertyFlowPricing() {
         </div>
 
         <div className="mt-12 overflow-hidden rounded-lg border border-white/10">
-          <div className="grid min-w-[820px] grid-cols-[1.2fr_repeat(3,0.8fr)] border-b border-white/10 bg-white/[0.03] px-5 py-4 text-sm text-zinc-400">
-            <div>Feature</div>
-            <div>Starter</div>
-            <div>Professional</div>
-            <div>White-Label</div>
-          </div>
           <div className="overflow-x-auto">
+            <div className="grid min-w-[820px] grid-cols-[1.2fr_repeat(3,0.8fr)] border-b border-white/10 bg-white/[0.03] px-5 py-4 text-sm text-zinc-400">
+              <div>Feature</div>
+              <div>Starter</div>
+              <div>Professional</div>
+              <div>White-Label</div>
+            </div>
             <div className="min-w-[820px]">
               {propertyFlowComparisonRows.map((row) => (
                 <div

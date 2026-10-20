@@ -55,6 +55,7 @@ const title = "Admin · Vouchers — VOLYNX";
                 <button type="button" class="btn ghost btn-sm" data-preset="black_diamond">◆ Black Diamond pack</button>
                 <button type="button" class="btn ghost btn-sm" data-preset="vx_80">+ 80 VX bonus</button>
                 <button type="button" class="btn ghost btn-sm" data-preset="diamond_only">Daily Diamond 90d</button>
+                <button type="button" class="btn ghost btn-sm" data-preset="daily_diamond_forever">Daily Diamond · permanent</button>
                 <button type="button" class="btn ghost btn-sm" data-preset="pro_perm">Pro plan (permanent)</button>
                 <button type="button" class="btn ghost btn-sm" data-preset="reset">↺ <span data-i18n="admin.vouchers.reset">Reset all</span></button>
               </div>
@@ -85,6 +86,7 @@ const title = "Admin · Vouchers — VOLYNX";
                     <label class="field">
                       <span data-i18n="admin.vouchers.plan">Plan</span>
                       <select name="grant_plan">
+                        <option value="free">Free</option>
                         <option value="launch">Launch</option>
                         <option value="business">Business</option>
                         <option value="pro" selected>Pro</option>
@@ -103,10 +105,11 @@ const title = "Admin · Vouchers — VOLYNX";
                       </select>
                     </label>
                   </div>
-                  <label class="field field--checkbox">
+                  <label class="field field--checkbox" id="dailyDurationControl">
                     <input type="checkbox" name="grant_plan_expires_enable" />
-                    <span data-i18n-html="admin.vouchers.expires_days">Expires after a fixed number of days <small>(unchecked = permanent)</small></span>
+                    <span data-i18n-html="admin.vouchers.expires_days">Daily plan duration <small>(starts when redeemed; unchecked = permanent)</small></span>
                   </label>
+                  <p class="grant-help" id="dailyDurationHint">A subscription duration applies only to a Daily plan. Code expiration below is a separate setting.</p>
                   <label class="field" data-show-if="grant_plan_expires_enable">
                     <span data-i18n="admin.vouchers.duration">Duration (days)</span>
                     <input type="number" name="grant_plan_expires_days" min="1" max="3650" value="90" />
@@ -432,9 +435,9 @@ const title = "Admin · Vouchers — VOLYNX";
         else if (scope === "builder_plan") grants.builder_plan = plan;
         else if (scope === "daily_plan") grants.daily_plan = plan;
         else if (scope === "both_apps") { grants.builder_plan = plan; grants.daily_plan = plan; }
-        if (fd.get("grant_plan_expires_enable") === "on") {
+        if (scope === "daily_plan" && fd.get("grant_plan_expires_enable") === "on") {
           const days = Number(fd.get("grant_plan_expires_days")) || 0;
-          if (days > 0) grants.daily_plan_expires_in_days = days;
+          if (Number.isInteger(days) && days >= 1 && days <= 3650) grants.daily_plan_expires_in_days = days;
         }
       }
 
@@ -536,6 +539,29 @@ const title = "Admin · Vouchers — VOLYNX";
         const on = !!(driver && driver.checked);
         el.hidden = !on;
       });
+      const scope = els.form.querySelector('[name="grant_plan_scope"]')?.value;
+      const planInput = els.form.querySelector('[name="grant_plan"]');
+      const durationToggle = els.form.querySelector('[name="grant_plan_expires_enable"]');
+      const durationRow = document.getElementById("dailyDurationControl");
+      const durationHint = document.getElementById("dailyDurationHint");
+      const allowedPlans = scope === "daily_plan"
+        ? ["free", "pro", "diamond"]
+        : scope === "builder_plan"
+        ? ["free", "launch", "business", "pro", "studio", "teams"]
+        : ["free", "pro"];
+      if (planInput) {
+        Array.from(planInput.options).forEach((option) => { option.disabled = !allowedPlans.includes(option.value); });
+        if (!allowedPlans.includes(planInput.value)) planInput.value = allowedPlans.includes("pro") ? "pro" : allowedPlans[0];
+      }
+      const supportsDuration = scope === "daily_plan";
+      if (durationToggle) {
+        durationToggle.disabled = !supportsDuration;
+        if (!supportsDuration) durationToggle.checked = false;
+      }
+      if (durationRow) durationRow.classList.toggle("is-disabled", !supportsDuration);
+      if (durationHint) durationHint.textContent = supportsDuration
+        ? "A duração do plano começa quando o voucher é resgatado. A validade do código é configurada separadamente abaixo."
+        : "Escolha “daily_plan only” para definir a duração da assinatura. A validade do código é configurada separadamente abaixo.";
       suggestLabel();
     }
 
@@ -588,6 +614,12 @@ const title = "Admin · Vouchers — VOLYNX";
         setVal("grant_plan_scope", "daily_plan");
         setVal("grant_plan_expires_enable", true);
         setVal("grant_plan_expires_days", 90);
+      } else if (preset === "daily_diamond_forever") {
+        resetAll();
+        setToggle("plan", true);
+        setVal("grant_plan", "diamond");
+        setVal("grant_plan_scope", "daily_plan");
+        setVal("grant_plan_expires_enable", false);
       } else if (preset === "pro_perm") {
         resetAll();
         setToggle("plan", true);
@@ -657,6 +689,22 @@ const title = "Admin · Vouchers — VOLYNX";
 
       const fd = new FormData(els.form);
       const grants = buildGrants();
+      const maxUses = Number(fd.get("max_uses"));
+      const scope = String(fd.get("grant_plan_scope") || "plan");
+      const durationEnabled = fd.get("grant_plan_expires_enable") === "on";
+      const durationDays = Number(fd.get("grant_plan_expires_days"));
+      if (!Number.isInteger(maxUses) || maxUses < 1 || maxUses > 100000) {
+        els.submitBtn.disabled = false;
+        els.formMsg.textContent = "Maximum uses must be an integer between 1 and 100,000.";
+        els.formMsg.className = "form-msg form-msg--err";
+        return;
+      }
+      if (durationEnabled && scope === "daily_plan" && (!Number.isInteger(durationDays) || durationDays < 1 || durationDays > 3650)) {
+        els.submitBtn.disabled = false;
+        els.formMsg.textContent = "Daily plan duration must be between 1 and 3,650 days.";
+        els.formMsg.className = "form-msg form-msg--err";
+        return;
+      }
       if (Object.keys(grants).length === 0) {
         els.submitBtn.disabled = false;
         els.formMsg.textContent = tx("admin.vouchers.runtime_pick_grant", "Select at least one grant section above.");
@@ -671,13 +719,22 @@ const title = "Admin · Vouchers — VOLYNX";
         description: null,
         recipient_name: fd.get("recipient_name") || null,
         target_email: fd.get("target_email") || null,
-        max_uses: Number(fd.get("max_uses")) || 1,
+        max_uses: maxUses,
         transferable: fd.get("transferable") === "on",
         expires_at: fd.get("expires_at") || null,
         grants,
       };
 
-      const { status, data } = await callApi(payload);
+      let response;
+      try {
+        response = await callApi(payload);
+      } catch (error) {
+        els.submitBtn.disabled = false;
+        els.formMsg.textContent = tx("admin.vouchers.runtime_error", "Error: {error}").replace("{error}", error?.message || "network_error");
+        els.formMsg.className = "form-msg form-msg--err";
+        return;
+      }
+      const { status, data } = response;
       els.submitBtn.disabled = false;
 
       if (!data?.ok) {
@@ -889,6 +946,8 @@ const title = "Admin · Vouchers — VOLYNX";
     }
     .field--checkbox span { font-size: 13px; color: rgba(255,255,255,0.78); }
     .field--checkbox input { width: auto; }
+    #dailyDurationControl.is-disabled { opacity: 0.48; }
+    #dailyDurationControl input:disabled { cursor: not-allowed; }
 
     .grants {
       border: 1px dashed rgba(0, 219, 255, 0.22);

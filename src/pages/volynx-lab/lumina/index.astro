@@ -82,7 +82,7 @@ const modes = [
     <section class="lumina-hero" aria-labelledby="lumina-title">
       <div class="lumina-hero__copy">
         <span class="lumina-pill">
-          <img src="/assets/lumina/lumina-icon-transparent.webp" alt="" width="4689" height="4784" loading="eager" decoding="async" />
+          <img src="/assets/lumina/lumina-hero-monogram.webp" alt="" width="3010" height="3010" loading="eager" decoding="async" />
           Volynx Lumina · v0.1
         </span>
         <h1 id="lumina-title" data-i18n-html="lumina.hero_title"><span>Conhecimento</span> não é privilégio. <em>É luz.</em></h1>
@@ -94,17 +94,17 @@ const modes = [
       </div>
       <div class="lumina-crystal" aria-hidden="true">
         <div class="lumina-crystal__halo"></div>
-        <img
-          src="/assets/lumina/lumina-icon-transparent.webp"
-          alt=""
-          width="4689"
-          height="4784"
-          loading="eager"
-          decoding="async"
-        />
-        <span data-i18n="lumina.mode_clear">Claro</span>
-        <span data-i18n="lumina.mode_deep">Profundo</span>
-        <span data-i18n="lumina.mode_practical">Prático</span>
+        <div class="lumina-crystal__art">
+          <img
+            src="/assets/lumina/lumina-hero-monogram.webp"
+            alt=""
+            width="3010"
+            height="3010"
+            loading="eager"
+            decoding="async"
+            fetchpriority="high"
+          />
+        </div>
       </div>
     </section>
 
@@ -492,9 +492,8 @@ const modes = [
 
   .lumina-crystal {
     position: relative;
-    display: grid;
-    place-items: center;
-    min-height: 510px;
+    min-width: 0;
+    min-height: 600px;
     overflow: visible;
     isolation: isolate;
   }
@@ -507,34 +506,21 @@ const modes = [
     background: radial-gradient(ellipse at 50% 50%, rgba(122,53,255,.2) 0%, rgba(0,216,255,.1) 45%, transparent 70%);
   }
 
-  .lumina-crystal img {
-    width: min(100%, 480px);
+  .lumina-crystal__art {
+    display: flex;
+    width: 100%;
+    height: 600px;
+    align-items: center;
+    justify-content: center;
+    overflow: clip;
+  }
+
+  .lumina-crystal__art img {
+    position: relative;
+    left: -4%;
+    flex: 0 0 auto;
+    width: 720px;
     height: auto;
-    object-fit: contain;
-    filter: drop-shadow(0 0 40px rgba(0,216,255,.35)) drop-shadow(0 0 80px rgba(122,53,255,.2));
-    animation: luminaFloat 8s ease-in-out infinite;
-  }
-
-  .lumina-crystal span {
-    position: absolute;
-    padding: 9px 12px;
-    border: 1px solid rgba(255,255,255,.13);
-    border-radius: 999px;
-    background: rgba(6,20,46,.74);
-    color: rgba(255,255,255,.82);
-    font-size: 12px;
-    font-weight: 900;
-    box-shadow: 0 14px 34px rgba(0,0,0,.24);
-  }
-
-  .lumina-crystal span:nth-of-type(1) { top: 82px; left: 42px; }
-  .lumina-crystal span:nth-of-type(2) { right: 18px; top: 46%; }
-  .lumina-crystal span:nth-of-type(3) { bottom: 88px; left: 29%; }
-
-  @keyframes luminaFloat {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    33% { transform: translateY(-18px) rotate(1.5deg); }
-    66% { transform: translateY(-8px) rotate(-1deg); }
   }
 
   @keyframes luminaShimmer {
@@ -921,14 +907,6 @@ const modes = [
   .lumina-feature {
     padding: 20px;
     min-height: 268px;
-    transition: transform .24s ease, border-color .24s ease, background .24s ease, box-shadow .24s ease;
-  }
-
-  .lumina-feature:hover {
-    transform: translateY(-5px);
-    border-color: rgba(0,216,255,.25);
-    background: rgba(255,255,255,.055);
-    box-shadow: 0 24px 70px rgba(0,0,0,.34), 0 0 30px rgba(0,216,255,.08);
   }
 
   .lumina-feature__icon {
@@ -1436,8 +1414,6 @@ const modes = [
     overflow: hidden;
   }
 
-  .lumina-feature--lead:hover { transform: translateY(-6px) rotate(-.5deg); }
-
   .lumina-feature--satellite {
     grid-column: span 3;
     min-height: 220px;
@@ -1446,7 +1422,6 @@ const modes = [
   }
 
   .lumina-feature--satellite:nth-child(odd) { transform: translateY(34px); }
-  .lumina-feature--satellite:hover { transform: translateY(26px); }
 
   .lumina-feature__icon {
     width: 118px;
@@ -1502,8 +1477,6 @@ const modes = [
 
   .lumina-modes article:first-child { border-left: 0; }
   .lumina-modes article:nth-child(even) { transform: translateY(24px); }
-  .lumina-modes article:hover { transform: translateY(-4px); }
-  .lumina-modes article:nth-child(even):hover { transform: translateY(18px); }
   .lumina-modes .lumina-mode--lead { padding-left: 0; }
 
   .lumina-modes .lumina-mode--lead .lumina-mode-icon,
@@ -1559,12 +1532,12 @@ const modes = [
     .lumina-shell { width: min(100% - 22px, 1180px); padding-top: 28px; }
     .lumina-hero { min-height: auto; }
     .lumina-crystal {
-      min-height: 280px;
+      min-height: 0;
       margin-top: 12px;
     }
     .lumina-crystal__halo { inset: 0; }
-    .lumina-crystal img { width: min(76vw, 300px); }
-    .lumina-crystal span { display: none; }
+    .lumina-crystal__art { height: clamp(420px, 120vw, 630px); }
+    .lumina-crystal__art img { width: min(150vw, 760px); }
     .lumina-controls,
     .lumina-features,
     .lumina-modes,
@@ -1671,13 +1644,10 @@ const modes = [
       transform: none !important;
     }
 
-    .lumina-feature--satellite:hover { transform: translateY(-4px) !important; }
     .lumina-modes__rail { grid-template-columns: 1fr; }
     .lumina-modes article,
     .lumina-modes article:nth-child(even) { border-left: 0; border-top: 1px solid var(--lumina-line); transform: none; }
     .lumina-modes article:first-child { border-top: 0; }
-    .lumina-modes article:hover,
-    .lumina-modes article:nth-child(even):hover { transform: translateY(-4px); }
     .lumina-modes .lumina-mode--lead { padding-left: 0; }
   }
 </style>

@@ -5,15 +5,22 @@ import FlagshipFooter from "../components/FlagshipFooter.astro";
 import PlatformAssistStrip from "../components/PlatformAssistStrip.astro";
 import ServicesHighlight from "../components/platform/ServicesHighlight.astro";
 import WorldFeature from "../components/platform/WorldFeature.astro";
+import EcosystemPathways from "../components/platform/EcosystemPathways.astro";
+import HomeSignalStage from "../components/platform/HomeSignalStage.astro";
 import AdSlot from "../components/AdSlot.astro";
+import PrivacyPositionBanner from "../components/PrivacyPositionBanner.astro";
 import { ROUTES, productPreviewHref } from "../data/routes";
 import { productOfferPreviewBySlug } from "../data/product-offers";
+
+if (Astro.url.pathname === "/platform" || Astro.url.pathname === "/platform/") {
+  return Astro.redirect("/");
+}
 
 const officialProductImages = {
   essential: productOfferPreviewBySlug["volynx-essential"].image,
   complete: productOfferPreviewBySlug["volynx-complete"].image,
   builderPro: "/assets/new-builder-icon.webp",
-  cvitaeBusiness: productOfferPreviewBySlug["cvitae-business"].image,
+  cvitaeBusiness: "/assets/cvitae-pathfinder-mark.png",
   vxCore: productOfferPreviewBySlug["vx-core"].image,
   portfolioCommercial: "/assets/kits/portfolio-commercial.webp",
   propertyflowProfessional: "/assets/flow-professional.webp",
@@ -21,7 +28,7 @@ const officialProductImages = {
 
 const homeAssistItems = [
   { href: ROUTES.products, label: { en: "Explore", pt: "Explorar" }, title: { en: "Browse products", pt: "Ver produtos" }, copy: { en: "Jump straight into kits, tools, PropertyFlow and the Icons Store.", pt: "Vá direto para kits, ferramentas, PropertyFlow e Icons Store." }, emphasized: true, iconSrc: "/assets/allproducts.webp" },
-  { href: ROUTES.daily, label: { en: "Workspace", pt: "Workspace" }, title: { en: "Open Daily", pt: "Abrir Daily" }, copy: { en: "Go back to My Day, Vault, Summary, Writing and the rest of the daily system.", pt: "Volte para My Day, Vault, Summary, Writing e o resto do sistema diário." }, iconSrc: "/assets/daily-icon.webp" },
+  { href: ROUTES.daily, label: { en: "Workspace", pt: "Workspace" }, title: { en: "Open Daily", pt: "Abrir Daily" }, copy: { en: "Go back to My Day, Vault, Summary, Writing and the rest of the daily system.", pt: "Volte para My Day, Vault, Summary, Writing e o resto do sistema diário." }, iconSrc: "/assets/daily-icon-general-512.webp" },
   { href: ROUTES.delivery, label: { en: "Post-purchase", pt: "Pós-compra" }, title: { en: "My products", pt: "Meus produtos" }, copy: { en: "Recover downloads, check access and reopen purchased product paths.", pt: "Recupere downloads, verifique acessos e reabra os produtos comprados." }, iconSrc: "/assets/mybox.webp" },
   { href: ROUTES.support, label: { en: "Help", pt: "Ajuda" }, title: { en: "Open support", pt: "Abrir suporte" }, copy: { en: "Route launch, billing and access issues without losing context.", pt: "Direcione questões de lançamento, cobrança e acesso sem perder contexto." }, iconSrc: "/assets/support-gold.webp" },
   { href: ROUTES.launch2026, label: { en: "Launch", pt: "Lançamento" }, title: { en: "Replay launch page", pt: "Rever o lançamento" }, copy: { en: "Revisit the original cinematic launch page without making it the default platform path.", pt: "Reveja a página cinematográfica de lançamento sem transformar isso no caminho padrão da plataforma." }, iconSrc: "/assets/golaunch.webp" },
@@ -32,32 +39,34 @@ const homeAssistItems = [
   description="VOLYNX brings tools, systems and practical paths together so you can build, operate and ship your next digital project."
   pageClass="page-home"
 >
-  <FlagshipHeader current={ROUTES.platform} ctaLabel="Open Builder" ctaI18n="nav.open_builder" ctaHref={ROUTES.builder} />
+  <FlagshipHeader current={ROUTES.home} ctaLabel="Open Builder" ctaI18n="nav.open_builder" ctaHref={ROUTES.builder} />
+  <PrivacyPositionBanner />
   <main>
 
-    <!-- ═══ HERO (v2 — premium emotional) ═══ -->
+    <!-- ═══ HERO — the single VOLYNX starting point ═══ -->
     <section class="hero-v2">
       <div class="hero-v2__bg" aria-hidden="true"></div>
       <div class="shell hero-v2__inner">
         <div class="hero-v2__copy">
           <div class="hero-v2__pill">
             <span class="hero-v2__pill-dot" aria-hidden="true"></span>
-            <span class="i18n-en">Dev Hub · Build and launch</span>
-            <span class="i18n-pt">Dev Hub · Crie e publique</span>
+            <span class="i18n-en">VOLYNX · From intention to execution</span>
+            <span class="i18n-pt">VOLYNX · Da intenção à execução</span>
           </div>
 
-          <h1 class="hero-v2__title" data-i18n-html="home2.hero_title_html">
-            Crie sites, ferramentas e ativos digitais premium<br />
-            <span class="gradient-text">com uma única conta VOLYNX</span>
+          <h1 class="hero-v2__title">
+            <span class="i18n-en">Turn your next idea into<br /><span class="gradient-text">something real.</span></span>
+            <span class="i18n-pt">Transforme sua próxima ideia em<br /><span class="gradient-text">algo real.</span></span>
           </h1>
 
-          <p class="hero-v2__desc" data-i18n-html="home2.hero_subtitle_html">
-            Comece grátis com Daily, CVitae e Lab — ou lance um site profissional com Builder e serviços sob medida.
+          <p class="hero-v2__desc">
+            <span class="i18n-en">Clarify what matters, choose the right tools or expert help, and move from an intention to work you can publish, operate and improve.</span>
+            <span class="i18n-pt">Esclareça o que importa, escolha as ferramentas ou a ajuda certa e transforme intenção em trabalho que você pode publicar, operar e melhorar.</span>
           </p>
 
           <div class="hero-v2__actions">
-            <a href="#ecosystem" class="hero-v2__cta-main" data-i18n="home2.btn_start_free">Começar grátis agora</a>
-            <a href={ROUTES.products} class="hero-v2__cta-ghost" data-i18n="home2.btn_view_kits">Ver os produtos</a>
+            <a href={ROUTES.impactMap} class="hero-v2__cta-main"><span class="i18n-en">Map my next step</span><span class="i18n-pt">Mapear meu próximo passo</span></a>
+            <a href="#ecosystem" class="hero-v2__cta-ghost"><span class="i18n-en">Explore the ecosystem</span><span class="i18n-pt">Explorar o ecossistema</span></a>
           </div>
 
           <div class="hero-v2__trust">
@@ -68,59 +77,39 @@ const homeAssistItems = [
         </div>
 
         <div class="hero-v2__visual">
-          <div class="hero-v2__mockup hero-v2__mockup--daily-grid">
-            <div class="hero-v2__mockup-glow" aria-hidden="true"></div>
-            <div class="hero-v2__mockup-brand">
-              <a href="https://daily.volynx.world/" class="hero-v2__mockup-chip" aria-label="Open VOLYNX Daily" data-i18n-aria="home2.mockup_daily_aria">
-                <img src="/assets/volynx-daily.webp" alt="VOLYNX Daily" width="1920" height="1080" loading="eager" fetchpriority="high" decoding="async" />
-              </a>
-              <p class="hero-v2__mockup-title" data-i18n="home2.mockup_title">Seu dia mais inteligente e organizado começa aqui</p>
-            </div>
-            <div class="hero-v2__mockup-grid hero-v2__mockup-grid--orbit" aria-label="VOLYNX Daily tools">
-              <a href="https://daily.volynx.world/tools/my-day/" class="hero-v2__mockup-tag hero-v2__mockup-tag--myday" style="--tag-delay: 120ms;">
-                <img src="/assets/myday.webp" alt="" width="1080" height="1080" loading="lazy" decoding="async">
-                <span class="hero-v2__tag-copy">
-                  <strong>My Day</strong>
-                  <span data-i18n="home2.mockup_myday_desc">Planeje prioridades e acompanhe seu foco do dia.</span>
-                </span>
-              </a>
-              <a href="https://daily.volynx.world/tools/scanner/" class="hero-v2__mockup-tag hero-v2__mockup-tag--scanner" style="--tag-delay: 260ms;">
-                <img src="/assets/scanner.webp" alt="" width="1275" height="1275" loading="lazy" decoding="async">
-                <span class="hero-v2__tag-copy">
-                  <strong>Scanner</strong>
-                  <span data-i18n="home2.mockup_scanner_desc">Leia arquivos, imagens e notas sem perder contexto.</span>
-                </span>
-              </a>
-              <a href="https://daily.volynx.world/tools/summary/" class="hero-v2__mockup-tag hero-v2__mockup-tag--summary" style="--tag-delay: 400ms;">
-                <img src="/assets/summary.webp" alt="" width="1275" height="1275" loading="lazy" decoding="async">
-                <span class="hero-v2__tag-copy">
-                  <strong>Summary</strong>
-                  <span data-i18n="home2.mockup_summary_desc">Transforme textos longos em resumo claro e acionável.</span>
-                </span>
-              </a>
-              <a href="https://daily.volynx.world/tools/vault/" class="hero-v2__mockup-tag hero-v2__mockup-tag--vault" style="--tag-delay: 540ms;">
-                <img src="/assets/vault.webp" alt="" width="1275" height="1275" loading="lazy" decoding="async">
-                <span class="hero-v2__tag-copy">
-                  <strong>Vault</strong>
-                  <span data-i18n="home2.mockup_vault_desc">Guarde ideias e informações importantes em um só lugar.</span>
-                </span>
-              </a>
-              <a href="https://daily.volynx.world/tools/writing/" class="hero-v2__mockup-tag hero-v2__mockup-tag--writing" style="--tag-delay: 680ms;">
-                <img src="/assets/writing.webp" alt="" width="1275" height="1275" loading="lazy" decoding="async">
-                <span class="hero-v2__tag-copy">
-                  <strong>Writing</strong>
-                  <span data-i18n="home2.mockup_writing_desc">Escreva, revise e refine mensagens com mais rapidez.</span>
-                </span>
-              </a>
-              <a href="https://daily.volynx.world/tools/decision/" class="hero-v2__mockup-tag hero-v2__mockup-tag--decision" style="--tag-delay: 820ms;">
-                <img src="/assets/decision.webp" alt="" width="1275" height="1275" loading="lazy" decoding="async">
-                <span class="hero-v2__tag-copy">
-                  <strong>Decision</strong>
-                  <span data-i18n="home2.mockup_decision_desc">Compare opções e tome decisões com mais clareza.</span>
-                </span>
-              </a>
-            </div>
+          <HomeSignalStage />
+          <img class="hero-v2__halloween-art" src="/assets/halloween-volynx-cyber-witch-helmet.png" alt="" aria-hidden="true" width="1356" height="1159" />
+        </div>
+      </div>
+      <img class="hero-v2__halloween-art hero-v2__halloween-art--mobile" src="/assets/halloween-volynx-cyber-witch-helmet.png" alt="" aria-hidden="true" width="1356" height="1159" />
+    </section>
+
+    <!-- ═══ CORE PATH — orientation without a second homepage ═══ -->
+    <section class="core-path-section page-section" aria-labelledby="core-path-title">
+      <div class="shell core-path">
+        <div class="core-path__intro">
+          <span class="label label--pro">
+            <span class="i18n-en">How VOLYNX works</span>
+            <span class="i18n-pt">Como a VOLYNX funciona</span>
+          </span>
+          <h2 id="core-path-title">
+            <span class="i18n-en">Start with the problem. Leave with a real next move.</span>
+            <span class="i18n-pt">Comece pelo problema. Saia com um próximo movimento real.</span>
+          </h2>
+          <p>
+            <span class="i18n-en">You do not need to learn the whole ecosystem first. VOLYNX brings the right layer forward when it can make your work clearer, faster or more useful.</span>
+            <span class="i18n-pt">Você não precisa conhecer todo o ecossistema antes de começar. A VOLYNX traz a camada certa quando ela pode tornar seu trabalho mais claro, rápido ou útil.</span>
+          </p>
+          <div class="core-path__actions">
+            <a href={ROUTES.impactMap}><span class="i18n-en">Start with your intention</span><span class="i18n-pt">Começar pela sua intenção</span><span aria-hidden="true">↗</span></a>
+            <a href={ROUTES.devHub}><span class="i18n-en">I know what I need · Open Dev Hub</span><span class="i18n-pt">Já sei o que preciso · Abrir Dev Hub</span><span aria-hidden="true">↗</span></a>
           </div>
+        </div>
+        <img class="core-path__mark" src="/assets/volynx-core-icon.webp" alt="" width="320" height="320" loading="lazy" decoding="async" aria-hidden="true" />
+        <div class="core-path__steps" aria-label="VOLYNX Core path">
+          <article><span>01</span><strong><span class="i18n-en">Clarify</span><span class="i18n-pt">Esclarecer</span></strong><p><span class="i18n-en">Frame the challenge, audience and first outcome.</span><span class="i18n-pt">Defina o desafio, o público e o primeiro resultado.</span></p></article>
+          <article><span>02</span><strong><span class="i18n-en">Build</span><span class="i18n-pt">Construir</span></strong><p><span class="i18n-en">Use the product, kit or expert path that fits.</span><span class="i18n-pt">Use o produto, kit ou caminho especializado que faz sentido.</span></p></article>
+          <article><span>03</span><strong><span class="i18n-en">Prove</span><span class="i18n-pt">Comprovar</span></strong><p><span class="i18n-en">Keep evidence of progress instead of making empty claims.</span><span class="i18n-pt">Registre o progresso em vez de fazer promessas vazias.</span></p></article>
         </div>
       </div>
     </section>
@@ -217,7 +206,7 @@ const homeAssistItems = [
 
         <div class="pathfinder__grid">
           <article class="path-card path-card--creator">
-            <img src={officialProductImages.essential} alt="" class="path-card__icon" loading="lazy" decoding="async" />
+            <div class="path-card__media"><img src={officialProductImages.essential} alt="" class="path-card__icon" loading="lazy" decoding="async" /></div>
             <span class="path-card__persona">Creator</span>
             <h3><span class="i18n-en">Launch, publish and run your day.</span><span class="i18n-pt">Lance, publique e organize seu dia.</span></h3>
             <p><span class="i18n-en">Best fit: Builder Pro + Daily Pro. The existing Essential bundle is the cleanest first paid step.</span><span class="i18n-pt">Melhor encaixe: Builder Pro + Daily Pro. O bundle Essential já é o primeiro passo pago mais claro.</span></p>
@@ -233,7 +222,7 @@ const homeAssistItems = [
           </article>
 
           <article class="path-card path-card--freelancer">
-            <img src={officialProductImages.cvitaeBusiness} alt="" class="path-card__icon" loading="lazy" decoding="async" />
+            <div class="path-card__media"><img src={officialProductImages.cvitaeBusiness} alt="" class="path-card__icon" loading="lazy" decoding="async" /></div>
             <span class="path-card__persona">Freelancer Premium</span>
             <h3><span class="i18n-en">Look credible before the first conversation.</span><span class="i18n-pt">Pareça confiável antes da primeira conversa.</span></h3>
             <p><span class="i18n-en">Best fit: CVitae Business + Builder Pro + Icons. Start by upgrading the career asset, then add the public presence.</span><span class="i18n-pt">Melhor encaixe: CVitae Business + Builder Pro + Icons. Comece pelo ativo de carreira e depois adicione presença pública.</span></p>
@@ -249,7 +238,7 @@ const homeAssistItems = [
           </article>
 
           <article class="path-card path-card--realestate">
-            <img src={officialProductImages.propertyflowProfessional} alt="" class="path-card__icon path-card__icon--wide" loading="lazy" decoding="async" />
+            <div class="path-card__media"><img src={officialProductImages.propertyflowProfessional} alt="" class="path-card__icon path-card__icon--wide" loading="lazy" decoding="async" /></div>
             <span class="path-card__persona"><span class="i18n-en">Real Estate</span><span class="i18n-pt">Imobiliário</span></span>
             <h3><span class="i18n-en">Sell listings with a sharper digital surface.</span><span class="i18n-pt">Venda imóveis com uma presença digital mais forte.</span></h3>
             <p><span class="i18n-en">Best fit: PropertyFlow Professional + premium icons + Lumina. This is the strongest niche path today.</span><span class="i18n-pt">Melhor encaixe: PropertyFlow Professional + icons premium + Lumina. É o caminho de nicho mais forte agora.</span></p>
@@ -265,7 +254,7 @@ const homeAssistItems = [
           </article>
 
           <article class="path-card path-card--team">
-            <img src={officialProductImages.complete} alt="" class="path-card__icon" loading="lazy" decoding="async" />
+            <div class="path-card__media"><img src={officialProductImages.complete} alt="" class="path-card__icon" loading="lazy" decoding="async" /></div>
             <span class="path-card__persona"><span class="i18n-en">Small Business / Team</span><span class="i18n-pt">Small Business / Equipe</span></span>
             <h3><span class="i18n-en">Build, publish and organise everything in one place.</span><span class="i18n-pt">Construa, publique e organize tudo em um só lugar.</span></h3>
             <p><span class="i18n-en">Best fit: Builder Studio + Daily Diamond. Complete brings our most powerful creative and planning tools together.</span><span class="i18n-pt">Melhor encaixe: Builder Studio + Daily Diamond. Complete reúne nossas ferramentas mais poderosas de criação e organização.</span></p>
@@ -475,9 +464,9 @@ const homeAssistItems = [
       <div class="shell section-head section-head--split">
         <div>
           <span class="eyebrow" data-i18n="home2.eyebrow_ecosystem">What Volynx is</span>
-          <h2 data-i18n="home2.section_ecosystem_title">An ecosystem, not a pile of pages.</h2>
+          <h2><span class="i18n-en">One direction. Many ways to make it real.</span><span class="i18n-pt">Uma direção. Muitos caminhos para torná-la real.</span></h2>
         </div>
-        <p data-i18n="home2.section_ecosystem_desc">Four products with one account, one token system, and a shared commitment to premium quality.</p>
+        <p><span class="i18n-en">Start with Builder, Daily or CVitae, then bring in creative tools, expert work, learning or connections when they serve your next step.</span><span class="i18n-pt">Comece com Builder, Daily ou CVitae e acrescente ferramentas criativas, trabalho especializado, aprendizado ou conexões quando fizer sentido para o próximo passo.</span></p>
       </div>
       <div class="shell ecosystem-showcase">
         <article class="panel feature-card premium-frame panel--pro has-card-asset ecosystem-card ecosystem-card--builder">
@@ -497,7 +486,7 @@ const homeAssistItems = [
           </a>
         </article>
         <article class="panel feature-card premium-frame has-card-asset ecosystem-card ecosystem-card--daily">
-          <img src="/assets/daily-icon.webp" alt="" class="card-asset" loading="lazy" />
+          <img src="/assets/daily-icon-general-512.webp" alt="" class="card-asset" loading="lazy" />
           <a href={ROUTES.daily} class="label" data-i18n="home2.card_daily_label">Daily tools</a>
           <h3 data-i18n="home2.card_daily_title">VOLYNX Daily</h3>
           <p data-i18n="home2.card_daily_desc">Six tools for your real routine. Scan documents, summarize texts, save references, write better and make clearer decisions — every day.</p>
@@ -515,7 +504,7 @@ const homeAssistItems = [
         <article class="panel feature-card premium-frame ecosystem-card ecosystem-card--cvitae">
           <div class="ecosystem-card__copy">
             <div class="ecosystem-card__heading">
-              <img src="/assets/cvitae.webp" alt="" class="ecosystem-card__mark" loading="lazy" />
+              <img src="/assets/cvitae-pathfinder-mark.png" alt="" class="ecosystem-card__mark" loading="lazy" />
               <div>
                 <a href={ROUTES.cvitae} class="label" data-i18n="home2.card_cvitae_label">Career & AI</a>
                 <h3 data-i18n="home2.card_cvitae_title">CVitae by VOLYNX</h3>
@@ -575,6 +564,13 @@ const homeAssistItems = [
           </div>
         </article>
       </div>
+      <div class="shell ecosystem-pathways-wrap">
+        <div class="ecosystem-pathways-heading">
+          <span class="eyebrow"><span class="i18n-en">Keep moving</span><span class="i18n-pt">Continue avançando</span></span>
+          <h3><span class="i18n-en">Choose the capability that fits the work.</span><span class="i18n-pt">Escolha o caminho que combina com o seu projeto.</span></h3>
+        </div>
+        <EcosystemPathways />
+      </div>
     </section>
 
     <!-- ═══ FREE VALUE STRIP ═══ -->
@@ -608,7 +604,7 @@ const homeAssistItems = [
               </a>
               <a href={ROUTES.cvitae} class="free-strip__item">
                 <div class="free-strip__item-top">
-                  <img src="/assets/cvitae.webp" alt="" class="free-strip__item-art" loading="lazy" />
+                  <img src="/assets/cvitae-pathfinder-mark.png" alt="" class="free-strip__item-art" loading="lazy" />
                   <span class="free-strip__icon" aria-hidden="true">&#10003;</span>
                 </div>
                 <strong data-i18n="home2.free_3_title">CVitae — free to build</strong>
@@ -616,7 +612,7 @@ const homeAssistItems = [
               </a>
               <a href={ROUTES.daily} class="free-strip__item">
                 <div class="free-strip__item-top">
-                  <img src="/assets/daily-icon.webp" alt="" class="free-strip__item-art" loading="lazy" />
+                  <img src="/assets/daily-icon-general-512.webp" alt="" class="free-strip__item-art" loading="lazy" />
                   <span class="free-strip__icon" aria-hidden="true">&#10003;</span>
                 </div>
                 <strong data-i18n="home2.free_4_title">Daily lite — free daily use</strong>
@@ -680,8 +676,8 @@ const homeAssistItems = [
           <div class="dj-mission-copy">
             <span class="label label--free dj-mission-label">
               <span class="dj-mission-label-dot" aria-hidden="true"></span>
-              <span class="i18n-en">VOLYNX.Lab Education · always free</span>
-              <span class="i18n-pt">VOLYNX.Lab Education · sempre grátis</span>
+              <span class="i18n-en">VOLYNX Education Lab · always free</span>
+              <span class="i18n-pt">VOLYNX Education Lab · sempre grátis</span>
             </span>
 
             <h2 class="dj-mission-title">
@@ -1008,6 +1004,48 @@ const homeAssistItems = [
     padding-bottom: clamp(28px, 4vw, 48px);
   }
 
+  .core-path-section {
+    padding-top: clamp(34px, 5vw, 62px);
+    padding-bottom: clamp(34px, 5vw, 62px);
+  }
+  .core-path {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+    gap: clamp(28px, 6vw, 86px);
+    align-items: end;
+    padding: clamp(26px, 4vw, 44px);
+    border: 1px solid rgba(167, 139, 250, .22);
+    border-radius: 28px;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 88% 12%, rgba(110, 231, 249, .12), transparent 34%),
+      linear-gradient(135deg, rgba(167, 139, 250, .10), rgba(255, 255, 255, .025) 58%, rgba(3, 4, 11, .42));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 24px 70px rgba(0, 0, 0, .16);
+  }
+  .core-path__intro, .core-path__steps { position: relative; z-index: 1; }
+  .core-path__mark { position: absolute; z-index: 0; top: -60px; right: 29%; width: min(30vw, 330px); height: auto; opacity: .14; pointer-events: none; }
+  .core-path__intro h2 { max-width: 680px; margin: 16px 0 18px; font-size: clamp(2.25rem, 4.4vw, 4.6rem); line-height: .98; letter-spacing: -.06em; }
+  .core-path__intro > p { max-width: 600px; margin: 0; color: rgba(226, 232, 240, .7); font-size: 1rem; line-height: 1.7; }
+  .core-path__actions { display: flex; flex-wrap: wrap; gap: 12px 22px; margin-top: 24px; }
+  .core-path__actions a { display: inline-flex; align-items: center; gap: 7px; color: #8bfaf0; font-size: .86rem; font-weight: 800; text-decoration: none; text-underline-offset: 4px; }
+  .core-path__actions a:hover, .core-path__actions a:focus-visible { text-decoration: underline; }
+  .core-path__actions a:focus-visible { outline: 2px solid #8bfaf0; outline-offset: 4px; border-radius: 3px; }
+  .core-path__steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .core-path__steps article { min-height: 184px; display: flex; flex-direction: column; gap: 10px; padding: 18px; border-top: 1px solid rgba(110, 231, 249, .42); background: rgba(255, 255, 255, .045); }
+  .core-path__steps article:nth-child(2) { border-top-color: rgba(167, 139, 250, .55); }
+  .core-path__steps article:nth-child(3) { border-top-color: rgba(233, 215, 165, .55); }
+  .core-path__steps article > span { color: #6ee7f9; font-size: .68rem; font-weight: 800; letter-spacing: .16em; }
+  .core-path__steps article:nth-child(2) > span { color: #a78bfa; }
+  .core-path__steps article:nth-child(3) > span { color: #e9d7a5; }
+  .core-path__steps strong { color: #fff; font-size: 1.25rem; letter-spacing: -.03em; }
+  .core-path__steps p { margin: auto 0 0; color: rgba(226, 232, 240, .62); font-size: .8rem; line-height: 1.5; }
+
+  .ecosystem-pathways-wrap { margin-top: clamp(42px, 5vw, 76px); }
+  .ecosystem-pathways-heading { max-width: 760px; }
+  .ecosystem-pathways-heading h3 { margin: 12px 0 0; color: #fff; font-size: clamp(1.65rem, 3vw, 2.7rem); line-height: 1.08; letter-spacing: -.045em; }
+
   .revenue-now {
     position: relative;
     display: grid;
@@ -1222,20 +1260,36 @@ const homeAssistItems = [
   .path-card--realestate::before { background: radial-gradient(circle, rgba(214, 179, 106, .22), transparent 66%); }
   .path-card--team::before { background: radial-gradient(circle, rgba(168, 85, 247, .24), transparent 66%); }
 
+  .path-card__media {
+    display: grid;
+    width: 100%;
+    height: 270px;
+    place-items: center;
+    margin: -18px 0 10px;
+  }
+
   .path-card__icon {
-    width: 200px;
+    width: 220px;
+    height: 220px;
     max-width: 100%;
-    height: 400px;
     object-fit: contain;
-    margin: -50px 20px -40px;
     filter: drop-shadow(0 18px 34px rgba(0, 0, 0, .46));
   }
 
-  .path-card__icon--wide {
-    width: 200px;
-    max-width: 100%;
-    border-radius: 22px;
-    object-fit: contain;
+  .path-card--freelancer .path-card__icon,
+  .path-card--team .path-card__icon {
+    width: 170px;
+    height: 250px;
+  }
+
+  .path-card--freelancer .path-card__icon {
+    width: 220px;
+    height: 220px;
+  }
+
+  .path-card--realestate .path-card__icon {
+    width: 240px;
+    height: 210px;
   }
 
   .path-card__persona {
@@ -1674,13 +1728,26 @@ const homeAssistItems = [
     .revenue-card__icon--wide {
       width: min(200px, 100%);
     }
-    .path-card__icon {
-      width: min(200px, 100%);
-      height: clamp(240px, 78vw, 400px);
-      margin: -28px auto -22px;
+    .path-card__media {
+      height: 238px;
+      margin: -8px 0 8px;
     }
-    .path-card__icon--wide {
-      width: min(200px, 100%);
+    .path-card__icon {
+      width: 190px;
+      height: 190px;
+    }
+    .path-card--freelancer .path-card__icon,
+    .path-card--team .path-card__icon {
+      width: 150px;
+      height: 220px;
+    }
+    .path-card--freelancer .path-card__icon {
+      width: 220px;
+      height: 220px;
+    }
+    .path-card--realestate .path-card__icon {
+      width: 210px;
+      height: 184px;
     }
     .ecosystem-card__heading {
       align-items: flex-start;
@@ -1737,8 +1804,9 @@ const homeAssistItems = [
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(ellipse 60% 80% at 50% 40%, rgba(20, 184, 166, 0.12) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 60% at 90% 90%, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+      linear-gradient(90deg, rgba(3, 4, 12, .72) 0%, rgba(3, 4, 12, .38) 43%, rgba(3, 4, 12, .12) 100%),
+      url('/assets/halloween-volynx-hero-scene.png') center / cover no-repeat;
+    filter: saturate(1.05) contrast(1.04);
     pointer-events: none;
     z-index: 0;
   }
@@ -1871,6 +1939,7 @@ const homeAssistItems = [
 
   /* ── Visual mockup card ── */
   .hero-v2__visual {
+    position: relative;
     display: none;
     justify-content: center;
     align-items: center;
@@ -1907,6 +1976,25 @@ const homeAssistItems = [
     box-shadow: 0 30px 80px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.05);
     overflow: hidden;
   }
+  .hero-v2__halloween-art {
+    position: fixed;
+    z-index: 0;
+    right: -5%;
+    bottom: 5%;
+    width: clamp(250px, 31vw, 460px);
+    height: auto;
+    pointer-events: none;
+    filter: drop-shadow(0 0 28px rgba(255, 130, 56, .5)) drop-shadow(0 12px 24px rgba(0, 0, 0, .55));
+    transform: rotate(5deg);
+    opacity: .6;
+  }
+  .hero-v2__halloween-art--mobile { display: none; }
+  .halloween-platform .hero-v2__pill { border-color: rgba(255,130,56,.7); background: rgba(255,130,56,.13); color: #ffc09d; }
+  .halloween-platform .hero-v2__pill-dot { background: #ff8238; box-shadow: 0 0 14px #ff8238; }
+  .halloween-platform .hero-v2__title .gradient-text { background: linear-gradient(135deg, #ffb16f, #ff8238 45%, #c084fc); -webkit-background-clip: text; background-clip: text; }
+  .halloween-platform .hero-v2__cta-main { background: linear-gradient(135deg, #ffb16f, #ff8238); color: #24100a; box-shadow: 0 16px 40px rgba(255,130,56,.25); }
+  .halloween-platform .hero-v2__trust .check { color: #ff9b5c; }
+  @media (max-width: 979px) { .hero-v2__halloween-art { right: -2rem; bottom: -2rem; width: min(260px, 54vw); opacity: .88; } .hero-v2__halloween-art--mobile { display: block; position: absolute; z-index: 1; right: -1.2rem; top: 5rem; bottom: auto; width: min(230px, 43vw); opacity: .86; filter: drop-shadow(0 0 28px rgba(255, 130, 56, .55)); } .hero-v2__copy { position: relative; z-index: 2; padding-right: clamp(6rem, 25vw, 11rem); } }
   .hero-v2__mockup-glow {
     position: absolute;
     inset: -40%;
@@ -2884,6 +2972,11 @@ const homeAssistItems = [
 
   /* ── Mobile adjustments ── */
   @media (max-width: 900px) {
+    .core-path {
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+    .core-path__mark { right: -45px; top: -70px; width: 230px; opacity: .1; }
     .dj-mission-panel {
       grid-template-columns: 1fr;
       gap: 24px;
@@ -2899,6 +2992,13 @@ const homeAssistItems = [
     }
   }
   @media (max-width: 639px) {
+    .hero-v2__bg { background: linear-gradient(90deg, rgba(3, 4, 12, .88), rgba(3, 4, 12, .55)), url('/assets/halloween-volynx-hero-scene.png') center / cover no-repeat; }
+    .hero-v2__copy { padding-right: 0; }
+    .hero-v2__halloween-art--mobile { display: none; }
+    .core-path { padding: 22px 18px; border-radius: 22px; }
+    .core-path__intro h2 { font-size: clamp(2rem, 10vw, 3.2rem); }
+    .core-path__steps { grid-template-columns: 1fr; }
+    .core-path__steps article { min-height: 0; }
     .hero-v2__mockup--daily-grid {
       max-width: 100%;
       min-height: auto;
