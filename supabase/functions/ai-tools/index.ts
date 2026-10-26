@@ -33,6 +33,7 @@ const TOOL_POLICY: Record<string, { actionClass: "light" | "medium" | "pro"; cos
   summary: { actionClass: "medium", cost: 2, freeLimit: 5 },
   writing: { actionClass: "light", cost: 1, freeLimit: 5 },
   task: { actionClass: "medium", cost: 2, freeLimit: 8 },
+  vault: { actionClass: "medium", cost: 2, freeLimit: 20 },
   decision: { actionClass: "pro", cost: 4, freeLimit: 3 },
   lumina: { actionClass: "medium", cost: 2, freeLimit: 5 },
   cvitae: { actionClass: "medium", cost: 2, freeLimit: 3 },
@@ -181,6 +182,31 @@ Rules:
 - If no due date is clear, use null.
 - If there are no real tasks, return {"tasks":[]}.`;
       user = `Reference date: ${referenceDate || ""}\n\nCapture:\n${text}`;
+
+    // ── Vault organization ─────────────────────────────────────
+    } else if (tool === "vault") {
+      const items = Array.isArray((input as Record<string, unknown>).items)
+        ? (input as { items: Array<Record<string, unknown>> }).items
+        : [];
+      const tasks = Array.isArray((input as Record<string, unknown>).tasks)
+        ? (input as { tasks: Array<Record<string, unknown>> }).tasks
+        : [];
+      if (!items.length || items.length > 20) return respond({ error: "Provide 1–20 Vault items" }, 400);
+      const safeItems = items.map((item) => ({
+        id: String(item.id || "").slice(0, 100),
+        title: String(item.title || "").slice(0, 180),
+        type: String(item.type || "").slice(0, 40),
+        filename: String(item.filename || "").slice(0, 180),
+      }));
+      const safeTasks = tasks.slice(0, 100).map((task) => ({
+        id: String(task.id || "").slice(0, 100),
+        title: String(task.title || "").slice(0, 180),
+      }));
+      system = `You organize a user's personal reference Vault. Return valid JSON only, no markdown or prose.
+Schema: {"items":[{"id":"existing item id","category":"short category","folder":"short folder name","related_task_ids":["existing task id"],"reason":"brief explanation"}]}
+Use only the provided titles, types, filenames and task titles. Never invent folders as if they already exist: folder is a suggested folder name. Relate only to tasks whose IDs are provided and only when the semantic connection is clear. If uncertain, use an empty related_task_ids array. Keep category/folder concise and in the requested language. Return exactly one result for every input item and preserve its id. Do not request or infer links, notes, or document contents.`;
+      user = `Language: ${String((input as Record<string, unknown>).locale || "pt").slice(0, 10)}\nVault items: ${JSON.stringify(safeItems)}\nOpen tasks: ${JSON.stringify(safeTasks)}`;
+      maxTokens = 1200;
 
     // ── Decision ───────────────────────────────────────────────
     } else if (tool === "decision") {
@@ -377,7 +403,7 @@ ${rawText}`;
     }
     reservationStarted = true;
     isLite = reservation.lite === true;
-    maxTokens = isLite ? 400 : 1024;
+    maxTokens = tool === "vault" ? (isLite ? 800 : 2_200) : (isLite ? 400 : 1_024);
     if (isLite) {
       system += "\n\nThis is a compact free response. Keep the answer focused, useful, and within the available space.";
     }

@@ -1,0 +1,79 @@
+---
+import FlagshipLayout from "../../../layouts/FlagshipLayout.astro";
+---
+<FlagshipLayout title="World avatar moderation · VOLYNX" pageClass="page-admin-world-avatars">
+  <main class="shell moderation-shell">
+    <header><span>WORLD · MODERATION</span><h1>Profile photo review</h1><p>Review submitted photos before they become public. Reject explicit, abusive, misleading, or otherwise unsuitable images.</p></header>
+    <p id="moderationStatus" role="status" aria-live="polite">Checking administrator access…</p>
+    <section id="moderationQueue" class="moderation-queue" aria-label="Pending profile photos"></section>
+  </main>
+</FlagshipLayout>
+<script>
+  import { createClient } from "@supabase/supabase-js";
+  const status = document.querySelector<HTMLElement>("#moderationStatus")!;
+  const queue = document.querySelector<HTMLElement>("#moderationQueue")!;
+  const setStatus = (message: string) => { status.textContent = message; };
+  async function init() {
+    const config = await fetch("/config.json", { cache: "no-store" }).then((response) => response.json());
+    const supabase = createClient(config.supabaseUrl, config.supabaseAnonKey);
+    const stored = JSON.parse(localStorage.getItem("volynx_session") || "{}");
+    if (!stored.access_token) throw new Error("Please sign in with an administrator account.");
+    const { data: sessionData, error: sessionError } = await supabase.auth.setSession({ access_token: stored.access_token, refresh_token: stored.refresh_token || "" });
+    if (sessionError || !sessionData.session) throw new Error("Your session expired. Sign in again.");
+    localStorage.setItem("volynx_session", JSON.stringify(sessionData.session));
+    const invoke = async (body: Record<string, string>) => {
+      const response = await fetch(`${config.functionsUrl}/moderate-world-avatar`, {
+        method: "POST", headers: { Authorization: `Bearer ${sessionData.session.access_token}`, "Content-Type": "application/json" }, body: JSON.stringify(body),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(response.status === 403 ? "Administrator access required." : result.error || "Moderation request failed.");
+      return result;
+    };
+    const load = async () => {
+      setStatus("Loading pending submissions…");
+      const result = await invoke({ action: "list" });
+      queue.replaceChildren();
+      if (!result.items?.length) { setStatus("No photos are waiting for review."); return; }
+      setStatus(`${result.items.length} photo${result.items.length === 1 ? "" : "s"} awaiting review.`);
+      for (const item of result.items) {
+        const card = document.createElement("article");
+        card.className = "moderation-card";
+        const image = document.createElement("img");
+        image.src = item.preview_url || ""; image.alt = `Submitted photo for ${item.display_name}`; image.width = 360; image.height = 360; image.loading = "lazy";
+        const details = document.createElement("div");
+        const heading = document.createElement("h2"); heading.textContent = item.display_name;
+        const handle = document.createElement("p"); handle.textContent = item.handle ? `@${item.handle}` : "World member";
+        const buttons = document.createElement("div"); buttons.className = "moderation-actions";
+        for (const [action, label] of [["approve", "Approve photo"], ["reject", "Reject & remove"]]) {
+          const button = document.createElement("button"); button.type = "button"; button.textContent = label; button.dataset.action = action;
+          button.addEventListener("click", async () => {
+            button.disabled = true;
+            try { await invoke({ action, id: item.id }); await load(); }
+            catch (error) { button.disabled = false; setStatus(error instanceof Error ? error.message : "Review failed."); }
+          });
+          buttons.append(button);
+        }
+        details.append(heading, handle, buttons); card.append(image, details); queue.append(card);
+      }
+    };
+    await load();
+  }
+  init().catch((error) => setStatus(error instanceof Error ? error.message : "Could not open moderation queue."));
+</script>
+<style>
+  .moderation-shell{min-height:80vh;padding-block:clamp(54px,9vw,110px)}
+  .moderation-shell header{max-width:760px;margin-bottom:28px}
+  .moderation-shell header>span{color:#67f1d1;font-size:.72rem;letter-spacing:.18em}
+  .moderation-shell h1{margin:12px 0;font-size:clamp(2rem,5vw,3.5rem);letter-spacing:-.04em}
+  .moderation-shell header p,#moderationStatus{color:rgba(255,255,255,.65);line-height:1.6}
+  .moderation-queue{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:18px;margin-top:24px}
+  .moderation-card{overflow:hidden;border:1px solid rgba(255,255,255,.13);border-radius:22px;background:rgba(255,255,255,.045)}
+  .moderation-card>img{display:block;width:100%;max-height:430px;aspect-ratio:1;object-fit:contain;background:#090b10}
+  .moderation-card>div{padding:18px}
+  .moderation-card h2{margin:0 0 4px;font-size:1.2rem}
+  .moderation-card p{margin:0;color:rgba(255,255,255,.58)}
+  .moderation-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  .moderation-actions button{padding:10px 14px;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:rgba(255,255,255,.06);color:white;cursor:pointer}
+  .moderation-actions button:first-child{border-color:rgba(103,241,209,.5);color:#67f1d1}
+  .moderation-actions button:disabled{opacity:.55;cursor:wait}
+</style>

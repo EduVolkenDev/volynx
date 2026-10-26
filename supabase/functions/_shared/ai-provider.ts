@@ -12,6 +12,7 @@ export type AiCapability =
   | "summary"
   | "writing"
   | "task"
+  | "vault"
   | "decision"
   | "lumina"
   | "cvitae"

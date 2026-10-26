@@ -113,21 +113,21 @@ const worldProLocalizedPrice = worldProPlan
           </div>
           <div class="world-demo__grid">
             <article class="world-demo-card world-demo-card--gold">
-              <span class="world-demo-card__avatar" aria-hidden="true">MC</span><span class="world-demo-card__tag">DEMO</span>
+              <span class="world-demo-card__avatar" aria-hidden="true"><img src="/assets/bd-assets/avatarfree4.webp" alt=""></span><span class="world-demo-card__tag">DEMO</span>
               <span class="world-demo-card__category"><span class="i18n-en">Design & brand</span><span class="i18n-pt">Design e marca</span></span>
               <h4>Maya Chen</h4><p class="world-demo-card__headline"><span class="i18n-en">Brand systems for independent hospitality.</span><span class="i18n-pt">Sistemas de marca para hospitalidade independente.</span></p>
               <div class="world-demo-card__skills"><span><span class="i18n-en">Identity</span><span class="i18n-pt">Identidade</span></span><span><span class="i18n-en">Art direction</span><span class="i18n-pt">Direção de arte</span></span><span><span class="i18n-en">London · Remote</span><span class="i18n-pt">Londres · Remoto</span></span></div>
               <div class="world-demo-card__offer"><small><span class="i18n-en">Sample service</span><span class="i18n-pt">Serviço demonstrativo</span></small><strong><span class="i18n-en">A cohesive brand starter</span><span class="i18n-pt">Kit inicial de marca coesa</span></strong><span><span class="i18n-en">From £480 · 10 days</span><span class="i18n-pt">A partir de £480 · 10 dias</span></span></div>
             </article>
             <article class="world-demo-card world-demo-card--teal">
-              <span class="world-demo-card__avatar" aria-hidden="true">RN</span><span class="world-demo-card__tag">DEMO</span>
+              <span class="world-demo-card__avatar" aria-hidden="true"><img src="/assets/bd-assets/avatarlaunch4.webp" alt=""></span><span class="world-demo-card__tag">DEMO</span>
               <span class="world-demo-card__category"><span class="i18n-en">Web & technology</span><span class="i18n-pt">Web e tecnologia</span></span>
               <h4>Rafael Nunes</h4><p class="world-demo-card__headline"><span class="i18n-en">Fast, accessible websites that help people decide.</span><span class="i18n-pt">Sites rápidos e acessíveis que ajudam as pessoas a decidir.</span></p>
               <div class="world-demo-card__skills"><span>Astro</span><span><span class="i18n-en">Accessibility</span><span class="i18n-pt">Acessibilidade</span></span><span>São Paulo · <span class="i18n-en">Remote</span><span class="i18n-pt">Remoto</span></span></div>
               <div class="world-demo-card__offer"><small><span class="i18n-en">Sample service</span><span class="i18n-pt">Serviço demonstrativo</span></small><strong><span class="i18n-en">Focused landing page</span><span class="i18n-pt">Landing page focada</span></strong><span><span class="i18n-en">From R$1,900 · 7 days</span><span class="i18n-pt">A partir de R$1.900 · 7 dias</span></span></div>
             </article>
             <article class="world-demo-card world-demo-card--violet">
-              <span class="world-demo-card__avatar" aria-hidden="true">AO</span><span class="world-demo-card__tag">DEMO</span>
+              <span class="world-demo-card__avatar" aria-hidden="true"><img src="/assets/bd-assets/avatarpro4.webp" alt=""></span><span class="world-demo-card__tag">DEMO</span>
               <span class="world-demo-card__category"><span class="i18n-en">Marketing & growth</span><span class="i18n-pt">Marketing e crescimento</span></span>
               <h4>Amara Okafor</h4><p class="world-demo-card__headline"><span class="i18n-en">Positioning and launch strategy for useful products.</span><span class="i18n-pt">Posicionamento e lançamento para produtos que resolvem algo.</span></p>
               <div class="world-demo-card__skills"><span><span class="i18n-en">Positioning</span><span class="i18n-pt">Posicionamento</span></span><span><span class="i18n-en">Launch plans</span><span class="i18n-pt">Planos de lançamento</span></span><span><span class="i18n-en">Lisbon · Remote</span><span class="i18n-pt">Lisboa · Remoto</span></span></div>
@@ -277,6 +277,16 @@ const worldProLocalizedPrice = worldProPlan
               <div><span><img src="/assets/world/world-profile-icon.webp" alt="" loading="lazy" decoding="async" /></span><h3><span class="i18n-en">Professional profile</span><span class="i18n-pt">Perfil profissional</span></h3></div>
               <label class="world-toggle"><input id="profilePublished" type="checkbox" /><span><span class="i18n-en">Public</span><span class="i18n-pt">Público</span></span></label>
             </div>
+            <fieldset class="world-avatar-picker">
+              <legend><span class="i18n-en">Profile avatar</span><span class="i18n-pt">Avatar do perfil</span></legend>
+              <p class="world-avatar-picker__hint"><span class="i18n-en">Choose an avatar or submit a photo. Submitted photos stay private until a moderator reviews them.</span><span class="i18n-pt">Escolha um avatar ou envie uma foto. Fotos enviadas ficam privadas até serem avaliadas pela moderação.</span></p>
+              <div class="world-avatar-picker__options" id="worldAvatarOptions" role="group" aria-label="Choose a profile avatar"></div>
+              <label class="world-avatar-upload">
+                <span><span class="i18n-en">Upload a real photo</span><span class="i18n-pt">Enviar uma foto real</span></span>
+                <input id="worldAvatarFile" type="file" accept="image/jpeg,image/png,image/webp" />
+              </label>
+              <p class="world-form__status" id="worldAvatarStatus" aria-live="polite"></p>
+            </fieldset>
             <div class="world-fields">
               <label><span><span class="i18n-en">Display name</span><span class="i18n-pt">Nome público</span></span><input id="profileDisplayName" maxlength="80" required /></label>
               <label><span><span class="i18n-en">World address</span><span class="i18n-pt">Endereço no World</span></span><input id="profileHandle" maxlength="30" pattern="[a-z0-9][a-z0-9_-]{2,29}" placeholder="your_name" required /><small class="world-field-hint">volynx.world/world/profile/?handle=<b id="handlePreview">your_name</b></small></label>
@@ -357,6 +367,7 @@ const worldProLocalizedPrice = worldProPlan
 <script>
   import { createClient } from "@supabase/supabase-js";
   import { initWorldScene } from "../../scripts/world-three";
+  import { AVATAR_CATALOG, getAvailableFor } from "../../data/avatars";
 
   const byId = (id: string) => document.getElementById(id) as HTMLElement | null;
   const value = (id: string) => ((byId(id) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null)?.value || "").trim();
@@ -379,6 +390,8 @@ const worldProLocalizedPrice = worldProPlan
   let receivedInquiries: any[] = [];
   let starterBenefit: any = null;
   let worldPlan = "free";
+  let selectedWorldAvatar = "";
+  let mainAccountProfile: any = null;
   let category = "";
   let selectedService: any = null;
   let editingServiceId = "";
@@ -910,14 +923,16 @@ const worldProLocalizedPrice = worldProPlan
       supabase.from("world_services").select("*").eq("provider_id", user.id).order("updated_at", { ascending: false }),
       supabase.from("world_inquiries").select("*").eq("provider_id", user.id).order("created_at", { ascending: false }),
       supabase.from("world_starter_benefits").select("*").eq("user_id", user.id).maybeSingle(),
-      supabase.from("profiles").select("world_plan").eq("id", user.id).maybeSingle(),
+      supabase.from("profiles").select("world_plan,plan,builder_plan,daily_plan,cvitae_plan,is_black_diamond").eq("id", user.id).maybeSingle(),
     ]);
     worldPlan = (mainProfile as any)?.world_plan || "free";
+    mainAccountProfile = mainProfile || {};
     ownProfile = profile || null;
     ownServices = own || [];
     receivedInquiries = inquiries || [];
     starterBenefit = benefitResult?.data || null;
     if (ownProfile) {
+      selectedWorldAvatar = ownProfile.avatar_url || "";
       (byId("profileDisplayName") as HTMLInputElement).value = ownProfile.display_name || "";
       (byId("profileHandle") as HTMLInputElement).value = ownProfile.handle || "";
       (byId("handlePreview") as HTMLElement).textContent = ownProfile.handle || "your_name";
@@ -930,11 +945,58 @@ const worldProLocalizedPrice = worldProPlan
       (byId("profilePortfolio") as HTMLInputElement).value = ownProfile.portfolio_url || "";
       (byId("profilePublished") as HTMLInputElement).checked = !!ownProfile.is_published;
     }
+    renderWorldAvatarPicker();
     renderWorldPlanSummary();
     renderOwnServices();
     renderStarterBenefit();
     renderInquiries();
   }
+
+  function renderWorldAvatarPicker() {
+    const root = byId("worldAvatarOptions");
+    if (!root) return;
+    const planRanks: Record<string, number> = { free: 0, launch: 1, business: 2, pro: 2, diamond: 2, studio: 3, teams: 4, enterprise: 5 };
+    const effectivePlan = [mainAccountProfile?.plan, mainAccountProfile?.builder_plan, mainAccountProfile?.daily_plan, mainAccountProfile?.cvitae_plan]
+      .filter(Boolean).sort((a: string, b: string) => (planRanks[String(b).toLowerCase()] || 0) - (planRanks[String(a).toLowerCase()] || 0))[0] || "free";
+    const options = getAvailableFor(effectivePlan, !!mainAccountProfile?.is_black_diamond);
+    root.innerHTML = options.map((avatar) => `<button type="button" class="world-avatar-option${selectedWorldAvatar.endsWith(avatar.src) ? " is-selected" : ""}" data-avatar-src="${escapeHtml(avatar.src)}" aria-pressed="${selectedWorldAvatar.endsWith(avatar.src)}" aria-label="${escapeHtml(avatar.label)}"><img src="${escapeHtml(avatar.src)}" alt="" width="100" height="auto"><span>${escapeHtml(avatar.label)}</span></button>`).join("");
+    root.querySelectorAll<HTMLButtonElement>("[data-avatar-src]").forEach((button) => button.addEventListener("click", async () => {
+      const src = button.dataset.avatarSrc || "";
+      const url = new URL(src, window.location.origin).toString();
+      selectedWorldAvatar = url;
+      renderWorldAvatarPicker();
+      if (user && ownProfile) {
+        const { error } = await supabase.from("world_profiles").update({ avatar_url: url }).eq("user_id", user.id);
+        if (error) { selectedWorldAvatar = ownProfile.avatar_url || ""; renderWorldAvatarPicker(); return setStatus("worldAvatarStatus", error.message, "error"); }
+        ownProfile.avatar_url = url;
+        await loadMarketplace();
+        setStatus("worldAvatarStatus", text("Avatar updated.", "Avatar atualizado."), "success");
+      }
+    }));
+  }
+
+  byId("worldAvatarFile")?.addEventListener("change", async (event) => {
+    const input = event.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file || !user || !cfg?.functionsUrl) return;
+    if (!ownProfile) { input.value = ""; return setStatus("worldAvatarStatus", text("Save your professional profile before submitting a photo.", "Salve seu perfil profissional antes de enviar uma foto."), "error"); }
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size > 5 * 1024 * 1024) {
+      input.value = "";
+      return setStatus("worldAvatarStatus", text("Choose a JPG, PNG or WebP image up to 5 MB.", "Escolha uma imagem JPG, PNG ou WebP de até 5 MB."), "error");
+    }
+    setStatus("worldAvatarStatus", text("Uploading privately for moderation…", "Enviando em privado para moderação…"));
+    const extension = file.type === "image/jpeg" ? "jpg" : file.type.split("/")[1];
+    const path = `${user.id}/${crypto.randomUUID()}.${extension}`;
+    const { error: uploadError } = await supabase.storage.from("world-avatar-pending").upload(path, file, { contentType: file.type, upsert: false });
+    if (uploadError) return setStatus("worldAvatarStatus", uploadError.message, "error");
+    const { error: submissionError } = await supabase.from("world_avatar_submissions").insert({ user_id: user.id, object_path: path });
+    if (submissionError) {
+      await supabase.storage.from("world-avatar-pending").remove([path]);
+      return setStatus("worldAvatarStatus", submissionError.message, "error");
+    }
+    input.value = "";
+    setStatus("worldAvatarStatus", text("Photo submitted. It will appear after a moderator approves it.", "Foto enviada. Ela aparecerá depois da aprovação da moderação."), "success");
+  });
 
   function openInquiry(service: any) {
     if (!user) {
@@ -1026,6 +1088,7 @@ const worldProLocalizedPrice = worldProPlan
       specialties: splitList(value("profileSpecialties")),
       languages: splitList(value("profileLanguages")),
       portfolio_url: value("profilePortfolio") || null,
+      avatar_url: selectedWorldAvatar || ownProfile?.avatar_url || null,
       is_published: (byId("profilePublished") as HTMLInputElement).checked,
     };
     const { error } = await supabase.from("world_profiles").upsert(payload, { onConflict: "user_id" });
@@ -2765,8 +2828,8 @@ const worldProLocalizedPrice = worldProPlan
   .page-world #worldGrid .world-card__portrait {
     position: relative;
     z-index: 1;
-    width: clamp(154px, 13vw, 208px);
-    aspect-ratio: 1;
+    width: 100px;
+    height: auto;
     display: grid;
     place-items: center;
     overflow: hidden;
@@ -2783,8 +2846,8 @@ const worldProLocalizedPrice = worldProPlan
   }
 
   .page-world #worldGrid .world-card__portrait img {
-    width: 100%;
-    height: 100%;
+    width: 100px;
+    height: auto;
     object-fit: cover;
   }
 
@@ -3208,7 +3271,19 @@ const worldProLocalizedPrice = worldProPlan
   .world-demo-card--gold { --demo-accent:#ffd76a; }
   .world-demo-card--teal { --demo-accent:#67f1d1; }
   .world-demo-card--violet { --demo-accent:#bea0ff; }
-  .world-demo-card__avatar { position:relative;display:grid;place-items:center;width:62px;height:62px;margin-bottom:20px;border:1px solid color-mix(in srgb,var(--demo-accent) 48%,transparent);border-radius:21px;background:linear-gradient(145deg,color-mix(in srgb,var(--demo-accent) 24%,transparent),rgba(255,255,255,.035));color:var(--demo-accent);font-size:1.18rem;font-weight:800;letter-spacing:-.05em; }
+  .world-demo-card__avatar { position:relative;display:grid;place-items:center;width:100px;height:auto;aspect-ratio:1;margin-bottom:20px;border:1px solid color-mix(in srgb,var(--demo-accent) 48%,transparent);border-radius:21px;background:linear-gradient(145deg,color-mix(in srgb,var(--demo-accent) 24%,transparent),rgba(255,255,255,.035));color:var(--demo-accent);font-size:1.18rem;font-weight:800;letter-spacing:-.05em;overflow:hidden; }
+  .world-demo-card__avatar img { display:block;width:100px;height:auto;object-fit:contain; }
+  .world-avatar-picker { display:grid;gap:12px;margin:0 0 22px;padding:18px;border:1px solid rgba(255,255,255,.12);border-radius:20px; }
+  .world-avatar-picker legend { padding:0 8px;color:#ffd76a;font-weight:800; }
+  .world-avatar-picker__hint { margin:0;color:rgba(255,255,255,.58);font-size:.82rem;line-height:1.55; }
+  .world-avatar-picker__options { display:flex;flex-wrap:wrap;gap:10px; }
+  .world-avatar-option { display:grid;justify-items:center;gap:6px;width:116px;padding:8px;border:1px solid rgba(255,255,255,.12);border-radius:15px;background:rgba(255,255,255,.035);color:rgba(255,255,255,.7);cursor:pointer; }
+  .world-avatar-option.is-selected { border-color:#67f1d1;box-shadow:0 0 0 2px rgba(103,241,209,.18); }
+  .world-avatar-option img { display:block;width:100px;height:auto;aspect-ratio:1;object-fit:contain;border-radius:12px; }
+  .world-avatar-option span { font-size:.68rem; }
+  .world-avatar-upload { display:grid;gap:8px;max-width:360px;color:rgba(255,255,255,.8);font-size:.84rem; }
+  .world-avatar-upload input { max-width:100%; }
+  @media(max-width:760px){.page-world #worldGrid .world-card__portrait,.page-world #worldGrid .world-card__portrait img{width:100px;height:auto}.world-profile__avatar{width:100px;height:auto}}
   .world-demo-card__tag { position:absolute;top:22px;right:20px;padding:6px 9px;border:1px solid rgba(255,255,255,.15);border-radius:999px;color:rgba(255,255,255,.48);font-size:.58rem;font-weight:800;letter-spacing:.12em; }
   .world-demo-card__category { color:var(--demo-accent);font-size:.65rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase; }
   .world-demo-card h4 { margin:8px 0 4px;font-size:1.55rem;line-height:1.06;letter-spacing:-.045em; }

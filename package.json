@@ -13,6 +13,8 @@
     "packages/*"
   ],
   "scripts": {
+    "postinstall": "node scripts/apply-dependency-security-patches.mjs",
+    "test:dependency-security": "node --test scripts/dependency-security.test.mjs",
     "dev": "astro dev",
     "lab:assets:sync": "node scripts/sync-lab-assets.mjs",
     "lab:assets:check": "node scripts/check-lab-assets.mjs",
@@ -65,6 +67,9 @@
   },
   "engines": {
     "node": ">=20.0.0"
+  },
+  "overrides": {
+    "argparse": "2.0.1"
   },
   "devDependencies": {
     "@swc/helpers": "^0.5.23",
