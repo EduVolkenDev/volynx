@@ -15,8 +15,22 @@ import LegalLayout from "../layouts/LegalLayout.astro";
     <li data-i18n-html="priv.collect_account"><strong>Account data</strong> — name and email address when you create an account or sign in via Supabase Auth.</li>
     <li data-i18n-html="priv.collect_payment"><strong>Payment data</strong> — billing information processed securely by Stripe. Volynx never stores card numbers directly.</li>
     <li data-i18n-html="priv.collect_usage"><strong>Optional analytics data</strong> — a pseudonymous session ID, page path, CTA/product-flow interaction, broad device class and campaign/referrer domain. We do not put email addresses, form values, file names, complete URL parameters or payment data into these events.</li>
-    <li data-i18n-html="priv.collect_contact"><strong>Contact data</strong> — messages and information you submit through our contact form (processed via Formspree).</li>
+    <li data-i18n-html="priv.collect_contact"><strong>Contact data</strong> — name, email, project type, budget, timeline, message, language, source page, browser user-agent and referrer supplied with a contact request.</li>
+    <li data-i18n="priv.collect_ai">If you use an AI feature, the prompt and content you submit (which may include CV text, role details or project descriptions) are sent to the AI provider selected for that feature to generate a response.</li>
     <li data-i18n-html="priv.collect_cookies"><strong>Cookies and local storage</strong> — essential session storage for authentication and optional first-party analytics storage.</li>
+  </ul>
+
+  <h2 data-i18n="priv.basis_title">How we use data and lawful bases</h2>
+  <p data-i18n="priv.basis_desc">Depending on your location, account data is processed to provide the account or service you request, optional analytics are processed only after consent, and records are processed where needed to meet legal obligations. The specific legal basis for each data category and jurisdiction still requires formal confirmation.</p>
+
+  <h2 data-i18n="priv.google_title">Google Sign-In and Authentication</h2>
+  <p data-i18n="priv.google_status">Google Sign-In is an optional authentication method. It is currently disabled in the VOLYNX login flow on this site; the details below describe how it is intended to work if enabled.</p>
+  <ul>
+    <li data-i18n="priv.google_data">When enabled and chosen by you, Google Sign-In uses your email address to identify you, create or access a VOLYNX account, and authenticate your session. Google may also return your name as basic profile metadata; the current account-creation flow does not reliably copy that name into the separate VOLYNX profile record. Authentication is processed through Supabase Auth.</li>
+    <li data-i18n="priv.google_scopes">The current application code does not request extra Google scopes. Supabase's standard Google sign-in uses OpenID Connect identity scopes (openid, email, and basic profile); VOLYNX does not request access to Gmail, Google Drive, Google Calendar, or other Google product data or APIs.</li>
+    <li data-i18n="priv.google_storage">Supabase Auth stores the authentication identity and provider metadata returned by Google. VOLYNX's separate profiles table stores account email; its current profile-creation code does not copy a Google profile picture into the profile avatar field. The exact provider attributes retained in Auth depend on Google's response and must be confirmed against the configured provider.</li>
+    <li data-i18n-html="priv.google_revoke">You can revoke VOLYNX's Google connection in <a href="https://myaccount.google.com/connections" target="_blank" rel="noopener noreferrer">your Google Account's third-party connections</a>. Revoking Google access does not delete your VOLYNX account or its data.</li>
+    <li data-i18n-html="priv.google_delete">To request access to, correction of, or deletion of your VOLYNX account data, email <a href="mailto:hello@volynx.world">hello@volynx.world</a> from the address associated with your account. Account deletion is a separate request; it does not happen automatically when you revoke Google access.</li>
   </ul>
 
   <h2 data-i18n="priv.why_title">Why we collect it</h2>
@@ -30,29 +44,31 @@ import LegalLayout from "../layouts/LegalLayout.astro";
 
   <h2 data-i18n="priv.third_title">Third-party services</h2>
   <ul>
-    <li data-i18n-html="priv.third_supabase"><strong>Supabase</strong> — authentication, database hosting and first-party consented analytics storage (EU infrastructure)</li>
-    <li data-i18n-html="priv.third_stripe"><strong>Stripe</strong> — payment processing. Subject to <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Stripe's Privacy Policy</a>.</li>
-    <li data-i18n-html="priv.third_formspree"><strong>Formspree</strong> — contact form processing</li>
-    <li data-i18n-html="priv.third_cloudflare"><strong>Cloudflare Pages</strong> — website hosting and CDN</li>
+    <li data-i18n-html="priv.third_supabase"><strong>Supabase</strong> — authentication, account/profile data, contact submissions and consented analytics. The VOLYNX project is hosted in the EU (eu-west-1).</li>
+    <li data-i18n-html="priv.third_stripe"><strong>Stripe</strong> — payment and subscription processing. VOLYNX stores a Stripe customer identifier for account billing; see <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer">Stripe's Privacy Policy</a>.</li>
+    <li data-i18n-html="priv.third_contact"><strong>Resend</strong> — may process contact-request details to send an email notification when that integration is configured; the request is stored in Supabase.</li>
+    <li data-i18n="priv.third_ai">Anthropic processes prompts for most VOLYNX AI features. The AI Builder can use Anthropic or OpenAI according to its server-side provider setting; the live provider setting has not been independently confirmed. The providers receive the prompt content needed to return the requested result.</li>
+    <li data-i18n-html="priv.third_google"><strong>Google</strong> — if optional Google Sign-In is enabled and you choose it, Google authenticates your identity; see the Google Sign-In section above.</li>
+    <li data-i18n-html="priv.third_cloudflare"><strong>Cloudflare</strong> — website hosting, content delivery and related infrastructure.</li>
   </ul>
 
   <h2 data-i18n="priv.cookies_title">Cookies</h2>
-  <p data-i18n="priv.cookies_desc">We use essential storage to keep you logged in and maintain session state. With your permission, VOLYNX creates a temporary pseudonymous session and records anonymous product events to understand usage patterns. You can change this preference at any time.</p>
+  <p data-i18n="priv.cookies_desc">The current site uses browser local storage for authentication session tokens and consent preferences; optional analytics uses session storage for a pseudonymous session identifier and campaign attribution. Analytics events are sent only after consent. You can reject or change analytics consent at any time using the controls below. This describes browser storage and does not claim that every item is an HTTP cookie.</p>
   <button id="privacyConsentPreferences" class="privacy-preferences" type="button" data-i18n="priv.cookies_manage">Manage analytics preferences</button>
 
   <h2 data-i18n="priv.retention_title">Data retention</h2>
-  <p data-i18n="priv.retention_desc">Account data is retained while your account is active. You may request deletion at any time. Payment records are retained as required by applicable financial regulations.</p>
+  <p data-i18n="priv.retention_desc">Account information is kept while needed to operate an active account, and payment records may need to be retained to meet applicable legal obligations. VOLYNX does not currently publish verified, fixed retention periods for each data category; the retention schedules for account, contact and analytics data require confirmation. You may email us to request deletion.</p>
 
   <h2 data-i18n="priv.rights_title">Your rights</h2>
   <ul>
     <li data-i18n="priv.rights_access">Request access to, correction, or deletion of your personal data</li>
-    <li data-i18n="priv.rights_consent">Withdraw consent for marketing communications at any time</li>
+    <li data-i18n="priv.rights_consent">Withdraw consent for optional analytics at any time using the privacy preferences control</li>
     <li data-i18n="priv.rights_complaint">Lodge a complaint with your local data protection authority</li>
   </ul>
 
   <h2 data-i18n="priv.contact_title">Contact</h2>
   <p data-i18n-html="priv.contact_desc">For privacy requests: <a href="mailto:hello@volynx.world">hello@volynx.world</a></p>
-  <p class="meta" data-i18n="priv.updated">Last updated: {new Date().toISOString().slice(0, 10)}</p>
+  <p class="meta" data-i18n="priv.updated">Last updated: 2026-10-21</p>
 </LegalLayout>
 
 <script is:inline>

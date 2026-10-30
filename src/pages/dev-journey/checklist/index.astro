@@ -104,6 +104,9 @@ const blocks = [
   <meta name="robots" content="noindex,nofollow" />
   <FaviconHead />
   <TierAttrInit />
+  <script is:inline src="/js/vx-auth-bridge.js"></script>
+  <script is:inline src="/js/vx-return.js"></script>
+  <script is:inline src="/js/vx-continuity.js"></script>
 </head>
 
 <body>
@@ -268,6 +271,17 @@ const blocks = [
         var pct = totalUnlocked === 0 ? 0 : Math.round((done / totalUnlocked) * 100);
         if (progressEl) progressEl.value = pct;
         if (progressLabel) progressLabel.textContent = pct + '%';
+        window.VxContinuity?.record?.({
+          surface: 'dev-journey',
+          resourceKey: 'checklist',
+          title: 'Dev Journey checklist',
+          detail: done + ' of ' + totalUnlocked + ' available items completed.',
+          path: '/dev-journey/checklist/',
+          actionLabel: pct >= 100 ? 'Review checklist' : 'Continue checklist',
+          status: pct >= 100 ? 'completed' : 'in_progress',
+          progress: pct,
+          metadata: { completed: done, total: totalUnlocked }
+        });
       }
 
       var token = getToken();

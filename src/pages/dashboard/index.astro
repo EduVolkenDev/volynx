@@ -64,6 +64,11 @@ const title = "Dashboard — VOLYNX";
             <a class="vx-button vx-button--primary" href={ROUTES.products}>Explorar produtos</a>
           </section>
 
+          <section class="vx-dashboard__section vx-dashboard__section--continuity" aria-labelledby="continuityTitle">
+            <div class="vx-dashboard__section-head"><div><span class="vx-dashboard__eyebrow">CONTINUIDADE</span><h2 id="continuityTitle">Continue de onde parou</h2></div><span class="vx-dashboard__section-note">Sincronizado com sua conta</span></div>
+            <div class="vx-dashboard__continuity" id="continuityGrid"></div>
+          </section>
+
           <section class="vx-dashboard__metrics" aria-label="Resumo da conta" id="dashboardMetrics"></section>
 
           <section class="vx-dashboard__section">
@@ -92,12 +97,14 @@ const title = "Dashboard — VOLYNX";
 
   type Profile = { email?: string | null; plan?: string | null; builder_plan?: string | null; daily_plan?: string | null; token_balance?: number | null };
   type Site = { id: string; name: string; slug: string; template_key?: string | null; status?: string | null; updated_at?: string | null; theme?: Record<string, unknown> | null };
+  type Project = { id: string; name: string; slug?: string | null; status?: string | null; updated_at?: string | null; created_at?: string | null };
+  type Continuity = { surface: string; resource_key: string; title: string; detail?: string | null; origin?: string | null; path: string; action_label: string; status: string; progress?: number | null; metadata?: Record<string, unknown>; last_opened_at: string };
   type ProductRecord = { key: string; source: "addon" | "purchase"; createdAt?: string | null; metadata?: Record<string, unknown> };
   type Product = ProductRecord & { title: string; eyebrow: string; description: string; href: string; icon: string; tone: "cyan" | "violet" | "gold" | "neutral" };
 
   const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T | null;
   const tokenKeys = ["volynx_access_token", "volynx_refresh_token"];
-  const state = { supa: null as any, user: null as any, profile: {} as Profile, products: [] as Product[], sites: [] as Site[] };
+  const state = { supa: null as any, user: null as any, profile: {} as Profile, products: [] as Product[], sites: [] as Site[], projects: [] as Project[], continuity: [] as Continuity[] };
 
   function escapeHtml(value: unknown) { return String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char] || char); }
   function iconSvg(name: string) {
@@ -128,6 +135,86 @@ const title = "Dashboard — VOLYNX";
     const seen = new Set<string>();
     return records.filter((record) => { if (seen.has(record.key)) return false; seen.add(record.key); return true; }).map(productSpec);
   }
+  function safeResumePath(value: unknown) {
+    const path = String(value || "");
+    const shared = (window as any).VxContinuity?.safePath?.(path);
+    if (shared) return shared;
+    return path.startsWith("/") && !path.startsWith("//") ? path : "/dashboard/";
+  }
+  function safeResumeUrl(item: Continuity) {
+    const path = safeResumePath(item.path);
+    const origin = String(item.origin || "https://volynx.world").replace(/\/$/, "");
+    if (origin === "https://cvitae.volynx.world" || origin === "https://daily.volynx.world") return `${origin}${path}`;
+    return path;
+  }
+  function continuityIdentity(item: Continuity) { return `${item.surface}:${item.resource_key}`; }
+  function continuityFromProject(project: Project): Continuity {
+    const updated = project.updated_at || project.created_at || new Date(0).toISOString();
+    return {
+      surface: "builder",
+      resource_key: project.id,
+      title: project.name || "Projeto do Builder",
+      detail: project.status === "published" ? "Site publicado e pronto para evoluir." : "Rascunho salvo e pronto para continuar.",
+      origin: "https://volynx.world",
+      path: `/builder/?project=${encodeURIComponent(project.id)}`,
+      action_label: "Continuar editando",
+      status: project.status === "published" ? "published" : "draft",
+      progress: null,
+      metadata: { slug: project.slug || null },
+      last_opened_at: updated
+    };
+  }
+  function mergeContinuity(cloudRows: any[], projects: Project[]) {
+    const localRows = ((window as any).VxContinuity?.list?.() || []) as Continuity[];
+    const items = [...(cloudRows || []), ...localRows, ...projects.map(continuityFromProject)]
+      .map((item) => ({ ...item, path: safeResumePath(item.path), last_opened_at: item.last_opened_at || new Date(0).toISOString() })) as Continuity[];
+    const byIdentity = new Map<string, Continuity>();
+    for (const item of items) {
+      const key = continuityIdentity(item);
+      const current = byIdentity.get(key);
+      if (!current || new Date(item.last_opened_at).getTime() > new Date(current.last_opened_at).getTime()) byIdentity.set(key, item);
+    }
+    const rows = Array.from(byIdentity.values()).sort((a, b) => new Date(b.last_opened_at).getTime() - new Date(a.last_opened_at).getTime());
+    const surfacesWithSpecificWork = new Set(rows.filter((row) => row.resource_key !== "workspace").map((row) => row.surface));
+    return rows.filter((row) => row.resource_key !== "workspace" || !surfacesWithSpecificWork.has(row.surface)).slice(0, 8);
+  }
+  function continuitySpec(surface: string) {
+    const specs: Record<string, { label: string; icon: string; tone: string }> = {
+      builder: { label: "BUILDER", icon: "spark", tone: "violet" },
+      qrgen: { label: "QRGEN", icon: "grid", tone: "cyan" },
+      "dev-journey": { label: "DEV JOURNEY", icon: "grid", tone: "gold" },
+      propertyflow: { label: "PROPERTYFLOW", icon: "box", tone: "cyan" },
+      deliveries: { label: "PRODUTOS", icon: "box", tone: "gold" },
+      cvitae: { label: "CVITAE", icon: "user", tone: "violet" }
+    };
+    return specs[surface] || { label: surface.replace(/-/g, " ").toUpperCase(), icon: "spark", tone: "neutral" };
+  }
+  function relativeTime(value: string) {
+    const timestamp = new Date(value).getTime();
+    if (!Number.isFinite(timestamp) || timestamp <= 0) return "Atividade recente";
+    const minutes = Math.round((timestamp - Date.now()) / 60000);
+    const formatter = new Intl.RelativeTimeFormat("pt-BR", { numeric: "auto" });
+    if (Math.abs(minutes) < 60) return formatter.format(minutes, "minute");
+    const hours = Math.round(minutes / 60);
+    if (Math.abs(hours) < 24) return formatter.format(hours, "hour");
+    return formatter.format(Math.round(hours / 24), "day");
+  }
+  function renderContinuity() {
+    const root = $("continuityGrid");
+    if (!root) return;
+    if (!state.continuity.length) {
+      root.innerHTML = `<article class="vx-dashboard__continuity-empty"><span class="vx-dashboard__eyebrow">PRIMEIRO PASSO</span><h3>Comece algo que valha a pena continuar.</h3><p>Crie seu primeiro projeto no Builder. Assim que o trabalho começar, este painel passa a levar você de volta ao ponto exato.</p><a class="vx-button vx-button--primary" href="/builder/">Criar projeto</a></article>`;
+      return;
+    }
+    const primary = state.continuity[0];
+    const spec = continuitySpec(primary.surface);
+    const progress = primary.progress == null ? "" : `<div class="vx-dashboard__progress"><span style="width:${Math.max(0, Math.min(100, Number(primary.progress)))}%"></span></div><small>${escapeHtml(primary.progress)}% concluído</small>`;
+    const recent = state.continuity.slice(1, 4);
+    const recentHtml = recent.length ? recent.map((item) => { const itemSpec = continuitySpec(item.surface); return `<a class="vx-dashboard__recent-item" href="${escapeHtml(safeResumeUrl(item))}"><span class="vx-dashboard__recent-icon vx-dashboard__recent-icon--${itemSpec.tone}"><span class="vx-icon" aria-hidden="true" data-icon="${itemSpec.icon}"></span></span><span><small>${escapeHtml(itemSpec.label)}</small><strong>${escapeHtml(item.title)}</strong><em>${escapeHtml(relativeTime(item.last_opened_at))}</em></span><span aria-hidden="true">↗</span></a>`; }).join("") : `<div class="vx-dashboard__continuity-note"><strong>Sua linha de trabalho começa aqui.</strong><span>Outras atividades recentes aparecerão conforme você usa a plataforma.</span></div>`;
+    const nextCopy = primary.progress != null && primary.progress < 100 ? `Avance a partir dos ${primary.progress}% já concluídos, sem refazer o caminho.` : "Retome o contexto mais recente e siga para a próxima entrega.";
+    root.innerHTML = `<article class="vx-dashboard__resume-card"><div class="vx-dashboard__resume-top"><span class="vx-dashboard__resume-icon vx-dashboard__resume-icon--${spec.tone}"><span class="vx-icon" aria-hidden="true" data-icon="${spec.icon}"></span></span><span><small>${escapeHtml(spec.label)}</small><b>${escapeHtml(relativeTime(primary.last_opened_at))}</b></span></div><h3>${escapeHtml(primary.title)}</h3><p>${escapeHtml(primary.detail || "Seu trabalho está pronto para continuar.")}</p>${progress}<div class="vx-dashboard__resume-actions"><a class="vx-button vx-button--primary" href="${escapeHtml(safeResumeUrl(primary))}">${escapeHtml(primary.action_label || "Continuar")}</a><span>Salvo na sua conta</span></div></article><aside class="vx-dashboard__continuity-side"><div class="vx-dashboard__next-action"><span class="vx-dashboard__eyebrow">PRÓXIMO PASSO</span><strong>${escapeHtml(primary.action_label || "Continuar")}</strong><p>${escapeHtml(nextCopy)}</p><a href="${escapeHtml(safeResumeUrl(primary))}">Retomar agora <span aria-hidden="true">→</span></a></div><div class="vx-dashboard__recent-list"><span class="vx-dashboard__eyebrow">TAMBÉM RECENTE</span>${recentHtml}</div></aside>`;
+    renderIcons();
+  }
   function showState(which: "loading" | "loggedOut" | "error" | "app") { $("dashboardLoading")!.hidden = which !== "loading"; $("dashboardLoggedOut")!.hidden = which !== "loggedOut"; $("dashboardError")!.hidden = which !== "error"; $("dashboardApp")!.hidden = which !== "app"; }
   function renderIcons() { document.querySelectorAll<HTMLElement>("[data-icon]").forEach((node) => { node.innerHTML = iconSvg(node.dataset.icon || "grid"); }); }
   function renderMetrics() {
@@ -147,7 +234,7 @@ const title = "Dashboard — VOLYNX";
   function render() {
     const email = state.user?.email || "Conta"; const name = firstName(email); const plan = state.profile.plan || state.profile.builder_plan || "Conta gratuita";
     $("dashboardEmail")!.textContent = email; $("dashboardInitial")!.textContent = email.slice(0, 1).toUpperCase(); $("dashboardPlan")!.textContent = String(plan); $("dashboardGreeting")!.textContent = `Olá, ${name}`; $("dashboardName")!.textContent = name;
-    renderMetrics(); renderWorkspaces(); renderProducts(); renderIcons();
+    renderContinuity(); renderMetrics(); renderWorkspaces(); renderProducts(); renderIcons();
   }
   function closeMenu() { $("dashboardSidebar")?.classList.remove("is-open"); $("dashboardOverlay")?.setAttribute("hidden", ""); }
   function openMenu() { $("dashboardSidebar")?.classList.add("is-open"); $("dashboardOverlay")?.removeAttribute("hidden"); }
@@ -161,17 +248,21 @@ const title = "Dashboard — VOLYNX";
       const userResult = await state.supa.auth.getUser();
       if (userResult.error || !userResult.data.user) { showState("loggedOut"); return; }
       state.user = userResult.data.user;
-      const [profileResult, addonsResult, eventsResult, sitesResult] = await Promise.all([
+      const [profileResult, addonsResult, eventsResult, sitesResult, projectsResult, continuityResult] = await Promise.all([
         state.supa.from("profiles").select("email,plan,builder_plan,daily_plan,token_balance").eq("id", state.user.id).maybeSingle(),
         state.supa.from("addons_purchased").select("addon_id,metadata,created_at").eq("user_id", state.user.id).eq("status", "active").order("created_at", { ascending: false }),
         state.supa.from("purchase_events").select("lookup_key,product_key,metadata,created_at").eq("user_id", state.user.id).eq("status", "completed").order("created_at", { ascending: false }),
-        state.supa.from("sites").select("id,name,slug,template_key,status,updated_at,theme").order("updated_at", { ascending: false })
+        state.supa.from("sites").select("id,name,slug,template_key,status,updated_at,theme").order("updated_at", { ascending: false }),
+        state.supa.from("projects").select("id,name,slug,status,updated_at,created_at").is("deleted_at", null).order("updated_at", { ascending: false }).limit(12),
+        state.supa.from("user_continuity").select("surface,resource_key,title,detail,origin,path,action_label,status,progress,metadata,last_opened_at").order("last_opened_at", { ascending: false }).limit(12)
       ]);
       if (profileResult.error) console.warn("Dashboard profile unavailable", profileResult.error.message);
       if (addonsResult.error) console.warn("Dashboard addons unavailable", addonsResult.error.message);
       if (eventsResult.error) console.warn("Dashboard purchase history unavailable", eventsResult.error.message);
       if (sitesResult.error) console.warn("Dashboard workspaces unavailable", sitesResult.error.message);
-      state.profile = (profileResult.data || {}) as Profile; state.products = uniqueProducts(addonsResult.data || [], eventsResult.data || []); state.sites = (sitesResult.data || []) as Site[];
+      if (projectsResult.error) console.warn("Dashboard projects unavailable", projectsResult.error.message);
+      if (continuityResult.error) console.warn("Dashboard continuity unavailable", continuityResult.error.message);
+      state.profile = (profileResult.data || {}) as Profile; state.products = uniqueProducts(addonsResult.data || [], eventsResult.data || []); state.sites = (sitesResult.data || []) as Site[]; state.projects = (projectsResult.data || []) as Project[]; state.continuity = mergeContinuity(continuityResult.data || [], state.projects);
       render(); showState("app");
     } catch (error) {
       $("dashboardErrorMessage")!.textContent = error instanceof Error ? error.message : "Atualize a página e tente novamente."; showState("error");
@@ -221,6 +312,8 @@ const title = "Dashboard — VOLYNX";
   .vx-dashboard__hero { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 34px; }
   .vx-dashboard__hero h1 { margin: 10px 0 12px; color: #fff; font-size: clamp(2.8rem, 5.4vw, 5.7rem); line-height: .93; letter-spacing: -.075em; }
   .vx-dashboard__hero p { margin: 0; color: rgba(223,230,245,.68); font-size: 18px; line-height: 1.55; }
+  .vx-dashboard__section--continuity { margin: 0 0 54px; }
+  .vx-dashboard__continuity { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(300px, .65fr); gap: 12px; }
   .vx-button { display: inline-flex; min-height: 52px; align-items: center; justify-content: center; gap: 8px; padding: 0 18px; border: 1px solid rgba(255,255,255,.14); border-radius: 999px; background: rgba(255,255,255,.05); color: #fff; font: inherit; font-size: 15px; font-weight: 800; text-decoration: none; white-space: nowrap; cursor: pointer; transition: transform .18s ease, border-color .18s ease, background .18s ease; }
   .vx-button:hover { transform: translateY(-1px); border-color: rgba(141,231,213,.7); }
   .vx-button--primary { border-color: transparent; background: linear-gradient(135deg, var(--vx-cyan), var(--vx-violet)); color: #071119; }
@@ -266,6 +359,13 @@ const title = "Dashboard — VOLYNX";
   .vx-dashboard__empty .vx-dashboard__text-link { margin-top: 5px; }
   .vx-button:focus-visible, .vx-dashboard__nav a:focus-visible, .vx-dashboard__logout:focus-visible, .vx-dashboard__close:focus-visible, .vx-dashboard__menu:focus-visible, .vx-dashboard__quick-card:focus-visible, .vx-dashboard__text-link:focus-visible { outline: 3px solid var(--vx-cyan); outline-offset: 3px; }
   /* Runtime-rendered account nodes do not receive Astro's scoped attribute. */
+  :global(.vx-dashboard .vx-icon) { display: inline-grid; width: 22px; height: 22px; flex: 0 0 22px; place-items: center; color: inherit; }
+  :global(.vx-dashboard .vx-icon svg) { width: 21px; height: 21px; }
+  :global(.vx-dashboard .vx-button) { display: inline-flex; min-height: 52px; align-items: center; justify-content: center; box-sizing: border-box; gap: 8px; padding: 0 18px; border: 1px solid rgba(255,255,255,.14); border-radius: 999px; background: rgba(255,255,255,.05); color: #fff; font: inherit; font-size: 15px; font-weight: 800; text-decoration: none; white-space: nowrap; cursor: pointer; transition: transform .18s ease, border-color .18s ease, background .18s ease; }
+  :global(.vx-dashboard .vx-button:hover) { transform: translateY(-1px); border-color: rgba(141,231,213,.7); }
+  :global(.vx-dashboard .vx-button--primary) { border-color: transparent; background: linear-gradient(135deg, var(--vx-cyan), var(--vx-violet)); color: #071119; }
+  :global(.vx-dashboard .vx-button--ghost) { background: rgba(255,255,255,.045); color: rgba(240,244,255,.86); }
+  :global(.vx-dashboard .vx-button--small) { min-height: 44px; padding: 0 14px; font-size: 14px; }
   :global(.vx-dashboard__metric), :global(.vx-dashboard__workspace-card), :global(.vx-dashboard__product-card), :global(.vx-dashboard__quick-card) { border: 1px solid rgba(255,255,255,.1); border-radius: 20px; background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.022)); box-shadow: 0 20px 70px rgba(0,0,0,.14); }
   :global(.vx-dashboard__metric) { display: grid; min-height: 138px; align-content: space-between; padding: 20px; }
   :global(.vx-dashboard__metric span), :global(.vx-dashboard__metric small) { color: rgba(220,228,245,.62); font-size: 14px; line-height: 1.35; }
@@ -286,6 +386,47 @@ const title = "Dashboard — VOLYNX";
   :global(.vx-dashboard__product-icon--neutral) { background: rgba(255,255,255,.1); color: #fff; }
   :global(.vx-dashboard__empty) { display: grid; gap: 7px; padding: 24px; border: 1px dashed rgba(255,255,255,.16); border-radius: 20px; color: rgba(223,230,245,.62); font-size: 15px; line-height: 1.55; }
   :global(.vx-dashboard__empty strong) { color: #fff; font-size: 17px; }
+  :global(.vx-dashboard__resume-card), :global(.vx-dashboard__continuity-side), :global(.vx-dashboard__continuity-empty) { border: 1px solid rgba(255,255,255,.11); border-radius: 8px; background: rgba(15,20,32,.88); box-shadow: 0 24px 80px rgba(0,0,0,.18); }
+  :global(.vx-dashboard__resume-card) { position: relative; display: grid; min-height: 382px; align-content: start; overflow: hidden; padding: clamp(24px, 4vw, 42px); }
+  :global(.vx-dashboard__resume-card::before) { position: absolute; inset: 0 auto 0 0; width: 3px; background: var(--vx-cyan); content: ""; }
+  :global(.vx-dashboard__resume-top) { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+  :global(.vx-dashboard__resume-top > span:last-child) { display: grid; justify-items: end; gap: 5px; color: rgba(223,230,245,.5); font-size: 12px; font-style: normal; }
+  :global(.vx-dashboard__resume-top small) { color: var(--vx-cyan); font-size: 11px; font-weight: 900; letter-spacing: .12em; }
+  :global(.vx-dashboard__resume-top b) { font-weight: 600; }
+  :global(.vx-dashboard__resume-icon), :global(.vx-dashboard__recent-icon) { display: grid; place-items: center; background: rgba(141,231,213,.11); color: var(--vx-cyan); }
+  :global(.vx-dashboard__resume-icon) { width: 54px; height: 54px; border-radius: 8px; }
+  :global(.vx-dashboard__resume-icon--violet), :global(.vx-dashboard__recent-icon--violet) { background: rgba(169,160,255,.12); color: var(--vx-violet); }
+  :global(.vx-dashboard__resume-icon--gold), :global(.vx-dashboard__recent-icon--gold) { background: rgba(240,197,106,.12); color: var(--vx-gold); }
+  :global(.vx-dashboard__resume-card h3) { max-width: 720px; margin: 30px 0 10px; color: #fff; font-size: clamp(2rem, 4vw, 3.55rem); line-height: 1; letter-spacing: 0; }
+  :global(.vx-dashboard__resume-card > p) { max-width: 620px; margin: 0; color: rgba(223,230,245,.65); font-size: 16px; line-height: 1.6; }
+  :global(.vx-dashboard__progress) { width: min(100%, 520px); height: 6px; margin-top: 28px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.09); }
+  :global(.vx-dashboard__progress span) { display: block; height: 100%; border-radius: inherit; background: var(--vx-cyan); }
+  :global(.vx-dashboard__progress + small) { margin-top: 8px; color: rgba(223,230,245,.52); font-size: 12px; }
+  :global(.vx-dashboard__resume-actions) { display: flex; align-items: center; gap: 16px; margin-top: auto; padding-top: 34px; }
+  :global(.vx-dashboard__resume-actions > span) { color: rgba(223,230,245,.5); font-size: 12px; }
+  :global(.vx-dashboard__continuity-side) { display: grid; grid-template-rows: auto 1fr; overflow: hidden; }
+  :global(.vx-dashboard__next-action) { padding: 24px; border-bottom: 1px solid rgba(255,255,255,.08); background: rgba(141,231,213,.045); }
+  :global(.vx-dashboard__next-action strong) { display: block; margin-top: 13px; color: #fff; font-size: 21px; }
+  :global(.vx-dashboard__next-action p) { margin: 8px 0 16px; color: rgba(223,230,245,.6); font-size: 14px; line-height: 1.55; }
+  :global(.vx-dashboard__next-action a) { color: var(--vx-cyan); font-size: 14px; font-weight: 900; text-decoration: none; }
+  :global(.vx-dashboard__recent-list) { display: grid; align-content: start; padding: 22px 24px 10px; }
+  :global(.vx-dashboard__recent-list > .vx-dashboard__eyebrow) { margin-bottom: 8px; }
+  :global(.vx-dashboard__recent-item) { display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; align-items: center; gap: 11px; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.07); color: #fff; text-decoration: none; }
+  :global(.vx-dashboard__recent-item:last-child) { border-bottom: 0; }
+  :global(.vx-dashboard__recent-icon) { width: 38px; height: 38px; border-radius: 7px; }
+  :global(.vx-dashboard__recent-icon .vx-icon), :global(.vx-dashboard__recent-icon .vx-icon svg) { width: 18px; height: 18px; }
+  :global(.vx-dashboard__recent-item > span:nth-child(2)) { min-width: 0; }
+  :global(.vx-dashboard__recent-item small), :global(.vx-dashboard__recent-item strong), :global(.vx-dashboard__recent-item em) { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  :global(.vx-dashboard__recent-item small) { color: var(--vx-cyan); font-size: 9px; font-weight: 900; letter-spacing: .1em; }
+  :global(.vx-dashboard__recent-item strong) { margin-top: 3px; font-size: 14px; }
+  :global(.vx-dashboard__recent-item em) { margin-top: 3px; color: rgba(223,230,245,.42); font-size: 11px; font-style: normal; }
+  :global(.vx-dashboard__recent-item > span:last-child) { color: rgba(255,255,255,.4); }
+  :global(.vx-dashboard__continuity-note) { display: grid; gap: 5px; padding: 18px 0; color: rgba(223,230,245,.52); font-size: 13px; line-height: 1.45; }
+  :global(.vx-dashboard__continuity-note strong) { color: #fff; }
+  :global(.vx-dashboard__continuity-empty) { grid-column: 1 / -1; padding: clamp(28px, 5vw, 54px); }
+  :global(.vx-dashboard__continuity-empty h3) { margin: 14px 0 8px; color: #fff; font-size: clamp(1.8rem, 4vw, 3rem); letter-spacing: 0; }
+  :global(.vx-dashboard__continuity-empty p) { max-width: 660px; margin: 0 0 24px; color: rgba(223,230,245,.62); line-height: 1.65; }
+  :global(.vx-dashboard__resume-card a:focus-visible), :global(.vx-dashboard__next-action a:focus-visible), :global(.vx-dashboard__recent-item:focus-visible), :global(.vx-dashboard__continuity-empty a:focus-visible) { outline: 3px solid var(--vx-cyan); outline-offset: 3px; }
   @media (max-width: 680px) {
     :global(.vx-dashboard__metric) { min-height: 116px; padding: 15px; }
     :global(.vx-dashboard__metric strong) { font-size: 2.2rem; }
@@ -293,8 +434,8 @@ const title = "Dashboard — VOLYNX";
     :global(.vx-dashboard__workspace-card .vx-button) { margin-left: 66px; }
     :global(.vx-dashboard__product-card .vx-button) { width: 100%; }
   }
-  @media (max-width: 1050px) { .vx-dashboard__product-grid, .vx-dashboard__quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 1050px) { .vx-dashboard__product-grid, .vx-dashboard__quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .vx-dashboard__continuity { grid-template-columns: 1fr; } }
   @media (max-width: 880px) { .vx-dashboard__sidebar { transform: translateX(-102%); transition: transform .24s ease; box-shadow: 20px 0 60px rgba(0,0,0,.35); } .vx-dashboard__sidebar.is-open { transform: translateX(0); } .vx-dashboard__close, .vx-dashboard__menu { display: inline-grid; place-items: center; } .vx-dashboard__main { margin-left: 0; } .vx-dashboard__overlay:not([hidden]) { position: fixed; inset: 0; z-index: 15; display: block; background: rgba(0,0,0,.58); } }
-  @media (max-width: 680px) { .vx-dashboard__content { width: min(100% - 24px, 1280px); padding-top: 30px; } .vx-dashboard__topbar { min-height: 70px; padding: 0 14px; } .vx-dashboard__topbar-link { min-height: 44px; padding: 0 12px; font-size: 13px; } .vx-dashboard__hero { align-items: flex-start; flex-direction: column; } .vx-dashboard__hero h1 { font-size: clamp(2.7rem, 15vw, 4.5rem); } .vx-dashboard__hero p { font-size: 16px; } .vx-dashboard__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 44px; } .vx-dashboard__metric { min-height: 116px; padding: 15px; } .vx-dashboard__metric strong { font-size: 2.2rem; } .vx-dashboard__product-grid, .vx-dashboard__quick-grid { grid-template-columns: 1fr; } .vx-dashboard__section { margin-top: 44px; } .vx-dashboard__workspace-card { align-items: flex-start; flex-wrap: wrap; } .vx-dashboard__workspace-card .vx-button { margin-left: 66px; } .vx-dashboard__section-head { align-items: flex-start; flex-direction: column; gap: 8px; } }
+  @media (max-width: 680px) { .vx-dashboard__content { width: min(100% - 24px, 1280px); padding-top: 30px; } .vx-dashboard__topbar { min-height: 70px; padding: 0 14px; } .vx-dashboard__topbar-link { min-height: 44px; padding: 0 12px; font-size: 13px; } .vx-dashboard__hero { align-items: flex-start; flex-direction: column; } .vx-dashboard__hero h1 { font-size: clamp(2.7rem, 15vw, 4.5rem); } .vx-dashboard__hero p { font-size: 16px; } .vx-dashboard__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 44px; } .vx-dashboard__metric { min-height: 116px; padding: 15px; } .vx-dashboard__metric strong { font-size: 2.2rem; } .vx-dashboard__product-grid, .vx-dashboard__quick-grid { grid-template-columns: 1fr; } .vx-dashboard__section { margin-top: 44px; } .vx-dashboard__section--continuity { margin-top: 0; } .vx-dashboard__workspace-card { align-items: flex-start; flex-wrap: wrap; } .vx-dashboard__workspace-card .vx-button { margin-left: 66px; } .vx-dashboard__section-head { align-items: flex-start; flex-direction: column; gap: 8px; } :global(.vx-dashboard__resume-card) { min-height: 360px; padding: 22px 20px; } :global(.vx-dashboard__resume-card h3) { margin-top: 24px; font-size: 2rem; } :global(.vx-dashboard__resume-actions) { align-items: stretch; flex-direction: column; } :global(.vx-dashboard__resume-actions .vx-button) { width: 100%; } :global(.vx-dashboard__resume-actions > span) { text-align: center; } :global(.vx-dashboard__continuity-side) { display: block; } :global(.vx-dashboard__next-action), :global(.vx-dashboard__recent-list) { padding: 20px; } }
   @media (prefers-reduced-motion: reduce) { .vx-dashboard *, .vx-dashboard *::before, .vx-dashboard *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
 </style>

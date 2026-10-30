@@ -23,6 +23,9 @@ import PageWidgets from "../../components/PageWidgets.astro";
   <script src="/vendor/jszip.min.js" defer></script>
   <script is:inline src="/builder/vx-renderer.js"></script>
   <script is:inline src="/builder/vx-section-editor.js"></script>
+  <script is:inline src="/js/vx-auth-bridge.js"></script>
+  <script is:inline src="/js/vx-return.js"></script>
+  <script is:inline src="/js/vx-continuity.js"></script>
 </head>
 
 <body>
@@ -1530,6 +1533,16 @@ import PageWidgets from "../../components/PageWidgets.astro";
 
   function openProject(p: any) {
     currentProject = p;
+    (window as any).VxContinuity?.record({
+      surface: "builder",
+      resourceKey: p.id,
+      title: p.name || "Builder project",
+      detail: p.status === "published" ? "Site published and ready to refine." : "Draft ready to continue editing.",
+      path: `/builder/?project=${encodeURIComponent(p.id)}`,
+      actionLabel: "Continue editing",
+      status: p.status === "published" ? "published" : "draft",
+      metadata: { slug: p.slug || null }
+    });
     const json = $("json") as HTMLTextAreaElement | null;
     lastSavedJson = JSON.stringify(p.builder_data || {}, null, 2);
     if (json) json.value = lastSavedJson;
@@ -1631,6 +1644,16 @@ import PageWidgets from "../../components/PageWidgets.astro";
     currentProject.builder_data = parsed;
     lastSavedJson = JSON.stringify(parsed, null, 2);
     setSaveState("saved");
+    (window as any).VxContinuity?.record({
+      surface: "builder",
+      resourceKey: currentProject.id,
+      title: currentProject.name || "Builder project",
+      detail: currentProject.status === "published" ? "Site published and ready to refine." : "Latest changes saved.",
+      path: `/builder/?project=${encodeURIComponent(currentProject.id)}`,
+      actionLabel: "Continue editing",
+      status: currentProject.status === "published" ? "published" : "draft",
+      metadata: { slug: currentProject.slug || null }
+    });
     // Telemetry — every save counts as a Builder edit action
     if (trackUsage) logUsage("builder_save");
     return true;

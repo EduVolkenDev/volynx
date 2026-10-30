@@ -543,6 +543,18 @@ const previewMode = false;
     ]);
     if (propertiesResult.error) throw propertiesResult.error; if (imagesResult.error) throw imagesResult.error;
     state.properties = (propertiesResult.data || []) as Property[]; state.images = (imagesResult.data || []) as ImageRow[]; renderAll();
+    if (!previewMode) {
+      (window as any).VxContinuity?.record({
+        surface: "propertyflow",
+        resourceKey: site.id,
+        title: site.name || "PropertyFlow workspace",
+        detail: `${state.properties.length} ${state.properties.length === 1 ? "imóvel" : "imóveis"} no catálogo.`,
+        path: `/dashboard/propertyflow/?site=${encodeURIComponent(site.id)}`,
+        actionLabel: "Gerenciar catálogo",
+        status: site.status === "published" ? "published" : "in_progress",
+        metadata: { propertyCount: state.properties.length, slug: site.slug || null }
+      });
+    }
   }
 
   function openProperty(propertyId?: string) {

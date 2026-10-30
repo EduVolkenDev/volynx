@@ -1518,7 +1518,7 @@
     } catch (_) {}
   }
 
-  function restoreProjectFromUrl() {
+  function restoreProjectFromUrl(finalAttempt) {
     let projectId = "";
     try {
       projectId = new URLSearchParams(window.location.search).get("project") || "";
@@ -1526,12 +1526,15 @@
     if (!projectId) return false;
 
     const row = getProjects().find((item) => item?.id === projectId);
-    clearRestoreParam("project");
     if (!row) {
-      setMessage(tq("projects.not_found", "Saved project was not found in this browser."), "warn");
+      if (finalAttempt || !getAuthToken()) {
+        clearRestoreParam("project");
+        setMessage(tq("projects.not_found", "Saved project was not found in this workspace."), "warn");
+      }
       return false;
     }
 
+    clearRestoreParam("project");
     activeProjectId = row.id;
     applyState(row.state);
     setMessage(tq("projects.loaded", "Project loaded."), "ok");
@@ -1571,6 +1574,18 @@
     saveProjects(rows);
     const savedProject = rows.find((item) => item.id === activeProjectId);
     if (savedProject && window.VxLab?.syncArtifact) VxLab.syncArtifact("qr-project", savedProject);
+    if (savedProject) {
+      window.VxContinuity?.record?.({
+        surface: "qrgen",
+        resourceKey: savedProject.id,
+        title: savedProject.name || "QR project",
+        detail: savedProject.state?.mode === "dynamic" ? "Managed QR campaign ready to continue." : "QR design saved and ready to continue.",
+        path: `/qrgen/?project=${encodeURIComponent(savedProject.id)}`,
+        actionLabel: "Continue design",
+        status: "draft",
+        metadata: { mode: savedProject.state?.mode || "static" }
+      });
+    }
     renderProjects();
     if (window.VxLab) {
       window.VxLab.recordUsage?.("qr-gen", "save", "completed", {
@@ -1685,6 +1700,16 @@
     if (action === "load") {
       activeProjectId = id;
       applyState(row.state);
+      window.VxContinuity?.record?.({
+        surface: "qrgen",
+        resourceKey: row.id,
+        title: row.name || "QR project",
+        detail: row.state?.mode === "dynamic" ? "Managed QR campaign ready to continue." : "QR design ready to continue.",
+        path: `/qrgen/?project=${encodeURIComponent(row.id)}`,
+        actionLabel: "Continue design",
+        status: "draft",
+        metadata: { mode: row.state?.mode || "static" }
+      });
       setMessage(tq("projects.loaded", "Project loaded."), "ok");
     }
 
@@ -1877,6 +1902,11 @@
       currentCurrency = normalizeCurrency(event.detail?.code || event.detail?.currency || currentCurrency);
       syncCurrencyButtons();
       renderPlans();
+    });
+
+    window.addEventListener("vx:lab-cloud-synced", () => {
+      renderProjects();
+      restoreProjectFromUrl(true);
     });
   }
 

@@ -244,6 +244,10 @@ const firstLesson = DEVJOURNEY_LESSONS[0];
     function restoreLesson() {
       var savedLesson = '';
       try { savedLesson = localStorage.getItem(currentLessonKey) || ''; } catch (_) {}
+      try {
+        var requestedLesson = new URLSearchParams(window.location.search).get('lesson') || '';
+        if (knownLessons[requestedLesson]) savedLesson = requestedLesson;
+      } catch (_) {}
       var firstIncomplete = completeButtons.find(function (button) {
         return !completed[button.getAttribute('data-complete-lesson')];
       });
@@ -302,6 +306,19 @@ const firstLesson = DEVJOURNEY_LESSONS[0];
       if (progressValue) progressValue.textContent = percent + '%';
       if (progressBar) progressBar.style.width = percent + '%';
       if (progressMeta) progressMeta.textContent = count + ' / ' + total;
+      var currentLesson = '';
+      try { currentLesson = localStorage.getItem(currentLessonKey) || ''; } catch (_) {}
+      window.VxContinuity?.record?.({
+        surface: 'dev-journey',
+        resourceKey: 'lessons',
+        title: 'Dev Journey',
+        detail: count + ' of ' + total + ' lessons completed.',
+        path: '/dev-journey/student/' + (currentLesson ? '?lesson=' + encodeURIComponent(currentLesson) : ''),
+        actionLabel: percent >= 100 ? 'Review lessons' : 'Continue learning',
+        status: percent >= 100 ? 'completed' : 'in_progress',
+        progress: percent,
+        metadata: { currentLesson: currentLesson || null, completed: count, total: total }
+      });
     }
 
     function paintCompletion() {
@@ -327,6 +344,16 @@ const firstLesson = DEVJOURNEY_LESSONS[0];
       var target = panels.find(function (panel) { return panel.getAttribute('data-lesson-panel') === id; });
       if (!target || target.hasAttribute('data-tier-required') && target.classList.contains('djl-is-locked')) return;
       try { localStorage.setItem(currentLessonKey, id); } catch (_) {}
+      window.VxContinuity?.record?.({
+        surface: 'dev-journey',
+        resourceKey: 'lessons',
+        title: 'Dev Journey',
+        detail: 'Current lesson: ' + id,
+        path: '/dev-journey/student/?lesson=' + encodeURIComponent(id),
+        actionLabel: 'Continue learning',
+        status: 'in_progress',
+        metadata: { currentLesson: id }
+      });
       panels.forEach(function (panel) { panel.classList.toggle('is-hidden', panel !== target); });
       navItems.forEach(function (item) {
         var active = item.getAttribute('data-lesson-id') === id;
