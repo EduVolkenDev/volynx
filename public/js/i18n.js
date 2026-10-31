@@ -1,4 +1,7 @@
 (function () {
+  if (window.__vxI18nLoaded) return;
+  window.__vxI18nLoaded = true;
+
   var KEY = 'volynx_lang';
 
   function normalizeLang(value) {
@@ -65,6 +68,44 @@
     });
   }
 
+  function matchingElements(root, selector) {
+    var elements = [];
+    if (root && root.nodeType === 1 && typeof root.matches === 'function' && root.matches(selector)) {
+      elements.push(root);
+    }
+    if (root && typeof root.querySelectorAll === 'function') {
+      elements = elements.concat(Array.prototype.slice.call(root.querySelectorAll(selector)));
+    }
+    return elements;
+  }
+
+  function translateScope(root, dict) {
+    matchingElements(root, '[data-i18n]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n');
+      if (Object.prototype.hasOwnProperty.call(dict, key)) el.textContent = dict[key];
+    });
+
+    matchingElements(root, '[data-i18n-html]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n-html');
+      if (Object.prototype.hasOwnProperty.call(dict, key)) el.innerHTML = dict[key];
+    });
+
+    matchingElements(root, '[data-i18n-placeholder]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n-placeholder');
+      if (Object.prototype.hasOwnProperty.call(dict, key)) el.setAttribute('placeholder', dict[key]);
+    });
+
+    matchingElements(root, '[data-i18n-aria]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n-aria');
+      if (Object.prototype.hasOwnProperty.call(dict, key)) el.setAttribute('aria-label', dict[key]);
+    });
+
+    matchingElements(root, '[data-i18n-title]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n-title');
+      if (Object.prototype.hasOwnProperty.call(dict, key)) el.setAttribute('title', dict[key]);
+    });
+  }
+
   function applyTranslations(lang) {
     var next = normalizeLang(lang);
     var dict = getDict(next);
@@ -72,30 +113,7 @@
 
     document.documentElement.lang = next === 'pt' ? 'pt-BR' : 'en';
 
-    document.querySelectorAll('[data-i18n]').forEach(function (el) {
-      var key = el.getAttribute('data-i18n');
-      if (Object.prototype.hasOwnProperty.call(dict, key)) el.textContent = dict[key];
-    });
-
-    document.querySelectorAll('[data-i18n-html]').forEach(function (el) {
-      var key = el.getAttribute('data-i18n-html');
-      if (Object.prototype.hasOwnProperty.call(dict, key)) el.innerHTML = dict[key];
-    });
-
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
-      var key = el.getAttribute('data-i18n-placeholder');
-      if (Object.prototype.hasOwnProperty.call(dict, key)) el.setAttribute('placeholder', dict[key]);
-    });
-
-    document.querySelectorAll('[data-i18n-aria]').forEach(function (el) {
-      var key = el.getAttribute('data-i18n-aria');
-      if (Object.prototype.hasOwnProperty.call(dict, key)) el.setAttribute('aria-label', dict[key]);
-    });
-
-    document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
-      var key = el.getAttribute('data-i18n-title');
-      if (Object.prototype.hasOwnProperty.call(dict, key)) el.setAttribute('title', dict[key]);
-    });
+    translateScope(document, dict);
 
     syncLangUI(next);
 
@@ -116,6 +134,21 @@
     }
     bindLangToggles(document);
     applyTranslations(getLang());
+
+    if (typeof MutationObserver !== 'undefined') {
+      var observer = new MutationObserver(function (mutations) {
+        var dict = getDict(getLang());
+        if (!dict) return;
+        mutations.forEach(function (mutation) {
+          Array.prototype.forEach.call(mutation.addedNodes || [], function (node) {
+            if (node.nodeType !== 1) return;
+            bindLangToggles(node);
+            translateScope(node, dict);
+          });
+        });
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
   }
 
   window.VxI18n = {

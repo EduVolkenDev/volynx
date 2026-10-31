@@ -355,6 +355,10 @@ const L = t[lang];
         });
       });
 
+      window.addEventListener('vx:currency-changed', function(event) {
+        applyCurrency(event.detail && event.detail.code ? event.detail.code : currentCurrency());
+      });
+
       // Load config and reveal Pix only when Stripe has enabled it.
       fetch('/config.json', { cache: 'no-store' })
         .then(function(r) { return r.ok ? r.json() : {}; })

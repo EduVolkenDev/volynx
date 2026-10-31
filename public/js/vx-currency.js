@@ -16,6 +16,9 @@
 (function () {
   "use strict";
 
+  if (window.__vxCurrencyLoaded) return;
+  window.__vxCurrencyLoaded = true;
+
   var CURRENCIES = [
     { code: "GBP", symbol: "£", label: "GBP" },
     { code: "EUR", symbol: "€", label: "EUR" },
@@ -88,6 +91,15 @@
       if (val) el.textContent = val;
     }
 
+    var currencyVariants = document.querySelectorAll('[data-currency="GBP"], [data-currency="EUR"], [data-currency="BRL"]');
+    for (var v = 0; v < currencyVariants.length; v++) {
+      var variant = currencyVariants[v];
+      var isActive = variant.getAttribute("data-currency") === code;
+      variant.classList.toggle("vx-price--hidden", !isActive);
+      variant.classList.toggle("pricing-card__price--hidden", !isActive);
+      variant.hidden = !isActive;
+    }
+
     // Update active button state
     var btns = document.querySelectorAll(".vx-cur-btn, [data-switch-currency]");
     for (var j = 0; j < btns.length; j++) {
@@ -96,11 +108,40 @@
       if (buttonCode === code) {
         btn.classList.add("vx-cur-btn--active");
         btn.classList.add("is-active");
+        btn.classList.add("lcbar__pill--active");
         btn.setAttribute("aria-pressed", "true");
       } else {
         btn.classList.remove("vx-cur-btn--active");
         btn.classList.remove("is-active");
+        btn.classList.remove("lcbar__pill--active");
         btn.setAttribute("aria-pressed", "false");
+      }
+    }
+
+    var pixRows = document.querySelectorAll(".token-card__pix");
+    for (var p = 0; p < pixRows.length; p++) {
+      pixRows[p].style.display = code === "BRL" && window.__volynxPixEnabled === true ? "flex" : "none";
+    }
+
+    var selects = document.querySelectorAll("[data-vx-currency-select]");
+    for (var s = 0; s < selects.length; s++) {
+      selects[s].value = code;
+    }
+
+    var checkoutControls = document.querySelectorAll('.vx-checkout-btn[data-currency], a[href*="/checkout/"]');
+    for (var x = 0; x < checkoutControls.length; x++) {
+      var control = checkoutControls[x];
+      if (control.hasAttribute("data-currency")) {
+        control.setAttribute("data-currency", code.toLowerCase());
+      }
+      if (control.tagName === "A") {
+        try {
+          var checkoutUrl = new URL(control.getAttribute("href"), window.location.origin);
+          if (checkoutUrl.pathname.indexOf("/checkout/") === 0) {
+            checkoutUrl.searchParams.set("currency", code.toLowerCase());
+            control.setAttribute("href", checkoutUrl.pathname + checkoutUrl.search + checkoutUrl.hash);
+          }
+        } catch (_) { /* noop */ }
       }
     }
 
@@ -137,10 +178,23 @@
     // Bind click handlers
     var allBtns = document.querySelectorAll(".vx-cur-btn, [data-switch-currency]");
     for (var k = 0; k < allBtns.length; k++) {
+      if (allBtns[k].dataset.vxCurrencyBound === "1") continue;
+      allBtns[k].dataset.vxCurrencyBound = "1";
       allBtns[k].addEventListener("click", function () {
         var code = this.getAttribute("data-cur") || this.getAttribute("data-switch-currency");
         setStored(code);
         apply(code);
+      });
+    }
+
+
+    var allSelects = document.querySelectorAll("[data-vx-currency-select]");
+    for (var m = 0; m < allSelects.length; m++) {
+      if (allSelects[m].dataset.vxCurrencyBound === "1") continue;
+      allSelects[m].dataset.vxCurrencyBound = "1";
+      allSelects[m].addEventListener("change", function () {
+        setStored(this.value);
+        apply(this.value);
       });
     }
 
@@ -162,6 +216,10 @@
   // language are independent preferences, but the displayed copy is not.
   window.addEventListener("vx:lang-changed", function () {
     apply(getStored());
+  });
+
+  window.addEventListener("storage", function (event) {
+    if (event.key === STORAGE_KEY) apply(getStored());
   });
 
   // Inject styles once

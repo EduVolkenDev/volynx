@@ -1,5 +1,6 @@
 ---
 import { ROUTES } from "../data/routes";
+import CurrencySelector from "./CurrencySelector.astro";
 
 const navIconThumb = (src: string) =>
   src.replace("/assets/", "/assets/nav-icons/").replace(/\.(webp|png|jpe?g)$/i, ".webp");
@@ -148,6 +149,8 @@ const { current = "", brandHref = ROUTES.home, ctaHref = ROUTES.pricing, ctaLabe
         <span data-i18n="widget.lang" data-vx-lang-label>EN</span>
       </button>
 
+      <CurrencySelector variant="flagship" />
+
       <!-- Signed-out: login + CTA -->
       <a href={ROUTES.login} class="vx-login" data-i18n="nav.login">Login</a>
       <a href={ctaHref} class="vx-cta" data-vx-hide-if-plan="pro" data-i18n={ctaI18n}>{ctaLabel}</a>
@@ -220,6 +223,7 @@ const { current = "", brandHref = ROUTES.home, ctaHref = ROUTES.pricing, ctaLabe
       <span data-i18n="widget.lang_full">Language</span>
       <span class="vx-mobile__lang-tag" id="vxLangTagMobile" data-vx-lang-label>EN</span>
     </button>
+    <CurrencySelector variant="mobile" />
     <a href={ROUTES.login} class="vx-mobile__link" data-auth="out" data-i18n="nav.login">Login</a>
     <a href={ctaHref} class="vx-mobile__cta" data-auth="out" data-i18n={ctaI18n}>{ctaLabel}</a>
     <a href={ROUTES.profile} class="vx-mobile__profile" data-auth="in" data-vx-avatar-slot>
@@ -983,6 +987,7 @@ const { current = "", brandHref = ROUTES.home, ctaHref = ROUTES.pricing, ctaLabe
     font-size: 18px;
     font-weight: 500;
     font-family: inherit;
+    color: rgba(255, 255, 255, .86);
   }
   .vx-mobile__lang-tag {
     display: inline-flex;
@@ -1002,6 +1007,12 @@ const { current = "", brandHref = ROUTES.home, ctaHref = ROUTES.pricing, ctaLabe
   .vx-mobile__lang:hover .vx-mobile__lang-tag {
     color: #fff;
     border-color: var(--topbar-accent);
+  }
+
+  @media (max-width: 760px) {
+    :global(.vx-actions .vx-currency-select--flagship) {
+      display: none;
+    }
   }
 </style>
 

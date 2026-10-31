@@ -1,5 +1,6 @@
 ---
 import { ROUTES } from "../data/routes";
+import CurrencySelector from "./CurrencySelector.astro";
 interface Props {
   /** Navigation links for the left side */
   leftLinks?: { href: string; label: string; i18n?: string }[];
@@ -36,6 +37,7 @@ const {
         <span class="vx-topbar-lang-label" data-i18n="widget.lang" data-vx-lang-label>EN</span>
       </button>
     )}
+    <CurrencySelector variant="topbar" />
     {leftLinks.map(link => (
       <a href={link.href} data-i18n={link.i18n || undefined}>{link.label}</a>
     ))}
@@ -173,3 +175,7 @@ const {
     .vx-topbar-wordmark { width: 136px; max-height: 40px; }
   }
 </style>
+
+<script is:inline src="/js/translations.js?v=20261031-preferences" defer></script>
+<script is:inline src="/js/i18n.js" defer></script>
+<script is:inline src="/js/vx-currency.js?v=20261031-preferences" defer></script>

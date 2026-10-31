@@ -20,6 +20,65 @@ export type ProductOfferPreview = {
 const bi = (en: string, pt: string): Bilingual => ({ en, pt });
 const metric = (value: string, en: string, pt: string) => ({ value, label: bi(en, pt) });
 
+type OfferCurrency = "GBP" | "EUR" | "BRL";
+type OfferPriceLabels = Record<OfferCurrency, Bilingual>;
+
+const offerCatalogAmounts: Record<string, Record<OfferCurrency, number>> = {
+  builder_launch: { GBP: 1100, EUR: 1300, BRL: 6900 },
+  builder_pro: { GBP: 2400, EUR: 2800, BRL: 14900 },
+  builder_studio: { GBP: 5400, EUR: 6300, BRL: 34900 },
+  builder_teams: { GBP: 11800, EUR: 13800, BRL: 74900 },
+  studio_pro: { GBP: 1800, EUR: 2100, BRL: 11900 },
+  daily_pro: { GBP: 1400, EUR: 1600, BRL: 8900 },
+  daily_diamond: { GBP: 3400, EUR: 3900, BRL: 21900 },
+  cvitae_business: { GBP: 1500, EUR: 1800, BRL: 9900 },
+  bundle_volynx_daily_pro: { GBP: 3500, EUR: 4100, BRL: 22900 },
+  bundle_volynx_daily_studio: { GBP: 8200, EUR: 9600, BRL: 54900 },
+  devjourney_pro: { GBP: 4500, EUR: 5300, BRL: 27900 },
+  devjourney_bundle: { GBP: 9900, EUR: 11700, BRL: 59900 },
+  tokens_starter: { GBP: 840, EUR: 980, BRL: 5400 },
+  tokens_core: { GBP: 1800, EUR: 2100, BRL: 11900 },
+  tokens_pro: { GBP: 4200, EUR: 4900, BRL: 27900 },
+  tokens_scale: { GBP: 8800, EUR: 10200, BRL: 58900 },
+};
+
+const recurringOfferLookups = new Set([
+  "builder_launch",
+  "builder_pro",
+  "builder_studio",
+  "builder_teams",
+  "studio_pro",
+  "daily_pro",
+  "daily_diamond",
+  "cvitae_business",
+  "bundle_volynx_daily_pro",
+  "bundle_volynx_daily_studio",
+]);
+
+function formatOfferAmount(amount: number, currency: OfferCurrency) {
+  return new Intl.NumberFormat(currency === "BRL" ? "pt-BR" : "en-GB", {
+    style: "currency",
+    currency,
+    minimumFractionDigits: amount % 100 === 0 ? 0 : 2,
+    maximumFractionDigits: 2,
+  }).format(amount / 100).replace(/\u00a0/g, "");
+}
+
+export function productOfferPriceLabels(lookup: string): OfferPriceLabels | null {
+  const amounts = offerCatalogAmounts[lookup];
+  if (!amounts) return null;
+  const recurring = recurringOfferLookups.has(lookup);
+  return Object.fromEntries(
+    (Object.keys(amounts) as OfferCurrency[]).map((currency) => {
+      const price = formatOfferAmount(amounts[currency], currency);
+      return [currency, {
+        en: `${price}${recurring ? " / month" : " one-time"}`,
+        pt: `${price}${recurring ? " / mês" : " pagamento único"}`,
+      }];
+    }),
+  ) as OfferPriceLabels;
+}
+
 export const productOfferPreviews: ProductOfferPreview[] = [
   {
     slug: "volynx-essential", lookup: "bundle_volynx_daily_pro",

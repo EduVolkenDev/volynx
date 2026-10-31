@@ -1,0 +1,23 @@
+---
+import { productOfferPriceLabels } from "../data/product-offers";
+
+interface Props {
+  lookup: string;
+  class?: string;
+  fallback?: string;
+}
+
+const { lookup, class: className, fallback = "" } = Astro.props;
+const prices = productOfferPriceLabels(lookup);
+const display = prices?.GBP.en || fallback;
+---
+
+<span
+  class={className}
+  data-price-gbp={prices?.GBP.en}
+  data-price-gbp-pt={prices?.GBP.pt}
+  data-price-eur={prices?.EUR.en}
+  data-price-eur-pt={prices?.EUR.pt}
+  data-price-brl={prices?.BRL.en}
+  data-price-brl-pt={prices?.BRL.pt}
+>{display}</span>

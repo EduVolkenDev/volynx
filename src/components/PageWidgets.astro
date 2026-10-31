@@ -1,5 +1,6 @@
 ---
 import CookieBanner from "./CookieBanner.astro";
+import CurrencySelector from "./CurrencySelector.astro";
 import { ROUTES } from "../data/routes";
 interface Props { hideUtilBar?: boolean; includeCookieBanner?: boolean; disableTokenRefresh?: boolean; }
 const { hideUtilBar = false, includeCookieBanner = true, disableTokenRefresh = false } = Astro.props;
@@ -10,6 +11,7 @@ const isProfile = Astro.url.pathname.startsWith("/profile");
 
 {!hideUtilBar && (
 <div class="vx-util-bar" id="vxUtilBar">
+  <CurrencySelector variant="utility" />
   <button
     id="vxLangToggle"
     class="vx-widget vx-lang-btn"
@@ -117,6 +119,10 @@ const isProfile = Astro.url.pathname.startsWith("/profile");
     gap: 10px;
   }
 
+  :global(body:has(.vx-topbar, .vxh) .vx-util-bar) {
+    display: none;
+  }
+
   /* Itens dentro da barra não devem ter position:fixed próprio */
   .vx-util-bar .vx-widget {
     position: relative;
@@ -177,8 +183,9 @@ const isProfile = Astro.url.pathname.startsWith("/profile");
 {!disableTokenRefresh && <script is:inline src="/js/vx-token-refresh.js" defer></script>}
 <script src="/js/vx-plan.js" defer></script>
 <script src="/js/vx-avatar.js" defer></script>
-<script src="/js/translations.js?v=20260906-release" defer></script>
+<script src="/js/translations.js?v=20261031-preferences" defer></script>
 <script src="/js/i18n.js" defer></script>
+<script src="/js/vx-currency.js?v=20261031-preferences" defer></script>
 <script src="/js/recording-mode.js?v=20260506" defer></script>
 <script src="/js/page-widgets.js" defer></script>
 <script src="/js/plan-aware-ui.js" defer></script>

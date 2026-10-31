@@ -155,6 +155,7 @@ window.VX_TRANS = {
     /* === WIDGETS === */
     "widget.lang":  "EN",
     "widget.lang_full": "Language",
+    "widget.currency": "Currency",
     "widget.login": "Login",
     "widget.tokens": "VX",
     "widget.recharge": "Get VX",
@@ -3632,6 +3633,8 @@ window.VX_TRANS = {
     "aria.primary_nav": "Primary",
     "aria.vx_balance": "VX balance",
     "aria.toggle_lang": "Toggle language",
+    "aria.skip_content": "Skip to main content",
+    "aria.currency_selector": "Select currency",
     "aria.profile": "Profile",
     "aria.open_menu": "Open menu",
     "aria.mobile_nav": "Mobile",
@@ -3865,6 +3868,7 @@ window.VX_TRANS = {
     /* === WIDGETS === */
     "widget.lang":  "PT",
     "widget.lang_full": "Idioma",
+    "widget.currency": "Moeda",
     "widget.login": "Entrar",
     "widget.tokens": "VX",
     "widget.recharge": "Comprar VX",
@@ -7352,6 +7356,8 @@ window.VX_TRANS = {
     "aria.primary_nav": "Principal",
     "aria.vx_balance": "Saldo VX",
     "aria.toggle_lang": "Alternar idioma",
+    "aria.skip_content": "Pular para o conteúdo principal",
+    "aria.currency_selector": "Selecionar moeda",
     "aria.profile": "Perfil",
     "aria.open_menu": "Abrir menu",
     "aria.mobile_nav": "Menu mobile",

@@ -2,6 +2,7 @@
 import FlagshipLayout from "../layouts/FlagshipLayout.astro";
 import FlagshipHeader from "./FlagshipHeader.astro";
 import FlagshipFooter from "./FlagshipFooter.astro";
+import CommercePrice from "./CommercePrice.astro";
 import { ROUTES, checkoutHref } from "../data/routes";
 import type { ProductOfferPreview } from "../data/product-offers";
 
@@ -62,7 +63,7 @@ const checkoutUrl = checkoutHref(offer.lookup, { next: `/products/offers/${offer
     <section id="offer-decision" class="page-section page-section--last">
       <div class="shell offer-preview-decision panel panel--pro">
         <div><span class="eyebrow"><span class="i18n-en">Make an informed choice</span><span class="i18n-pt">Escolha com clareza</span></span><p><span class="i18n-en">{offer.decisionNote.en}</span><span class="i18n-pt">{offer.decisionNote.pt}</span></p></div>
-        <div class="offer-preview-decision__price"><span><span class="i18n-en">{offer.format.en}</span><span class="i18n-pt">{offer.format.pt}</span></span><strong>{offer.price.en}</strong></div>
+        <div class="offer-preview-decision__price"><span><span class="i18n-en">{offer.format.en}</span><span class="i18n-pt">{offer.format.pt}</span></span><strong><CommercePrice lookup={offer.lookup} fallback={offer.price.en} /></strong></div>
         <a href={checkoutUrl} class="button button--gold vx-checkout-btn" data-lookup={offer.lookup} data-label={offer.checkoutLabel.en}><span class="i18n-en">{offer.checkoutLabel.en}</span><span class="i18n-pt">{offer.checkoutLabel.pt}</span></a>
       </div>
     </section>
