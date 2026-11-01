@@ -1,0 +1,13 @@
+---
+import FlagshipLayout from '../../../layouts/FlagshipLayout.astro';
+import FlagshipHeader from '../../../components/FlagshipHeader.astro';
+import FlagshipFooter from '../../../components/FlagshipFooter.astro';
+import WorldNav from '../../../components/WorldNav.astro';
+import { ROUTES } from '../../../data/routes';
+import '../../../styles/world-opportunities.css';
+---
+<FlagshipLayout title="My World — VOLYNX" description="Your saved opportunities, applications and professional resources." pageClass="page-world-workspace">
+<FlagshipHeader current={ROUTES.world} ctaI18n="" ctaLabel="World Opportunities" ctaHref={ROUTES.worldOpportunities}/>
+<main class="shell world-work" data-world-app="workspace"><WorldNav current={ROUTES.worldWorkspace}/><span class="eyebrow">MY WORLD</span><h1><span class="i18n-en">Make your next move.</span><span class="i18n-pt">Prepare seu próximo passo.</span></h1><p><span class="i18n-en">Track your applications here. Stages are your own records; employers do not receive these updates. Your notes are private.</span><span class="i18n-pt">Acompanhe suas candidaturas aqui. As etapas são registros seus; as empresas não recebem essas atualizações. Suas notas são privadas.</span></p><div class="actions"><a class="action" href={`${ROUTES.world}#join-world`}><span class="i18n-en">Manage profile & services</span><span class="i18n-pt">Gerenciar perfil e serviços</span></a><a id="worldAdminLink" class="action" href={ROUTES.adminWorldOpportunities} hidden><span class="i18n-en">Manage opportunities</span><span class="i18n-pt">Gerenciar oportunidades</span></a><a class="action" href={ROUTES.cvitae}>CVitae ↗</a></div><p id="worldStatus" class="status" role="status" aria-live="polite"></p><div class="results" id="worldResults"></div><div class="actions"><button id="worldMore" type="button" hidden><span class="i18n-en">Load more</span><span class="i18n-pt">Carregar mais</span></button></div></main><FlagshipFooter/>
+</FlagshipLayout>
+<script>import '../../../scripts/world-opportunities';</script>

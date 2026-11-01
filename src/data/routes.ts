@@ -12,6 +12,10 @@ export const ROUTES = {
   impactMap: "/impact-map/",
   platform: "/platform/", // legacy alias; the unified entry is ROUTES.home
   world: "/world/",
+  worldOpportunities: "/world/opportunities/",
+  worldOpportunityDetail: "/world/opportunities/detail/",
+  worldWorkspace: "/world/workspace/",
+  adminWorldOpportunities: "/admin/world-opportunities/",
   about: "/about/",
   contact: "/contact/",
   support: "/support/",

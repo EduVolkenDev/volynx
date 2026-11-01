@@ -8,6 +8,7 @@ export default defineConfig({
   base: '/',
   output: 'static',
   vite: {
+    server: { allowedHosts: ["terminal.local"] },
     // Vite 8's default browser targets support native top-level await.
     // The former transform plugin depends on Rollup internals removed by Vite 8.
     plugins: [wasm()]

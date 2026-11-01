@@ -2,6 +2,7 @@
 import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
 import FlagshipHeader from "../../components/FlagshipHeader.astro";
 import FlagshipFooter from "../../components/FlagshipFooter.astro";
+import WorldNav from "../../components/WorldNav.astro";
 import { ROUTES } from "../../data/routes";
 import { sitePricing } from "../../data/pricing";
 
@@ -18,27 +19,29 @@ const worldProLocalizedPrice = worldProPlan
 
 <FlagshipLayout
   title="Volynx World — Premium professionals for ambitious work"
-  description="Discover clear professional services, publish your expertise, and connect directly inside Volynx World."
+  description="Discover professionals, services and work opportunities. Build your professional presence inside Volynx World."
   pageClass="page-world"
 >
-  <FlagshipHeader current={ROUTES.world} ctaLabel="Join World" ctaHref="#join-world" ctaI18n="nav.world" />
+  <FlagshipHeader current={ROUTES.world} ctaLabel="World" ctaHref="#join-world" ctaI18n="nav.world" />
 
   <main>
+    <div class="shell" style="padding-top:24px;position:relative;z-index:2"><WorldNav current={ROUTES.world}/></div>
     <canvas class="world-webgl" data-world-scene aria-hidden="true"></canvas>
     <section class="world-hero world-reveal">
       <div class="shell world-hero__grid">
         <div class="world-hero__copy">
           <span class="world-kicker"><span class="i18n-en">Volynx World · Founding marketplace</span><span class="i18n-pt">Volynx World · Marketplace fundador</span></span>
           <h1>
-            <span class="i18n-en">The right professional can change what is possible.</span>
-            <span class="i18n-pt">O profissional certo pode mudar o que é possível.</span>
+            <span class="i18n-en">Great talent. Meaningful opportunities.</span>
+            <span class="i18n-pt">Grandes talentos. Novas oportunidades.</span>
           </h1>
           <p>
-            <span class="i18n-en">Find premium talent, clear services, and people ready to build. Volynx World is where ambitious work starts a direct conversation.</span>
-            <span class="i18n-pt">Encontre talentos premium, serviços claros e pessoas prontas para construir. Volynx World é onde trabalhos ambiciosos começam uma conversa direta.</span>
+            <span class="i18n-en">Find professionals, offer your services, and discover your next work opportunity. Your expertise and your next step belong together.</span>
+            <span class="i18n-pt">Encontre profissionais, ofereça seus serviços e descubra sua próxima oportunidade de trabalho. Sua experiência e seu próximo passo no mesmo lugar.</span>
           </p>
           <div class="world-actions">
-            <a href="#marketplace" class="button button--gold"><span class="i18n-en">Find a professional</span><span class="i18n-pt">Encontrar profissional</span></a>
+            <a href={ROUTES.worldOpportunities} class="button button--gold"><span class="i18n-en">Find work</span><span class="i18n-pt">Encontrar trabalho</span></a>
+            <a href="#marketplace" class="button button--ghost"><span class="i18n-en">Find a professional</span><span class="i18n-pt">Encontrar profissional</span></a>
             <a href="#join-world" class="button button--ghost"><span class="i18n-en">Offer your services</span><span class="i18n-pt">Oferecer serviços</span></a>
           </div>
           <div class="world-trust">
