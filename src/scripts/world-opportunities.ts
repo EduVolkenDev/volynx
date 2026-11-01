@@ -175,7 +175,14 @@ async function init() {
       else await load();
     }catch{status(t('Could not save changes. Sign in again or try later.','Não foi possível salvar. Entre novamente ou tente depois.'),true);}finally{button.disabled=false;}
   });
-  window.addEventListener('vx:lang-changed',()=>render());
+  window.addEventListener('vx:lang-changed',()=>{
+    // Preserve unsaved application edits while switching interface language.
+    if(root?.dataset.worldApp==='workspace')for(const article of document.querySelectorAll<HTMLElement>('.opportunity[data-id]')){
+      const draft=activity.get(article.dataset.id!);
+      if(draft){draft.stage=article.querySelector<HTMLSelectElement>('[data-stage]')?.value||draft.stage;draft.notes=article.querySelector<HTMLTextAreaElement>('[data-notes]')?.value??draft.notes;}
+    }
+    render();
+  });
   window.addEventListener('storage',event=>{if(['volynx_session','volynx_access_token'].includes(event.key||'')&&!event.newValue)location.reload();});
 }
 void init().catch(()=>status(t('Could not connect. Reload the page to try again.','Não foi possível conectar. Recarregue a página para tentar novamente.'),true));
