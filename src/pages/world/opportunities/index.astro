@@ -1,0 +1,29 @@
+---
+import FlagshipLayout from '../../../layouts/FlagshipLayout.astro';
+import FlagshipHeader from '../../../components/FlagshipHeader.astro';
+import FlagshipFooter from '../../../components/FlagshipFooter.astro';
+import WorldNav from '../../../components/WorldNav.astro';
+import { ROUTES } from '../../../data/routes';
+import { OPPORTUNITY_KINDS, OPPORTUNITY_CATEGORIES, LABELS } from '../../../lib/world/opportunities';
+import '../../../styles/world-opportunities.css';
+---
+<FlagshipLayout title="Opportunities — VOLYNX World" description="Discover work opportunities and prepare your next step with VOLYNX World, CVitae and your portfolio." pageClass="page-world-opportunities">
+<FlagshipHeader current={ROUTES.world} ctaI18n="" ctaLabel="World" ctaHref={ROUTES.worldWorkspace} />
+<main class="shell world-work" data-world-app="discovery">
+<WorldNav current={ROUTES.worldOpportunities}/>
+<span class="eyebrow">WORLD · OPPORTUNITIES</span>
+<h1><span class="i18n-en">Your talent.<br/>Your next opportunity.</span><span class="i18n-pt">Seu talento.<br/>Sua próxima oportunidade.</span></h1>
+<p class="intro"><span class="i18n-en">Explore projects and roles, check the requirements, and prepare your application. Apply directly through the original source.</span><span class="i18n-pt">Explore projetos e vagas, confira os requisitos e prepare sua candidatura. Candidate-se diretamente pela fonte original.</span></p>
+<form class="filters" id="opportunityFilters">
+<label><span class="i18n-en">Search</span><span class="i18n-pt">Buscar</span><input name="search" type="search" maxlength="150" /></label>
+<label><span class="i18n-en">Specialty</span><span class="i18n-pt">Especialidade</span><select name="category"><option value="">—</option>{OPPORTUNITY_CATEGORIES.map(v=><option value={v} data-label={v}>{LABELS[v][0]}</option>)}</select></label>
+<label><span class="i18n-en">Contract type</span><span class="i18n-pt">Tipo de contrato</span><select name="kind"><option value="">—</option>{OPPORTUNITY_KINDS.map(v=><option value={v} data-label={v}>{LABELS[v][0]}</option>)}</select></label>
+<label><span class="i18n-en">Work mode</span><span class="i18n-pt">Modalidade</span><select name="work_mode"><option value="">—</option>{['remote','hybrid','onsite'].map(v=><option value={v} data-label={v}>{LABELS[v][0]}</option>)}</select></label>
+<button class="primary" type="submit"><span class="i18n-en">Find opportunities</span><span class="i18n-pt">Buscar oportunidades</span></button>
+</form>
+<p class="status" id="worldStatus" role="status" aria-live="polite"></p><div class="results" id="worldResults"></div>
+<div class="actions"><button id="worldMore" type="button" hidden><span class="i18n-en">Load more</span><span class="i18n-pt">Carregar mais</span></button></div>
+<section class="preparation"><h2><span class="i18n-en">Be ready for the next step.</span><span class="i18n-pt">Prepare seu próximo passo.</span></h2><p><span class="i18n-en">Your public profile, CV and portfolio work together. Resources are optional; buying a kit is never required to apply.</span><span class="i18n-pt">Seu perfil público, currículo e portfólio se complementam. Os recursos são opcionais; comprar um kit nunca é requisito para se candidatar.</span></p><div class="actions"><a class="action" href={ROUTES.cvitae}>CVitae ↗</a><a class="action" href={`${ROUTES.world}#join-world`}><span class="i18n-en">My professional profile</span><span class="i18n-pt">Meu perfil profissional</span></a><a class="action" href={ROUTES.portfolioKitPreview}><span class="i18n-en">Explore portfolio kit</span><span class="i18n-pt">Explorar kit de portfólio</span></a></div></section>
+</main><FlagshipFooter/>
+</FlagshipLayout>
+<script>import '../../../scripts/world-opportunities';</script>

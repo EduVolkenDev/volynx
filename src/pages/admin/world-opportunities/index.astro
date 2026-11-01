@@ -1,0 +1,28 @@
+---
+import FlagshipLayout from '../../../layouts/FlagshipLayout.astro';
+import FlagshipHeader from '../../../components/FlagshipHeader.astro';
+import WorldNav from '../../../components/WorldNav.astro';
+import { ROUTES } from '../../../data/routes';
+import { OPPORTUNITY_KINDS, OPPORTUNITY_CATEGORIES, LABELS } from '../../../lib/world/opportunities';
+import '../../../styles/world-opportunities.css';
+const fields = [
+ ['title','Title','Título','text',160],['company_name','Company','Empresa','text',120],['location','Location / time zone','Localização / fuso','text',160],['eligibility','Eligible countries and work authorization','Países elegíveis e autorização de trabalho','text',500],
+ ['source_name','Source name','Nome da fonte','text',160],['source_url','Original source URL','URL da fonte original','url',2000],['application_url','Application URL','URL de candidatura','url',2000],
+ ['source_published_at','Original publication date (optional)','Publicação original (opcional)','date',100],['last_checked_at','Last checked (your local time)','Última conferência (sua hora local)','datetime-local',100],['expires_at','Expires (your local time)','Validade (sua hora local)','datetime-local',100],
+ ['salary_min','Minimum compensation (optional)','Remuneração mínima (opcional)','number',100],['salary_max','Maximum compensation (optional)','Remuneração máxima (opcional)','number',100],['skills','Skills (comma-separated)','Habilidades (separadas por vírgula)','text',1000],
+];
+const selects = [['category','Specialty','Especialidade',OPPORTUNITY_CATEGORIES],['kind','Contract type','Tipo de contrato',OPPORTUNITY_KINDS],['work_mode','Work mode','Modalidade',['remote','hybrid','onsite']],['currency','Currency','Moeda',['GBP','EUR','BRL','USD']],['salary_period','Compensation period','Período da remuneração',['hour','month','year','project']],['status','Publication status','Status da publicação',['draft','published','closed','archived']]];
+---
+<FlagshipLayout title="World opportunities administration — VOLYNX" pageClass="page-admin-world-opportunities">
+<FlagshipHeader current={ROUTES.world} ctaI18n="" ctaLabel="World Opportunities" ctaHref={ROUTES.worldOpportunities}/>
+<main class="shell world-work" data-world-app="admin"><WorldNav/><span class="eyebrow">WORLD · EDITORIAL</span><h1><span class="i18n-en">Opportunity desk.</span><span class="i18n-pt">Central de oportunidades.</span></h1><p><span class="i18n-en">Review the original source, eligibility and application link before publishing. Compensation uses currency units, not cents. No email is sent by this editor.</span><span class="i18n-pt">Revise a fonte original, a elegibilidade e o link de candidatura antes de publicar. Informe a remuneração em unidades da moeda, não centavos. Este editor não envia emails.</span></p>
+<p id="worldStatus" class="status" role="status" aria-live="polite"></p>
+<section id="worldAdmin" hidden><div class="actions"><button id="newOpportunity" type="button"><span class="i18n-en">New opportunity</span><span class="i18n-pt">Nova oportunidade</span></button></div>
+<form id="opportunityEditor" class="editor"><input name="id" type="hidden"/>
+{fields.map(([name,en,pt,type,max])=><label><span class="i18n-en">{en}</span><span class="i18n-pt">{pt}</span><input name={String(name)} type={String(type)} maxlength={Number(max)} step={type === 'number' ? '.01' : undefined} min={type === 'number' ? '0' : undefined} required={!['salary_min','salary_max','source_published_at','skills'].includes(String(name))}/></label>)}
+{selects.map(([name,en,pt,options])=><label><span class="i18n-en">{en}</span><span class="i18n-pt">{pt}</span><select name={String(name)}>{Array.from(options as readonly string[]).map(v=><option value={v} data-label={v}>{LABELS[v]?.[0] || v}</option>)}</select></label>)}
+<label class="wide"><span class="i18n-en">Description and requirements</span><span class="i18n-pt">Descrição e requisitos</span><textarea name="description" rows="10" minlength="40" maxlength="12000" required/></label>
+<div class="actions wide"><button type="submit" class="primary"><span class="i18n-en">Save opportunity</span><span class="i18n-pt">Salvar oportunidade</span></button></div></form>
+<div class="results" id="worldResults"></div><div class="actions"><button id="worldMore" type="button" hidden><span class="i18n-en">Load more</span><span class="i18n-pt">Carregar mais</span></button></div></section>
+</main></FlagshipLayout>
+<script>import '../../../scripts/world-opportunities';</script>

@@ -1,0 +1,9 @@
+---
+import { ROUTES } from '../data/routes';
+const { current = '' } = Astro.props;
+const items = [[ROUTES.world, 'Professionals & services', 'Profissionais e serviços'], [ROUTES.worldOpportunities, 'Opportunities', 'Oportunidades'], [ROUTES.worldWorkspace, 'My World', 'Meu World']];
+---
+<nav class="world-navigation" aria-label="World">
+  {items.map(([url,en,pt]) => <a href={url} aria-current={current === url ? 'page' : undefined}><span class="i18n-en">{en}</span><span class="i18n-pt">{pt}</span></a>)}
+</nav>
+<style>.world-navigation{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:36px}.world-navigation a{padding:10px 16px;border:1px solid #ffffff24;border-radius:999px;color:#d7dfeb;text-decoration:none;font-size:.88rem}.world-navigation a[aria-current]{color:#8fe6d6;border-color:#8fe6d666;background:#8fe6d60b}.world-navigation a:focus-visible{outline:2px solid #8fe6d6;outline-offset:4px}</style>
