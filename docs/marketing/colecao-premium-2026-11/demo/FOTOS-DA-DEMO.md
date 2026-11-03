@@ -147,7 +147,7 @@ O seed insere **somente os anúncios**. As imagens ficam em `property_listing_im
 
 1. Rode o seed primeiro (`seed-demo-listings.sql`), para os anúncios existirem.
 2. Abra o painel: `/dashboard/propertyflow` no domínio da VOLYNX.
-3. Selecione o tenant da demo (`aurora-demo`).
+3. Selecione o tenant da demo (`propertyflow-jp`, “Aurora Imóveis”).
 4. Em cada anúncio, envie as fotos na ordem do `photo_files`.
 5. Defina a capa. A primeira foto deve ser a mais forte do imóvel, não a fachada por padrão.
 6. Salve como **publicado**.
@@ -164,7 +164,7 @@ Não invente esse caminho. Ele é gerado por `buildPropertyFlowImagePath` a part
 
 ## 7. Checklist antes de gravar o vídeo
 
-- [ ] 16 anúncios publicados no tenant `aurora-demo`.
+- [ ] 16 anúncios publicados no tenant `propertyflow-jp`.
 - [ ] 79 imagens carregadas (5 por imóvel, 4 no terreno).
 - [ ] Nenhuma foto com pessoa, placa, número de casa ou logo.
 - [ ] Nenhuma foto repetida entre dois imóveis.

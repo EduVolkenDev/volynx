@@ -38,7 +38,7 @@ Saída: `links.csv` na pasta do script.
 
 ```bash
 cd docs/marketing/colecao-premium-2026-11/demo
-node gerar-seed.mjs --site aurora-demo
+node gerar-seed.mjs --site propertyflow-jp
 ```
 
 ## Regras que não mudam

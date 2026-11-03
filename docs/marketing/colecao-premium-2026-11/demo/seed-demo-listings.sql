@@ -1,8 +1,8 @@
 -- Demo PropertyFlow · Aurora Imóveis
--- Gerado por gerar-seed.mjs em 2026-11-03T04:27:15.463Z
+-- Gerado por gerar-seed.mjs em 2026-11-03T17:56:07.349Z
 -- Demonstração com dados fictícios
 --
--- Alvo: tenant PropertyFlow com subdomínio "aurora-demo"
+-- Alvo: tenant PropertyFlow com subdomínio "propertyflow-jp"
 -- Modo: insert-only (ignora linhas existentes)
 --
 -- NÃO rode isto em tenant de cliente. O bloco recusa site com domínio próprio.
@@ -12,7 +12,7 @@
 
 do $$
 declare
-  v_target_subdomain text := 'aurora-demo';
+  v_target_subdomain text := 'propertyflow-jp';
   v_site_id          uuid;
   v_org_id           uuid;
   v_domain           text;
@@ -99,7 +99,7 @@ select id, slug, title, status, price_label, is_featured, sort_order
 from public.property_listings
 where site_id = (
   select id from public.sites
-  where lower(coalesce(subdomain, '')) = lower('aurora-demo')
+  where lower(coalesce(subdomain, '')) = lower('propertyflow-jp')
   order by updated_at desc
   limit 1
 )

@@ -5,6 +5,13 @@ Tudo o que é preciso para gravar o vídeo demo sem usar a sua voz.
 Marca fictícia: **Aurora Imóveis** · Porto Alegre/RS · 16 imóveis · BRL
 Selo obrigatório: `Demonstração com dados fictícios`
 
+## Estado atual (2026-11-03)
+
+- Tenant `propertyflow-jp` publicado em `https://propertyflow-jp.volynx.world/`.
+- **16 anúncios publicados**, 3 em destaque (10 venda, 6 aluguel).
+- Marca, cores e tier `white-label` aplicados; template `classic-grid`.
+- **Pendente:** as 79 fotos. Sem foto, o card mostra a inicial do tipo como placeholder.
+
 ---
 
 ## Arquivos
@@ -23,16 +30,17 @@ Selo obrigatório: `Demonstração com dados fictícios`
 
 ---
 
-## Passo 1 — Criar o tenant da demo
+## Passo 1 — Tenant da demo
 
-No painel do PropertyFlow (`/dashboard/propertyflow`), crie um site novo com:
+O tenant já está provisionado e é o alvo padrão do seed:
 
 | Campo | Valor |
 |---|---|
 | Nome | `Aurora Imóveis` |
-| Slug | `aurora-imoveis` |
-| Subdomínio | `aurora-demo` |
-| Template | qualquer um que seja `property-flow` |
+| Subdomínio | `propertyflow-jp` |
+| URL pública | `https://propertyflow-jp.volynx.world/` |
+| Template | `classic-grid` |
+| Tier | `white-label` |
 | Status | publicado |
 | Domínio próprio | **vazio** |
 | Idiomas | `pt` e `en` |
@@ -47,13 +55,13 @@ No painel do PropertyFlow (`/dashboard/propertyflow`), crie um site novo com:
 
 ```bash
 cd docs/marketing/colecao-premium-2026-11/demo
-node gerar-seed.mjs --site aurora-demo
+node gerar-seed.mjs --site propertyflow-jp
 ```
 
 Saída esperada:
 
 ```
-seed-demo-listings.sql gerado para o tenant "aurora-demo" (insert-only).
+seed-demo-listings.sql gerado para o tenant "propertyflow-jp" (insert-only).
   anúncios: 16
   destaques: 3
   venda: 10 · aluguel: 6
@@ -64,7 +72,7 @@ seed-demo-listings.sql gerado para o tenant "aurora-demo" (insert-only).
 Para atualizar anúncios já existentes sem duplicar:
 
 ```bash
-node gerar-seed.mjs --site aurora-demo --upsert
+node gerar-seed.mjs --site propertyflow-jp --upsert
 ```
 
 ---
@@ -92,7 +100,7 @@ select count(*) as anuncios, count(*) filter (where status = 'published') as pub
 from public.property_listings
 where site_id = (
   select id from public.sites
-  where lower(subdomain) = lower('aurora-demo')
+  where lower(subdomain) = lower('propertyflow-jp')
   order by updated_at desc
   limit 1
 );
@@ -118,7 +126,7 @@ Resumo:
 ## Passo 5 — Publicar e verificar
 
 1. Confirme o tenant como publicado.
-2. Abra `https://aurora-demo.volynx.world/`.
+2. Abra `https://propertyflow-jp.volynx.world/`.
 3. Teste os filtros de bairro, tipo e finalidade.
 4. Abra um imóvel e navegue pela galeria.
 5. Teste no celular (390 px).
@@ -147,7 +155,7 @@ Use `../ROTEIRO-SEM-VOZ.md`, seção **A. Demo silenciosa**.
 delete from public.property_listings
 where site_id = (
   select id from public.sites
-  where lower(subdomain) = lower('aurora-demo')
+  where lower(subdomain) = lower('propertyflow-jp')
   order by updated_at desc
   limit 1
 );

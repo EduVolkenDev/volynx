@@ -3,8 +3,8 @@
  * Gera o SQL de seed da demo do PropertyFlow a partir de demo-listings.json.
  *
  * Uso:
- *   node gerar-seed.mjs                      # alvo padrão: subdomínio aurora-demo
- *   node gerar-seed.mjs --site aurora-demo   # alvo explícito
+ *   node gerar-seed.mjs                      # alvo padrão: subdomínio propertyflow-jp
+ *   node gerar-seed.mjs --site propertyflow-jp   # alvo explícito
  *   node gerar-seed.mjs --upsert             # atualiza linhas existentes
  *
  * Saídas (na mesma pasta):
@@ -32,7 +32,7 @@ function argValue(name, fallback) {
   const i = argv.indexOf(name);
   return i !== -1 && argv[i + 1] ? argv[i + 1] : fallback;
 }
-const targetSite = argValue("--site", "aurora-demo");
+const targetSite = argValue("--site", "propertyflow-jp");
 const upsert = argv.includes("--upsert");
 
 if (!/^[a-z0-9][a-z0-9-]{1,48}[a-z0-9]$/.test(targetSite)) {

@@ -319,7 +319,7 @@ Peça **um sample de 15 segundos antes de contratar**. Voz de demo reel nem semp
 
 ## Checklist de produção
 
-- [ ] Tenant `aurora-demo` populado (16 anúncios, 79 fotos).
+- [ ] Tenant `propertyflow-jp` populado (16 anúncios, 79 fotos).
 - [ ] Selo `Demonstração com dados fictícios` visível.
 - [ ] Gravação em 1080×1920 e 1920×1080.
 - [ ] 14 planos, 60s exatos.
