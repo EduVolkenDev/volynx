@@ -128,6 +128,7 @@ const skipDates = new Set(
 const feedTime = args["feed-time"] ?? "09:00";
 const storyTime = args["story-time"] ?? "12:30";
 const enFeedTime = args["en-feed-time"] ?? "18:00";
+const enStoryTime = args["en-story-time"] ?? "18:30";
 const timezone = args.tz ?? "America/Sao_Paulo";
 const outputDir = path.resolve(HERE, args.out ?? ".");
 
@@ -213,7 +214,7 @@ for (const item of items) {
     hora_story_pt: storyTime,
     data_en: date,
     hora_feed_en: enFeedTime,
-    hora_story_en: storyTime,
+    hora_story_en: enStoryTime,
     fuso: timezone,
     feed_pt: path.join("Português", "Feed", `${item.slug}.png`),
     story_pt: path.join("Português", "Stories", `${item.slug}.png`),
@@ -274,8 +275,11 @@ const payload = {
     feedTimePt: feedTime,
     storyTimePt: storyTime,
     feedTimeEn: enFeedTime,
+    storyTimeEn: enStoryTime,
     format: "feed 4:5 + story 9:16 por assunto, PT e EN",
-    english: "mesma data do PT; usar somente se houver canal EN separado",
+    english:
+      "mesma conta e mesma data do PT; feed EN às " +
+      `${enFeedTime} e story EN às ${enStoryTime}, sem conta separada`,
     publishing: "nenhuma publicação automática; importar o CSV no agendador",
   },
   counts: {
@@ -335,7 +339,7 @@ md.push(
   `- **Janela:** ${rows[0].data_pt} a ${rows[rows.length - 1].data_pt}`
 );
 md.push(
-  `- **Cadência:** ${weekdays.size} dias por semana · feed às ${feedTime} · story às ${storyTime} (${timezone})`
+  `- **Cadência:** ${weekdays.size} dias por semana · PT feed ${feedTime} + story ${storyTime} · EN feed ${enFeedTime} + story ${enStoryTime} (${timezone})`
 );
 md.push(
   `- **Datas puladas:** ${[...skipDates].join(", ") || "nenhuma"}`
@@ -347,9 +351,9 @@ md.push(
   "- O calendário usa os arquivos de `Posts VOLYNX - Português e Inglês`; nada é movido ou renomeado."
 );
 md.push(
-  "- O inglês está na mesma data do português, às " +
-    `${enFeedTime}. Use apenas se existir um canal EN separado; caso contrário, ignore as colunas ` +
-    "`data_en`/`hora_feed_en`."
+  "- Português e inglês são publicados **na mesma conta e no mesmo dia**: feed PT às " +
+    `${feedTime}, feed EN às ${enFeedTime}, story PT às ${storyTime} e story EN às ${enStoryTime}. ` +
+    "Não existe conta EN separada."
 );
 md.push(
   "- O story do dia usa a arte 9:16 correspondente e deve ser publicado depois do feed."

@@ -29,14 +29,15 @@ Planejamento de publicação dos **50 assuntos** da coleção `Posts VOLYNX - Po
 |---|---|
 | Início | `2026-11-16` (segunda-feira) |
 | Cadência | Segunda a sexta, 1 assunto por dia |
+| Conta | **A mesma conta** para PT e EN; não existe conta EN separada |
 | Feed PT | `09:00` `America/Sao_Paulo` |
 | Story PT | `12:30` `America/Sao_Paulo` |
 | Feed EN | `18:00` `America/Sao_Paulo`, mesma data |
-| Story EN | `12:30`, mesma data |
+| Story EN | `18:30` `America/Sao_Paulo`, mesma data |
 | Janela | 16/11/2026 a 28/01/2027 |
 | Formatos | feed 4:5 + story 9:16 por assunto |
 
-O inglês está na mesma data do português. Use as colunas `data_en`/`hora_feed_en` somente se existir um canal inglês separado; se o EN for publicado em outro fuso, ajuste com `--en-feed-time`.
+Português e inglês vão para a **mesma conta, no mesmo dia**, em dois momentos: PT pela manhã/tarde e EN no fim da tarde. Isso significa **2 feeds e 2 stories por dia** (10 feeds e 10 stories por semana). Se quiser reduzir o volume, altere a cadência com `--weekdays` ou publique o EN em dias alternados.
 
 ## Como atualizar depois do refinamento
 
@@ -61,7 +62,7 @@ node gerar-calendario.mjs --start=2026-11-09 --weekdays=1,2,3,4,5
 Publicar em outro fuso/horário:
 
 ```bash
-node gerar-calendario.mjs --feed-time=10:00 --story-time=18:00 --en-feed-time=19:00 --tz=Europe/London
+node gerar-calendario.mjs --feed-time=10:00 --story-time=18:00 --en-feed-time=19:00 --en-story-time=19:30 --tz=Europe/London
 ```
 
 Usar outra pasta de artes:
@@ -93,7 +94,7 @@ O script falha com uma lista clara se algum dos 300 arquivos estiver faltando.
 ## O que ainda precisa de decisão
 
 1. **Canal**: o plano assume Instagram feed + stories. LinkedIn, TikTok e Pinterest precisam de recorte/roteiro próprio.
-2. **Conta EN**: confirmar se o inglês vai para um perfil separado ou se as colunas EN devem ser ignoradas.
+2. **Volume**: confirmar se 2 feeds por dia na mesma conta é o ritmo desejado; se não, reduzir para 1 idioma por dia ou usar dias alternados.
 3. **Horários**: os horários acima são um ponto de partida; o ideal é validar com os insights reais das contas.
 4. **Aprovação**: definir se o fluxo é publicação automática, rascunho no agendador ou aprovação manual.
 5. **Refino**: marcar cada arte como `pronta` somente depois de revisar a observação correspondente da auditoria.

@@ -9,13 +9,13 @@ Planejamento dos 50 assuntos da coleção, com feed 4:5 e story 9:16 em portugu�
 - **Prioridade da auditoria:** 23 correções e 27 refinamentos
 - **Prontas para agendar:** 0 de 50
 - **Janela:** 2026-11-16 a 2027-01-28
-- **Cadência:** 5 dias por semana · feed às 09:00 · story às 12:30 (America/Sao_Paulo)
+- **Cadência:** 5 dias por semana · PT feed 09:00 + story 12:30 · EN feed 18:00 + story 18:30 (America/Sao_Paulo)
 - **Datas puladas:** 2026-12-24, 2026-12-25, 2026-12-31, 2027-01-01
 
 ## Premissas
 
 - O calendário usa os arquivos de `Posts VOLYNX - Português e Inglês`; nada é movido ou renomeado.
-- O inglês está na mesma data do português, às 18:00. Use apenas se existir um canal EN separado; caso contrário, ignore as colunas `data_en`/`hora_feed_en`.
+- Português e inglês são publicados **na mesma conta e no mesmo dia**: feed PT às 09:00, feed EN às 18:00, story PT às 12:30 e story EN às 18:30. Não existe conta EN separada.
 - O story do dia usa a arte 9:16 correspondente e deve ser publicado depois do feed.
 - Nenhuma publicação é automática. O CSV é a fonte para Meta Business Suite, Buffer, Later ou outro agendador.
 - O status `refino_pendente` marca os 27 itens que o Codex apontou como refinamento; `correcao_pendente` marca os 23 de correção material.
