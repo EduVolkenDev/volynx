@@ -64,7 +64,7 @@ serve(async (req) => {
     global: { headers: { Authorization: `Bearer ${jwt}` } },
     auth: { persistSession: false },
   });
-  const { data: userData, error: userErr } = await userClient.auth.getUser();
+  const { data: userData, error: userErr } = await userClient.auth.getUser(jwt);
   if (userErr || !userData?.user) {
     return jsonResponse({ error: "invalid_token" }, 401);
   }
