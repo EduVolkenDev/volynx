@@ -65,6 +65,12 @@ async function confirm() {
   const token_hash = params.get("token_hash");
   const type       = params.get("type");
 
+  const fragmentType = new URLSearchParams(window.location.hash.slice(1)).get("type");
+  if (type === "recovery" || fragmentType === "recovery") {
+    window.location.replace("/auth/reset/" + window.location.search + window.location.hash);
+    return;
+  }
+
   if (token_hash && type) {
     try {
       const cfg = await loadConfig();

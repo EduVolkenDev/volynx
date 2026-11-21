@@ -1,0 +1,38 @@
+---
+import FlagshipLayout from "../../layouts/FlagshipLayout.astro";
+import FlagshipHeader from "../../components/FlagshipHeader.astro";
+import FlagshipFooter from "../../components/FlagshipFooter.astro";
+import { ROUTES } from "../../data/routes";
+---
+<FlagshipLayout title="Set a new password — VOLYNX" description="Reset your VOLYNX password securely." pageClass="page-login">
+  <FlagshipHeader current={ROUTES.login} ctaLabel="Sign in" ctaHref={ROUTES.login} />
+  <main class="shell reset-page">
+    <section class="reset-card">
+      <h1><span class="i18n-en">Set a new password</span><span class="i18n-pt">Defina uma nova senha</span></h1>
+      <p id="resetStatus" role="status" aria-live="polite"><span class="i18n-en">Checking your recovery link…</span><span class="i18n-pt">Verificando seu link de recuperação…</span></p>
+      <form id="resetForm" hidden>
+        <label for="resetPassword"><span class="i18n-en">New password</span><span class="i18n-pt">Nova senha</span></label>
+        <input id="resetPassword" type="password" autocomplete="new-password" minlength="6" required />
+        <label for="resetConfirm"><span class="i18n-en">Confirm password</span><span class="i18n-pt">Confirme a senha</span></label>
+        <input id="resetConfirm" type="password" autocomplete="new-password" minlength="6" required />
+        <button id="resetSave" class="button button--gold" type="submit"><span class="i18n-en">Save password</span><span class="i18n-pt">Salvar senha</span></button>
+      </form>
+      <a id="resetRetry" href="/auth/recover/" hidden><span class="i18n-en">Request a new link</span><span class="i18n-pt">Solicitar novo link</span></a>
+      <a id="resetContinue" class="button button--gold" href="/profile/" hidden><span class="i18n-en">Open my account</span><span class="i18n-pt">Abrir minha conta</span></a>
+    </section>
+  </main>
+  <FlagshipFooter />
+  <script is:inline src="/vendor/supabase-js-2.118.0/supabase.js"></script>
+  <script is:inline type="module" src="/scripts/auth-reset.js"></script>
+</FlagshipLayout>
+<style>
+  .reset-page { min-height: 65svh; display: grid; place-items: center; padding-block: 48px; }
+  .reset-card { width: min(100%, 480px); padding: clamp(22px, 5vw, 36px); border: 1px solid rgba(220,190,130,.25); border-radius: 26px; background: rgba(11,13,25,.85); }
+  h1 { margin: 0 0 18px; font-size: clamp(1.65rem, 5vw, 2.3rem); }
+  p { line-height: 1.6; }
+  form:not([hidden]) { display: grid; gap: 12px; }
+  input { width: 100%; min-width: 0; padding: 12px; border: 1px solid rgba(220,190,130,.4); border-radius: 10px; color: var(--ink); background: rgba(255,255,255,.06); font: inherit; }
+  input:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+  button, a { margin-top: 14px; }
+  [hidden] { display: none !important; }
+</style>

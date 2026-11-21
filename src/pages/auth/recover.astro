@@ -86,7 +86,8 @@ const title = "Reset Password — VOLYNX";
 
       try {
         const cfg = await loadConfig();
-        const res = await fetch(`${cfg.supabaseUrl}/auth/v1/recover`, {
+        const returnUrl = new URL("/auth/reset/", window.location.origin);
+        const res = await fetch(`${cfg.supabaseUrl}/auth/v1/recover?redirect_to=${encodeURIComponent(returnUrl.href)}`, {
           method: "POST",
           headers: { apikey: cfg.supabaseAnonKey, "Content-Type": "application/json" },
           body: JSON.stringify({ email }),
