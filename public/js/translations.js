@@ -1806,6 +1806,7 @@ window.VX_TRANS = {
     "maintenance.hero.cta.plans": "View plans",
     "maintenance.hero.cta.quote": "Request a quote",
     "maintenance.plans.title":    "VOLYNX Cloud plans",
+    "maintenance.plans.agreement": "Monthly fees are a guide. We confirm scope, billing currency, response times and backup arrangements before you subscribe.",
     "maintenance.plans.subtitle": "Three levels of operational care for the stage your product is in today.",
     "maintenance.cta.title":      "Maintenance is only the beginning.",
     "maintenance.cta.subtitle":   "Let's give your digital presence the operational clarity to perform today and evolve tomorrow.",
@@ -1841,7 +1842,7 @@ window.VX_TRANS = {
     "maint.opal.f5":          "Uptime monitoring",
     "maint.opal.f6":          "Async support (SLA)",
     "maint.opal.price":       "€219.90 per month",
-    "maint.opal.cta":         "Activate Opal",
+    "maint.opal.cta":         "Discuss Opal",
 
     "maint.saphyra.name":     "Volynx Cloud Saphyra",
     "maint.saphyra.desc":     "A performance-led operating layer for products ready to grow with intention.",
@@ -1852,7 +1853,7 @@ window.VX_TRANS = {
     "maint.saphyra.f5":       "Security hardening + WAF",
     "maint.saphyra.f6":       "Monthly insights report",
     "maint.saphyra.price":    "€449.90 per month",
-    "maint.saphyra.cta":      "Activate Saphyra",
+    "maint.saphyra.cta":      "Discuss Saphyra",
     "maint.saphyra.popular":  "(recommended)",
 
     "maint.diamond.name":     "Volynx Cloud Diamond",
@@ -1864,7 +1865,7 @@ window.VX_TRANS = {
     "maint.diamond.f5":       "Strategic consulting",
     "maint.diamond.f6":       "Executive-level reporting",
     "maint.diamond.price":    "€749.90 per month",
-    "maint.diamond.cta":      "Enter Diamond",
+    "maint.diamond.cta":      "Discuss Diamond",
 
     /* === MANIFESTO PAGE === */
     "heroLabel":            "Manifesto",
@@ -5560,6 +5561,7 @@ window.VX_TRANS = {
     "maintenance.hero.cta.plans": "Ver planos",
     "maintenance.hero.cta.quote": "Solicitar orçamento",
     "maintenance.plans.title":    "Planos VOLYNX Cloud",
+    "maintenance.plans.agreement": "Os valores mensais são uma referência. Confirmamos escopo, moeda de cobrança, prazos de resposta e condições de backup antes da assinatura.",
     "maintenance.plans.subtitle": "Três níveis de cuidado operacional para a fase atual do seu produto.",
     "maintenance.cta.title":      "Manutenção é só o começo.",
     "maintenance.cta.subtitle":   "Vamos dar à sua presença digital a clareza operacional para performar hoje e evoluir amanhã.",
@@ -5595,7 +5597,7 @@ window.VX_TRANS = {
     "maint.opal.f5":          "Monitoramento de uptime",
     "maint.opal.f6":          "Suporte assíncrono (SLA)",
     "maint.opal.price":       "€219,90 por mês",
-    "maint.opal.cta":         "Ativar Opal",
+    "maint.opal.cta":         "Conversar sobre o Opal",
 
     "maint.saphyra.name":     "Volynx Cloud Saphyra",
     "maint.saphyra.desc":     "Uma camada operacional orientada a performance para produtos prontos para crescer com intenção.",
@@ -5606,7 +5608,7 @@ window.VX_TRANS = {
     "maint.saphyra.f5":       "Fortalecimento de segurança + WAF",
     "maint.saphyra.f6":       "Relatório mensal de insights",
     "maint.saphyra.price":    "€449,90 por mês",
-    "maint.saphyra.cta":      "Ativar Saphyra",
+    "maint.saphyra.cta":      "Conversar sobre o Saphyra",
     "maint.saphyra.popular":  "(recomendado)",
 
     "maint.diamond.name":     "Volynx Cloud Diamond",
@@ -5618,7 +5620,7 @@ window.VX_TRANS = {
     "maint.diamond.f5":       "Consultoria estratégica",
     "maint.diamond.f6":       "Relatórios de nível executivo",
     "maint.diamond.price":    "€749,90 por mês",
-    "maint.diamond.cta":      "Entrar no Diamond",
+    "maint.diamond.cta":      "Conversar sobre o Diamond",
 
     /* === MANIFESTO PAGE === */
     "heroLabel":            "Manifesto",

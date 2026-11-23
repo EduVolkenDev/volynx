@@ -585,6 +585,18 @@ const title = "Contact & Sales — VOLYNX";
         : 'Website URL:\nBusiness goal:\nWhat feels unclear or is not converting:';
     }
 
+    if (params.get('product') === 'maintenance' && params.get('intent') === 'guided-quote') {
+      var cloudPlans = { opal: 'Opal', saphyra: 'Saphyra', diamond: 'Diamond' };
+      var selectedCloudPlan = Object.prototype.hasOwnProperty.call(cloudPlans, params.get('plan'))
+        ? cloudPlans[params.get('plan')] : '';
+      var isPortuguese = document.documentElement.lang.indexOf('pt') === 0;
+      try { isPortuguese = (localStorage.getItem('volynx_lang') || document.documentElement.lang).indexOf('pt') === 0; } catch (_) { /* Use the document language when storage is unavailable. */ }
+      form.project_type.value = 'maintenance';
+      form.brief.value = (selectedCloudPlan ? 'VOLYNX Cloud ' + selectedCloudPlan + '\n' : 'VOLYNX Cloud\n') + (isPortuguese
+        ? 'URL do site:\nCuidados necessários:\nMoeda de cobrança desejada:\nPrazos de resposta e condições de backup a confirmar:'
+        : 'Website URL:\nCare required:\nPreferred billing currency:\nResponse times and backup arrangements to confirm:');
+    }
+
     var submitBtn = form.querySelector('.submit-btn');
     var originalBtnText = submitBtn ? submitBtn.textContent : 'Send brief →';
 
