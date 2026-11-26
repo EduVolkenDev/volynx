@@ -353,7 +353,8 @@ window.VxRenderer = (function () {
   function renderSection(section, brand) {
     var fn = RENDERERS[section.type];
     if (!fn) return '<!-- unknown section: ' + esc(section.type) + ' -->';
-    return fn(section, brand);
+    var html = fn(section, brand);
+    return section.id ? html.replace('<section ', '<section id="' + esc(section.id) + '" ') : html;
   }
 
   // ── Full Page Render ──

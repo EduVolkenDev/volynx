@@ -1,0 +1,12 @@
+--- a/src/worker.js
++++ b/src/worker.js
+@@ -435,7 +435,8 @@
+   const sections = Array.isArray(builderData?.sections) ? builderData.sections : [];
+   const sectionsHtml = sections.map((s) => {
+     const renderer = sectionRenderers[s.type];
+-    return renderer ? renderer(s, brand) : "";
++    const html = renderer ? renderer(s, brand) : "";
++    return s.id ? html.replace("<section ", '<section id="' + esc(s.id) + '" ') : html;
+   }).join("\n");
+   const heroSection = sections.find((s) => s.type === "hero");
+   const seoTitle = heroSection?.content?.title ? `${brandName} \u2014 ${esc(heroSection.content.title).slice(0, 60)}` : brandName;

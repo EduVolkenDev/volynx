@@ -380,6 +380,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
 
 <script>
   import { createClient } from "@supabase/supabase-js";
+  import { finalizeGeneratedProject } from "../../lib/builder/generated-project";
 
   // Declare globals loaded via external scripts
   declare const JSZip: any;
@@ -923,6 +924,10 @@ import PageWidgets from "../../components/PageWidgets.astro";
               <input id="exSlug" class="field" placeholder="my-brand" data-i18n-placeholder="builder.ph_ex_slug" />
             </div>
           </div>
+          <div class="field-group" style="margin-top:12px">
+            <label class="label" for="exCtaHref" data-i18n="builder.workspace.cta_link">Primary button link</label>
+            <input id="exCtaHref" class="field" placeholder="https://..." data-i18n-placeholder="builder.ph_cta_href" />
+          </div>
           <button class="btn btn--primary" id="exGenerate" style="margin-top:18px;width:100%">
             <span data-i18n="builder.express.generate">Generate my landing page</span> <span aria-hidden="true">→</span>
           </button>
@@ -984,6 +989,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
       const brand = ($("exBrand") as HTMLInputElement)?.value?.trim() || "My Brand";
       const tagline = ($("exTagline") as HTMLInputElement)?.value?.trim() || "";
       const cta = ($("exCta") as HTMLInputElement)?.value?.trim() || "Get started";
+      const ctaHref = ($("exCtaHref") as HTMLInputElement)?.value?.trim() || "";
       const slug = ($("exSlug") as HTMLInputElement)?.value?.trim() || brand.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
       const counts = await countActiveProjects(user.id);
@@ -1007,6 +1013,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
       ($("wBrand") as HTMLInputElement).value = brand;
       ($("wTagline") as HTMLInputElement).value = tagline;
       ($("wCta") as HTMLInputElement).value = cta;
+      ($("wCtaHref") as HTMLInputElement).value = ctaHref;
       ($("wGoal") as HTMLSelectElement).value = exGoal;
 
       // Auto-create the project
@@ -1333,7 +1340,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
 
     // ── Blank / custom ──────────────────────────────────────
     if (selectedPresetId === "blank") {
-      return {
+      return finalizeGeneratedProject({
         meta: buildMeta(w),
         brand: { name: brandName, tagline: w.tagline || seed.tagline(brandName), colors: { primary: "#7DD3FC", bg: "#070A12", fg: "#E7EEF7", accent: "#34D399" } },
         sections: [
@@ -1345,7 +1352,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
           }},
           { type: "cta", content: { title: seed.ctaClose, subtitle: seed.urgency || `Built for results.`, primaryCta: { label: cta, href: ctaHref } } },
         ],
-      };
+      }, selectedPresetId, w.ctaHref);
     }
 
     // ── Preset-based ────────────────────────────────────────
@@ -1367,10 +1374,8 @@ import PageWidgets from "../../components/PageWidgets.astro";
       if (s.type === "hero") {
         if (selectedVariants.hero) s.variant = selectedVariants.hero;
         s.content.badge = badge;
-        if (!w.tagline) {
-          s.content.title = seed.title(brandName);
-          s.content.subtitle = seed.subtitle;
-        }
+        s.content.title = w.tagline || seed.title(brandName);
+        s.content.subtitle = seed.subtitle;
       }
 
       if (s.type === "pricing" && selectedVariants.pricing) {
@@ -1491,7 +1496,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
       }
     }
 
-    return data;
+    return finalizeGeneratedProject(data, selectedPresetId, w.ctaHref);
   }
 
   function showAuth(show: boolean) {
