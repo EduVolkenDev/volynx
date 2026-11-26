@@ -1,3 +1,5 @@
+import { persistVolynxSession } from "./auth-session.js";
+
 async function loadConfig() {
   const res = await fetch("/config.json", { cache: "no-store" });
   if (!res.ok) throw new Error("config.json not found.");
@@ -11,6 +13,13 @@ const msgEl       = document.getElementById("confirmMsg");
 const countdownEl = document.getElementById("confirmCountdown");
 const btnLogin    = document.getElementById("confirmBtn");
 const btnRetry    = document.getElementById("confirmBtnRetry");
+
+function finishSession(session) {
+  if (!session?.access_token || !session.refresh_token) return false;
+  persistVolynxSession(session);
+  window.location.replace(window.VxReturn?.consume('/profile/?welcome=1') || '/profile/?welcome=1');
+  return true;
+}
 
 function showSuccess() {
   try {
@@ -27,7 +36,7 @@ function showSuccess() {
   msgEl.textContent   = "Your account is verified. You can now sign in.";
 
   const loginHref = window.VxReturn
-    ? window.VxReturn.loginUrl(window.VxReturn.storedPath() || "/volynx-lab/")
+    ? window.VxReturn.loginUrl(window.VxReturn.paramPath() || window.VxReturn.storedPath() || "/volynx-lab/")
     : "/login/";
   btnLogin.href = loginHref;
   btnLogin.hidden = false;
@@ -62,13 +71,15 @@ function showError(errorMsg) {
 
 async function confirm() {
   const params     = new URLSearchParams(window.location.search);
+  if (params.get("type") === "recovery" || new URLSearchParams(window.location.hash.slice(1)).get("type") === "recovery") return;
   const token_hash = params.get("token_hash");
   const type       = params.get("type");
-
-  const fragmentType = new URLSearchParams(window.location.hash.slice(1)).get("type");
-  if (type === "recovery" || fragmentType === "recovery") {
-    window.location.replace("/auth/reset/" + window.location.search + window.location.hash);
-    return;
+  const fragment = new URLSearchParams(window.location.hash.slice(1));
+  // Remove email-link credentials before calling the provider.
+  if (token_hash || fragment.has('access_token')) {
+    params.delete('token_hash');
+    params.delete('type');
+    history.replaceState(null, '', window.location.pathname + (params.size ? '?' + params.toString() : ''));
   }
 
   if (token_hash && type) {
@@ -93,7 +104,7 @@ async function confirm() {
       if (!res.ok) {
         showError(data?.error_description || data?.msg || data?.error || "Verification failed.");
       } else {
-        showSuccess();
+        if (!finishSession(data.session || data)) showSuccess();
       }
     } catch (e) {
       showError(e?.message);
@@ -101,8 +112,15 @@ async function confirm() {
     return;
   }
 
-  if (window.location.hash && window.location.hash.includes("access_token")) {
-    showError("This confirmation link format is no longer supported. Please request a new confirmation email.");
+  if (fragment.has('access_token') && fragment.has('refresh_token')) {
+    try {
+      const cfg = await loadConfig();
+      const response = await fetch(`${cfg.supabaseUrl}/auth/v1/user`, {
+        headers: { apikey: cfg.supabaseAnonKey, Authorization: `Bearer ${fragment.get('access_token')}` },
+      });
+      if (!response.ok) throw new Error('This confirmation link is invalid or has expired.');
+      finishSession({ access_token: fragment.get('access_token'), refresh_token: fragment.get('refresh_token'), user: await response.json() });
+    } catch (error) { showError(error.message); }
     return;
   }
 

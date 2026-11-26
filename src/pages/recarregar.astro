@@ -288,7 +288,10 @@ const L = t[lang];
       }
 
       function loginHref() {
-        return '/login/?next=' + encodeURIComponent('/recarregar/?currency=' + currentCurrency());
+        var destination = new URL(window.location.href);
+        destination.searchParams.set('currency', currentCurrency());
+        var next = destination.pathname + destination.search + destination.hash;
+        return window.VxReturn ? window.VxReturn.loginUrl(next) : '/login/?next=' + encodeURIComponent(next);
       }
 
       function priceFor(el, code) {

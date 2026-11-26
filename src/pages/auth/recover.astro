@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import PasswordResetForm from "../../components/PasswordResetForm.astro";
 import VxHeader from "../../components/VxHeader.astro";
 import SiteFooter from "../../components/SiteFooter.astro";
 import { ROUTES } from "../../data/routes";
@@ -34,6 +35,7 @@ const title = "Reset Password — VOLYNX";
           </form>
         </div>
 
+        <PasswordResetForm />
         <div id="sentState" hidden>
           <div class="check-icon" aria-hidden="true">✉</div>
           <h1 data-i18n="recover.sent_title">Check your inbox</h1>
@@ -48,74 +50,7 @@ const title = "Reset Password — VOLYNX";
   <SiteFooter />
 </BaseLayout>
 
-<script is:inline type="module">
-  async function loadConfig() {
-    const res = await fetch("/config.json", { cache: "no-store" });
-    if (!res.ok) throw new Error("config.json not found.");
-    return await res.json();
-  }
-
-  function t(key, fallback) {
-    try {
-      const lang = localStorage.getItem("volynx_lang") || "en";
-      const dict = (window.VX_TRANS && window.VX_TRANS[lang]) || {};
-      return dict[key] || fallback;
-    } catch (_) {
-      return fallback;
-    }
-  }
-
-  const form = document.getElementById("recoverForm");
-  const emailEl = document.getElementById("email");
-  const btn = document.getElementById("submitBtn");
-  const msg = document.getElementById("msg");
-
-  if (form && emailEl && btn && msg) {
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = emailEl.value.trim();
-      if (!email) {
-        msg.textContent = t("recover.msg_enter_email", "Please enter your email.");
-        msg.className = "msg err";
-        return;
-      }
-
-      btn.disabled = true;
-      msg.textContent = t("recover.msg_sending", "Sending reset link...");
-      msg.className = "msg";
-
-      try {
-        const cfg = await loadConfig();
-        const returnUrl = new URL("/auth/reset/", window.location.origin);
-        const res = await fetch(`${cfg.supabaseUrl}/auth/v1/recover?redirect_to=${encodeURIComponent(returnUrl.href)}`, {
-          method: "POST",
-          headers: { apikey: cfg.supabaseAnonKey, "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        });
-
-        if (res.status === 429) {
-          throw new Error(t("recover.msg_rate_limited", "Too many attempts. Please wait a minute and try again."));
-        }
-
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
-          throw new Error(data.error_description || data.msg || t("recover.msg_failed", "Failed to send reset link."));
-        }
-
-        // Show success
-        document.getElementById("requestState").hidden = true;
-        document.getElementById("sentState").hidden = false;
-        document.getElementById("sentEmail").textContent = email;
-
-      } catch (err) {
-        msg.textContent = err.message || t("recover.msg_unknown", "Something went wrong.");
-        msg.className = "msg err";
-      } finally {
-        btn.disabled = false;
-      }
-    });
-  }
-</script>
+<script is:inline src="/js/auth-recovery.js" defer></script>
 
 <style>
   @import "../../styles/home.css";

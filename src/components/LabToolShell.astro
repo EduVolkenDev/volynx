@@ -70,7 +70,7 @@ const shell = shellByTool[active] || shellByTool.home;
     </div>
     <div class="vx-lab-shell__actions">
       <a href={ROUTES.profile} data-auth="in" data-i18n="nav.profile">Profile</a>
-      <a href={`${ROUTES.login}?next=${ROUTES.lab}`} data-auth="out" data-i18n="login2.kicker">Sign in</a>
+      <a href={`${ROUTES.login}?next=${encodeURIComponent(Astro.url.pathname + Astro.url.search)}`} data-auth="out" data-i18n="login2.kicker" data-lab-signin>Sign in</a>
       <a href={shell.ctaHref} data-i18n={`lab_shell.${active}_cta`}>{shell.cta}</a>
     </div>
   </div>
@@ -81,6 +81,18 @@ const shell = shellByTool[active] || shellByTool.home;
     <span><b>Local</b><em data-i18n="lab_shell.legend_local_desc">runs in this browser when possible</em></span>
   </div>
 </section>
+
+<script>
+  // Astro's static render cannot read query/hash; capture the live tool state.
+  document.querySelectorAll<HTMLAnchorElement>('[data-lab-signin]').forEach((link) => {
+    const update = () => {
+      const next = location.pathname + location.search + location.hash;
+      link.href = '/login/?next=' + encodeURIComponent(next);
+    };
+    update();
+    link.addEventListener('click', update);
+  });
+</script>
 
 <style>
   .vx-lab-shell {

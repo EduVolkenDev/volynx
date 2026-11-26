@@ -25,7 +25,7 @@ async function loadConfig() {
 }
 
 function authRedirectUrl() {
-  return `${window.location.origin}/auth/confirm/`;
+  return `${window.location.origin}/auth/confirm/?next=${encodeURIComponent(resolveRedirect())}`;
 }
 
 async function supabaseSignup({ supabaseUrl, supabaseAnonKey, email, password, fullName, username }) {
