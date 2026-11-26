@@ -72,6 +72,7 @@ test("recovered publisher renders the same anchors and keeps unauthenticated wri
   skip: !process.env.VOLYNX_PUBLISHER_SOURCE && "Set VOLYNX_PUBLISHER_SOURCE to the recovered active Worker",
 }, async () => {
   const source = readFileSync(process.env.VOLYNX_PUBLISHER_SOURCE, "utf8")
+    .replace(/^import .*publication-authority\.mjs.*;\n/m, "")
     .replace(/export\s*\{\s*worker_default as default\s*\};/, "");
   const context = { URL, Request, Response, Headers, crypto: globalThis.crypto, fetch };
   runInNewContext(source + "; this.render = renderSite; this.worker = worker_default;", context);

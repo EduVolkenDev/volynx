@@ -1856,6 +1856,15 @@ import PageWidgets from "../../components/PageWidgets.astro";
       window.location.href = "/";
     });
 
+    const publicationErrors: Record<string, string> = {
+      publish_limit_reached: "Your plan has no available publication slots. Unpublish another site or upgrade your plan.",
+      publication_busy: "Another publication is still processing for this project. Please wait before trying again.",
+      publication_needs_review: "We could not confirm the publication state. Contact support before retrying.",
+      plan_unavailable: "We could not verify your plan. Please try again later.",
+      slug_in_use: "This site address is already reserved. Choose another address.",
+      project_deleted: "Restore this project before publishing.",
+    };
+
     async function unpublishCurrentProject() {
       if (!currentProject) return false;
       const { data: sessData } = await supa.auth.getSession();
@@ -1879,6 +1888,7 @@ import PageWidgets from "../../components/PageWidgets.astro";
       const j: any = await r.json().catch(() => ({}));
       if (!r.ok) {
         const errMap: Record<string, string> = {
+          ...publicationErrors,
           missing_token: "Authentication failed. Try signing out and back in.",
           invalid_token: "Session invalid. Try signing out and back in.",
           missing_projectId: "Internal error: project ID missing.",
@@ -2100,6 +2110,7 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
 
         if (!r.ok) {
           const errMap: Record<string, string> = {
+            ...publicationErrors,
             missing_token: "Authentication failed. Try signing out and back in.",
             invalid_token: "Session invalid. Try signing out and back in.",
             missing_projectId: "Internal error: project ID missing.",
@@ -2125,10 +2136,6 @@ section{padding:40px 0;border-bottom:1px solid rgba(231,238,247,.08)}</style>
         if (infoUrl) { infoUrl.href = liveUrl; infoUrl.textContent = liveUrl; }
         if (visitBtn) { visitBtn.hidden = false; visitBtn.href = liveUrl; }
         if (infoBadge) { infoBadge.textContent = "published"; infoBadge.className = "status-badge status-badge--published"; }
-
-        await supa.from("projects")
-          .update({ status: "published", updated_at: new Date().toISOString() })
-          .eq("id", currentProject.id);
 
         await listProjects(user.id);
       } catch (err: any) {

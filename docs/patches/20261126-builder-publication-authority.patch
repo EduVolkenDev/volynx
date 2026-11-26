@@ -1,0 +1,115 @@
+--- a/src/worker.js
++++ b/src/worker.js
+@@ -1,3 +1,4 @@
++import { executePublication } from "./publication-authority.mjs";
+ var __defProp = Object.defineProperty;
+ var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+ 
+@@ -679,56 +680,6 @@
+ }
+ __name(supabaseGetUser, "supabaseGetUser");
+ __name2(supabaseGetUser, "supabaseGetUser");
+-async function supabaseGetProject(env, projectId) {
+-  const url = new URL(`${env.SUPABASE_URL}/rest/v1/projects`);
+-  url.searchParams.set("id", `eq.${projectId}`);
+-  url.searchParams.set("select", "id,user_id,slug,name,builder_data,status");
+-  const r = await fetch(url.toString(), {
+-    headers: {
+-      apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+-      Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`
+-    }
+-  });
+-  if (!r.ok) return null;
+-  const arr = await r.json();
+-  return Array.isArray(arr) ? arr[0] : null;
+-}
+-__name(supabaseGetProject, "supabaseGetProject");
+-__name2(supabaseGetProject, "supabaseGetProject");
+-async function supabaseMarkPublished(env, projectId) {
+-  const url = new URL(`${env.SUPABASE_URL}/rest/v1/projects`);
+-  url.searchParams.set("id", `eq.${projectId}`);
+-  await fetch(url.toString(), {
+-    method: "PATCH",
+-    headers: {
+-      "content-type": "application/json",
+-      apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+-      Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+-      Prefer: "return=minimal"
+-    },
+-    body: JSON.stringify({ status: "published", updated_at: (/* @__PURE__ */ new Date()).toISOString() })
+-  }).catch(() => {
+-  });
+-}
+-__name(supabaseMarkPublished, "supabaseMarkPublished");
+-__name2(supabaseMarkPublished, "supabaseMarkPublished");
+-async function supabaseMarkDraft(env, projectId) {
+-  const url = new URL(`${env.SUPABASE_URL}/rest/v1/projects`);
+-  url.searchParams.set("id", `eq.${projectId}`);
+-  await fetch(url.toString(), {
+-    method: "PATCH",
+-    headers: {
+-      "content-type": "application/json",
+-      apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+-      Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+-      Prefer: "return=minimal"
+-    },
+-    body: JSON.stringify({ status: "draft", updated_at: (/* @__PURE__ */ new Date()).toISOString() })
+-  }).catch(() => {
+-  });
+-}
+-__name(supabaseMarkDraft, "supabaseMarkDraft");
+-__name2(supabaseMarkDraft, "supabaseMarkDraft");
+ var TOOL_LIMITS = {
+   free: { converter: 5, "image-scaler": 5, "image-suite": 3, "qr-gen": 2, builder_create: 1, builder_publish: 0, scanner: 3, summary: 3, writing: 3, decision: 2, vault: 20, "my-day": -1 },
+   launch: { converter: 20, "image-scaler": 20, "image-suite": 10, "qr-gen": 10, builder_create: 3, builder_publish: 5, scanner: 10, summary: 10, writing: 10, decision: 5, vault: 50, "my-day": -1 },
+@@ -1196,23 +1147,9 @@
+       const projectId = body?.projectId;
+       if (!projectId)
+         return json({ error: "missing_projectId" }, { status: 400, headers: cors(origin) });
+-      const project = await supabaseGetProject(env, projectId);
+-      if (!project)
+-        return json({ error: "project_not_found" }, { status: 404, headers: cors(origin) });
+-      if (project.user_id !== user.id)
+-        return json({ error: "forbidden" }, { status: 403, headers: cors(origin) });
+-      const slug2 = String(project.slug || "").trim();
+-      if (!slug2)
+-        return json({ error: "missing_slug" }, { status: 400, headers: cors(origin) });
+-      const html = renderSite(project.builder_data, slug2);
+-      await env.SITES.put(`${slug2}/index.html`, html, {
+-        httpMetadata: { contentType: "text/html; charset=utf-8" }
+-      });
+-      await supabaseMarkPublished(env, projectId);
+-      return json(
+-        { ok: true, url: `https://${slug2}.volynx.world/` },
+-        { status: 200, headers: cors(origin) }
+-      );
++      const result = await executePublication(env, user.id, projectId, "publish", renderSite);
++      const { status, ...bodyResult } = result;
++      return json(bodyResult, { status, headers: cors(origin) });
+     }
+     if (isApiHost && url.pathname === "/unpublish") {
+       if (method !== "POST")
+@@ -1232,20 +1169,9 @@
+       const projectId = body?.projectId;
+       if (!projectId)
+         return json({ error: "missing_projectId" }, { status: 400, headers: cors(origin) });
+-      const project = await supabaseGetProject(env, projectId);
+-      if (!project)
+-        return json({ error: "project_not_found" }, { status: 404, headers: cors(origin) });
+-      if (project.user_id !== user.id)
+-        return json({ error: "forbidden" }, { status: 403, headers: cors(origin) });
+-      const slug2 = String(project.slug || "").trim();
+-      if (!slug2)
+-        return json({ error: "missing_slug" }, { status: 400, headers: cors(origin) });
+-      await env.SITES.delete(`${slug2}/index.html`);
+-      await supabaseMarkDraft(env, projectId);
+-      return json(
+-        { ok: true, slug: slug2, url: `https://${slug2}.volynx.world/` },
+-        { status: 200, headers: cors(origin) }
+-      );
++      const result = await executePublication(env, user.id, projectId, "unpublish", renderSite);
++      const { status, ...bodyResult } = result;
++      return json(bodyResult, { status, headers: cors(origin) });
+     }
+     if (isApiHost && url.pathname === "/api/create-checkout-session") {
+       if (method !== "POST")
