@@ -406,7 +406,7 @@
 
   async function loadConfig() {
     try {
-      const res = await fetch("/config.json", { cache: "no-store" });
+      const res = await fetch("/config.json", { cache: "no-store", signal: AbortSignal.timeout(15000) });
       return res.ok ? await res.json() : {};
     } catch (_) {
       return {};
@@ -425,6 +425,7 @@
 
     try {
       const res = await fetch(`${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(uid)}&select=is_admin,plan,builder_plan,is_black_diamond`, {
+        signal: AbortSignal.timeout(15000),
         headers: {
           apikey: anonKey,
           Authorization: `Bearer ${token}`,
@@ -803,7 +804,7 @@
       metallicPreset: getFieldValue("qgMetallicPreset", "chrome"),
       bgColor: getFieldValue("qgBgColor", "#ffffff"),
       previewSize: numberValue("qgPreviewSize", 320),
-      exportSize: numberValue("qgExportSize", 1024),
+      exportSize: getFieldValue("qgExportFormat", "png") === "png" ? 1024 : numberValue("qgExportSize", 1024),
       margin: numberValue("qgMargin", 12),
       logoSize: numberValue("qgLogoSize", 0.22),
       logoMargin: numberValue("qgLogoMargin", 10),
@@ -1102,6 +1103,7 @@
     try {
       const response = await fetch(`${functionsUrl}/qrgen-export`, {
         method: "POST",
+        signal: AbortSignal.timeout(30000),
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${session.access_token}`,
@@ -1147,9 +1149,16 @@
       }
 
       if (!data.ok || !data.svg) throw new Error("Invalid premium export response");
-      const output = state.exportFormat === "svg"
-        ? new Blob([data.svg], { type: "image/svg+xml;charset=utf-8" })
-        : await svgToPngBlob(data.svg, Number(data.size) || state.exportSize);
+      // Authorization stays server-side. Render the approved settings with the
+      // same engine as the preview so dot styles, corners and margins match.
+      const extension = state.exportFormat === "svg" ? "svg" : "png";
+      const renderer = new QRCodeStyling(buildQrOptions(state, {
+        mode: "export",
+        size: state.exportSize,
+        type: extension === "svg" ? "svg" : "canvas",
+      }));
+      const output = await renderer.getRawData(extension);
+      if (!output?.size) throw new Error("Empty QR export");
       saveBlob(output, data.filename || `volynx-qrgen-premium.${state.exportFormat === "svg" ? "svg" : "png"}`);
       if (window.VxLab) {
         VxLab.recordEvent("qr-gen", "export", `${state.exportFormat.toUpperCase()} premium export authorized by server`);
@@ -1171,31 +1180,6 @@
         : "Premium export is unavailable. No file was generated. Please try again.", "err", false);
       return false;
     }
-  }
-
-  function svgToPngBlob(svg, size) {
-    return new Promise((resolve, reject) => {
-      const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }));
-      const image = new Image();
-      image.onload = () => {
-        try {
-          const canvas = document.createElement("canvas");
-          canvas.width = size;
-          canvas.height = size;
-          canvas.getContext("2d").drawImage(image, 0, 0, size, size);
-          canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("PNG conversion failed")), "image/png");
-        } catch (error) {
-          reject(error);
-        } finally {
-          URL.revokeObjectURL(url);
-        }
-      };
-      image.onerror = () => {
-        URL.revokeObjectURL(url);
-        reject(new Error("Premium SVG could not be rasterized"));
-      };
-      image.src = url;
-    });
   }
 
   function updatePreviewGate(state) {
@@ -1363,7 +1347,37 @@
     });
   }
 
+  let exportInProgress = false;
+
   async function exportFinal() {
+    if (exportInProgress) return;
+    exportInProgress = true;
+    const button = $("qgExportBtn");
+    const label = button?.textContent;
+    if (button) {
+      button.disabled = true;
+      button.textContent = getLang() === "pt" ? "Exportando..." : "Exporting...";
+      button.setAttribute("aria-busy", "true");
+    }
+    setMessage(getLang() === "pt" ? "Preparando exportação..." : "Preparing export...", "info", false);
+    try {
+      await performExport();
+    } catch (error) {
+      console.error("[qrgen] export failed", error);
+      setMessage(getLang() === "pt"
+        ? "Não foi possível exportar. Verifique sua conexão e tente novamente."
+        : "Export failed. Check your connection and try again.", "err", false);
+    } finally {
+      exportInProgress = false;
+      if (button) {
+        button.disabled = false;
+        button.textContent = label;
+        button.removeAttribute("aria-busy");
+      }
+    }
+  }
+
+  async function performExport() {
     await refreshRemoteEntitlement();
     const state = getState();
     const validation = validateExport(state);
@@ -1482,10 +1496,10 @@
   function setMessage(text, kind, clearLater = true) {
     const el = $("qgMessage");
     if (!el) return;
+    clearTimeout(setMessage.timer);
     el.textContent = text || "";
     el.dataset.kind = kind || "";
     if (clearLater && text) {
-      clearTimeout(setMessage.timer);
       setMessage.timer = setTimeout(() => {
         if (el.textContent === text) {
           el.textContent = "";
@@ -1506,7 +1520,15 @@
   }
 
   function saveProjects(rows) {
-    try { localStorage.setItem(QRGEN_STORAGE_KEY, JSON.stringify(rows)); } catch (_) {}
+    try {
+      localStorage.setItem(QRGEN_STORAGE_KEY, JSON.stringify(rows));
+      return true;
+    } catch (_) {
+      setMessage(getLang() === "pt"
+        ? "Não foi possível salvar. O armazenamento deste navegador está cheio ou indisponível."
+        : "Could not save. Browser storage is full or unavailable.", "err", false);
+      return false;
+    }
   }
 
   function clearRestoreParam(name) {
@@ -1544,7 +1566,7 @@
   function saveProject() {
     const state = getState();
     const rows = getProjects();
-    if (currentPlan === "free" && !activeProjectId && rows.length >= SAVE_LIMIT_FREE) {
+    if (currentPlan === "free" && !rows.some((row) => row.id === activeProjectId) && rows.length >= SAVE_LIMIT_FREE) {
       setMessage(`Free project limit reached (${SAVE_LIMIT_FREE}). QRGen Launch unlocks more saved drafts.`, "warn");
       return;
     }
@@ -1555,6 +1577,8 @@
       logoDataUrl: state.logoDataUrl && state.logoDataUrl.length < 700000 ? state.logoDataUrl : ""
     };
 
+    const previousProjectId = activeProjectId;
+    if (activeProjectId && !rows.some((row) => row.id === activeProjectId)) activeProjectId = null;
     if (activeProjectId) {
       const idx = rows.findIndex((row) => row.id === activeProjectId);
       if (idx >= 0) {
@@ -1571,7 +1595,10 @@
       });
     }
 
-    saveProjects(rows);
+    if (!saveProjects(rows)) {
+      activeProjectId = previousProjectId;
+      return;
+    }
     const savedProject = rows.find((item) => item.id === activeProjectId);
     if (savedProject && window.VxLab?.syncArtifact) VxLab.syncArtifact("qr-project", savedProject);
     if (savedProject) {
@@ -1625,9 +1652,9 @@
     setValue("qgBgColor", state.bgColor || "#ffffff");
     setValue("qgPreviewSize", state.previewSize || 320);
     setValue("qgExportSize", state.exportSize || 1024);
-    setValue("qgMargin", state.margin || 12);
+    setValue("qgMargin", state.margin ?? 12);
     setValue("qgLogoSize", state.logoSize || 0.22);
-    setValue("qgLogoMargin", state.logoMargin || 10);
+    setValue("qgLogoMargin", state.logoMargin ?? 10);
     setValue("qgErrorCorrection", state.errorCorrection || "H");
     setValue("qgExportFormat", state.exportFormat || "png");
     const transparent = $("qgTransparent");
@@ -1720,7 +1747,7 @@
     }
 
     if (action === "delete") {
-      saveProjects(rows.filter((item) => item.id !== id));
+      if (!saveProjects(rows.filter((item) => item.id !== id))) return;
       if (window.VxLab?.deleteArtifact) VxLab.deleteArtifact("qr-project", id);
       if (activeProjectId === id) activeProjectId = null;
       renderProjects();
@@ -1850,6 +1877,18 @@
       reader.readAsDataURL(file);
     });
 
+    ["qgExportFormat", "qgExportSize", "qgTransparent"].forEach((id) => {
+      $(id)?.addEventListener("change", () => {
+        if (id === "qgExportFormat" && $("qgExportFormat").value === "png") {
+          setValue("qgExportSize", "1024");
+        }
+        if (id === "qgExportSize" && Number($("qgExportSize").value) > 1024
+            && $("qgExportFormat").value === "png") {
+          setValue("qgExportFormat", "png-hd");
+        }
+        schedulePreview();
+      });
+    });
     $("qgExportBtn")?.addEventListener("click", exportFinal);
     $("qgSaveBtn")?.addEventListener("click", saveProject);
     $("qgLogoutBtn")?.addEventListener("click", signOutQrGen);

@@ -382,7 +382,7 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
   <script is:inline src="/js/vx-lab-runtime.js"></script>
   <script is:inline set:html={`window.VOLYNX_QRGEN_PLANS = ${JSON.stringify(qrgenPlanPayload)};`}></script>
   <script is:inline src="/scripts/kit-checkout.js?v=20260906-release" defer></script>
-  <script is:inline src="/scripts/qrgen-editor.js?v=20260906-release"></script>
+  <script is:inline src="/scripts/qrgen-editor.js?v=20261127-export-layout"></script>
 </FlagshipLayout>
 
 <style>
@@ -983,14 +983,20 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
   }
 
   .qrgen-preview {
-    position: relative;
+    position: sticky;
+    top: 18px;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100dvh - 36px);
+    min-height: 0;
   }
 
   .qrgen-preview__sticky {
-    position: sticky;
-    top: 18px;
-    z-index: 2;
+    min-height: 0;
+    overflow-y: auto;
     padding: 2px 0 8px;
+    scrollbar-gutter: stable;
     border-radius: 22px;
     background:
       linear-gradient(135deg, rgba(255,255,255,.055), rgba(255,255,255,.025)),
@@ -1086,6 +1092,7 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
   }
 
   .qrgen-export {
+    flex-shrink: 0;
     border-top: 1px solid rgba(255,255,255,.10);
     padding-top: 18px;
     display: grid;
@@ -1414,15 +1421,27 @@ const qrgenProCheckoutHref = checkoutHref("builder_pro", { next: ROUTES.qrgen })
 
     .qrgen-preview {
       position: static;
+      max-height: none;
       order: -1;
     }
 
     .qrgen-preview__sticky {
-      position: static;
+      overflow: visible;
     }
 
     .qrgen-plan-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-height: 560px) {
+    .qrgen-preview {
+      position: static;
+      max-height: none;
+    }
+
+    .qrgen-preview__sticky {
+      overflow: visible;
     }
   }
 
