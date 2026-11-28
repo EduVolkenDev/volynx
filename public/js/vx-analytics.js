@@ -40,7 +40,33 @@
     "/profile/",
     "/recarregar/",
   ];
+  const GOOGLE_MEASUREMENT_ID = "G-N820406NJ2";
+  let googleStarted = false;
   let active = false;
+
+  function startGoogleAnalytics() {
+    window["ga-disable-" + GOOGLE_MEASUREMENT_ID] = false;
+    if (googleStarted) return;
+    googleStarted = true;
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+    window.gtag("consent", "default", {
+      analytics_storage: "granted",
+      ad_storage: "denied",
+      ad_user_data: "denied",
+      ad_personalization: "denied",
+    });
+    window.gtag("js", new Date());
+    window.gtag("config", GOOGLE_MEASUREMENT_ID, {
+      send_page_view: false,
+      page_location: window.location.origin + window.location.pathname,
+      page_referrer: document.referrer ? new URL(document.referrer).origin : "",
+    });
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://www.googletagmanager.com/gtag/js?id=" + GOOGLE_MEASUREMENT_ID;
+    document.head.appendChild(script);
+  }
   let pageViewTracked = false;
   let configPromise = null;
 
@@ -150,6 +176,13 @@
   function track(event, detail = {}) {
     if (!active || !hasConsent() || !EVENT_NAMES.has(event)) return false;
 
+    if (!isPrivatePage() && window.gtag) {
+      window.gtag("event", event, {
+        send_to: GOOGLE_MEASUREMENT_ID,
+        page_location: window.location.origin + window.location.pathname,
+        event_label: eventLabel(detail?.label),
+      });
+    }
     const attribution = currentAttribution();
     const payload = {
       event_name: event,
@@ -180,6 +213,7 @@
 
   function start() {
     if (active || !hasConsent()) return;
+    if (!isPrivatePage()) startGoogleAnalytics();
     active = true;
     window.VxAnalytics.active = true;
     if (!pageViewTracked) {
@@ -204,6 +238,7 @@
       start();
       return;
     }
+    window["ga-disable-" + GOOGLE_MEASUREMENT_ID] = true;
     active = false;
     pageViewTracked = false;
     window.VxAnalytics.active = false;
