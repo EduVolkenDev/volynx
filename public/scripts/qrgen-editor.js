@@ -1160,15 +1160,17 @@
       const output = await renderer.getRawData(extension);
       if (!output?.size) throw new Error("Empty QR export");
       saveBlob(output, data.filename || `volynx-qrgen-premium.${state.exportFormat === "svg" ? "svg" : "png"}`);
-      if (window.VxLab) {
-        VxLab.recordEvent("qr-gen", "export", `${state.exportFormat.toUpperCase()} premium export authorized by server`);
-        VxLab.savePreset("qr-gen", {
+      try {
+        await window.VxLab?.recordEvent?.("qr-gen", "export", `${state.exportFormat.toUpperCase()} premium export authorized by server`);
+        await window.VxLab?.savePreset?.("qr-gen", {
           mode: state.mode,
           format: state.exportFormat,
           color: state.colorMode,
           size: String(state.exportSize),
           payment: "plan/server-authorized",
         });
+      } catch (error) {
+        console.warn("[qrgen] premium export metadata logging failed", error);
       }
       setMessage(getLang() === "pt" ? "Exportação premium concluída. Teste o QR antes de enviar para impressão." : "Premium export complete. Test the QR before sending to print.", "ok");
       showExportSuccess();
