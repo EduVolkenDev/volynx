@@ -59,10 +59,11 @@ async function load(reset = true) {
   loading = true;
   status(t('Loading opportunities…','Carregando oportunidades…'));
   if (reset) { page = 0; items = []; }
+  byId('worldMore')?.setAttribute('disabled','');
   try {
     if (mode === 'detail') {
       const id = new URLSearchParams(location.search).get('id') || '';
-      if (!/^[0-9a-f-]{36}$/i.test(id)) { items=[]; render(); status(''); return; }
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) { items=[]; render(); status(''); return; }
       const {data,error} = await client.from('world_opportunities').select(columns).eq('id',id).maybeSingle();
       if(error) throw error;
       if(current!==request) return;
@@ -99,7 +100,7 @@ async function load(reset = true) {
     if(current!==request)return;
     render(); status(items.length?t(`${items.length} opportunity / opportunities loaded.`,`${items.length} oportunidade(s) carregada(s).`):'');
   } catch { if(current===request) { if(!reset)page=Math.max(0,page-1); status(t('Could not load opportunities. Please try again.','Não foi possível carregar as oportunidades. Tente novamente.'),true); if(reset)byId('worldResults').innerHTML=`<button type="button" data-retry>${t('Try again','Tentar novamente')}</button>`; } }
-  finally { if(current===request)loading=false; }
+  finally { if(current===request){loading=false;byId('worldMore')?.removeAttribute('disabled');} }
 }
 function editorReset() {
   const form=byId<HTMLFormElement>('opportunityEditor');form.reset();
@@ -139,10 +140,10 @@ async function init() {
     if(error||!data){status(t('Administrator access required.','Acesso de administrador necessário.'),true);return;}
     byId('worldAdmin').hidden=false;editorReset();
   }
-  client.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT'){++request;loading=false;userId=null;activity.clear();items=[];byId('worldAdmin')?.setAttribute('hidden','');byId('worldAdminLink')?.setAttribute('hidden','');if(root?.dataset.worldApp==='admin'){byId('worldResults').replaceChildren();status(t('Administrator sign-in required.','É necessário entrar como administrador.'),true);}else render();}});
+  client.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT'){++request;loading=false;userId=null;activity.clear();items=[];byId('worldMore')?.setAttribute('hidden','');byId('worldAdmin')?.setAttribute('hidden','');byId('worldAdminLink')?.setAttribute('hidden','');if(root?.dataset.worldApp==='admin'){byId('worldResults').replaceChildren();status(t('Administrator sign-in required.','É necessário entrar como administrador.'),true);}else render();}});
   await load();
   byId<HTMLFormElement>('opportunityFilters')?.addEventListener('submit',event=>{event.preventDefault();void load();});
-  byId('worldMore')?.addEventListener('click',()=>{if(!loading){page++;void load(false);}});
+  byId('worldMore')?.addEventListener('click',()=>{if(!loading&&(root?.dataset.worldApp!=='workspace'||userId)){page++;void load(false);}});
   byId('newOpportunity')?.addEventListener('click',editorReset);
   byId<HTMLFormElement>('opportunityEditor')?.addEventListener('submit',async event=>{
     event.preventDefault();const form=event.currentTarget as HTMLFormElement;const button=form.querySelector<HTMLButtonElement>('[type=submit]')!;button.disabled=true;
