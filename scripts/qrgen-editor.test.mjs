@@ -4,7 +4,7 @@ import { test } from "node:test";
 import vm from "node:vm";
 
 const source = readFileSync(new URL("../public/scripts/qrgen-editor.js", import.meta.url), "utf8");
-function editor({ storageFails = false, responseFails = false, denied = false } = {}) {
+function editor({ storageFails = false, responseFails = false, denied = false, emptyBlob = false, usageFails = false } = {}) {
   const values = new Map();
   const fields = new Map();
   const downloads = [];
@@ -49,12 +49,13 @@ function editor({ storageFails = false, responseFails = false, denied = false } 
     },
     QRCodeStyling: class {
       constructor(options) { renders.push(options); }
-      async getRawData() { return new Blob(["rendered-qr"]); }
+      async getRawData() { return new Blob(emptyBlob ? [] : ["rendered-qr"]); }
     },
   };
+  if (usageFails) context.VxLab = { recordUsage: async () => { throw new Error('Telemetry offline'); }, recordEvent() {}, savePreset() {} };
   context.window = context;
   vm.runInNewContext(source.replace("window.VxQRGenProduct = {", `window.testEditor = {
-    saveProject, applyState, getState, exportFinal, requestPremiumExport,
+    saveProject, applyState, getState, exportFinal, requestPremiumExport, exportQrFile,
     setPlan(plan) { currentPlan = plan; },
     setActive(id) { activeProjectId = id; },
   };
@@ -122,3 +123,19 @@ for (const size of [1024, 2048, 4096]) {
     assert.equal(e.downloads.length, 1);
   });
 }
+
+test("empty standard export does not download or claim success", async () => {
+  const e = editor({ emptyBlob: true });
+  e.fields.get("qgExportFormat").value = "png";
+  await e.api.exportQrFile(e.api.getState());
+  assert.equal(e.downloads.length, 0);
+  assert.equal(e.fields.get("qgMessage").dataset.kind, "err");
+  assert.equal(e.fields.get("qgExportBtn").disabled, false);
+});
+test("telemetry rejection does not invalidate a completed export", async () => {
+  const e = editor({ usageFails: true });
+  e.fields.get("qgExportFormat").value = "png";
+  await e.api.exportQrFile(e.api.getState());
+  assert.equal(e.downloads.length, 1);
+  assert.equal(e.fields.get("qgMessage").dataset.kind, "ok");
+});
