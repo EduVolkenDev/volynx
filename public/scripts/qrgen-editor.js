@@ -435,7 +435,7 @@
       if (!res.ok) return;
       const rows = await res.json();
       const profile = Array.isArray(rows) ? rows[0] : null;
-      if (!profile) return;
+      if (!profile || !hasFreshAuth() || getSessionUserId() !== uid || getAuthToken() !== token) return;
 
       if (profile.is_admin) {
         remoteAdminBypass = true;
