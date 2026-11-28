@@ -65,12 +65,16 @@ async function load(reset = true) {
       if (!/^[0-9a-f-]{36}$/i.test(id)) { items=[]; render(); status(''); return; }
       const {data,error} = await client.from('world_opportunities').select(columns).eq('id',id).maybeSingle();
       if(error) throw error;
+      if(current!==request) return;
+      const owner=userId;
+      if(owner) { const {data: saved,error: saveError}=await client.from('world_opportunity_activity').select('*').eq('user_id',owner).eq('opportunity_id',id); if(saveError) throw saveError; if(current!==request||owner!==userId)return; activity=new Map((saved||[]).map(a=>[a.opportunity_id,a])); }
       items=data?[data]:[];
-      if(userId) { const {data: saved,error: saveError}=await client.from('world_opportunity_activity').select('*').eq('user_id',userId).eq('opportunity_id',id); if(saveError) throw saveError; activity=new Map((saved||[]).map(a=>[a.opportunity_id,a])); }
     } else if (mode === 'workspace') {
       if(!userId) { loginNotice(); status(''); return; }
-      const {data,error}=await client.from('world_opportunity_activity').select(`*,opportunity:world_opportunities(${columns})`).eq('user_id',userId).order('updated_at',{ascending:false}).order('opportunity_id').range(page*pageSize,(page+1)*pageSize-1);
+      const owner=userId;
+      const {data,error}=await client.from('world_opportunity_activity').select(`*,opportunity:world_opportunities(${columns})`).eq('user_id',owner).order('updated_at',{ascending:false}).order('opportunity_id').range(page*pageSize,(page+1)*pageSize-1);
       if(error) throw error;
+      if(current!==request||owner!==userId)return;
       if(reset)activity.clear();
       for(const a of data||[])activity.set(a.opportunity_id,a);
       const next=(data||[]).map(a=>a.opportunity||{id:a.opportunity_id,unavailable:true});
@@ -94,7 +98,7 @@ async function load(reset = true) {
     }
     if(current!==request)return;
     render(); status(items.length?t(`${items.length} opportunity / opportunities loaded.`,`${items.length} oportunidade(s) carregada(s).`):'');
-  } catch { if(current===request) { if(!reset)page=Math.max(0,page-1); status(t('Could not load opportunities. Please try again.','Não foi possível carregar as oportunidades. Tente novamente.'),true); byId('worldResults').innerHTML=`<button type="button" data-retry>${t('Try again','Tentar novamente')}</button>`; } }
+  } catch { if(current===request) { if(!reset)page=Math.max(0,page-1); status(t('Could not load opportunities. Please try again.','Não foi possível carregar as oportunidades. Tente novamente.'),true); if(reset)byId('worldResults').innerHTML=`<button type="button" data-retry>${t('Try again','Tentar novamente')}</button>`; } }
   finally { if(current===request)loading=false; }
 }
 function editorReset() {
@@ -135,7 +139,7 @@ async function init() {
     if(error||!data){status(t('Administrator access required.','Acesso de administrador necessário.'),true);return;}
     byId('worldAdmin').hidden=false;editorReset();
   }
-  client.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT'){userId=null;activity.clear();items=[];byId('worldAdmin')?.setAttribute('hidden','');byId('worldAdminLink')?.setAttribute('hidden','');if(root?.dataset.worldApp==='admin'){byId('worldResults').replaceChildren();status(t('Administrator sign-in required.','É necessário entrar como administrador.'),true);}else render();}});
+  client.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT'){++request;loading=false;userId=null;activity.clear();items=[];byId('worldAdmin')?.setAttribute('hidden','');byId('worldAdminLink')?.setAttribute('hidden','');if(root?.dataset.worldApp==='admin'){byId('worldResults').replaceChildren();status(t('Administrator sign-in required.','É necessário entrar como administrador.'),true);}else render();}});
   await load();
   byId<HTMLFormElement>('opportunityFilters')?.addEventListener('submit',event=>{event.preventDefault();void load();});
   byId('worldMore')?.addEventListener('click',()=>{if(!loading){page++;void load(false);}});
@@ -164,14 +168,18 @@ async function init() {
     if(button.dataset.edit){edit(button.dataset.edit);return;}
     const id=button.dataset.save||button.dataset.update||button.dataset.remove;if(!id||!userId)return;
     button.disabled=true;
+    const owner=userId;
+    const stage=button.closest('article')?.querySelector<HTMLSelectElement>('[data-stage]')?.value;
+    const notes=button.closest('article')?.querySelector<HTMLTextAreaElement>('[data-notes]')?.value;
     try{
       let result;
       if(button.dataset.remove)result=await client.from('world_opportunity_activity').delete().eq('user_id',userId).eq('opportunity_id',id).select('opportunity_id');
-      else if(button.dataset.update){const article=button.closest('article')!;result=await client.from('world_opportunity_activity').update({stage:article.querySelector<HTMLSelectElement>('[data-stage]')!.value,notes:article.querySelector<HTMLTextAreaElement>('[data-notes]')!.value}).eq('user_id',userId).eq('opportunity_id',id).select('opportunity_id');}
+      else if(button.dataset.update){result=await client.from('world_opportunity_activity').update({stage,notes}).eq('user_id',userId).eq('opportunity_id',id).select('opportunity_id');}
       else result=await client.from('world_opportunity_activity').upsert({user_id:userId,opportunity_id:id},{onConflict:'user_id,opportunity_id',ignoreDuplicates:true}).select('opportunity_id');
+      if(owner!==userId)return;
       if(result.error)throw result.error;
-      if(button.dataset.update&&!result.data?.length)throw new Error('No row updated');
-      if(button.dataset.update){const a=activity.get(id);const article=button.closest('article')!;a.stage=article.querySelector<HTMLSelectElement>('[data-stage]')!.value;a.notes=article.querySelector<HTMLTextAreaElement>('[data-notes]')!.value;status(t('Changes saved.','Alterações salvas.'));}
+      if((button.dataset.update||button.dataset.remove)&&!result.data?.length)throw new Error('No row changed');
+      if(button.dataset.update){const a=activity.get(id);if(a){a.stage=stage;a.notes=notes;}status(t('Changes saved.','Alterações salvas.'));}
       else await load();
     }catch{status(t('Could not save changes. Sign in again or try later.','Não foi possível salvar. Entre novamente ou tente depois.'),true);}finally{button.disabled=false;}
   });
