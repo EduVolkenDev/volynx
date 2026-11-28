@@ -1432,15 +1432,16 @@
 
       if (exportQr.getRawData) {
         const blob = await exportQr.getRawData(extension);
+        if (!blob?.size) throw new Error("Empty QR export");
         if (blob) {
           saveBlob(blob, `${fileNameForState(state)}.${extension}`);
           incrementUsage();
           if (window.VxLab) {
-            await window.VxLab.recordUsage?.("qr-gen", "export", "completed", {
+            await Promise.resolve(window.VxLab.recordUsage?.("qr-gen", "export", "completed", {
               quantity: 1,
               output_bytes: blob.size,
               metadata: { format: extension, size, paid_with_vx: Boolean(exportOptions.vxCost) },
-            });
+            })).catch(error => console.warn("[qrgen] usage logging failed", error));
             VxLab.recordEvent("qr-gen", "export", exportOptions.vxCost ? `${extension.toUpperCase()} exported via VX` : `${extension.toUpperCase()} exported`);
             VxLab.savePreset("qr-gen", {
               mode: state.mode,
@@ -1463,10 +1464,10 @@
       await exportQr.download({ name: fileNameForState(state), extension });
       incrementUsage();
       if (window.VxLab) {
-        await window.VxLab.recordUsage?.("qr-gen", "export", "completed", {
+        await Promise.resolve(window.VxLab.recordUsage?.("qr-gen", "export", "completed", {
           quantity: 1,
           metadata: { format: extension, size, paid_with_vx: Boolean(exportOptions.vxCost) },
-        });
+        })).catch(error => console.warn("[qrgen] usage logging failed", error));
         VxLab.recordEvent("qr-gen", "export", exportOptions.vxCost ? `${extension.toUpperCase()} exported via VX` : `${extension.toUpperCase()} exported`);
         VxLab.savePreset("qr-gen", {
           mode: state.mode,
@@ -1484,7 +1485,7 @@
       showExportSuccess();
     } catch (err) {
       console.error("[qrgen] export failed", err);
-      setMessage("Could not export this QR. Try PNG standard or simplify the design.", "err");
+      setMessage(getLang() === "pt" ? "Não foi possível exportar este QR. Tente PNG padrão ou simplifique o design." : "Could not export this QR. Try PNG standard or simplify the design.", "err", false);
     } finally {
       if (btn) {
         btn.disabled = false;
