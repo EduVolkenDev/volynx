@@ -19,3 +19,7 @@ test('compensation distinguishes undisclosed, zero and one-sided ranges',()=>{
  assert.equal(salaryLabel({...base,salary_max:2500}),'Up to £25 / hour');
  assert.equal(salaryLabel(base,'pt-BR'),'Remuneração não informada');
 });
+
+test('fractional hourly compensation is not rounded',()=>{
+ assert.equal(salaryLabel({salary_min:1250,salary_max:1299,currency:'GBP',salary_period:'hour'}),'£12.50 – £12.99 / hour');
+});
