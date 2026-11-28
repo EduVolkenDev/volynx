@@ -4,7 +4,7 @@ import { test } from "node:test";
 import vm from "node:vm";
 
 const source = readFileSync(new URL("../public/scripts/qrgen-editor.js", import.meta.url), "utf8");
-function editor({ storageFails = false, responseFails = false, denied = false, emptyBlob = false, usageFails = false } = {}) {
+function editor({ storageFails = false, responseFails = false, denied = false, emptyBlob = false, usageFails = false, metadataFails = false } = {}) {
   const values = new Map();
   const fields = new Map();
   const downloads = [];
@@ -53,6 +53,7 @@ function editor({ storageFails = false, responseFails = false, denied = false, e
     },
   };
   if (usageFails) context.VxLab = { recordUsage: async () => { throw new Error('Telemetry offline'); }, recordEvent() {}, savePreset() {} };
+  if (metadataFails) context.VxLab = { recordEvent: async () => { throw new Error('Metadata offline'); } };
   context.window = context;
   vm.runInNewContext(source.replace("window.VxQRGenProduct = {", `window.testEditor = {
     saveProject, applyState, getState, exportFinal, requestPremiumExport, exportQrFile,
@@ -136,6 +137,13 @@ test("telemetry rejection does not invalidate a completed export", async () => {
   const e = editor({ usageFails: true });
   e.fields.get("qgExportFormat").value = "png";
   await e.api.exportQrFile(e.api.getState());
+  assert.equal(e.downloads.length, 1);
+  assert.equal(e.fields.get("qgMessage").dataset.kind, "ok");
+});
+
+test("premium export succeeds even when metadata logging rejects", async () => {
+  const e = editor({ metadataFails: true });
+  assert.equal(await e.api.requestPremiumExport(e.api.getState()), true);
   assert.equal(e.downloads.length, 1);
   assert.equal(e.fields.get("qgMessage").dataset.kind, "ok");
 });
