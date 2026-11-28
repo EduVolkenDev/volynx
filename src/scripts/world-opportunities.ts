@@ -154,6 +154,8 @@ async function init() {
       for(const key of ['salary_min','salary_max'])payload[key]=payload[key]===''?null:Math.round(Number(payload[key])*100);
       payload.source_published_at=payload.source_published_at||null;
       for(const key of ['last_checked_at','expires_at'])payload[key]=new Date(payload[key]).toISOString();
+      if(['salary_min','salary_max'].some(key=>payload[key]!==null&&(!Number.isSafeInteger(payload[key])||payload[key]<0)))throw new Error(t('Enter a valid non-negative compensation amount.','Informe uma remuneração válida e não negativa.'));
+      if(payload.salary_min!==null&&payload.salary_max!==null&&payload.salary_min>payload.salary_max)throw new Error(t('Maximum compensation must not be below the minimum.','A remuneração máxima não pode ser inferior à mínima.'));
       if(Date.parse(payload.expires_at)<=Date.parse(payload.last_checked_at))throw new Error(t('Expiration must follow the last check.','A validade deve ser posterior à última conferência.'));
       if(payload.status==='published'&&Date.parse(payload.expires_at)<=Date.now())throw new Error(t('Choose a future expiration before publishing.','Escolha uma validade futura antes de publicar.'));
       const id=String(f.get('id')||'');
